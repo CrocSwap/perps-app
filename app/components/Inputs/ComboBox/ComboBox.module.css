@@ -1,0 +1,77 @@
+
+
+.comboBoxContainer {
+  position: relative;
+  user-select: none;
+  display: inline-block;
+  height: auto !important;
+}
+
+.comboBoxContainer > div {
+    height: auto;
+}
+
+.comboBoxValueContainer {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  padding: .25rem;
+  border-radius: .25rem;
+  cursor: pointer;
+}
+
+.comboBoxValueContainer svg{
+    fill: var(--text2);
+}
+
+.comboBoxValue {
+  white-space: nowrap;
+  min-width: 2rem;
+  text-align: center;
+  color: var(--text1);
+}
+
+.comboBoxIcon {
+  transition: ease-in-out .2s;
+  transform: rotate(0deg);
+}
+
+.comboBoxIconOpen {
+  transform: rotate(180deg);
+}
+
+
+.comboBoxOptionsWrapper {
+  background: var(--dark4);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  border-radius: .25rem;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  border-radius: .25rem;
+}
+
+.comboBoxOptionsWrapper > div {
+    transition: ease-in-out .2s;
+  padding: .25rem;
+}
+
+.comboBoxOptionsWrapper > div:hover {
+  background: var(--dark3);
+}
+
+.comboBoxOptionSelected {
+  color: var(--text1);
+}
+
+
+.bigVal .comboBoxValue{
+  font-size: 1.2rem;
+}
+
+

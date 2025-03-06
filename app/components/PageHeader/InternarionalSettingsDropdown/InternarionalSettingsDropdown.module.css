@@ -5,10 +5,10 @@
   position: absolute;
   top: 56px;
   right: 0;
-  width: 112px;
   height: auto;
   display: flex;
-  padding: 4px 0px;
+  padding: 4px 10px;
+
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
@@ -28,5 +28,32 @@
   height: 257px;
 
   z-index: var(--navbar-dropdown-zindex);
+  font-family: var(--font-family-main);
+  font-size: .8rem;
 
 }
+
+.intSettingItem{
+    width: 100%;
+    display: flex;
+    align-items: start;
+    justify-content: left;
+    padding-left: 1rem;
+    color: var(--text2);
+    cursor: pointer;
+}
+
+.internationalSettingHeader{
+  color: var(--accent1);
+  white-space: nowrap;
+  padding-left: .5rem;
+}
+
+
+.intSettingItem.selected{
+    color: var(--text1);
+    cursor: default;
+  }
+
+
+  

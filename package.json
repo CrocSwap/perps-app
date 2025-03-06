@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "node scripts/copy-tv.js",
     "build": "react-router build && node netlify/prepare.js",
+    "predev": "node scripts/copy-tv.js",
     "dev": "cross-env NODE_ENV=development node ./dev-server.js",
+    "prestart": "node scripts/copy-tv.js",
     "start": "netlify serve",
     "typecheck": "react-router typegen && tsc"
   },
@@ -28,6 +31,7 @@
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
     "cross-env": "^7.0.3",
+    "fs-extra": "^11.3.0",
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
     "vite-tsconfig-paths": "^5.1.4"

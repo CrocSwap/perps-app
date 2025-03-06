@@ -7,3 +7,11 @@
 
 # Netlify
 .netlify
+
+
+# Tradingview
+/public/tv/charting_library
+/public/tv/datafeeds
+
+/public/tradingview/charting_library
+/public/tradingview/datafeeds
