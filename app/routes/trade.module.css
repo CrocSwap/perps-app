@@ -16,11 +16,16 @@
 }
 
 .containerTop {
+  transition: all 0.2s ease;
   grid-template-columns: 1fr var(--order-book-width-desktop-small) var(
       --trade-module-width-desktop-small
     );
   gap: var(--main-gap);
   /* background: var(--dark2); */
+}
+
+.containerTop.orderBookLarge{
+  grid-template-columns: 1fr var(--order-book-width-desktop-large-doubled) var(--trade-module-width-desktop-large);
 }
 /* .containerTop div{
     background: var(--dark2);
@@ -81,52 +86,36 @@
 }
 
 /* THIS IS JUST FOR DEVELOPMENT. REMOVE THIS AND THE FOLDER (TEMPIMAGES) ONCE WE HAVE THE ACTUAL COMPONENTS */
-.watchlist {
-  background: url('./tempImages/watchlist.png') !important;
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(2px);
-}
-.symbolInfo {
-  background: url('./tempImages/symboilInfo.png') !important;
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(2px);
-}
-.orderBook {
-  background: url('./tempImages/orderBook.png') !important;
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(2px);
-}
-.tradeModules {
-  background: url('./tempImages/orderInput.png') !important;
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(2px);
-}
 
-.chart {
-  background: url('./tempImages/chart.png') !important;
+.tradeModules {
+  /* background: url('./tempImages/orderInput.png') !important;
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
-  filter: blur(2px);
+  filter: blur(2px); */
 }
 
 /* -----------------------END OF TEMP CSS CODE */
+.chart{
+  max-height: 61vh;
+  overflow: hidden;
+}
+
+
+
+.orderBook{
+  align-items: flex-start;
+  overflow: hidden;
+}
+
 @media only screen and (min-width: 1920px) {
   .containerTop {
     grid-template-columns: 1fr var(--order-book-width-desktop-large) var(
         --trade-module-width-desktop-large
       );
   }
-  .containerBottom {
-    grid-template-columns: 1fr var(--trade-module-width-desktop-large);
+  .containerTop.orderBookLarge{
+    grid-template-columns: 1fr var(--order-book-width-desktop-large-doubled) var(--trade-module-width-desktop-large);
   }
 }
 
@@ -141,3 +130,20 @@
     display: none;
   }
 }
+
+
+.wsUrlSelector{
+  position: fixed;
+  top: 3rem;
+  right: 2rem;
+  font-size: .8rem;
+  z-index: 2;
+  font-family: var(--font-family-main);
+  background-color: var(--dark2);
+  border-radius: .4rem;
+  border: 1px solid rgba(255, 255, 255, .2);
+  padding: 0 1.2rem;
+  right: 1rem;
+}
+
+

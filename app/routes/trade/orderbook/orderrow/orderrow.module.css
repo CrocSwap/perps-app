@@ -1,0 +1,111 @@
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: .2;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes orderRowEffect{
+    0%{
+        opacity: 0;
+    }
+    30%{
+        opacity: .15;
+    }
+    100%{
+        opacity: 0;
+    }
+}
+.orderRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    font-size: .8rem;
+    /* animation: fadeIn 0.1s ease-in-out; */
+    padding: 0 .5rem;
+    cursor: pointer;
+}
+
+
+
+.orderRow.buy .orderRowPrice {
+    color: var(--green);
+}
+
+.orderRow.sell .orderRowPrice {
+    color: var(--red);
+}
+
+.orderRow .ratio{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .2;
+}
+
+.orderRowPrice, .orderRowSize, .orderRowTotal{
+    flex: 1 1;
+}
+
+.orderRowTotal{
+    text-align: right;
+}
+
+.orderRowSize{
+    text-align: center;
+}
+
+.orderRow.buy .ratio {
+    background-color: var(--green);
+}
+
+.orderRow.sell .ratio {
+    background-color: var(--red);
+}
+
+.orderRow .fadeOverlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    display: block;
+    animation: orderRowEffect .5s ease-in-out forwards;
+}
+
+.orderRow.buy .fadeOverlay {
+    background-color: var(--green);
+}
+
+.orderRow.sell .fadeOverlay{
+    background-color: var(--red);
+}
+
+.userOrderIndicator{
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 100%;
+    background-color: white;
+}

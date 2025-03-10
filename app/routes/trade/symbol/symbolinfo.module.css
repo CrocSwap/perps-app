@@ -1,0 +1,22 @@
+.symbolInfoContainer {
+    width: 100%;
+    font-family: var(--font-family-main);
+    font-size: .8rem;
+    display: flex;
+    align-items: center;
+}
+
+.symbolInfoContainer div{
+    height: auto !important;
+}
+
+.symbolSelector {
+    display: inline-block;
+    margin-left: 2rem !important;
+}
+
+.symbolInfoFieldsWrapper {
+    display: inline-block;
+    /* white-space: nowrap;
+    overflow: hidden; */
+}

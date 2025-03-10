@@ -1,0 +1,51 @@
+.symbolInfoField {
+    display: inline-block;
+    margin-left: 3rem;
+}
+
+
+@keyframes changePositive{
+    0% {
+        color: var(--green);
+    }
+    100% {
+        color: var(--text1);
+    }
+}
+
+@keyframes changeNegative{
+    0% {
+        color: var(--red);
+    }
+    100% {
+        color: var(--text1);
+    }
+}
+
+.symbolInfoFieldLabel {
+    color: var(--text2);
+    padding-right: 1rem;
+}
+
+.symbolInfoFieldValue {
+
+    color: var(--text1);
+    margin-top: .2rem;
+}
+
+.symbolInfoFieldValue.positiveAnimation {
+    animation: changePositive 1s ease-in-out;
+}
+
+.symbolInfoFieldValue.negativeAnimation {
+    animation: changeNegative 1s ease-in-out;
+}
+
+.symbolInfoFieldValue.positive {
+    color: var(--green);
+}
+
+.symbolInfoFieldValue.negative {
+    color: var(--red);
+}
+

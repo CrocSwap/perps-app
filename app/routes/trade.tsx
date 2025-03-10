@@ -1,9 +1,24 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
-import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
+import { WebSocketProvider } from '~/contexts/WebSocketContext';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
-
+import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
+import OrderBook from './trade/orderbook/orderbook';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import SymbolInfo from './trade/symbol/symbolinfo';
+import OrderBookSection from './trade/orderbook/orderbooksection';
+import TradingViewChart from './chart/chart';
+import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
+import { useAppSettings } from '~/stores/AppSettingsStore';
+import WatchList from './trade/watchlist/watchlist';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import { useDebugStore } from '~/stores/DebugStore';
+import { wsUrls } from '~/utils/Constants';
+import { getLS } from '~/utils/AppUtils';
+import { useWsObserver } from '~/hooks/useWsObserver';
+import TradeRouteHandler from './trade/traderoutehandler';
+import TradeModules from './trade/trademodules/trademodules';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -15,40 +30,69 @@ export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
 }
 
+// const wsUrl = 'wss://api.hyperliquid.xyz/ws';
+// const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
+
 export default function Trade({ loaderData }: Route.ComponentProps) {
-    // const nav = (
-    //      {/* Example nav links to each child route */}
-    //   <nav style={{ marginBottom: '1rem' }}>
-    //   <Link to='market' style={{ marginRight: '1rem' }}>
-    //     Market
-    //   </Link>
-    //   <Link to='limit' style={{ marginRight: '1rem' }}>
-    //     Limit
-    //   </Link>
-    //   <Link to='pro' style={{ marginRight: '1rem' }}>
-    //     Pro
-    //   </Link>
-    // </nav>
 
-    const { marketId } = useParams<{ marketId: string }>(); // Get marketId from URL
+  const {symbol} = useTradeDataStore();
+  const { orderBookMode } = useAppSettings();
 
-    useEffect(() => {
-        marketId && console.log(marketId); // Logs the ticker from the URL
-    }, [marketId]);
 
-    // )
-    return (
-        <div className={styles.container}>
-            <section className={styles.containerTop}>
-                <div className={styles.containerTopLeft}>
-                    <div className={styles.watchlist}></div>
-                    <div className={styles.symbolInfo}></div>
-                    <div className={styles.chart}></div>
-                </div>
+  const { wsUrl, setWsUrl } = useDebugStore();
 
-                <div className={styles.orderBook}></div>
 
-                <div className={styles.tradeModules}></div>
+    
+  
+  // const nav = (
+  //      {/* Example nav links to each child route */}
+  //   <nav style={{ marginBottom: '1rem' }}>
+  //   <Link to='market' style={{ marginRight: '1rem' }}>
+  //     Market
+  //   </Link>
+  //   <Link to='limit' style={{ marginRight: '1rem' }}>
+  //     Limit
+  //   </Link>
+  //   <Link to='pro' style={{ marginRight: '1rem' }}>
+  //     Pro
+  //   </Link>
+  // </nav>
+ 
+  // )
+
+
+  return (
+<>
+<div className={styles.wsUrlSelector}>
+<ComboBox
+  value={wsUrl}
+  options={wsUrls}
+  onChange={(value) => setWsUrl(value)}
+/>
+</div>
+    
+    <WebSocketProvider url={wsUrl}>
+
+      <TradeRouteHandler />
+
+      {
+        symbol && symbol.length > 0 && (
+
+<div className={styles.container}>
+      <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
+        <div className={styles.containerTopLeft}>
+          <div className={styles.watchlist}><WatchList/></div>
+          <div className={styles.symbolInfo}>
+
+            <SymbolInfo />
+
+
+          </div>
+          <div id='chartSection' className={styles.chart}><TradingViewWrapper /></div>
+        </div>
+
+        <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
+              <div className={styles.tradeModules}><TradeModules /></div>
             </section>
             <section className={styles.containerBottom}>
                 <div className={styles.table}>table</div>
@@ -58,9 +102,15 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                         setIsUserConnected={() => console.log('connected')}
                     />
                 </div>
-            </section>
-            {/* Child routes (market, limit, pro) appear here */}
-            {/* <Outlet /> */}
-        </div>
-    );
+             </section>
+      {/* Child routes (market, limit, pro) appear here */}
+      {/* <Outlet /> */}
+    </div>
+          
+        )
+      }
+    
+    </WebSocketProvider>
+    </>
+  );
 }

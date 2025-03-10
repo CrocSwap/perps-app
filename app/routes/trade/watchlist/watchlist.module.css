@@ -1,0 +1,37 @@
+.watchListContainer{
+    width: 100%;
+    display: flex;
+    padding-left: 2rem;
+    align-items: center;
+    font-family: var(--font-family-main);
+}
+
+.favIcon{
+    
+    color: var(--red);
+    margin-right: 1rem;
+}
+
+.watchListToolbarIcon{
+    cursor: pointer;
+    color: var(--text2);
+    /* padding: .5rem; */
+    margin-left: .5rem;
+}
+
+.watchListToolbarIcon.active{
+    color: var(--text1);
+}
+
+.percentIcon{
+    margin-right: 1rem;
+}
+
+
+.watchListNodesWrapper{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+}

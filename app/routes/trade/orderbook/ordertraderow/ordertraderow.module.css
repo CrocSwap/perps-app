@@ -1,0 +1,56 @@
+
+
+@keyframes fadeIn{
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}
+
+.orderTradeRow{
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    font-size: .8rem;
+    padding: 0 .5rem;
+    /* animation: fadeIn .2s ease-in-out; */
+}
+
+.orderTradeTime{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+}
+
+.orderTradeTime svg{
+    color: var(--accent1);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+
+
+.buy .orderTradePrice{
+    color: var(--green);
+}
+
+.sell .orderTradePrice{
+    color: var(--red);
+}
+
+
+div[class*="inverse"] .buy .orderTradePrice{
+    color: var(--red);
+}
+
+div[class*="inverse"] .sell .orderTradePrice{
+    color: var(--green);
+}

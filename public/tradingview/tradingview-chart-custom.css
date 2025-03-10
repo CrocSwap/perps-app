@@ -1,0 +1,13 @@
+:root:not(.theme-dark) {
+  /* for light mode */
+} 
+
+.theme-dark:root {
+/*     --tv-color-platform-background: #0e0e14;
+    --tv-color-pane-background: #0e0e14;
+    --themed-color-pane-bg: #0e0e14;
+    --tv-color-popup-background:#0e0e14;
+    --themed-color-popup-background:#0e0e14;
+    --themed-color-chart-page-bg:#0e0e14; */
+    
+}

@@ -1,0 +1,36 @@
+.orderBookBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+}
+
+.orderBookContainer {
+    width: 100%;
+    font-size: .8rem;
+}
+
+
+.orderBookBlockMid{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: .25rem;
+    background-color: var(--dark4);
+    margin: .25rem 0;
+    padding: 0 1rem;
+}
+
+.orderBookHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: .25rem;
+    margin: .25rem 0;
+    padding: 0 .5rem;
+    color: var(--text3);
+}
+
