@@ -17,6 +17,5 @@
 
 .symbolInfoFieldsWrapper {
     display: inline-block;
-    /* white-space: nowrap;
-    overflow: hidden; */
+    white-space: nowrap;
 }
