@@ -6,7 +6,7 @@ import type {
   SubscribeBarsCallback,
 } from "~/tv/charting_library/charting_library";
 import { getHistoricalData } from "./candleDataCache";
-import { mapResolutionToInterval } from "../utils";
+import { mapResolutionToInterval } from "./utils/utils";
 import { useWsObserver } from "~/hooks/useWsObserver";
 import { processWSCandleMessage } from "./processChartData";
 import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";

@@ -7,11 +7,11 @@ import {
 } from '~/tv/charting_library';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
-import { useWebSocketContext } from './WebSocketContext';
 import { useWsObserver } from '~/hooks/useWsObserver';
-import { processWSCandleMessage } from '~/routes/chart/data/processChartData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { priceFormatterFactory } from "~/routes/chart/utils";
+import { loadChartDrawState } from '~/routes/chart/data/utils/chartStorage';
+import { useChartEvents } from '~/routes/chart/hook/useChartEvents';
+import { priceFormatterFactory } from '~/routes/chart/data/utils/utils';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -42,6 +42,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { subscribe } = useWsObserver();
     const { symbol } = useTradeDataStore();
+    
+    useChartEvents(chart);
 
     const defaultProps: Omit<ChartContainerProps, 'container'> = {
         symbolName: 'BTC',
@@ -55,22 +57,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         autosize: true,
         studiesOverrides: {},
     };
-
-    // const changeSubscription = (payload: any) => {
-    //   subscribe('candle',
-    //     {payload: payload,
-    //     handler: candleDataHandler,
-    //     single: true
-    //   })
-    // }
-
-    // useEffect(() => {
-    //   changeSubscription({
-    //     coin: defaultProps.symbolName,
-    //     // interval: defaultProps.interval,
-    //     interval: "1d",
-    //   });
-    // }, [defaultProps.symbolName])
 
     useEffect(() => {
         const tvWidget = new widget({
@@ -90,13 +76,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             overrides: {
                 volumePaneSize: 'medium',
             },
-            /*   overrides: {
-        //  "paneProperties.background": "rgba(14,14,20, 1)",
-        //  "paneProperties.backgroundType": "solid",
-        "mainSeriesProperties.priceAxisProperties.log" : false,
-        // "mainSeriesProperties.priceAxisProperties.log" : "false",
-
-      }, */
             custom_css_url: './../tradingview-overrides.css',
             loading_screen: { backgroundColor: '#0e0e14' },
             // load_last_chart:false,
@@ -117,7 +96,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             tvWidget.applyOverrides({
                 'paneProperties.background': '#0e0e14',
                 'paneProperties.backgroundType': 'solid',
-                // "paneProperties.gridLinesMode": "none"
             });
 
             /**
@@ -135,6 +113,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 priceScale.setMode(0);
             }
             setChart(tvWidget);
+
+            loadChartDrawState(tvWidget);
         });
 
         return () => tvWidget.remove();

@@ -1,4 +1,4 @@
-import { mapResolutionToInterval, resolutionToSeconds } from "../utils";
+import { mapResolutionToInterval, resolutionToSeconds } from "./utils/utils";
 import { fetchCandles } from "./fetchCandleData";
 
 const dataCache = new Map<string, any[]>();
