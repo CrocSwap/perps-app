@@ -14,6 +14,7 @@ import {
 } from '~/routes/chart/data/utils/chartStorage';
 import {
     priceFormatterFactory,
+    reverseColors,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
 import {
@@ -24,6 +25,7 @@ import {
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -54,7 +56,11 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const { subscribe } = useWsObserver();
     const { symbol } = useTradeDataStore();
 
+    const { isInverseColor } = useAppSettings();
+
     const [chartState, setChartState] = useState<ChartLayout | null>();
+
+    const [isInitialColor, setIsInitialColor] = useState<boolean>(false);
 
     useEffect(() => {
         const res = getChartLayout();
@@ -157,6 +163,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             }
         };
     }, [chartState]);
+
+    useEffect(() => {
+        if (chart) {
+            reverseColors(chart, isInverseColor, isInitialColor);
+            setIsInitialColor(true);
+        }
+    }, [isInverseColor, chart]);
 
     useEffect(() => {
         if (chart) {
