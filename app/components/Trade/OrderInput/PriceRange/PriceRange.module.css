@@ -1,0 +1,42 @@
+.container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.label {
+    color: var(--text2, #bcbcc4);
+
+    font-size: var(--font-size-s, 12px);
+    font-weight: 400;
+}
+
+.inputsContainer{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 32px 1fr;
+    gap: 8px;
+    align-items: center;
+}
+.inputsContainer input, .totalOrdersInput{
+    width: 100%;
+    display: flex;
+height: 32px;
+padding: 0px 8px;
+justify-content: space-between;
+align-items: center;
+
+border-radius: var(--half-border-radius, 8px);
+background: var(--dark3, #1C1C22);
+font-size: var(--font-size-s, 12px);
+color: var(--text1);
+
+outline: none;
+border: none;
+}
+
+.seperator{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

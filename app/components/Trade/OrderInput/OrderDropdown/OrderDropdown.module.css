@@ -1,0 +1,113 @@
+.dropdownContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+  }
+  
+  .dropdownToggle {
+    display: flex;
+    height: 100%;
+    padding: 0px 4px 0px 8px;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--dark3, #1C1C22);
+    border-radius: 8px;
+    border: none;
+    color: var(--text1, #F0F0F8);
+    font-family: var(--font-family-main, "Lato", sans-serif);
+    font-size: var(--font-size-s, 12px);
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+    flex-shrink: 0;
+    gap: 8px;
+  }
+  
+  .dropdownToggle.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .selectedText {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+.dropdownToggle svg{
+    color: var(--text2);
+}
+  
+.dropdownToggle:hover svg{
+    color: var(--text1)
+}
+  .dropdownMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    margin-top: 4px;
+    padding: 0;
+    background: var(--dark3, #1C1C22);
+    border-radius: 4px;
+    list-style: none;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    padding-bottom: 8px;
+  }
+  
+  .dropdownItem {
+    display: flex;
+    height: 15px;
+    padding: 0 8px;
+    align-items: center;
+    cursor: pointer;
+    color: var(--text2, #BCBCC4);
+    font-family: var(--font-family-main, "Lato", sans-serif);
+    font-size: var(--font-size-s, 12px);
+    font-weight: 400;
+    transition: background-color 0.15s ease;
+  }
+  
+  .dropdownItem.selected {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text1, #F0F0F8);
+  }
+  
+  .dropdownItem:hover {
+    color: var(--text1);
+    background: var(--dark2)
+  }
+  
+  .noOptions {
+    padding: 8px;
+    text-align: center;
+    color: var(---text2, #BCBCC4);
+    font-family: var(--Font-Family-Main, "Lato", sans-serif);
+    font-size: var(--Font-Size-Font-S, 12px);
+    font-style: italic;
+  }
+  
+  .dropdownMenu::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .dropdownMenu::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .dropdownMenu::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+.orderDropdownWrapper {
+    display: flex;
+    align-items: center;
+  }
+  

@@ -1,0 +1,157 @@
+.positionSliderContainer {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    gap: 8px;
+
+    padding-left: 4px;
+  }
+  .containerTitle{
+    color: var(--text2, #BCBCC4);
+
+font-family: var(--font-family-main, "Lexend Deca");
+font-size: var(--font-size-s, 12px);
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+  }
+  
+  .sliderWithValue {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 16px;
+  }
+  
+  .sliderContainer {
+    flex: 1;
+    position: relative;
+   
+  }
+  
+  .sliderTrack {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    /* margin: 20px 0 30px 0;  */
+  }
+  
+  .sliderBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dark4);
+  }
+  
+  .sliderActive {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transition: width 0.2s ease;;
+    background: var(--accent1);
+  }
+  
+  .sliderMarker {
+    position: absolute;
+    width: 3px;
+    height: 8px;
+    border-radius: 8px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid ;
+    z-index: 2;
+    background: transparent;
+
+    
+  }
+
+  .sliderMarker.active{
+    background: var(--accent1);
+  }
+  
+  .sliderMarkerCurrent{
+    display: none;
+  }
+  .sliderKnob {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    top: 50%;
+    
+    transform: translate(-10%, -50%);
+    border: 2px solid var(--accent1);
+    background-color: transparent; 
+    z-index: 3;
+    cursor: grab;
+    transition: left 0.2s ease;
+    outline: none; 
+
+    
+  }
+  .sliderKnobTransparent{
+    border: 2px solid var(--dark4);
+    background: var(--dark4);
+  }
+  
+  .sliderKnob:active {
+    cursor: grabbing;
+    width: 0;
+    height: 0;
+  }
+  
+  .labelContainer {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    margin-top: -25px; 
+  }
+  
+  .valueLabel {
+    position: absolute;
+    transform: translateX(-50%);
+    font-size: var(--font-size-xs, 10px);
+    white-space: nowrap;
+    text-align: center;
+    cursor: pointer;
+    padding: 5px;
+  }
+  
+  .valueLabel:hover {
+    color: var(--text1) !important;
+  }
+  
+  .valueDisplay {
+    position: relative;
+    width: 50px;  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--dark3);
+    border-radius: 8px;
+    padding: 0 8px;
+   
+  }
+  
+  .valueInput {
+   width: 100%;
+    height: 32px;
+    background-color: transparent;
+    border: none;
+    color: var(--text1);
+    font-size: var(--font-size-s, 12px);
+    font-weight: 400;
+    text-align: center;
+    outline: none;
+  }
+  
+  .valueSuffix {
+    font-size: var(--font-size-s, 12px);
+
+  }

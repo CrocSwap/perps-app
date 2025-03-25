@@ -1,0 +1,14 @@
+.chasePriceContainer{
+    width: 100%;
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+}
+.chasePriceContainer h3{
+    color: var(--text2, #BCBCC4);
+
+font-size: var(--font-size-s, 12px);
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}

@@ -1,0 +1,83 @@
+.mainContainer{
+    display: flex;
+width: 100%;
+height: 100%;
+padding: 16px 8px 4px 8px;
+flex-direction: column;
+align-items: flex-start;
+justify-content: space-between;
+gap: 8px;
+flex-shrink: 0;
+
+border-radius: var(--main-border-radius, 16px);
+background: var(--dark2, #111117);
+
+}
+
+.mainContent{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    gap: 8px;
+    overflow-y: scroll;
+    /* subtract height of placeorderbuttons.tsx */
+    height: calc(100% - 125px);
+}
+.mainContent::-webkit-scrollbar {
+    display: none;
+}
+.orderTypeDropdownContainer{
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    height: 32px;
+}
+.inputDetailsDataContainer{
+    width: 100%;
+    display: flex;
+padding: 8px 0px;
+flex-direction: column;
+align-items: flex-start;
+gap: 2px;
+align-self: stretch;
+
+border-radius: var(--half-border-radius, 8px);
+border: 1px solid var(--dark4, #27272C);
+
+}
+.inputDetailsDataContent{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--font-size-s, 12px);
+    padding: 0 8px;
+    height: 16px;
+
+    
+}
+.inputDetailsLabel{
+  
+    color: var(--text2);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+
+}
+.inputDetailValue{
+    color: var(--text1)
+}
+
+
+@media (min-width: 1600px) {
+    .mainContainer{
+        padding: 16px 16px 4px 16px;
+
+    }
+
+}

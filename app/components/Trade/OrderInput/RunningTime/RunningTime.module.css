@@ -1,0 +1,48 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.label {
+    color: var(--text2, #bcbcc4);
+
+    font-size: var(--font-size-s, 12px);
+    font-weight: 400;
+}
+.inputContainer{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.runningPriceMinutes{
+    border-radius: var(--half-border-radius, 8px);
+
+    background-color: var(--dark3);
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.container input{
+    border-radius: var(--half-border-radius, 8px);
+
+    width: 100%;
+    background-color: var(--dark3);
+    outline: none;
+    border: none;
+    text-align: left;
+    color: var(--text1);
+    cursor: pointer;
+    font-size: var(--font-size-s, 12px);
+    padding: 0 8px;
+    height: 32px;
+
+}
+.runningPriceMinutes span{
+    color: var(--text1) !important;
+    font-size: var(--font-size-s, 12px);
+
+}
