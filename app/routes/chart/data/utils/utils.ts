@@ -1,12 +1,14 @@
-import type { ResolutionString } from '~/tv/charting_library';
+import type {
+    IChartingLibraryWidget,
+    ResolutionString,
+} from '~/tv/charting_library';
 
 import type { LibrarySymbolInfo } from '~/tv/charting_library/charting_library';
 
-
 export type ChartLayout = {
-    chartLayout:object,
-    interval:string
-} 
+    chartLayout: object;
+    interval: string;
+};
 export const mapResolutionToInterval = (resolution: string): string => {
     const mapping: Record<string, string> = {
         '1': '1m',
@@ -66,6 +68,65 @@ export const priceFormatterFactory = (
                 price.toFixed(Math.log10(Number(userPrecision))),
         };
     }
+};
+
+export const reverseColors = (
+    chart: IChartingLibraryWidget,
+    isInverseColor: boolean,
+    isInitialColor: boolean,
+) => {
+    const activeChart = chart.activeChart();
+
+    const styleProps = activeChart.getSeries().chartStyleProperties(1);
+
+    const chartUpColor =
+        !isInverseColor && isInitialColor
+            ? styleProps.downColor
+            : styleProps.upColor;
+    const chartBorderUpColor =
+        !isInverseColor && isInitialColor
+            ? styleProps.borderDownColor
+            : styleProps.borderUpColor;
+    const chartWickUpColor =
+        !isInverseColor && isInitialColor
+            ? styleProps.wickDownColor
+            : styleProps.wickUpColor;
+
+    const chartDownColor =
+        !isInverseColor && isInitialColor
+            ? styleProps.upColor
+            : styleProps.downColor;
+    const chartBorderDownColor =
+        !isInverseColor && isInitialColor
+            ? styleProps.borderUpColor
+            : styleProps.borderDownColor;
+    const chartWickDownColor =
+        !isInverseColor && isInitialColor
+            ? styleProps.wickUpColor
+            : styleProps.wickDownColor;
+
+    const upColor = isInverseColor ? chartDownColor : chartUpColor;
+    const borderUpColor = isInverseColor
+        ? chartBorderDownColor
+        : chartBorderUpColor;
+    const wickUpColor = isInverseColor ? chartWickDownColor : chartWickUpColor;
+
+    const downColor = !isInverseColor ? chartDownColor : chartUpColor;
+    const borderDownColor = !isInverseColor
+        ? chartBorderDownColor
+        : chartBorderUpColor;
+    const wickDownColor = !isInverseColor
+        ? chartWickDownColor
+        : chartWickUpColor;
+
+    chart.applyOverrides({
+        'mainSeriesProperties.candleStyle.upColor': upColor, // Green for bullish candles
+        'mainSeriesProperties.candleStyle.downColor': downColor, // Red for bearish candles
+        'mainSeriesProperties.candleStyle.borderUpColor': borderUpColor,
+        'mainSeriesProperties.candleStyle.borderDownColor': borderDownColor,
+        'mainSeriesProperties.candleStyle.wickUpColor': wickUpColor,
+        'mainSeriesProperties.candleStyle.wickDownColor': wickDownColor,
+    });
 };
 
 export const supportedResolutions = [
