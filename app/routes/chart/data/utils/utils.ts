@@ -29,10 +29,19 @@ export const mapResolutionToInterval = (resolution: string): string => {
 
 export function resolutionToSeconds(resolution: string): number {
     if (resolution === '1D') return 86400;
+    if (resolution === '3D') return 3 * 86400;
     if (resolution === 'W') return 604800;
     if (resolution === 'M') return 2592000;
 
     return Number(resolution);
+}
+
+export function resolutionToSecondsMiliSeconds(resolution: string): number {
+    if (resolution === '1D') return 86400000;
+    if (resolution === 'W') return 604800000;
+    if (resolution === 'M') return 2629746000;
+
+    return Number(resolution) * 60 * 1000;
 }
 
 const calculatePrecision = (price: number) => {

@@ -22,6 +22,11 @@ const symbolList = [
   'XRP',
   'ADA',
   'DOGE',
+  'MELANIA',
+  'HYPE',
+  'HMSTR',
+  'FET',
+  'kPEPE'
 ]
 
 

@@ -61,10 +61,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     }, [])
 
-    useEffect(() => {
+    // useEffect(() => {
 
-      console.log('>>> user orders', userOrders);
-    }, [userOrders])
+    //   console.log('>>> user orders', userOrders);
+    // }, [userOrders])
 
     const userBuySlots:Set<string> = useMemo(() => {
       if(!filledResolution.current){
@@ -120,10 +120,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       return slots;
     }, [userSymbolOrders, filledResolution.current, JSON.stringify(sellSlots)])
 
-    useEffect(() => {
+    // useEffect(() => {
 
-      console.log('>>> user symbol orders', userSymbolOrders);
-    }, [userSymbolOrders])
+    //   console.log('>>> user symbol orders', userSymbolOrders);
+    // }, [userSymbolOrders])
 
     const changeSubscription = (payload: any) => {
       subscribe('l2Book', 
