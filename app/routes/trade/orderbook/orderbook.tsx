@@ -43,6 +43,15 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const {userOrders, setUserOrders, userSymbolOrders, addOrderToHistory} = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
+    const lockOrderBookProcessing = useRef(false);
+
+    const orderRowClickListener = useCallback(() => {
+      lockOrderBookProcessing.current = true;
+      setTimeout(() => {
+        lockOrderBookProcessing.current = false;
+      }, 1000);
+    }, [])
+
     const buySlots = useMemo(() => {
       return buys.map((order) => order.px);
     }, [buys])
@@ -133,6 +142,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         handler: (response) => {
           
           if(!isWsEnabledRef.current){
+            return;
+          }
+
+          if(lockOrderBookProcessing.current){
             return;
           }
 
@@ -274,7 +287,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
           {sells.slice(0, orderCount).reverse().map((order, index) => (
             <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} 
             resolution={filledResolution.current}
-            userSlots={userSellSlots} />
+            userSlots={userSellSlots} 
+            orderRowClickListener={orderRowClickListener} />
           ))}
     </div>
 
@@ -291,7 +305,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
           {buys.slice(0, orderCount).map((order, index) => (
             <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} 
             resolution={filledResolution.current}
-            userSlots={userBuySlots} />
+            userSlots={userBuySlots}
+            orderRowClickListener={orderRowClickListener} />
           ))} 
     </div>
     </>

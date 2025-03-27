@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './OrderInput.module.css';
 import OrderDropdown from './OrderDropdown/OrderDropdown';
 import LeverageSlider from './LeverageSlider/LeverageSlider';
@@ -14,6 +14,8 @@ import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PriceRange from './PriceRange/PriceRange';
 import PriceDistribution from './PriceDistribution/PriceDistribution';
 import RunningTime from './RunningTime/RunningTime';
+import { useTradeModuleStore } from '~/stores/TradeModuleStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 export interface OrderTypeOption {
     value: string;
@@ -71,6 +73,18 @@ export default function OrderInput() {
     const [priceRangeMax, setPriceRangeMax] = useState('');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('');
 
+    const {tradeSlot, setTradeSlot} = useTradeModuleStore();
+    const {symbol} = useTradeDataStore();
+
+    useEffect(() => {
+        setTradeSlot(null);
+    }, [symbol])
+
+    useEffect(() => {
+        setSize(tradeSlot?.amount.toString() || '');
+        setPrice(tradeSlot?.price.toString() || '');
+    }, [tradeSlot])
+
     const showPriceInputComponent = [
         'limit',
         'stop_limit',
@@ -94,7 +108,7 @@ export default function OrderInput() {
         {
             label: 'Current Position',
             tooltipLabel: 'current position',
-            value: '0.000 ETH',
+            value: `0.000 ${symbol}`,
         },
     ];
 

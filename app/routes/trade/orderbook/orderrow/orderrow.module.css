@@ -28,6 +28,30 @@
         opacity: 0;
     }
 }
+
+@keyframes orderClickEffect{
+    0%{
+        opacity: 0;
+        width: 0;
+    }
+    50%{
+        opacity: .4;
+        width: 100%;
+    }
+    60%{
+        opacity: .05;
+        width: 100%;
+    }
+    80%{
+        opacity: .45;
+        width: 100%;
+    }
+    100%{
+        opacity: 0;
+        width: 0;
+    }
+}
+
 .orderRow {
     display: flex;
     flex-direction: row;
@@ -83,8 +107,8 @@
 .orderRow .fadeOverlay{
     position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
     height: 100%;
     opacity: 0;
     display: block;
@@ -108,4 +132,25 @@
     height: 4px;
     border-radius: 100%;
     background-color: white;
+}
+
+.clickEffect{
+    animation: orderClickEffect .5s ease-in-out forwards;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+.buy .clickEffect{
+    background-color: var(--green);
+    box-shadow: 0 0 10px 0 color-mix(in srgb, var(--green) 70%, white);
+}
+
+.sell .clickEffect{
+    background-color: var(--red);
+    box-shadow: 0 0 10px 0 color-mix(in srgb, var(--red) 70%, white);
 }
