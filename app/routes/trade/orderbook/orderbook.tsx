@@ -43,6 +43,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const {userOrders, setUserOrders, userSymbolOrders, addOrderToHistory} = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
+    const addressRef = useRef<string>(debugWallet.address);
+    addressRef.current = debugWallet.address;
+
     const buySlots = useMemo(() => {
       return buys.map((order) => order.px);
     }, [buys])
@@ -162,23 +165,26 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
 
     const fetchOpenOrders = useCallback(() => {
-      
+      console.log('>>> fetching ', debugWallet.label)
       fetchData({
         type: ApiEndpoints.OPEN_ORDERS,
         payload: {
           user: debugWallet.address
         },
-        handler: (payload) => {
+        handler: (data, payload) => {
 
-          if(payload && payload.length > 0){
+          if(data && data.length > 0 && addressRef.current === payload.user){
             const userOrders:OrderDataIF[] = [];
-            payload.map((order:any) => {
+            data.map((order:any) => {
               const processedOrder = processUserOrder(order, 'open');
               if(processedOrder){
                 userOrders.push(processedOrder);
               }
             })
             setUserOrders(userOrders);
+          }
+          else{
+            setUserOrders([]);
           }
         }
       })
@@ -190,7 +196,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       const intervalRef = setInterval(() => {
         if(!isWsEnabledRef.current){ return; }
         fetchOpenOrders();
-      }, 1000);
+      }, 3000); // increased to 3 secs because of getting TooManyRequests error
 
       return () => {
         clearInterval(intervalRef);
