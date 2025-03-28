@@ -1,4 +1,4 @@
-import styles from './PriceRange.module.css'
+import styles from './PriceRange.module.css';
 
 interface PropsIF {
     minValue: string;
@@ -15,10 +15,11 @@ interface PropsIF {
     ariaLabelMax?: string;
 
     totalOrders: string;
-    handleChangetotalOrders: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleChangetotalOrders: (
+        event: React.ChangeEvent<HTMLInputElement>,
+    ) => void;
+}
 
-  }
-  
 export default function PriceRange(props: PropsIF) {
     const {
         minValue,
@@ -34,52 +35,48 @@ export default function PriceRange(props: PropsIF) {
         ariaLabelMin,
         ariaLabelMax,
         totalOrders,
-        handleChangetotalOrders
-      } = props;
+        handleChangetotalOrders,
+    } = props;
 
     return (
         <div className={styles.container}>
             <h3 className={styles.label}>Price Range</h3>
 
             <div className={styles.inputsContainer}>
-            <input
-                type='text'
-                value={minValue}
-                onChange={handleChangeMin}
-                onBlur={onBlurMin}
-                onKeyDown={onKeyDownMin}
-                className={classNameMin}
-                aria-label={ariaLabelMin}
-                inputMode='numeric'
-                pattern='[0-9]*'
-                placeholder='Enter Min'
+                <input
+                    type='text'
+                    value={minValue}
+                    onChange={handleChangeMin}
+                    onBlur={onBlurMin}
+                    onKeyDown={onKeyDownMin}
+                    className={classNameMin}
+                    aria-label={ariaLabelMin}
+                    inputMode='numeric'
+                    pattern='[0-9]*'
+                    placeholder='Enter Min'
                 />
                 <span className={styles.seperator}>-</span>
                 <input
-                type='text'
-                value={maxValue}
-                onChange={handleChangeMax}
-                onBlur={onBlurMax}
-                onKeyDown={onKeyDownMax}
-                className={classNameMax}
-                aria-label={ariaLabelMax}
-                inputMode='numeric'
-                pattern='[0-9]*'
-                placeholder='Enter Max'
-            />
-
+                    type='text'
+                    value={maxValue}
+                    onChange={handleChangeMax}
+                    onBlur={onBlurMax}
+                    onKeyDown={onKeyDownMax}
+                    className={classNameMax}
+                    aria-label={ariaLabelMax}
+                    inputMode='decimal'
+                    placeholder='Enter Max'
+                />
             </div>
             <input
                 type='text'
                 value={totalOrders}
                 onChange={handleChangetotalOrders}
                 aria-label={'total orders'}
-                inputMode='numeric'
-                pattern='[0-9]*'
+                pattern='[0-9]*\.?[0-9]*'
                 placeholder='Total Orders'
                 className={styles.totalOrdersInput}
             />
-
         </div>
-    )
+    );
 }

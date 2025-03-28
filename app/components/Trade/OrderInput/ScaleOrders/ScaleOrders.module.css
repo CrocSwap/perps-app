@@ -1,0 +1,351 @@
+.scaleOrdersContainer {
+    width: 100%;
+
+    padding: 8px 16px 16px 16px;
+    border-radius: var(--main-border-radius, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--dark3, #1c1c22);
+    box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
+}
+
+.header {
+    display: flex;
+    padding: 8px 0px;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+}
+
+.title {
+    color: var(--text1, #f0f0f8);
+    text-align: center;
+
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-l, 24px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 24px;
+    padding: 0;
+}
+
+.closeButton:hover {
+    color: var(--text1);
+}
+.totalOrdersSection {
+    width: calc(100% - 8px);
+    height: 25px;
+    display: grid;
+    /* based on figma design of 223px on 391px */
+    grid-template-columns: 57% 43%;
+    gap: 8px;
+}
+
+.totalOrdersInput {
+    width: 100%;
+    display: flex;
+    height: 100%;
+    padding: 0px 8px;
+    justify-content: space-between;
+    border-radius: var(--half-border-radius, 8px);
+    background: var(--dark4, #27272c);
+
+    color: var(--text1);
+
+    font-size: var(--font-size-s, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    outline: none;
+    border: none;
+}
+
+.quantityButtons {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    height: 100%;
+}
+
+.quantityButton {
+    display: flex;
+    width: 100%;
+    height: 25px;
+    padding: 1px 8px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--half-border-radius, 8px);
+    background: var(--dark4, #27272c);
+    color: var(--base-text2, #bcbcc4);
+
+    font-size: var(--font-size-s, 12px);
+    outline: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.quantityButton.active,
+.quantityButton:hover {
+    border: 1px solid var(--text2);
+    color: var(--text1);
+}
+
+.tableHeader {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    align-items: center;
+    padding: 0 8px 0 8px;
+
+  
+}
+
+.priceHeader,
+.ratioHeader,
+.quantityHeader {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    color: var(--text1, #f0f0f8) !important;
+    font-size: var(--font-size-s, 12px) !important;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+
+.dropdownToggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.flatIcon,
+.increasingIcon,
+.decreasingIcon,
+.dropdownIcon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.dropdownIcon svg {
+    fill: var(--text2);
+}
+.dropdownToggle:hover .dropdownIcon svg {
+    fill: var(--text1);
+}
+
+.totalRatio {
+    background-color: transparent;
+    font-size: var(--font-size-s, 12px);
+}
+
+.totalRatio.invalid {
+    color: #ff3b30;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    min-width: 110px;
+    z-index: 10;
+    display: flex;
+
+    padding: 4px 0px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    border-radius: var(--half-border-radius, 8px);
+    background: var(--dark5, #323237);
+}
+
+.dropdownItem {
+    width: 100%;
+    display: flex;
+    height: 25px;
+    padding: 0px 8px;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    /* border-radius: var(--half-border-radius, 8px); */
+    color: var(--text2);
+    font-size: var(--font-size-s, 12px);
+    cursor: pointer;
+}
+
+.dropdownItem:hover {
+    background-color: var(--dark3);
+    color: var(--text1, #f0f0f8);
+}
+
+.quantityHeader {
+    height: 100%;
+    display: flex;
+    justify-content: end;
+    color: var(--text1, #f0f0f8);
+    /* padding: 0 8px; */
+   
+}
+
+.orderList {
+    width: 100% ;
+    max-height: 200px;
+    overflow-y: auto;
+    /* scrollbar-gutter: stable; */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent1) transparent;
+
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+   
+    
+}
+
+.orderList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.orderList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.orderList::-webkit-scrollbar-thumb {
+    background-color: var(--accent1);
+    border-radius: 4px;
+}
+
+.orderRow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    height: 25px;
+    
+}
+
+.orderRow input {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--half-border-radius, 8px);
+    background: var(--dark4, #27272c);
+    display: flex;
+    padding: 0px 8px;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1);
+    outline: none;
+    border: 1px solid transparent;
+}
+.orderRow input:focus {
+    border: 1px solid var(--text2);
+}
+
+.ratioCell {
+    padding: 0 8px;
+    background: var(--dark4, #27272c);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--half-border-radius, 8px);
+   
+
+}
+.ratioInput {
+    padding: 0 !important;
+}
+
+.percentSign {
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1);
+}
+
+.invalidInput {
+    border-color: #ff3b30;
+}
+
+.errorMessage {
+    color: var(--red, #ef5350);
+
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-s, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+.optionHeader{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.actions button
+ {
+    height: 47px;
+    border: none;
+    outline: none;;
+    display: flex;
+    padding: 12px 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1 0 0;
+    border-radius: var(--half-border-radius, 8px);
+
+    color: var(--text1, #f0f0f8);
+
+    font-size: var(--font-size-m, 18px);
+    transition: all 0.3s ease-in-out;
+}
+
+.actions button:hover{
+    opacity: 0.7;
+}
+.cancelButton {
+    background-color: var(--dark4);
+    
+}
+
+.confirmButton {
+    background: var(--accent1, #7371fc);
+
+    
+}
+
+.confirmButton:disabled {
+    background-color: var(--dark3);
+    cursor: not-allowed;
+    opacity: 0.7;
+}

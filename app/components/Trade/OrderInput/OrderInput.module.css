@@ -23,6 +23,7 @@ background: var(--dark2, #111117);
     overflow-y: scroll;
     /* subtract height of placeorderbuttons.tsx */
     height: calc(100% - 125px);
+   
 }
 .mainContent::-webkit-scrollbar {
     display: none;
@@ -71,6 +72,73 @@ border: 1px solid var(--dark4, #27272C);
 }
 .inputDetailValue{
     color: var(--text1)
+}
+
+.isolatedButton{
+   
+    display: flex;
+    height: 100%;
+    padding: 0px 4px 0px 8px;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--dark3, #1C1C22);
+    border-radius: 8px;
+    border: none;
+    color: var(--text1, #F0F0F8);
+    font-family: var(--font-family-main, "Lato", sans-serif);
+    font-size: var(--font-size-s, 12px);
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+    flex-shrink: 0;
+    gap: 8px;
+}
+
+.isolatedButton svg{
+    color: var(--text2);
+}
+  
+.isolatedButton:hover svg{
+    color: var(--text1)
+}
+
+.priceDistributionContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.priceDistributionContainer .inputDetailsLabel {
+    color: var(--text2);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--font-size-s, 12px);
+
+}
+.priceDistributionContainer .actionButtonsContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+.priceDistributionContainer .actionButtonsContainer button {
+    width: 100%;
+    display: flex;
+    height: 25px;
+    padding: 0px 8px;
+    align-items: center;
+    gap: 8px;
+    border-radius: var(--half-border-radius, 8px);
+    background: var(--dark3, #1c1c22);
+    display: grid;
+    grid-template-columns: 24px auto;
+    align-items: center;
+    outline: none;
+    border: none;
+    color: var(--text1, #F0F0F8);
+    font-size: var(--font-size-s, 12px);
+
+
 }
 
 
