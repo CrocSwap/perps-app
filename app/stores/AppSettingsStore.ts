@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { applyChartColors } from '~/utils/chartUtils';
 import {
     // buySellColors,
     Langs, NumFormatTypes,
@@ -62,8 +63,11 @@ export const useAppSettings = create<AppSettingsStore>()(
             // setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
             // isInverseColor: false,
             bsColor: 'default',
-            setBsColor: (c: colorSetNames) => set({ bsColor: c }),
-            getBsColor: () => bsColorSets[get().bsColor],
+            setBsColor: (c: colorSetNames) => {
+                set({ bsColor: c });
+               
+                applyChartColors(bsColorSets[c]);
+            },            getBsColor: () => bsColorSets[get().bsColor],
         }),
         {
             name: LS_KEY,

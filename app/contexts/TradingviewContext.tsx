@@ -25,6 +25,7 @@ import {
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
 import { bsColorSets, useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
+import { applyChartColors, setChartInstance } from '~/utils/chartUtils';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -89,8 +90,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }
 
-    useEffect(() => changeColors(getBsColor()), [bsColor, chart]);
-    console.log(bsColorSets.default.buy)
+    // useEffect(() => changeColors(getBsColor()), [bsColor, chart]);
+    // console.log(bsColorSets.default.buy)
 
     useEffect(() => {
         const tvWidget = new widget({
@@ -172,6 +173,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
             }
             setChart(tvWidget);
+            setChartInstance(tvWidget); 
+            applyChartColors(getBsColor());
+
         });
 
         return () => {
