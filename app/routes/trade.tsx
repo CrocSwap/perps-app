@@ -99,6 +99,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                         Symbol: {symbol.toUpperCase()}
                     </div>
                 </div>
+                <button>
+                    <a href='/portfolio'>Go to Portfolio</a>
+                </button>
                 <div className={styles.containerTopLeft}>
                     <div className={styles.watchlist}>
                         <WatchList />

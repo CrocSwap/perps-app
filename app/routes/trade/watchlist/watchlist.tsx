@@ -1,14 +1,13 @@
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './watchlist.module.css';
-import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { useEffect, useRef, useState } from 'react';
-import { processSymbolInfo } from '~/processors/processSymbolInfo';
-import { TbHeartFilled } from 'react-icons/tb';
 import { FiDollarSign, FiPercent } from 'react-icons/fi';
-import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import WatchListNode from './watchlistnode/watchlistnode';
+import { TbHeartFilled } from 'react-icons/tb';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
+import { processSymbolInfo } from '~/processors/processSymbolInfo';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import styles from './watchlist.module.css';
+import WatchListNode from './watchlistnode/watchlistnode';
 
 interface WatchListProps {}
 
@@ -29,16 +28,16 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
 
     useEffect(() => {
         const lsVal = localStorage.getItem(LS_KEY_FAV_COINS);
-        if (lsVal !== null) {
+        if (lsVal) {
             const favs = JSON.parse(lsVal);
             setFavs(favs);
         } else {
             setFavs(['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK']);
         }
 
-        return () => {
-            unsubscribeAllByChannel('webData2');
-        };
+        // return () => {
+        //     unsubscribeAllByChannel('webData2');
+        // };
     }, []);
 
     const processWebData2Message = (payload: any) => {
@@ -96,18 +95,18 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
                 }  ${watchListMode === 'percent' ? styles.active : ''}`}
             />
 
-                <HorizontalScrollable className={styles.watchListLimitor}>
-            <div className={styles.watchListNodesWrapper}>
-                {favCoins &&
-                    favCoins.map((e) => (
-                        <WatchListNode
-                            key={e.coin + e.dayNtlVlm}
-                            symbol={e}
-                            showMode={watchListMode}
-                        ></WatchListNode>
-                    ))}
-            </div>
-                </HorizontalScrollable>
+            <HorizontalScrollable className={styles.watchListLimitor}>
+                <div className={styles.watchListNodesWrapper}>
+                    {favCoins &&
+                        favCoins.map((e) => (
+                            <WatchListNode
+                                key={e.coin + e.dayNtlVlm}
+                                symbol={e}
+                                showMode={watchListMode}
+                            ></WatchListNode>
+                        ))}
+                </div>
+            </HorizontalScrollable>
         </div>
     );
 };
