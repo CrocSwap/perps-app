@@ -21,6 +21,6 @@ export const useDebugStore = create<DebugStore>((set) => ({
     setWsUrl: (wsUrl: string) => set({ wsUrl }),
     debugWallet: debugWallets[1],
     setDebugWallet: (debugWallet: DebugWallet) => set({ debugWallet }),
-    isWsEnabled: true,
+    isWsEnabled: false,
     setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled }),
 }));

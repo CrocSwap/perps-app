@@ -1,9 +1,11 @@
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
+import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { debugWallets, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
@@ -27,8 +29,7 @@ export function loader({ context }: Route.LoaderArgs) {
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
     console.log('running trade');
-    // const { symbol } = useTradeDataStore();
-    const symbol = 'BTC';
+    const { symbol } = useTradeDataStore();
     const { orderBookMode } = useAppSettings();
 
     const {
@@ -126,9 +127,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                             >
                                 <OrderBookSection symbol={symbol} />
                             </div>
-                            {/* <div className={styles.tradeModules}>
+                            <div className={styles.tradeModules}>
                                 <OrderInput />
-                            </div> */}
+                            </div>
                         </section>
                         <section className={styles.containerBottom}>
                             <div className={styles.table}>
