@@ -22,7 +22,7 @@ const useTradeDataStore = create<TradeDataStore>((set, get) => {
 
     return {
         ...createUserTradesSlice(set, get),
-        symbol: storedSymbol, // Initialize state with stored value
+        symbol: 'BTC', // Initialize state with stored value
         setSymbol: (symbol: string) => {
             localStorage.setItem('activeCoin', symbol); // Update local storage
             set({ symbol });
