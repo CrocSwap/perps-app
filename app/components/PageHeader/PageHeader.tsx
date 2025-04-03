@@ -301,7 +301,7 @@ export default function PageHeader() {
 
             {dropdownMenuDisplay}
             {appSettingsModal.isOpen && (
-                <Modal close={appSettingsModal.close}>
+                <Modal close={appSettingsModal.close} position={'center'}>
                     <AppOptions modalControl={appSettingsModal} />
                 </Modal>
             )}
