@@ -2,12 +2,12 @@ import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { debugWallets, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
-import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
@@ -115,17 +115,17 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                                 <div className={styles.symbolInfo}>
                                     <SymbolInfo />
                                 </div>
-                                {/* <div id='chartSection' className={styles.chart}>
+                                <div id='chartSection' className={styles.chart}>
                                     <TradingViewWrapper />
-                                </div> */}
+                                </div>
                             </div>
 
-                            <div
+                            {/* <div
                                 id='orderBookSection'
                                 className={styles.orderBook}
                             >
                                 <OrderBookSection symbol={symbol} />
-                            </div>
+                            </div> */}
                             <div className={styles.tradeModules}>
                                 <OrderInput />
                             </div>
