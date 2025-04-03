@@ -1,5 +1,5 @@
 
-import { useWsObserver } from '~/hooks/useWsObserver';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import styles from './orderbooktrades.module.css';
 import { useCallback, useEffect, useRef } from 'react';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
@@ -46,7 +46,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol, tradesCount }
   }, [symbol, tradesCount])
 
   useEffect(() => {
-    subscribe('trades', {
+    subscribe(WsChannels.ORDERBOOK_TRADES, {
       payload: {coin: symbol},
       handler: (payload) => {
         mergeTrades(processOrderBookTrades(payload));

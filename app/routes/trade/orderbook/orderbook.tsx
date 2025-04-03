@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useWebSocketContext } from '~/contexts/WebSocketContext';
-import OrderRow from './orderrow/orderrow';
-import styles from './orderbook.module.css';
-import { useWsObserver } from '~/hooks/useWsObserver';
-import { processOrderBookMessage, processUserOrders } from '~/processors/processOrderBook';
-import { useOrderBookStore } from '~/stores/OrderBookStore';
-import type { OrderBookMode, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
-import { getPrecisionForResolution, getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
-import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import BasicDivider from '~/components/Dividers/BasicDivider';
-import { useInfoApi } from '~/hooks/useInfoApi';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
+import { processOrderBookMessage, processUserOrder } from '~/processors/processOrderBook';
 import { useDebugStore } from '~/stores/DebugStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { OrderBookMode, OrderDataIF, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
+import { getPrecisionForResolution, getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
+import styles from './orderbook.module.css';
+import OrderRow from './orderrow/orderrow';
 interface OrderBookProps {
   symbol: string;
   orderCount: number;
@@ -21,7 +20,7 @@ interface OrderBookProps {
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const { subscribe, unsubscribeAllByChannel} = useWsObserver();
-    const {fetchInfo} = useInfoApi();
+    const {fetchData} = useInfoApi();
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const resolutionsShouldReset = useRef(true);
     const [selectedResolution, setSelectedResolution] = useState<OrderRowResolutionIF | null>(null);
@@ -35,9 +34,14 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const { formatNum, decimalPrecision } = useNumFormatter();
 
+    const {isWsEnabled} = useDebugStore();
+
+    const isWsEnabledRef = useRef<boolean>(true);
+    isWsEnabledRef.current = isWsEnabled;
 
     const {buys, sells, setOrderBook} = useOrderBookStore();
-    const {userOrders, setUserOrders, userSymbolOrders} = useTradeDataStore();
+    const {userOrders, setUserOrders, userSymbolOrders, addOrderToHistory} = useTradeDataStore();
+    const userOrdersRef = useRef<OrderDataIF[]>([]);
 
     const buySlots = useMemo(() => {
       return buys.map((order) => order.px);
@@ -63,7 +67,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
 
-      console.log('>>> user orders', userOrders);
+      if(userOrdersRef.current.length === 0){
+        userOrdersRef.current = userOrders;
+      }
     }, [userOrders])
 
     const userBuySlots:Set<string> = useMemo(() => {
@@ -120,15 +126,16 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       return slots;
     }, [userSymbolOrders, filledResolution.current, JSON.stringify(sellSlots)])
 
-    useEffect(() => {
-
-      console.log('>>> user symbol orders', userSymbolOrders);
-    }, [userSymbolOrders])
 
     const changeSubscription = (payload: any) => {
-      subscribe('l2Book', 
+      subscribe(WsChannels.ORDERBOOK, 
         {payload: payload,
         handler: (response) => {
+          
+          if(!isWsEnabledRef.current){
+            return;
+          }
+
           filledResolution.current = payload.resolution;
           const {sells, buys} = processOrderBookMessage(response, orderCount);
           setOrderBook(buys, sells);
@@ -137,25 +144,58 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       })
     }
 
+
+    const orderProcessorIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
     useEffect(() => {
 
-      fetchInfo({
-        type: 'frontendOpenOrders',
+      if(orderProcessorIntervalRef.current){
+        clearInterval(orderProcessorIntervalRef.current);
+      }
+
+      return () => {
+        if(orderProcessorIntervalRef.current){
+          clearInterval(orderProcessorIntervalRef.current);
+        }
+      }
+    }, [])
+
+
+    const fetchOpenOrders = useCallback(() => {
+      
+      fetchData({
+        type: ApiEndpoints.OPEN_ORDERS,
         payload: {
           user: debugWallet.address
         },
         handler: (payload) => {
 
           if(payload && payload.length > 0){
-            const userOrders = processUserOrders(payload, 'open');
+            const userOrders:OrderDataIF[] = [];
+            payload.map((order:any) => {
+              const processedOrder = processUserOrder(order, 'open');
+              if(processedOrder){
+                userOrders.push(processedOrder);
+              }
+            })
             setUserOrders(userOrders);
           }
         }
       })
+    }, [debugWallet.address])
 
+    useEffect(() => {
+
+      fetchOpenOrders();
+      const intervalRef = setInterval(() => {
+        if(!isWsEnabledRef.current){ return; }
+        fetchOpenOrders();
+      }, 1000);
 
       return () => {
+        clearInterval(intervalRef);
         unsubscribeAllByChannel('l2Book');
+        unsubscribeAllByChannel('userHistoricalOrders');
       }
     }, [debugWallet.address])
 

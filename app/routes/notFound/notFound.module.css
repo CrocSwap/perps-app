@@ -1,0 +1,121 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    padding: var(--main-padding);
+    color: var(--text1);
+    background-color: var(--dark2);
+    text-align: center;
+  }
+  
+  .content {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 32px;
+    border-radius: var(--main-border-radius);
+    background-color: var(--dark3);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  }
+  
+  .errorCode {
+    font-size: 120px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 24px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text1);
+  }
+  
+  .message {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 32px;
+    color: var(--text2);
+  }
+  
+  .actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .primaryButton {
+    padding: 12px 24px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent4));
+    color: var(--text1);
+    border: none;
+    border-radius: var(--half-border-radius);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .primaryButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(115, 113, 252, 0.3);
+  }
+  
+  .secondaryButton {
+    padding: 12px 24px;
+    background-color: var(--dark5);
+    color: var(--text1);
+    border: none;
+    border-radius: var(--half-border-radius);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .secondaryButton:hover {
+    background-color: var(--dark6);
+    transform: translateY(-2px);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .errorCode {
+      font-size: 100px;
+    }
+    
+    .title {
+      font-size: 28px;
+    }
+    
+    .message {
+      font-size: 16px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .errorCode {
+      font-size: 80px;
+    }
+    
+    .title {
+      font-size: 24px;
+    }
+    
+    .actions {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .primaryButton,
+    .secondaryButton {
+      width: 100%;
+    }
+  }

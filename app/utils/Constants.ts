@@ -63,7 +63,8 @@ export const Langs: LangType[] = [
 
 export const wsUrls = [
     'wss://api.hyperliquid.xyz/ws',
-    'wss://pulse-api-mock.liquidity.tools/ws'
+    'wss://pulse-api-mock.liquidity.tools/ws',
+    'wss://api-ui.hyperliquid.xyz/ws'
 ]
 
 export const debugWallets: DebugWallet[] = [
@@ -98,3 +99,7 @@ export const buySellColors: BuySellColor[] = [
 
 
 
+export const OrderHistoryLimits = {
+    MAX: 1000,
+    RENDERED: 50
+}

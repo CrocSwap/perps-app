@@ -1,45 +1,43 @@
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './OrderHistoryTable.module.css';
-
-export interface OrderHistoryData {
-  time: string;
-  type: string;
-  coin: string;
-  direction: 'Long' | 'Short';
-  size: string;
-  filledSize: string;
-  orderValue: string;
-  price: string;
-  reduceOnly: string;
-  triggerConditions: string;
-  tpsl: string;
-  status: string;
-  orderId: string;
-}
-
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
+import useNumFormatter from '~/hooks/useNumFormatter';
 interface OrderHistoryTableRowProps {
-  order: OrderHistoryData;
+  order: OrderDataIF;
 }
 
 export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
   const { order } = props;
 
+  const {formatNum} = useNumFormatter();
+  const {isInverseColor} = useAppSettings();
+
+  const getDirectionClass = (side: string) => {
+    if(side === 'buy' && !isInverseColor) return styles.longDirection;
+    if(side === 'buy' && isInverseColor) return styles.shortDirection;
+    if(side === 'sell' && !isInverseColor) return styles.shortDirection;
+    if(side === 'sell' && isInverseColor) return styles.longDirection;
+  }
+
+
   return (
     <div className={styles.rowContainer}>
-      <div className={`${styles.cell} ${styles.timeCell}`}>{order.time}</div>
-      <div className={`${styles.cell} ${styles.typeCell}`}>{order.type}</div>
+      <div className={`${styles.cell} ${styles.timeCell}`}>{formatTimestamp(order.timestamp)}</div>
+      <div className={`${styles.cell} ${styles.typeCell}`}>{order.orderType}</div>
       <div className={`${styles.cell} ${styles.coinCell}`}>{order.coin}</div>
-      <div className={`${styles.cell} ${styles.directionCell} ${order.direction === 'Long' ? styles.longDirection : styles.shortDirection}`}>
-        {order.direction}
+      <div className={`${styles.cell} ${styles.directionCell} ${getDirectionClass(order.side)}`}>
+        {order.side === 'buy' ? 'Long' : 'Short'}
       </div>
-      <div className={`${styles.cell} ${styles.sizeCell}`}>{order.size}</div>
-      <div className={`${styles.cell} ${styles.filledSizeCell}`}>{order.filledSize}</div>
-      <div className={`${styles.cell} ${styles.orderValueCell}`}>{order.orderValue}</div>
-      <div className={`${styles.cell} ${styles.priceCell}`}>{order.price}</div>
+      <div className={`${styles.cell} ${styles.sizeCell}`}>{order.sz ? formatNum(order.sz) : '--'}</div>
+      <div className={`${styles.cell} ${styles.filledSizeCell}`}>{order.filledSz ? formatNum(order.filledSz) : '--'}</div>
+      <div className={`${styles.cell} ${styles.orderValueCell}`}>{order.sz ? formatNum(order.sz * order.limitPx) : '--'}</div>
+      <div className={`${styles.cell} ${styles.priceCell}`}>{order.limitPx ? formatNum(order.limitPx) : '--'}</div>
       <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>{order.reduceOnly}</div>
-      <div className={`${styles.cell} ${styles.triggerConditionsCell}`}>{order.triggerConditions}</div>
-      <div className={`${styles.cell} ${styles.tpslCell}`}>{order.tpsl}</div>
+      <div className={`${styles.cell} ${styles.triggerConditionsCell}`}>{order.triggerCondition}</div>
+      <div className={`${styles.cell} ${styles.tpslCell}`}>{order.isTrigger ? formatNum(order.triggerPx || 0) : '--'}</div>
       <div className={`${styles.cell} ${styles.statusCell}`}>{order.status}</div>
-      <div className={`${styles.cell} ${styles.orderIdCell}`}>{order.orderId}</div>
+      <div className={`${styles.cell} ${styles.orderIdCell}`}>{order.oid}</div>
     </div>
   );
 }

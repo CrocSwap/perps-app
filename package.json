@@ -1,6 +1,6 @@
 {
     "name": "perps-app",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "private": true,
     "type": "module",
     "scripts": {
@@ -36,7 +36,7 @@
         "cross-env": "^7.0.3",
         "fs-extra": "^11.3.0",
         "typescript": "^5.7.2",
-        "vite": "^5.4.11",
+        "vite": "^5.4.15",
         "vite-tsconfig-paths": "^5.1.4"
     }
 }

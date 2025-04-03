@@ -42,7 +42,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   const { orderBookMode } = useAppSettings();
 
 
-  const { wsUrl, setWsUrl, debugWallet, setDebugWallet } = useDebugStore();
+  const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
 
     
@@ -80,6 +80,13 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   onChange={(value) => setDebugWallet({label: value, address: debugWallets.find((wallet) => wallet.label === value)?.address || ''})}
 />
 </div>
+
+<div  className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`} onClick={() => setIsWsEnabled(!isWsEnabled)}>
+  <div
+    className={styles.wsToggleButton}
+  > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
+</div>
+
     
       <TradeRouteHandler />
       {

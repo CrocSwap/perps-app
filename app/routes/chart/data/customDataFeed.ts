@@ -7,7 +7,7 @@ import type {
 } from '~/tv/charting_library/charting_library';
 import { getHistoricalData } from './candleDataCache';
 import { mapResolutionToInterval, supportedResolutions } from './utils/utils';
-import { useWsObserver } from '~/hooks/useWsObserver';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
 import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
 
@@ -87,7 +87,7 @@ export const createDataFeed = (
         },
 
         subscribeBars: (symbolInfo, resolution, onTick) => {
-            subscribe('candle', {
+            subscribe(WsChannels.CANDLE, {
                 payload: {
                     coin: symbolInfo.ticker,
                     interval: mapResolutionToInterval(resolution),

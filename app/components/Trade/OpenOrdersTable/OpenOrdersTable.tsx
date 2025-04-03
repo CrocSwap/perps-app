@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow, { type OpenOrderData } from './OpenOrdersTableRow';
 import styles from './OpenOrdersTable.module.css';
@@ -8,10 +8,11 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 interface OpenOrdersTableProps {
   onCancel?: (time: number, coin: string) => void;
   onViewAll?: () => void;
+  selectedFilter: string;
 }
 
 export default function OpenOrdersTable(props: OpenOrdersTableProps) {
-  const { onCancel, onViewAll } = props;
+  const { onCancel, onViewAll, selectedFilter } = props;
   
   const handleCancel = (time: number, coin: string) => {
     if (onCancel) {
@@ -25,13 +26,28 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     }
   };
 
-  const { userSymbolOrders } = useTradeDataStore();
+  const { userSymbolOrders, userOrders } = useTradeDataStore();
+
+  const filteredOrders = useMemo(() => {
+    switch(selectedFilter){
+      case 'all':
+        return userOrders;
+      case 'active':
+        return userSymbolOrders;
+      case 'long':
+        return userOrders.filter((order) => order.side === 'buy');
+      case 'short':
+        return userOrders.filter((order) => order.side === 'sell');
+    }
+
+    return userOrders;
+  }, [userOrders, selectedFilter]);
   
   return (
     <div className={styles.tableWrapper}>
       <OpenOrdersTableHeader />
       <div className={styles.tableBody}>
-        {userSymbolOrders.map((order, index) => (
+        {filteredOrders.slice(0, 50).map((order, index) => (
           <OpenOrdersTableRow 
             key={`order-${index}`} 
             order={order} 

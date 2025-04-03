@@ -11,6 +11,18 @@ export type WsSubscriptionConfig = {
 }
 
 
+export enum WsChannels {
+  ORDERBOOK = 'l2Book',
+  ORDERBOOK_TRADES = 'trades',
+  USER_FILLS = 'userFills',
+  USER_HISTORICAL_ORDERS = 'userHistoricalOrders',
+  COINS = 'webData2',
+  ACTIVE_COIN_DATA = 'activeAssetCtx',
+  NOTIFICATION = 'notification',
+  CANDLE = 'candle',
+}
+
+
 export function useWsObserver() {
   
 

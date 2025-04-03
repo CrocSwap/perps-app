@@ -1,7 +1,7 @@
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './symbolinfo.module.css';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import { useWsObserver } from '~/hooks/useWsObserver';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { useEffect } from 'react';
 import { processSymbolInfo } from '~/processors/processSymbolInfo';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
@@ -46,7 +46,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
   }, [])
 
   useEffect(() => {
-    subscribe('activeAssetCtx', {
+    subscribe(WsChannels.ACTIVE_COIN_DATA, {
       payload: {coin: symbol},
       handler: (payload) => {
         if(payload.coin === symbol){

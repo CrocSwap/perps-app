@@ -84,11 +84,10 @@ export default function TradeTable(props: TradeTableProps) {
         switch (activeTab) {
             case 'Balances':
                 return <BalancesTable />;
-
             case 'Positions':
                 return <PositionsTable />;
             case 'Open Orders':
-                return <OpenOrdersTable />;
+                return <OpenOrdersTable selectedFilter={selectedFilter} />;
             case 'TWAP':
                 return <TwapTable />;
             case 'Trade History':
@@ -96,7 +95,7 @@ export default function TradeTable(props: TradeTableProps) {
             case 'Funding History':
                 return <FundingHistoryTable />;
             case 'Order History':
-                return <OrderHistoryTable />;
+                return <OrderHistoryTable selectedFilter={selectedFilter} />;
             case 'Deposits and Withdrawals':
                 return <DepositsWithdrawalsTable />;
             default:

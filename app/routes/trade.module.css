@@ -49,6 +49,7 @@
 }
 
 .wallet {
+  width: 100%;
   height: 100%;
   background: var(--dark2);
 
@@ -115,8 +116,13 @@
         --trade-module-width-desktop-large
       );
   }
+
   .containerTop.orderBookLarge{
     grid-template-columns: 1fr var(--order-book-width-desktop-large-doubled) var(--trade-module-width-desktop-large);
+  }
+  .containerBottom{
+    grid-template-columns: 1fr var(--trade-module-width-desktop-large, 350px);
+   
   }
 }
 
@@ -133,7 +139,8 @@
 }
 
 
-.wsUrlSelector, .walletSelector{
+.wsUrlSelector, .walletSelector, .wsToggle{
+  user-select: none;
   position: fixed;
   top: 1rem;
   right: 20rem;
@@ -149,6 +156,26 @@
 .walletSelector{
   right: 38rem;
 }
+
+.wsToggle{
+  transition: all 0.2s ease;
+  right: 46rem; 
+  top: 1.2rem;
+  cursor: pointer;
+}
+
+.wsToggleRunning{
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.wsTogglePaused{
+  border-color: var(--red);
+  color: var(--red);
+}
+
+
+
 
 
 

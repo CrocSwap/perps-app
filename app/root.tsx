@@ -1,3 +1,4 @@
+import React, { Suspense, useEffect } from 'react';
 import {
   isRouteErrorResponse,
   Links,
@@ -15,7 +16,62 @@ import './css/index.css';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import { useDebugStore } from './stores/DebugStore';
 
+// Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
+class ComponentErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error("Component error:", error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="component-error">
+          <h3>Something went wrong</h3>
+          <button onClick={() => this.setState({ hasError: false })}>
+            Try Again
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Added loading component for async operations
+function LoadingIndicator() {
+  return <div className="loading-indicator">Loading...</div>;
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "../tv/datafeeds/udf/dist/bundle.js";
+    script.async = true;
+    script.onerror = (error) => {
+      console.error("Failed to load TradingView script:", error);
+    };
+    document.head.appendChild(script);
+    
+    return () => {
+      // Cleanup script when component unmounts
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
+  }, []);
+
   return (
     <html lang='en'>
       <head>
@@ -28,32 +84,44 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
-        <script src="../tv/datafeeds/udf/dist/bundle.js"></script>
+        {/* Removed inline script - now loading dynamically in useEffect */}
       </body>
     </html>
   );
 }
 
 export default function App() {
-
-
+  // Use memoized value to prevent unnecessary re-renders
   const { wsUrl } = useDebugStore();
+
   
   return (
     <Layout>
+  
       <WebSocketProvider url={wsUrl}>
-      <div className='root-container'>
-        <header className='header'>
-          <PageHeader/>
-        </header>
+        <div className='root-container'>
+          {/* Added error boundary for header */}
+          <ComponentErrorBoundary>
+            <header className='header'>
+              <PageHeader/>
+            </header>
+          </ComponentErrorBoundary>
 
-        <main className='content'>
-          <Outlet />
-        </main>
+          <main className='content'>
+            {/*  Added Suspense for async content loading */}
+            <Suspense fallback={<LoadingIndicator />}>
+              <ComponentErrorBoundary>
+                <Outlet />
+              </ComponentErrorBoundary>
+            </Suspense>
+          </main>
 
-        <Notifications />
-      </div>
-        </WebSocketProvider>
+          {/* Added error boundary for notifications */}
+          <ComponentErrorBoundary>
+            <Notifications />
+          </ComponentErrorBoundary>
+        </div>
+      </WebSocketProvider>
     </Layout>
   );
 }
@@ -75,14 +143,21 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-      <main className='content error-boundary'>
-        <h1>{message}</h1>
-        <p>{details}</p>
-        {stack && (
-          <pre>
-            <code>{stack}</code>
-          </pre>
-        )}
-      </main>
+    <main className='content error-boundary'>
+      <h1>{message}</h1>
+      <p>{details}</p>
+      {stack && (
+        <pre>
+          <code>{stack}</code>
+        </pre>
+      )}
+      {/*  Added refresh button for better user experience */}
+      <button 
+        onClick={() => window.location.reload()}
+        className="retry-button"
+      >
+        Reload Page
+      </button>
+    </main>
   );
 }

@@ -10,12 +10,19 @@ export type ApiCallConfig = {
   payload?: any;
 }
 
-const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
+
+export enum ApiEndpoints {
+  HISTORICAL_ORDERS = 'historicalOrders',
+  OPEN_ORDERS = 'frontendOpenOrders',
+}
+
+// const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
+const apiUrl = 'https://api.hyperliquid.xyz/info';
 
 
 export function useInfoApi() {
 
-  const fetchInfo = async (config: ApiCallConfig) => {
+  const fetchData = async (config: ApiCallConfig) => {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
@@ -24,6 +31,7 @@ export function useInfoApi() {
     const data = await response.json();
     config.handler(data);
   }
+  
 
-  return { fetchInfo};
+  return { fetchData};
 }

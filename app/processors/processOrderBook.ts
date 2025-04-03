@@ -65,26 +65,28 @@ export function processOrderBookTrades(data: any): OrderBookTradeIF[] {
 }
 
 
-export function processUserOrders(data: any, status: string): OrderDataIF[] {
-  return data.map((e: any) => {
+export function processUserOrder(data: any, status: string): OrderDataIF|null {
+  if (data) {
     return {
-      coin: e.coin,
-      cloid: e.cloid,
-      oid: parseNum(e.oid),
+      coin: data.coin,
+      cloid: data.cloid,
+      oid: parseNum(data.oid),
       // side: e.side,
-      side: e.side === 'A' ? 'sell' : 'buy',
-      sz: parseNum(e.sz),
-      tif: e.tif,
-      timestamp: e.timestamp,
+      side: data.side === 'A' ? 'sell' : 'buy',
+      sz: parseNum(data.sz),
+      tif: data.tif,
+      timestamp: data.timestamp,
       status: status,
-      limitPx: parseNum(e.limitPx),
-      origSz: parseNum(e.origSz),
-      reduceOnly: e.reduceOnly,
-      isPositionTpsl: e.isPositionTpsl,
-      isTrigger: e.isTrigger,
-      triggerPx: parseNum(e.triggerPx),
-      triggerCondition: e.triggerCondition,
-      orderType: e.orderType
+      limitPx: parseNum(data.limitPx),
+      origSz: parseNum(data.origSz),
+      reduceOnly: data.reduceOnly,
+      isPositionTpsl: data.isPositionTpsl,
+      isTrigger: data.isTrigger,
+      triggerPx: parseNum(data.triggerPx),
+      triggerCondition: data.triggerCondition,
+      orderType: data.orderType
     }
-  })
+  }
+
+  return null;
 }

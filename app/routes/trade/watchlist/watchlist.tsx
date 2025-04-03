@@ -1,7 +1,7 @@
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './watchlist.module.css';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import { useWsObserver } from '~/hooks/useWsObserver';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { useEffect, useRef, useState } from 'react';
 import { processSymbolInfo } from '~/processors/processSymbolInfo';
 import { TbHeartFilled } from 'react-icons/tb';
@@ -72,7 +72,7 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
     };
 
     useEffect(() => {
-        subscribe('webData2', {
+        subscribe(WsChannels.COINS, {
             payload: { user: '0x0000000000000000000000000000000000000000' },
             handler: (payload) => {
                 processWebData2Message(payload);
