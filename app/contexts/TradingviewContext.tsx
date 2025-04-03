@@ -1,13 +1,14 @@
-import {
-    widget,
-    type IChartingLibraryWidget,
-    type ResolutionString,
-    type TradingTerminalFeatureset,
-} from '~/tv/charting_library';
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createDataFeed } from '~/routes/chart/data/customDataFeed';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useWsObserver } from '~/hooks/useWsObserver';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { createDataFeed } from '~/routes/chart/data/customDataFeed';
+import {
+    drawingEvent,
+    drawingEventUnsubscribe,
+    intervalChangedSubscribe,
+    intervalChangedUnsubscribe,
+    studyEvents,
+    studyEventsUnsubscribe,
+} from '~/routes/chart/data/utils/chartEvents';
 import {
     getChartLayout,
     saveChartLayout,
@@ -17,13 +18,11 @@ import {
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
 import {
-    drawingEvent,
-    drawingEventUnsubscribe,
-    intervalChangedSubscribe,
-    intervalChangedUnsubscribe,
-    studyEvents,
-    studyEventsUnsubscribe,
-} from '~/routes/chart/data/utils/chartEvents';
+    widget,
+    type IChartingLibraryWidget,
+    type ResolutionString,
+    type TradingTerminalFeatureset,
+} from '~/tv/charting_library';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -52,7 +51,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
     const { subscribe } = useWsObserver();
-    const { symbol } = useTradeDataStore();
+    // const { symbol } = useTradeDataStore();
+    const symbol = 'BTC';
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 

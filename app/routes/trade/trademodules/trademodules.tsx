@@ -1,25 +1,20 @@
-
-import { useCallback, useEffect, useRef, useState } from 'react';
-import styles from './trademodules.module.css';
-import { useWsObserver } from '~/hooks/useWsObserver';
+import { useEffect } from 'react';
 import { useTradeModuleStore } from '~/stores/TradeModuleStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-interface TradeModulesProps {
-}
+import styles from './trademodules.module.css';
+interface TradeModulesProps {}
 
 const TradeModules: React.FC<TradeModulesProps> = () => {
-
     const { tradeSlot, setTradeSlot } = useTradeModuleStore();
-    const { symbol } = useTradeDataStore();
+    // const { symbol } = useTradeDataStore();
+    const symbol = 'BTC';
 
     useEffect(() => {
         setTradeSlot(null);
-    }, [symbol])
+    }, [symbol]);
 
-  return (
-    <div className={styles.tradeModulesContainer}>
-
-     {/* {
+    return (
+        <div className={styles.tradeModulesContainer}>
+            {/* {
         tradeSlot && (
             <div className={styles.tradeSlot}>
                 <div className={styles.tradeSlotCoin}>{tradeSlot.coin}</div>
@@ -28,8 +23,8 @@ const TradeModules: React.FC<TradeModulesProps> = () => {
             </div>
         )
      } */}
-    </div>
-  );
-}
+        </div>
+    );
+};
 
 export default TradeModules;

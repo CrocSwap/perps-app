@@ -5,7 +5,6 @@ import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { debugWallets, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
@@ -28,7 +27,9 @@ export function loader({ context }: Route.LoaderArgs) {
 // const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
-    const { symbol } = useTradeDataStore();
+    // const { symbol } = useTradeDataStore();
+    const symbol = 'BTC';
+
     const { orderBookMode } = useAppSettings();
 
     const {
