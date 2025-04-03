@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { setLS } from '~/utils/AppUtils';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
 
@@ -12,33 +11,43 @@ type TradeDataStore = UserTradeStore & {
     setFavs: (favs: string[]) => void;
     addToFavs: (coin: string) => void;
 };
+const useTradeDataStore = create<TradeDataStore>((set, get) => {
+    // Retrieve stored symbol from local storage
+    let storedSymbol = '';
 
-const useTradeDataStore = create<TradeDataStore>((set, get) => ({
-    ...createUserTradesSlice(set, get),
-    symbol: '',
-    setSymbol: (symbol: string) => {
-        setLS('activeCoin', symbol);
-        set({ symbol });
-        get().setUserSymbolOrders(
-            get().userOrders.filter((e) => e.coin === symbol),
-        );
-    },
-    symbolInfo: null,
-    setSymbolInfo: (symbolInfo: SymbolInfoIF) => {
-        const prevSymbolInfo = get().symbolInfo;
-        if (prevSymbolInfo) {
-            const lastPriceChange = symbolInfo.markPx - prevSymbolInfo.markPx;
-            symbolInfo.lastPriceChange = lastPriceChange;
-        }
-        set({ symbolInfo });
-    },
-    favs: [],
-    setFavs: (favs: string[]) => set({ favs }),
-    addToFavs: (coin: string) => {
-        if (get().favs.filter((e) => e == coin).length === 0) {
-            set({ favs: [...get().favs, coin] });
-        }
-    },
-}));
+    // Ensure we're in the browser before accessing localStorage
+    if (typeof window !== 'undefined') {
+        storedSymbol = localStorage.getItem('activeCoin') || 'BTC';
+    }
+
+    return {
+        ...createUserTradesSlice(set, get),
+        symbol: storedSymbol, // Initialize state with stored value
+        setSymbol: (symbol: string) => {
+            localStorage.setItem('activeCoin', symbol); // Update local storage
+            set({ symbol });
+            get().setUserSymbolOrders(
+                get().userOrders.filter((e) => e.coin === symbol),
+            );
+        },
+        symbolInfo: null,
+        setSymbolInfo: (symbolInfo: SymbolInfoIF) => {
+            const prevSymbolInfo = get().symbolInfo;
+            if (prevSymbolInfo) {
+                const lastPriceChange =
+                    symbolInfo.markPx - prevSymbolInfo.markPx;
+                symbolInfo.lastPriceChange = lastPriceChange;
+            }
+            set({ symbolInfo });
+        },
+        favs: [],
+        setFavs: (favs: string[]) => set({ favs }),
+        addToFavs: (coin: string) => {
+            if (!get().favs.includes(coin)) {
+                set({ favs: [...get().favs, coin] });
+            }
+        },
+    };
+});
 
 export { useTradeDataStore };

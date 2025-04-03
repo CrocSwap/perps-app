@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { getLS } from '~/utils/AppUtils';
 
 export default function TradeRouteHandler() {
     const { marketId } = useParams<{ marketId: string }>(); // Get marketId from URL
@@ -15,15 +14,15 @@ export default function TradeRouteHandler() {
 
     const { subscribe } = useWsObserver();
 
-    useEffect(() => {
-        const activeSymbol = getLS('activeCoin');
-        console.log({ activeSymbol });
-        if (activeSymbol) {
-            setSymbol(activeSymbol);
-        } else {
-            setSymbol('BTC');
-        }
-    }, []);
+    // useEffect(() => {
+    //     const activeSymbol = getLS('activeCoin');
+    //     console.log({ activeSymbol });
+    //     if (activeSymbol) {
+    //         setSymbol(activeSymbol);
+    //     } else {
+    //         setSymbol('BTC');
+    //     }
+    // }, []);
 
     const checkSymbol = async () => {
         const urlSymbol = marketId?.toUpperCase();
