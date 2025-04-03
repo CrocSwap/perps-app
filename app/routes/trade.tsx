@@ -1,17 +1,11 @@
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
-import OrderInput from '~/components/Trade/OrderInput/OrderInput';
-import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { debugWallets, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
-import OrderBookSection from './trade/orderbook/orderbooksection';
-import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
-import WatchList from './trade/watchlist/watchlist';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -94,7 +88,14 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
             </div>
 
             <TradeRouteHandler />
-            {symbol && symbol.length > 0 && (
+            <div>
+                <h1>Trade</h1>
+                <p>Placeholder.</p>
+                <button>
+                    <a href='/portfolio'>Go to Portfolio</a>
+                </button>
+            </div>
+            {/* {symbol && symbol.length > 0 && (
                 <div className={styles.container}>
                     <section
                         className={`${styles.containerTop} ${
@@ -124,13 +125,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                     </section>
                     <section className={styles.containerBottom}>
                         <div className={styles.table}>
-                            <div>
-                                <h1>Trade Table</h1>
-                                <p>Placeholder.</p>
-                                <button>
-                                    <a href='/portfolio'>Go to Portfolio</a>
-                                </button>
-                            </div>
+                            <TradeTable />
                         </div>
                         <div className={styles.wallet}>
                             <DepositDropdown
@@ -142,7 +137,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                         </div>
                     </section>
                 </div>
-            )}
+            )} */}
         </>
     );
 }
