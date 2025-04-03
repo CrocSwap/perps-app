@@ -143,7 +143,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                 // <div></div>
                 <div>
                     <h1>Trade</h1>
-                    <p>Placeholder.</p>
+                    <p>Symbol value = {symbol}</p>
                     <button>
                         <a href='/portfolio'>Go to Portfolio</a>
                     </button>
