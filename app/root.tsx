@@ -2,7 +2,6 @@ import {
     isRouteErrorResponse,
     Links,
     Meta,
-    Outlet,
     Scripts,
     ScrollRestoration,
 } from 'react-router';
@@ -45,9 +44,9 @@ export default function App() {
                     <PageHeader />
                 </header>
 
-                <main className='content'>
+                {/* <main className='content'>
                     <Outlet />
-                </main>
+                </main> */}
 
                 {/* <Notifications /> */}
             </div>
