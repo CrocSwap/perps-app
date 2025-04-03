@@ -28,6 +28,7 @@ export function loader({ context }: Route.LoaderArgs) {
 // const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
+    console.log('running trade');
     const { symbol } = useTradeDataStore();
     const { orderBookMode } = useAppSettings();
 
