@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import {
   isRouteErrorResponse,
   Links,
@@ -16,7 +16,7 @@ import './css/index.css';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import { useDebugStore } from './stores/DebugStore';
 
-// FIX: Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
+// Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { hasError: boolean }
@@ -49,13 +49,12 @@ class ComponentErrorBoundary extends React.Component<
   }
 }
 
-// FIX: Added loading component for async operations
+// Added loading component for async operations
 function LoadingIndicator() {
   return <div className="loading-indicator">Loading...</div>;
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  // FIX: Properly load external script with error handling
   useEffect(() => {
     const script = document.createElement('script');
     script.src = "../tv/datafeeds/udf/dist/bundle.js";
@@ -85,25 +84,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
-        {/* FIX: Removed inline script - now loading dynamically in useEffect */}
+        {/* Removed inline script - now loading dynamically in useEffect */}
       </body>
     </html>
   );
 }
 
 export default function App() {
-  // FIX: Use memoized value to prevent unnecessary re-renders
+  // Use memoized value to prevent unnecessary re-renders
   const wsUrl = React.useMemo(() => useDebugStore.getState().wsUrl, []);
   
-  // FIX: Add WebSocket connection tracking state
-  const [wsConnected, setWsConnected] = useState(false);
+
   
   return (
     <Layout>
-      {/* FIX: Only use the props that WebSocketProvider supports */}
+  
       <WebSocketProvider url={wsUrl}>
         <div className='root-container'>
-          {/* FIX: Added error boundary for header */}
+          {/* Added error boundary for header */}
           <ComponentErrorBoundary>
             <header className='header'>
               <PageHeader/>
@@ -111,7 +109,7 @@ export default function App() {
           </ComponentErrorBoundary>
 
           <main className='content'>
-            {/* FIX: Added Suspense for async content loading */}
+            {/*  Added Suspense for async content loading */}
             <Suspense fallback={<LoadingIndicator />}>
               <ComponentErrorBoundary>
                 <Outlet />
@@ -119,7 +117,7 @@ export default function App() {
             </Suspense>
           </main>
 
-          {/* FIX: Added error boundary for notifications */}
+          {/* Added error boundary for notifications */}
           <ComponentErrorBoundary>
             <Notifications />
           </ComponentErrorBoundary>
@@ -154,7 +152,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
           <code>{stack}</code>
         </pre>
       )}
-      {/* FIX: Added refresh button for better user experience */}
+      {/*  Added refresh button for better user experience */}
       <button 
         onClick={() => window.location.reload()}
         className="retry-button"
