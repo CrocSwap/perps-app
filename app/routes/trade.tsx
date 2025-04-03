@@ -105,14 +105,14 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                 <div className={styles.symbolInfo}>
                     <SymbolInfo />
                 </div>
-                <div className={styles.containerTopLeft}>
-                    {/* <div className={styles.watchlist}>
+                {/* <div className={styles.containerTopLeft}>
+                    <div className={styles.watchlist}>
                         <WatchList />
-                    </div> */}
-                    {/* <div id='chartSection' className={styles.chart}>
+                    </div>
+                    <div id='chartSection' className={styles.chart}>
                         <TradingViewWrapper />
-                    </div> */}
-                </div>
+                    </div>
+                </div> */}
             </div>
             {/* <div className={styles.container}>
                 <section
