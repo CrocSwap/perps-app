@@ -17,6 +17,11 @@ export default function Portfolio({ loaderData }: Route.ComponentProps) {
         // <Welcome title='Portfolio' />
         <div className={styles.container}>
             {/* <TradeTable initialTab="Balances" /> */}
+            <h1>Portfolio</h1>
+            <p>Placeholder.</p>
+            <button>
+                <a href='/trade'>Go to Trade</a>
+            </button>
         </div>
     );
 }

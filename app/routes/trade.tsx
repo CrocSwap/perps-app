@@ -51,6 +51,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
         <div>
             <h1>Trade</h1>
             <p>Placeholder.</p>
+            <button>
+                <a href='/portfolio'>Go to Portfolio</a>
+            </button>
         </div>
     );
 }
