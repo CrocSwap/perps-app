@@ -56,6 +56,8 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
     // )
 
+    console.log({ symbol });
+
     return (
         <>
             <div className={styles.wsUrlSelector}>

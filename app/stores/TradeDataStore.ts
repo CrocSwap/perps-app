@@ -1,13 +1,7 @@
-import { use } from 'react';
-import {create} from 'zustand';
+import { create } from 'zustand';
 import { setLS } from '~/utils/AppUtils';
-import { NumFormatTypes } from '~/utils/Constants';
-import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import { createUserTradesSlice, type UserTradeStore} from './UserOrderStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-
-
+import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
 
 type TradeDataStore = UserTradeStore & {
     symbol: string;
@@ -15,36 +9,36 @@ type TradeDataStore = UserTradeStore & {
     symbolInfo: SymbolInfoIF | null;
     setSymbolInfo: (symbolInfo: SymbolInfoIF) => void;
     favs: string[];
-    setFavs: (favs:string[]) => void;
+    setFavs: (favs: string[]) => void;
     addToFavs: (coin: string) => void;
-} 
+};
 
- const useTradeDataStore = create<TradeDataStore>((set, get) => ({
-     ...createUserTradesSlice(set, get),
-     symbol: '',
+const useTradeDataStore = create<TradeDataStore>((set, get) => ({
+    ...createUserTradesSlice(set, get),
+    symbol: 'BTC',
     setSymbol: (symbol: string) => {
         setLS('activeCoin', symbol);
         set({ symbol });
-        get().setUserSymbolOrders(get().userOrders.filter(e=> e.coin === symbol));
+        get().setUserSymbolOrders(
+            get().userOrders.filter((e) => e.coin === symbol),
+        );
     },
     symbolInfo: null,
     setSymbolInfo: (symbolInfo: SymbolInfoIF) => {
         const prevSymbolInfo = get().symbolInfo;
-        if(prevSymbolInfo){
+        if (prevSymbolInfo) {
             const lastPriceChange = symbolInfo.markPx - prevSymbolInfo.markPx;
             symbolInfo.lastPriceChange = lastPriceChange;
         }
-        set({ symbolInfo })
+        set({ symbolInfo });
     },
     favs: [],
-    setFavs: (favs: string[]) => set({favs}),
+    setFavs: (favs: string[]) => set({ favs }),
     addToFavs: (coin: string) => {
-        if(get().favs.filter(e=> e==coin).length === 0){
-            set({favs: [...get().favs, coin]});
+        if (get().favs.filter((e) => e == coin).length === 0) {
+            set({ favs: [...get().favs, coin] });
         }
     },
 }));
 
-
-
-export {useTradeDataStore};
+export { useTradeDataStore };
