@@ -1,4 +1,6 @@
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
+import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -129,17 +131,17 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                             </div> */}
                         </section>
                         <section className={styles.containerBottom}>
-                            {/* <div className={styles.table}>
+                            <div className={styles.table}>
                                 <TradeTable />
-                            </div> */}
-                            {/* <div className={styles.wallet}>
+                            </div>
+                            <div className={styles.wallet}>
                                 <DepositDropdown
                                     isUserConnected={false}
                                     setIsUserConnected={() =>
                                         console.log('connected')
                                     }
                                 />
-                            </div> */}
+                            </div>
                         </section>
                     </div>
                 )}

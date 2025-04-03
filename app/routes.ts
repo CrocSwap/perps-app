@@ -4,7 +4,7 @@ export default [
     // Renders "routes/home/home.tsx" at "/"
     index('routes/home/home.tsx'),
 
-    route('trade/:marketId?', 'routes/trade.tsx'),
+    // route('trade/:marketId?', 'routes/trade.tsx'),
 
     // Renders "routes/vaults/vaults.tsx" at "/vaults"
     route('vaults', 'routes/vaults/vaults.tsx'),
