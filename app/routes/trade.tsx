@@ -99,58 +99,43 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
             </div>
 
             <TradeRouteHandler />
-            {symbol.length > 0 ? (
-                <div className={styles.container}>
-                    <section
-                        className={`${styles.containerTop} ${
-                            orderBookMode === 'large'
-                                ? styles.orderBookLarge
-                                : ''
-                        }`}
-                    >
-                        <div className={styles.containerTopLeft}>
-                            <div className={styles.watchlist}>
-                                <WatchList />
-                            </div>
-                            <div className={styles.symbolInfo}>
-                                <SymbolInfo />
-                            </div>
-                            <div id='chartSection' className={styles.chart}>
-                                <TradingViewWrapper />
-                            </div>
+            <div className={styles.container}>
+                <section
+                    className={`${styles.containerTop} ${
+                        orderBookMode === 'large' ? styles.orderBookLarge : ''
+                    }`}
+                >
+                    <div className={styles.containerTopLeft}>
+                        <div className={styles.watchlist}>
+                            <WatchList />
                         </div>
+                        <div className={styles.symbolInfo}>
+                            <SymbolInfo />
+                        </div>
+                        <div id='chartSection' className={styles.chart}>
+                            <TradingViewWrapper />
+                        </div>
+                    </div>
 
-                        <div id='orderBookSection' className={styles.orderBook}>
-                            <OrderBookSection symbol={symbol} />
-                        </div>
-                        <div className={styles.tradeModules}>
-                            <OrderInput />
-                        </div>
-                    </section>
-                    <section className={styles.containerBottom}>
-                        <div className={styles.table}>
-                            <TradeTable />
-                        </div>
-                        <div className={styles.wallet}>
-                            <DepositDropdown
-                                isUserConnected={false}
-                                setIsUserConnected={() =>
-                                    console.log('connected')
-                                }
-                            />
-                        </div>
-                    </section>
-                </div>
-            ) : (
-                // <div></div>
-                <div>
-                    <h1>Trade</h1>
-                    <p>Symbol value = {symbol}</p>
-                    <button>
-                        <a href='/portfolio'>Go to Portfolio</a>
-                    </button>
-                </div>
-            )}
+                    <div id='orderBookSection' className={styles.orderBook}>
+                        <OrderBookSection symbol={symbol} />
+                    </div>
+                    <div className={styles.tradeModules}>
+                        <OrderInput />
+                    </div>
+                </section>
+                <section className={styles.containerBottom}>
+                    <div className={styles.table}>
+                        <TradeTable />
+                    </div>
+                    <div className={styles.wallet}>
+                        <DepositDropdown
+                            isUserConnected={false}
+                            setIsUserConnected={() => console.log('connected')}
+                        />
+                    </div>
+                </section>
+            </div>
         </>
     );
 }
