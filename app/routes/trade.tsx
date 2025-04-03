@@ -1,13 +1,11 @@
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
-import OrderInput from '~/components/Trade/OrderInput/OrderInput';
-import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { debugWallets, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
+import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
@@ -120,28 +118,28 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                                 </div>
                             </div>
 
-                            {/* <div
+                            <div
                                 id='orderBookSection'
                                 className={styles.orderBook}
                             >
                                 <OrderBookSection symbol={symbol} />
-                            </div> */}
-                            <div className={styles.tradeModules}>
-                                <OrderInput />
                             </div>
+                            {/* <div className={styles.tradeModules}>
+                                <OrderInput />
+                            </div> */}
                         </section>
                         <section className={styles.containerBottom}>
-                            <div className={styles.table}>
+                            {/* <div className={styles.table}>
                                 <TradeTable />
-                            </div>
-                            <div className={styles.wallet}>
+                            </div> */}
+                            {/* <div className={styles.wallet}>
                                 <DepositDropdown
                                     isUserConnected={false}
                                     setIsUserConnected={() =>
                                         console.log('connected')
                                     }
                                 />
-                            </div>
+                            </div> */}
                         </section>
                     </div>
                 )}
