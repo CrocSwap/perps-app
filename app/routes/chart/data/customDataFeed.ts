@@ -1,15 +1,11 @@
+import { WsChannels } from '~/hooks/useWsObserver';
 import type {
-    HistoryCallback,
     IDatafeedChartApi,
     LibrarySymbolInfo,
-    ResolutionString,
-    SubscribeBarsCallback,
 } from '~/tv/charting_library/charting_library';
 import { getHistoricalData } from './candleDataCache';
-import { mapResolutionToInterval, supportedResolutions } from './utils/utils';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
-import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
+import { mapResolutionToInterval, supportedResolutions } from './utils/utils';
 
 export const createDataFeed = (
     subscribe: (channel: string, payload: any) => void,
