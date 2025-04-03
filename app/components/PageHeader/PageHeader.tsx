@@ -4,9 +4,7 @@ import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
 import { type useModalIF, useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
-import AppOptions from '../AppOptions/AppOptions';
 import Button from '../Button/Button';
-import Modal from '../Modal/Modal';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
 import InternarionalSettingsDropdown from './InternarionalSettingsDropdown/InternarionalSettingsDropdown';
@@ -300,11 +298,11 @@ export default function PageHeader() {
             </header>
 
             {dropdownMenuDisplay}
-            {appSettingsModal.isOpen && (
+            {/* {appSettingsModal.isOpen && (
                 <Modal close={appSettingsModal.close} position={'center'}>
                     <AppOptions modalControl={appSettingsModal} />
                 </Modal>
-            )}
+            )} */}
         </>
     );
 }

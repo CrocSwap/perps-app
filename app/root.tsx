@@ -7,11 +7,10 @@ import {
     ScrollRestoration,
 } from 'react-router';
 import type { Route } from './+types/root';
-import PageHeader from './components/PageHeader/PageHeader';
 
+import PageHeader from './components/PageHeader/PageHeader';
 import './css/app.css';
 import './css/index.css';
-import { useDebugStore } from './stores/DebugStore';
 
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
@@ -36,7 +35,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-    const { wsUrl } = useDebugStore();
+    // const { wsUrl } = useDebugStore();
 
     return (
         <Layout>
