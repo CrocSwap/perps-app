@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LuMenu, LuSettings, LuWallet } from 'react-icons/lu';
+import { LuWallet } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
 import { type useModalIF, useModal } from '~/hooks/useModal';
@@ -267,7 +267,7 @@ export default function PageHeader() {
                     ))}
                     {moreDropdownDisplay}
                 </nav>
-                <div className={styles.rightSide}>
+                {/* <div className={styles.rightSide}>
                     {isUserConnected && depositDisplay}
                     {isUserConnected && networksDisplay}
                     {isUserConnected && rpcDisplay}
@@ -296,7 +296,7 @@ export default function PageHeader() {
                     >
                         <LuMenu size={20} />
                     </button>
-                </div>
+                </div> */}
             </header>
 
             {dropdownMenuDisplay}
