@@ -15,7 +15,7 @@ type TradeDataStore = UserTradeStore & {
 
 const useTradeDataStore = create<TradeDataStore>((set, get) => ({
     ...createUserTradesSlice(set, get),
-    symbol: 'BTC',
+    symbol: '',
     setSymbol: (symbol: string) => {
         setLS('activeCoin', symbol);
         set({ symbol });
