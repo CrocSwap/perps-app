@@ -59,87 +59,103 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
     console.log({ symbol });
 
-    return (
-        <>
-            <div className={styles.wsUrlSelector}>
-                <ComboBox
-                    value={wsUrl}
-                    options={wsUrls}
-                    onChange={(value) => setWsUrl(value)}
-                />
-            </div>
-            <div className={styles.walletSelector}>
-                <ComboBox
-                    value={debugWallet.label}
-                    options={debugWallets}
-                    fieldName='label'
-                    onChange={(value) =>
-                        setDebugWallet({
-                            label: value,
-                            address:
-                                debugWallets.find(
-                                    (wallet) => wallet.label === value,
-                                )?.address || '',
-                        })
-                    }
-                />
-            </div>
-            <div
-                className={`${styles.wsToggle} ${
-                    isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused
-                }`}
-                onClick={() => setIsWsEnabled(!isWsEnabled)}
-            >
-                <div className={styles.wsToggleButton}>
-                    {' '}
-                    {isWsEnabled ? 'WS Running' : 'Paused'}
+    try {
+        return (
+            <>
+                <div className={styles.wsUrlSelector}>
+                    <ComboBox
+                        value={wsUrl}
+                        options={wsUrls}
+                        onChange={(value) => setWsUrl(value)}
+                    />
                 </div>
-            </div>
-
-            <TradeRouteHandler />
-            {symbol && symbol.length > 0 && (
-                <div className={styles.container}>
-                    <section
-                        className={`${styles.containerTop} ${
-                            orderBookMode === 'large'
-                                ? styles.orderBookLarge
-                                : ''
-                        }`}
-                    >
-                        <div className={styles.containerTopLeft}>
-                            <div className={styles.watchlist}>
-                                <WatchList />
-                            </div>
-                            <div className={styles.symbolInfo}>
-                                <SymbolInfo />
-                            </div>
-                            <div id='chartSection' className={styles.chart}>
-                                <TradingViewWrapper />
-                            </div>
-                        </div>
-
-                        <div id='orderBookSection' className={styles.orderBook}>
-                            <OrderBookSection symbol={symbol} />
-                        </div>
-                        <div className={styles.tradeModules}>
-                            <OrderInput />
-                        </div>
-                    </section>
-                    <section className={styles.containerBottom}>
-                        <div className={styles.table}>
-                            <TradeTable />
-                        </div>
-                        <div className={styles.wallet}>
-                            <DepositDropdown
-                                isUserConnected={false}
-                                setIsUserConnected={() =>
-                                    console.log('connected')
-                                }
-                            />
-                        </div>
-                    </section>
+                <div className={styles.walletSelector}>
+                    <ComboBox
+                        value={debugWallet.label}
+                        options={debugWallets}
+                        fieldName='label'
+                        onChange={(value) =>
+                            setDebugWallet({
+                                label: value,
+                                address:
+                                    debugWallets.find(
+                                        (wallet) => wallet.label === value,
+                                    )?.address || '',
+                            })
+                        }
+                    />
                 </div>
-            )}
-        </>
-    );
+                <div
+                    className={`${styles.wsToggle} ${
+                        isWsEnabled
+                            ? styles.wsToggleRunning
+                            : styles.wsTogglePaused
+                    }`}
+                    onClick={() => setIsWsEnabled(!isWsEnabled)}
+                >
+                    <div className={styles.wsToggleButton}>
+                        {' '}
+                        {isWsEnabled ? 'WS Running' : 'Paused'}
+                    </div>
+                </div>
+
+                <TradeRouteHandler />
+                {symbol && symbol.length > 0 && (
+                    <div className={styles.container}>
+                        <section
+                            className={`${styles.containerTop} ${
+                                orderBookMode === 'large'
+                                    ? styles.orderBookLarge
+                                    : ''
+                            }`}
+                        >
+                            <div className={styles.containerTopLeft}>
+                                <div className={styles.watchlist}>
+                                    <WatchList />
+                                </div>
+                                <div className={styles.symbolInfo}>
+                                    <SymbolInfo />
+                                </div>
+                                <div id='chartSection' className={styles.chart}>
+                                    <TradingViewWrapper />
+                                </div>
+                            </div>
+
+                            <div
+                                id='orderBookSection'
+                                className={styles.orderBook}
+                            >
+                                <OrderBookSection symbol={symbol} />
+                            </div>
+                            <div className={styles.tradeModules}>
+                                <OrderInput />
+                            </div>
+                        </section>
+                        <section className={styles.containerBottom}>
+                            <div className={styles.table}>
+                                <TradeTable />
+                            </div>
+                            <div className={styles.wallet}>
+                                <DepositDropdown
+                                    isUserConnected={false}
+                                    setIsUserConnected={() =>
+                                        console.log('connected')
+                                    }
+                                />
+                            </div>
+                        </section>
+                    </div>
+                )}
+            </>
+        );
+    } catch (error) {
+        console.log({ error });
+        return (
+            <div>
+                <h1>Trade</h1>
+                <p>Something went wrong while loading the trade page.</p>
+                <p>{JSON.stringify(error)}</p>
+            </div>
+        );
+    }
 }
