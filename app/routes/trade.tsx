@@ -1,10 +1,7 @@
 import { useEffect } from 'react';
-import { useAppSettings } from '~/stores/AppSettingsStore';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
-import TradeRouteHandler from './trade/traderoutehandler';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -21,16 +18,16 @@ export function loader({ context }: Route.LoaderArgs) {
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
     const { symbol } = useTradeDataStore();
-    const { orderBookMode } = useAppSettings();
+    // const { orderBookMode } = useAppSettings();
 
-    const {
-        wsUrl,
-        setWsUrl,
-        debugWallet,
-        setDebugWallet,
-        isWsEnabled,
-        setIsWsEnabled,
-    } = useDebugStore();
+    // const {
+    //     wsUrl,
+    //     setWsUrl,
+    //     debugWallet,
+    //     setDebugWallet,
+    //     isWsEnabled,
+    //     setIsWsEnabled,
+    // } = useDebugStore();
 
     // const nav = (
     //      {/* Example nav links to each child route */}
@@ -89,7 +86,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                 </div>
             </div> */}
 
-            <TradeRouteHandler />
+            {/* <TradeRouteHandler /> */}
             <div>
                 <div className={styles.tradeHeader}>
                     <div className={styles.tradeHeaderTitle}>
