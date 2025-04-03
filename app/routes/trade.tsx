@@ -6,7 +6,6 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { debugWallets, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
-import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 export function meta({}: Route.MetaArgs) {
@@ -104,9 +103,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                     <div className={styles.watchlist}>
                         <WatchList />
                     </div>
-                    <div className={styles.symbolInfo}>
+                    {/* <div className={styles.symbolInfo}>
                         <SymbolInfo />
-                    </div>
+                    </div> */}
                     {/* <div id='chartSection' className={styles.chart}>
                         <TradingViewWrapper />
                     </div> */}
