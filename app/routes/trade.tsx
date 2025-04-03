@@ -1,7 +1,6 @@
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
-import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -133,7 +132,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                         </section>
                         <section className={styles.containerBottom}>
                             <div className={styles.table}>
-                                <TradeTable />
+                                {/* <TradeTable /> */}
                             </div>
                             <div className={styles.wallet}>
                                 <DepositDropdown
