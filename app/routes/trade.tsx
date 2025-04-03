@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -108,9 +107,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                     <div className={styles.symbolInfo}>
                         <SymbolInfo />
                     </div>
-                    <div id='chartSection' className={styles.chart}>
+                    {/* <div id='chartSection' className={styles.chart}>
                         <TradingViewWrapper />
-                    </div>
+                    </div> */}
                 </div>
             </div>
             {/* <div className={styles.container}>
