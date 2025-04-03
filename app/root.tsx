@@ -8,6 +8,7 @@ import {
 } from 'react-router';
 import type { Route } from './+types/root';
 
+import PageHeader from './components/PageHeader/PageHeader';
 import './css/app.css';
 import './css/index.css';
 
@@ -40,7 +41,9 @@ export default function App() {
         <Layout>
             {/* <WebSocketProvider url={wsUrl}> */}
             <div className='root-container'>
-                <header className='header'>{/* <PageHeader /> */}</header>
+                <header className='header'>
+                    <PageHeader />
+                </header>
 
                 <main className='content'>
                     <Outlet />
