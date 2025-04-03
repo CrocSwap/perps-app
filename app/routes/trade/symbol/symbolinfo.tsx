@@ -16,7 +16,7 @@ interface SymbolInfoProps {}
 const symbolList = ['BTC', 'ETH', 'SOL', 'XRP', 'ADA', 'DOGE'];
 
 const SymbolInfo: React.FC<SymbolInfoProps> = ({}) => {
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
+    const { subscribe, unsubscribe, unsubscribeAllByChannel } = useWsObserver();
 
     const { symbol, setSymbolInfo, symbolInfo } = useTradeDataStore();
 
@@ -25,12 +25,6 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({}) => {
     const { formatNum } = useNumFormatter();
 
     const { orderBookMode } = useAppSettings();
-
-    useEffect(() => {
-        return () => {
-            unsubscribeAllByChannel('activeAssetCtx');
-        };
-    }, []);
 
     useEffect(() => {
         subscribe(WsChannels.ACTIVE_COIN_DATA, {
@@ -42,6 +36,10 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({}) => {
             },
             single: true,
         });
+        // Unsubscribe when component unmounts
+        return () => {
+            unsubscribeAllByChannel('activeAssetCtx');
+        };
     }, [symbol]);
 
     const get24hChangeString = () => {
