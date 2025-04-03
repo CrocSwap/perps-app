@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
-import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { debugWallets, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
 import TradeRouteHandler from './trade/traderoutehandler';
@@ -55,7 +53,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
     return (
         <>
-            <div className={styles.wsUrlSelector}>
+            {/* <div className={styles.wsUrlSelector}>
                 <ComboBox
                     value={wsUrl}
                     options={wsUrls}
@@ -89,7 +87,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                     {' '}
                     {isWsEnabled ? 'WS Running' : 'Paused'}
                 </div>
-            </div>
+            </div> */}
 
             <TradeRouteHandler />
             <div>
