@@ -1,7 +1,4 @@
-import { useEffect } from 'react';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { Route } from '../+types/root';
-import styles from './trade.module.css';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -17,7 +14,7 @@ export function loader({ context }: Route.LoaderArgs) {
 // const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
-    const { symbol } = useTradeDataStore();
+    // const { symbol } = useTradeDataStore();
     // const { orderBookMode } = useAppSettings();
 
     // const {
@@ -44,9 +41,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
     // </nav>
 
     // )
-    useEffect(() => {
-        console.log({ symbol });
-    }, [symbol]);
+    // useEffect(() => {
+    //     console.log({ symbol });
+    // }, [symbol]);
 
     return (
         <>
@@ -88,11 +85,11 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
             {/* <TradeRouteHandler /> */}
             <div>
-                <div className={styles.tradeHeader}>
+                {/* <div className={styles.tradeHeader}>
                     <div className={styles.tradeHeaderTitle}>
                         Symbol: {symbol.toUpperCase()}
                     </div>
-                </div>
+                </div> */}
                 <button>
                     <a href='/portfolio'>Go to Portfolio</a>
                 </button>
