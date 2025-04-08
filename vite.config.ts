@@ -10,8 +10,8 @@ export default defineConfig(({ isSsrBuild }) => ({
         }
       : undefined,
   },
- 
   plugins: [ reactRouter(), tsconfigPaths()],
+  ssr: { noExternal: ['react-router-async'] },
   // optimizeDeps: {
   //   include: ["react-use-websocket"],
   // },

@@ -15,6 +15,7 @@ import './css/app.css';
 import './css/index.css';
 import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
+import { HelmetProvider } from '~/utils/helmet';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -93,36 +94,38 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   // Use memoized value to prevent unnecessary re-renders
   const { wsUrl } = useDebugStore();
-
   
+  const helmetContext = {};
+
   return (
-    <Layout>
-  
-      <WsObserverProvider url={wsUrl}>
-        <div className='root-container'>
-          {/* Added error boundary for header */}
-          <ComponentErrorBoundary>
-            <header className='header'>
-              <PageHeader/>
-            </header>
-          </ComponentErrorBoundary>
+    <HelmetProvider context={helmetContext}>
+      <Layout>
+        <WsObserverProvider url={wsUrl}>
+          <div className='root-container'>
+            {/* Added error boundary for header */}
+            <ComponentErrorBoundary>
+              <header className='header'>
+                <PageHeader/>
+              </header>
+            </ComponentErrorBoundary>
 
-          <main className='content'>
-            {/*  Added Suspense for async content loading */}
-            <Suspense fallback={<LoadingIndicator />}>
-              <ComponentErrorBoundary>
-                <Outlet />
-              </ComponentErrorBoundary>
-            </Suspense>
-          </main>
+            <main className='content'>
+              {/*  Added Suspense for async content loading */}
+              <Suspense fallback={<LoadingIndicator />}>
+                <ComponentErrorBoundary>
+                  <Outlet />
+                </ComponentErrorBoundary>
+              </Suspense>
+            </main>
 
-          {/* Added error boundary for notifications */}
-          <ComponentErrorBoundary>
-            <Notifications />
-          </ComponentErrorBoundary>
-        </div>
-        </WsObserverProvider>
-    </Layout>
+            {/* Added error boundary for notifications */}
+            <ComponentErrorBoundary>
+              <Notifications />
+            </ComponentErrorBoundary>
+          </div>
+          </WsObserverProvider>
+      </Layout>
+    </HelmetProvider>
   );
 }
 
