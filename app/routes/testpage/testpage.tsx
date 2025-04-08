@@ -1,15 +1,21 @@
+import { useState } from 'react';
 import ScaleOrders from '~/components/Trade/OrderInput/ScaleOrders/ScaleOrders';
 import styles from './testpage.module.css';
 
 interface propsIF {}
 
+const randomNumber = Math.random() * 2;
 // main react fn
 export default function testpage(props: propsIF) {
     false && props;
 
+    const [selectedAsset, setSelectedAsset] = useState<'BTC' | 'ETH'>(
+        randomNumber > 1 ? 'BTC' : 'ETH',
+    );
+
     return (
         <>
-            <title>My Page Title</title>
+            <title>{`${selectedAsset} Page Title`}</title>
             <meta name='description' content='My Page Description' />
             <meta
                 name='viewport'
@@ -23,7 +29,7 @@ export default function testpage(props: propsIF) {
             <meta property='og:url' content='https://www.example.com' />
             <meta
                 property='og:image'
-                content='https://res.cloudinary.com/demo/image/upload/l_text:Arial_50_bold:BTC%20USDC,co_rgb:FFFFFF,c_fit,w_1000,h_500/v1/background.jpg'
+                content={`https://res.cloudinary.com/demo/image/upload/l_text:Arial_50_bold:${selectedAsset}%20USDC,co_rgb:FFFFFF,c_fit,w_1000,h_500/v1/background.jpg`}
             />
             <meta property='og:description' content='My Page Description' />
             <meta property='og:site_name' content='My Site Name' />
@@ -32,8 +38,17 @@ export default function testpage(props: propsIF) {
             <meta property='og:image:width' content='1200' />
             <meta property='og:image:height' content='630' />
             <meta property='og:image:type' content='image/jpeg' />
-            <meta property='og:title' content='My Page Title' />
+            <meta property='og:title' content={`${selectedAsset} Page Title`} />
             <div className={styles.testpage}>
+                <button
+                    onClick={() =>
+                        setSelectedAsset((prev) =>
+                            prev === 'BTC' ? 'ETH' : 'BTC',
+                        )
+                    }
+                >
+                    Switch to {selectedAsset === 'BTC' ? 'ETH' : 'BTC'}
+                </button>
                 <div style={{ width: '400px' }}>
                     <ScaleOrders
                         totalQuantity={parseFloat('0.2233')}
