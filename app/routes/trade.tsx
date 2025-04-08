@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { useParams } from 'react-router';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
@@ -47,12 +48,16 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
         setIsWsEnabled,
     } = useDebugStore();
 
+    const { marketId } = useParams<{ marketId: string }>(); // Get marketId from URL
+
     return (
         <>
-            <title>{`${symbol} Page Title`}</title>
+            <title>{`${marketId || 'BTC'} Page Title`}</title>
             <meta
                 property='og:image'
-                content={`https://res.cloudinary.com/demo/image/upload/l_text:Arial_50_bold:${symbol}%20USDC,co_rgb:FFFFFF,c_fit,w_1000,h_500/v1/background.jpg`}
+                content={`https://res.cloudinary.com/demo/image/upload/l_text:Arial_50_bold:${
+                    marketId || 'BTC'
+                }%20USDC,co_rgb:FFFFFF,c_fit,w_1000,h_500/v1/background.jpg`}
             />
             <div className={styles.wsUrlSelector}>
                 <ComboBox
