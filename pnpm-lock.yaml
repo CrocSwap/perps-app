@@ -64,7 +64,7 @@ importers:
         specifier: ^11.3.0
         version: 11.3.0
       typescript:
-        specifier: ^5.8.3
+        specifier: ^5.7.2
         version: 5.8.3
       vite:
         specifier: ^6.2.5
