@@ -21,19 +21,19 @@ importers:
         specifier: ^4.21.2
         version: 4.21.2
       framer-motion:
-        specifier: ^12.6.3
+        specifier: ^12.4.13
         version: 12.6.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       isbot:
-        specifier: ^5.1.26
+        specifier: ^5.1.17
         version: 5.1.26
       react:
-        specifier: ^19.1.0
+        specifier: ^19.0.0
         version: 19.1.0
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^19.0.0
         version: 19.1.0(react@19.1.0)
       react-icons:
-        specifier: ^5.5.0
+        specifier: ^5.4.0
         version: 5.5.0(react@19.1.0)
       react-router:
         specifier: ^7.1.5
