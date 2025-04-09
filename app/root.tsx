@@ -103,6 +103,27 @@ export default function App() {
         };
     }, []);
 
+    useEffect(() => {
+        const errorHandler = (event: ErrorEvent) => {
+            if (
+                event.error &&
+                event.error.message &&
+                event.error.message.includes('removeChild')
+            ) {
+                console.error('RemoveChild error occurred:', event.error);
+                console.trace('Stack trace at error handler');
+                // Optionally prevent default error handling
+                event.preventDefault();
+            }
+        };
+
+        window.addEventListener('error', errorHandler);
+
+        return () => {
+            window.removeEventListener('error', errorHandler);
+        };
+    }, []);
+
     const scriptRef = useRef<HTMLScriptElement | null>(null);
 
     useEffect(() => {
