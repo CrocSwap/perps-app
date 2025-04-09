@@ -81,6 +81,28 @@ export default function App() {
     // Use memoized value to prevent unnecessary re-renders
     const { wsUrl } = useDebugStore();
 
+    // Add this to a top-level component for debugging purposes only
+    useEffect(() => {
+        const originalRemoveChild = Node.prototype.removeChild;
+
+        // Use a type assertion to satisfy TypeScript
+        Node.prototype.removeChild = function <T extends Node>(child: T): T {
+            try {
+                return originalRemoveChild.call(this, child) as T;
+            } catch (e) {
+                console.error('RemoveChild error:', e);
+                console.log('Parent:', this);
+                console.log('Child to remove:', child);
+                console.trace('Stack trace');
+                throw e;
+            }
+        };
+
+        return () => {
+            Node.prototype.removeChild = originalRemoveChild;
+        };
+    }, []);
+
     const scriptRef = useRef<HTMLScriptElement | null>(null);
 
     useEffect(() => {
