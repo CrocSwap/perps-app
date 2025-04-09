@@ -17,7 +17,7 @@
     "dependencies": {
         "@eslint/js": "^9.24.0",
         "@netlify/functions": "3.0.4",
-        "@react-router/node": "^7.5.0",
+        "@react-router/node": "^7.1.5",
         "express": "^5.1.0",
         "framer-motion": "^12.6.3",
         "isbot": "^5.1.26",
