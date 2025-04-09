@@ -106,6 +106,7 @@ export default function App() {
                 scriptRef.current &&
                 document.head.contains(scriptRef.current)
             ) {
+                console.log({ scriptRef }, 'Removing TradingView script...');
                 document.head.removeChild(scriptRef.current);
             }
         };
