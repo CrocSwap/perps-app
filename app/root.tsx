@@ -100,16 +100,16 @@ export default function App() {
         document.head.appendChild(script);
         scriptRef.current = script;
 
-        return () => {
-            // Only remove if it's the script we added
-            if (
-                scriptRef.current &&
-                document.head.contains(scriptRef.current)
-            ) {
-                console.log({ scriptRef }, 'Removing TradingView script...');
-                document.head.removeChild(scriptRef.current);
-            }
-        };
+        // return () => {
+        //     // Only remove if it's the script we added
+        //     if (
+        //         scriptRef.current &&
+        //         document.head.contains(scriptRef.current)
+        //     ) {
+        //         console.log({ scriptRef }, 'Removing TradingView script...');
+        //         document.head.removeChild(scriptRef.current);
+        //     }
+        // };
     }, []);
 
     return (
