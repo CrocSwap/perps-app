@@ -15,7 +15,7 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       '@react-router/node':
-        specifier: ^7.5.0
+        specifier: ^7.1.5
         version: 7.5.0(react-router@7.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
       express:
         specifier: ^5.1.0
