@@ -56,6 +56,31 @@ function LoadingIndicator() {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
+    return (
+        <html lang='en'>
+            <head>
+                <meta charSet='utf-8' />
+                <meta
+                    name='viewport'
+                    content='width=device-width, initial-scale=1'
+                />
+                <Meta />
+                <Links />
+            </head>
+            <body>
+                {children}
+                <ScrollRestoration />
+                <Scripts />
+                {/* Removed inline script - now loading dynamically in useEffect */}
+            </body>
+        </html>
+    );
+}
+
+export default function App() {
+    // Use memoized value to prevent unnecessary re-renders
+    const { wsUrl } = useDebugStore();
+
     const scriptRef = useRef<HTMLScriptElement | null>(null);
 
     useEffect(() => {
@@ -85,31 +110,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             }
         };
     }, []);
-
-    return (
-        <html lang='en'>
-            <head>
-                <meta charSet='utf-8' />
-                <meta
-                    name='viewport'
-                    content='width=device-width, initial-scale=1'
-                />
-                <Meta />
-                <Links />
-            </head>
-            <body>
-                {children}
-                <ScrollRestoration />
-                <Scripts />
-                {/* Removed inline script - now loading dynamically in useEffect */}
-            </body>
-        </html>
-    );
-}
-
-export default function App() {
-    // Use memoized value to prevent unnecessary re-renders
-    const { wsUrl } = useDebugStore();
 
     return (
         <Layout>
