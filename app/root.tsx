@@ -64,6 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             'script[src*="bundle.js"]',
         );
         if (existingScript) return;
+        console.log({ existingScript }, 'Loading TradingView script...');
 
         const script = document.createElement('script');
         script.src = '/tv/datafeeds/udf/dist/bundle.js'; // Use absolute path
