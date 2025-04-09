@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@eslint/js':
-        specifier: ^9.24.0
+        specifier: ^9.20.0
         version: 9.24.0
       '@netlify/functions':
         specifier: 2.8.2
