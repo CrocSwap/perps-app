@@ -18,8 +18,25 @@ jobs:
                   cache: 'pnpm'
             - run: pnpm install
             - name: Run linter
-              run: pnpm lint || echo "::warning::Linting issues found but continuing workflow"
+              id: lint
+              run: |
+                  # Run lint and capture output even if it fails
+                  pnpm lint > lint-results.txt 2>&1 || true
+
+                  # Count errors/warnings (adjust pattern based on your linter output format)
+                  ERROR_COUNT=$(grep -c "error" lint-results.txt || echo 0)
+                  WARNING_COUNT=$(grep -c "warning" lint-results.txt || echo 0)
+
+                  # Set output variables for use in later steps
+                  echo "error_count=$ERROR_COUNT" >> $GITHUB_OUTPUT
+                  echo "warning_count=$WARNING_COUNT" >> $GITHUB_OUTPUT
+
+                  # Create warning annotation but don't fail the workflow
+                  if [ "$ERROR_COUNT" -gt 0 ] || [ "$WARNING_COUNT" -gt 0 ]; then
+                    echo "::warning::Found $ERROR_COUNT errors and $WARNING_COUNT warnings in linting"
+                  fi
               continue-on-error: true
+
             - name: Post lint results as comment
               if: ${{ always() }}
               uses: actions/github-script@v6
@@ -28,16 +45,35 @@ jobs:
                   script: |
                       const fs = require('fs');
                       try {
-                      // You may need to adjust this to capture your actual lint output
-                      // For example, you could redirect your lint output to a file
-                      const lintOutput = `Lint check completed. Please review any warnings mentioned above.`;
-
-                      github.rest.issues.createComment({
+                        // Get error/warning counts from previous step
+                        const errorCount = parseInt('${{ steps.lint.outputs.error_count }}', 10) || 0;
+                        const warningCount = parseInt('${{ steps.lint.outputs.warning_count }}', 10) || 0;
+                        
+                        let lintOutput = "No issues found";
+                        if (fs.existsSync('lint-results.txt')) {
+                          lintOutput = fs.readFileSync('lint-results.txt', 'utf8');
+                        }
+                        
+                        // Create summary with counts
+                        const summary = `## Lint Results Summary
+                        
+                        📊 **Stats:**
+                        - Errors: ${errorCount}
+                        - Warnings: ${warningCount}
+                        - Total issues: ${errorCount + warningCount}
+                        
+                        ${errorCount + warningCount > 0 ? '⚠️ Please review the following issues:' : '✅ All checks passed!'}
+                        
+                        \`\`\`
+                        ${lintOutput}
+                        \`\`\``;
+                        
+                        github.rest.issues.createComment({
                           issue_number: context.issue.number,
                           owner: context.repo.owner,
                           repo: context.repo.repo,
-                          body: '## Lint Results\n\n' + lintOutput
-                      });
+                          body: summary
+                        });
                       } catch (error) {
-                      console.log("Error posting comment:", error);
+                        console.log("Error posting comment:", error);
                       }
