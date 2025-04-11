@@ -36,7 +36,8 @@ jobs:
                     echo "::warning::Found $ERROR_COUNT errors and $WARNING_COUNT warnings in linting"
                   fi
 
-                  cat lint-results.txt >> $GITHUB_OUTPUT
+                  ENCODED_OUTPUT=$(base64 -w 0 lint-results.txt)
+                  echo "lint_output=$ENCODED_OUTPUT" >> $GITHUB_OUTPUT
               continue-on-error: true
 
             - name: Post lint results as comment
