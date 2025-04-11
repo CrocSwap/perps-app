@@ -33,7 +33,7 @@ export function loader({ context }: Route.LoaderArgs) {
 // const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
 
 export default function Trade() {
-// { loaderData }: Route.ComponentProps
+    // { loaderData }: Route.ComponentProps
     const { symbol } = useTradeDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;

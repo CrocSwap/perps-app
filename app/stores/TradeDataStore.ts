@@ -49,7 +49,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             favKeys: ['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK'],
             setFavKeys: (favs: string[]) => set({ favKeys: favs }),
             addToFavKeys: (coin: string) => {
-                if (get().favKeys.filter((e: string) => e == coin).length === 0) {
+                if (
+                    get().favKeys.filter((e: string) => e == coin).length === 0
+                ) {
                     set({ favKeys: [...get().favKeys, coin] });
                     set({
                         favCoins: [
