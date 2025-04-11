@@ -62,7 +62,7 @@ jobs:
                         - Warnings: ${warningCount}
                         - Total issues: ${errorCount + warningCount}
                         
-                        ${errorCount + warningCount > 0 ? '⚠️ Please review the linting issues:' : '✅ All checks passed!'}`;
+                        ${errorCount + warningCount > 0 ? '⚠️' : '✅ All checks passed!'}`;
                         
                         github.rest.issues.createComment({
                           issue_number: context.issue.number,
