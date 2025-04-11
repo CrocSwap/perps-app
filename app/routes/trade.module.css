@@ -30,9 +30,9 @@
         var(--trade-module-width-desktop-large);
 }
 /* .containerTop div{
-    background: var(--dark2);
-    height: 100%;
-    border-radius: var(--main-border-radius);
+  background: var(--dark2);
+  height: 100%;
+  border-radius: var(--main-border-radius);
 } */
 
 .containerBottom {
@@ -103,10 +103,10 @@
 
 .tradeModules {
     /* background: url('./tempImages/orderInput.png') !important;
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(2px); */
+background-size: 100% 100%;
+background-position: center;
+background-repeat: no-repeat;
+filter: blur(2px); */
 }
 
 /* -----------------------END OF TEMP CSS CODE */

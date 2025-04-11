@@ -28,6 +28,20 @@ export function useNumFormatter() {
         [parseNum],
     );
 
+    // return the group and decimal separators for a given locale
+    function getSeparators(locale: string): { decimal: string; group: string } {
+        const numberWithGroupAndDecimal = 1234567.89;
+
+        const parts = new Intl.NumberFormat(locale).formatToParts(
+            numberWithGroupAndDecimal,
+        );
+
+        const group = parts.find((p) => p.type === 'group')?.value || ',';
+        const decimal = parts.find((p) => p.type === 'decimal')?.value || '.';
+
+        return { group, decimal };
+    }
+
     // returns the number of decimal places in a number
     const decimalPrecision = (precisionNumber: number) => {
         if (!precisionNumber.toString().includes('.')) return 0;
@@ -61,6 +75,19 @@ export function useNumFormatter() {
         [numFormat, parseNum, getDefaultPrecision],
     );
 
+    const parseFormattedNum = useCallback(
+        (str: string) => {
+            const { group, decimal } = getSeparators(numFormat.value);
+
+            const cleaned = str
+                .replace(new RegExp(`\\${group}`, 'g'), '')
+                .replace(decimal, '.');
+
+            return Number(cleaned);
+        },
+        [numFormat],
+    );
+
     const formatPriceForChart = useCallback(
         (num: number | string) => {
             const precision =
@@ -81,6 +108,7 @@ export function useNumFormatter() {
         formatPriceForChart,
         decimalPrecision,
         getDefaultPrecision,
+        parseFormattedNum,
     };
 }
 

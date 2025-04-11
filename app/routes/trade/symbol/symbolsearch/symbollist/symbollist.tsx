@@ -8,6 +8,7 @@ import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import styles from './symbollist.module.css';
 import SymbolListTableHeader from './SymbolListTableHeader';
 import SymbolListTableRow from './SymbolListTableRow';
+import { MdSearchOff } from 'react-icons/md';
 
 interface SymbolListProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -157,15 +158,38 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
                     sortBy={sortBy}
                     sortDirection={sortDirection}
                 />
-                <div className={styles.symbolList}>
-                    {coinsToShow.map((c) => (
-                        <SymbolListTableRow
-                            key={c.coin}
-                            symbol={c}
-                            symbolSelectListener={symbolSelectListener}
-                        />
-                    ))}
-                </div>
+                {coinsToShow.length > 0 ? (
+                    <div className={styles.symbolList}>
+                        {coinsToShow.map((c) => (
+                            <SymbolListTableRow
+                                key={c.coin}
+                                symbol={c}
+                                symbolSelectListener={symbolSelectListener}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className={styles.symbolListEmpty}>
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <MdSearchOff
+                                className={styles.symbolListEmptyIcon}
+                            />
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2, delay: 0.2 }}
+                        >
+                            No results found
+                        </motion.div>
+                    </div>
+                )}
             </motion.div>
         </>
     );

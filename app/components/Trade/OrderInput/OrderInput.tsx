@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './OrderInput.module.css';
 import OrderDropdown from './OrderDropdown/OrderDropdown';
 import LeverageSlider from './LeverageSlider/LeverageSlider';
@@ -21,8 +21,13 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
+import {
+    useNotificationStore,
+    type NotificationStoreIF,
+} from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -64,7 +69,7 @@ export default function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
     const [modalContent, setModalContent] = useState<
-        'margin' | 'scale' | 'confirmation' | null
+        'margin' | 'scale' | 'confirm_buy' | 'confirm_sell' | null
     >(null);
 
     const [leverage, setLeverage] = useState(100);
@@ -95,8 +100,9 @@ export default function OrderInput() {
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
 
-    const { obChosenPrice, obChosenAmount, symbol } = useTradeDataStore();
-    const { formatNum } = useNumFormatter();
+    const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
+        useTradeDataStore();
+    const { formatNum, parseFormattedNum } = useNumFormatter();
 
     const appSettingsModal: useModalIF = useModal('closed');
 
@@ -133,11 +139,25 @@ export default function OrderInput() {
             handleTypeChange();
         }
         if (obChosenPrice > 0) {
-            console.log(obChosenPrice);
             setPrice(obChosenPrice.toString());
             handleTypeChange();
         }
     }, [obChosenAmount, obChosenPrice]);
+
+    const orderValue = useMemo(() => {
+        if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
+            return parseFormattedNum(size) * parseNum(symbolInfo?.markPx || 0);
+        } else if (
+            (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
+            price &&
+            price.length > 0 &&
+            size &&
+            size.length > 0
+        ) {
+            return parseFormattedNum(size) * parseNum(price);
+        }
+        return 0;
+    }, [size, price, marketOrderType, symbolInfo?.markPx]);
 
     useEffect(() => {
         setSize('');
@@ -156,7 +176,7 @@ export default function OrderInput() {
     };
 
     const openModalWithContent = (
-        content: 'margin' | 'scale' | 'confirmation',
+        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
     ) => {
         setModalContent(content);
         appSettingsModal.open();
@@ -387,7 +407,9 @@ export default function OrderInput() {
         handleChangetotalOrders: handleTotalordersPriceRange,
         totalOrders: priceRangeTotalOrders,
     };
-    // ------------------------------------END OF PROPS-----------------------------
+
+    const notifications: NotificationStoreIF = useNotificationStore();
+
     return (
         <div className={styles.mainContainer}>
             <div className={styles.mainContent}>
@@ -397,11 +419,6 @@ export default function OrderInput() {
                         value={marketOrderType}
                         onChange={handleMarketOrderTypeChange}
                     />
-                    {/* <OrderDropdown
-                        options={isolatedOrderTypes}
-                        value={isolatedOrderType}
-                        onChange={handleIsolatedOrderTypeChange}
-                    /> */}
                     <button
                         onClick={() => openModalWithContent('margin')}
                         className={styles.isolatedButton}
@@ -445,14 +462,6 @@ export default function OrderInput() {
 
                 {showPriceRangeComponent && <PriceRange {...priceRangeProps} />}
                 {marketOrderType === 'scale' && priceDistributionButtons}
-                {/* {marketOrderType === 'scale' && (
-                    <ScaleOrders
-                    totalQuantity={parseFloat(priceRangeTotalOrders)}
-                    minPrice={parseFloat(priceRangeMin)}
-                    maxPrice={parseFloat(priceRangeMax)}
-                    
-                />
-                )} */}
                 {marketOrderType === 'twap' && <RunningTime />}
 
                 <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
@@ -461,6 +470,8 @@ export default function OrderInput() {
             <PlaceOrderButtons
                 orderMarketPrice={marketOrderType}
                 openModalWithContent={openModalWithContent}
+                orderValue={formatNum(orderValue)}
+                leverage={leverage}
             />
 
             {appSettingsModal.isOpen && (
@@ -482,8 +493,21 @@ export default function OrderInput() {
                             onClose={appSettingsModal.close}
                         />
                     )}
-                    {modalContent === 'confirmation' && (
-                        <ConfirmationModal onClose={appSettingsModal.close} />
+                    {modalContent === 'confirm_buy' && (
+                        <ConfirmationModal
+                            onClose={() => {
+                                notifications.add('buyPending');
+                                appSettingsModal.close();
+                            }}
+                        />
+                    )}
+                    {modalContent === 'confirm_sell' && (
+                        <ConfirmationModal
+                            onClose={() => {
+                                notifications.add('sellPending');
+                                appSettingsModal.close();
+                            }}
+                        />
                     )}
                 </Modal>
             )}

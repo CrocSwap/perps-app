@@ -1,0 +1,41 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+
+    width: 100%;
+    max-width: 1200px; /* Add a max-width to constrain the content */
+    margin-left: auto;
+    margin-right: auto;
+}
+.container header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--text1, #e1eeee);
+
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-xl, 36px);
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+}
+.container header a {
+    color: var(--accent1, #7371fc);
+    font-size: var(--font-size-m, 18px);
+}
+.content {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    align-self: stretch;
+}
+
+@media (min-width: 768px) {
+    .container {
+        margin-top: 96px;
+    }
+}

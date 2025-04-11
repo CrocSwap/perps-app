@@ -226,11 +226,9 @@ export default function PageHeader() {
                                         ? styles.activeNavLink
                                         : styles.navLink
                                 }
-                                onClick={
-                                    isMenuOpen
-                                        ? () => setIsMenuOpen(false)
-                                        : undefined
-                                }
+                                onClick={() => {
+                                    if (isMenuOpen) setIsMenuOpen(false);
+                                }}
                             >
                                 {link.name}
                             </Link>

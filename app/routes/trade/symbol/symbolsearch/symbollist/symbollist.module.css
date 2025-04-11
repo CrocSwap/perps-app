@@ -145,3 +145,18 @@
 .favIconActive:hover {
     opacity: 0.8;
 }
+
+.symbolListEmpty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    color: var(--text2);
+}
+
+.symbolListEmptyIcon {
+    font-size: 2rem;
+    color: var(--text2);
+}

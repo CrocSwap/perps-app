@@ -29,14 +29,24 @@ const notificationMeta: { [x: string]: notificationMetaIF } = {
         messages: ['Switched to 100x Leverage'],
         icon: 'check',
     },
-    orderPending: {
-        title: 'Order Pending',
-        messages: ['Order 0.0001 ETH at $2,300'],
+    buyPending: {
+        title: 'Buy / Long Order Pending',
+        messages: ['Buying 0.0001 ETH at $2,300'],
         icon: 'spinner',
     },
-    orderConfirmed: {
-        title: 'Order Confirmed',
-        messages: ['Order 0.0001 ETH at $2,300'],
+    buyConfirmed: {
+        title: 'Buy / Long Order Confirmed',
+        messages: ['Bought 0.0001 ETH at $2,300'],
+        icon: 'check',
+    },
+    sellPending: {
+        title: 'Sell / Short Order Pending',
+        messages: ['Selling 0.0001 ETH at $2,300'],
+        icon: 'spinner',
+    },
+    sellConfirmed: {
+        title: 'Sell / Short Confirmed',
+        messages: ['Sold 0.0001 ETH at $2,300'],
         icon: 'check',
     },
     depositPending: {

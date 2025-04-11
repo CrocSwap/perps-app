@@ -57,7 +57,7 @@ export default function ConfirmationModal(props: PropsIF) {
             </header>
 
             <div className={styles.contentContainer}>
-                {dataInfo.map((info, idx) => (
+                {dataInfo.map((info) => (
                     <div className={styles.infoRow}>
                         <div className={styles.infoLabel}>
                             {info.label}
@@ -85,7 +85,7 @@ export default function ConfirmationModal(props: PropsIF) {
                     isOn={isDontShowEnabled}
                     onToggle={() => setIsDontShowEnabled(!isDontShowEnabled)}
                     label={"Don't show this again"}
-                    reverse
+                    // reverse
                 />
             </div>
             <button className={styles.confirmButton} onClick={onClose}>

@@ -13,8 +13,6 @@ import { useEffect, useRef } from 'react';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 
 export default function Notifications() {
-    const hideNotificationsInDevelop = true;
-
     // boolean to suppress notifications if toggled by user
     const { enableTxNotifications, enableBackgroundFillNotif } =
         useAppOptions();
@@ -32,7 +30,7 @@ export default function Notifications() {
     const { debugWallet } = useDebugStore();
 
     // ws observer to subscribe to notifications
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
+    const { subscribe } = useWsObserver();
 
     // use effect to subscribe to notifications
     useEffect(() => {
@@ -65,8 +63,6 @@ export default function Notifications() {
             });
         }
     }, [debugWallet]);
-
-    if (hideNotificationsInDevelop) return null;
 
     return (
         <div className={styles.notifications}>
