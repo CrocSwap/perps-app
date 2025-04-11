@@ -104,9 +104,7 @@ export default function App() {
                 <div className='root-container'>
                     {/* Added error boundary for header */}
                     <ComponentErrorBoundary>
-                        <header className='header'>
-                            <PageHeader />
-                        </header>
+                      <PageHeader />
                     </ComponentErrorBoundary>
 
                     <main className='content'>
