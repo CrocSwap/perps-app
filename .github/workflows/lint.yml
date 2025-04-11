@@ -63,10 +63,7 @@ jobs:
                         - Total issues: ${errorCount + warningCount}
                         
                         ${errorCount + warningCount > 0 ? '⚠️ Please review the following issues:' : '✅ All checks passed!'}
-                        
-                        \`\`\`
-                        ${lintOutput}
-                        \`\`\``;
+
                         
                         github.rest.issues.createComment({
                           issue_number: context.issue.number,
