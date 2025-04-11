@@ -1,14 +1,8 @@
 .container {
-    width: 100%;
-    /* height: 100%; */
-/* height: 80px; */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    gap: 32px;
-    /* position: relative; */
-background-color: blue;
 }
 
 .header_content {
@@ -18,13 +12,10 @@ background-color: blue;
     justify-content: space-between;
     gap: 32px;
     width: 100%;
-    /* height: 100%; */
 }
 
 .container nav {
     width: 100%;
-    /* height: 100%; */
-
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -206,10 +197,10 @@ background-color: blue;
 
 .announcements {
     width: 100%;
-    height: 400px;
     overflow: hidden;
     position: relative;
     background-color: green;
+    font-size: var(--font-size-s);
 }
 
 .announcements > div {
@@ -217,8 +208,7 @@ background-color: blue;
     display: flex;
     flex-direction: row;
     white-space: nowrap;
-    animation: marquee 15s linear infinite;
-    
+    animation: marquee 25s linear infinite;
 }
 
 .announcements p {
@@ -226,8 +216,12 @@ background-color: blue;
 }
 
 @keyframes marquee {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
 }
 
 @keyframes bounce {

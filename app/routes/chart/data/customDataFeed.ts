@@ -3,7 +3,11 @@ import type {
     LibrarySymbolInfo,
     Mark,
 } from '~/tv/charting_library/charting_library';
-import { getHistoricalData, getMarkColorData, getMarkFillData } from './candleDataCache';
+import {
+    getHistoricalData,
+    getMarkColorData,
+    getMarkFillData,
+} from './candleDataCache';
 import {
     mapResolutionToInterval,
     resolutionToSecondsMiliSeconds,
@@ -103,7 +107,9 @@ export const createDataFeed = (
                 payload.forEach((element: any, index: number) => {
                     const isBuy = element.side === 'B';
 
-                    const markerColor = isBuy ? chartTheme.buy : chartTheme.sell;
+                    const markerColor = isBuy
+                        ? chartTheme.buy
+                        : chartTheme.sell;
 
                     const markData = {
                         id: index,

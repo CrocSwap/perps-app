@@ -56,11 +56,9 @@ export default function PageHeader() {
         setIsMoreDropdownOpen(false);
     }, isMoreDropdownOpen);
 
-    const announcements: string[] = [
-        'Announcements Bar',
-        'Hola',
-        'Bienvenue'
-    ];
+    // listing announcements here will populate the announcements bar
+    // ... in the DOM (check styling before pushing)
+    const announcements: string[] = [];
 
     const walletDisplay = (
         <section
@@ -270,16 +268,21 @@ export default function PageHeader() {
                     </div>
                     {dropdownMenuDisplay}
                     {appSettingsModal.isOpen && (
-                        <Modal close={appSettingsModal.close} position={'center'}>
+                        <Modal
+                            close={appSettingsModal.close}
+                            position={'center'}
+                        >
                             <AppOptions modalControl={appSettingsModal} />
                         </Modal>
                     )}
                 </div>
-                <div className={styles.announcements}>
+                { announcements.length && <div className={styles.announcements}>
                     <div>
-                    { announcements.map((a: string) => <div key={a}>{a}</div>) }
+                        {announcements.map((a: string) => (
+                            <p key={a}>{a}</p>
+                        ))}
                     </div>
-                </div>
+                </div> }
             </header>
         </>
     );
