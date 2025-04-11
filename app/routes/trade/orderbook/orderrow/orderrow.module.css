@@ -96,7 +96,9 @@
     opacity: 0.4;
 }
 
-.userOrder .orderRowPrice {
+.userOrder .orderRowPrice,
+.userOrder .orderRowSize,
+.userOrder .orderRowTotal {
     color: #e9e980 !important;
 }
 
