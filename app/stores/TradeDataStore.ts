@@ -1,11 +1,7 @@
-import { use } from 'react';
 import { create } from 'zustand';
 import { setLS } from '~/utils/AppUtils';
-import { NumFormatTypes } from '~/utils/Constants';
-import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { persist } from 'zustand/middleware';
 
 type TradeDataStore = UserTradeStore & {
@@ -53,13 +49,13 @@ const useTradeDataStore = create<TradeDataStore>()(
             favKeys: ['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK'],
             setFavKeys: (favs: string[]) => set({ favKeys: favs }),
             addToFavKeys: (coin: string) => {
-                if (get().favKeys.filter((e) => e == coin).length === 0) {
+                if (get().favKeys.filter((e: string) => e == coin).length === 0) {
                     set({ favKeys: [...get().favKeys, coin] });
                     set({
                         favCoins: [
                             ...get().favCoins,
                             get().coins.find(
-                                (e) => e.coin == coin,
+                                (e: SymbolInfoIF) => e.coin == coin,
                             ) as SymbolInfoIF,
                         ],
                     });
@@ -81,7 +77,7 @@ const useTradeDataStore = create<TradeDataStore>()(
         }),
         {
             name: 'TRADE_DATA',
-            partialize: (state: any) => ({
+            partialize: (state) => ({
                 favKeys: state.favKeys,
             }),
         },

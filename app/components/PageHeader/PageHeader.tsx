@@ -276,13 +276,15 @@ export default function PageHeader() {
                         </Modal>
                     )}
                 </div>
-                { announcements.length && <div className={styles.announcements}>
-                    <div>
-                        {announcements.map((a: string) => (
-                            <p key={a}>{a}</p>
-                        ))}
+                {announcements.length && (
+                    <div className={styles.announcements}>
+                        <div>
+                            {announcements.map((a: string) => (
+                                <p key={a}>{a}</p>
+                            ))}
+                        </div>
                     </div>
-                </div> }
+                )}
             </header>
         </>
     );
