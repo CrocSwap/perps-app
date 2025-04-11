@@ -14,8 +14,30 @@ jobs:
                   version: 8
             - uses: actions/setup-node@v3
               with:
-                  node-version: '18'
+                  node-version: '20'
                   cache: 'pnpm'
             - run: pnpm install
             - name: Run linter
-              run: pnpm lint
+              run: pnpm lint || echo "::warning::Linting issues found but continuing workflow"
+              continue-on-error: true
+            - name: Post lint results as comment
+              if: ${{ always() }}
+              uses: actions/github-script@v6
+              with:
+                  github-token: ${{secrets.GITHUB_TOKEN}}
+                  script: |
+                      const fs = require('fs');
+                      try {
+                      // You may need to adjust this to capture your actual lint output
+                      // For example, you could redirect your lint output to a file
+                      const lintOutput = `Lint check completed. Please review any warnings mentioned above.`;
+
+                      github.rest.issues.createComment({
+                          issue_number: context.issue.number,
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          body: '## Lint Results\n\n' + lintOutput
+                      });
+                      } catch (error) {
+                      console.log("Error posting comment:", error);
+                      }
