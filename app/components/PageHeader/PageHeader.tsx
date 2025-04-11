@@ -58,7 +58,7 @@ export default function PageHeader() {
 
     // listing announcements here will populate the announcements bar
     // ... in the DOM (check styling before pushing)
-    const announcements: string[] = [];
+    const announcements: string[] = ['Hello there'];
 
     const walletDisplay = (
         <section
@@ -276,14 +276,14 @@ export default function PageHeader() {
                         </Modal>
                     )}
                 </div>
-                {announcements.length && (
-                    <div className={styles.announcements}>
+                {!!announcements.length && (
+                    <aside className={styles.announcements}>
                         <div>
                             {announcements.map((a: string) => (
                                 <p key={a}>{a}</p>
                             ))}
                         </div>
-                    </div>
+                    </aside>
                 )}
             </header>
         </>
