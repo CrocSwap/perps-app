@@ -37,8 +37,9 @@ jobs:
                   fi
 
                   # Truncate output if it's extremely long (GitHub comment size limit)
-                  LINT_OUTPUT=$(cat lint-results.txt)
-                  echo $LINT_OUTPUT
+                  echo "lint_output<<EOF" >> $GITHUB_OUTPUT
+                  cat lint-results.txt >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
               continue-on-error: true
 
             - name: Post lint results as comment
