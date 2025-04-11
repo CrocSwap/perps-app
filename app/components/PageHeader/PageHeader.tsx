@@ -58,7 +58,9 @@ export default function PageHeader() {
 
     // listing announcements here will populate the announcements bar
     // ... in the DOM (check styling before pushing)
-    const announcements: string[] = ['Hello there'];
+    const announcements: string[] = [
+        // 'Hello there'
+    ];
 
     const walletDisplay = (
         <section

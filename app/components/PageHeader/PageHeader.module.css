@@ -6,6 +6,8 @@
 }
 
 .header_content {
+    /* `flex` allows elem to grow when there are no announcements */
+    flex: 1;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -198,7 +200,7 @@
 .announcements {
     width: 100%;
     overflow: hidden;
-    position: relative;
+    /* position: relative; */
     background-color: green;
     font-size: var(--font-size-s);
 }
