@@ -37,20 +37,20 @@ jobs:
                   fi
 
                   # Truncate output if it's extremely long (GitHub comment size limit)
-                    LINT_OUTPUT=$(cat lint-results.txt)
-                    if [ ${#LINT_OUTPUT} -gt 60000 ]; then
-                        echo "$(head -c 55000 lint-results.txt)
+                  LINT_OUTPUT=$(cat lint-results.txt)
+                  if [ ${#LINT_OUTPUT} -gt 60000 ]; then
+                    echo "$(head -c 55000 lint-results.txt)
                         
-                        ... [Output truncated due to size limits] ...
+                    ... [Output truncated due to size limits] ...
                         
-                        $(tail -c 5000 lint-results.txt)" > lint-results.txt
-                    fi
+                    $(tail -c 5000 lint-results.txt)" > lint-results.txt
+                  fi
                     
-                    # Escape the output for GitHub Actions
-                    LINT_OUTPUT_ESCAPED=$(cat lint-results.txt | sed 's/%/%25/g' | sed 's/\r/%0D/g' | sed 's/\n/%0A/g')
-                    echo "lint_output<<EOF" >> $GITHUB_OUTPUT
-                    echo "$LINT_OUTPUT_ESCAPED" >> $GITHUB_OUTPUT
-                    echo "EOF" >> $GITHUB_OUTPUT
+                  # Escape the output for GitHub Actions
+                  LINT_OUTPUT_ESCAPED=$(cat lint-results.txt | sed 's/%/%25/g' | sed 's/\r/%0D/g' | sed 's/\n/%0A/g')
+                  echo "lint_output<<EOF" >> $GITHUB_OUTPUT
+                  echo "$LINT_OUTPUT_ESCAPED" >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
               continue-on-error: true
 
             - name: Post lint results as comment
