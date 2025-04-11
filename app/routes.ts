@@ -1,5 +1,7 @@
 import { type RouteConfig, index, route } from '@react-router/dev/routes';
 
+// const symbol: string = localStorage.getItem('activeCoin');
+
 export default [
     // Renders "routes/home/home.tsx" at "/"
     index('routes/home/home.tsx'),

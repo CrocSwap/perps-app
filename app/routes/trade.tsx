@@ -15,8 +15,9 @@ import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import WebDataConsumer from './trade/webdataconsumer';
+// eslint-disable-next-line no-empty-pattern
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -31,8 +32,10 @@ export function loader({ context }: Route.LoaderArgs) {
 // const wsUrl = 'wss://api.hyperliquid.xyz/ws';
 // const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
 
-export default function Trade({ loaderData }: Route.ComponentProps) {
-    const { symbol, setSymbol } = useTradeDataStore();
+export default function Trade(
+    // { loaderData }: Route.ComponentProps
+) {
+    const { symbol } = useTradeDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
