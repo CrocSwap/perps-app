@@ -14,6 +14,7 @@ import NetworkDropdown from './NetworkDropdown/NetworkDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 import WalletDropdown from './WalletDropdown/WalletDropdown';
+import { useLinkGen, type useLinkGenMethodsIF } from '~/hooks/useLinkGen';
 export default function PageHeader() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
@@ -59,7 +60,7 @@ export default function PageHeader() {
     // listing announcements here will populate the announcements bar
     // ... in the DOM (check styling before pushing)
     const announcements: string[] = [
-        // 'Hello there'
+        'Hello there'
     ];
 
     const walletDisplay = (
@@ -196,6 +197,8 @@ export default function PageHeader() {
 
     const appSettingsModal: useModalIF = useModal('closed');
 
+    const linkGenTestpage: useLinkGenMethodsIF = useLinkGen('testpage');
+
     return (
         <>
             <header id={'pageHeader'} className={styles.container}>
@@ -276,7 +279,7 @@ export default function PageHeader() {
                         </Modal>
                     )}
                 </div>
-                {!!announcements.length && (
+                {!!announcements.length && linkGenTestpage.isPage && (
                     <aside className={styles.announcements}>
                         <div>
                             {announcements.map((a: string) => (
