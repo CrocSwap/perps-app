@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -101,6 +101,10 @@ export default function App() {
     // listing announcements here will populate the announcements bar
     // ... in the DOM (check styling before pushing)
     const announcements: string[] = ['Hello there'];
+    const [
+        showAnnouncements,
+        setShowAnnouncements
+    ] = useState<boolean>(!!announcements.length);
 
     const linkGenTestpage = useLinkGen('testpage');
 
@@ -113,7 +117,10 @@ export default function App() {
                         <PageHeader />
                     </ComponentErrorBoundary>
 
-                    {linkGenTestpage.isPage && !!announcements.length && (
+                    {linkGenTestpage.isPage
+                        && !!announcements.length
+                        && showAnnouncements
+                        && (
                         <ComponentErrorBoundary>
                             <aside
                                 style={{
@@ -125,39 +132,53 @@ export default function App() {
                                     overflow: 'hidden',
                                     backgroundColor: 'green',
                                     fontSize: 'var(--font-size-s)',
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
                                 }}
                             >
                                 <style>
                                     {`
-                                @keyframes announcements_marquee {
-                                    0% {
-                                        transform: translateX(100%);
+                                    @keyframes announcements_marquee {
+                                        0% {
+                                            transform: translateX(100%);
+                                        }
+                                        100% {
+                                            transform: translateX(-100%);
+                                        }
                                     }
-                                    100% {
-                                        transform: translateX(-100%);
-                                    }
-                                }
-                                `}
+                                    `}
                                 </style>
                                 <div
                                     style={{
                                         height: '100%',
-                                        display: 'flex',
-                                        flexDirection: 'row',
-                                        whiteSpace: 'nowrap',
-                                        animation:
-                                            'announcements_marquee 25s linear infinite',
+                                        flex: '1',
+                                        overflow: 'hidden',
                                     }}
                                 >
-                                    {announcements.map((a: string) => (
-                                        <p
-                                            key={a}
-                                            style={{ paddingLeft: '50px' }}
-                                        >
-                                            {a}
-                                        </p>
-                                    ))}
+                                    <div
+                                        style={{
+                                            height: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            whiteSpace: 'nowrap',
+                                            animation: 'announcements_marquee 25s linear infinite',
+                                        }}
+                                    >
+                                        {announcements.map((a: string) => (
+                                            <p
+                                                key={a}
+                                                style={{ paddingLeft: '50px' }}
+                                            >
+                                                {a}
+                                            </p>
+                                        ))}
+                                    </div>
                                 </div>
+                                <button onClick={() => setShowAnnouncements(false)}>
+                                    Close
+                                </button>
                             </aside>
                         </ComponentErrorBoundary>
                     )}
