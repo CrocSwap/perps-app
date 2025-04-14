@@ -9,11 +9,16 @@ const pageRoutes = {
 
 export type pagesT = keyof typeof pageRoutes;
 
-export function useLinkGen(p: pagesT) {
-    const { pathname } = useLocation();
-    console.log('pages: ', pageRoutes);
-    console.log(pathname);
+export interface useLinkGenMethodsIF {
+    isPage: boolean;
+}
 
-    const isPage: boolean = pathname.toLowerCase().startsWith(pageRoutes[p].toLowerCase());
-    console.log(isPage);
+export function useLinkGen(p: pagesT): useLinkGenMethodsIF {
+    const { pathname } = useLocation();
+
+    return {
+        isPage: (
+            pathname.toLowerCase().startsWith(pageRoutes[p].toLowerCase())
+        ),
+    }
 }
