@@ -29,7 +29,7 @@ const useTradeDataStore = create<TradeDataStore>()(
     persist(
         (set, get) => ({
             ...createUserTradesSlice(set, get),
-            symbol: '',
+            symbol: 'BTC',
             setSymbol: (symbol: string) => {
                 setLS('activeCoin', symbol);
                 set({ symbol });
@@ -94,6 +94,7 @@ const useTradeDataStore = create<TradeDataStore>()(
             name: 'TRADE_DATA',
             partialize: (state) => ({
                 favKeys: state.favKeys,
+                symbol: state.symbol,
             }),
         },
     ),

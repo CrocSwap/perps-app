@@ -4,6 +4,7 @@ import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
 import { type useModalIF, useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import AppOptions from '../AppOptions/AppOptions';
 import Button from '../Button/Button';
 import Modal from '../Modal/Modal';
@@ -25,8 +26,10 @@ export default function PageHeader() {
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
     const location = useLocation();
 
+    const { symbol } = useTradeDataStore();
+
     const navLinks = [
-        { name: 'Trade', path: '/trade' },
+        { name: 'Trade', path: `/trade/${symbol}` },
         { name: 'Vaults', path: '/vaults' },
         { name: 'Portfolio', path: '/portfolio' },
         { name: 'Referrals', path: '/referrals' },
