@@ -11,18 +11,25 @@ interface PositionsTableRowProps {
 
 export default function PositionsTableRow(props: PositionsTableRowProps) {
     const { position } = props;
-    const { coins } = useTradeDataStore();
+    const { coinPriceMap } = useTradeDataStore();
     const { formatNum } = useNumFormatter();
     const { getBsColor } = useAppSettings();
 
-    // TODO that block may optimized after adding hashmap for coins
-    const coinPrice = useMemo(() => {
-        const price = coins.find((c) => c.coin === position.coin)?.markPx;
-        return formatNum(price ?? 0);
-    }, [coins, position.coin]);
+    const getTpSl = () => {
+        let ret = '';
+        if (position.tp && position.tp > 0) {
+            ret = `${formatNum(position.tp)}`;
+        } else {
+            ret = '--';
+        }
 
-    // TODO tpsl will be added after finding a sample
-    const tpsl = '--/--';
+        if (position.sl && position.sl > 0) {
+            ret = `${ret} / ${formatNum(position.sl)}`;
+        } else {
+            ret = `${ret} / --`;
+        }
+        return ret;
+    };
 
     return (
         <div className={styles.rowContainer}>
@@ -44,7 +51,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 {formatNum(position.entryPx)}
             </div>
             <div className={`${styles.cell} ${styles.markPriceCell}`}>
-                {coinPrice}
+                {formatNum(coinPriceMap.get(position.coin) ?? 0)}
             </div>
             <div
                 className={`${styles.cell} ${styles.pnlCell}`}
@@ -79,7 +86,9 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
             >
                 ${formatNum(position.cumFunding.allTime, 2)}
             </div>
-            <div className={`${styles.cell} ${styles.tpslCell}`}>{tpsl}</div>
+            <div className={`${styles.cell} ${styles.tpslCell}`}>
+                {getTpSl()}
+            </div>
             <div className={`${styles.cell} ${styles.closeCell}`}>
                 <div className={styles.actionContainer}>
                     <button className={styles.actionButton}>Limit</button>

@@ -1,13 +1,13 @@
+import type { IChartingLibraryWidget } from '~/tv/charting_library';
+
 export const buyColor = '#26A69A';
 export const sellColor = '#E57373';
-export const addCustomOrderLine = async (
-    chart: any,
-    orderPrice: number,
-    orderSide: 'buy' | 'sell',
-) => {
-    if (!chart) return;
-    const orderColor = orderSide === 'buy' ? buyColor : sellColor;
 
+export const addCustomOrderLine = async (
+    chart: IChartingLibraryWidget,
+    orderPrice: number,
+    lineColor: string,
+) => {
     const orderLine = await chart
         .activeChart()
         .createMultipointShape([{ time: 10, price: orderPrice }], {
@@ -17,144 +17,14 @@ export const addCustomOrderLine = async (
             disableSave: true,
             disableUndo: true,
             overrides: {
-                linecolor: orderColor,
-                borderColor: orderColor,
+                linecolor: lineColor,
+                borderColor: lineColor,
                 linestyle: 3,
-                extendLeft: true,
-                extendRight: true,
                 linewidth: 1,
             },
         });
 
     return orderLine;
-};
-
-export const getLabelText = (
-    lineType: 'liq' | 'limit' | 'pnl',
-    price: number,
-) => {
-    const orderText =
-        lineType === 'limit'
-            ? ' Limit  ' + price
-            : lineType === 'pnl'
-              ? '  PNL ' + (price > 0 ? '$' + price : '-$' + Math.abs(price))
-              : '   Liq. Price';
-
-    return orderText;
-};
-export const createShapeText = async (
-    chart: any,
-    price: number,
-    orderSide: 'buy' | 'sell',
-    lineType: 'liq' | 'limit' | 'pnl',
-) => {
-    const orderColor = orderSide === 'buy' ? buyColor : sellColor;
-
-    const priceScalePane = chart.activeChart().getPanes()[0] as any;
-    const priceScale = priceScalePane.getMainSourcePriceScale();
-    const priceRange = priceScale.getVisiblePriceRange();
-    const chartHeight = priceScalePane.getHeight();
-
-    const orderText = getLabelText(lineType, price);
-    if (!priceRange) return;
-
-    const maxPrice = priceRange.to;
-    const minPrice = priceRange.from;
-
-    const pixel = priceToPixel(
-        minPrice,
-        maxPrice,
-        chartHeight,
-        price,
-        priceScale.getMode() === 1,
-    );
-
-    const pricePerPixel = (pixel * 1) / chartHeight;
-
-    const shape = await chart.activeChart().createShape(
-        { x: 0.4, price: pricePerPixel },
-        {
-            shape: 'anchored_text',
-            lock: true,
-            disableSelection: true,
-            disableSave: true,
-            disableUndo: true,
-            text: orderText,
-            overrides: {
-                fontsize: 10,
-                backgroundColor: '#D1D1D1',
-                bold: true,
-                fillBackground: true,
-                drawBorder: true,
-                borderColor: orderColor,
-                wordWrap: true,
-                wordWrapWidth: orderText.length > 13 ? 100 : 70,
-                borderWidth: 2,
-            },
-        },
-    );
-
-    chart.activeChart().getShapeById(shape).bringToFront();
-
-    return shape;
-};
-
-export const createQuantityText = async (
-    chart: any,
-    price: number,
-    quantity: number,
-    lineType: 'liq' | 'limit' | 'pnl',
-) => {
-    const priceScalePane = chart.activeChart().getPanes()[0] as any;
-    const priceScale = priceScalePane.getMainSourcePriceScale();
-    const priceRange = priceScale.getVisiblePriceRange();
-    const chartHeight = priceScalePane.getHeight();
-
-    if (!priceRange) return;
-
-    const maxPrice = priceRange.to;
-    const minPrice = priceRange.from;
-
-    const pixel = priceToPixel(
-        minPrice,
-        maxPrice,
-        chartHeight,
-        price,
-        priceScale.getMode() === 1,
-    );
-
-    const pricePerPixel = (pixel * 1) / chartHeight;
-    const bufferX = 0.4;
-    const shape = await chart.activeChart().createShape(
-        {
-            x: getOrderQuantityTextLocation(bufferX, chart, lineType, price),
-            price: pricePerPixel,
-        },
-        {
-            shape: 'anchored_text',
-            lock: true,
-            disableSelection: true,
-            disableSave: true,
-            disableUndo: true,
-            text: quantity,
-            overrides: {
-                fontsize: 10,
-                backgroundColor: '#000000',
-                bold: true,
-                fillBackground: true,
-                drawBorder: true,
-                wordWrap: true,
-                wordWrapWidth: quantity.toString().length > 8 ? 70 : 60,
-                color: '#FFFFFF',
-                borderWidth: 3,
-                borderColor: '#3C91FF',
-            },
-        },
-    );
-
-    chart.activeChart().getShapeById(shape).bringToFront();
-
-    return shape;
 };
 
 export const priceToPixel = (
@@ -185,19 +55,96 @@ export const priceToPixel = (
     }
 };
 
-export const getOrderQuantityTextLocation = (
+export const getAnchoredQuantityTextLocation = (
+    chart: IChartingLibraryWidget,
     bufferX: number,
-    chart: any,
-    lineType: 'liq' | 'limit' | 'pnl',
-    price: number,
+    orderText: string,
 ) => {
     const timeScale = chart.activeChart().getTimeScale();
     const chartWidth = Math.floor(timeScale.width());
 
-    const orderText = getLabelText(lineType, price);
     const wrapWidthPx = orderText.length > 13 ? 105 : 75;
 
     const offsetX = Number(wrapWidthPx / chartWidth);
 
     return bufferX + offsetX;
+};
+
+export const createAnchoredMainText = async (
+    chart: IChartingLibraryWidget,
+    xLoc: number,
+    yLoc: number,
+    text: string,
+    borderColor: string,
+) => {
+    return createAnchoredText(
+        chart,
+        xLoc,
+        yLoc,
+        text,
+        '#D1D1D1',
+        text.toString().length > 13 ? 100 : 70,
+        borderColor,
+    );
+};
+
+export const createQuantityAnchoredText = async (
+    chart: IChartingLibraryWidget,
+    xLoc: number,
+    yLoc: number,
+    text: string,
+) => {
+    return createAnchoredText(
+        chart,
+        xLoc,
+        yLoc,
+        text,
+        '#000000',
+        text.toString().length > 8 ? 70 : 60,
+        '#3C91FF',
+        '#FFFFFF',
+    );
+};
+
+export const createAnchoredText = async (
+    chart: IChartingLibraryWidget,
+    xLoc: number,
+    yLoc: number,
+    text: string,
+    backgroundColor: string,
+    wordWrapWidth: number,
+    borderColor: string,
+    color?: string,
+) => {
+    const shape = await chart.activeChart().createAnchoredShape(
+        {
+            x: xLoc,
+            y: yLoc,
+        },
+        {
+            shape: 'anchored_text',
+            lock: true,
+            disableSelection: true,
+            disableSave: true,
+            disableUndo: true,
+            text: text,
+            overrides: {
+                fontsize: 10,
+                backgroundColor: backgroundColor,
+                bold: true,
+                fillBackground: true,
+                drawBorder: true,
+                wordWrap: true,
+                wordWrapWidth: wordWrapWidth,
+                color: color,
+                borderWidth: 3,
+                borderColor: borderColor,
+                zOrder: 'top',
+            },
+        },
+    );
+
+    chart.activeChart().getShapeById(shape).bringToFront();
+
+    return shape;
 };
