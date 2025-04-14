@@ -7,7 +7,6 @@ import {
     type notificationIF,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useKeydown } from '~/hooks/useKeydown';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useEffect, useRef } from 'react';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
@@ -19,9 +18,6 @@ export default function Notifications() {
 
     // notification data from which to generate DOM elements
     const data: NotificationStoreIF = useNotificationStore();
-
-    // run fn `data.add` when the user presses the 'a' key
-    useKeydown('a', data.add);
 
     const backgroundFillNotifRef = useRef(false);
     backgroundFillNotifRef.current = enableBackgroundFillNotif;
