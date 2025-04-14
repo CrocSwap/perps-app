@@ -195,6 +195,7 @@ export default function PageHeader() {
 
     const appSettingsModal: useModalIF = useModal('closed');
 
+    // hook to manage page data and navigation
     const linkGenTestpage: useLinkGenMethodsIF = useLinkGen('testpage');
 
     return (
