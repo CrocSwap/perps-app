@@ -6,6 +6,7 @@ import type { OrderDataIF } from '../../utils/orderbook/OrderBookIFs';
 import { processUserOrder } from '../processOrderBook';
 import { processPosition } from '../processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
+import { parseNum } from '../../utils/orderbook/OrderBookUtils';
 
 self.onmessage = function (event) {
     try {
@@ -15,6 +16,8 @@ self.onmessage = function (event) {
         const userOpenOrders: OrderDataIF[] = [];
         const positions: PositionIF[] = [];
         const data = parsedData.data;
+        const tpSlMap: Map<string, { tp: number; sl: number }> = new Map();
+        const coinPriceMap: Map<string, number> = new Map();
 
         if (data) {
             if (data.meta && data.meta.universe && data.assetCtxs) {
@@ -31,12 +34,36 @@ self.onmessage = function (event) {
                             ctx: ctxVal,
                         });
                         coins.push(coinObject);
+                        coinPriceMap.set(coin.name, coinObject.markPx);
                     }
                 });
                 data.openOrders.forEach((order: any) => {
                     const processedOrder = processUserOrder(order, 'open');
                     if (processedOrder) {
                         userOpenOrders.push(processedOrder);
+                        if (processedOrder.isPositionTpsl) {
+                            if (
+                                processedOrder.orderType?.indexOf(
+                                    'Take Profit',
+                                ) !== -1
+                            ) {
+                                tpSlMap.set(processedOrder.coin, {
+                                    tp: parseNum(processedOrder.triggerPx || 0),
+                                    sl:
+                                        tpSlMap.get(processedOrder.coin)?.sl ||
+                                        0,
+                                });
+                            } else if (
+                                processedOrder.orderType?.indexOf('Stop') !== -1
+                            ) {
+                                tpSlMap.set(processedOrder.coin, {
+                                    tp:
+                                        tpSlMap.get(processedOrder.coin)?.tp ||
+                                        0,
+                                    sl: parseNum(processedOrder.triggerPx || 0),
+                                });
+                            }
+                        }
                     }
                 });
 
@@ -44,6 +71,13 @@ self.onmessage = function (event) {
                     data.clearinghouseState.assetPositions.forEach(
                         (position: any) => {
                             const processedPosition = processPosition(position);
+                            if (tpSlMap.has(processedPosition.coin)) {
+                                const existingOrder = tpSlMap.get(
+                                    processedPosition.coin,
+                                );
+                                processedPosition.tp = existingOrder?.tp || 0;
+                                processedPosition.sl = existingOrder?.sl || 0;
+                            }
                             positions.push(processedPosition);
                         },
                     );
@@ -53,7 +87,14 @@ self.onmessage = function (event) {
 
         self.postMessage({
             channel: parsedData.channel,
-            data: { coins, userOpenOrders, user: data.user, size, positions },
+            data: {
+                coins,
+                userOpenOrders,
+                user: data.user,
+                size,
+                positions,
+                coinPriceMap,
+            },
         });
     } catch (error) {
         self.postMessage({ error: (error as Error).message });

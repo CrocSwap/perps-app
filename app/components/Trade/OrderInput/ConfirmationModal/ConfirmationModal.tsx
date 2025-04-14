@@ -6,6 +6,7 @@ import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import { useState } from 'react';
 
 interface PropsIF {
+    tx: 'buy' | 'sell';
     onClose: () => void;
 }
 type InfoItem = {
@@ -15,38 +16,40 @@ type InfoItem = {
     className?: string;
 };
 
-const dataInfo: InfoItem[] = [
-    {
-        label: 'Action',
-        value: 'Buy',
-        className: styles.green,
-    },
-    {
-        label: 'Size',
-        value: '0.0001 ETH',
-        className: styles.green,
-    },
-    {
-        label: 'Price',
-        value: 'Market',
-        className: styles.white,
-    },
-    {
-        label: 'Est. Liquidation Price',
-        value: 'N/A',
-        tooltip: 'Estimated price at which your position will be liquidated',
-        className: styles.white,
-    },
-    {
-        label: 'Network Fee',
-        value: '0.000001 FOGO',
-        tooltip: 'Fee required to execute this trade on the network',
-        className: styles.white,
-    },
-];
-
 export default function ConfirmationModal(props: PropsIF) {
-    const { onClose } = props;
+    const { onClose, tx } = props;
+
+    const dataInfo: InfoItem[] = [
+        {
+            label: 'Action',
+            value: tx === 'buy' ? 'Buy' : 'Sell',
+            className: styles[tx === 'buy' ? 'green' : 'red'],
+        },
+        {
+            label: 'Size',
+            value: '0.0001 ETH',
+            className: styles[tx === 'buy' ? 'green' : 'red'],
+        },
+        {
+            label: 'Price',
+            value: 'Market',
+            className: styles.white,
+        },
+        {
+            label: 'Est. Liquidation Price',
+            value: 'N/A',
+            tooltip:
+                'Estimated price at which your position will be liquidated',
+            className: styles.white,
+        },
+        {
+            label: 'Network Fee',
+            value: '0.000001 FOGO',
+            tooltip: 'Fee required to execute this trade on the network',
+            className: styles.white,
+        },
+    ];
+
     const [isDontShowEnabled, setIsDontShowEnabled] = useState(false);
     return (
         <div className={styles.container}>
@@ -89,7 +92,7 @@ export default function ConfirmationModal(props: PropsIF) {
                 />
             </div>
             <button className={styles.confirmButton} onClick={onClose}>
-                Buy/Long
+                {tx === 'buy' ? 'Buy / Long' : 'Sell / Short'}
             </button>
         </div>
     );

@@ -2,16 +2,14 @@ import React from 'react';
 import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
 import OpenOrderLine from '~/routes/chart/orders/openOrderLine';
-import PnlLine from '~/routes/chart/orders/pnlLine';
-import PositionsLine from '~/routes/chart/orders/positionsLine';
+import PositionOrderLine from '~/routes/chart/orders/positionOrderLine';
 
 const TradingViewWrapper: React.FC = () => {
     return (
         <TradingViewProvider>
             <TradingViewChart />
-            <PnlLine />
             <OpenOrderLine />
-            <PositionsLine />
+            <PositionOrderLine />
         </TradingViewProvider>
     );
 };

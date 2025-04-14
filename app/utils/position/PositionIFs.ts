@@ -22,4 +22,6 @@ export interface PositionIF {
     unrealizedPnl: number;
     type: string;
     cumFunding: CumulativeFundingIF;
+    tp?: number;
+    sl?: number;
 }

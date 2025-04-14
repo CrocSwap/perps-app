@@ -19,6 +19,7 @@ export default function WebDataConsumer() {
         coins,
         setPositions,
         positions,
+        setCoinPriceMap,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
@@ -49,6 +50,7 @@ export default function WebDataConsumer() {
             payload: { user: debugWallet.address },
             handler: (payload) => {
                 setCoins(payload.data.coins);
+                setCoinPriceMap(payload.data.coinPriceMap);
                 if (payload.data.user.toLowerCase() === addressRef.current) {
                     openOrdersRef.current = payload.data.userOpenOrders;
                     positionsRef.current = payload.data.positions;

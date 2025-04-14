@@ -144,10 +144,11 @@ export const createDataFeed = (
             const fillHistory = markRes.dataCache;
             // const userWallet = markRes.user;
 
-            fillHistory.sort((a: any, b: any) => b.time - a.time);
+            if (fillHistory) {
+                fillHistory.sort((a: any, b: any) => b.time - a.time);
 
-            fillMarks(fillHistory);
-
+                fillMarks(fillHistory);
+            }
             const markArray = [
                 ...bSideOrderHistoryMarks.values(),
                 ...aSideOrderHistoryMarks.values(),

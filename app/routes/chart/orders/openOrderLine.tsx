@@ -1,259 +1,99 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import {
-    addCustomOrderLine,
-    buyColor,
-    createQuantityText,
-    createShapeText,
-    getLabelText,
-    getOrderQuantityTextLocation,
-    priceToPixel,
-    sellColor,
-} from './customOrderLineUtils';
 import { useDebugStore } from '~/stores/DebugStore';
+import type { ChartShapeRefs, LineData } from './component/LineComponent';
+import { buyColor, sellColor } from './customOrderLineUtils';
+import LineComponent from './component/LineComponent';
 
-interface OrderLineProps {}
-
-const OpenOrderLine = (props: OrderLineProps) => {
+const OpenOrderLine = () => {
     const { chart } = useTradingView();
-    const { userSymbolOrders, symbol } = useTradeDataStore();
-
-    const [orderLineItems, setOrderLineItems] = useState<any[]>([]);
-
+    const { userSymbolOrders, positions, symbol } = useTradeDataStore();
     const { debugWallet } = useDebugStore();
 
-    const [data, setData] = useState<any[]>([]);
+    const [lines, setLines] = useState<LineData[]>([]);
 
-    const symbolRef = useRef(symbol);
-
-    useEffect(() => {
-        setData([]);
-    }, [debugWallet]);
-
-    useEffect(() => {
-        setData([]);
-
-        setTimeout(() => {
-            symbolRef.current = symbol;
-        }, 200);
-    }, [symbol]);
-
-    useEffect(() => {
-        if (symbol === symbolRef.current) {
-            const tempData = userSymbolOrders.map((i) => {
+    const pnlSzi = useMemo(() => {
+        const data = positions
+            .filter((i) => i.coin === symbol)
+            .map((i) => {
                 return {
-                    timestamp: i.timestamp,
-                    price: i.limitPx,
-                    sz: i.sz,
-                    side: i.side,
+                    price: i.entryPx,
+                    pnl: Number(i.unrealizedPnl.toFixed(2)),
+                    szi: i.szi,
+                    liqPrice: i.liquidationPx,
                 };
             });
 
-            setData(tempData);
+        if (data.length > 0) {
+            return data[0].szi;
+        } else {
+            return undefined;
         }
-    }, [JSON.stringify(userSymbolOrders), symbolRef.current]);
+    }, [JSON.stringify(positions), symbol]);
+
+    function formatTPorSLLabel(rawText: string, orderType: string): string {
+        const match = rawText.match(/Price (above|below) (\d+)/);
+
+        if (!match) return rawText;
+
+        const direction = match[1];
+        const price = match[2];
+        const operator = direction === 'above' ? '>' : '<';
+
+        const labelPrefix = orderType === 'Take Profit Market' ? 'TP' : 'SL';
+
+        return `${labelPrefix} Price ${operator} ${price}`;
+    }
 
     useEffect(() => {
-        let isMounted = true;
+        if (!chart || !userSymbolOrders?.length || !pnlSzi) {
+            setLines([]);
+            return;
+        }
+        const newLines: LineData[] = userSymbolOrders.map((order) => {
+            const { sz, side } = order;
 
-        const cleanupShapes = () => {
-            try {
-                if (chart) {
-                    orderLineItems.forEach((order: any) => {
-                        const lineId = order.lineId;
-                        const textId = order.text;
-                        const quantityTextId = order.quantityText;
+            let price = order.limitPx;
 
-                        const element = chart
-                            .activeChart()
-                            .getShapeById(lineId);
-                        element && chart.activeChart().removeEntity(lineId);
+            let quantityText = 0;
+            let orderText: string | undefined = '';
 
-                        const elementText = chart
-                            .activeChart()
-                            .getShapeById(textId);
-                        const quantityElementText = chart
-                            .activeChart()
-                            .getShapeById(quantityTextId);
-
-                        elementText && chart.activeChart().removeEntity(textId);
-                        quantityElementText &&
-                            chart.activeChart().removeEntity(quantityTextId);
-                    });
+            if (order.orderType === 'Limit') {
+                orderText = ' Limit  ' + price;
+                quantityText = order.sz;
+            } else {
+                if (order.triggerCondition && order.orderType) {
+                    orderText = formatTPorSLLabel(
+                        order.triggerCondition,
+                        order.orderType,
+                    );
+                    if (order.triggerPx) price = order.triggerPx;
+                    quantityText = pnlSzi;
                 }
-            } catch (error) {}
-        };
-
-        const setupShapes = async () => {
-            if (!chart || data.length === 0) return;
-
-            cleanupShapes();
-
-            const shapePairs = await Promise.all(
-                data
-                    .sort((a, b) => a.timestamp - b.timestamp)
-                    .map(async (item) => {
-                        const lineId = await addCustomOrderLine(
-                            chart,
-                            item.price,
-                            item.side,
-                        );
-
-                        const quantityText = await createQuantityText(
-                            chart,
-                            item.price,
-                            item.sz,
-                            'limit',
-                        );
-
-                        const textId = await createShapeText(
-                            chart,
-                            item.price,
-                            item.side,
-                            'limit',
-                        );
-                        return { lineId, textId, quantityText };
-                    }),
-            );
-
-            if (!isMounted) return;
-
-            setOrderLineItems(
-                shapePairs.map((p: any) => {
-                    return {
-                        lineId: p.lineId,
-                        text: p.textId,
-                        quantityText: p.quantityText,
-                    };
-                }),
-            );
-        };
-
-        setupShapes();
-
-        return () => {
-            isMounted = false;
-            cleanupShapes();
-        };
-    }, [chart, data.length]);
-
-    useEffect(() => {
-        let isCancelled = false;
-        const intervals: number[] = [];
-
-        const setupTextPositioning = async () => {
-            if (!chart || orderLineItems.length === 0) return;
-
-            for (let i = 0; i < orderLineItems.length; i++) {
-                const lineShapeId = await orderLineItems[i].lineId;
-                const textShapeId = await orderLineItems[i].text;
-                const textQuantityTextId = await orderLineItems[i].quantityText;
-
-                const interval = setInterval(() => {
-                    try {
-                        if (isCancelled) return;
-
-                        const priceScalePane = chart
-                            .activeChart()
-                            .getPanes()[0] as any;
-                        const priceScale =
-                            priceScalePane.getMainSourcePriceScale();
-                        const priceRange = priceScale.getVisiblePriceRange();
-                        const chartHeight = priceScalePane.getHeight();
-
-                        if (!priceRange) return;
-
-                        const maxPrice = priceRange.to;
-                        const minPrice = priceRange.from;
-
-                        const pixel = priceToPixel(
-                            minPrice,
-                            maxPrice,
-                            chartHeight,
-                            data[i]?.price ?? 0,
-                            priceScale.getMode() === 1,
-                        );
-
-                        const pricePerPixel = pixel / chartHeight;
-
-                        const activeLabel = chart
-                            .activeChart()
-                            .getShapeById(textShapeId);
-
-                        const activeQuantityLabel = chart
-                            .activeChart()
-                            .getShapeById(textQuantityTextId);
-
-                        const activeLine = chart
-                            .activeChart()
-                            .getShapeById(lineShapeId);
-
-                        const bufferX = 0.4;
-                        if (activeLabel) {
-                            activeLabel.setAnchoredPosition({
-                                x: bufferX,
-                                y: pricePerPixel,
-                            });
-                            const orderText = getLabelText(
-                                'limit',
-                                data[i].price,
-                            );
-
-                            activeLabel.setProperties({
-                                text: orderText,
-                                wordWrapWidth: orderText.length > 13 ? 100 : 70,
-                            });
-
-                            activeQuantityLabel.setProperties({
-                                text: data[i].sz,
-                            });
-
-                            activeQuantityLabel.setAnchoredPosition({
-                                x: getOrderQuantityTextLocation(
-                                    bufferX,
-                                    chart,
-                                    'limit',
-                                    data[i].price,
-                                ),
-                                y: pricePerPixel,
-                            });
-
-                            chart.activeChart().restoreChart();
-                        }
-
-                        if (activeLine) {
-                            const orderColor =
-                                data[i].side === 'buy' ? buyColor : sellColor;
-
-                            activeLine.setPoints([
-                                {
-                                    time: 10,
-                                    price: data[i]?.price,
-                                },
-                            ]);
-
-                            activeLine.setProperties({
-                                linecolor: orderColor,
-                                borderColor: orderColor,
-                            });
-                        }
-                    } catch (error) {}
-                }, 10) as unknown as number;
-
-                intervals.push(interval);
             }
-        };
 
-        setupTextPositioning();
+            return {
+                xLoc: 0.4,
+                yLoc: price,
+                text: orderText,
+                quantityText: quantityText.toFixed(5),
+                color: side === 'buy' ? buyColor : sellColor,
+            };
+        });
 
-        return () => {
-            isCancelled = true;
-            intervals.forEach(clearInterval);
-        };
-    }, [orderLineItems, chart, JSON.stringify(data)]);
+        setLines(newLines);
+    }, [
+        chart,
+        JSON.stringify(userSymbolOrders),
+        debugWallet,
+        symbol,
+        JSON.stringify(pnlSzi),
+    ]);
 
-    return null;
+    if (!chart) return null;
+
+    return <LineComponent key='limit' lines={lines} />;
 };
 
 export default OpenOrderLine;
