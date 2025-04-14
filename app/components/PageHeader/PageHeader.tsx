@@ -203,9 +203,7 @@ export default function PageHeader() {
                 />
             </Link>
             <nav
-                className={`${styles.nav} ${
-                    isMenuOpen ? styles.showMenu : ''
-                }`}
+                className={`${styles.nav} ${isMenuOpen ? styles.showMenu : ''}`}
                 ref={isMenuOpen ? mobileNavbarRef : null}
             >
                 <button
@@ -263,10 +261,7 @@ export default function PageHeader() {
             </div>
             {dropdownMenuDisplay}
             {appSettingsModal.isOpen && (
-                <Modal
-                    close={appSettingsModal.close}
-                    position={'center'}
-                >
+                <Modal close={appSettingsModal.close} position={'center'}>
                     <AppOptions modalControl={appSettingsModal} />
                 </Modal>
             )}
