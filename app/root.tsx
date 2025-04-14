@@ -113,7 +113,7 @@ export default function App() {
                         <PageHeader />
                     </ComponentErrorBoundary>
 
-                    { linkGenTestpage.isPage && !!announcements.length &&
+                    {linkGenTestpage.isPage && !!announcements.length && (
                         <ComponentErrorBoundary>
                             <aside
                                 style={{
@@ -160,7 +160,7 @@ export default function App() {
                                 </div>
                             </aside>
                         </ComponentErrorBoundary>
-                    }
+                    )}
 
                     <main className='content'>
                         {/*  Added Suspense for async content loading */}

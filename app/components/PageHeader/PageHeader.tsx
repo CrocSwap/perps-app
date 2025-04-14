@@ -194,95 +194,82 @@ export default function PageHeader() {
     const appSettingsModal: useModalIF = useModal('closed');
 
     return (
-        <>
-            <header id={'pageHeader'} className={styles.container}>
-                <div className={styles.header_content}>
-                    <Link to='/'>
-                        <img
-                            src='/images/perpsLogo.svg'
-                            alt='Perps Logo'
-                            width='240px'
-                        />
-                    </Link>
-                    <nav
-                        className={`${styles.nav} ${
-                            isMenuOpen ? styles.showMenu : ''
-                        }`}
-                        ref={isMenuOpen ? mobileNavbarRef : null}
+        <header id={'pageHeader'} className={styles.container}>
+            <Link to='/'>
+                <img
+                    src='/images/perpsLogo.svg'
+                    alt='Perps Logo'
+                    width='240px'
+                />
+            </Link>
+            <nav
+                className={`${styles.nav} ${
+                    isMenuOpen ? styles.showMenu : ''
+                }`}
+                ref={isMenuOpen ? mobileNavbarRef : null}
+            >
+                <button
+                    onClick={() => setIsMenuOpen(false)}
+                    className={styles.mobileNavCloseButton}
+                >
+                    <MdOutlineClose size={20} color='var(--text1)' />
+                </button>
+                {navLinks.map((link) => (
+                    <Link
+                        key={link.name}
+                        to={link.path}
+                        className={
+                            location.pathname.includes(link.path)
+                                ? styles.activeNavLink
+                                : styles.navLink
+                        }
+                        onClick={() => {
+                            if (isMenuOpen) setIsMenuOpen(false);
+                        }}
                     >
-                        <button
-                            onClick={() => setIsMenuOpen(false)}
-                            className={styles.mobileNavCloseButton}
-                        >
-                            <MdOutlineClose size={20} color='var(--text1)' />
-                        </button>
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                to={link.path}
-                                className={
-                                    location.pathname.includes(link.path)
-                                        ? styles.activeNavLink
-                                        : styles.navLink
-                                }
-                                onClick={() => {
-                                    if (isMenuOpen) setIsMenuOpen(false);
-                                }}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
-                        {moreDropdownDisplay}
-                    </nav>
-                    <div className={styles.rightSide}>
-                        {isUserConnected && depositDisplay}
-                        {isUserConnected && networksDisplay}
-                        {isUserConnected && rpcDisplay}
-                        {!isUserConnected && (
-                            <Button
-                                size='medium'
-                                selected
-                                onClick={() => setIsUserConnected(true)}
-                            >
-                                Connect
-                            </Button>
-                        )}
-                        {isUserConnected && walletDisplay}
+                        {link.name}
+                    </Link>
+                ))}
+                {moreDropdownDisplay}
+            </nav>
+            <div className={styles.rightSide}>
+                {isUserConnected && depositDisplay}
+                {isUserConnected && networksDisplay}
+                {isUserConnected && rpcDisplay}
+                {!isUserConnected && (
+                    <Button
+                        size='medium'
+                        selected
+                        onClick={() => setIsUserConnected(true)}
+                    >
+                        Connect
+                    </Button>
+                )}
+                {isUserConnected && walletDisplay}
 
-                        <button
-                            className={styles.internationalButton}
-                            onClick={appSettingsModal.open}
-                        >
-                            <LuSettings size={20} />
-                        </button>
+                <button
+                    className={styles.internationalButton}
+                    onClick={appSettingsModal.open}
+                >
+                    <LuSettings size={20} />
+                </button>
 
-                        <button
-                            className={styles.menuButtonMobile}
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        >
-                            <LuMenu size={20} />
-                        </button>
-                    </div>
-                    {dropdownMenuDisplay}
-                    {appSettingsModal.isOpen && (
-                        <Modal
-                            close={appSettingsModal.close}
-                            position={'center'}
-                        >
-                            <AppOptions modalControl={appSettingsModal} />
-                        </Modal>
-                    )}
-                </div>
-                {/* {!!announcements.length && linkGenTestpage.isPage && (
-                    <aside className={styles.announcements}>
-                        <div>
-                            {announcements.map((a: string) => (
-                                <p key={a}>{a}</p>
-                            ))}
-                        </div>
-                    </aside>
-                )} */}
-            </header>
-        </>
+                <button
+                    className={styles.menuButtonMobile}
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                    <LuMenu size={20} />
+                </button>
+            </div>
+            {dropdownMenuDisplay}
+            {appSettingsModal.isOpen && (
+                <Modal
+                    close={appSettingsModal.close}
+                    position={'center'}
+                >
+                    <AppOptions modalControl={appSettingsModal} />
+                </Modal>
+            )}
+        </header>
     );
 }
