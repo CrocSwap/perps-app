@@ -17,8 +17,6 @@ export function useLinkGen(p: pagesT): useLinkGenMethodsIF {
     const { pathname } = useLocation();
 
     return {
-        isPage: (
-            pathname.toLowerCase().startsWith(pageRoutes[p].toLowerCase())
-        ),
-    }
+        isPage: pathname.toLowerCase().startsWith(pageRoutes[p].toLowerCase()),
+    };
 }

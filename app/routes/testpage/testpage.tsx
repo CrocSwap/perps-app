@@ -8,7 +8,9 @@ export default function testpage() {
     return (
         <div className={styles.testpage}>
             <h2>Hi there!</h2>
-            <p>This is {isPage || 'not'} the page "{PAGE}".</p>
+            <p>
+                This is {isPage || 'not'} the page "{PAGE}".
+            </p>
         </div>
     );
 }
