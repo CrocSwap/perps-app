@@ -112,18 +112,6 @@ export default function App() {
 
                     {
                         <ComponentErrorBoundary>
-                            <style>
-                                {`
-                            @keyframes announcements_marquee {
-                                0% {
-                                    transform: translateX(100%);
-                                }
-                                100% {
-                                    transform: translateX(-100%);
-                                }
-                            }
-                            `}
-                            </style>
                             <aside
                                 style={{
                                     height: '100px',
@@ -133,6 +121,18 @@ export default function App() {
                                     fontSize: 'var(--font-size-s)',
                                 }}
                             >
+                                <style>
+                                    {`
+                                @keyframes announcements_marquee {
+                                    0% {
+                                        transform: translateX(100%);
+                                    }
+                                    100% {
+                                        transform: translateX(-100%);
+                                    }
+                                }
+                                `}
+                                </style>
                                 <div
                                     style={{
                                         height: '100%',
