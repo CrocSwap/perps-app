@@ -101,7 +101,7 @@ export default function App() {
 
     // listing announcements here will populate the announcements bar
     // ... in the DOM (check styling before pushing)
-    const announcements: string[] = [ 'Hello there' ];
+    const announcements: string[] = ['Hello there'];
 
     return (
         <Layout>
@@ -112,9 +112,10 @@ export default function App() {
                         <PageHeader />
                     </ComponentErrorBoundary>
 
-                    {<ComponentErrorBoundary>
-                        <style>
-                            {`
+                    {
+                        <ComponentErrorBoundary>
+                            <style>
+                                {`
                             @keyframes marquee {
                                 0% {
                                     transform: translateX(100%);
@@ -124,33 +125,38 @@ export default function App() {
                                 }
                             }
                             `}
-                        </style>
-                        <aside
-                            style={{
-                                height: '100px',
-                                width: '100%',
-                                overflow: 'hidden',
-                                backgroundColor: 'green',
-                                fontSize: 'var(--font-size-s)',
-                            }}
-                        >
-                            <div
+                            </style>
+                            <aside
                                 style={{
-                                    height: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    whiteSpace: 'nowrap',
-                                    animation: 'marquee 25s linear infinite',
+                                    height: '100px',
+                                    width: '100%',
+                                    overflow: 'hidden',
+                                    backgroundColor: 'green',
+                                    fontSize: 'var(--font-size-s)',
                                 }}
                             >
-                                {announcements.map((a: string) => (
-                                    <p key={a} style={{ paddingLeft: '50px' }}>
-                                        {a}
-                                    </p>
-                                ))}
-                            </div>
-                        </aside>
-                    </ComponentErrorBoundary>}
+                                <div
+                                    style={{
+                                        height: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        whiteSpace: 'nowrap',
+                                        animation:
+                                            'marquee 25s linear infinite',
+                                    }}
+                                >
+                                    {announcements.map((a: string) => (
+                                        <p
+                                            key={a}
+                                            style={{ paddingLeft: '50px' }}
+                                        >
+                                            {a}
+                                        </p>
+                                    ))}
+                                </div>
+                            </aside>
+                        </ComponentErrorBoundary>
+                    }
 
                     <main className='content'>
                         {/*  Added Suspense for async content loading */}
