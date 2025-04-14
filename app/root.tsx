@@ -116,7 +116,7 @@ export default function App() {
                         <ComponentErrorBoundary>
                             <style>
                                 {`
-                            @keyframes marquee {
+                            @keyframes announcements_marquee {
                                 0% {
                                     transform: translateX(100%);
                                 }
@@ -142,7 +142,7 @@ export default function App() {
                                         flexDirection: 'row',
                                         whiteSpace: 'nowrap',
                                         animation:
-                                            'marquee 25s linear infinite',
+                                            'announcements_marquee 25s linear infinite',
                                     }}
                                 >
                                     {announcements.map((a: string) => (
