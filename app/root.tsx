@@ -11,11 +11,11 @@ import Notifications from '~/components/Notifications/Notifications';
 import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 
+import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import './css/app.css';
 import './css/index.css';
 import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
-import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<

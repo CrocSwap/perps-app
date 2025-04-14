@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
@@ -15,7 +17,6 @@ import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
-import { useRef } from 'react';
 import WebDataConsumer from './trade/webdataconsumer';
 // eslint-disable-next-line no-empty-pattern
 export function meta({}: Route.MetaArgs) {
@@ -38,7 +39,8 @@ export default function Trade() {
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
-
+    const { marketId } = useParams<{ marketId: string }>();
+    const navigate = useNavigate();
     const {
         wsUrl,
         setWsUrl,
@@ -47,6 +49,12 @@ export default function Trade() {
         isWsEnabled,
         setIsWsEnabled,
     } = useDebugStore();
+
+    // logic to automatically redirect the user if they land on a
+    // ... route with no token symbol in the URL
+    useEffect(() => {
+        if (!marketId) navigate(`/trade/${symbol}`, { replace: true });
+    }, [navigate]);
 
     return (
         <>
@@ -86,7 +94,7 @@ export default function Trade() {
 
             <TradeRouteHandler />
             <WebDataConsumer />
-            {symbol && symbol.length > 0 && (
+            {symbol && (
                 <div className={styles.container}>
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
