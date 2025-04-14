@@ -1,12 +1,8 @@
 import ScaleOrders from '~/components/Trade/OrderInput/ScaleOrders/ScaleOrders';
 import styles from './testpage.module.css';
 
-interface propsIF {}
-
 // main react fn
-export default function testpage(props: propsIF) {
-    false && props;
-
+export default function testpage() {
     return (
         <div className={styles.testpage}>
             <div style={{ width: '400px' }}>
