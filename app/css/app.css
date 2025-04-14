@@ -7,7 +7,12 @@
 */
 .root-container {
     display: grid;
-    grid-template-rows: 56px 1fr;
+    grid-template-rows: 56px auto 1fr;
+    grid-template-areas:
+      'page-header'
+      'announcements'
+      'main-content'
+      ;
     height: 100vh;
     color: white;
     /* overflow-y: hidden; */
