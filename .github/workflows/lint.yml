@@ -1,0 +1,71 @@
+name: Lint Check
+
+on:
+    pull_request:
+        branches: [develop]
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: 8
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: '18'
+                  cache: 'pnpm'
+            - run: pnpm install
+            - name: Run linter
+              id: lint
+              run: |
+                  # Run lint and capture output even if it fails
+                  pnpm lint > lint-results.txt 2>&1 || true
+
+                  # Extract error and warning counts from the summary line
+                  ERROR_COUNT=$(grep -o "[0-9]* errors" lint-results.txt | grep -o "[0-9]*" || echo 0)
+                  WARNING_COUNT=$(grep -o "[0-9]* warnings" lint-results.txt | grep -o "[0-9]*" || echo 0)
+
+                  # Set output variables for use in later steps
+                  echo "error_count=$ERROR_COUNT" >> $GITHUB_OUTPUT
+                  echo "warning_count=$WARNING_COUNT" >> $GITHUB_OUTPUT
+
+              continue-on-error: true
+
+            - name: Post lint results as comment
+              if: ${{ always() }}
+              uses: actions/github-script@v6
+              with:
+                  github-token: ${{secrets.GITHUB_TOKEN}}
+                  script: |
+                      const fs = require('fs');
+                      try {
+                        // Get error/warning counts from previous step
+                        const errorCount = parseInt('${{ steps.lint.outputs.error_count }}', 10) || 0;
+                        const warningCount = parseInt('${{ steps.lint.outputs.warning_count }}', 10) || 0;
+                        
+                        let lintOutput = "No issues found";
+                        if (fs.existsSync('lint-results.txt')) {
+                          lintOutput = fs.readFileSync('lint-results.txt', 'utf8');
+                        }
+                        
+                        // Create summary with counts
+                        const summary = `## Lint Results Summary
+                        
+                        📊 **Stats:**
+                        - Errors: ${errorCount}
+                        - Warnings: ${warningCount}
+                        - Total issues: ${errorCount + warningCount}
+                        
+                        ${errorCount + warningCount > 0 ? '⚠️' : '✅ All checks passed!'}`;
+                        
+                        github.rest.issues.createComment({
+                          issue_number: context.issue.number,
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          body: summary
+                        });
+                      } catch (error) {
+                        console.log("Error posting comment:", error);
+                      }
