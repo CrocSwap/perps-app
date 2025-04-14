@@ -16,6 +16,7 @@ import './css/index.css';
 import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import { useLinkGen, type useLinkGenMethodsIF } from './hooks/useLinkGen';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -98,6 +99,10 @@ export default function App() {
     // Use memoized value to prevent unnecessary re-renders
     const { wsUrl } = useDebugStore();
 
+    // listing announcements here will populate the announcements bar
+    // ... in the DOM (check styling before pushing)
+    const announcements: string[] = [ 'Hello there' ];
+
     return (
         <Layout>
             <WsObserverProvider url={wsUrl}>
@@ -106,6 +111,46 @@ export default function App() {
                     <ComponentErrorBoundary>
                         <PageHeader />
                     </ComponentErrorBoundary>
+
+                    {<ComponentErrorBoundary>
+                        <style>
+                            {`
+                            @keyframes marquee {
+                                0% {
+                                    transform: translateX(100%);
+                                }
+                                100% {
+                                    transform: translateX(-100%);
+                                }
+                            }
+                            `}
+                        </style>
+                        <aside
+                            style={{
+                                height: '100px',
+                                width: '100%',
+                                overflow: 'hidden',
+                                backgroundColor: 'green',
+                                fontSize: 'var(--font-size-s)',
+                            }}
+                        >
+                            <div
+                                style={{
+                                    height: '100%',
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    whiteSpace: 'nowrap',
+                                    animation: 'marquee 25s linear infinite',
+                                }}
+                            >
+                                {announcements.map((a: string) => (
+                                    <p key={a} style={{ paddingLeft: '50px' }}>
+                                        {a}
+                                    </p>
+                                ))}
+                            </div>
+                        </aside>
+                    </ComponentErrorBoundary>}
 
                     <main className='content'>
                         {/*  Added Suspense for async content loading */}

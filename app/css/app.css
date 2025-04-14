@@ -9,10 +9,9 @@
     display: grid;
     grid-template-rows: 56px auto 1fr;
     grid-template-areas:
-      'page-header'
-      'announcements'
-      'main-content'
-      ;
+        'page-header'
+        'announcements'
+        'main-content';
     height: 100vh;
     color: white;
     /* overflow-y: hidden; */
@@ -28,6 +27,7 @@
     /* background: var(--dark3); */
     padding: 0px var(--main-padding, 8px) var(--main-padding, 8px)
         var(--main-padding, 8px);
+    grid-area: 'main-content';
 }
 
 /* Simple styling examples for header/footer */
