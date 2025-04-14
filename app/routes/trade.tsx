@@ -81,7 +81,6 @@ export default function Trade() {
                     }
                 />
             </div>
-
             <div
                 className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`}
                 onClick={() => setIsWsEnabled(!isWsEnabled)}
@@ -91,11 +90,10 @@ export default function Trade() {
                     {isWsEnabled ? 'WS Running' : 'Paused'}
                 </div>
             </div>
-
             <TradeRouteHandler />
             <WebDataConsumer />
             {symbol && (
-                <div className={styles.container}>
+                <div className={styles.trade_page}>
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                     >

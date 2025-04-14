@@ -1,4 +1,4 @@
-.container {
+.trade_page {
     height: 100%;
     display: grid;
     grid-template-rows: 1fr var(--trade-tables-height-desktop);
@@ -8,9 +8,8 @@
 .containerTop,
 .containerBottom {
     display: grid;
-    height: 100%;
+    /* height: 100%; */
     border-radius: var(--main-border-radius);
-
     justify-content: center;
     align-items: center;
 }
@@ -21,7 +20,6 @@
             --trade-module-width-desktop-small
         );
     gap: var(--main-gap);
-    /* background: var(--dark2); */
 }
 
 .containerTop.orderBookLarge {
@@ -29,15 +27,10 @@
         1fr var(--order-book-width-desktop-large-doubled)
         var(--trade-module-width-desktop-large);
 }
-/* .containerTop div{
-  background: var(--dark2);
-  height: 100%;
-  border-radius: var(--main-border-radius);
-} */
 
 .containerBottom {
     width: 100%;
-    height: 100%;
+    /* height: 100%; */
     display: grid;
     grid-template-columns: 1fr var(--trade-module-width-desktop-small);
     gap: var(--main-gap);
@@ -99,17 +92,6 @@
     );
 }
 
-/* THIS IS JUST FOR DEVELOPMENT. REMOVE THIS AND THE FOLDER (TEMPIMAGES) ONCE WE HAVE THE ACTUAL COMPONENTS */
-
-.tradeModules {
-    /* background: url('./tempImages/orderInput.png') !important;
-background-size: 100% 100%;
-background-position: center;
-background-repeat: no-repeat;
-filter: blur(2px); */
-}
-
-/* -----------------------END OF TEMP CSS CODE */
 .chart {
     max-height: 61vh;
     overflow: hidden;

@@ -114,6 +114,9 @@ export default function App() {
                         <ComponentErrorBoundary>
                             <aside
                                 style={{
+                                    position: 'absolute',
+                                    top: 'var(--header-height-desktop)',
+                                    zIndex: '11',
                                     height: '100px',
                                     width: '100%',
                                     overflow: 'hidden',
