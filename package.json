@@ -16,7 +16,8 @@
         "prepare": "husky",
         "lint": "eslint app --ext .js,.jsx,.ts,.tsx",
         "lint:fix": "eslint app --ext .js,.jsx,.ts,.tsx --fix",
-        "prettier": "prettier --write ."
+        "prettier": "prettier --write .",
+        "update-tv": "git submodule update --remote --recursive --merge"
     },
     "dependencies": {
         "@netlify/functions": "3.0.4",
