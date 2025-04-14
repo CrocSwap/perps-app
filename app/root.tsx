@@ -15,6 +15,7 @@ import './css/app.css';
 import './css/index.css';
 import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
+import { useLinkGen } from './hooks/useLinkGen';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -101,6 +102,8 @@ export default function App() {
     // ... in the DOM (check styling before pushing)
     const announcements: string[] = ['Hello there'];
 
+    const linkGenTestpage = useLinkGen('testpage');
+
     return (
         <Layout>
             <WsObserverProvider url={wsUrl}>
@@ -110,7 +113,7 @@ export default function App() {
                         <PageHeader />
                     </ComponentErrorBoundary>
 
-                    {
+                    { linkGenTestpage.isPage && !!announcements.length &&
                         <ComponentErrorBoundary>
                             <aside
                                 style={{
