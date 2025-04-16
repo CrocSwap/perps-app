@@ -22,6 +22,7 @@ function LeaderboardTable({
     isFullScreen,
 }: LeaderboardTableProps) {
     // Memoize to prevent recalculation on every render
+
     const wrapperClassName = useMemo(() => {
         return `${styles.tableWrapper} ${isFullScreen ? styles.fullScreen : ''}`;
     }, [isFullScreen]);

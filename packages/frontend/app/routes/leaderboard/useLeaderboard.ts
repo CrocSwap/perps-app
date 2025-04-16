@@ -16,7 +16,7 @@ export const useLeaderboard = (initialData: LeaderboardData[]) => {
         useState<LeaderboardData[]>(initialData);
     const [period, setPeriod] = useState<Period>('30D');
     const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
-    const [isFullScreen, setIsFullScreen] = useState(false);
+    const [isFullScreen, setIsFullScreen] = useState(true);
 
     // Sort state
     const [sortConfig, setSortConfig] = useState<SortConfig>({
@@ -26,7 +26,7 @@ export const useLeaderboard = (initialData: LeaderboardData[]) => {
 
     // State for pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
     const [isRowsDropdownOpen, setIsRowsDropdownOpen] = useState(false);
 
     const totalRows = filteredData.length;

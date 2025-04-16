@@ -7,6 +7,7 @@
     gap: 64px;
     margin: 0 auto;
     margin-top: 48px;
+    overflow-x: hidden;
 }
 
 .container header {
@@ -95,7 +96,8 @@
     font-size: var(--font-size-s, 12px);
 }
 
-.dropdownMenu {
+.dropdownMenu,
+.dropupMenu {
     position: absolute;
     top: calc(100% + 0.5rem);
     right: 0;
@@ -211,6 +213,12 @@
 .expandIcon:hover {
     fill: var(--text1);
 }
+.chvrDown {
+    display: none;
+}
+.chvrUp {
+    display: none;
+}
 
 @media (min-width: 1280px) {
     .container {
@@ -247,4 +255,27 @@
     .container {
         margin-top: 0;
     }
+}
+
+/* For screens smaller than 1500px, make dropdown appear above */
+
+.dropupMenu {
+    top: auto;
+    bottom: calc(100% + 0.5rem);
+}
+.chvrUp{
+    display: flex;
+}
+÷
+
+.dropdownItem {
+    width: 100%;
+    padding: 8px;
+    color: var(--text1, #f0f0f8);
+    font-size: var(--font-size-s, 12px);
+    cursor: pointer;
+}
+
+.dropdownItem:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }

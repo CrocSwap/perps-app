@@ -5,7 +5,12 @@ import { leaderboardData } from './data';
 import LeaderboardTable from '~/components/Leaderboard/LeaderboardTable/LeaderboardTable';
 import { LuSearch } from 'react-icons/lu';
 import { MdClose, MdExpand } from 'react-icons/md';
-import { FaChevronDown, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import {
+    FaChevronDown,
+    FaChevronLeft,
+    FaChevronRight,
+    FaChevronUp,
+} from 'react-icons/fa';
 import { useLeaderboard } from './useLeaderboard';
 import useOutsideClick from '~/hooks/useOutsideClick';
 
@@ -29,7 +34,7 @@ const periods: { label: string; value: Period }[] = [
     { label: '24H', value: '24H' },
 ];
 
-const rowsOptions = [10, 25, 50, 100];
+const rowsOptions = [10, 20, 50, 100];
 
 function Leaderboard({ loaderData }: Route.ComponentProps) {
     const {
@@ -41,7 +46,7 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
         isRowsDropdownOpen,
         setIsRowsDropdownOpen,
         rowsPerPage,
-        isFullScreen,
+        // isFullScreen,
         sortConfig,
 
         // Calculated values
@@ -69,6 +74,8 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
         totalPages,
     } = useLeaderboard(leaderboardData);
 
+    const isFullScreen = true;
+
     // Memoize the container class name
     const containerClassName = useMemo(() => {
         return `${styles.container} ${isFullScreen ? styles.fullScreen : ''}`;
@@ -87,7 +94,6 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
         ));
     }, [handlePeriodChange]);
 
-    // Memoize the rows per page dropdown items
     const rowsItems = useMemo(() => {
         return rowsOptions.map((value) => (
             <div
@@ -179,9 +185,12 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
                             ref={rowsDropdownRef}
                         >
                             {rowsPerPage}
-                            <FaChevronDown />
+                            {/* <FaChevronDown className={styles.chvrDown} />{' '} */}
+                            <FaChevronUp className={styles.chvrUp} />
                             {isRowsDropdownOpen && (
-                                <div className={styles.dropdownMenu}>
+                                <div
+                                    className={` ${styles.dropupMenu}`}
+                                >
                                     {rowsItems}
                                 </div>
                             )}
