@@ -94,7 +94,7 @@ export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
     return 0;
 };
 
-export function estimateTextWidth(text: string, fontSize: number = 10): number {
+export function estimateTextWidth(text: string, fontSize: number = 11): number {
     const isMac = navigator.userAgent.includes('Macintosh');
     const charWidthFactor = isMac ? 0.58 : 0.5;
 
@@ -131,7 +131,7 @@ export const createAnchoredMainText = async (
         xLoc,
         yPrice,
         text,
-        '#D1D1D1',
+        'rgba(220, 223, 228, 0.8)',
         estimateTextWidth(text),
         borderColor,
     );
@@ -178,7 +178,7 @@ export const createAnchoredText = async (
             disableUndo: true,
             text: text,
             overrides: {
-                fontsize: 10,
+                fontsize: 11,
                 backgroundColor: backgroundColor,
                 bold: true,
                 fillBackground: true,
@@ -186,7 +186,7 @@ export const createAnchoredText = async (
                 wordWrap: true,
                 wordWrapWidth: wordWrapWidth,
                 color: color,
-                borderWidth: 3,
+                borderWidth: 2,
                 borderColor: borderColor,
                 zOrder: 'top',
             },
