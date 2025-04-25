@@ -1,5 +1,4 @@
 import { useState, useCallback, memo, useMemo } from 'react';
-import { MdClose } from 'react-icons/md';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import styles from './PortfolioSend.module.css';
@@ -28,7 +27,7 @@ function PortfolioSend({
     availableAmount,
     networkFee = '$0.001',
     onSend,
-    onClose,
+   
     isProcessing = false,
     portfolio,
 }: PortfolioSendProps) {
@@ -41,9 +40,6 @@ function PortfolioSend({
         ) || AVAILABLE_TOKENS[0],
     );
 
-    const isValidNumberInput = useCallback((value: string) => {
-        return value === '' || /^\d*\.?\d*$/.test(value);
-    }, []);
 
     const validateAmount = useCallback(
         (inputAmount: number, maxAmount: number) => {
@@ -75,8 +71,8 @@ function PortfolioSend({
         [],
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const formatCurrency = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (value: number, currency = selectedToken) => {
             return CURRENCY_FORMATTER.format(value);
         },
@@ -84,18 +80,17 @@ function PortfolioSend({
     );
 
     const debouncedAmountChange = useDebouncedCallback((newValue: string) => {
-        if (isValidNumberInput(newValue)) {
-            setAmount(newValue);
-            setError(null);
-        }
-    }, 150);
+     
+        setAmount(newValue);
+        setError(null);
+    }, 20);
 
     const debouncedAddressChange = useDebouncedCallback((newValue: string) => {
         setAddress(newValue);
         if (error && error.includes('address')) {
             setError(null);
         }
-    }, 150);
+    }, 20);
 
     const handleInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,11 +165,7 @@ function PortfolioSend({
 
     return (
         <div className={styles.container}>
-            <header>
-                <span />
-                <h3>Send</h3>
-                <MdClose onClick={onClose} />
-            </header>
+       
             <div className={styles.textContent}>
                 <h4>Send {selectedToken.symbol} on Fogo</h4>
                 <p>Send tokens to another address on Fogo.</p>

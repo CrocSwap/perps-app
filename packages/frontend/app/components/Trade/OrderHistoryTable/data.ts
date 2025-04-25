@@ -1,7 +1,5 @@
-import type { OrderHistoryData } from './OrderHistoryTableRow';
-
 // Sample order history data based on the mockup
-export const orderHistoryData: OrderHistoryData[] = [
+export const orderHistoryData = [
     {
         time: '2025/02/24 - 16:51:12',
         type: 'Limit',

@@ -42,7 +42,9 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
                 {order.filledSz ? formatNum(order.filledSz) : '--'}
             </div>
             <div className={`${styles.cell} ${styles.orderValueCell}`}>
-                {order.sz ? formatNum(order.sz * order.limitPx) : '--'}
+                {order.sz
+                    ? formatNum(order.sz * order.limitPx, null, true, true)
+                    : '--'}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
                 {order.limitPx ? formatNum(order.limitPx) : '--'}

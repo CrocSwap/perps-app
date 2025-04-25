@@ -1,4 +1,4 @@
-import { API_URLS, DEFAULT_API_ENVIRONMENT, Environment } from './config';
+import { API_URLS, DEFAULT_API_ENVIRONMENT, type Environment } from './config';
 import { ClientError } from './utils/errors';
 import { ServerError } from './utils/errors';
 

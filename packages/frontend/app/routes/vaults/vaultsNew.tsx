@@ -53,7 +53,11 @@ export default function vaultsNew() {
             </div>
 
             {modalOpen && selectedVault && (
-                <Modal close={closeModal} position='center'>
+                <Modal
+                    close={closeModal}
+                    position='center'
+                    title={modalContent === 'deposit' ? 'Deposit' : 'Withdraw'}
+                >
                     {modalContent === 'deposit' && (
                         <DepositModal
                             vault={selectedVault}

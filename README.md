@@ -21,6 +21,12 @@ pnpm dev
 pnpm dev
 ```
 
+## Troubleshooting (if app/tv submodule directory not getting populated)
+
+```bash
+git submodule update --init --recursive
+```
+
 ## Start Frontend in Production Mode
 
 ```bash

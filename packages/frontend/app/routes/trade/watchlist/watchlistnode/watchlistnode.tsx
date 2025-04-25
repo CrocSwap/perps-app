@@ -15,6 +15,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
     const navigate = useNavigate();
 
     const { formatNum } = useNumFormatter();
+    const { selectedCurrency } = useTradeDataStore();
 
     const { symbol: storeSymbol, setSymbol: setStoreSymbol } =
         useTradeDataStore();

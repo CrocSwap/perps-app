@@ -1,4 +1,4 @@
-import { Cloid } from './types';
+import type { Cloid } from './types';
 
 export type Tif = 'Alo' | 'Ioc' | 'Gtc';
 export type Tpsl = 'tp' | 'sl';

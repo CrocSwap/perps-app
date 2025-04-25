@@ -1,17 +1,29 @@
-// jsonParser.worker.js
+/// <reference lib="webworker" />
 
 import type { SymbolInfoIF } from '../../utils/SymbolInfoIFs';
-import { processSymbolInfo } from '../processSymbolInfo';
+import { processSymbolInfo } from '../../processors/processSymbolInfo';
 import type { OrderDataIF } from '../../utils/orderbook/OrderBookIFs';
-import { processUserOrder } from '../processOrderBook';
-import { processPosition } from '../processPosition';
+import { processUserOrder } from '../../processors/processOrderBook';
+import { processPosition } from '../../processors/processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
 import { parseNum } from '../../utils/orderbook/OrderBookUtils';
+import type { OtherWsMsg } from '@perps-app/sdk/src/utils/types';
 
-self.onmessage = function (event) {
+export type WebData2Input = OtherWsMsg;
+export type WebData2Output = {
+    channel: string;
+    data: {
+        coins: SymbolInfoIF[];
+        userOpenOrders: OrderDataIF[];
+        user: string;
+        positions: PositionIF[];
+        coinPriceMap: Map<string, number>;
+    };
+};
+
+self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
     try {
-        const size = event.data.length;
-        const parsedData = JSON.parse(event.data);
+        const parsedData = event.data;
         const coins: SymbolInfoIF[] = [];
         const userOpenOrders: OrderDataIF[] = [];
         const positions: PositionIF[] = [];
@@ -19,6 +31,7 @@ self.onmessage = function (event) {
         const tpSlMap: Map<string, { tp: number; sl: number }> = new Map();
         const coinPriceMap: Map<string, number> = new Map();
 
+        // TODO: type check data, the type might end up kinda different for our backend though
         if (data) {
             if (data.meta && data.meta.universe && data.assetCtxs) {
                 data.meta.universe.forEach((coin: any) => {
@@ -91,12 +104,12 @@ self.onmessage = function (event) {
                 coins,
                 userOpenOrders,
                 user: data.user,
-                size,
                 positions,
                 coinPriceMap,
             },
-        });
+        } as WebData2Output);
     } catch (error) {
+        console.error('Error processing webdata2 worker:', error);
         self.postMessage({ error: (error as Error).message });
     }
 };

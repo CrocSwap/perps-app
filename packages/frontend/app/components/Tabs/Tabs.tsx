@@ -6,10 +6,11 @@ interface TabProps {
     label: string;
     isActive: boolean;
     onClick: () => void;
+    layoutId: string; 
 }
 
 export function Tab(props: TabProps) {
-    const { label, isActive, onClick } = props;
+    const { label, isActive, onClick, layoutId } = props;
 
     return (
         <button
@@ -20,7 +21,7 @@ export function Tab(props: TabProps) {
             {isActive && (
                 <motion.div
                     className={styles.activeIndicator}
-                    layoutId='activeIndicator'
+                    layoutId={layoutId} 
                     initial={false}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
@@ -29,17 +30,24 @@ export function Tab(props: TabProps) {
     );
 }
 
-// Modified interface to accept both simple strings and objects with id/label
 export interface TabsProps {
     tabs: Array<string | { id: string; label: string }>;
     defaultTab?: string;
     onTabChange?: (tab: string) => void;
     rightContent?: React.ReactNode;
     wrapperId?: string;
+    layoutIdPrefix?: string; 
 }
 
 export default function Tabs(props: TabsProps) {
-    const { tabs, defaultTab, onTabChange, rightContent, wrapperId } = props;
+    const { 
+        tabs, 
+        defaultTab, 
+        onTabChange, 
+        rightContent, 
+        wrapperId,
+        layoutIdPrefix = 'tabIndicator' 
+    } = props;
 
     // Function to get tab ID (either the string itself or the id property)
     const getTabId = (tab: string | { id: string; label: string }): string => {
@@ -158,6 +166,9 @@ export default function Tabs(props: TabsProps) {
         }
     };
 
+    // Create a unique layoutId for this specific tabs instance
+    const layoutId = `${layoutIdPrefix}-${wrapperId || ''}`;
+
     return (
         <div
             {...(wrapperId ? { id: wrapperId } : {})}
@@ -196,6 +207,7 @@ export default function Tabs(props: TabsProps) {
                                 label={tabLabel}
                                 isActive={activeTab === tabId}
                                 onClick={() => handleTabClick(tabId)}
+                                layoutId={layoutId} // Pass the unique layoutId
                             />
                         );
                     })}

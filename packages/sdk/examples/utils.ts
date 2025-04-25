@@ -1,6 +1,6 @@
 import { Info } from '../src/info';
 import { Exchange } from '../src/exchange';
-import { DEMO_USER, Environment } from '../src/config';
+import { DEMO_USER, type Environment } from '../src/config';
 
 export async function setup(environment: Environment, skipWs: boolean = false) {
     const info = new Info({ environment, skipWs, isDebug: true });

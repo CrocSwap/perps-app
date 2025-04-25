@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { MdClose } from 'react-icons/md';
 import styles from './DepositModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
@@ -21,16 +20,16 @@ interface DepositModalProps {
 export default function DepositModal({
     vault,
     onDeposit,
-    onClose,
+    // onClose,
 }: DepositModalProps) {
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
-    const [selectedToken, setSelectedToken] = useState('USDe');
+    const [selectedToken] = useState('USDe');
 
     const {
         formatCurrency,
         validateAmount,
-        isValidNumberInput,
+        // isValidNumberInput,
         getAvailableCapacity,
     } = useVaultManager();
 
@@ -43,14 +42,10 @@ export default function DepositModal({
     const handleInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = event.target.value;
-
-            // Use the utility function for validation
-            if (isValidNumberInput(newValue)) {
-                setAmount(newValue);
-                setError(null);
-            }
+            setAmount(newValue);
+            setError(null);
         },
-        [isValidNumberInput],
+        [],
     );
 
     const handleMaxClick = useCallback(() => {
@@ -92,11 +87,11 @@ export default function DepositModal({
 
     return (
         <div className={styles.container}>
-            <header>
+            {/* <header>
                 <span />
                 <h3>Deposit</h3>
                 <MdClose onClick={onClose} />
-            </header>
+            </header> */}
             <div className={styles.textContent}>
                 <h4>
                     Deposit {unitValue} to {vault.name}

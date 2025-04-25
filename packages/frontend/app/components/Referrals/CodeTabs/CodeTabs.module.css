@@ -1,0 +1,119 @@
+.tableWrapper {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--main-border-radius, 16px);
+    background: var(--dark2, #0e0e14);
+    min-height: 317px;
+
+    display: flex;
+    flex-direction: column;
+}
+.tableContent {
+    /* padding: 8px 9px 0px 9px; */
+    height: 100%;
+}
+.tableControls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.sectionWithButton{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px;
+}
+.sectionWithButton button{
+    outline: none;
+    border: none;
+    display: flex;
+width: 100%;
+padding: 12px 16px;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+border-radius: 8px;
+background: var(--accent1, #7371FC);
+font-size: var(--font-size-m, 18px);
+color: var(--text1);
+transition: all 0.3s ease-in-out;
+
+}
+.sectionWithButton button:hover{
+    opacity: 0.8;
+}
+.enterCodeContent{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  
+    align-items: flex-start;
+}
+
+.enterCodeContent h6{
+    color: var(--base-text1, #F0F0F8);
+text-align: center;
+
+
+font-family: var(--Font-Family-Main, "Lexend Deca");
+font-size: var(--font-size-s, 12px);
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.enterCodeContent input{
+    display: flex;
+height: 33px;
+padding: 0px 8px;
+align-items: center;
+gap: 4px;
+align-self: stretch;
+border-radius: 8px;
+background: var(--dark4, #27272C);
+font-size: var(--font-size-s, 12px);
+outline: none;
+border: none;
+color: var(--text1)
+
+}
+.createCodeContent{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    
+    gap: 16px;
+    font-family: var(--Font-Family-Main, "Lexend Deca");
+font-size: var(--font-size-s, 12px);
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.createCodeContent .walletLink{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+.createCodeContent a{
+    color: var(--accent1);
+}
+
+.createCodeContent p span{
+    color: var(--accent2)
+}
+
+.claimContent{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--Font-Family-Main, "Lexend Deca");
+    font-size: var(--font-size-s, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}

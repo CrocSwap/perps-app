@@ -9,6 +9,10 @@
     background: var(--dark2, #111117);
     width: 350px;
     height: 290px;
+
+    flex: 1 1 350px; /* Grow, shrink, and basis */
+    min-width: 300px;
+    max-width: 450px;
 }
 .headerContainer {
     width: 100%;
@@ -146,4 +150,19 @@
 }
 .withdrawButton {
     background: var(--dark3);
+}
+/* Small screens (mobile) */
+@media (max-width: 480px) {
+    .vaultCard {
+        flex-basis: 100%;
+        min-width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 1024px) {
+    .vaultCard {
+        flex-basis: calc(50% - 24px);
+        min-width: 300px;
+    }
 }

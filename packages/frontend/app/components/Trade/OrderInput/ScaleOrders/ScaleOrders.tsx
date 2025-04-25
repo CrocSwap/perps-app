@@ -12,7 +12,6 @@ import flatPriceSvg from '../../../../assets/icons/FlatPriceDistribution.svg';
 import evenRatioSvg from '../../../../assets/icons/EvenRatio.svg';
 import decreasingRatioSvg from '../../../../assets/icons/DecreasingRatio.svg';
 import increasingRatioSvg from '../../../../assets/icons/IncreasingRatio.svg';
-import SVGIcon from '~/components/SvgIcon/SvgIcon';
 import DistributionDropdown from './DistributionDropdown';
 
 interface ScaleOrdersProps {
@@ -99,7 +98,6 @@ export default function ScaleOrders({
         setIsPriceDropdownOpen,
         isRatioDropdownOpen,
         setIsRatioDropdownOpen,
-        totalRatio,
         isValidRatio,
         updateOrderRatio,
         updateOrderQuantity,
@@ -156,19 +154,6 @@ export default function ScaleOrders({
             }}
         >
             <div className={styles.scaleOrdersContent}>
-                {isModal && (
-                    <div className={styles.header}>
-                        <span />
-                        <h2 className={styles.title}>Scale Options</h2>
-                        <button
-                            className={styles.closeButton}
-                            onClick={onClose}
-                        >
-                            ×
-                        </button>
-                    </div>
-                )}
-
                 <div className={styles.totalOrdersSection}>
                     <input
                         type='text'

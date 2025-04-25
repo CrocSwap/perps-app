@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { MdClose } from 'react-icons/md';
 import styles from './WithdrawModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
@@ -19,12 +18,12 @@ interface WithdrawModalProps {
 export default function WithdrawModal({
     vault,
     onWithdraw,
-    onClose,
+    // onClose,
 }: WithdrawModalProps) {
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
 
-    const { formatCurrency, validateAmount, isValidNumberInput } =
+    const { formatCurrency, validateAmount } =
         useVaultManager();
 
     // Use a default unit if none is provided
@@ -34,12 +33,11 @@ export default function WithdrawModal({
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = event.target.value;
 
-            if (isValidNumberInput(newValue)) {
-                setAmount(newValue);
-                setError(null);
-            }
+            setAmount(newValue);
+            setError(null);
+         
         },
-        [isValidNumberInput],
+        [],
     );
 
     const handleMaxClick = useCallback(() => {
@@ -81,11 +79,6 @@ export default function WithdrawModal({
 
     return (
         <div className={styles.container}>
-            <header>
-                <span />
-                <h3>Withdraw</h3>
-                <MdClose onClick={onClose} />
-            </header>
             <div className={styles.textContent}>
                 <h4>
                     Withdraw {unitValue} from {vault.name}

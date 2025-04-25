@@ -56,6 +56,29 @@ export const wsUrls = [
     'wss://api-ui.hyperliquid.xyz/ws',
 ];
 
+export const wsEnvironments = [
+    {
+        label: 'Mock',
+        value: 'mock',
+    },
+    {
+        label: 'HyperLiquid',
+        value: 'hl',
+    },
+    {
+        label: 'Local',
+        value: 'local',
+    },
+    {
+        label: 'Mainnet',
+        value: 'mainnet',
+    },
+    {
+        label: 'Testnet',
+        value: 'testnet',
+    },
+];
+
 export const debugWallets: DebugWallet[] = [
     {
         label: 'Crazy Account',
@@ -75,3 +98,16 @@ export const OrderHistoryLimits = {
     MAX: 1000,
     RENDERED: 50,
 };
+
+export * from './feeSchedule';
+
+export enum WsChannels {
+    ORDERBOOK = 'l2Book',
+    ORDERBOOK_TRADES = 'trades',
+    USER_FILLS = 'userFills',
+    USER_HISTORICAL_ORDERS = 'userHistoricalOrders',
+    WEB_DATA2 = 'webData2',
+    ACTIVE_COIN_DATA = 'activeAssetCtx',
+    NOTIFICATION = 'notification',
+    CANDLE = 'candle',
+}

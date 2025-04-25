@@ -33,7 +33,7 @@ export default function PageHeader() {
         { name: 'Vaults', path: '/vaults' },
         { name: 'Portfolio', path: '/portfolio' },
         { name: 'Referrals', path: '/referrals' },
-        { name: 'Points', path: '/points' },
+        // { name: 'Points', path: '/points' },
         { name: 'Leaderboard', path: '/leaderboard' },
     ];
 

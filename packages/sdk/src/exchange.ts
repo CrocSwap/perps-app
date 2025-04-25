@@ -1,18 +1,18 @@
 import { API } from './api';
 import { Info } from './info';
-import { Meta, Cloid, BuilderInfo } from './utils/types';
+import type { Meta, Cloid, BuilderInfo } from './utils/types';
 import {
-    OrderRequest,
-    ModifyRequest,
-    CancelRequest,
-    CancelByCloidRequest,
+    type OrderRequest,
+    type ModifyRequest,
+    type CancelRequest,
+    type CancelByCloidRequest,
     signL1Action,
     orderRequestToOrderWire,
     orderWiresToOrderAction,
     getTimestampMs,
-    OidOrCloid,
+    type OidOrCloid,
 } from './utils/signing';
-import { API_URLS, DEFAULT_SLIPPAGE, DEMO_USER, Environment } from './config';
+import { DEFAULT_SLIPPAGE, DEMO_USER, type Environment } from './config';
 
 export interface ExchangeOptions {
     environment: Environment;
@@ -27,7 +27,7 @@ export class Exchange extends API {
     public vaultAddress?: string;
     public accountAddress?: string;
     public info: Info;
-    public readonly environment: Environment;
+    public environment: Environment;
 
     constructor(wallet: any, options: ExchangeOptions) {
         super(options.environment);
@@ -41,6 +41,18 @@ export class Exchange extends API {
             meta: options.meta,
             isDebug: options.isDebug,
         });
+    }
+
+    public async setEnvironment(newEnvironment: Environment) {
+        if (newEnvironment === this.environment) {
+            console.log(
+                'New environment is the same as the current one. No action taken.',
+            );
+            return;
+        }
+
+        this.environment = newEnvironment;
+        this.info.setEnvironment(newEnvironment);
     }
 
     private async _postAction(
@@ -65,8 +77,8 @@ export class Exchange extends API {
     ): Promise<number> {
         const coin = this.info.nameToCoin[name];
         if (!px) {
-            const mids = await this.info.allMids();
-            px = mids[coin];
+            const { mids } = await this.info.allMids();
+            px = Number(mids[coin]);
         }
         const asset = this.info.coinToAsset[coin];
 

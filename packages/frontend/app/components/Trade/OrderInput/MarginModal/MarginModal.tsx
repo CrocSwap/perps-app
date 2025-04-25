@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import type { MarginMode } from '../OrderInput';
 import styles from './MarginModal.module.css';
-import { MdClose } from 'react-icons/md';
 
 interface PropsIF {
     handleMarginModeChange: (mode: MarginMode) => void;
@@ -14,11 +12,6 @@ export default function MarginModal(props: PropsIF) {
 
     return (
         <section className={styles.container}>
-            <header>
-                <span />
-                <h3>Margin Mode</h3>
-                <MdClose onClick={() => handleMarginModeConfirm()} />
-            </header>
             <div className={styles.contentContainer}>
                 <button
                     className={`${styles.content} ${activeMargin === 'cross' ? styles.selected : ''}`}

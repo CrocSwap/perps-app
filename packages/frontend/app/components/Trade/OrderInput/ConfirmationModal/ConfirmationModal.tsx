@@ -1,4 +1,3 @@
-import { MdClose } from 'react-icons/md';
 import styles from './ConfirmationModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
@@ -53,12 +52,6 @@ export default function ConfirmationModal(props: PropsIF) {
     const [isDontShowEnabled, setIsDontShowEnabled] = useState(false);
     return (
         <div className={styles.container}>
-            <header>
-                <span />
-                <h3>Confirm Order</h3>
-                <MdClose onClick={onClose} />
-            </header>
-
             <div className={styles.contentContainer}>
                 {dataInfo.map((info) => (
                     <div className={styles.infoRow}>

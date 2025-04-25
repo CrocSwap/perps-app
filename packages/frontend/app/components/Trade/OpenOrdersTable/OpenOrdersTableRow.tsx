@@ -64,7 +64,9 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 {order.origSz ? formatNum(order.origSz) : '--'}
             </div>
             <div className={`${styles.cell} ${styles.orderValueCell}`}>
-                {order.orderValue ? `$${formatNum(order.orderValue)}` : '--'}
+                {order.orderValue
+                    ? `${formatNum(order.orderValue, 2, true, true)}`
+                    : '--'}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
                 {formatNum(order.limitPx)}

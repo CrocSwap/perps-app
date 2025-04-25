@@ -52,6 +52,8 @@ export interface AllMidsSubscription {
 export interface L2BookSubscription {
     type: 'l2Book';
     coin: string;
+    nSigFigs?: number;
+    mantissa?: number | null;
 }
 
 export interface TradesSubscription {
@@ -95,6 +97,16 @@ export interface WebData2Subscription {
     user: string;
 }
 
+export interface NotificationSubscription {
+    type: 'notification';
+    user: string;
+}
+
+export interface UserHistoricalOrdersSubscription {
+    type: 'userHistoricalOrders';
+    user: string;
+}
+
 export type Subscription =
     | AllMidsSubscription
     | L2BookSubscription
@@ -105,7 +117,9 @@ export type Subscription =
     | OrderUpdatesSubscription
     | UserFundingsSubscription
     | UserNonFundingLedgerUpdatesSubscription
-    | WebData2Subscription;
+    | WebData2Subscription
+    | NotificationSubscription
+    | UserHistoricalOrdersSubscription;
 
 export interface AllMidsData {
     mids: Record<string, string>;
@@ -206,9 +220,42 @@ export interface UserFillsData {
     fills: Fill[];
 }
 
+export interface NotificationData {
+    notification: string;
+}
+
 export interface UserFillsMsg {
     channel: 'userFills';
     data: UserFillsData;
+}
+
+export interface UserHistoricalOrdersData {
+    user: string;
+    orderHistory: OrderHistory[];
+}
+
+export interface OrderHistory {
+    order: OrderData;
+    status: string;
+    statusTimestamp: number;
+}
+
+export interface OrderData {
+    cloid: string;
+    coin: string;
+    isPositionTpsl?: boolean;
+    isTrigger?: boolean;
+    limitPx: number;
+    oid: number;
+    orderType: string;
+    origSz: number;
+    reduceOnly?: boolean;
+    side: 'buy' | 'sell';
+    sz: number;
+    tif?: string;
+    timestamp: number;
+    triggerCondition?: string;
+    triggerPx?: number;
 }
 
 export interface OtherWsMsg {
@@ -221,6 +268,16 @@ export interface OtherWsMsg {
     data: any;
 }
 
+export interface NotificationMsg {
+    channel: 'notification';
+    data: NotificationData;
+}
+
+export interface UserHistoricalOrdersMsg {
+    channel: 'userHistoricalOrders';
+    data: UserHistoricalOrdersData;
+}
+
 export type WsMsg =
     | AllMidsMsg
     | L2BookMsg
@@ -228,7 +285,9 @@ export type WsMsg =
     | UserEventsMsg
     | PongMsg
     | UserFillsMsg
-    | OtherWsMsg;
+    | OtherWsMsg
+    | NotificationMsg
+    | UserHistoricalOrdersMsg;
 
 export interface BuilderInfo {
     b: string; // public address of the builder

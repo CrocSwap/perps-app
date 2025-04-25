@@ -3,6 +3,7 @@ import { setLS } from '~/utils/AppUtils';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
 import { persist } from 'zustand/middleware';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
 type TradeDataStore = UserTradeStore & {
     symbol: string;
@@ -23,6 +24,8 @@ type TradeDataStore = UserTradeStore & {
     setObChosenPrice: (price: number) => void;
     obChosenAmount: number;
     setObChosenAmount: (amount: number) => void;
+    selectedCurrency: string;
+    setSelectedCurrency: (currency: string) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -89,6 +92,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             coinPriceMap: new Map(),
             setCoinPriceMap: (coinPriceMap: Map<string, number>) =>
                 set({ coinPriceMap }),
+            selectedCurrency: 'USD',
+            setSelectedCurrency: (currency: string) =>
+                set({ selectedCurrency: currency }),
         }),
         {
             name: 'TRADE_DATA',

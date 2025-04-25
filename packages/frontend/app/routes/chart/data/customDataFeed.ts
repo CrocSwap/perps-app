@@ -1,25 +1,22 @@
+import type { Info } from '@perps-app/sdk';
 import type {
     IDatafeedChartApi,
     LibrarySymbolInfo,
     Mark,
 } from '~/tv/charting_library/charting_library';
+import { WsChannels } from '~/utils/Constants';
 import {
     getHistoricalData,
     getMarkColorData,
     getMarkFillData,
 } from './candleDataCache';
+import { processWSCandleMessage } from './processChartData';
 import {
     mapResolutionToInterval,
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
-import { WsChannels } from '~/hooks/useWsObserver';
-import { processWSCandleMessage } from './processChartData';
-import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-
-export const createDataFeed = (
-    subscribe: (channel: string, payload: any) => void,
-): IDatafeedChartApi =>
+export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
     ({
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
             onResult([
@@ -197,18 +194,19 @@ export const createDataFeed = (
         },
 
         subscribeBars: (symbolInfo, resolution, onTick) => {
-            subscribe(WsChannels.CANDLE, {
-                payload: {
-                    coin: symbolInfo.ticker,
+            if (!info) return console.log('SDK is not ready');
+            info.subscribe(
+                {
+                    type: WsChannels.CANDLE,
+                    coin: symbolInfo.ticker || '',
                     interval: mapResolutionToInterval(resolution),
                 },
-                handler: (payload: any) => {
-                    if (payload.s === symbolInfo.ticker) {
-                        onTick(processWSCandleMessage(payload));
+                (payload: any) => {
+                    if (payload.data.s === symbolInfo.ticker) {
+                        onTick(processWSCandleMessage(payload.data));
                     }
                 },
-                single: true,
-            });
+            );
             // subscribeOnStream(symbolInfo, resolution, onTick);
         },
 

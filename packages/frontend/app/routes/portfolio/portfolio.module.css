@@ -49,9 +49,11 @@
 
     font-size: var(--font-size-xl, 36px);
 }
-.detailsContent a {
-    font-size: var(--font-size-m, 18px);
-    color: var(--accent1, #7371fc);
+
+.view_detail_clickable {
+    font-size: var(--font-size-m);
+    cursor: pointer;
+    color: var(--accent1);
 }
 
 .totalNetDisplay {
@@ -117,6 +119,83 @@
     display: none !important;
 }
 
+.fee_schedule_modal {
+    display: flex;
+    flex-direction: column;
+    min-width: 500px;
+    padding: 8px 16px 16px;
+    border-radius: var(--main-border-radius);
+    font-family: var(--font-family-main);
+    color: var(--text1);
+    gap: 16px;
+    background-color: var(--dark3);
+    user-select: none;
+    -webkit-user-select: none;
+    outline: 1px solid var(--text2);
+}
+
+.fee_schedule_modal > header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fee_schedule_modal > header > h3 {
+    font-size: var(--font-size-l);
+}
+
+.fee_table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    /* this keeps consistent spacing in table header and data rows */
+    --fee_table_col_spacing: 2fr 6fr 3fr 3fr;
+    --fee_table_col_gap: 8px;
+    --fee_table_row_padding: 0 8px;
+}
+
+.fee_table > h4 {
+    font-size: var(--font-size-m);
+}
+
+.fee_table > header {
+    display: grid;
+    grid-template-columns: var(--fee_table_col_spacing);
+    padding: var(--fee_table_row_padding);
+    gap: var(--fee_table_col_gap);
+    justify-items: start;
+    font-size: var(--font-size-xs);
+}
+
+.fee_table > ol {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    gap: 4px;
+}
+
+.fee_table > ol > li {
+    display: grid;
+    grid-template-columns: var(--fee_table_col_spacing);
+    padding: var(--fee_table_row_padding);
+    gap: var(--fee_table_col_gap);
+    justify-items: start;
+    border-radius: var(--half-border-radius);
+    font-size: var(--font-size-s);
+    transition: background-color 0.3s ease-out;
+}
+
+.fee_table > ol > li:hover {
+    background-color: var(--dark5);
+    transition: background-color 0.1s ease-in;
+}
+
+.neg_fees {
+    font-size: var(--font-size-xs);
+}
+
 @media (max-width: 768px) {
     .container {
         overflow-y: auto;
@@ -152,7 +231,7 @@
     .detailsContent h3 {
         font-size: var(--font-size-l);
     }
-    .detailsContent a {
+    .view_detail_clickable {
         font-size: var(--font-size-s);
     }
 }

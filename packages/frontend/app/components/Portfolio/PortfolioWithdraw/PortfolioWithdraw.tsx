@@ -1,5 +1,4 @@
 import { useState, useCallback, memo, useMemo } from 'react';
-import { MdClose } from 'react-icons/md';
 import styles from './PortfolioWithdraw.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
@@ -20,7 +19,6 @@ interface PortfolioWithdrawProps {
 function PortfolioWithdraw({
     portfolio,
     onWithdraw,
-    onClose,
     isProcessing = false,
 }: PortfolioWithdrawProps) {
     const [amount, setAmount] = useState<string>('');
@@ -28,11 +26,8 @@ function PortfolioWithdraw({
 
     const unitValue = portfolio.unit || 'USD';
 
-    const isValidNumberInput = useCallback((value: string) => {
-        if (value === '') return true;
-
-        const regex = /^(\d+)?(\.\d{0,8})?$/;
-        return regex.test(value);
+    const isValidNumberInput = useCallback(() => {
+        return true
     }, []);
 
     const USD_FORMATTER = useMemo(
@@ -94,11 +89,10 @@ function PortfolioWithdraw({
     }, []);
 
     const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
-        if (isValidNumberInput(newValue)) {
-            setAmount(newValue);
-            setError(null);
-        }
-    }, 150);
+      
+        setAmount(newValue);
+        setError(null);
+    }, 20);
 
     const handleInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,11 +154,7 @@ function PortfolioWithdraw({
 
     return (
         <div className={styles.container}>
-            <header>
-                <span />
-                <h3>Withdraw</h3>
-                <MdClose onClick={onClose} />
-            </header>
+     
             <div className={styles.textContent}>
                 <h4>
                     Withdraw {unitValue} from {portfolio.name}

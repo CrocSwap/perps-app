@@ -2,8 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
-import type { ChartShapeRefs, LineData } from './component/LineComponent';
-import { buyColor, sellColor } from './customOrderLineUtils';
+import type { LineData } from './component/LineComponent';
+import {
+    buyColor,
+    quantityTextFormatWithComma,
+    sellColor,
+    type LineLabel,
+} from './customOrderLineUtils';
 import LineComponent from './component/LineComponent';
 
 const OpenOrderLine = () => {
@@ -19,7 +24,7 @@ const OpenOrderLine = () => {
             .map((i) => {
                 return {
                     price: i.entryPx,
-                    pnl: Number(i.unrealizedPnl.toFixed(2)),
+                    pnl: i.unrealizedPnl,
                     szi: i.szi,
                     liqPrice: i.liquidationPx,
                 };
@@ -32,55 +37,80 @@ const OpenOrderLine = () => {
         }
     }, [JSON.stringify(positions), symbol]);
 
-    function formatTPorSLLabel(rawText: string, orderType: string): string {
-        const match = rawText.match(/Price (above|below) (\d+)/);
-
-        if (!match) return rawText;
-
-        const direction = match[1];
-        const price = match[2];
-        const operator = direction === 'above' ? '>' : '<';
-
-        const labelPrefix = orderType === 'Take Profit Market' ? 'TP' : 'SL';
-
-        return `${labelPrefix} Price ${operator} ${price}`;
-    }
-
     useEffect(() => {
-        if (!chart || !userSymbolOrders?.length || !pnlSzi) {
+        if (!chart || !userSymbolOrders?.length) {
             setLines([]);
             return;
         }
-        const newLines: LineData[] = userSymbolOrders.map((order) => {
-            const { sz, side } = order;
+        const newLines: LineData[] = userSymbolOrders
+            .sort((a, b) => a.timestamp - b.timestamp)
+            .map((order): LineData => {
+                const {
+                    sz,
+                    side,
+                    orderType,
+                    limitPx,
+                    triggerPx,
+                    triggerCondition,
+                } = order;
 
-            let price = order.limitPx;
+                const color = side === 'buy' ? buyColor : sellColor;
+                const xLoc = 0.4;
+                const tempTriggerCondition =
+                    triggerCondition && triggerCondition !== 'N/A'
+                        ? triggerCondition
+                        : '';
 
-            let quantityText = 0;
-            let orderText: string | undefined = '';
+                let yPrice = limitPx;
+                let quantityTextValue = sz;
+                let label: LineLabel = {
+                    type: 'Limit',
+                    price: limitPx,
+                    triggerCondition: tempTriggerCondition,
+                };
+                const type = 'LIMIT';
 
-            if (order.orderType === 'Limit') {
-                orderText = ' Limit  ' + price;
-                quantityText = order.sz;
-            } else {
-                if (order.triggerCondition && order.orderType) {
-                    orderText = formatTPorSLLabel(
-                        order.triggerCondition,
-                        order.orderType,
-                    );
-                    if (order.triggerPx) price = order.triggerPx;
-                    quantityText = pnlSzi;
+                if (orderType === 'Limit') {
+                    label = {
+                        type: 'Limit',
+                        price: limitPx,
+                        triggerCondition: tempTriggerCondition,
+                    };
+                } else {
+                    if (orderType === 'Stop Limit') {
+                        label = {
+                            type: 'Stop Limit',
+                            price: quantityTextFormatWithComma(limitPx),
+                            triggerCondition: tempTriggerCondition,
+                            orderType,
+                        };
+                    }
+                    if (
+                        orderType === 'Take Profit Market' ||
+                        orderType === 'Stop Market'
+                    ) {
+                        label = {
+                            type: orderType,
+                            triggerCondition: tempTriggerCondition,
+                            orderType,
+                        };
+                    }
+
+                    if (triggerPx) {
+                        yPrice = triggerPx;
+                    }
+                    quantityTextValue = sz ? sz : pnlSzi ? pnlSzi : 0;
                 }
-            }
 
-            return {
-                xLoc: 0.4,
-                yLoc: price,
-                text: orderText,
-                quantityText: quantityText.toFixed(5),
-                color: side === 'buy' ? buyColor : sellColor,
-            };
-        });
+                return {
+                    xLoc,
+                    yPrice,
+                    textValue: label,
+                    quantityTextValue,
+                    color,
+                    type,
+                };
+            });
 
         setLines(newLines);
     }, [

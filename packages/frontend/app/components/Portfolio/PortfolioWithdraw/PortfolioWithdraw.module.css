@@ -7,9 +7,7 @@
     gap: 8px;
     flex-shrink: 0;
 
-    border-radius: 16px;
-    background: var(--dark3, #1c1c22);
-    box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
+
 }
 
 .container header {
@@ -151,4 +149,9 @@
     background: var(--dark4, #27272c);
     color: var(--text2, #bcbcc4);
     cursor: not-allowed;
+}
+@media (max-width: 768px) {
+    .container {
+        width: auto;
+    }
 }

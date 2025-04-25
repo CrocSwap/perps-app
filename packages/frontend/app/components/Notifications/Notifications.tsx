@@ -8,8 +8,9 @@ import {
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useDebugStore } from '~/stores/DebugStore';
-import { useEffect, useRef } from 'react';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
+import { useCallback, useEffect, useRef } from 'react';
+import { useSdk } from '~/hooks/useSdk';
+import { WsChannels } from '~/utils/Constants';
 
 export default function Notifications() {
     // boolean to suppress notifications if toggled by user
@@ -25,40 +26,39 @@ export default function Notifications() {
     // debug store to import sample wallet addres to use
     const { debugWallet } = useDebugStore();
 
-    // ws observer to subscribe to notifications
-    const { subscribe } = useWsObserver();
+    const { info } = useSdk();
 
     // use effect to subscribe to notifications
     useEffect(() => {
-        if (debugWallet.address) {
-            subscribe(WsChannels.NOTIFICATION, {
-                payload: {
-                    user: debugWallet.address,
-                },
-                handler: (payload) => {
-                    if (
-                        backgroundFillNotifRef.current &&
-                        payload.notification
-                    ) {
-                        // split the payload into title and message
-                        const title = payload.notification.split(':')[0];
-                        const message = payload.notification.split(':')[1];
+        if (!info) return;
+        if (!debugWallet.address) return;
 
-                        // add to store
-                        data.addFromWS({
-                            title: title,
-                            message: message,
-                            icon: 'check',
-                            oid: makeOID(14),
-                        });
-                    }
-                },
-                // that flag will generate a single subscription for this payload,
-                // will remove any existing subscription for this payload
-                single: true,
+        const { unsubscribe } = info.subscribe(
+            {
+                type: WsChannels.NOTIFICATION,
+                user: debugWallet.address,
+            },
+            postNotification,
+        );
+
+        return unsubscribe;
+    }, [debugWallet, info]);
+
+    const postNotification = useCallback((payload: any) => {
+        if (backgroundFillNotifRef.current && payload.notification) {
+            // split the payload into title and message
+            const title = payload.notification.split(':')[0];
+            const message = payload.notification.split(':')[1];
+
+            // add to store
+            data.addFromWS({
+                title: title,
+                message: message,
+                icon: 'check',
+                oid: makeOID(14),
             });
         }
-    }, [debugWallet]);
+    }, []);
 
     return (
         <div className={styles.notifications}>

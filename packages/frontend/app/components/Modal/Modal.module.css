@@ -4,10 +4,215 @@
     left: 0px;
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height that adjusts to browser UI */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(10px);
     z-index: 100000;
+    /* Prevent scrolling of background content */
+    overflow: hidden;
+    /* Prevent swipe-up navigation gestures on iOS */
+    overscroll-behavior: none;
+}
+
+/* Special styling when keyboard is visible */
+.keyboardVisible {
+    /* Override height to use viewport rather than fixed value */
+    height: auto !important;
+    bottom: 0;
+}
+
+.outside_modal header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px 16px 16px;
+}
+
+.outside_modal header h3 {
+    font-size: var(--font-size-l, 24px);
+}
+
+.outside_modal header svg {
+    cursor: pointer;
+}
+.outside_modal header svg:hover {
+    fill: var(--text1);
+}
+
+/* Bottom sheet specific container style */
+.bottomSheetContainer {
+    /* Override the default modal container styles */
+    justify-content: flex-end !important;
+
+    /* Remove any padding that might create empty space */
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.bottomSheet {
+    /* Style the actual content container */
+    border-radius: 16px 16px 0 0; /* Rounded corners only at the top */
+    background: var(--dark3, #1c1c22);
+    box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
+    width: 100%;
+    
+    /* Key fixes for mobile browsers */
+    max-height: 85dvh; /* Dynamic viewport height - adapts to browser UI */
+    
+    /* This is important: extend the background color all the way to the bottom */
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+    
+    /* Ensure content is scrollable but modal itself doesn't scroll with page */
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+    
+    /* Prevent iOS safari bounce effect */
+    overscroll-behavior: contain;
+    
+    /* Add negative margin to avoid gap at bottom */
+    margin-bottom: -1px;
+}
+
+/* Special handling when keyboard is active */
+.keyboardActive {
+    /* Adjust max-height to prevent overflow when keyboard is visible */
+    max-height: 70dvh;
+    
+    /* Enhance scroll experience when keyboard is open */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    /* Prevent animating when keyboard appears */
+    transition: none !important;
+    
+    /* Keep in place when keyboard is open */
+    transform: translateY(0) !important;
+    
+    /* Disable border-radius to maximize space when keyboard is visible */
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    
+    /* For older iOS Safari versions */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.bottomSheetHandle {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    cursor: grab;
+    touch-action: none;
+}
+
+.bottomSheetHandle:active {
+    cursor: grabbing;
+}
+
+.dragging {
+    cursor: grabbing;
+}
+
+.handle {
+    width: 36px;
+    height: 4px;
+    background-color: #666; /* Darker handle to match dark theme */
+    border-radius: 2px;
+}
+
+.modalContent {
+    /* padding: 0 16px 16px 16px; */
+    /* Ensure adequate space for form elements */
+    /* padding-bottom: 16px; */
+}
+
+/* Add a spacer at the bottom to ensure content isn't hidden */
+.safeAreaSpacer {
+    height: env(safe-area-inset-bottom, 16px);
+    
+    /* Add extra space for keyboard */
+    height: calc(env(safe-area-inset-bottom, 16px) + 16px);
+}
+
+/* For the keyboard-active case, increase the spacer */
+.keyboardActive .safeAreaSpacer {
+    height: calc(env(safe-area-inset-bottom, 16px) + 36px);
+}
+
+/* Animations */
+.slideUp {
+    transform: translateY(0);
+}
+
+.slideDown {
+    transform: translateY(100%);
+}
+
+/* Center modal (non-bottom sheet) */
+.centerModal {
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: var(--dark3, #1c1c22);
+    box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
+    max-width: 90vw;
+    max-height: 90dvh; /* Dynamic viewport height */
+    overflow-y: auto;
+}
+
+/* Input element styling inside modal */
+.modalContent input, 
+.modalContent textarea {
+    /* Prevent iOS zoom on focus */
+    font-size: 16px !important;
+    
+    /* Ensure padding for touch targets */
+    padding: 12px !important;
+    
+    /* Improve appearance when focused */
+    outline: none;
+}
+
+/* Special styling for iOS keyboard */
+@supports (-webkit-touch-callout: none) {
+    /* iOS devices */
+    .keyboardActive {
+        /* Fix for iOS keyboard positioning issues */
+        position: absolute;
+        top: auto;
+        bottom: 0;
+        
+        /* Fix height for iOS */
+        max-height: unset;
+        
+        /* Prevent scroll bounce */
+        overscroll-behavior: none;
+    }
+    
+    .keyboardVisible .bottomSheet {
+        /* Make sure the bottom sheet doesn't get hidden under keyboard */
+        max-height: 50vh !important;
+    }
+}
+
+/* Fallback for browsers that don't support env() */
+@supports not (padding-bottom: env(safe-area-inset-bottom)) {
+    .bottomSheet {
+        padding-bottom: 16px;
+    }
+    
+    .safeAreaSpacer {
+        height: 32px; /* Extra padding when env() not supported */
+    }
+    
+    .keyboardActive .safeAreaSpacer {
+        height: 48px;
+    }
 }

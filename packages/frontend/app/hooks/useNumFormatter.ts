@@ -1,14 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 
 export function useNumFormatter() {
     const { numFormat } = useAppSettings();
+    const { coinPriceMap, selectedCurrency } = useTradeDataStore();
 
     const parseNum = useCallback((val: string | number) => {
         return Number(val);
+    }, []);
+
+    const isAllZeroFormatted = useCallback((str: string): boolean => {
+        return /^[\s,.\-0]*$/.test(str);
+    }, []);
+
+    const getExponent = useCallback((num: number): number => {
+        const expStr = num.toExponential();
+        const exponent = parseInt(expStr.split('e')[1], 10);
+        return exponent;
     }, []);
 
     const getDefaultPrecision = useCallback(
@@ -20,8 +32,11 @@ export function useNumFormatter() {
                 return 1;
             } else if (numVal > 100) {
                 return 2;
-            } else if (numVal < 10) {
+            } else if (numVal < 10 && numVal >= 0.01) {
                 return 4;
+            } else if (numVal < 1 && numVal > 0) {
+                const exponent = getExponent(numVal);
+                return exponent < 0 ? exponent * -1 : exponent;
             }
             return 2;
         },
@@ -48,10 +63,24 @@ export function useNumFormatter() {
         return precisionNumber.toString().split('.')[1].length;
     };
 
+    const fillWithCurrencyChar = useCallback(
+        (currency: string, formattedNum: string, showDollarSign: boolean) => {
+            if (currency === 'USD')
+                return showDollarSign ? '$' + formattedNum : '' + formattedNum;
+            if (currency === 'BTC') return '₿' + formattedNum;
+            if (currency === 'ETH') return 'Ξ' + formattedNum;
+
+            return currency;
+        },
+        [],
+    );
+
     const formatNum = useCallback(
         (
             num: number | string,
             precision?: number | OrderRowResolutionIF | null,
+            currencyConversion: boolean = false,
+            showDollarSign: boolean = false,
         ) => {
             const formatType = numFormat.value;
 
@@ -63,16 +92,42 @@ export function useNumFormatter() {
                 precisionVal = precision;
             }
 
-            // if (Number.isInteger(num)) {
-            //   return num.toLocaleString(formatType);
-            // } else {
-            return num.toLocaleString(formatType, {
+            if (currencyConversion && selectedCurrency !== 'USD') {
+                num = parseNum(num);
+                num = num / (coinPriceMap.get(selectedCurrency) || 1);
+            }
+
+            let formattedNum = num.toLocaleString(formatType, {
                 minimumFractionDigits: precisionVal || getDefaultPrecision(num),
                 maximumFractionDigits: precisionVal || getDefaultPrecision(num),
             });
+
+            // to handle if a static precision has given as parameter but its causing all zeros issue
+            if (isAllZeroFormatted(formattedNum)) {
+                formattedNum = num.toLocaleString(formatType, {
+                    minimumFractionDigits: getDefaultPrecision(num),
+                    maximumFractionDigits: getDefaultPrecision(num),
+                });
+            }
+
+            if (currencyConversion) {
+                return fillWithCurrencyChar(
+                    selectedCurrency,
+                    formattedNum,
+                    showDollarSign,
+                );
+            } else {
+                return formattedNum;
+            }
             // }
         },
-        [numFormat, parseNum, getDefaultPrecision],
+        [
+            numFormat,
+            parseNum,
+            getDefaultPrecision,
+            coinPriceMap,
+            selectedCurrency,
+        ],
     );
 
     const formatNumWithOnlyDecimals = useCallback(

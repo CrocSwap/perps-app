@@ -154,7 +154,9 @@ filter: blur(2px); */
 
 .wsUrlSelector,
 .walletSelector,
-.wsToggle {
+.wsToggle,
+.sdkToggle,
+.currencySelector {
     user-select: none;
     position: fixed;
     top: 1rem;
@@ -174,7 +176,29 @@ filter: blur(2px); */
 
 .wsToggle {
     transition: all 0.2s ease;
-    right: 46rem;
+    right: 49rem;
+    top: 1.2rem;
+    cursor: pointer;
+}
+
+.sdkToggle {
+    right: 54rem;
+    top: 1.2rem;
+    cursor: pointer;
+}
+
+.sdkToggle.active {
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.sdkToggle.disabled {
+    border-color: var(--red);
+    color: var(--red);
+}
+
+.currencySelector {
+    right: 60rem;
     top: 1.2rem;
     cursor: pointer;
 }

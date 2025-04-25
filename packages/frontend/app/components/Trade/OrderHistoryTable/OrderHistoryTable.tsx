@@ -1,16 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
+import { useSdk } from '~/hooks/useSdk';
+import { processUserOrder } from '~/processors/processOrderBook';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { OrderHistoryLimits, WsChannels } from '~/utils/Constants';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './OrderHistoryTable.module.css';
 import OrderHistoryTableHeader from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
 import { orderHistoryData } from './data';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { useDebugStore } from '~/stores/DebugStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-import { processUserOrder } from '~/processors/processOrderBook';
-import type { FilterOption } from '../TradeTables/TradeTables';
-import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
-import { OrderHistoryLimits } from '~/utils/Constants';
 
 interface OrderHistoryTableProps {
     onViewAll?: () => void;
@@ -22,7 +21,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
 
     const { orderHistory } = useTradeDataStore();
 
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
+    const { info } = useSdk();
     const { addOrderToHistory, symbol, setOrderHistory, filterOrderHistory } =
         useTradeDataStore();
 
@@ -89,47 +88,46 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     }, [orderHistory, selectedFilter, symbol]);
 
     useEffect(() => {
-        subscribe(WsChannels.USER_HISTORICAL_ORDERS, {
-            payload: { user: debugWallet.address },
-            handler: (payload) => {
-                if (
-                    payload &&
-                    payload.orderHistory &&
-                    payload.orderHistory.length > 0
-                ) {
-                    if (payload.user !== currentUserRef.current) {
-                        saveToStoreLock.current = true;
-                    } else {
-                        const orderUpdates: OrderDataIF[] = [];
-                        payload.orderHistory.map((o: any) => {
-                            const processedOrder = processUserOrder(
-                                o.order,
-                                o.status,
-                            );
-                            if (processedOrder) {
-                                orderUpdates.push(processedOrder);
-                            }
-                        });
-                        if (!payload.isSnapshot) {
-                            userOrderHistoryRef.current = [
-                                ...orderUpdates,
-                                ...userOrderHistoryRef.current,
-                            ];
-                            userOrderHistoryRef.current.sort(
-                                (a, b) => b.timestamp - a.timestamp,
-                            );
-                        }
-                        saveToStoreLock.current = false;
-                    }
-                }
-            },
-            single: true,
-        });
+        if (!info) return;
+        if (!debugWallet.address) return;
 
-        return () => {
-            unsubscribeAllByChannel('userHistoricalOrders');
-        };
-    }, [debugWallet.address]);
+        const { unsubscribe } = info.subscribe(
+            {
+                type: WsChannels.USER_HISTORICAL_ORDERS,
+                user: debugWallet.address,
+            },
+            postUserHistoricalOrders,
+        );
+
+        return unsubscribe;
+    }, [debugWallet.address, info]);
+
+    const postUserHistoricalOrders = useCallback((payload: any) => {
+        const data = payload.data;
+        if (data && data.orderHistory && data.orderHistory.length > 0) {
+            if (data.user !== currentUserRef.current) {
+                saveToStoreLock.current = true;
+            } else {
+                const orderUpdates: OrderDataIF[] = [];
+                data.orderHistory.map((o: any) => {
+                    const processedOrder = processUserOrder(o.order, o.status);
+                    if (processedOrder) {
+                        orderUpdates.push(processedOrder);
+                    }
+                });
+                if (!data.isSnapshot) {
+                    userOrderHistoryRef.current = [
+                        ...orderUpdates,
+                        ...userOrderHistoryRef.current,
+                    ];
+                    userOrderHistoryRef.current.sort(
+                        (a, b) => b.timestamp - a.timestamp,
+                    );
+                }
+                saveToStoreLock.current = false;
+            }
+        }
+    }, []);
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();

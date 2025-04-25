@@ -10,7 +10,7 @@ export interface HeaderCell {
 }
 
 interface LeaderboardTableHeaderProps {
-    sortConfig: {
+sortConfig: {
         key: string;
         direction: 'asc' | 'desc' | null;
     };

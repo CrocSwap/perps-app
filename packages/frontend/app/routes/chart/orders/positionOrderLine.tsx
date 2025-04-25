@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { ChartShapeRefs, LineData } from './component/LineComponent';
-import { buyColor, sellColor } from './customOrderLineUtils';
+import type { LineData } from './component/LineComponent';
+import { buyColor, sellColor, type LineLabel } from './customOrderLineUtils';
 import LineComponent from './component/LineComponent';
 
 const PositionOrderLine = () => {
@@ -11,33 +11,14 @@ const PositionOrderLine = () => {
 
     const [lines, setLines] = useState<LineData[]>([]);
 
-    function formatWithComma(value: number): string {
-        const isNegative = value < 0;
-        const [integerPart, decimalPart] = Math.abs(value)
-            .toString()
-            .split('.');
-
-        const formattedInteger = integerPart.replace(
-            /\B(?=(\d{3})+(?!\d))/g,
-            ',',
-        );
-
-        let result = formattedInteger;
-        if (decimalPart !== undefined) {
-            result += '.' + decimalPart;
-        }
-
-        return isNegative ? `-${result}` : result;
-    }
-
     const filteredPositions = useMemo(() => {
         const data = positions
             .filter((i) => i.coin === symbol)
             .map((i) => {
                 return {
                     price: i.entryPx,
-                    pnl: Number(i.unrealizedPnl.toFixed(2)),
-                    szi: formatWithComma(i.szi),
+                    pnl: i.unrealizedPnl,
+                    szi: i.szi,
                     liqPrice: i.liquidationPx,
                 };
             });
@@ -53,23 +34,28 @@ const PositionOrderLine = () => {
 
         const newLines: LineData[] = filteredPositions.flatMap((order) => {
             const pnl = Number(order.pnl.toFixed(2));
-            const orderText: string =
-                '  PNL ' + (pnl > 0 ? '$' + pnl : '-$' + Math.abs(pnl));
+            const orderTextValuePNL = { type: 'PNL', pnl: pnl } as LineLabel;
+            const orderTextValueLiq = {
+                type: 'Liq',
+                text: ' Liq. Price',
+            } as LineLabel;
 
             const pnlLine: LineData = {
                 xLoc: 0.1,
-                yLoc: order.price,
-                text: orderText,
-                quantityText: order.szi,
+                yPrice: order.price,
+                textValue: orderTextValuePNL,
+                quantityTextValue: order.szi,
                 color: pnl > 0 ? buyColor : sellColor,
+                type: 'PNL',
             };
 
             const liqLine: LineData = {
                 xLoc: 0.2,
-                yLoc: order.liqPrice,
-                text: '  Liq. Price',
-                quantityText: undefined,
+                yPrice: order.liqPrice,
+                textValue: orderTextValueLiq,
+                quantityTextValue: undefined,
                 color: sellColor,
+                type: 'LIQ',
             };
 
             return [pnlLine, liqLine];

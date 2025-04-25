@@ -1,5 +1,4 @@
 import { useState, useCallback, memo, useMemo } from 'react';
-import { MdClose } from 'react-icons/md';
 import styles from './PortfolioDeposit.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
@@ -24,7 +23,7 @@ interface PortfolioDepositProps {
 function PortfolioDeposit({
     portfolio,
     onDeposit,
-    onClose,
+   
     isProcessing = false,
 }: PortfolioDepositProps) {
     const [amount, setAmount] = useState<string>('');
@@ -38,16 +37,13 @@ function PortfolioDeposit({
     // Available balance for this portfolio
     const availableBalance = portfolio.availableBalance;
 
-    const validateInput = useCallback((newValue: string) => {
-        return newValue === '' || /^(\d+)?(\.\d{0,8})?$/.test(newValue);
-    }, []);
+
 
     const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
-        if (validateInput(newValue)) {
-            setAmount(newValue);
-            setError(null);
-        }
-    }, 150);
+       
+        setAmount(newValue);
+        setError(null);
+    }, 20);
 
     const handleInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,11 +143,7 @@ function PortfolioDeposit({
 
     return (
         <div className={styles.container}>
-            <header>
-                <span />
-                <h3>Deposit</h3>
-                <MdClose onClick={onClose} />
-            </header>
+        
             <div className={styles.textContent}>
                 <h4>
                     Deposit {selectedToken.symbol} to {portfolio.name}

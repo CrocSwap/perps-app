@@ -45,7 +45,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 {position.szi} {position.coin}
             </div>
             <div className={`${styles.cell} ${styles.positionValueCell}`}>
-                ${formatNum(position.positionValue)}
+                {formatNum(position.positionValue, null, true, true)}
             </div>
             <div className={`${styles.cell} ${styles.entryPriceCell}`}>
                 {formatNum(position.entryPx)}
@@ -64,7 +64,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                               : 'var(--text2)',
                 }}
             >
-                {formatNum(position.unrealizedPnl, 2)} (
+                {formatNum(position.unrealizedPnl, 2, true, true)} (
                 {formatNum(position.returnOnEquity * 100, 1)}%)
             </div>
             <div className={`${styles.cell} ${styles.liqPriceCell}`}>
@@ -84,7 +84,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                               : 'var(--text2)',
                 }}
             >
-                ${formatNum(position.cumFunding.allTime, 2)}
+                {formatNum(position.cumFunding.allTime, 2, true, true)}
             </div>
             <div className={`${styles.cell} ${styles.tpslCell}`}>
                 {getTpSl()}

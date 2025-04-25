@@ -1,0 +1,119 @@
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    max-width: 1280px;
+    margin: 0 auto;
+    margin-top: 96px;
+    padding-bottom: 1rem;
+    /* overflow-y: hidden; */
+    max-height: calc(100vh - 300px); 
+}
+
+.container header {
+    color: var(--text1, #f0f0f8);
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-xl, 36px);
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+}
+
+.container header p {
+    color: var(--text2, #bcbcc4);
+    font-size: var(--font-size-m, 18px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.container header p a {
+    color: var(--accent1, #7371fc);
+}
+
+.detailsContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5rem;
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.detailsContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.detailsContent h6 {
+    color: var(--base-text1, #f0f0f8);
+    font-size: var(--font-size-m, 18px);
+}
+
+.detailsContent h3 {
+    color: var(--base-text1, #f0f0f8);
+    font-size: var(--font-size-xl, 36px);
+}
+
+.tableContainer {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 8px;
+
+    height: 346px;
+}
+@media (max-width: 1568px) {
+.container{
+    margin-top: 16px;
+}
+}
+@media (max-width: 768px) {
+    .container {
+        margin-top: 0;
+        overflow-y: auto;
+        height: auto;
+        max-height: none;
+    }
+    
+    .tableContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: none;
+        height: auto;
+        
+    }
+    
+    .tableContainer > div {
+        min-height: 200px;
+        margin-bottom: 20px;
+    }
+    
+    .detailsContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+    
+    .detailsContent {
+        padding: 8px 0;
+    }
+
+    .detailsContent h6 {
+        font-size: var(--font-size-s);
+    }
+    
+    .detailsContent h3 {
+        font-size: var(--font-size-l);
+    }
+    
+    .detailsContent a {
+        font-size: var(--font-size-s);
+    }
+}
