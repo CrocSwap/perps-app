@@ -53,8 +53,8 @@ export default function VolHistory(props: propsIF) {
             title='Your Volume History'
             close={close}
         >
-            <div className={styles.fee_schedule_modal}>
-                <section className={styles.fee_table}>
+            <div className={styles.vol_history_modal}>
+                <section className={styles.vol_history_table}>
                     <header>
                         <div>Tier</div>
                         <div>14D Volume</div>
@@ -76,8 +76,8 @@ export default function VolHistory(props: propsIF) {
                         }
                     </ol>
                 </section>
-                <div className={styles.neg_fees}>Dates are based on UTC time zones and do not include the current day.</div>
-                <div className={styles.neg_fees}>Your 14D maker volume share is 0.00%.</div>
+                <div className={styles.note}>Dates are based on UTC time zones and do not include the current day.</div>
+                <div className={styles.note}>Your 14D maker volume share is 0.00%.</div>
             </div>
         </Modal>
     );
