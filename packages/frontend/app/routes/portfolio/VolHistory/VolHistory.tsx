@@ -56,20 +56,20 @@ export default function VolHistory(props: propsIF) {
             <div className={styles.vol_history_modal}>
                 <section className={styles.vol_history_table}>
                     <header>
-                        <div>Tier</div>
-                        <div>14D Volume</div>
-                        <div>Taker</div>
-                        <div>Maker</div>
+                        <div className={styles.left}>Date</div>
+                        <div className={styles.right}>Exchange Volume</div>
+                        <div className={styles.right}>Your Maker Volume</div>
+                        <div className={styles.right}>Your Taker Volume</div>
                     </header>
                     <ol>
                         {
                             makeVolData(8).map(
                                 (vol: volHistoryIF) => (
                                     <li key={JSON.stringify(vol)}>
-                                        <div>{vol.date}</div>
-                                        <div>{vol.exchVol}</div>
-                                        <div>{vol.makerVol}</div>
-                                        <div>{vol.takerVol}</div>
+                                        <div className={styles.left}>{vol.date}</div>
+                                        <div className={styles.right}>{vol.exchVol}</div>
+                                        <div className={styles.right}>{vol.makerVol}</div>
+                                        <div className={styles.right}>{vol.takerVol}</div>
                                     </li>
                                 )
                             )

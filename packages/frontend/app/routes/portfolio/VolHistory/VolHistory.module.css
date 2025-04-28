@@ -1,7 +1,7 @@
 .vol_history_modal {
     display: flex;
     flex-direction: column;
-    min-width: 500px;
+    min-width: 800px;
     padding: 8px 16px 16px;
     border-radius: var(--main-border-radius);
     font-family: var(--font-family-main);
@@ -19,7 +19,7 @@
     gap: 8px;
 
     /* this keeps consistent spacing in table header and data rows */
-    --vol_history_col_spacing: 2fr 6fr 3fr 3fr;
+    --vol_history_col_spacing: 3fr 3fr 3fr 3fr;
     --vol_history_col_gap: 8px;
     --vol_history_row_padding: 0 8px;
 }
@@ -59,3 +59,7 @@
 .note {
     font-size: var(--font-size-xs);
 }
+
+/* generic classes follow */
+.left { justify-self: start; }
+.right { justify-self: end; }
