@@ -200,17 +200,8 @@ function Portfolio() {
                 </Modal>
             )}
             { feeScheduleModalCtrl.isOpen &&
-                <Modal close={feeScheduleModalCtrl.close}>
+                <Modal title='Fee Schedule' close={feeScheduleModalCtrl.close}>
                     <div className={styles.fee_schedule_modal}>
-                        <header>
-                            <div />
-                            <h3>Fee Schedule</h3>
-                            <MdOutlineClose
-                                size={20}
-                                onClick={feeScheduleModalCtrl.close}
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </header>
                         <section className={styles.fee_table}>
                             <h4>VIP Tiers</h4>
                             <header>
