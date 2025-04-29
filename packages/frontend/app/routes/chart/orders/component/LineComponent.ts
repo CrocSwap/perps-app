@@ -171,7 +171,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
 
         intervalId = setInterval(async () => {
             const current = chartRef.symbol();
-            if (current === symbol) {
+            if (current.toLocaleLowerCase() === symbol.toLocaleLowerCase()) {
                 setTimeout(() => {
                     setChartReady(true);
                 }, 2500);
@@ -248,7 +248,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             setOrderLineItems(shapeRefs);
         };
 
-        if (lines.length !== 0 && chartReady) {
+        if (chartReady) {
             cleanupShapes();
             setupShapes();
         }
@@ -331,16 +331,12 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         };
 
         const updateTextPositionOnce = () => {
-            if (!chart || orderLineItems.length === 0 || lines.length === 0)
-                return;
             orderLineItems.forEach((item, i) =>
                 updateSingleLine(item, lines[i]),
             );
         };
 
         const startZoomInterval = () => {
-            if (!chart || orderLineItems.length === 0 || lines.length === 0)
-                return;
             orderLineItems.forEach((item, i) => {
                 const interval = setInterval(() => {
                     if (!isCancelled) {
@@ -351,6 +347,13 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             });
         };
 
+        if (
+            !chart ||
+            orderLineItems.length === 0 ||
+            lines.length === 0 ||
+            orderLineItems.length !== lines.length
+        )
+            return;
         if (zoomChanged) {
             startZoomInterval();
         } else {
