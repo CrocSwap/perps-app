@@ -1,14 +1,10 @@
+import { useState } from 'react';
+import { FiDollarSign, FiPercent } from 'react-icons/fi';
+import { TbHeartFilled } from 'react-icons/tb';
+import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './watchlist.module.css';
-import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { useEffect, useRef, useState } from 'react';
-import { processSymbolInfo } from '~/processors/processSymbolInfo';
-import { TbHeartFilled } from 'react-icons/tb';
-import { FiDollarSign, FiPercent } from 'react-icons/fi';
-import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import WatchListNode from './watchlistnode/watchlistnode';
-import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 
 interface WatchListProps {}
 

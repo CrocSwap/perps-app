@@ -66,7 +66,7 @@ const PositionOrderLine = () => {
 
     if (!chart) return null;
 
-    return <LineComponent key='pnl' lines={lines} />;
+    return <LineComponent key='pnl' orderType='position' lines={lines} />;
 };
 
 export default PositionOrderLine;

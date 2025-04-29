@@ -4,7 +4,7 @@ export default function MoreDropdown() {
     const submenuData = [
         { name: 'Testnet', link: '/testnet' },
         { name: 'Explorer', link: '/explorer' },
-        { name: 'Sub-Accounts', link: '/sub-accounts' },
+        { name: 'Sub-Accounts', link: '/subaccounts' },
         { name: 'API', link: '/api' },
         { name: 'Multi-Sig', link: '/multi-sig' },
         { name: 'Funding Comparison', link: '/funding-comparison' },

@@ -14,8 +14,8 @@ import PageHeader from './components/PageHeader/PageHeader';
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import './css/app.css';
 import './css/index.css';
-import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
+import { SdkProvider } from './hooks/useSdk';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -101,7 +101,7 @@ export default function App() {
     return (
         <>
             <Layout>
-                <WsObserverProvider url={wsUrl} wsEnvironment={wsEnvironment}>
+                <SdkProvider environment={wsEnvironment}>
                     <div className='root-container'>
                         {/* Added error boundary for header */}
                         <ComponentErrorBoundary>
@@ -125,7 +125,7 @@ export default function App() {
                         </ComponentErrorBoundary>
                     </div>
                     <RuntimeDomManipulation />
-                </WsObserverProvider>
+                </SdkProvider>
             </Layout>
         </>
     );

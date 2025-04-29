@@ -52,6 +52,8 @@ export interface AllMidsSubscription {
 export interface L2BookSubscription {
     type: 'l2Book';
     coin: string;
+    nSigFigs?: number;
+    mantissa?: number | null;
 }
 
 export interface TradesSubscription {

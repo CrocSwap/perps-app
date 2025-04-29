@@ -41,7 +41,8 @@
 
     /* heights */
     --trade-tables-height-desktop: 281px;
-    --header-height-desktop: 56px;
+     /* should be 56px. 30px extra for the combo box container */
+    --header-height-desktop: 56px ;
 
     --order-book-width-desktop-large-doubled: calc(
         var(--order-book-width-desktop-large) * 2

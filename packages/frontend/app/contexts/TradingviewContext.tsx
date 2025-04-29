@@ -1,13 +1,15 @@
-import {
-    widget,
-    type IChartingLibraryWidget,
-    type ResolutionString,
-    type TradingTerminalFeatureset,
-} from '~/tv/charting_library';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useSdk } from '~/hooks/useSdk';
+import { getMarkFillData } from '~/routes/chart/data/candleDataCache';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
-import { useWsObserver } from '~/hooks/useWsObserver';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import {
+    drawingEvent,
+    drawingEventUnsubscribe,
+    intervalChangedSubscribe,
+    intervalChangedUnsubscribe,
+    studyEvents,
+    studyEventsUnsubscribe,
+} from '~/routes/chart/data/utils/chartEvents';
 import {
     getChartLayout,
     saveChartLayout,
@@ -19,17 +21,15 @@ import {
     priceFormatterFactory,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
-import {
-    drawingEvent,
-    drawingEventUnsubscribe,
-    intervalChangedSubscribe,
-    intervalChangedUnsubscribe,
-    studyEvents,
-    studyEventsUnsubscribe,
-} from '~/routes/chart/data/utils/chartEvents';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
-import { getMarkFillData } from '~/routes/chart/data/candleDataCache';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import {
+    widget,
+    type IChartingLibraryWidget,
+    type ResolutionString,
+    type TradingTerminalFeatureset,
+} from '~/tv/charting_library';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -57,7 +57,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
-    const { subscribe } = useWsObserver();
+    const { info } = useSdk();
+
     const { symbol } = useTradeDataStore();
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
@@ -153,6 +154,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [bsColor, chart]);
 
     useEffect(() => {
+        if (!info) return;
+
         const tvWidget = new widget({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
@@ -160,7 +163,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             symbol: symbol,
             fullscreen: false,
             autosize: true,
-            datafeed: createDataFeed(subscribe) as any,
+            datafeed: createDataFeed(info) as any,
             interval: (chartState?.interval || '1D') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
@@ -235,7 +238,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 chart.remove();
             }
         };
-    }, [chartState]);
+    }, [chartState, info]);
 
     useEffect(() => {
         if (chart) {

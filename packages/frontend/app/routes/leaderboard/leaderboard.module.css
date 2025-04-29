@@ -263,12 +263,10 @@
     top: auto;
     bottom: calc(100% + 0.5rem);
 }
-.chvrUp{
+.chvrUp {
     display: flex;
 }
-÷
-
-.dropdownItem {
+÷ .dropdownItem {
     width: 100%;
     padding: 8px;
     color: var(--text1, #f0f0f8);

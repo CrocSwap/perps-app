@@ -1,0 +1,30 @@
+.subaccounts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 5vh;
+    height: 100%;
+    width: 100%;
+    font-family: var(--font-family-main);
+}
+
+.subaccounts_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+}
+
+.subaccounts_wrapper > header {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.subaccounts_wrapper > header > h2 {
+    font-size: var(--font-size-xl);
+}

@@ -41,8 +41,7 @@ export default function AppOptions(props: propsIF) {
 
     return (
         <section className={styles.app_options}>
-            <header>
-                {/* first `<div>` is just to help with CSS spacing rules */}
+            {/* <header>
                 <div />
                 <h2>Options</h2>
                 <MdOutlineClose
@@ -50,7 +49,7 @@ export default function AppOptions(props: propsIF) {
                     onClick={modalControl.close}
                     style={{ cursor: 'pointer' }}
                 />
-            </header>
+            </header> */}
             <ul>
                 <OptionLine
                     text='Skip Open Order Confirmation'

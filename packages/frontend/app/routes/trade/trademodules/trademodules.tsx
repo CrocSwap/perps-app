@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import styles from './trademodules.module.css';
-import { useWsObserver } from '~/hooks/useWsObserver';
-import { useTradeModuleStore } from '~/stores/TradeModuleStore';
+import { useEffect } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useTradeModuleStore } from '~/stores/TradeModuleStore';
+import styles from './trademodules.module.css';
 interface TradeModulesProps {}
 
 const TradeModules: React.FC<TradeModulesProps> = () => {

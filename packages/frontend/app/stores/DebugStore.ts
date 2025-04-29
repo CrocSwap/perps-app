@@ -1,6 +1,7 @@
+import type { Environment } from '@perps-app/sdk';
 import { create } from 'zustand';
 
-import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
+import { wsEnvironments, debugWallets, wsUrls } from '~/utils/Constants';
 
 export type DebugWallet = {
     label: string;
@@ -10,8 +11,10 @@ export type DebugWallet = {
 interface DebugStore {
     wsUrl: string;
     setWsUrl: (wsUrl: string) => void;
-    wsEnvironment: string;
-    setWsEnvironment: (wsEnvironment: string) => void;
+    wsEnvironment: 'mock' | 'hl' | 'local' | 'mainnet' | 'testnet';
+    setWsEnvironment: (
+        wsEnvironment: 'mock' | 'hl' | 'local' | 'mainnet' | 'testnet',
+    ) => void;
     debugWallet: DebugWallet;
     setDebugWallet: (debugWallet: DebugWallet) => void;
     isWsEnabled: boolean;

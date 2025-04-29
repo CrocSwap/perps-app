@@ -2,11 +2,12 @@ import type {
     OrderBookTradeIF,
     OrderDataIF,
     OrderBookRowIF,
+    L2BookDataIF,
 } from '../utils/orderbook/OrderBookIFs';
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
 
 export function processOrderBookMessage(
-    data: any,
+    data: L2BookDataIF,
     slice?: number,
 ): { sells: OrderBookRowIF[]; buys: OrderBookRowIF[] } {
     const buysRaw = data.levels[0].slice(0, slice || 11);
@@ -52,7 +53,7 @@ export function processOrderBookMessage(
     return { sells: sellsProcessed, buys: buysProcessed };
 }
 
-export function processOrderBookTrades(data: any): OrderBookTradeIF[] {
+export function processTrades(data: any): OrderBookTradeIF[] {
     return data.map((e: any) => {
         return {
             coin: e.coin,

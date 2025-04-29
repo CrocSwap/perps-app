@@ -97,10 +97,6 @@ export function useNumFormatter() {
                 num = num / (coinPriceMap.get(selectedCurrency) || 1);
             }
 
-            // if (Number.isInteger(num)) {
-            //   return num.toLocaleString(formatType);
-            // } else {
-
             let formattedNum = num.toLocaleString(formatType, {
                 minimumFractionDigits: precisionVal || getDefaultPrecision(num),
                 maximumFractionDigits: precisionVal || getDefaultPrecision(num),

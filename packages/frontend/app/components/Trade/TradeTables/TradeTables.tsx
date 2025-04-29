@@ -114,6 +114,8 @@ export default function TradeTable(props: TradeTableProps) {
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
                 rightContent={rightAlignedContent}
+                wrapperId="tradeTableTabs" 
+                layoutIdPrefix="tradeTableTabsIndicator" 
             />
             <motion.div
                 className={styles.tableContent}

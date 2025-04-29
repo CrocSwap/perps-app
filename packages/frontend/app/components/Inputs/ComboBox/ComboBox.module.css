@@ -3,6 +3,7 @@
     user-select: none;
     display: inline-block;
     height: auto !important;
+    
 }
 
 .comboBoxContainer > div {
@@ -14,7 +15,7 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.25rem;
-    border-radius: 0.25rem;
+   
     cursor: pointer;
 }
 
@@ -45,7 +46,6 @@
     left: 0;
     z-index: 1000;
     width: 100%;
-    border-radius: 0.25rem;
     color: var(--text2);
     cursor: pointer;
     display: flex;
@@ -67,5 +67,87 @@
 }
 
 .bigVal .comboBoxValue {
-    font-size: 1.2rem;
+    font-size: var(--font-size-s);
+}
+
+/* ---------------------CONTAINER--------------- */
+.wsUrlSelector,
+.walletSelector,
+.wsToggle,
+.sdkToggle,
+.currencySelector {
+    user-select: none;
+    /* position: fixed; */
+    /* top: 1rem;
+    right: 20rem; */
+    font-size: var(--font-size-s);
+    z-index: 2;
+    font-family: var(--font-family-main);
+    background-color: var(--dark2);
+    border-radius: 4px ;
+ 
+    border: 1px solid var(--dark3);
+    padding: 0 8px;
+}
+
+.walletSelector {
+    right: 38rem;
+}
+
+.wsToggle {
+    transition: all 0.2s ease;
+    right: 49rem;
+    top: 1.2rem;
+    cursor: pointer;
+}
+
+.sdkToggle {
+    right: 54rem;
+    top: 1.2rem;
+    cursor: pointer;
+}
+
+.sdkToggle.active {
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.sdkToggle.disabled {
+    border-color: var(--red);
+    color: var(--red);
+}
+
+.currencySelector {
+    right: 60rem;
+    top: 1.2rem;
+    cursor: pointer;
+}
+
+.wsToggleRunning {
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.wsTogglePaused {
+    border-color: var(--red);
+    color: var(--red);
+}
+
+
+.comboBoxContainers{
+    width: 100%;
+    justify-content: flex-start;
+   
+    background-color: var(--dark2);
+    border-radius: var(--main-border-radius);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+    gap: 8px;
+    z-index: 9;
+    font-size: var(--font-size-s) !important;
+    padding: 0 2rem;
+   
+   
 }

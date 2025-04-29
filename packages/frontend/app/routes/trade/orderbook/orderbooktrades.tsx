@@ -1,12 +1,13 @@
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import styles from './orderbooktrades.module.css';
 import { useCallback, useEffect, useRef } from 'react';
-import { useOrderBookStore } from '~/stores/OrderBookStore';
-import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
-import { processOrderBookTrades } from '~/processors/processOrderBook';
-import OrderTradeRow from './ordertraderow/ordertraderow';
 import BasicDivider from '~/components/Dividers/BasicDivider';
+import { useSdk } from '~/hooks/useSdk';
+import { processTrades } from '~/processors/processOrderBook';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { WsChannels } from '~/utils/Constants';
+import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
+import styles from './orderbooktrades.module.css';
+import OrderTradeRow from './ordertraderow/ordertraderow';
 
 interface OrderBookTradesProps {
     symbol: string;
@@ -17,7 +18,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
     symbol,
     tradesCount,
 }) => {
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
+    const { info } = useSdk();
     const { trades, setTrades } = useOrderBookStore();
 
     const { orderBookMode } = useAppSettings();
@@ -28,26 +29,23 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
     const tradesCountRef = useRef(tradesCount);
     tradesCountRef.current = tradesCount;
 
-    useEffect(() => {
-        return () => {
-            unsubscribeAllByChannel(WsChannels.ORDERBOOK_TRADES);
-        };
-    }, []);
+    const symbolRef = useRef(symbol);
+    symbolRef.current = symbol;
 
     const mergeTrades = useCallback(
         (wsTrades: OrderBookTradeIF[]) => {
             if (
                 wsTrades &&
                 wsTrades.length > 0 &&
-                wsTrades[0].coin === symbol
+                wsTrades[0].coin === symbolRef.current
             ) {
                 if (
                     tradesRef.current.length > 0 &&
-                    tradesRef.current[0].coin === symbol
+                    tradesRef.current[0].coin === symbolRef.current
                 ) {
                     const newTrades = wsTrades.filter(
                         (trade) =>
-                            trade.coin === symbol &&
+                            trade.coin === symbolRef.current &&
                             !tradesRef.current.some((e) => e.tid === trade.tid),
                     );
                     setTrades(
@@ -61,18 +59,30 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
                 }
             }
         },
-        [symbol, tradesCount],
+        [tradesCount, info],
     );
 
     useEffect(() => {
-        subscribe(WsChannels.ORDERBOOK_TRADES, {
-            payload: { coin: symbol },
-            handler: (payload) => {
-                mergeTrades(processOrderBookTrades(payload));
+        if (!info) return;
+        if (!symbol || symbol.length === 0) return;
+
+        const { unsubscribe } = info.subscribe(
+            {
+                type: WsChannels.ORDERBOOK_TRADES,
+                coin: symbol,
             },
-            single: true,
-        });
-    }, [symbol]);
+            postOrderBookTrades,
+        );
+
+        return unsubscribe;
+    }, [symbol, info]);
+
+    const postOrderBookTrades = useCallback(
+        (payload: any) => {
+            mergeTrades(processTrades(payload.data));
+        },
+        [trades],
+    );
 
     return (
         <div className={styles.orderTradesContainer}>

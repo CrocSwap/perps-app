@@ -1,3 +1,15 @@
+export interface L2BookDataIF {
+    coin: string;
+    time: number;
+    levels: L2BookLevel[][];
+}
+
+interface L2BookLevel {
+    px: string;
+    sz: string;
+    n: number;
+}
+
 export interface OrderBookRowIF {
     coin: string;
     px: number;
@@ -5,7 +17,7 @@ export interface OrderBookRowIF {
     n: number;
     type: 'buy' | 'sell';
     total: number;
-    ratio: number;
+    ratio?: number;
 }
 
 export interface OrderBookTradeIF {

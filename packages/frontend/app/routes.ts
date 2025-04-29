@@ -26,5 +26,7 @@ export default [
 
     route('testpage', 'routes/testpage/testpage.tsx'),
 
+    route('subaccounts', 'routes/subaccounts/subaccounts.tsx'),
+
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;

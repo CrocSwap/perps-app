@@ -6,21 +6,27 @@ interface TabProps {
     label: string;
     isActive: boolean;
     onClick: () => void;
+    layoutId: string;
+    notInteractive?: boolean;
 }
 
 export function Tab(props: TabProps) {
-    const { label, isActive, onClick } = props;
+    const { label, isActive, onClick, layoutId, notInteractive = false } = props;
 
     return (
         <button
             className={`${styles.tab} ${isActive ? styles.activeTab : ''}`}
-            onClick={onClick}
+            style={{
+                color: notInteractive ? 'var(--text1)' : '',
+                cursor: notInteractive ? 'auto' : 'cursor',
+            }}
+            onClick={() => notInteractive || onClick()}
         >
             {label}
             {isActive && (
                 <motion.div
                     className={styles.activeIndicator}
-                    layoutId='activeIndicator'
+                    layoutId={layoutId} 
                     initial={false}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
@@ -29,17 +35,24 @@ export function Tab(props: TabProps) {
     );
 }
 
-// Modified interface to accept both simple strings and objects with id/label
 export interface TabsProps {
     tabs: Array<string | { id: string; label: string }>;
     defaultTab?: string;
     onTabChange?: (tab: string) => void;
     rightContent?: React.ReactNode;
     wrapperId?: string;
+    layoutIdPrefix?: string; 
 }
 
 export default function Tabs(props: TabsProps) {
-    const { tabs, defaultTab, onTabChange, rightContent, wrapperId } = props;
+    const { 
+        tabs, 
+        defaultTab, 
+        onTabChange, 
+        rightContent, 
+        wrapperId,
+        layoutIdPrefix = 'tabIndicator' 
+    } = props;
 
     // Function to get tab ID (either the string itself or the id property)
     const getTabId = (tab: string | { id: string; label: string }): string => {
@@ -158,6 +171,9 @@ export default function Tabs(props: TabsProps) {
         }
     };
 
+    // Create a unique layoutId for this specific tabs instance
+    const layoutId = `${layoutIdPrefix}-${wrapperId || ''}`;
+
     return (
         <div
             {...(wrapperId ? { id: wrapperId } : {})}
@@ -189,13 +205,14 @@ export default function Tabs(props: TabsProps) {
                     {tabs.map((tab, idx) => {
                         const tabId = getTabId(tab);
                         const tabLabel = getTabLabel(tab);
-
                         return (
                             <Tab
                                 key={tabId + tabLabel + idx} // Ensure unique key
                                 label={tabLabel}
                                 isActive={activeTab === tabId}
                                 onClick={() => handleTabClick(tabId)}
+                                notInteractive={tabs.length <= 1}
+                                layoutId={layoutId} // Pass the unique layoutId
                             />
                         );
                     })}

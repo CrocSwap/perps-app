@@ -1,16 +1,14 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getLS } from '~/utils/AppUtils';
+import { WsChannels } from '~/utils/Constants';
 
 export default function TradeRouteHandler() {
     const { marketId } = useParams<{ marketId: string }>(); // Get marketId from URL
 
     const { symbol, setSymbol } = useTradeDataStore();
     const navigate = useNavigate();
-
-    const { subscribe } = useWsObserver();
 
     useEffect(() => {
         const activeSymbol = getLS('activeCoin');

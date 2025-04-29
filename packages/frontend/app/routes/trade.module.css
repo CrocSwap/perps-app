@@ -1,3 +1,9 @@
+.mainContainer{
+    height: 100%;
+    
+    display: grid;
+    grid-template-rows: 10px minmax(0, 1fr);
+}
 .container {
     height: 100%;
     display: grid;
@@ -64,14 +70,16 @@
 .containerTopLeft {
     height: 100%;
     display: grid;
-    grid-template-rows: 40px 56px 1fr;
+    grid-template-rows: 30px 40px 56px 1fr;
     width: 100%;
     gap: var(--main-gap);
 }
-.containerTopLeft div {
+
+.watchlist, .symbolInfo{
     background: var(--dark2);
     height: 100%;
     border-radius: var(--main-border-radius);
+    
 }
 
 .watchlist,
@@ -152,63 +160,6 @@ filter: blur(2px); */
     }
 }
 
-.wsUrlSelector,
-.walletSelector,
-.wsToggle,
-.sdkToggle,
-.currencySelector {
-    user-select: none;
-    position: fixed;
-    top: 1rem;
-    right: 20rem;
-    font-size: 0.8rem;
-    z-index: 2;
-    font-family: var(--font-family-main);
-    background-color: var(--dark2);
-    border-radius: 0.4rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 0 1.2rem;
-}
 
-.walletSelector {
-    right: 38rem;
-}
 
-.wsToggle {
-    transition: all 0.2s ease;
-    right: 49rem;
-    top: 1.2rem;
-    cursor: pointer;
-}
 
-.sdkToggle {
-    right: 54rem;
-    top: 1.2rem;
-    cursor: pointer;
-}
-
-.sdkToggle.active {
-    border-color: var(--green);
-    color: var(--green);
-}
-
-.sdkToggle.disabled {
-    border-color: var(--red);
-    color: var(--red);
-}
-
-.currencySelector {
-    right: 60rem;
-    top: 1.2rem;
-    cursor: pointer;
-}
-
-.wsToggleRunning {
-    border-color: var(--green);
-    color: var(--green);
-}
-
-.wsTogglePaused {
-    border-color: var(--red);
-    color: var(--red);
-}

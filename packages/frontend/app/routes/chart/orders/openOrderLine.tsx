@@ -123,7 +123,7 @@ const OpenOrderLine = () => {
 
     if (!chart) return null;
 
-    return <LineComponent key='limit' lines={lines} />;
+    return <LineComponent key='limit' orderType='openOrder' lines={lines} />;
 };
 
 export default OpenOrderLine;

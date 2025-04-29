@@ -76,6 +76,8 @@ export default function PerformancePanel() {
                 tabs={AVAILABLE_TABS}
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
+                wrapperId="performanceTabs" 
+                layoutIdPrefix="performanceTabIndicator" 
             />
             <AnimatePresence mode='wait'>
                 <div className={styles.tableContent} key={activeTab}>

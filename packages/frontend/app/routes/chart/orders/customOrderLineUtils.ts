@@ -53,6 +53,17 @@ export const addCustomOrderLine = async (
 };
 
 export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
+    const { pixel, chartHeight } = getPricetoPixel(chart, price);
+
+    if (chartHeight) return pixel / chartHeight;
+
+    return 0;
+};
+
+export const getPricetoPixel = (
+    chart: IChartingLibraryWidget,
+    price: number,
+) => {
     const textHeight = 15;
     let pixel = 0;
 
@@ -63,7 +74,7 @@ export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
         const priceRange = priceScale.getVisiblePriceRange();
         const chartHeight = priceScalePane.getHeight();
 
-        if (!priceRange) return 0;
+        if (!priceRange) return { pixel: 0, chartHeight: 0 };
 
         const maxPrice = priceRange.to;
         const minPrice = priceRange.from;
@@ -88,10 +99,10 @@ export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
             pixel = chartHeight - pixelCoordinate - textHeight / 2;
         }
 
-        return pixel / chartHeight;
+        return { pixel: pixel, chartHeight: chartHeight };
     }
 
-    return 0;
+    return { pixel: 0, chartHeight: 0 };
 };
 
 export function estimateTextWidth(text: string, fontSize: number = 11): number {
@@ -116,6 +127,26 @@ export const getAnchoredQuantityTextLocation = (
     const offsetX = Number(wrapWidthPx / chartWidth);
 
     return bufferX + offsetX;
+};
+
+export const getAnchoredCancelButtonTextLocation = (
+    chart: IChartingLibraryWidget,
+    bufferX: number,
+    orderTextValue: LineLabel,
+    orderQuantityText?: string,
+) => {
+    const timeScale = chart.activeChart().getTimeScale();
+    const chartWidth = Math.floor(timeScale.width());
+
+    const orderText = formatLineLabel(orderTextValue);
+    const wrapWidthPx = estimateTextWidth(orderText) + 5;
+
+    const offsetX = Number(wrapWidthPx / chartWidth);
+
+    const quantityTextWidth = orderQuantityText
+        ? Number((estimateTextWidth(orderQuantityText) + 15) / chartWidth)
+        : 0;
+    return bufferX + offsetX + quantityTextWidth;
 };
 
 export const createAnchoredMainText = async (
@@ -152,6 +183,22 @@ export const createQuantityAnchoredText = async (
         estimateTextWidth(text) + 15,
         '#3C91FF',
         '#FFFFFF',
+    );
+};
+
+export const createCancelAnchoredText = async (
+    chart: IChartingLibraryWidget,
+    xLoc: number,
+    yPrice: number,
+) => {
+    return createAnchoredText(
+        chart,
+        xLoc,
+        yPrice,
+        ' X ',
+        '#D1D1D1',
+        12,
+        '#3C91FF',
     );
 };
 
@@ -267,4 +314,39 @@ export function formatLineLabel(label: LineLabel): string {
         default:
             return '';
     }
+}
+
+export function isInsideTextBounds(
+    hoverX: number,
+    hoverY: number,
+    textX: number,
+    cancelTextX: number,
+    textY: number,
+): boolean {
+    const estimatedTextsEndLocation = cancelTextX + estimateTextWidth(' X ');
+    const estimatedHeight = 10 * 1.1;
+
+    return (
+        hoverX >= textX &&
+        hoverX <= estimatedTextsEndLocation &&
+        hoverY >= textY &&
+        hoverY <= textY + estimatedHeight
+    );
+}
+
+export function isInsideCancelTextBounds(
+    clickX: number,
+    clickY: number,
+    textX: number,
+    textY: number,
+): boolean {
+    const estimatedCancelTextEndLocation = textX + estimateTextWidth(' X ');
+    const estimatedHeight = 10 * 1.1;
+
+    return (
+        clickX >= textX &&
+        clickX <= estimatedCancelTextEndLocation &&
+        clickY >= textY &&
+        clickY <= textY + estimatedHeight
+    );
 }

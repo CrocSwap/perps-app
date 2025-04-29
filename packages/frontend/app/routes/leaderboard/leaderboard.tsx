@@ -188,9 +188,7 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
                             {/* <FaChevronDown className={styles.chvrDown} />{' '} */}
                             <FaChevronUp className={styles.chvrUp} />
                             {isRowsDropdownOpen && (
-                                <div
-                                    className={` ${styles.dropupMenu}`}
-                                >
+                                <div className={` ${styles.dropupMenu}`}>
                                     {rowsItems}
                                 </div>
                             )}

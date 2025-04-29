@@ -1,0 +1,89 @@
+/* top-level JSX element */
+.table_wrapper {
+    width: 800px;
+    border-radius: var(--main-border-radius, 16px);
+    background-color: var(--dark2, #0e0e14);
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    -webkit-user-select: none;
+
+    /* centralize the column spacing rule */
+    /* this keeps header and data cells spaced consistently */
+    --accounts-table-column-spacing: 2fr 4fr 2fr 1fr;
+    --accounts-table-row-padding: 0px 8px;
+}
+
+/* all content below the highest-level tab elem */
+.table_content {
+    padding: var(--accounts-table-row-padding);
+    height: 100%;
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent1) transparent;
+}
+
+.table_content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.table_content::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.table_content::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+/* row with column headers */
+.col_headers_row {
+    position: sticky;
+    top: 0px;
+    display: grid;
+    grid-template-columns: var(--accounts-table-column-spacing);
+    padding: var(--accounts-table-row-padding);
+    background-color: var(--dark2);
+    /* keep same row height when sort arrows are suppressed */
+    min-height: 22px;
+}
+
+/* individual cells in the .col_headers_row line */
+.col_headers_row > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--font-size-xs);
+    color: var(--text2);
+}
+
+/* <ol> elem containing all <li> elems */
+.table_body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* data line items in the table */
+.table_body > li {
+    display: grid;
+    grid-template-columns: var(--accounts-table-column-spacing);
+    transition: background-color 0.3s ease-out;
+    padding: var(--accounts-table-row-padding);
+    border-radius: var(--half-border-radius);
+}
+
+.table_body > li:hover {
+    background-color: var(--dark5);
+    transition: background-color 0.1s ease-in;
+}
+
+/* individual cells in the .table_row line */
+.table_body > li > div {
+    display: flex;
+    flex-direction: row;
+    font-size: var(--font-size-s);
+    color: var(--text1);
+}

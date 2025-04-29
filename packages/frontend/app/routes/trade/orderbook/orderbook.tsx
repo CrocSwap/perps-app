@@ -2,9 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { processOrderBookMessage } from '~/processors/processOrderBook';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
@@ -19,13 +16,19 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
+import { useSdk } from '~/hooks/useSdk';
+import { useWorker } from '~/hooks/useWorker';
+import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
-    const { subscribe } = useWsObserver();
+    // FIXME: data is not rendered on UI
+
+    const { info } = useSdk();
+
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);
@@ -37,20 +40,13 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const { formatNum } = useNumFormatter();
 
-    const { isWsEnabled } = useDebugStore();
-
-    const isWsEnabledRef = useRef<boolean>(true);
-    isWsEnabledRef.current = isWsEnabled;
-
     const lockOrderBook = useRef<boolean>(false);
 
     const { buys, sells, setOrderBook } = useOrderBookStore();
     const {
         userOrders,
-        setUserOrders,
         userSymbolOrders,
         symbolInfo,
-        addOrderToHistory,
         setObChosenPrice,
         setObChosenAmount,
     } = useTradeDataStore();
@@ -168,38 +164,16 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         return slots;
     }, [userSymbolOrders, filledResolution.current, JSON.stringify(sellSlots)]);
 
-    const changeSubscription = (payload: any) => {
-        subscribe(WsChannels.ORDERBOOK, {
-            payload: payload,
-            handler: (response) => {
-                if (!isWsEnabledRef.current || lockOrderBook.current) {
-                    return;
-                }
+    const handleOrderBookWorkerResult = useCallback(
+        ({ data }: { data: OrderBookOutput }) =>
+            setOrderBook(data.buys, data.sells),
+        [setOrderBook],
+    );
 
-                filledResolution.current = payload.resolution;
-                const { sells, buys } = processOrderBookMessage(
-                    response,
-                    orderCountRef.current,
-                );
-                setOrderBook(buys, sells);
-            },
-            single: true,
-        });
-    };
-
-    const orderProcessorIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        if (orderProcessorIntervalRef.current) {
-            clearInterval(orderProcessorIntervalRef.current);
-        }
-
-        return () => {
-            if (orderProcessorIntervalRef.current) {
-                clearInterval(orderProcessorIntervalRef.current);
-            }
-        };
-    }, []);
+    const postOrderBookRaw = useWorker<OrderBookOutput>(
+        'orderbook',
+        handleOrderBookWorkerResult,
+    );
 
     useEffect(() => {
         if (symbol === symbolInfo?.coin) {
@@ -210,43 +184,56 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     }, [symbol, symbolInfo?.coin]);
 
     useEffect(() => {
+        if (!info) return;
+
         if (selectedResolution) {
-            changeSubscription({
+            const subKey = {
+                type: 'l2Book' as const,
                 coin: symbol,
-                nSigFigs: selectedResolution.nsigfigs,
-                mantissa: selectedResolution.mantissa,
-                resolution: selectedResolution,
-            });
-        }
-    }, [selectedResolution]);
+                ...(selectedResolution.nsigfigs
+                    ? { nSigFigs: selectedResolution.nsigfigs }
+                    : {}),
+                ...(selectedResolution.mantissa
+                    ? { mantissa: selectedResolution.mantissa }
+                    : {}),
+            };
 
-    const rowClickHandler = (
-        order: OrderBookRowIF,
-        type: OrderRowClickTypes,
-        rowIndex: number,
-    ) => {
-        lockOrderBook.current = true;
-        if (type === OrderRowClickTypes.PRICE) {
-            setObChosenPrice(order.px);
-        } else if (type === OrderRowClickTypes.AMOUNT) {
-            let amount = 0;
-            if (order.type === 'buy') {
-                for (let i = 0; i <= rowIndex; i++) {
-                    amount += buys[i].sz;
+            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+
+            setTimeout(() => {
+                filledResolution.current = selectedResolution;
+            }, 200);
+
+            return unsubscribe;
+        }
+    }, [selectedResolution, info]);
+
+    const rowClickHandler = useCallback(
+        (order: OrderBookRowIF, type: OrderRowClickTypes, rowIndex: number) => {
+            lockOrderBook.current = true;
+            if (type === OrderRowClickTypes.PRICE) {
+                setObChosenPrice(order.px);
+            } else if (type === OrderRowClickTypes.AMOUNT) {
+                let amount = 0;
+                if (order.type === 'buy') {
+                    for (let i = 0; i <= rowIndex; i++) {
+                        amount += buys[i].sz;
+                    }
+                } else {
+                    for (let i = 0; i < orderCount - rowIndex; i++) {
+                        amount += sells[i].sz;
+                    }
                 }
-            } else {
-                for (let i = 0; i < orderCount - rowIndex; i++) {
-                    amount += sells[i].sz;
-                }
+                setObChosenPrice(order.px);
+                setObChosenAmount(amount);
             }
-            setObChosenPrice(order.px);
-            setObChosenAmount(amount);
-        }
 
-        setTimeout(() => {
-            lockOrderBook.current = false;
-        }, 1000);
-    };
+            setTimeout(() => {
+                lockOrderBook.current = false;
+            }, 1000);
+        },
+        [buys, sells, orderCount, setObChosenPrice, setObChosenAmount],
+    );
 
     return (
         <div className={styles.orderBookContainer}>
