@@ -2,9 +2,13 @@ import {
     useNotificationStore,
     type notificationSlugs,
 } from '~/stores/NotificationStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
-
+import { useMemo } from 'react';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
+import { motion } from 'framer-motion';
 interface propsIF {
     isUserConnected: boolean;
     setIsUserConnected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,33 +21,61 @@ export default function DepositDropdown(props: propsIF) {
     const populateNotification: (s: notificationSlugs) => void =
         useNotificationStore().add;
 
-    const overviewData = [
-        {
-            label: 'Balance',
-            tooltipContent: 'this is tooltip data',
-            value: '$1,069.00',
-        },
-        {
-            label: 'Unrealized PNL',
-            tooltipContent: 'this is tooltip data',
-            value: '$0.00',
-        },
-        {
-            label: 'Cross Margin Ratio',
-            tooltipContent: 'this is tooltip data',
-            value: '0.00%',
-        },
-        {
-            label: 'Maintenance Margin',
-            tooltipContent: 'this is tooltip data',
-            value: '$0.00',
-        },
-        {
-            label: 'Cross Account Leverage',
-            tooltipContent: 'this is tooltip data',
-            value: '0.00x',
-        },
-    ];
+    const { accountOverview, selectedCurrency } = useTradeDataStore();
+
+    const { getBsColor } = useAppSettings();
+
+    const { formatNum } = useNumFormatter();
+
+    const overviewData = useMemo(
+        () => [
+            {
+                label: 'Balance',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(accountOverview.balance, 2, true, true),
+                change: accountOverview.balanceChange,
+            },
+            {
+                label: 'Unrealized PNL',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(accountOverview.unrealizedPnl, 2, true, true),
+                color:
+                    accountOverview.unrealizedPnl > 0
+                        ? getBsColor().buy
+                        : accountOverview.unrealizedPnl < 0
+                          ? getBsColor().sell
+                          : 'var(--text-)',
+            },
+            {
+                label: 'Cross Margin Ratio',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(accountOverview.crossMarginRatio, 2) + '%',
+                color:
+                    accountOverview.crossMarginRatio > 0
+                        ? getBsColor().buy
+                        : accountOverview.crossMarginRatio < 0
+                          ? getBsColor().sell
+                          : 'var(--text-)',
+            },
+            {
+                label: 'Maintenance Margin',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(
+                    accountOverview.maintainanceMargin,
+                    2,
+                    true,
+                    true,
+                ),
+                change: accountOverview.maintainanceMarginChange,
+            },
+            {
+                label: 'Cross Account Leverage',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(accountOverview.crossAccountLeverage, 2) + 'x',
+            },
+        ],
+        [accountOverview, selectedCurrency],
+    );
 
     return (
         <div
@@ -85,7 +117,34 @@ export default function DepositDropdown(props: propsIF) {
                                 {tooltipSvg}
                             </Tooltip>
                         </div>
-                        <p className={styles.value}>{data.value}</p>
+                        {data.change ? (
+                            <motion.p
+                                key={data.change}
+                                className={styles.value}
+                                initial={{
+                                    color:
+                                        data.change > 0
+                                            ? getBsColor().buy
+                                            : getBsColor().sell,
+                                }}
+                                animate={{
+                                    color: 'var(--text1)',
+                                }}
+                                transition={{
+                                    duration: 0.3,
+                                    ease: 'easeInOut',
+                                }}
+                            >
+                                {data.value}
+                            </motion.p>
+                        ) : (
+                            <p
+                                className={styles.value}
+                                style={{ color: data.color }}
+                            >
+                                {data.value}
+                            </p>
+                        )}
                     </div>
                 ))}
             </div>

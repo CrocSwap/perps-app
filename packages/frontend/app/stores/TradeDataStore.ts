@@ -1,11 +1,14 @@
 import { create } from 'zustand';
 import { setLS } from '~/utils/AppUtils';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
+import {
+    createUserTradesSlice,
+    type UserTradeDataStore,
+} from './UserTradeDataStore';
 import { persist } from 'zustand/middleware';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
-type TradeDataStore = UserTradeStore & {
+type TradeDataStore = UserTradeDataStore & {
     symbol: string;
     setSymbol: (symbol: string) => void;
     symbolInfo: SymbolInfoIF | null;

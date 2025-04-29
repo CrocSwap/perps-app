@@ -63,6 +63,7 @@
     align-items: center;
     gap: 4px;
     cursor: default;
+    user-select: none;
 }
 
 .sortable {
@@ -146,4 +147,12 @@
         font-size: 0.75rem;
         padding: 0.2rem 0.4rem;
     }
+}
+
+.cell.positive {
+    color: var(--green);
+}
+
+.cell.negative {
+    color: var(--red);
 }

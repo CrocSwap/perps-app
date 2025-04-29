@@ -1,14 +1,12 @@
 /// <reference lib="webworker" />
 
-import type {
-    L2BookDataIF,
-    OrderBookRowIF,
-} from '~/utils/orderbook/OrderBookIFs';
+import type { OrderBookRowIF } from '~/utils/orderbook/OrderBookIFs';
 import { processOrderBookMessage } from '../../processors/processOrderBook';
+import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 
 export type OrderBookInput = {
     channel: 'l2Book';
-    data: L2BookDataIF;
+    data: L2BookData;
 };
 export type OrderBookOutput = {
     sells: OrderBookRowIF[];

@@ -21,10 +21,6 @@ export default function OpenOrdersTableHeader({
     sortDirection,
     sortClickHandler,
 }: OpenOrdersTableHeaderProps) {
-    const handleSort = (key: string) => {
-        console.log(`Sorting by: ${key}`);
-    };
-
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Time',

@@ -1,74 +1,76 @@
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './BalancesTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { UserBalanceSortBy } from '~/utils/UserDataIFs';
 
 export interface HeaderCell {
     name: string;
     key: string;
     sortable: boolean;
-    onClick: (() => void) | undefined;
     className: string;
 }
 
-export default function BalancesTableHeader() {
-    const handleSort = (key: string) => {
-        console.log(`Sorting by: ${key}`);
-    };
+interface BalancesTableHeaderProps {
+    sortBy: UserBalanceSortBy;
+    sortDirection: TableSortDirection;
+    sortClickHandler: (key: string) => void;
+}
+
+export default function BalancesTableHeader({
+    sortBy,
+    sortDirection,
+    sortClickHandler,
+}: BalancesTableHeaderProps) {
+    const { selectedCurrency } = useTradeDataStore();
 
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Coin',
-            key: 'coin',
+            key: 'sortName',
             sortable: true,
-            onClick: () => handleSort('coin'),
             className: 'coinCell',
         },
         {
             name: 'Total Balance',
-            key: 'totalBalance',
+            key: 'total',
             sortable: true,
-            onClick: () => handleSort('totalBalance'),
             className: 'totalBalanceCell',
         },
         {
             name: 'Available Balance',
-            key: 'availableBalance',
+            key: 'available',
             sortable: true,
-            onClick: () => handleSort('availableBalance'),
             className: 'availableBalanceCell',
         },
         {
-            name: 'USDC Value',
+            name: `${selectedCurrency} Value`,
             key: 'usdcValue',
             sortable: true,
-            onClick: () => handleSort('usdcValue'),
             className: 'usdcValueCell',
         },
         {
             name: 'Buying Power',
             key: 'buyingPower',
             sortable: true,
-            onClick: () => handleSort('buyingPower'),
             className: 'buyingPowerCell',
         },
         {
             name: 'PNL (ROGER)',
-            key: 'pnl',
+            key: 'pnlValue',
             sortable: true,
-            onClick: () => handleSort('pnl'),
             className: 'pnlCell',
         },
         {
             name: 'Contract',
             key: 'contract',
             sortable: false,
-            onClick: undefined,
             className: 'contractCell',
         },
         {
             name: '',
             key: 'action',
             sortable: false,
-            onClick: undefined,
             className: 'actionCell',
         },
     ];
@@ -78,11 +80,23 @@ export default function BalancesTableHeader() {
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}
-                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
-                    onClick={header.onClick}
+                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
+                    onClick={() => {
+                        if (header.sortable) {
+                            sortClickHandler(header.key);
+                        }
+                    }}
                 >
                     {header.name}
-                    {header.sortable && <SortIcon />}
+                    {header.sortable && (
+                        <SortIcon
+                            sortDirection={
+                                sortDirection && header.key === sortBy
+                                    ? sortDirection
+                                    : undefined
+                            }
+                        />
+                    )}
                 </div>
             ))}
         </div>

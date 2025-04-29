@@ -18,18 +18,6 @@ const SymbolInfo: React.FC = () => {
 
     const { orderBookMode } = useAppSettings();
 
-    // useEffect(() => {
-    //   subscribe(WsChannels.ACTIVE_COIN_DATA, {
-    //     payload: {coin: symbol},
-    //     handler: (payload) => {51
-    //       if(payload.coin === symbol){
-    //         setSymbolInfo(processSymbolInfo(payload));
-    //       }
-    //     },
-    //     single: true
-    //   })
-    // }, [symbol])
-
     const get24hChangeString = () => {
         if (symbolInfo) {
             const usdChange = symbolInfo.markPx - symbolInfo.prevDayPx;

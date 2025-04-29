@@ -83,7 +83,7 @@ export default function TradeTable(props: TradeTableProps) {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'Balances':
-                return <BalancesTable />;
+                return <BalancesTable hideSmallBalances={hideSmallBalances} />;
             case 'Positions':
                 return <PositionsTable />;
             case 'Open Orders':
@@ -114,8 +114,8 @@ export default function TradeTable(props: TradeTableProps) {
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
                 rightContent={rightAlignedContent}
-                wrapperId="tradeTableTabs" 
-                layoutIdPrefix="tradeTableTabsIndicator" 
+                wrapperId='tradeTableTabs'
+                layoutIdPrefix='tradeTableTabsIndicator'
             />
             <motion.div
                 className={styles.tableContent}

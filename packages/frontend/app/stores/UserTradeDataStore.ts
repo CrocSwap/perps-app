@@ -1,9 +1,10 @@
 import { OrderHistoryLimits } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
+import type { AccountOverviewIF, UserBalanceIF } from '~/utils/UserDataIFs';
 
 const limit = 10;
-export interface UserTradeStore {
+export interface UserTradeDataStore {
     userOrders: OrderDataIF[];
     userSymbolOrders: OrderDataIF[];
     setUserOrders: (userOrders: OrderDataIF[]) => void;
@@ -19,6 +20,10 @@ export interface UserTradeStore {
     setUserSymbolOrderHistory: (userSymbolOrderHistory: OrderDataIF[]) => void;
     positions: PositionIF[];
     setPositions: (positions: PositionIF[]) => void;
+    userBalances: UserBalanceIF[];
+    setUserBalances: (userBalances: UserBalanceIF[]) => void;
+    accountOverview: AccountOverviewIF;
+    setAccountOverview: (accountOverview: AccountOverviewIF) => void;
 }
 
 export const createUserTradesSlice = (set: any, get: any) => ({
@@ -85,4 +90,18 @@ export const createUserTradesSlice = (set: any, get: any) => ({
     userSymbolOrderHistory: [],
     setUserSymbolOrderHistory: (userSymbolOrderHistory: OrderDataIF[]) =>
         set({ userSymbolOrderHistory }),
+    userBalances: [],
+    setUserBalances: (userBalances: UserBalanceIF[]) => {
+        set({ userBalances });
+    },
+    accountOverview: {
+        balance: 0,
+        unrealizedPnl: 0,
+        crossMarginRatio: 0,
+        maintainanceMargin: 0,
+        crossAccountLeverage: 0,
+    },
+    setAccountOverview: (accountOverview: AccountOverviewIF) => {
+        set({ accountOverview });
+    },
 });
