@@ -18,6 +18,7 @@
     },
     "dependencies": {
         "@netlify/functions": "3.0.4",
+        "@perps-app/sdk": "workspace:*",
         "@react-router/node": "^7.5.0",
         "express": "^5.1.0",
         "framer-motion": "^12.6.3",
@@ -26,8 +27,7 @@
         "react-dom": "^19.0.0",
         "react-icons": "^5.5.0",
         "react-router": "^7.5.2",
-        "zustand": "^5.0.3",
-        "@perps-app/sdk": "workspace:*"
+        "zustand": "^5.0.3"
     },
     "devDependencies": {
         "@eslint/js": "^9.24.0",
@@ -44,7 +44,7 @@
         "fs-extra": "^11.3.0",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.29.1",
-        "vite": "^6.2.6",
+        "vite": "^6.3.4",
         "vite-tsconfig-paths": "^5.1.4"
     }
 }
