@@ -15,7 +15,7 @@ export default function testpage(props: propsIF) {
                     minPrice={parseFloat('242423')}
                     maxPrice={parseFloat('99993321')}
                     // isModal
-                    onClose={() => console.log('close modal')}
+                    onClose={() => console.log('close modal testpage')}
                 />
             </div>
         </div>
