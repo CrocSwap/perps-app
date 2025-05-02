@@ -279,10 +279,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 const iframeDoc = iframe.contentDocument;
 
                 if (iframeDoc) {
-                    const chartContainer =
-                        iframeDoc.querySelector('.chart-container');
-
-                    useHandleSwipeBack(chartContainer);
+                    useHandleSwipeBack(iframeDoc);
                 }
             }
         }
