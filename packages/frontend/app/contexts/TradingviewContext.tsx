@@ -19,6 +19,7 @@ import {
     getChartDefaultColors,
     getChartThemeColors,
     priceFormatterFactory,
+    useHandleSwipeBack,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
@@ -266,6 +267,26 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             });
         }
     }, [debugWallet, chart, symbol]);
+
+    useEffect(() => {
+        if (chart) {
+            const chartDiv = document.getElementById('tv_chart');
+            const iframe = chartDiv?.querySelector(
+                'iframe',
+            ) as HTMLIFrameElement;
+
+            if (iframe) {
+                const iframeDoc = iframe.contentDocument;
+
+                if (iframeDoc) {
+                    const chartContainer =
+                        iframeDoc.querySelector('.chart-container');
+
+                    useHandleSwipeBack(chartContainer);
+                }
+            }
+        }
+    }, [chart]);
 
     return (
         <TradingViewContext.Provider value={{ chart }}>

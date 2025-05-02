@@ -148,3 +148,26 @@ export const supportedResolutions = [
     '1W',
     '1M',
 ] as ResolutionString[];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useHandleSwipeBack(ref: any) {
+    const handleSwipeBack = (event: WheelEvent | TouchEvent) => {
+        if (event.target instanceof HTMLInputElement) {
+            return;
+        }
+        
+        event.preventDefault();
+    };
+
+    ref.addEventListener('wheel', handleSwipeBack, {
+        passive: false,
+    });
+    ref.addEventListener('touchmove', handleSwipeBack, {
+        passive: false,
+    });
+
+    return () => {
+        ref.removeEventListener('wheel', handleSwipeBack);
+        ref.removeEventListener('touchmove', handleSwipeBack);
+    };
+}
