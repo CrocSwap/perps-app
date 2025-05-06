@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 
+import { useDebugStore } from '~/stores/DebugStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
     EntityId,
     IChartingLibraryWidget,
@@ -22,8 +24,6 @@ import {
     quantityTextFormatWithComma,
     type LineLabel,
 } from '../customOrderLineUtils';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useDebugStore } from '~/stores/DebugStore';
 
 export type LineData = {
     xLoc: number;
@@ -188,8 +188,6 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                 setTimeout(() => {
                     setChartReady(true);
                 }, 2500);
-
-                clearInterval(intervalId);
             }
         }, 100);
 
@@ -350,18 +348,27 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
 
             const activeLine = activeChart.getShapeById(lineId);
             if (activeLine) {
-                activeLine.setPoints([{ time: 10, price: lineData.yPrice }]);
-                activeLine.setProperties({
-                    linecolor: lineData.color,
-                    borderColor: lineData.color,
-                });
+                try {
+                    activeLine.setPoints([
+                        { time: 10, price: lineData.yPrice },
+                    ]);
+                    activeLine.setProperties({
+                        linecolor: lineData.color,
+                        borderColor: lineData.color,
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
             }
         };
 
         const updateTextPositionOnce = () => {
-            orderLineItems.forEach((item, i) => {
-                updateSingleLine(item, lines[i]);
-            });
+            if (orderLineItems) {
+                console.log({ orderLineItems });
+                orderLineItems.forEach((item, i) => {
+                    updateSingleLine(item, lines[i]);
+                });
+            }
         };
 
         const startZoomInterval = () => {
