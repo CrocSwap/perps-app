@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useDebugStore } from '~/stores/DebugStore';
 import type { LineData } from './component/LineComponent';
 import {
     buyColor,
@@ -13,9 +12,8 @@ import LineComponent from './component/LineComponent';
 
 const OpenOrderLine = () => {
     const { chart } = useTradingView();
-    const { userSymbolOrders, positions, symbol } = useTradeDataStore();
-    const { debugWallet } = useDebugStore();
-
+    const { userSymbolOrders, positions, symbol, webDataFetched } =
+        useTradeDataStore();
     const [lines, setLines] = useState<LineData[]>([]);
 
     const pnlSzi = useMemo(() => {
@@ -112,12 +110,16 @@ const OpenOrderLine = () => {
                 };
             });
 
-        setLines(newLines);
+        if (webDataFetched) {
+            setLines(newLines);
+        } else {
+            setLines([]);
+        }
     }, [
         chart,
         JSON.stringify(userSymbolOrders),
-        debugWallet,
         symbol,
+        webDataFetched,
         JSON.stringify(pnlSzi),
     ]);
 

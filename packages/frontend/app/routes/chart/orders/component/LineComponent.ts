@@ -54,7 +54,6 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
 
     const { symbol } = useTradeDataStore();
-    const { debugWallet } = useDebugStore();
 
     const removeShapeById = async (
         chart: IChartingLibraryWidget,
@@ -197,11 +196,11 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             clearInterval(intervalId);
             setChartReady(false);
         };
-    }, [symbol, debugWallet]);
+    }, [symbol]);
 
     useEffect(() => {
         const setupShapes = async () => {
-            if (!chart || lines.length === 0) return;
+            if (!chart ) return;
 
             const currentCount = orderLineItemsRef.current.length;
             const newCount = lines.length;
@@ -358,35 +357,41 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             }
         };
 
-        const updateTextPositionOnce = () => {
-            orderLineItems.forEach((item, i) => {
-                updateSingleLine(item, lines[i]);
-            });
-        };
+        try {
+            const updateTextPositionOnce = () => {
+                orderLineItems.forEach((item, i) => {
+                    updateSingleLine(item, lines[i]);
+                });
+            };
 
-        const startZoomInterval = () => {
-            orderLineItems.forEach((item, i) => {
-                const interval = setInterval(() => {
-                    if (!isCancelled) {
-                        updateSingleLine(item, lines[i]);
-                    }
-                }, 10) as unknown as number;
-                intervals.push(interval);
-            });
-        };
+            const startZoomInterval = () => {
+                orderLineItems.forEach((item, i) => {
+                    const interval = setInterval(() => {
+                        if (!isCancelled) {
+                            updateSingleLine(item, lines[i]);
+                        }
+                    }, 10) as unknown as number;
+                    intervals.push(interval);
+                });
+            };
 
-        if (
-            !chart ||
-            orderLineItems.length === 0 ||
-            lines.length === 0 ||
-            orderLineItems.length !== lines.length
-        )
-            return;
+            if (
+                !chart ||
+                orderLineItems.length === 0 ||
+                lines.length === 0 ||
+                orderLineItems.length !== lines.length
+            )
+                return;
 
-        if (zoomChanged) {
-            startZoomInterval();
-        } else {
-            updateTextPositionOnce();
+            if (zoomChanged) {
+                startZoomInterval();
+            } else {
+                updateTextPositionOnce();
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error: unknown) {
+            // console.error({ error });
         }
 
         return () => {

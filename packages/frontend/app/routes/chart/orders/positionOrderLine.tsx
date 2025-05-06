@@ -7,7 +7,7 @@ import LineComponent from './component/LineComponent';
 
 const PositionOrderLine = () => {
     const { chart } = useTradingView();
-    const { positions, symbol } = useTradeDataStore();
+    const { positions, symbol,webDataFetched } = useTradeDataStore();
 
     const [lines, setLines] = useState<LineData[]>([]);
 
@@ -61,8 +61,12 @@ const PositionOrderLine = () => {
             return [pnlLine, liqLine];
         });
 
-        setLines(newLines);
-    }, [chart, JSON.stringify(filteredPositions), symbol]);
+        if (webDataFetched) {
+            setLines(newLines);
+        } else {
+            setLines([]);
+        }
+    }, [chart, JSON.stringify(filteredPositions), symbol,webDataFetched]);
 
     if (!chart) return null;
 
