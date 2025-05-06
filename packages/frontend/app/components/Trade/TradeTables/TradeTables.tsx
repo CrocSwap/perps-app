@@ -40,7 +40,12 @@ const filterOptions: FilterOption[] = [
     { id: 'short', label: 'Short' },
 ];
 export default function TradeTable(props: TradeTableProps) {
-    const { selectedTradeTab, setSelectedTradeTab } = useTradeDataStore();
+    const {
+        selectedTradeTab,
+        setSelectedTradeTab,
+        orderHistory,
+        orderHistoryFetched,
+    } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
@@ -95,7 +100,13 @@ export default function TradeTable(props: TradeTableProps) {
             case 'Funding History':
                 return <FundingHistoryTable />;
             case 'Order History':
-                return <OrderHistoryTable selectedFilter={selectedFilter} />;
+                return (
+                    <OrderHistoryTable
+                        selectedFilter={selectedFilter}
+                        data={orderHistory}
+                        isFetched={orderHistoryFetched}
+                    />
+                );
             case 'Deposits and Withdrawals':
                 return <DepositsWithdrawalsTable />;
             default:

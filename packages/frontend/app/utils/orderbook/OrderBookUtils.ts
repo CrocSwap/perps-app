@@ -197,6 +197,26 @@ export const sortOrderData = (
                         ? (a.limitPx ?? 0) - (b.limitPx ?? 0)
                         : (b.limitPx ?? 0) - (a.limitPx ?? 0),
                 );
+            case 'status':
+                return [...orderData].sort((a, b) =>
+                    sortDirection === 'asc'
+                        ? a.status.localeCompare(b.status)
+                        : b.status.localeCompare(a.status),
+                );
+            case 'triggerCondition':
+                return [...orderData].sort((a, b) =>
+                    sortDirection === 'asc'
+                        ? (a.triggerCondition ?? '').localeCompare(
+                              b.triggerCondition ?? '',
+                          )
+                        : (b.triggerCondition ?? '').localeCompare(
+                              a.triggerCondition ?? '',
+                          ),
+                );
+            case 'oid':
+                return [...orderData].sort((a, b) =>
+                    sortDirection === 'asc' ? a.oid - b.oid : b.oid - a.oid,
+                );
             default:
                 return orderData;
         }

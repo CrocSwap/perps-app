@@ -52,10 +52,6 @@ export default function PositionsTable(props: PositionsTableProps) {
         }
     }, [positionsToShow, webDataFetched]);
 
-    useEffect(() => {
-        console.log('>>> table state 2', tableState);
-    }, [tableState]);
-
     return (
         <div className={styles.tableWrapper}>
             {tableState === TableState.LOADING ? (

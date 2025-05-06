@@ -1,0 +1,94 @@
+.container {
+    width: 100%;
+
+    /* padding: 2rem; */
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+    margin: 0 auto;
+    margin-top: 48px;
+    overflow-x: hidden;
+}
+
+.container header {
+    color: #fff;
+
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-xl, 36px);
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+}
+
+.content {
+    width: 100%;
+    border-radius: var(--main-border-radius, 16px);
+    background: var(--dark2, #111117);
+    display: flex;
+    padding: 8px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.pageInfo {
+    color: var(--text1, #f0f0f8);
+}
+
+.fullScreen {
+    margin-top: 0 !important;
+    gap: 8px !important;
+}
+
+.fullScreen .searchRow {
+    height: auto;
+}
+.expandIcon {
+    fill: var(--text2);
+}
+.expandIcon:hover {
+    fill: var(--text1);
+}
+.chvrDown {
+    display: none;
+}
+.chvrUp {
+    display: none;
+}
+
+@media (min-width: 1280px) {
+    .container {
+        width: 1165px;
+    }
+}
+@media (min-width: 1580px) {
+    .container {
+        margin-top: 96px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        margin-top: 48px;
+    }
+
+    .searchRow {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .searchContainer {
+        width: 100%;
+        max-width: none;
+    }
+
+    .periodSelector {
+        align-self: flex-end;
+    }
+}
+@media (max-width: 500px) {
+    .container {
+        margin-top: 0;
+    }
+}

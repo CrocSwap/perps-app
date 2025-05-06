@@ -69,4 +69,7 @@ export type OrderDataSortBy =
     | 'origSz'
     | 'orderValue'
     | 'price'
+    | 'status'
+    | 'triggerCondition'
+    | 'oid'
     | undefined;

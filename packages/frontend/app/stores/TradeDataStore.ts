@@ -33,6 +33,8 @@ type TradeDataStore = UserTradeDataStore & {
     setSelectedTradeTab: (tab: string) => void;
     webDataFetched: boolean;
     setWebDataFetched: (fetched: boolean) => void;
+    orderHistoryFetched: boolean;
+    setOrderHistoryFetched: (fetched: boolean) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -109,6 +111,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             webDataFetched: false,
             setWebDataFetched: (fetched: boolean) =>
                 set({ webDataFetched: fetched }),
+            orderHistoryFetched: false,
+            setOrderHistoryFetched: (fetched: boolean) =>
+                set({ orderHistoryFetched: fetched }),
         }),
         {
             name: 'TRADE_DATA',

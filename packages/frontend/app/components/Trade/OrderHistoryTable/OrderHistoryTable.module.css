@@ -36,7 +36,7 @@
 }
 
 .tableBody {
-    height: 100%;
+    height: calc(100% - 3rem);
     overflow-y: scroll;
     padding-bottom: 1rem;
 }
@@ -84,6 +84,13 @@
     text-align: left;
     padding-left: 8px;
     margin-top: 8px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: red;
+    width: 100%;
+    padding: 0.2rem 1.4rem;
+    background-color: var(--dark2);
 }
 
 .viewAllLink:hover {

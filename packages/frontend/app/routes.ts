@@ -30,5 +30,7 @@ export default [
 
     route('positions', 'routes/positions/positions.tsx'),
 
+    route('orderHistory/:address?', 'routes/orderHistory/orderHistory.tsx'),
+
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;

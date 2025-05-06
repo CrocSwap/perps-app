@@ -1,3 +1,6 @@
+import { processUserOrder } from '~/processors/processOrderBook';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+
 export type ApiCallConfig = {
     type: string;
     handler: (data: any, payload: any) => void;
@@ -24,5 +27,29 @@ export function useInfoApi() {
         config.handler(data, payload);
     };
 
-    return { fetchData };
+    const fetchOrderHistory = async (
+        address: string,
+    ): Promise<OrderDataIF[]> => {
+        const ret: OrderDataIF[] = [];
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.HISTORICAL_ORDERS,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        if (data && data.length > 0) {
+            data.map((o: any) => {
+                const processedOrder = processUserOrder(o.order, o.status);
+                if (processedOrder) {
+                    ret.push(processedOrder);
+                }
+            });
+        }
+        return ret;
+    };
+
+    return { fetchData, fetchOrderHistory };
 }
