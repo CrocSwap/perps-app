@@ -2,7 +2,11 @@ import { saveChartLayout } from './chartStorage';
 
 export const drawingEvent = (chart: any) => {
     chart?.subscribe('drawing_event', (id: any, type: any) => {
-        if (['points_changed', 'properties_changed'].includes(type)) return;
+        if (['properties_changed'].includes(type)) return;
+        if (chart) saveChartLayout(chart);
+    });
+
+    chart?.subscribe('drawing', (event: any) => {
         if (chart) saveChartLayout(chart);
     });
 };
