@@ -1,15 +1,12 @@
-// Home.tsx
 import { useState, useEffect, type CSSProperties, type JSX} from 'react';
 import { Link } from 'react-router';
-import styles from './Home.module.css';
+import styles from './home.module.css';
 
-// Import token images
 import btcImage from '../../assets/tokens/btc.svg';
 import ethImage from '../../assets/tokens/eth.svg';
 import daiImage from '../../assets/tokens/dai.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 
-// Interfaces
 interface FloatingTokenProps {
   src: string;
   size?: number;
@@ -36,7 +33,6 @@ interface TradingPair {
   change: string;
 }
 
-// Token component
 function FloatingBgToken({ 
   src, 
   size = 90, 
@@ -89,7 +85,7 @@ const tradingPairs: TradingPair[] = [
 ];
 
 export default function Home(): JSX.Element {
-  const [tradingVolume, setTradingVolume] = useState<string>("$1.24B");
+  const [tradingVolume] = useState<string>("$1.24B");
   const [traders, setTraders] = useState<number>(42617);
   const [countdown, setCountdown] = useState<number>(300);
   const [hasVisited, setHasVisited] = useState<boolean>(false);
