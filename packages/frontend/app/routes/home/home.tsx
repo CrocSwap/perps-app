@@ -138,7 +138,16 @@ export default function Home(): JSX.Element {
       <div className={styles.container}>
         {/* Left side: Headline and CTA */}
         <div className={styles.leftContent}>
-          <h1 className={styles.heading}>Trade Perps With Confidence</h1>
+          <h1 className={styles.heading}>Trade
+            <span style={{
+              color: 'var(--text1)',
+              margin: '0 4px'
+            }}>
+
+            Perps
+            </span>
+            
+            With Confidence</h1>
           <p className={styles.subheading}>Fast execution. Low fees. Up to 50x leverage.</p>
           
           {/* Stats Bar */}
