@@ -6,7 +6,7 @@ import CreateSubaccount from './CreateSubaccount/CreateSubaccount';
 import { useAccounts, type useAccountsIF } from '~/stores/AccountsStore';
 import { useRef, useEffect } from 'react';
 
-export default function subaccounts() {
+export default function Subaccounts() {
     // logic to open and close subaccount creation modal
     const createSubaccountModal: useModalIF = useModal('closed');
 
