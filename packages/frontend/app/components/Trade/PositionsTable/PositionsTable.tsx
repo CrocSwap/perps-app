@@ -18,14 +18,13 @@ interface PositionsTableProps {
     pageMode?: boolean;
 }
 
-
 export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode } = props;
     const navigate = useNavigate();
     const { coinPriceMap } = useTradeDataStore();
     const [sortDirection, setSortDirection] = useState<TableSortDirection>();
     const [sortBy, setSortBy] = useState<PositionDataSortBy>();
-    
+
     const handleViewAll = () => {
         navigate(`/positions`);
     };
@@ -44,7 +43,7 @@ export default function PositionsTable(props: PositionsTableProps) {
     }, [fetchedChannels]);
 
     const sortedPositions = useMemo(() => {
-        return sortPositionData(positions, sortBy, sortDirection,coinPriceMap);
+        return sortPositionData(positions, sortBy, sortDirection, coinPriceMap);
     }, [positions, sortBy, sortDirection]);
 
     const positionsToShow = useMemo(() => {
@@ -69,23 +68,21 @@ export default function PositionsTable(props: PositionsTableProps) {
         }
     }, [positionsToShow, webDataFetched]);
 
-
-            const handleSort = (key: string) => {
-                
-                if (sortBy === key) {
-                    if (sortDirection === 'desc') {
-                        setSortDirection('asc');
-                    } else if (sortDirection === 'asc') {
-                        setSortDirection(undefined);
-                        setSortBy(undefined);
-                    } else {
-                        setSortDirection('desc');
-                    }
-                } else {
-                    setSortBy(key as PositionDataSortBy);
-                    setSortDirection('desc');
-                }
-            };
+    const handleSort = (key: string) => {
+        if (sortBy === key) {
+            if (sortDirection === 'desc') {
+                setSortDirection('asc');
+            } else if (sortDirection === 'asc') {
+                setSortDirection(undefined);
+                setSortBy(undefined);
+            } else {
+                setSortDirection('desc');
+            }
+        } else {
+            setSortBy(key as PositionDataSortBy);
+            setSortDirection('desc');
+        }
+    };
 
     return (
         <div className={styles.tableWrapper}>
@@ -96,10 +93,11 @@ export default function PositionsTable(props: PositionsTableProps) {
                 />
             ) : (
                 <>
-                    <PositionsTableHeader  
+                    <PositionsTableHeader
                         sortBy={sortBy}
                         sortDirection={sortDirection}
-                        sortClickHandler={handleSort} />
+                        sortClickHandler={handleSort}
+                    />
                     <div className={styles.tableBody}>
                         {tableState === TableState.FILLED && (
                             <>

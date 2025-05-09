@@ -21,8 +21,6 @@ export default function PositionsTableHeader({
     sortDirection,
     sortClickHandler,
 }: PositionsTableHeaderProps) {
-   
-
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Coin',
@@ -101,18 +99,19 @@ export default function PositionsTableHeader({
                     onClick={() => {
                         if (header.sortable) {
                             sortClickHandler(header.key);
-
                         }
                     }}
                 >
                     {header.name}
-                    {header.sortable && <SortIcon
+                    {header.sortable && (
+                        <SortIcon
                             sortDirection={
                                 sortDirection && header.key === sortBy
                                     ? sortDirection
                                     : undefined
                             }
-                        />}
+                        />
+                    )}
                 </div>
             ))}
         </div>
