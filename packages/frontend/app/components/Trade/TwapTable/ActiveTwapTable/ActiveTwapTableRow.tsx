@@ -1,26 +1,28 @@
+import type { ActiveTwapIF } from '~/utils/UserDataIFs';
 import styles from './ActiveTwapTable.module.css';
-
-export interface ActiveTwapData {
-    coin: string;
-    size: string;
-    executedSize: string;
-    averagePrice: string;
-    runningTime: string;
-    reduceOnly: string;
-    creationTime: string;
-}
-
+import {
+    formatMinuteValue,
+    formatTimestamp,
+} from '~/utils/orderbook/OrderBookUtils';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useMemo } from 'react';
 interface ActiveTwapTableRowProps {
-    twap: ActiveTwapData;
+    twap: ActiveTwapIF;
     onTerminate: (coin: string) => void;
 }
 
 export default function ActiveTwapTableRow(props: ActiveTwapTableRowProps) {
     const { twap, onTerminate } = props;
 
+    const { formatNum } = useNumFormatter();
+
     const handleTerminate = () => {
         onTerminate(twap.coin);
     };
+
+    const avgPx = useMemo(() => {
+        return twap.executedNtl / twap.executedSz;
+    }, [twap.executedNtl, twap.executedSz]);
 
     return (
         <div className={styles.rowContainer}>
@@ -28,22 +30,22 @@ export default function ActiveTwapTableRow(props: ActiveTwapTableRowProps) {
                 {twap.coin}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
-                {twap.size}
+                {formatNum(twap.sz)} {twap.coin}
             </div>
             <div className={`${styles.cell} ${styles.executedSizeCell}`}>
-                {twap.executedSize}
+                {formatNum(twap.executedSz)} {twap.coin}
             </div>
             <div className={`${styles.cell} ${styles.averagePriceCell}`}>
-                {twap.averagePrice}
+                {formatNum(avgPx)}
             </div>
             <div className={`${styles.cell} ${styles.runningTimeCell}`}>
-                {twap.runningTime}
+                {formatMinuteValue(twap.minutes)}
             </div>
             <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>
-                {twap.reduceOnly}
+                {twap.reduceOnly ? 'Yes' : 'No'}
             </div>
             <div className={`${styles.cell} ${styles.creationTimeCell}`}>
-                {twap.creationTime}
+                {formatTimestamp(twap.timestamp)}
             </div>
             <div className={`${styles.cell} ${styles.terminateCell}`}>
                 <button

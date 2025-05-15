@@ -100,6 +100,16 @@ export const formatTimestamp = (timestamp: number) => {
     });
 };
 
+export const formatMinuteValue = (value: number) => {
+    if (value <= 60) {
+        return `${value} minutes`;
+    } else if (value <= 1440) {
+        return `${Math.floor(value / 60)} hours`;
+    } else {
+        return `${Math.floor(value / 1440)} days`;
+    }
+};
+
 const decimalPrecision = (precisionNumber: number) => {
     if (!precisionNumber.toString().includes('.')) return 0;
     return precisionNumber.toString().split('.')[1].length;
