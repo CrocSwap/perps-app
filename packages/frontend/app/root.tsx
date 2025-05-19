@@ -154,7 +154,6 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     let message = 'Oops!';
     let details = 'An unexpected error occurred.';
     let stack: string | undefined;
-    console.log(error);
     if (isRouteErrorResponse(error)) {
         message = error.status === 404 ? '404' : 'Error';
         details =
@@ -170,11 +169,15 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         <main className='content error-boundary'>
             <h1>{message}</h1>
             <p>{details}</p>
-            {stack && (
+            {stack ? (
                 <pre>
                     <code>{stack}</code>
                 </pre>
-            )}
+            ) : error ? (
+                <pre>
+                    <code>{error.toString()}</code>
+                </pre>
+            ) : null}
             {/*  Added refresh button for better user experience */}
             <button
                 onClick={() => window.location.reload()}
