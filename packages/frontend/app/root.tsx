@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -20,39 +20,39 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
-class ComponentErrorBoundary extends React.Component<
-    { children: React.ReactNode },
-    { hasError: boolean }
-> {
-    state = { hasError: false };
+// class ComponentErrorBoundary extends React.Component<
+//     { children: React.ReactNode },
+//     { hasError: boolean }
+// > {
+//     state = { hasError: false };
 
-    static getDerivedStateFromError() {
-        return { hasError: true };
-    }
+//     static getDerivedStateFromError() {
+//         return { hasError: true };
+//     }
 
-    componentDidCatch(error: Error, info: React.ErrorInfo) {
-        console.error('Component error:', error, info.componentStack);
-    }
+//     componentDidCatch(error: Error, info: React.ErrorInfo) {
+//         console.error('Component error:', error, info.componentStack);
+//     }
 
-    render() {
-        if (this.state.hasError) {
-            return (
-                <div className='component-error'>
-                    <h3>Something went wrong</h3>
-                    <button onClick={() => this.setState({ hasError: false })}>
-                        Try Again
-                    </button>
-                </div>
-            );
-        }
-        return this.props.children;
-    }
-}
+//     render() {
+//         if (this.state.hasError) {
+//             return (
+//                 <div className='component-error'>
+//                     <h3>Something went wrong</h3>
+//                     <button onClick={() => this.setState({ hasError: false })}>
+//                         Try Again
+//                     </button>
+//                 </div>
+//             );
+//         }
+//         return this.props.children;
+//     }
+// }
 
 // Added loading component for async operations
-function LoadingIndicator() {
-    return <div className='loading-indicator'>Loading...</div>;
-}
+// function LoadingIndicator() {
+//     return <div className='loading-indicator'>Loading...</div>;
+// }
 
 export function Layout({ children }: { children: React.ReactNode }) {
     useEffect(() => {
@@ -116,28 +116,28 @@ export default function App() {
                     <TutorialProvider>
                         <div className='root-container'>
                             {/* Added error boundary for header */}
-                            <ComponentErrorBoundary>
-                                <PageHeader />
-                            </ComponentErrorBoundary>
+                            {/* <ComponentErrorBoundary> */}
+                            <PageHeader />
+                            {/* </ComponentErrorBoundary> */}
 
                             <main className='content'>
                                 {/*  Added Suspense for async content loading */}
-                                <Suspense fallback={<LoadingIndicator />}>
-                                    <ComponentErrorBoundary>
-                                        <Outlet />
-                                    </ComponentErrorBoundary>
-                                </Suspense>
+                                {/* <Suspense fallback={<LoadingIndicator />}> */}
+                                {/* <ComponentErrorBoundary> */}
+                                <Outlet />
+                                {/* </ComponentErrorBoundary> */}
+                                {/* </Suspense> */}
                             </main>
-                            <ComponentErrorBoundary>
-                                <footer className='mobile-footer'>
-                                    <MobileFooter />
-                                </footer>
-                            </ComponentErrorBoundary>
+                            {/* <ComponentErrorBoundary> */}
+                            <footer className='mobile-footer'>
+                                <MobileFooter />
+                            </footer>
+                            {/* </ComponentErrorBoundary> */}
 
                             {/* Added error boundary for notifications */}
-                            <ComponentErrorBoundary>
-                                <Notifications />
-                            </ComponentErrorBoundary>
+                            {/* <ComponentErrorBoundary> */}
+                            <Notifications />
+                            {/* </ComponentErrorBoundary> */}
                         </div>
                     </TutorialProvider>
                     <RuntimeDomManipulation />
