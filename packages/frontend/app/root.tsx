@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -53,9 +53,9 @@ class ComponentErrorBoundary extends React.Component<
 }
 
 // Added loading component for async operations
-// function LoadingIndicator() {
-//     return <div className='loading-indicator'>Loading...</div>;
-// }
+function LoadingIndicator() {
+    return <div className='loading-indicator'>Loading...</div>;
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
     useEffect(() => {
@@ -125,11 +125,11 @@ export default function App() {
 
                             <main className='content'>
                                 {/*  Added Suspense for async content loading */}
-                                {/* <Suspense fallback={<LoadingIndicator />}> */}
-                                <ComponentErrorBoundary>
-                                    <Outlet />
-                                </ComponentErrorBoundary>
-                                {/* </Suspense> */}
+                                <Suspense fallback={<LoadingIndicator />}>
+                                    <ComponentErrorBoundary>
+                                        <Outlet />
+                                    </ComponentErrorBoundary>
+                                </Suspense>
                             </main>
                             <ComponentErrorBoundary>
                                 <footer className='mobile-footer'>
