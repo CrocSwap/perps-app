@@ -28,31 +28,31 @@ importers:
         version: link:../sdk
       '@react-router/node':
         specifier: ^7.6.0
-        version: 7.6.0(react-router@7.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.8.3)
+        version: 7.6.0(react-router@7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
       express:
         specifier: ^5.1.0
         version: 5.1.0
       framer-motion:
         specifier: ^12.6.3
-        version: 12.6.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        version: 12.6.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       isbot:
         specifier: ^5.1.26
         version: 5.1.26
       react:
-        specifier: ^19.0.0
-        version: 19.0.0
+        specifier: ^19.1.0
+        version: 19.1.0
       react-dom:
-        specifier: ^19.0.0
-        version: 19.0.0(react@19.0.0)
+        specifier: ^19.1.0
+        version: 19.1.0(react@19.1.0)
       react-icons:
         specifier: ^5.5.0
-        version: 5.5.0(react@19.0.0)
+        version: 5.5.0(react@19.1.0)
       react-router:
         specifier: ^7.6.0
-        version: 7.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        version: 7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       zustand:
         specifier: ^5.0.3
-        version: 5.0.3(@types/react@19.0.8)(react@19.0.0)
+        version: 5.0.3(@types/react@19.0.8)(react@19.1.0)
     devDependencies:
       '@eslint/js':
         specifier: ^9.24.0
@@ -62,7 +62,7 @@ importers:
         version: 0.6.1
       '@react-router/dev':
         specifier: ^7.6.0
-        version: 7.6.0(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-router@7.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(terser@5.39.2)(typescript@5.8.3)(vite@6.2.7(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.2)(yaml@2.7.1))(yaml@2.7.1)
+        version: 7.6.0(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-router@7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(terser@5.39.2)(typescript@5.8.3)(vite@6.2.7(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.2)(yaml@2.7.1))(yaml@2.7.1)
       '@types/express':
         specifier: ^5.0.1
         version: 5.0.1
@@ -3001,10 +3001,10 @@ packages:
     resolution: {integrity: sha512-RmkhL8CAyCRPXCE28MMH0z2PNWQBNk2Q09ZdxM9IOOXwxwZbN+qbWaatPkdkWIKL2ZVDImrN/pK5HTRz2PcS4g==}
     engines: {node: '>= 0.8'}
 
-  react-dom@19.0.0:
-    resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
+  react-dom@19.1.0:
+    resolution: {integrity: sha512-Xs1hdnE+DyKgeHJeJznQmYMIBG3TKIHJJT95Q58nHLSrElKlGQqDTR2HQ9fx5CN/Gk6Vh/kupBTDLU11/nDk/g==}
     peerDependencies:
-      react: ^19.0.0
+      react: ^19.1.0
 
   react-icons@5.5.0:
     resolution: {integrity: sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==}
@@ -3028,8 +3028,8 @@ packages:
       react-dom:
         optional: true
 
-  react@19.0.0:
-    resolution: {integrity: sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==}
+  react@19.1.0:
+    resolution: {integrity: sha512-FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==}
     engines: {node: '>=0.10.0'}
 
   readdirp@4.1.1:
@@ -3143,8 +3143,8 @@ packages:
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
-  scheduler@0.25.0:
-    resolution: {integrity: sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==}
+  scheduler@0.26.0:
+    resolution: {integrity: sha512-NlHwttCI/l5gCPR3D1nNXtWABUmBwvZpEQiD4IXSbIDq8BzLIK/7Ir5gTFSGZDUu37K5cMNp0hFtzO38sC7gWA==}
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -4923,7 +4923,7 @@ snapshots:
     dependencies:
       quansync: 0.2.10
 
-  '@react-router/dev@7.6.0(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-router@7.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(terser@5.39.2)(typescript@5.8.3)(vite@6.2.7(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.2)(yaml@2.7.1))(yaml@2.7.1)':
+  '@react-router/dev@7.6.0(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(react-router@7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(terser@5.39.2)(typescript@5.8.3)(vite@6.2.7(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.2)(yaml@2.7.1))(yaml@2.7.1)':
     dependencies:
       '@babel/core': 7.26.7
       '@babel/generator': 7.26.5
@@ -4934,7 +4934,7 @@ snapshots:
       '@babel/traverse': 7.26.7
       '@babel/types': 7.27.0
       '@npmcli/package-json': 4.0.1
-      '@react-router/node': 7.6.0(react-router@7.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.8.3)
+      '@react-router/node': 7.6.0(react-router@7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
       arg: 5.0.2
       babel-dead-code-elimination: 1.0.8
       chokidar: 4.0.3
@@ -4948,7 +4948,7 @@ snapshots:
       picocolors: 1.1.1
       prettier: 2.8.8
       react-refresh: 0.14.2
-      react-router: 7.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-router: 7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       semver: 7.7.1
       set-cookie-parser: 2.7.1
       valibot: 0.41.0(typescript@5.8.3)
@@ -4972,10 +4972,10 @@ snapshots:
       - tsx
       - yaml
 
-  '@react-router/node@7.6.0(react-router@7.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.8.3)':
+  '@react-router/node@7.6.0(react-router@7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)':
     dependencies:
       '@mjackson/node-fetch-server': 0.2.0
-      react-router: 7.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-router: 7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       source-map-support: 0.5.21
       stream-slice: 0.1.2
       undici: 6.21.1
@@ -6091,14 +6091,14 @@ snapshots:
 
   forwarded@0.2.0: {}
 
-  framer-motion@12.6.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  framer-motion@12.6.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       motion-dom: 12.6.3
       motion-utils: 12.6.3
       tslib: 2.8.1
     optionalDependencies:
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   fresh@2.0.0: {}
 
@@ -6921,28 +6921,28 @@ snapshots:
       iconv-lite: 0.6.3
       unpipe: 1.0.0
 
-  react-dom@19.0.0(react@19.0.0):
+  react-dom@19.1.0(react@19.1.0):
     dependencies:
-      react: 19.0.0
-      scheduler: 0.25.0
+      react: 19.1.0
+      scheduler: 0.26.0
 
-  react-icons@5.5.0(react@19.0.0):
+  react-icons@5.5.0(react@19.1.0):
     dependencies:
-      react: 19.0.0
+      react: 19.1.0
 
   react-is@16.13.1: {}
 
   react-refresh@0.14.2: {}
 
-  react-router@7.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  react-router@7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       cookie: 1.0.2
-      react: 19.0.0
+      react: 19.1.0
       set-cookie-parser: 2.7.1
     optionalDependencies:
-      react-dom: 19.0.0(react@19.0.0)
+      react-dom: 19.1.0(react@19.1.0)
 
-  react@19.0.0: {}
+  react@19.1.0: {}
 
   readdirp@4.1.1: {}
 
@@ -7100,7 +7100,7 @@ snapshots:
 
   safer-buffer@2.1.2: {}
 
-  scheduler@0.25.0: {}
+  scheduler@0.26.0: {}
 
   semver@6.3.1: {}
 
@@ -7834,7 +7834,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zustand@5.0.3(@types/react@19.0.8)(react@19.0.0):
+  zustand@5.0.3(@types/react@19.0.8)(react@19.1.0):
     optionalDependencies:
       '@types/react': 19.0.8
-      react: 19.0.0
+      react: 19.1.0
