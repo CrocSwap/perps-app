@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -58,22 +58,22 @@ function LoadingIndicator() {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-    // useEffect(() => {
-    //     const script = document.createElement('script');
-    //     script.src = '../tv/datafeeds/udf/dist/bundle.js';
-    //     script.async = true;
-    //     script.onerror = (error) => {
-    //         console.error('Failed to load TradingView script:', error);
-    //     };
-    //     document.head.appendChild(script);
+    useEffect(() => {
+        const script = document.createElement('script');
+        script.src = '../tv/datafeeds/udf/dist/bundle.js';
+        script.async = true;
+        script.onerror = (error) => {
+            console.error('Failed to load TradingView script:', error);
+        };
+        document.head.appendChild(script);
 
-    //     return () => {
-    //         // Cleanup script when component unmounts
-    //         if (document.head.contains(script)) {
-    //             document.head.removeChild(script);
-    //         }
-    //     };
-    // }, []);
+        return () => {
+            // Cleanup script when component unmounts
+            if (document.head.contains(script)) {
+                document.head.removeChild(script);
+            }
+        };
+    }, []);
 
     return (
         <html lang='en'>
