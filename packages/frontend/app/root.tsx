@@ -24,17 +24,14 @@ class ComponentErrorBoundary extends React.Component<
     { children: React.ReactNode },
     { hasError: boolean }
 > {
-    constructor(props: { children: React.ReactNode }) {
-        super(props);
-        this.state = { hasError: false };
-    }
+    state = { hasError: false };
 
     static getDerivedStateFromError() {
         return { hasError: true };
     }
 
     componentDidCatch(error: Error, info: React.ErrorInfo) {
-        console.error('Component error:', error, info);
+        console.error('Component error:', error, info.componentStack);
     }
 
     render() {
