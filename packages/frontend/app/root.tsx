@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -12,12 +12,12 @@ import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import MobileFooter from './components/MobileFooter/MobileFooter';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
-import { useDebugStore } from './stores/DebugStore';
 import { TutorialProvider } from './hooks/useTutorial';
-import MobileFooter from './components/MobileFooter/MobileFooter';
+import { useDebugStore } from './stores/DebugStore';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -58,22 +58,22 @@ function LoadingIndicator() {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-    useEffect(() => {
-        const script = document.createElement('script');
-        script.src = '../tv/datafeeds/udf/dist/bundle.js';
-        script.async = true;
-        script.onerror = (error) => {
-            console.error('Failed to load TradingView script:', error);
-        };
-        document.head.appendChild(script);
+    // useEffect(() => {
+    //     const script = document.createElement('script');
+    //     script.src = '../tv/datafeeds/udf/dist/bundle.js';
+    //     script.async = true;
+    //     script.onerror = (error) => {
+    //         console.error('Failed to load TradingView script:', error);
+    //     };
+    //     document.head.appendChild(script);
 
-        return () => {
-            // Cleanup script when component unmounts
-            if (document.head.contains(script)) {
-                document.head.removeChild(script);
-            }
-        };
-    }, []);
+    //     return () => {
+    //         // Cleanup script when component unmounts
+    //         if (document.head.contains(script)) {
+    //             document.head.removeChild(script);
+    //         }
+    //     };
+    // }, []);
 
     return (
         <html lang='en'>
