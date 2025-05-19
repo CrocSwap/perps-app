@@ -113,7 +113,7 @@ export default function App() {
     const { wsEnvironment } = useDebugStore();
 
     return (
-        <>
+        <div>
             <Layout>
                 <SdkProvider environment={wsEnvironment}>
                     <TutorialProvider>
@@ -146,7 +146,7 @@ export default function App() {
                     <RuntimeDomManipulation />
                 </SdkProvider>
             </Layout>
-        </>
+        </div>
     );
 }
 
