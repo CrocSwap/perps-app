@@ -1,14 +1,6 @@
 import React, { useEffect } from 'react';
-import {
-    isRouteErrorResponse,
-    Links,
-    Meta,
-    Outlet,
-    Scripts,
-    ScrollRestoration,
-} from 'react-router';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 import Notifications from '~/components/Notifications/Notifications';
-import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
@@ -147,38 +139,38 @@ export default function App() {
     );
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-    let message = 'Oops!';
-    let details = 'An unexpected error occurred.';
-    let stack: string | undefined;
+// export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+//     let message = 'Oops!';
+//     let details = 'An unexpected error occurred.';
+//     let stack: string | undefined;
 
-    if (isRouteErrorResponse(error)) {
-        message = error.status === 404 ? '404' : 'Error';
-        details =
-            error.status === 404
-                ? 'The requested page could not be found.'
-                : error.statusText || details;
-    } else if (import.meta.env.DEV && error && error instanceof Error) {
-        details = error.message;
-        stack = error.stack;
-    }
+//     if (isRouteErrorResponse(error)) {
+//         message = error.status === 404 ? '404' : 'Error';
+//         details =
+//             error.status === 404
+//                 ? 'The requested page could not be found.'
+//                 : error.statusText || details;
+//     } else if (import.meta.env.DEV && error && error instanceof Error) {
+//         details = error.message;
+//         stack = error.stack;
+//     }
 
-    return (
-        <main className='content error-boundary'>
-            <h1>{message}</h1>
-            <p>{details}</p>
-            {stack && (
-                <pre>
-                    <code>{stack}</code>
-                </pre>
-            )}
-            {/*  Added refresh button for better user experience */}
-            <button
-                onClick={() => window.location.reload()}
-                className='retry-button'
-            >
-                Reload Page
-            </button>
-        </main>
-    );
-}
+//     return (
+//         <main className='content error-boundary'>
+//             <h1>{message}</h1>
+//             <p>{details}</p>
+//             {stack && (
+//                 <pre>
+//                     <code>{stack}</code>
+//                 </pre>
+//             )}
+//             {/*  Added refresh button for better user experience */}
+//             <button
+//                 onClick={() => window.location.reload()}
+//                 className='retry-button'
+//             >
+//                 Reload Page
+//             </button>
+//         </main>
+//     );
+// }
