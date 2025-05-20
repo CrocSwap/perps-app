@@ -47,7 +47,6 @@
 
 .left h1 {
     font-size: 2.7rem;
-    font-weight: 700;
     margin-bottom: 1rem;
     line-height: 1.2;
 }
@@ -70,7 +69,6 @@
     color: white;
     border: none;
     border-radius: 12px;
-    font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -86,7 +84,6 @@
     border: 2px solid #7371fc;
     color: #7371fc;
     border-radius: 12px;
-    font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
 }

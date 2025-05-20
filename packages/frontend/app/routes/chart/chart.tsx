@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 const TradingViewChart = () => {
+        const isMobile = useMobile(768);
+    
     const [chartHeight, setChartHeight] = useState(400);
 
     const assignChartHeight = () => {
@@ -27,7 +30,7 @@ const TradingViewChart = () => {
             style={{
                 position: 'relative',
                 width: '100%',
-                height: `${chartHeight}px`,
+                height: isMobile ? '100%' : `${chartHeight}px`,
             }}
         />
     );

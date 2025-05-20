@@ -13,7 +13,6 @@
 }
 
 .title {
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-l, 24px);
     margin-bottom: 20px;
 }
@@ -34,8 +33,8 @@
     width: var(--home-link-width, 360px);
     height: var(--home-link-height, 160px);
     padding: 16px;
-    border-radius: var(--main-border-radius, 16px);
-    background: var(--dark2, #0e0e14);
+    border-radius: var(--radius-m, 16px);
+    background: var(--bg-dark2, #0e0e14);
 }
 
 .header {
@@ -43,16 +42,12 @@
     align-items: center;
     gap: 16px;
     color: var(--text1, #f0f0f8);
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-fize-l, 24px);
-    font-weight: 400;
 }
 
 .description {
     color: var(--text2, #6a6a6d);
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
 }
 
 .button {
@@ -61,12 +56,10 @@
     align-items: center;
     height: 25px;
     padding: 1px 8px;
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
     background: var(--accent1, #7371fc);
     color: var(--text1, #f0f0f8);
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
     text-decoration: none;
 }
 

@@ -56,7 +56,7 @@
 .bottomSheet {
     /* Style the actual content container */
     border-radius: 16px 16px 0 0; /* Rounded corners only at the top */
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     width: 100%;
 
@@ -154,7 +154,7 @@
 .centerModal {
     flex-shrink: 0;
     border-radius: 16px;
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     max-width: 90vw;
     max-height: 90dvh; /* Dynamic viewport height */

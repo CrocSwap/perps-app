@@ -13,19 +13,12 @@
 
 .container header {
     color: var(--text1, #f0f0f8);
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-xl, 36px);
-    font-style: normal;
-    font-weight: 300;
-    line-height: normal;
 }
 
 .container header p {
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .container header p a {
@@ -37,10 +30,6 @@
     flex-direction: row;
     align-items: center;
     gap: 5rem;
-    font-family: var(--font-family-main, 'Lexend Deca');
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .detailsContent {

@@ -13,7 +13,7 @@ export function meta() {
     ];
 }
 
-export default function subaccounts() {
+export default function Subaccounts() {
     // logic to open and close subaccount creation modal
     const createSubaccountModal: useModalIF = useModal('closed');
 

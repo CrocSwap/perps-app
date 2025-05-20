@@ -256,7 +256,7 @@ export default function PositionSize({
                                     borderColor:
                                         index <= selectedIndex
                                             ? 'transparent'
-                                            : 'var(--dark3)',
+                                            : 'var(--bg-dark3)',
                                 }}
                             ></div>
                         ))}

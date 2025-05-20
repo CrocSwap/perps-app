@@ -10,7 +10,6 @@
     background-color: transparent;
     color: white;
     font-size: 12px;
-    font-weight: 500;
     border: none;
     display: flex;
     justify-content: space-between;
@@ -31,7 +30,7 @@
     position: absolute;
     top: 40px;
     right: 4px;
-    background: var(--dark4);
+    background: var(--bg-dark4);
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     padding: 8px 0;

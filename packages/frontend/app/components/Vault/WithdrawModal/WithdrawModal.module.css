@@ -13,10 +13,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    font-family: var(--font-family-main, 'Lexend Deca');
 }
 .textContent h4 {
     color: var(--text1, #f0f0f8);
@@ -37,8 +33,8 @@
     justify-content: space-between;
     align-items: center;
     align-self: stretch;
-    border-radius: var(--half-border-radius, 8px);
-    background: var(--dark4, #27272c);
+    border-radius: var(--radius-s, 8px);
+    background: var(--bg-dark4, #27272c);
     gap: 8px;
 }
 .inputContainer input {
@@ -47,7 +43,6 @@
     border: none;
     background: transparent;
     color: var(--text1, #f0f0f8);
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
 }
 
@@ -78,12 +73,9 @@
     align-items: flex-start;
     gap: 8px;
     align-self: stretch;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
     padding: 8px;
-    border-radius: var(--half-border-radius, 8px);
-    border: 1px solid var(--dark4, #27272c);
+    border-radius: var(--radius-s, 8px);
+    border: 1px solid var(--bg-dark4, #27272c);
 }
 
 .infoRow {

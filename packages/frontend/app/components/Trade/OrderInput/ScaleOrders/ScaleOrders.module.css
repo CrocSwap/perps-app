@@ -3,7 +3,7 @@
     min-height: 391px;
 
     padding: 8px 16px 16px 16px;
-    border-radius: var(--main-border-radius, 16px);
+    border-radius: var(--radius-m, 16px);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -32,15 +32,10 @@
     height: 100%;
     padding: 0px 8px;
     justify-content: space-between;
-    border-radius: var(--half-border-radius, 8px);
-    background: var(--dark4, #27272c);
-
+    border-radius: var(--radius-s, 8px);
+    background: var(--bg-dark4, #27272c);
     color: var(--text1);
-
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
     outline: none;
     border: none;
 }
@@ -61,8 +56,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-radius: var(--half-border-radius, 8px);
-    background: var(--dark4, #27272c);
+    border-radius: var(--radius-s, 8px);
+    background: var(--bg-dark4, #27272c);
     color: var(--base-text2, #bcbcc4);
 
     font-size: var(--font-size-s, 12px);
@@ -98,9 +93,6 @@
     gap: 4px;
     color: var(--text1, #f0f0f8) !important;
     font-size: var(--font-size-s, 12px) !important;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .dropdownToggle {
@@ -149,8 +141,8 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
-    border-radius: var(--half-border-radius, 8px);
-    background: var(--dark5, #323237);
+    border-radius: var(--radius-s, 8px);
+    background: var(--bg-dark5, #323237);
 }
 
 .dropdownItem {
@@ -161,14 +153,14 @@
     align-items: center;
     gap: 4px;
     flex-shrink: 0;
-    /* border-radius: var(--half-border-radius, 8px); */
+    /* border-radius: var(--radius-s, 8px); */
     color: var(--text2);
     font-size: var(--font-size-s, 12px);
     cursor: pointer;
 }
 
 .dropdownItem:hover {
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
     color: var(--text1, #f0f0f8);
 }
 
@@ -218,8 +210,8 @@
 .orderRow input {
     width: 100%;
     height: 100%;
-    border-radius: var(--half-border-radius, 8px);
-    background: var(--dark4, #27272c);
+    border-radius: var(--radius-s, 8px);
+    background: var(--bg-dark4, #27272c);
     display: flex;
     padding: 0px 8px;
     justify-content: space-between;
@@ -235,12 +227,12 @@
 
 .ratioCell {
     padding: 0 8px;
-    background: var(--dark4, #27272c);
+    background: var(--bg-dark4, #27272c);
 
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
 }
 .ratioCell:focus {
     border: 1px solid transparent !important;
@@ -265,12 +257,7 @@
 
 .errorMessage {
     color: var(--red, #ef5350);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .optionHeader {
     display: flex;
@@ -295,7 +282,7 @@
     justify-content: center;
     align-items: center;
     flex: 1 0 0;
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
 
     color: var(--text1, #f0f0f8);
 
@@ -307,7 +294,7 @@
     opacity: 0.7;
 }
 .cancelButton {
-    background-color: var(--dark4);
+    background-color: var(--bg-dark4);
 }
 
 .confirmButton {
@@ -315,7 +302,7 @@
 }
 
 .confirmButton:disabled {
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
     cursor: not-allowed;
     opacity: 0.7;
 }

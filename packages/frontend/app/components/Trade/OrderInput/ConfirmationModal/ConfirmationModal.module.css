@@ -14,10 +14,6 @@
     align-items: flex-start;
     gap: 8px;
     align-self: stretch;
-
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .infoRow {
@@ -63,7 +59,7 @@
     align-items: center;
     flex: 1 0 0;
 
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
     background: var(--accent1, #7371fc);
 
     color: var(--base-text1, #f0f0f8);

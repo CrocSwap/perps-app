@@ -6,7 +6,7 @@
     visibility: visible;
     pointer-events: auto;
 
-    z-index: var(--navbar-dropdown-zindex);
+    z-index: var(--z-index-navbar-dropdown);
 }
 .container,
 .dropdownContainer {
@@ -14,14 +14,14 @@
     flex-direction: column;
     gap: 8px;
     padding: 16px;
-    border-radius: var(--main-border-radius, 16px);
+    border-radius: var(--radius-m, 16px);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
     transition:
         opacity var(--ease-in-out-med),
         visibility var(--ease-in-out-med);
 }
 .dropdownContainer {
-    background: var(--dark2, #0e0e14);
+    background: var(--bg-dark2, #0e0e14);
     position: absolute;
     top: 30px;
     right: 0;
@@ -45,17 +45,10 @@
     outline: none;
     border: none;
 
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
     background: var(--accent1, #7371fc);
-
     color: var(--text1, #f0f0f8);
-
-    /* Main/M */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .actionButtons button {
     outline: none;
@@ -69,32 +62,21 @@
     align-items: center;
     align-self: stretch;
 
-    border-radius: var(--half-border-radius, 8px);
-    background: var(--dark3, #16161c);
-
+    border-radius: var(--radius-s, 8px);
+    background: var(--bg-dark3, #16161c);
     color: var(--text1, #f0f0f8);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .notConnectedContainer {
     display: flex;
     flex-direction: column;
-    gap: var(--half-border-radius);
+    gap: var(--radius-s);
 }
 .notConnectedText {
     color: var(--text1, #f0f0f8);
     text-align: center;
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .overviewContainer {
     display: flex;
@@ -104,19 +86,13 @@
     gap: 8px;
     align-self: stretch;
 
-    border-radius: var(--half-border-radius, 8px);
-    border: 1px solid var(--dark4, #1e1e24);
+    border-radius: var(--radius-s, 8px);
+    border: 1px solid var(--bg-dark4, #1e1e24);
 }
 .overviewContainer h3 {
     flex: 1 0 0;
     color: var(--text1, #f0f0f8);
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .overviewItem {
@@ -130,13 +106,7 @@
 .overviewLabel {
     color: var(--text2, #6a6a6d);
     text-align: center;
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .tooltipContainer {
@@ -149,11 +119,5 @@
 .value {
     color: var(--text1, #f0f0f8);
     text-align: center;
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

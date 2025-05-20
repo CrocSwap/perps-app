@@ -26,7 +26,7 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
 
     const symbolSelectListener = (coin: string) => {
         setSymbol(coin);
-        navigate(`/trade/${coin}`);
+        navigate(`/trade/${coin}`, { viewTransition: true });
         setIsOpen(false);
     };
 

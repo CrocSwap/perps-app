@@ -1,15 +1,15 @@
-import HistoryTwapTableHeader from './HistoryTwapTableHeader';
-import HistoryTwapTableRow from './HistoryTwapTableRow';
-import styles from './HistoryTwapTable.module.css';
-import type { TwapHistoryIF } from '~/utils/UserDataIFs';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
+import Pagination from '~/components/Pagination/Pagination';
+import NoDataRow from '~/components/Skeletons/NoDataRow';
+import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { TableState } from '~/utils/CommonIFs';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
-import Pagination from '~/components/Pagination/Pagination';
-import { useNavigate } from 'react-router';
-import { useDebugStore } from '~/stores/DebugStore';
+import type { TwapHistoryIF } from '~/utils/UserDataIFs';
+import styles from './HistoryTwapTable.module.css';
+import HistoryTwapTableHeader from './HistoryTwapTableHeader';
+import HistoryTwapTableRow from './HistoryTwapTableRow';
 interface HistoryTwapTableProps {
     data: TwapHistoryIF[];
     isFetched: boolean;
@@ -40,7 +40,9 @@ export default function HistoryTwapTable(props: HistoryTwapTableProps) {
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
-        navigate(`/twapHistory/${currentUserRef.current}`);
+        navigate(`/twapHistory/${currentUserRef.current}`, {
+            viewTransition: true,
+        });
     };
 
     const filteredData = useMemo(() => {

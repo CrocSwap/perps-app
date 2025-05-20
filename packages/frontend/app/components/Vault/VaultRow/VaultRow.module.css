@@ -6,7 +6,6 @@
 
     padding-right: 8px;
     align-items: center;
-    font-family: var(--font-family-main, 'Lexend Deca');
 }
 .cell {
     font-size: var(--font-size-m, 18px);
@@ -14,10 +13,7 @@
 }
 .headerCell {
     color: var(--text2, #6a6a6d);
-
     font-size: var(--font-size-s, 12px);
-
-    font-weight: 400;
     display: flex;
     flex-direction: row;
     align-items: center;

@@ -1,29 +1,35 @@
 .container {
+    --notFound-font-weight-boldest: 700;
+    --notFound-font-weight-bold: 600;
+    --notFound-font-weight-medium: 500;
+    --notFound-font-size-errorCode: 120px;
+    --notFound-font-size-errorCode-sm: 80px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100%;
-    padding: var(--main-padding);
+    padding: var(--padding-s);
     color: var(--text1);
-    background-color: var(--dark2);
+    background-color: var(--bg-dark2);
     text-align: center;
 }
 
 .content {
     max-width: 500px;
     margin: 0 auto;
-    padding: 32px;
-    border-radius: var(--main-border-radius);
-    background-color: var(--dark3);
+    padding: var(--header-link-gap);
+    border-radius: var(--radius-m);
+    background-color: var(--bg-dark3);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
 .errorCode {
-    font-size: 120px;
-    font-weight: 700;
+    font-size: var(--notFound-font-size-errorCode);
+    font-weight: var(--notFound-font-weight-boldest);
     line-height: 1;
-    margin-bottom: 24px;
+    margin-bottom: var(--font-size-l);
     background: linear-gradient(
         90deg,
         var(--accent1),
@@ -36,34 +42,34 @@
 }
 
 .title {
-    font-size: 32px;
-    font-weight: 600;
-    margin-bottom: 16px;
+    font-size: var(--font-size-xl);
+    font-weight: var(--notFound-font-weight-bold);
+    margin-bottom: var(--font-size-m);
     color: var(--text1);
 }
 
 .message {
-    font-size: 18px;
+    font-size: var(--font-size-m);
     line-height: 1.5;
-    margin-bottom: 32px;
+    margin-bottom: var(--header-link-gap);
     color: var(--text2);
 }
 
 .actions {
     display: flex;
-    gap: 16px;
+    gap: var(--radius-m);
     justify-content: center;
     flex-wrap: wrap;
 }
 
 .primaryButton {
-    padding: 12px 24px;
+    padding: var(--font-size-s) var(--font-size-l);
     background: linear-gradient(90deg, var(--accent1), var(--accent4));
     color: var(--text1);
     border: none;
-    border-radius: var(--half-border-radius);
-    font-size: 16px;
-    font-weight: 500;
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-m);
+    font-weight: var(--notFound-font-weight-medium);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -74,44 +80,43 @@
 }
 
 .secondaryButton {
-    padding: 12px 24px;
-    background-color: var(--dark5);
+    padding: var(--notFound-padding-button);
+    background-color: var(--bg-dark5);
     color: var(--text1);
     border: none;
-    border-radius: var(--half-border-radius);
-    font-size: 16px;
-    font-weight: 500;
+    border-radius: var(--radius-s);
+    font-size: var(--notFound-font-size-button);
+    font-weight: var(--notFound-font-weight-medium);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .secondaryButton:hover {
-    background-color: var(--dark6);
+    background-color: var(--bg-dark6);
     transform: translateY(-2px);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .errorCode {
-        font-size: 100px;
+        font-size: var(--font-size-xxl);
     }
 
     .title {
-        font-size: 28px;
+        font-size: var(--font-size-l);
     }
 
     .message {
-        font-size: 16px;
+        font-size: var(--font-size-m);
     }
 }
 
 @media (max-width: 480px) {
     .errorCode {
-        font-size: 80px;
+        font-size: var(--notFound-font-size-errorCode-sm);
     }
 
     .title {
-        font-size: 24px;
+        font-size: var(--font-size-m);
     }
 
     .actions {

@@ -1,0 +1,70 @@
+.footer {
+    display: flex;
+    height: 56px;
+    padding: 0 8px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    background: var(--bg-dark2, #111117);
+
+    border-radius: var(--radius-m, 16px) var(--radius-m, 16px) 0 0;
+}
+
+.navItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.iconWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+}
+
+.icon {
+    color: var(--text1, #f0f0f8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.label {
+    color: var(--text1, #f0f0f8);
+    text-align: center;
+    font-size: var(--font-size-s, 12px);
+}
+
+.navItem:hover .icon,
+.navItem:hover .label,
+.navItem:active .icon,
+.navItem:active .label {
+    color: var(--base-accent1, #7371fc);
+}
+
+/* For devices that support hover */
+@media (hover: hover) {
+    .navItem:hover .icon,
+    .navItem:hover .label {
+        color: var(--accent1, #7371fc);
+    }
+}
+
+/* Active state for navigation items */
+.navItem[aria-current='page'] .icon,
+.navItem[aria-current='page'] .label {
+    color: var(--accent1, #7371fc);
+}

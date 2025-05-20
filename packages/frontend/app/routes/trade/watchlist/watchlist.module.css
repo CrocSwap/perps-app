@@ -8,12 +8,15 @@
 }
 .watchListContainer {
     width: 100%;
+    height: 100%;
     display: flex;
-    padding-left: 2rem;
+    padding-left: var(--padding-s);
+    border-radius: var(--radius-m);
     align-items: center;
-    font-family: var(--font-family-main);
     animation: fadeIn 0.1s ease;
     white-space: nowrap;
+    /* this is to get it to lineup perfectly with symbolInfo */
+    padding-left: var(--font-size-s);
 }
 
 .favIcon {
@@ -47,16 +50,14 @@
 .watchListLimitor {
     max-width: calc(
         100vw - var(--order-book-width-desktop-small) -
-            var(--trade-module-width-desktop-small) - var(--main-gap) * 4 -
-            9.2rem
+            var(--trade-module-width-desktop-small) - var(--gap-s) * 4 - 9.2rem
     );
 }
 
 .watchListLimitorNarrow {
     max-width: calc(
         100vw - var(--order-book-width-desktop-small) * 3 -
-            var(--trade-module-width-desktop-small) - var(--main-gap) * 4 -
-            9.2rem
+            var(--trade-module-width-desktop-small) - var(--gap-s) * 4 - 9.2rem
     );
 }
 
@@ -64,7 +65,7 @@
     .watchListLimitor {
         max-width: calc(
             100vw - var(--order-book-width-desktop-large) -
-                var(--trade-module-width-desktop-large) - var(--main-gap) * 4 -
+                var(--trade-module-width-desktop-large) - var(--gap-s) * 4 -
                 9.2rem
         );
     }
@@ -72,7 +73,7 @@
     .watchListLimitorNarrow {
         max-width: calc(
             100vw - var(--order-book-width-desktop-large) * 3 -
-                var(--trade-module-width-desktop-large) - var(--main-gap) * 4 -
+                var(--trade-module-width-desktop-large) - var(--gap-s) * 4 -
                 9.2rem
         );
     }
@@ -81,6 +82,6 @@
 @media only screen and (max-width: 1080px) {
     .watchListLimitor,
     .watchListLimitorNarrow {
-        max-width: calc(100vw - var(--main-gap) * 4 - 8.2rem);
+        max-width: calc(100vw - var(--gap-s) * 4 - 8.2rem);
     }
 }

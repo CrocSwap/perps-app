@@ -6,8 +6,7 @@
     gap: 8px;
     min-width: 400px;
     user-select: none;
-    font-family: var(--font-family-main);
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
     border-radius: 20px;
 
     /*
@@ -38,7 +37,7 @@
 /* styling to make a <div> elem appear like an <hr> elem */
 .horizontal_divider {
     height: 2px;
-    background-color: var(--dark6);
+    background-color: var(--bg-dark6);
 }
 
 /* clickable to apply default settings at bottom of screen */

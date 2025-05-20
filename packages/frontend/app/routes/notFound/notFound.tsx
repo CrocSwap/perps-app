@@ -15,7 +15,7 @@ const NotFound: React.FC = () => {
                 </p>
                 <div className={styles.actions}>
                     <button
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/', { viewTransition: true })}
                         className={styles.primaryButton}
                     >
                         Back to Home

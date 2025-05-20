@@ -11,9 +11,9 @@ export interface HeaderCell {
 }
 
 interface TradeHistoryTableHeaderProps {
-    sortBy: UserFillSortBy;
+    sortBy?: UserFillSortBy;
     sortDirection: TableSortDirection;
-    sortClickHandler: (key: string) => void;
+    sortClickHandler: (key: UserFillSortBy) => void;
 }
 
 export default function TradeHistoryTableHeader({
@@ -80,7 +80,7 @@ export default function TradeHistoryTableHeader({
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
                     onClick={() => {
                         if (header.sortable) {
-                            sortClickHandler(header.key);
+                            sortClickHandler(header.key as UserFillSortBy);
                         }
                     }}
                 >

@@ -52,6 +52,8 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
     const [localChartReady, setLocalChartReady] = useState(true);
 
+    const cleanupInProgressRef = useRef(false);
+
     const removeShapeById = async (
         chart: IChartingLibraryWidget,
         id: EntityId,
@@ -62,6 +64,12 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         if (element) chartRef.removeEntity(id);
     };
     const cleanupShapes = async () => {
+        if (cleanupInProgressRef.current) {
+            return;
+        }
+
+        cleanupInProgressRef.current = true;
+
         try {
             if (chart) {
                 const chartRef = chart.activeChart();
@@ -104,8 +112,9 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error: unknown) {
-            orderLineItemsRef.current = [];
-            setOrderLineItems([]);
+            // console.warn('Cleanup failed:', error);
+        } finally {
+            cleanupInProgressRef.current = false;
         }
     };
 
@@ -172,25 +181,29 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     }, [chart]);
 
     useEffect(() => {
-        let intervalId: NodeJS.Timeout | undefined = undefined;
+        let timeoutId: NodeJS.Timeout | undefined = undefined;
 
-        setLocalChartReady(false);
-        cleanupShapes();
+        const init = async () => {
+            setLocalChartReady(false);
+            await cleanupShapes();
 
-        if (isChartReady) {
-            intervalId = setTimeout(() => {
-                setLocalChartReady(true);
-            }, 300);
-        }
+            if (isChartReady) {
+                timeoutId = setTimeout(() => {
+                    setLocalChartReady(true);
+                }, 500);
+            }
+        };
+
+        init();
 
         return () => {
-            clearInterval(intervalId);
+            clearTimeout(timeoutId);
         };
     }, [isChartReady]);
 
     useEffect(() => {
         const setupShapes = async () => {
-            if (!chart || lines.length === 0) return;
+            if (!chart) return;
 
             const currentCount = orderLineItemsRef.current.length;
             const newCount = lines.length;

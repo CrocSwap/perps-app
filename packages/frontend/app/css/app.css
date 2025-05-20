@@ -9,8 +9,13 @@
     display: grid;
     grid-template-rows: 56px 1fr;
     height: 100vh;
+    height: 100svh; /* Added for mobile browsers */
     color: white;
     /* overflow-y: hidden; */
+}
+
+.mobile-footer {
+    display: none;
 }
 
 /* 
@@ -20,6 +25,47 @@
 .content {
     height: 100%;
     overflow-y: auto;
-    padding: 0px var(--main-padding, 8px) var(--main-padding, 8px)
-        var(--main-padding, 8px);
+    /* background: var(--bg-dark3); */
+    padding: 0px var(--padding-s, 8px) var(--padding-s, 8px)
+        var(--padding-s, 8px);
+}
+
+/* Simple styling examples for header/footer */
+.header {
+    height: 56px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 0px var(--padding-s);
+}
+
+.header a {
+    color: var(--accent1);
+}
+
+@media (max-width: 768px) {
+    .root-container {
+        grid-template-rows: 56px 1fr 56px; /* Mobile: header, content,  footer */
+    }
+
+    /* Show the footer only on mobile with proper positioning */
+    .mobile-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 56px;
+        background-color: var(--bg-dark2, #222);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+    }
+
+    /* Make the main content scrollable with padding for the footer */
+    .content {
+        padding-bottom: 50px; /* Add padding to prevent content being hidden behind footer */
+    }
 }

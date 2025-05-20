@@ -40,7 +40,7 @@ export const useDebugStore = create<DebugStore>((set) => ({
                 | 'mainnet'
                 | 'testnet',
         }),
-    debugWallet: debugWallets[1],
+    debugWallet: debugWallets[0],
     setDebugWallet: (debugWallet: DebugWallet) => set({ debugWallet }),
     isWsEnabled: true,
     setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled }),

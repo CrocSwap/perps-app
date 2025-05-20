@@ -1,7 +1,12 @@
 import { bsColorSets, type colorSetIF } from '~/stores/AppSettingsStore';
 import type { ResolutionString } from '~/tv/charting_library';
 
-import type { LibrarySymbolInfo } from '~/tv/charting_library/charting_library';
+import type {
+    ColorGradient,
+    CustomThemeColors,
+    CustomThemes,
+    LibrarySymbolInfo,
+} from '~/tv/charting_library/charting_library';
 
 export type ChartLayout = {
     chartLayout: object;
@@ -148,3 +153,92 @@ export const supportedResolutions = [
     '1W',
     '1M',
 ] as ResolutionString[];
+
+function rgbaFromHex(value: string) {
+    const rgba = {
+        r: parseInt(value.slice(1, 3), 16),
+        g: parseInt(value.slice(3, 5), 16),
+        b: parseInt(value.slice(5, 8), 16),
+        a: 1,
+    };
+
+    return rgba;
+}
+
+export function interpolate(fromHexString: string, toHexString: string) {
+    const fromRgba = rgbaFromHex(fromHexString);
+    const toRgba = rgbaFromHex(toHexString);
+    const numberOfSteps = 12;
+    const results = [];
+    const step = 1 / numberOfSteps;
+
+    for (let t = step; t < 1 - step; t += step) {
+        const r = Math.round(fromRgba.r + (toRgba.r - fromRgba.r) * t)
+            .toString(16)
+            .padStart(2, '0');
+        const g = Math.round(fromRgba.g + (toRgba.g - fromRgba.g) * t)
+            .toString(16)
+            .padStart(2, '0');
+        const b = Math.round(fromRgba.b + (toRgba.b - fromRgba.b) * t)
+            .toString(16)
+            .padStart(2, '0');
+
+        results.push('#' + r + g + b);
+    }
+
+    return results;
+}
+
+const defaultChartColors = [
+    '#7371FC',
+    '#626060',
+    '#F23645',
+    '#089981',
+    '#FF9800',
+    '#9c27b0',
+    '#ffeb3b',
+];
+
+export function customThemes() {
+    const colorGradeArr: Array<ColorGradient> = [];
+
+    defaultChartColors.forEach((color) => {
+        const lighterColors = interpolate('#ffffff', color);
+        const darkerColors = interpolate(color, '#000000');
+
+        const colorGrades = [
+            ...lighterColors,
+            ...darkerColors.slice(0, -1),
+        ] as ColorGradient;
+        colorGradeArr.push(colorGrades);
+    });
+
+    const lightTheme: CustomThemeColors = {
+        color1: colorGradeArr[0],
+        color2: colorGradeArr[1],
+        color3: colorGradeArr[2],
+        color4: colorGradeArr[3],
+        color5: colorGradeArr[4],
+        color6: colorGradeArr[5],
+        color7: colorGradeArr[6],
+        white: '#ffffff',
+        black: '#000000',
+    };
+
+    const darkTheme: CustomThemeColors = {
+        color1: colorGradeArr[0],
+        color2: colorGradeArr[1],
+        color3: colorGradeArr[2],
+        color4: colorGradeArr[3],
+        color5: colorGradeArr[4],
+        color6: colorGradeArr[5],
+        color7: colorGradeArr[6],
+        white: '#ffffff',
+        black: '#000000',
+    };
+
+    return {
+        light: lightTheme,
+        dark: darkTheme,
+    } as CustomThemes;
+}

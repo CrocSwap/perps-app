@@ -3,6 +3,8 @@ import PositionsTable from '~/components/Trade/PositionsTable/PositionsTable';
 import type { Route } from '../../+types/root';
 import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './positions.module.css';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { WsChannels } from '~/utils/Constants';
 export function meta() {
     return [
         { title: 'Positions | Ambient' },
@@ -22,13 +24,21 @@ function Positions() {
         return `${styles.container} ${isFullScreen ? styles.fullScreen : ''}`;
     }, [isFullScreen]);
 
+    const { fetchedChannels } = useTradeDataStore();
+
+    const isFetched = fetchedChannels.has(WsChannels.USER_FILLS);
+
     return (
         <div className={containerClassName}>
             <WebDataConsumer />
             <header>Positions</header>
 
             <div className={styles.content}>
-                <PositionsTable pageMode={true} />
+                <PositionsTable
+                    pageMode={true}
+                    isFetched={isFetched}
+                    selectedFilter='all'
+                />
             </div>
         </div>
     );

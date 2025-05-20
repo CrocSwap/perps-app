@@ -12,11 +12,12 @@ import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import MobileFooter from './components/MobileFooter/MobileFooter';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
-import { useDebugStore } from './stores/DebugStore';
 import { TutorialProvider } from './hooks/useTutorial';
+import { useDebugStore } from './stores/DebugStore';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -130,6 +131,11 @@ export default function App() {
                                     </ComponentErrorBoundary>
                                 </Suspense>
                             </main>
+                            <ComponentErrorBoundary>
+                                <footer className='mobile-footer'>
+                                    <MobileFooter />
+                                </footer>
+                            </ComponentErrorBoundary>
 
                             {/* Added error boundary for notifications */}
                             <ComponentErrorBoundary>
@@ -164,11 +170,15 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         <main className='content error-boundary'>
             <h1>{message}</h1>
             <p>{details}</p>
-            {stack && (
+            {stack ? (
                 <pre>
                     <code>{stack}</code>
                 </pre>
-            )}
+            ) : error ? (
+                <pre>
+                    <code>{error.toString()}</code>
+                </pre>
+            ) : null}
             {/*  Added refresh button for better user experience */}
             <button
                 onClick={() => window.location.reload()}

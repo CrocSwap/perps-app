@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
-import styles from './AccountsTable.module.css';
-import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 import Tabs from '~/components/Tabs/Tabs';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { accountIF } from '~/stores/AccountsStore';
+import styles from './AccountsTable.module.css';
 
 // interface for table column header metadata
 export interface headerItemIF {
@@ -170,7 +170,9 @@ export default function AccountsTable(props: propsIF) {
                                     color: 'var(--accent1)',
                                     cursor: 'pointer',
                                 }}
-                                onClick={() => navigate('/trade')}
+                                onClick={() =>
+                                    navigate('/trade', { viewTransition: true })
+                                }
                             >
                                 Trade
                             </div>

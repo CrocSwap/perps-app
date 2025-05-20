@@ -1,16 +1,15 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
+import Pagination from '~/components/Pagination/Pagination';
+import NoDataRow from '~/components/Skeletons/NoDataRow';
+import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import { useDebugStore } from '~/stores/DebugStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { TableState } from '~/utils/CommonIFs';
+import type { TwapSliceFillIF } from '~/utils/UserDataIFs';
+import styles from './FillTwapTable.module.css';
 import FillTwapTableHeader from './FillTwapTableHeader';
 import FillTwapTableRow from './FillTwapTableRow';
-import styles from './FillTwapTable.module.css';
-import type { TwapSliceFillIF } from '~/utils/UserDataIFs';
-import { TableState } from '~/utils/CommonIFs';
-import { useEffect, useRef } from 'react';
-import { useMemo, useState } from 'react';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
-import Pagination from '~/components/Pagination/Pagination';
-import { useNavigate } from 'react-router';
-import { useDebugStore } from '~/stores/DebugStore';
 
 interface FillTwapTableProps {
     data: TwapSliceFillIF[];
@@ -42,7 +41,9 @@ export default function FillTwapTable(props: FillTwapTableProps) {
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
-        navigate(`/twapFillHistory/${currentUserRef.current}`);
+        navigate(`/twapFillHistory/${currentUserRef.current}`, {
+            viewTransition: true,
+        });
     };
 
     const handleExportCsv = (e: React.MouseEvent) => {

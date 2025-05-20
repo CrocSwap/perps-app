@@ -3,10 +3,11 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    gap: 0.25rem;
-    margin: 0.25rem 0;
-    padding: 0 0.5rem;
+    gap: var(--gap-xs);
+    margin: var(--margin-xs) 0;
+    padding: 0 var(--padding-s);
     color: var(--text3);
+    font-size: var(--font-size-s);
 }
 
 .orderTradesContainer {
@@ -21,6 +22,7 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
+    gap: var(--gap-xs);
 }
 
 .orderTradesListStacked::-webkit-scrollbar {
@@ -28,13 +30,13 @@
 }
 
 .orderTradesListStacked {
-    max-height: 16vh;
+    max-height: 20vh;
     overflow-y: auto;
 }
 
 @media only screen and (min-height: 1080px) {
     .orderTradesListStacked {
-        max-height: 22vh;
+        max-height: 28vh;
     }
 }
 
@@ -43,5 +45,10 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    gap: 0.3rem;
+    gap: var(--gap-xs);
+}
+
+.orderTradesHeader div:last-child {
+    text-align: right;
+    padding-right: var(--padding-xs);
 }

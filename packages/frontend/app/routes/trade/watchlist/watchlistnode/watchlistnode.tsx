@@ -28,7 +28,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
     const nodeClickListener = () => {
         if (symbol.coin === storeSymbol) return;
         setStoreSymbol(symbol.coin);
-        navigate(`/trade/${symbol.coin}`);
+        navigate(`/trade/${symbol.coin}`, { viewTransition: true });
     };
 
     const shownVal = useMemo(() => {
@@ -55,7 +55,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
             >
                 <div className={styles.symbolName}>{symbol.coin}-USD</div>
                 <div
-                    className={`w3 ${styles.symbolValue}`}
+                    className={`${styles.symbolValue}`}
                     style={{
                         color:
                             change > 0
@@ -63,6 +63,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
                                 : change < 0
                                   ? getBsColor().sell
                                   : 'var(--text1)',
+                        width: `${shownVal.length * 7}px`,
                     }}
                 >
                     {shownVal}

@@ -1,8 +1,8 @@
 .tableWrapper {
     width: 100%;
     height: 100%;
-    border-radius: var(--main-border-radius, 16px);
-    background: var(--dark2, #0e0e14);
+    border-radius: var(--radius-m, 16px);
+    background: var(--bg-dark2, #0e0e14);
     min-height: 317px;
 
     display: flex;
@@ -54,12 +54,7 @@
 .enterCodeContent h6 {
     color: var(--base-text1, #f0f0f8);
     text-align: center;
-
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .enterCodeContent input {
     display: flex;
@@ -69,7 +64,7 @@
     gap: 4px;
     align-self: stretch;
     border-radius: 8px;
-    background: var(--dark4, #27272c);
+    background: var(--bg-dark4, #27272c);
     font-size: var(--font-size-s, 12px);
     outline: none;
     border: none;
@@ -80,13 +75,8 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-
     gap: 16px;
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .createCodeContent .walletLink {
     display: flex;
@@ -107,9 +97,5 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

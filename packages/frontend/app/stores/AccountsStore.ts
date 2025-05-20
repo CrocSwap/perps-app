@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface accountIF {
     name: string;
@@ -17,23 +17,59 @@ class Account implements accountIF {
         this.equity = e;
     }
 }
+const BASE58_ALPHABET =
+    '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
+function base58Encode(buffer: number[]): string {
+    let intVal = BigInt(0);
+    for (let i = 0; i < buffer.length; i++) {
+        intVal = (intVal << 8n) + BigInt(buffer[i]);
+    }
+    let encoded = '';
+    while (intVal > 0) {
+        const rem = Number(intVal % 58n);
+        intVal = intVal / 58n;
+        encoded = BASE58_ALPHABET[rem] + encoded;
+    }
+    // Add '1' for each leading 0 byte
+    for (let i = 0; i < buffer.length && buffer[i] === 0; i++) {
+        encoded = BASE58_ALPHABET[0] + encoded;
+    }
+    return encoded;
+}
+
+function generatePseudoRandomBytes(length: number): number[] {
+    const bytes: number[] = [];
+    for (let i = 0; i < length; i++) {
+        bytes.push(Math.floor(Math.random() * 256));
+    }
+    return bytes;
+}
+
+export function generateSolanaAddress(): string {
+    const randomBytes = generatePseudoRandomBytes(32);
+    return base58Encode(randomBytes);
+}
 
 export interface allAccountsIF {
     master: accountIF;
     sub: accountIF[];
 }
 
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const ZERO_DOLLARS = '$0.00';
 
 const MOCK_ACCOUNTS: allAccountsIF = {
-    master: new Account('Master Account', ZERO_ADDRESS, ZERO_DOLLARS),
+    master: new Account(
+        'Master Account',
+        generateSolanaAddress(),
+        ZERO_DOLLARS,
+    ),
     sub: [
-        new Account('Sub-Account 1', ZERO_ADDRESS, ZERO_DOLLARS),
-        new Account('Sub-Account 5', ZERO_ADDRESS, ZERO_DOLLARS),
-        new Account('Sub-Account 2', ZERO_ADDRESS, ZERO_DOLLARS),
-        new Account('Sub-Account 3', ZERO_ADDRESS, ZERO_DOLLARS),
-        new Account('Sub-Account 4', ZERO_ADDRESS, ZERO_DOLLARS),
+        new Account('Sub-Account 1', generateSolanaAddress(), ZERO_DOLLARS),
+        new Account('Sub-Account 2', generateSolanaAddress(), ZERO_DOLLARS),
+        new Account('Sub-Account 5', generateSolanaAddress(), ZERO_DOLLARS),
+        new Account('Sub-Account 3', generateSolanaAddress(), ZERO_DOLLARS),
+        new Account('Sub-Account 4', generateSolanaAddress(), ZERO_DOLLARS),
     ],
 };
 
@@ -46,7 +82,7 @@ export interface useAccountsIF extends allAccountsIF {
 export type accountLevelsT = keyof typeof MOCK_ACCOUNTS;
 
 // key to identify data obj in local storage
-const LS_KEY = 'ACCOUNTS';
+const LS_KEY = 'subaccounts';
 
 // hook to manage global state and local storage
 export const useAccounts = create<useAccountsIF>()(
@@ -60,7 +96,11 @@ export const useAccounts = create<useAccountsIF>()(
             create: (name: string): void =>
                 set({
                     sub: get().sub.concat(
-                        new Account(name, ZERO_ADDRESS, ZERO_DOLLARS),
+                        new Account(
+                            name,
+                            generateSolanaAddress(),
+                            ZERO_DOLLARS,
+                        ),
                     ),
                 }),
             // reset to only the default mock data

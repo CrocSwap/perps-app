@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
     LuChevronDown,
     LuChevronUp,
-    LuMenu,
     LuSettings,
     LuWallet,
 } from 'react-icons/lu';
@@ -194,7 +193,9 @@ export default function PageHeader() {
                 more
                 {isMoreDropdownOpen ? <LuChevronUp /> : <LuChevronDown />}
             </button>
-            {isMoreDropdownOpen && <MoreDropdown />}
+            {isMoreDropdownOpen && (
+                <MoreDropdown setIsMoreDropdownOpen={setIsMoreDropdownOpen} />
+            )}
         </section>
     );
 
@@ -264,14 +265,8 @@ export default function PageHeader() {
                         <LuSettings size={20} />
                     </button>
 
-                    <button
-                        className={styles.menuButtonMobile}
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    >
-                        <LuMenu size={20} />
-                    </button>
+                    {dropdownMenuDisplay}
                 </div>
-                {dropdownMenuDisplay}
             </header>
 
             {appSettingsModal.isOpen && (

@@ -25,7 +25,9 @@ const DropdownMenu = () => {
     const { handleRestartTutorial } = useTutorial();
 
     const handleTutorialClick = () => {
-        console.log('Tutorial button clicked in DropdownMenu, restarting tutorial...');
+        console.log(
+            'Tutorial button clicked in DropdownMenu, restarting tutorial...',
+        );
         handleRestartTutorial();
     };
 
@@ -37,8 +39,8 @@ const DropdownMenu = () => {
                     <span>{item.icon}</span>
                 </div>
             ))}
-            <button 
-                className={styles.tutorialButton} 
+            <button
+                className={styles.tutorialButton}
                 onClick={handleTutorialClick}
             >
                 Tutorial <IoIosInformationCircle size={22} />

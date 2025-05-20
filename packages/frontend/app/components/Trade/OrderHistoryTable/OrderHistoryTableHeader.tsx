@@ -13,7 +13,7 @@ export interface HeaderCell {
 interface OrderHistoryTableHeaderProps {
     sortBy: OrderDataSortBy;
     sortDirection: TableSortDirection;
-    sortClickHandler: (key: string) => void;
+    sortClickHandler: (key: OrderDataSortBy) => void;
 }
 
 export default function OrderHistoryTableHeader(
@@ -110,7 +110,7 @@ export default function OrderHistoryTableHeader(
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
                     onClick={() => {
                         if (header.sortable) {
-                            sortClickHandler(header.key);
+                            sortClickHandler(header.key as OrderDataSortBy);
                         }
                     }}
                 >

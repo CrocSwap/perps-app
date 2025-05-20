@@ -1,3 +1,4 @@
+/* Base styles */
 html,
 body {
     overscroll-behavior-x: none;
@@ -5,23 +6,22 @@ body {
 }
 .mainContainer {
     height: 100%;
-
     display: grid;
     grid-template-rows: 10px minmax(0, 1fr);
 }
+
 .container {
     height: 100%;
     display: grid;
     grid-template-rows: 1fr var(--trade-tables-height-desktop);
-    gap: var(--main-gap);
+    gap: var(--gap-s);
 }
 
 .containerTop,
 .containerBottom {
     display: grid;
     height: 100%;
-    border-radius: var(--main-border-radius);
-
+    border-radius: var(--radius-m);
     justify-content: center;
     align-items: center;
 }
@@ -31,8 +31,7 @@ body {
     grid-template-columns: 1fr var(--order-book-width-desktop-small) var(
             --trade-module-width-desktop-small
         );
-    gap: var(--main-gap);
-    /* background: var(--dark2); */
+    gap: var(--gap-s);
 }
 
 .containerTop.orderBookLarge {
@@ -40,51 +39,46 @@ body {
         1fr var(--order-book-width-desktop-large-doubled)
         var(--trade-module-width-desktop-large);
 }
-/* .containerTop div{
-  background: var(--dark2);
-  height: 100%;
-  border-radius: var(--main-border-radius);
-} */
 
 .containerBottom {
     width: 100%;
     height: 100%;
     display: grid;
     grid-template-columns: 1fr var(--trade-module-width-desktop-small);
-    gap: var(--main-gap);
+    gap: var(--gap-s);
 }
 
 .table {
-    background: var(--dark2);
+    background: var(--bg-dark2);
     height: 100%;
-    border-radius: var(--main-border-radius);
+    border-radius: var(--radius-m);
     overflow-y: hidden;
 }
 
 .wallet {
     width: 100%;
     height: 100%;
-    background: var(--dark2);
-
-    border-radius: var(--main-border-radius);
-
+    background: var(--bg-dark2);
+    border-radius: var(--radius-m);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
 }
+
 .containerTopLeft {
     height: 100%;
     display: grid;
-    grid-template-rows: 30px 40px 56px 1fr;
+    grid-template-rows: 30px 40px 40px 1fr;
     width: 100%;
-    gap: var(--main-gap);
+
+    gap: var(--gap-s);
 }
 
 .watchlist,
 .symbolInfo {
-    background: var(--dark2);
+    background: var(--bg-dark2);
     height: 100%;
-    border-radius: var(--main-border-radius);
+    border-radius: var(--radius-m);
 }
 
 .watchlist,
@@ -92,11 +86,9 @@ body {
 .symbolInfo,
 .orderBook,
 .tradeModules {
-    background: var(--dark2);
+    background: var(--bg-dark2);
     height: 100%;
-    border-radius: var(--main-border-radius);
-
-    /*  */
+    border-radius: var(--radius-m);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -108,35 +100,22 @@ body {
     overflow: hidden;
     max-height: calc(
         100vh - var(--trade-tables-height-desktop) -
-            var(--header-height-desktop) - var(--main-gap)
+            var(--header-height-desktop) - var(--gap-s)
     );
 }
 
 .orderBook {
     position: relative;
+    align-items: flex-start;
+    overflow: hidden;
 }
 
-/* THIS IS JUST FOR DEVELOPMENT. REMOVE THIS AND THE FOLDER (TEMPIMAGES) ONCE WE HAVE THE ACTUAL COMPONENTS */
-
-.tradeModules {
-    /* background: url('./tempImages/orderInput.png') !important;
-background-size: 100% 100%;
-background-position: center;
-background-repeat: no-repeat;
-filter: blur(2px); */
-}
-
-/* -----------------------END OF TEMP CSS CODE */
 .chart {
     max-height: 61vh;
     overflow: hidden;
 }
 
-.orderBook {
-    align-items: flex-start;
-    overflow: hidden;
-}
-
+/* Desktop styles (1920px and above) */
 @media only screen and (min-width: 1920px) {
     .containerTop {
         grid-template-columns: 1fr var(--order-book-width-desktop-large) var(
@@ -157,14 +136,171 @@ filter: blur(2px); */
     }
 }
 
-@media only screen and (max-width: 1080px) {
-    .containerTop,
+/* Tablet styles */
+@media only screen and (max-width: 1080px) and (min-width: 769px) {
+    .containerTop {
+        grid-template-columns: 1fr;
+    }
+
     .containerTopLeft {
         grid-template-columns: 1fr;
     }
 
+    .orderBook {
+        display: none;
+    }
+}
+
+/* Mobile styles */
+@media only screen and (max-width: 768px) {
+    .symbolInfoContainer {
+        border-radius: var(--radius-m, 16px);
+        background: var(--bg-dark2, #111117);
+    }
+    .container {
+        grid-template-rows: 1fr;
+        height: 100vh;
+        height: 100svh; /* Added for mobile browser support */
+        gap: 0;
+    }
+
+    .containerTop {
+        grid-template-columns: 1fr;
+        height: 100vh;
+        height: 100svh; /* Added for mobile browser support */
+        gap: 0;
+        border-radius: 0;
+        padding-top: 120px;
+    }
+
+    .mobileTabNav {
+        display: flex;
+        position: fixed;
+        top: 105px;
+        left: 0;
+        width: 100%;
+        height: 40px;
+        background: var(--bg-dark1);
+        z-index: 200;
+        justify-content: center;
+        align-items: center;
+        padding: 0 8px;
+    }
+
+    .mobileTabBtns {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        width: 100%;
+        gap: 8px;
+    }
+
+    .mobileTabBtn {
+        flex: 0 0 auto;
+        background: var(--bg-dark2, #111117);
+        white-space: nowrap;
+        border: none;
+        padding: 1px 8px;
+        height: 33px;
+        cursor: pointer;
+        position: relative;
+        transition: color 0.2s ease;
+        border-radius: 8px;
+        color: var(--text2);
+        font-size: var(--font-size-s, 12px);
+    }
+
+    .mobileTabBtn.active {
+        background: var(--accent1, #7371fc);
+        color: var(--text1);
+    }
+
+    .mobileSection {
+        position: fixed;
+        top: 150px;
+        left: 0;
+        width: 100%;
+        height: calc(
+            100svh - 145px - 40px
+        ); /* Calculate remaining height, accounting for 40px footer */
+        background: var(--bg-dark1);
+        overflow-y: auto !important; /* Make the content scrollable */
+        display: none;
+        border-radius: 0;
+        padding-bottom: 60px !important; /* Add bottom padding to ensure all content is visible */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
+    .mobileSection.active {
+        display: block;
+    }
+
+    /* Order section styling */
+    .mobileOrder.active {
+        display: block;
+        background: var(--bg-dark1);
+        padding: 0 8px;
+        overflow-y: auto !important;
+    }
+
+    /* Book and Recent trades sections */
+    .mobileOnlyOrderBook,
+    .mobileOnlyRecentTrades {
+        height: 100%;
+        width: 100%;
+        overflow-y: auto !important;
+        background: var(--bg-dark1);
+        padding: 0 8px;
+    }
+
+    /* Mobile order book section styling */
+    .mobileOrderBook,
+    .mobileRecentTrades {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Mobile book section tabs - for subcategories inside Book view */
+    .mobileBookTabs {
+        display: flex;
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .mobileBookTabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .mobileBookTab {
+        padding: 12px 16px;
+        color: rgba(255, 255, 255, 0.6);
+        border: none;
+        background: transparent;
+        font-size: 14px;
+        position: relative;
+    }
+
+    .mobileBookTab.active {
+        color: var(--primary);
+    }
+
+    .mobileBookTab.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--primary);
+    }
+
+    /* Hide desktop elements */
+    .containerTopLeft,
     .orderBook,
-    .tradeModules {
+    .containerBottom {
         display: none;
     }
 }

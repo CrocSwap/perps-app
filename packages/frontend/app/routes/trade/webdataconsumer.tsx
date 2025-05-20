@@ -84,6 +84,9 @@ export default function WebDataConsumer() {
         fetchedChannelsRef.current = new Set();
         setUserOrders([]);
         setUserSymbolOrders([]);
+        setPositions([]);
+        positionsRef.current = [];
+        openOrdersRef.current = [];
 
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },

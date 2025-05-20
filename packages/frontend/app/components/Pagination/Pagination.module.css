@@ -3,8 +3,8 @@
     position: absolute;
     top: calc(100% + 0.5rem);
     right: 0;
-    background-color: var(--dark3);
-    border-radius: var(--half-border-radius);
+    background-color: var(--bg-dark3);
+    border-radius: var(--radius-s);
     padding: 8px;
     width: 100%;
     z-index: 10;
@@ -43,7 +43,7 @@
 }
 
 .rowSelector {
-    background-color: var(--dark2, #1a1b23);
+    background-color: var(--bg-dark2, #1a1b23);
     padding: 8px;
     display: flex;
     align-items: center;
@@ -87,12 +87,7 @@
 .footer {
     color: var(--text2, #bcbcc4);
     text-align: center;
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
     align-self: stretch;
 }
 .periodSelectorContainer {

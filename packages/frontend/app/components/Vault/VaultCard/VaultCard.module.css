@@ -5,8 +5,8 @@
     align-items: center;
     gap: 16px;
 
-    border-radius: var(--main-border-radius, 16px);
-    background: var(--dark2, #111117);
+    border-radius: var(--radius-m, 16px);
+    background: var(--bg-dark2, #111117);
     width: 350px;
     height: 290px;
 
@@ -28,18 +28,10 @@
     align-items: flex-start;
     gap: 4px;
     flex: 1 0 0;
-
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    font-family: var(--font-family-main, 'Lexend Deca');
 }
 .headerTextContainer h3 {
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-l, 24px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .headerTextContainer h6 {
     color: var(--text2, #bcbcc4);
@@ -69,8 +61,6 @@
     gap: auto;
 }
 .detailsItem {
-    font-family: var(--font-family-main, 'Lexend Deca');
-
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -89,10 +79,10 @@
     flex-direction: column;
     gap: 8px;
     padding: 8px;
-    background: var(--dark3);
+    background: var(--bg-dark3);
 
-    border-radius: var(--half-border-radius, 8px);
-    background: var(--dark3, #1c1c22);
+    border-radius: var(--radius-s, 8px);
+    background: var(--bg-dark3, #1c1c22);
 }
 .depositContainer h6 {
     font-size: var(--font-size-xs, 10px);
@@ -104,12 +94,7 @@
     outline: none;
     border: none;
     color: var(--text1, #f0f0f8);
-
-    /* Main/L */
     font-size: var(--font-size-l, 24px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .buttonContainer {
     width: 100%;
@@ -127,17 +112,10 @@
     justify-content: center;
     align-items: center;
     flex: 1 0 0;
-
     color: var(--text1, #f0f0f8);
-
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-
     outline: none;
     border: none;
-
     border-radius: 8px;
     transition: all var(--ease-in-out-med);
 }
@@ -149,7 +127,7 @@
     background: var(--accent1);
 }
 .withdrawButton {
-    background: var(--dark3);
+    background: var(--bg-dark3);
 }
 /* Small screens (mobile) */
 @media (max-width: 480px) {

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
@@ -14,22 +14,16 @@ import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
 import styles from './TradeTable.module.css';
-
+import { Pages, usePage } from '~/hooks/usePage';
 export interface FilterOption {
     id: string;
     label: string;
 }
 
-const availableTabs = [
-    'Balances',
-    'Positions',
-    'Open Orders',
-    'TWAP',
-    'Trade History',
+const tradePageBlackListTabs = new Set([
     'Funding History',
-    'Order History',
     'Deposits and Withdrawals',
-];
+]);
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -47,6 +41,38 @@ export default function TradeTable() {
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
+
+    const { page } = usePage();
+
+    const tabs = useMemo(() => {
+        if (!page) return [];
+
+        let availableTabs = [
+            'Balances',
+            'Positions',
+            'Open Orders',
+            'TWAP',
+            'Trade History',
+            'Funding History',
+            'Order History',
+            'Deposits and Withdrawals',
+        ];
+
+        if (page === Pages.TRADE) {
+            return availableTabs.filter(
+                (tab) => !tradePageBlackListTabs.has(tab),
+            );
+        }
+        return availableTabs;
+    }, [page]);
+
+    useEffect(() => {
+        if (page === Pages.TRADE) {
+            if (tradePageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('Positions');
+            }
+        }
+    }, [page]);
 
     const { orderHistoryFetched, tradeHistoryFetched } = useMemo(() => {
         return {
@@ -98,7 +124,12 @@ export default function TradeTable() {
             case 'Balances':
                 return <BalancesTable hideSmallBalances={hideSmallBalances} />;
             case 'Positions':
-                return <PositionsTable />;
+                return (
+                    <PositionsTable
+                        isFetched={tradeHistoryFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
             case 'Open Orders':
                 return <OpenOrdersTable selectedFilter={selectedFilter} />;
             case 'TWAP':
@@ -134,7 +165,7 @@ export default function TradeTable() {
     return (
         <div className={styles.tradeTableWrapper}>
             <Tabs
-                tabs={availableTabs}
+                tabs={tabs}
                 defaultTab={selectedTradeTab}
                 onTabChange={handleTabChange}
                 rightContent={rightAlignedContent}

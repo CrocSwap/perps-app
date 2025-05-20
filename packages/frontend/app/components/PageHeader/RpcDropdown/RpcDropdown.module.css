@@ -3,14 +3,14 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: var(--main-gap);
+    gap: var(--gap-s);
     position: absolute;
     top: 30px;
     right: 0;
     width: 278px;
     padding: 16px;
-    border-radius: var(--main-border-radius, 16px);
-    background: var(--dark3, #16161c);
+    border-radius: var(--radius-m, 16px);
+    background: var(--bg-dark3, #16161c);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
 
     transition:
@@ -23,19 +23,13 @@
     height: auto;
     visibility: visible;
     pointer-events: auto;
-    z-index: var(--navbar-dropdown-zindex);
+    z-index: var(--z-index-navbar-dropdown);
 }
 
 .viewMoreButton {
     color: var(--accent1, #7371fc);
     text-align: center;
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .container section {
     gap: 5px;
@@ -49,21 +43,10 @@
 
 .rpcRowContainer p {
     color: var(--text1, #f0f0f8);
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .container h3 {
     color: var(--text2, #6a6a6d);
-
     /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

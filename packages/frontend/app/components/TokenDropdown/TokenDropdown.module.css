@@ -11,7 +11,7 @@
     height: 32px;
     padding: 0px 4px 0px 8px;
 
-    background: var(--dark4, #27272c);
+    background: var(--bg-dark4, #27272c);
     border-radius: 8px;
     cursor: pointer;
     transition: border-color 0.2s ease;
@@ -34,7 +34,6 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-weight: 400;
 }
 
 .dropdown {
@@ -44,7 +43,7 @@
     width: 100%;
     max-height: 250px;
     overflow-y: auto;
-    background: var(--dark4, #27272c);
+    background: var(--bg-dark4, #27272c);
     border: 1px solid var(--border-color, #2a2a2a);
     border-radius: 8px;
     z-index: 100;
@@ -75,11 +74,11 @@
 }
 
 .tokenItem:hover {
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
 }
 
 .tokenItem.selected {
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
 }
 
 .tokenLogo {
@@ -96,7 +95,6 @@
 }
 
 .tokenSymbol {
-    font-weight: 500;
     font-size: 15px;
 }
 

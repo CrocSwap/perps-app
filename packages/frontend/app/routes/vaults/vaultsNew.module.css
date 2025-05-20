@@ -14,12 +14,7 @@
     align-items: center;
     gap: 16px;
     color: var(--text1, #e1eeee);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-xl, 36px);
-    font-style: normal;
-    font-weight: 300;
-    line-height: normal;
 }
 .container header a {
     color: var(--accent1, #7371fc);

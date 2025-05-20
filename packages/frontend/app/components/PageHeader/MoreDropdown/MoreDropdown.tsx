@@ -1,6 +1,12 @@
+import { Link } from 'react-router';
 import styles from './MoreDropdown.module.css';
 
-export default function MoreDropdown() {
+interface propsIF {
+    setIsMoreDropdownOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function MoreDropdown(props: propsIF) {
+    const { setIsMoreDropdownOpen } = props;
     const submenuData = [
         { name: 'Testnet', link: '/testnet' },
         { name: 'Explorer', link: '/explorer' },
@@ -15,9 +21,15 @@ export default function MoreDropdown() {
     return (
         <div className={styles.container}>
             {submenuData.map((menu, idx) => (
-                <a href={menu.link} key={idx}>
+                <Link
+                    to={menu.link}
+                    key={idx}
+                    className={styles.row}
+                    viewTransition
+                    onClick={() => setIsMoreDropdownOpen(false)}
+                >
                     {menu.name}
-                </a>
+                </Link>
             ))}
         </div>
     );

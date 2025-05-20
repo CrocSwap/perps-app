@@ -38,7 +38,7 @@ const SymbolSearch: React.FunctionComponent = () => {
                     <div
                         className={styles.symbolIcon}
                         style={{
-                            background: `var(--${bgType === 'light' ? 'text1' : 'dark1'})`,
+                            background: `var(--${bgType === 'light' ? 'text1' : 'bg-dark1'})`,
                         }}
                     >
                         <img

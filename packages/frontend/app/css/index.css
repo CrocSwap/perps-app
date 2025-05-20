@@ -2,63 +2,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
 :root {
-    /* Dark Shades */
-    --dark1: #06060c;
-    --dark2: #0e0e14;
-    --dark3: #16161c;
-    --dark4: #1e1e24;
-    --dark5: #23232a;
-    --dark6: #27272f;
+    /* ------------------------------ */
+    /* 🎨 Color Palette               */
+    /* ------------------------------ */
+    --bg-dark1: #06060c;
+    --bg-dark2: #111117;
+    --bg-dark3: #1c1c22;
+    --bg-dark4: #27272c;
+    --bg-dark5: #323237;
+    --bg-dark6: #3e3e42;
 
-    /* Text Colors */
     --text1: #f0f0f8;
-    --text2: #6a6a6d;
-    --text3: #424246;
+    --text2: #bcbcc4;
+    --text3: #88888f;
 
-    /* Accent Colors */
     --accent1: #7371fc;
     --accent2: #e480ff;
     --accent3: #5ffff2;
     --accent4: #71b5fc;
     --accent5: #cdc1ff;
 
-    /* Other Colors */
     --green: #26a69a;
     --green-dark: #26a69a59;
     --red: #ef5350;
     --red-dark: #ef535059;
     --orange: #e78a56;
     --white: #ffffff;
+    --gold: #ffb648;
+    --neon-yellow: #e9e980;
 
-    /* gaps */
-    --main-gap: 8px;
-    --header-link-gap: 32px;
-    --main-padding: 8px;
-
-    --main-border-radius: 16px;
-    --half-border-radius: 8px;
-
-    /* widths */
-    --order-book-width-desktop-large: 280px;
-    --order-book-width-desktop-small: 220px;
-
-    /* heights */
-    --trade-tables-height-desktop: 281px;
-    /* should be 56px. 30px extra for the combo box container */
-    --header-height-desktop: 56px;
-
-    --order-book-width-desktop-large-doubled: calc(
-        var(--order-book-width-desktop-large) * 2
-    );
-    --order-book-width-desktop-small-doubled: calc(
-        var(--order-book-width-desktop-small) * 2
-    );
-
-    --trade-module-width-desktop-large: 350px;
-    --trade-module-width-desktop-small: 280px;
-
-    /* fonts */
+    /* ------------------------------ */
+    /* 🔤 Typography                  */
+    /* ------------------------------ */
     --font-family-main: 'Lexend Deca';
+    --font-weight: 400;
 
     --font-size-xs: 10px;
     --font-size-s: 12px;
@@ -68,9 +45,81 @@
     --font-size-xxl: 64px;
     --font-size-xxxl: 100px;
 
-    /* z indexes */
-    --navbar-dropdown-zindex: 99;
+    /* ------------------------------ */
+    /* 📏 Spacing System (4x scale)   */
+    /* ------------------------------ */
+    --margin-xs: 4px;
+    --margin-s: 8px;
+    --margin-m: 16px;
+    --margin-l: 32px;
+    --margin-xl: 64px;
 
+    --padding-xs: 4px;
+    --padding-s: 8px;
+    --padding-m: 16px;
+    --padding-l: 32px;
+    --padding-xl: 64px;
+
+    --gap-xs: 4px;
+    --gap-s: 8px;
+    --gap-m: 16px;
+    --gap-l: 32px;
+    --gap-xl: 64px;
+
+    --radius-xs: 4px;
+    --radius-s: 8px;
+    --radius-m: 16px;
+    --radius-l: 32px;
+    --radius-xl: 64px;
+
+    /* ------------------------------ */
+    /* 📐 Layout Sizes                */
+    /* ------------------------------ */
+    --order-book-width-desktop-large: 280px;
+    --order-book-width-desktop-small: 220px;
+    --trade-module-width-desktop-large: 350px;
+    --trade-module-width-desktop-small: 280px;
+
+    --order-book-width-desktop-large-doubled: calc(
+        var(--order-book-width-desktop-large) * 2
+    );
+    --order-book-width-desktop-small-doubled: calc(
+        var(--order-book-width-desktop-small) * 2
+    );
+
+    --trade-tables-height-desktop: 281px;
+    --header-height-desktop: 56px;
+
+    /* ------------------------------ */
+    /* 🧱 Z-Index Layers              */
+    /* ------------------------------ */
+    --z-index-base: 1;
+    --z-index-dropdown: 10;
+    --z-index-modal: 100;
+    --z-index-toast: 200;
+    --z-index-tooltip: 300;
+    --z-index-navbar-dropdown: 99;
+
+    /* ------------------------------ */
+    /* 🌫️ Shadows                    */
+    /* ------------------------------ */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-s: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-m: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-l: 0 10px 15px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.2);
+
+    /* ------------------------------ */
+    /* 🌫️ Opacity Levels             */
+    /* ------------------------------ */
+    --opacity-disabled: 0.5;
+    --opacity-hover: 0.85;
+    --opacity-overlay: 0.6;
+
+    /* ------------------------------ */
+    /* 🦴 Skeleton Loading Styles     */
+    /* ------------------------------ */
+    --skeleton-height: 20px;
     --skeleton-animation-duration: 1.5s;
     --skeleton-background: linear-gradient(
         90deg,
@@ -79,9 +128,9 @@
         #f0f0f003 70%
     );
 
-    --skeleton-height: 20px;
-
-    /* transitions */
+    /* ------------------------------ */
+    /* ⚡ Transitions                 */
+    /* ------------------------------ */
     --ease-in-out-fast: ease-in-out 0.2s;
     --ease-in-out-med: ease-in-out 0.3s;
 }
@@ -101,11 +150,12 @@ html {
 }
 
 body {
-    font-family: var(--font-sans, sans-serif);
-    line-height: 1.5;
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-weight: var(--font-weight, 400);
+    line-height: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: var(--dark1);
+    background: var(--bg-dark1);
 }
 
 img,

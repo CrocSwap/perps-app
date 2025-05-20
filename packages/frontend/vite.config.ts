@@ -1,3 +1,4 @@
+import netlifyPlugin from '@netlify/vite-plugin-react-router';
 import { reactRouter } from '@react-router/dev/vite';
 import { defineConfig, type PluginOption, type UserConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -20,6 +21,7 @@ export default defineConfig(
         plugins: [
             tsconfigPaths() as PluginOption,
             reactRouter(),
+            netlifyPlugin(),
             VitePWA({
                 registerType: 'autoUpdate',
                 workbox: {

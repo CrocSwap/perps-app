@@ -4,7 +4,7 @@ import { type useModalIF, useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { PositionIF } from '~/utils/position/PositionIFs';
+import type { PositionIF, PositionDataSortBy } from '~/utils/UserDataIFs';
 import styles from './PositionsTable.module.css';
 
 interface PositionsTableRowProps {

@@ -14,9 +14,7 @@
 }
 .toggleLabel {
     color: var(--text1, #f0f0f8);
-
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
 }
 .chasingIntervalContainer {
     display: flex;

@@ -67,7 +67,7 @@ export default function ShareModal(props: propsIF) {
                             <div
                                 className={styles.symbol_icon}
                                 style={{
-                                    background: `var(--${bgType === 'light' ? 'text1' : 'dark1'})`,
+                                    background: `var(--${bgType === 'light' ? 'text1' : 'bg-dark1'})`,
                                 }}
                             >
                                 <img

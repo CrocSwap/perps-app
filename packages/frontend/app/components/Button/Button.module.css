@@ -7,11 +7,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    border-radius: var(--half-border-radius, 8px);
-    font-family: var(--font-family-main, 'Lexend Deca');
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
+    border-radius: var(--radius-s, 8px);
     border: none;
     cursor: pointer;
 }
@@ -42,12 +38,12 @@
 }
 
 .unselected {
-    background: var(--dark3, #16161c);
+    background: var(--bg-dark3, #16161c);
     color: var(--text1, #f0f0f8);
 }
 
 .disabled {
-    background: var(--dark3, #16161c);
+    background: var(--bg-dark3, #16161c);
     color: var(--text3, #424246);
     cursor: not-allowed;
 }
@@ -71,7 +67,7 @@
             var(--misc-button-hover, rgba(6, 6, 12, 0.3)) 0%,
             var(--misc-button-hover, rgba(6, 6, 12, 0.3)) 100%
         ),
-        var(--dark3, #16161c);
+        var(--bg-dark3, #16161c);
 }
 
 /* Focus state */

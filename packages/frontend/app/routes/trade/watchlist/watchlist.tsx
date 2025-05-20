@@ -15,7 +15,7 @@ const WatchList: React.FC = () => {
 
     return (
         <div className={styles.watchListContainer}>
-            <TbHeartFilled className={styles.favIcon} />
+            <TbHeartFilled className={styles.favIcon} size={23} />
             <FiDollarSign
                 onClick={() => setWatchListMode('dollar')}
                 className={`${styles.watchListToolbarIcon} ${

@@ -29,7 +29,7 @@
     align-items: center;
     width: 200px;
     padding: 2px 8px;
-    background-color: var(--dark4);
+    background-color: var(--bg-dark4);
     border-radius: 8px;
     cursor: pointer;
 }
@@ -39,7 +39,7 @@
     display: flex;
     flex-direction: column;
     padding: 4px 4px;
-    background-color: var(--dark6);
+    background-color: var(--bg-dark6);
     border-radius: 8px;
     z-index: calc(var(--base-z-idx-app-options) + 1);
 }
@@ -61,5 +61,5 @@
 /* hover effects for clickable elems in the dropdown */
 .options_dropdown > *:hover {
     cursor: pointer;
-    background-color: var(--dark4);
+    background-color: var(--bg-dark4);
 }

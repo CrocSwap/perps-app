@@ -8,8 +8,8 @@
     width: 241px;
     height: auto;
     padding: 8px;
-    border-radius: var(--main-border-radius, 16px);
-    background: var(--dark2, #0e0e14);
+    border-radius: var(--radius-m, 16px);
+    background: var(--bg-dark2, #0e0e14);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
 
     transition:
@@ -22,7 +22,7 @@
     height: auto;
     visibility: visible;
     pointer-events: auto;
-    z-index: var(--navbar-dropdown-zindex);
+    z-index: var(--z-index-navbar-dropdown);
 }
 .networkContent {
     width: 100%;
@@ -42,11 +42,5 @@
 }
 .testnet {
     color: var(--core-accent1, #7371fc);
-
-    /* Main/XS */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-xs, 10px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

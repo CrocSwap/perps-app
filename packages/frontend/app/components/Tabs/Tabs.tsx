@@ -113,6 +113,10 @@ export default function Tabs(props: TabsProps) {
     const defaultTabId = defaultTab || getTabId(tabs[0]);
     const [activeTab, setActiveTab] = useState<string>(defaultTabId);
 
+    useEffect(() => {
+        setActiveTab(defaultTabId);
+    }, [defaultTabId]);
+
     const tabsListRef = useRef<HTMLDivElement>(null);
     const tabsWrapperRef = useRef<HTMLDivElement>(null);
 
