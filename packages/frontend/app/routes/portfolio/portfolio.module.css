@@ -11,7 +11,11 @@
 }
 .container header {
     color: var(--text1, #f0f0f8);
+    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-xl, 36px);
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
 }
 .column {
     height: 100%;
@@ -23,6 +27,10 @@
     height: 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
     gap: 4px;
 }
 .detailsContent {
@@ -84,7 +92,7 @@
     align-items: center;
     flex: 1 0 0;
     border-radius: var(--Corner-Radius-Button, 8px);
-    background: var(--bg-dark3, #1c1c22);
+    background: var(--dark3, #1c1c22);
     color: var(--text1, #f0f0f8);
 
     font-size: var(--font-size-m, 18px);
@@ -116,10 +124,11 @@
     flex-direction: column;
     min-width: 500px;
     padding: 8px 16px 16px;
-    border-radius: var(--radius-m);
+    border-radius: var(--main-border-radius);
+    font-family: var(--font-family-main);
     color: var(--text1);
     gap: 16px;
-    background-color: var(--bg-dark3);
+    background-color: var(--dark3);
     user-select: none;
     -webkit-user-select: none;
 }
@@ -172,13 +181,13 @@
     padding: var(--fee_table_row_padding);
     gap: var(--fee_table_col_gap);
     justify-items: start;
-    border-radius: var(--radius-s);
+    border-radius: var(--half-border-radius);
     font-size: var(--font-size-s);
     transition: background-color 0.3s ease-out;
 }
 
 .fee_table > ol > li:hover {
-    background-color: var(--bg-dark5);
+    background-color: var(--dark5);
     transition: background-color 0.1s ease-in;
 }
 
