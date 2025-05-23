@@ -1,4 +1,5 @@
 import type {
+    UserActiveTwap,
     UserFillsData,
     UserFunding,
     UserFundingsData,
@@ -9,6 +10,7 @@ import type { TableSortDirection } from '~/utils/CommonIFs';
 import type {
     TwapHistoryIF,
     TwapSliceFillIF,
+    ActiveTwapIF,
     UserFillIF,
     UserFundingIF,
     UserFillSortBy,
@@ -450,4 +452,19 @@ export function sortUserFundings(
         }
     }
     return fundings;
+}
+
+export function processUserActiveTwap(data: UserActiveTwap): ActiveTwapIF {
+    return {
+        coin: data.coin,
+        executedNtl: parseFloat(data.executedNtl),
+        executedSz: parseFloat(data.executedSz),
+        minutes: data.minutes,
+        randomize: data.randomize,
+        reduceOnly: data.reduceOnly,
+        side: data.side === 'A' ? 'sell' : 'buy',
+        sz: parseFloat(data.sz),
+        timestamp: data.timestamp,
+        user: data.user,
+    } as ActiveTwapIF;
 }

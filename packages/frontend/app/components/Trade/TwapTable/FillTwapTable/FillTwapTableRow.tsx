@@ -26,26 +26,6 @@ export default function FillTwapTableRow(props: FillTwapTableRowProps) {
 
     const { getBsColor } = useAppSettings();
 
-    // // to determine direction class
-    // const getDirectionClass = (direction: string) => {
-    //     if (direction.includes('Long')) {
-    //         return styles.openLong;
-    //     } else if (direction.includes('Short')) {
-    //         return styles.openShort;
-    //     }
-    //     return '';
-    // };
-
-    // // to determine PNL class
-    // const getPnlClass = (pnl: string) => {
-    //     if (pnl.startsWith('-')) {
-    //         return styles.negative;
-    //     } else if (pnl !== '$0.00') {
-    //         return styles.positive;
-    //     }
-    //     return '';
-    // };
-
     return (
         <div className={styles.rowContainer}>
             <div className={`${styles.cell} ${styles.timeCell}`}>

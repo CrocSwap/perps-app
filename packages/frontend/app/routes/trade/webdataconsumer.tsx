@@ -24,6 +24,7 @@ import type {
     UserBalanceIF,
     UserFillIF,
     UserFundingIF,
+    ActiveTwapIF,
 } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
@@ -49,6 +50,7 @@ export default function WebDataConsumer() {
         setTwapHistory,
         setTwapSliceFills,
         setUserFundings,
+        setActiveTwaps,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
@@ -68,6 +70,7 @@ export default function WebDataConsumer() {
     const twapHistoryRef = useRef<TwapHistoryIF[]>([]);
     const twapSliceFillsRef = useRef<TwapSliceFillIF[]>([]);
     const userFundingsRef = useRef<UserFundingIF[]>([]);
+    const activeTwapsRef = useRef<ActiveTwapIF[]>([]);
 
     const { info } = useSdk();
     const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
@@ -92,6 +95,7 @@ export default function WebDataConsumer() {
         positionsRef.current = [];
         openOrdersRef.current = [];
         userFundingsRef.current = [];
+        activeTwapsRef.current = [];
 
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },
@@ -135,6 +139,7 @@ export default function WebDataConsumer() {
             setTwapHistory(twapHistoryRef.current);
             setTwapSliceFills(twapSliceFillsRef.current);
             setUserFundings(userFundingsRef.current);
+            setActiveTwaps(activeTwapsRef.current);
 
             if (acccountOverviewPrevRef.current && accountOverviewRef.current) {
                 accountOverviewRef.current.balanceChange =
@@ -174,6 +179,7 @@ export default function WebDataConsumer() {
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
                 accountOverviewRef.current = data.data.accountOverview;
+                activeTwapsRef.current = data.data.activeTwaps;
             }
             fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
         },

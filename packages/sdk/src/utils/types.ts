@@ -611,6 +611,24 @@ export interface UserFundingsData {
     fundings: UserFunding[];
 }
 
+export interface UserActiveTwap {
+    coin: string;
+    executedNtl: string;
+    executedSz: string;
+    minutes: number;
+    randomize: boolean;
+    reduceOnly: boolean;
+    side: string;
+    sz: string;
+    timestamp: number;
+    user: string;
+}
+
+export interface UserActiveTwapData {
+    0: number;
+    1: UserActiveTwap;
+
+}
 export interface OpenOrderRawData {
     coin: string;
     side: string;

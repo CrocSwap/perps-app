@@ -1,29 +1,54 @@
+import { useMemo } from 'react';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { ActiveTwapIF, ActiveTwapSortBy } from '~/utils/UserDataIFs';
 import ActiveTwapTableHeader from './ActiveTwapTableHeader';
 import ActiveTwapTableRow from './ActiveTwapTableRow';
-import styles from './ActiveTwapTable.module.css';
-import { activeTwapsData } from './data';
 
-export default function ActiveTwapTable() {
+interface ActiveTwapTableProps {
+    data: ActiveTwapIF[];
+    isFetched: boolean;
+    selectedFilter?: string;
+}
+
+export default function ActiveTwapTable(props: ActiveTwapTableProps) {
+    const { data, isFetched, selectedFilter } = props;
+    const { symbol } = useTradeDataStore();
+
     const handleTerminate = (coin: string) => {
         console.log(`Terminating TWAP for ${coin}`);
     };
 
+    const filteredData = useMemo(() => {
+        switch (selectedFilter) {
+            case 'all':
+                return data;
+            case 'active':
+                return data.filter((fill) => fill.coin === symbol);
+            case 'long':
+                return data.filter((fill) => fill.side === 'buy');
+            case 'short':
+                return data.filter((fill) => fill.side === 'sell');
+        }
+
+        return data;
+    }, [data, selectedFilter]);
+
     return (
-        <div className={styles.tableWrapper}>
-            <ActiveTwapTableHeader />
-            <div className={styles.tableBody}>
-                {activeTwapsData.length > 0 ? (
-                    activeTwapsData.map((twap, index) => (
-                        <ActiveTwapTableRow
-                            key={`twap-${index}`}
-                            twap={twap}
-                            onTerminate={handleTerminate}
-                        />
-                    ))
-                ) : (
-                    <div className={styles.emptyState}>No active TWAPs</div>
+        <>
+            <GenericTable<ActiveTwapIF, ActiveTwapSortBy>
+                data={filteredData}
+                renderHeader={() => <ActiveTwapTableHeader />}
+                renderRow={(twap) => (
+                    <ActiveTwapTableRow
+                        twap={twap}
+                        onTerminate={handleTerminate}
+                    />
                 )}
-            </div>
-        </div>
+                isFetched={isFetched}
+                skeletonRows={7}
+                skeletonColRatios={[2, 2, 2, 1, 2, 1, 2, 1]}
+            />
+        </>
     );
 }
