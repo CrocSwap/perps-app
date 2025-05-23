@@ -135,7 +135,6 @@ export function sortTwapHistory(
     if (sortDirection && sortBy) {
         switch (sortBy) {
             case 'time':
-                console.log(sortBy);
                 return fills.sort((a, b) => {
                     if (sortDirection === 'asc') {
                         return a.state.timestamp - b.state.timestamp;

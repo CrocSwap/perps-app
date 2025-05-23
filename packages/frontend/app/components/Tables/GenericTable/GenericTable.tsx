@@ -1,4 +1,11 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useId,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
@@ -54,36 +61,39 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         TableState.LOADING,
     );
 
-    useEffect(() => {
-        let scrollEvent = null;
+    const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
             `${id}-tableBody`,
         ) as HTMLElement;
         const actionsContainer = document.getElementById(
             `${id}-actionsContainer`,
         ) as HTMLElement;
-        const headerContainer = document.getElementById(
-            `${id}-headerContainer`,
+
+        if (!tableBody || !actionsContainer) {
+            return;
+        }
+
+        const bottomNotShadowed =
+            tableBody.scrollTop + tableBody.clientHeight >=
+            tableBody.scrollHeight;
+        if (bottomNotShadowed) {
+            actionsContainer?.classList.add(styles.notShadowed);
+        } else {
+            actionsContainer?.classList.remove(styles.notShadowed);
+        }
+    }, []);
+
+    useEffect(() => {
+        checkShadow();
+
+        let scrollEvent = null;
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
         ) as HTMLElement;
 
         if (tableBody) {
             scrollEvent = tableBody.addEventListener('scroll', (e: Event) => {
-                const target = e.target as HTMLElement;
-                const bottomNotShadowed =
-                    target.scrollTop + target.clientHeight >=
-                    target.scrollHeight;
-                if (bottomNotShadowed) {
-                    actionsContainer?.classList.add(styles.notShadowed);
-                } else {
-                    actionsContainer?.classList.remove(styles.notShadowed);
-                }
-
-                const topShadowed = target.scrollTop > 0;
-                if (topShadowed) {
-                    headerContainer?.classList.add(styles.shadowed);
-                } else {
-                    headerContainer?.classList.remove(styles.shadowed);
-                }
+                checkShadow();
             });
         }
 
@@ -94,12 +104,11 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         };
     }, [tableState]);
 
-
     const [sortBy, setSortBy] = useState<S>(defaultSortBy ?? (undefined as S));
     const [sortDirection, setSortDirection] = useState<TableSortDirection>(
         defaultSortDirection ?? 'desc',
     );
-    
+
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
