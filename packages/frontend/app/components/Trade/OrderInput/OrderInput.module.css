@@ -31,14 +31,16 @@
 .mainContent::-webkit-scrollbar {
     display: none;
 }
+
 .orderTypeDropdownContainer {
     width: 100%;
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     gap: var(--gap-s);
     height: var(--dropdown-height);
 }
+
 .inputDetailsDataContainer {
     width: 100%;
     display: flex;
@@ -97,6 +99,19 @@
     color: var(--text1);
 }
 
+.trade_type_toggle {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: var(--dropdown-height);
+    background-color: var(--bg-dark3, #1c1c22);
+    color: var(--text1, #f0f0f8);
+    border-radius: var(--radius-s);
+    cursor: pointer;
+    border: none;
+}
+
 .priceDistributionContainer {
     display: flex;
     flex-direction: column;
@@ -131,6 +146,39 @@
     border: none;
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s);
+}
+
+.launchpad {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.launchpad > header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.launchpad > header > div {
+    width: 20px;
+}
+
+.launchpad > header > div > svg {
+    cursor: pointer;
+}
+
+.launchpad_clickables {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    list-style-type: none;
+}
+
+.launchpad_clickables > li {
+    display: flex;
+    flex-direction: row;
 }
 
 @media (min-width: 1600px) {

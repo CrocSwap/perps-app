@@ -1,9 +1,9 @@
 import OrderDropdown from '../OrderDropdown/OrderDropdown';
-import type { OrderTypeOption } from '../OrderInput';
+import type { ChaseOption } from '../OrderInput';
 import styles from './ChasePrice.module.css';
 
 interface PropsIF {
-    chaseOptionTypes: OrderTypeOption[];
+    chaseOptionTypes: ChaseOption[];
     chaseOption: string;
     handleChaseOptionChange: (value: string) => void;
 }
