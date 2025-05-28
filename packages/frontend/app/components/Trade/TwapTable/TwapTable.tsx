@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './TwapTable.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
@@ -15,11 +15,23 @@ interface Props {
 
 const availableTabs = ['Active', 'History', 'Fill History'];
 export default function TwapTable(props: Props) {
+    const STORAGE_KEY = 'twapTable:selectedTab';
+
     const { initialTab = 'Active', selectedFilter } = props;
-    const [activeTab, setActiveTab] = useState(initialTab);
+    const [activeTab, setActiveTab] = useState<string>(() => {
+        return localStorage.getItem(STORAGE_KEY) || initialTab;
+    });
+
+    useEffect(() => {
+        localStorage.setItem(STORAGE_KEY, activeTab);
+    }, [activeTab]);
 
     const { fetchedChannels, twapHistory, twapSliceFills } =
         useTradeDataStore();
+
+    useEffect(() => {
+        localStorage.setItem(STORAGE_KEY, activeTab);
+    }, [activeTab]);
 
     const { twapHistoryFetched, twapSliceFillsFetched } = useMemo(() => {
         return {

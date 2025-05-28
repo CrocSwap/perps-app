@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserBalances } from '~/processors/processUserBalance';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -6,12 +6,17 @@ import { WsChannels } from '~/utils/Constants';
 import type { UserBalanceIF, UserBalanceSortBy } from '~/utils/UserDataIFs';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
+import { useDebugStore } from '~/stores/DebugStore';
 
 type BalancesTableProps = {
     hideSmallBalances: boolean;
 };
 
 export default function BalancesTable(props: BalancesTableProps) {
+    const { debugWallet } = useDebugStore();
+    const currentUserRef = useRef<string>('');
+    currentUserRef.current = debugWallet.address;
+
     const { hideSmallBalances } = props;
 
     const smallBalanceThreshold = 10;
@@ -33,6 +38,7 @@ export default function BalancesTable(props: BalancesTableProps) {
 
     return (
         <GenericTable<UserBalanceIF, UserBalanceSortBy>
+            storageKey={`BalancesTable_${currentUserRef.current}`}
             data={balancesToShow}
             renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                 <BalancesTableHeader

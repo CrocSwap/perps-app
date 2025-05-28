@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -23,6 +23,9 @@ export default function PositionsTable(props: PositionsTableProps) {
     const { positions, fetchedChannels } = useTradeDataStore();
 
     const { debugWallet } = useDebugStore();
+
+    const currentUserRef = useRef<string>('');
+    currentUserRef.current = debugWallet.address;
 
     const webDataFetched = useMemo(() => {
         return fetchedChannels.has(WsChannels.WEB_DATA2);
@@ -49,6 +52,7 @@ export default function PositionsTable(props: PositionsTableProps) {
     return (
         <>
             <GenericTable
+                storageKey={`PositionsTable_${currentUserRef.current}`}
                 data={filteredData as any}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <>

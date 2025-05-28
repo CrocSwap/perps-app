@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -29,6 +29,9 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
 
     const { debugWallet } = useDebugStore();
 
+    const currentUserRef = useRef<string>('');
+    currentUserRef.current = debugWallet.address;
+
     const { symbol } = useTradeDataStore();
 
     const filteredOrders = useMemo(() => {
@@ -57,6 +60,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     return (
         <>
             <GenericTable
+                storageKey={`OpenOrdersTable_${currentUserRef.current}`}
                 data={filteredOrders}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <OpenOrdersTableHeader

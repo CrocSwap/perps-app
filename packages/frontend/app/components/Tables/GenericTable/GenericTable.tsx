@@ -1,11 +1,4 @@
-import {
-    useCallback,
-    useEffect,
-    useId,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
@@ -36,10 +29,12 @@ interface GenericTableProps<T, S> {
     defaultSortBy?: S;
     defaultSortDirection?: TableSortDirection;
     heightOverride?: string;
+    storageKey: string;
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
-    const id = useId();
+    const id = props.storageKey;
+    const navigate = useNavigate();
 
     const {
         data,
@@ -57,60 +52,40 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         heightOverride = '100%',
     } = props;
 
-    const navigate = useNavigate();
+    function safeParse<T>(value: string | null, fallback: T): T {
+        if (!value || value === 'undefined') return fallback;
+        try {
+            return JSON.parse(value) as T;
+        } catch {
+            return fallback;
+        }
+    }
+
+    const sortByKey = `GenericTable:${id}:sortBy`;
+    const sortDirKey = `GenericTable:${id}:sortDir`;
+
+    const [sortBy, setSortBy] = useState<S>(() => {
+        const stored = localStorage.getItem(sortByKey);
+        return safeParse<S>(stored, props.defaultSortBy as S);
+    });
+    const [sortDirection, setSortDirection] = useState<TableSortDirection>(
+        () => {
+            const stored = localStorage.getItem(sortDirKey);
+            return safeParse<TableSortDirection>(
+                stored,
+                props.defaultSortDirection as TableSortDirection,
+            );
+        },
+    );
+
+    useEffect(() => {
+        localStorage.setItem(sortByKey, JSON.stringify(sortBy));
+        localStorage.setItem(sortDirKey, JSON.stringify(sortDirection));
+    }, [sortBy, sortDirection, sortByKey, sortDirKey]);
 
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
     );
-
-    const checkShadow = useCallback(() => {
-        const tableBody = document.getElementById(
-            `${id}-tableBody`,
-        ) as HTMLElement;
-        const actionsContainer = document.getElementById(
-            `${id}-actionsContainer`,
-        ) as HTMLElement;
-
-        if (!tableBody || !actionsContainer) {
-            return;
-        }
-
-        const bottomNotShadowed =
-            tableBody.scrollTop + tableBody.clientHeight >=
-            tableBody.scrollHeight;
-        if (bottomNotShadowed) {
-            actionsContainer?.classList.add(styles.notShadowed);
-        } else {
-            actionsContainer?.classList.remove(styles.notShadowed);
-        }
-    }, []);
-
-    useEffect(() => {
-        checkShadow();
-
-        let scrollEvent = null;
-        const tableBody = document.getElementById(
-            `${id}-tableBody`,
-        ) as HTMLElement;
-
-        if (tableBody) {
-            scrollEvent = tableBody.addEventListener('scroll', (e: Event) => {
-                checkShadow();
-            });
-        }
-
-        return () => {
-            if (scrollEvent) {
-                tableBody.removeEventListener('scroll', scrollEvent);
-            }
-        };
-    }, [tableState]);
-
-    const [sortBy, setSortBy] = useState<S>(defaultSortBy ?? (undefined as S));
-    const [sortDirection, setSortDirection] = useState<TableSortDirection>(
-        defaultSortDirection ?? 'desc',
-    );
-
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
@@ -118,12 +93,10 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         setPage(0);
     }, [sortBy, sortDirection]);
 
-    const sortedData = useMemo(() => {
-        if (sortBy) {
-            return [...sorterMethod(data, sortBy, sortDirection)];
-        }
-        return data;
-    }, [data, sortBy, sortDirection]);
+    const sortedData = useMemo(
+        () => (sortBy ? [...sorterMethod(data, sortBy, sortDirection)] : data),
+        [data, sortBy, sortDirection],
+    );
 
     const dataToShow = useMemo(() => {
         if (pageMode) {
@@ -135,45 +108,68 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         return sortedData.slice(0, slicedLimit);
     }, [sortedData, pageMode, page, rowsPerPage]);
 
-    const handleSort = (key: S) => {
-        if (sortBy === key) {
-            if (sortDirection === 'desc') {
-                setSortDirection('asc');
-            } else if (sortDirection === 'asc') {
-                setSortDirection(undefined);
-                setSortBy(undefined as S);
-            } else {
-                setSortDirection('desc');
-            }
+    useEffect(() => {
+        if (!isFetched) {
+            setTableState(TableState.LOADING);
+        } else if (dataToShow.length === 0) {
+            setTableState(TableState.EMPTY);
         } else {
-            setSortBy(key as S);
-            setSortDirection('desc');
+            setTableState(TableState.FILLED);
         }
+    }, [isFetched, dataToShow]);
+
+    const handleSort = (key: S) => {
+        let nextBy: S | undefined;
+        let nextDir: TableSortDirection | undefined;
+
+        if (sortBy === key) {
+            nextDir =
+                sortDirection === 'desc'
+                    ? 'asc'
+                    : sortDirection === 'asc'
+                      ? undefined
+                      : 'desc';
+            nextBy = nextDir ? key : undefined;
+        } else {
+            nextBy = key;
+            nextDir = 'desc';
+        }
+
+        setSortBy(nextBy as S);
+        setSortDirection(nextDir!);
     };
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
-        if (viewAllLink) {
-            navigate(viewAllLink, { viewTransition: true });
-        }
+        viewAllLink && navigate(viewAllLink, { viewTransition: true });
     };
-
     const handleExportCsv = (e: React.MouseEvent) => {
         e.preventDefault();
         console.log('Exporting CSV');
     };
 
-    useEffect(() => {
-        if (isFetched) {
-            if (dataToShow.length === 0) {
-                setTableState(TableState.EMPTY);
-            } else {
-                setTableState(TableState.FILLED);
-            }
+    const checkShadow = useCallback(() => {
+        const body = document.getElementById(`${id}-tableBody`);
+        const actions = document.getElementById(`${id}-actionsContainer`);
+        if (!body || !actions) return;
+
+        if (body.scrollTop + body.clientHeight >= body.scrollHeight) {
+            actions.classList.add(styles.notShadowed);
         } else {
-            setTableState(TableState.LOADING);
+            actions.classList.remove(styles.notShadowed);
         }
-    }, [dataToShow, isFetched]);
+    }, [id]);
+
+    useEffect(() => {
+        checkShadow();
+        const body = document.getElementById(`${id}-tableBody`);
+        if (!body) return;
+
+        body.addEventListener('scroll', checkShadow);
+        return () => {
+            body.removeEventListener('scroll', checkShadow);
+        };
+    }, [tableState, checkShadow, id]);
 
     return (
         <div className={styles.tableWrapper} style={{ height: heightOverride }}>
@@ -185,29 +181,29 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
             ) : (
                 <>
                     <span
-                        className={styles.headerContainer}
                         id={`${id}-headerContainer`}
+                        className={styles.headerContainer}
                     >
                         {renderHeader(sortDirection, handleSort, sortBy)}
                     </span>
                     <div
                         id={`${id}-tableBody`}
-                        className={`${styles.tableBody} 
-                        ${pageMode ? styles.pageMode : styles.notPage}
-                        `}
+                        className={`${styles.tableBody} ${
+                            pageMode ? styles.pageMode : styles.notPage
+                        }`}
                     >
                         {tableState === TableState.FILLED &&
                             dataToShow.map(renderRow)}
                         {tableState === TableState.EMPTY && <NoDataRow />}
+
                         {sortedData.length > 0 && (
                             <div
                                 id={`${id}-actionsContainer`}
                                 className={styles.actionsContainer}
                             >
-                                {sortedData.length > slicedLimit &&
-                                    viewAllLink &&
-                                    viewAllLink.length > 0 &&
-                                    !pageMode && (
+                                {!pageMode &&
+                                    sortedData.length > slicedLimit &&
+                                    viewAllLink && (
                                         <a
                                             href='#'
                                             className={styles.viewAllLink}

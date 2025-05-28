@@ -46,6 +46,7 @@ export default function HistoryTwapTable(props: HistoryTwapTableProps) {
     return (
         <>
             <GenericTable
+                storageKey={`HistoryTwapTable_${currentUserRef.current}`}
                 data={filteredData as any}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <HistoryTwapTableHeader

@@ -98,6 +98,7 @@ export default function FillTwapTable(props: FillTwapTableProps) {
     return (
         <>
             <GenericTable
+                storageKey={`FillTwapTable_${currentUserRef.current}`}
                 data={filteredData as any}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <FillTwapTableHeader
