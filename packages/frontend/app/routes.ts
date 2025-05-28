@@ -11,6 +11,9 @@ export default [
     route('strategies/:address?', 'routes/strategies/StrategyDetail.tsx'),
 
     // Renders "routes/vaults/vaults.tsx" at "/vaults"
+    route('vaults/majors', 'routes/vaults/vaultDetail.tsx', { id: 'VAULT_DETAIL_MAJORS' }),
+    route('vaults/frontier', 'routes/vaults/vaultDetail.tsx', { id: 'VAULT_DETAIL_FRONTIER' }),
+    route('vaults/btc', 'routes/vaults/vaultDetail.tsx', { id: 'VAULT_DETAIL_BTC' }),
     route('vaults', 'routes/vaults/vaultsNew.tsx'),
 
     // Renders "routes/leaderboard/leaderboard.tsx" at "/leaderboard"
