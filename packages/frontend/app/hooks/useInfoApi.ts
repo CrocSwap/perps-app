@@ -14,6 +14,7 @@ import type {
     UserFundingIF,
     UserFundingResponseIF,
 } from '~/utils/UserDataIFs';
+import type { VaultDetailsIF } from '~/utils/VaultIFs';
 
 export type ApiCallConfig = {
     type: string;
@@ -28,6 +29,7 @@ export enum ApiEndpoints {
     TWAP_HISTORY = 'twapHistory',
     TWAP_SLICE_FILLS = 'userTwapSliceFills',
     FUNDING_HISTORY = 'userFunding',
+    VAULT_DETAILS = 'vaultDetails',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
@@ -200,6 +202,23 @@ export function useInfoApi() {
         return ret;
     };
 
+    const fetchVaultDetails = async (
+        address: string,
+        vaultAddress: string,
+    ): Promise<VaultDetailsIF> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.VAULT_DETAILS,
+                user: address,
+                vaultAddress: vaultAddress,
+            }),
+        });
+        const data = await response.json();
+        return data as VaultDetailsIF;
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -208,5 +227,6 @@ export function useInfoApi() {
         fetchTwapSliceFills,
         fetchFundingHistory,
         fetchOpenOrders,
+        fetchVaultDetails,
     };
 }
