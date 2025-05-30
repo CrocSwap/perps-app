@@ -95,11 +95,14 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 className={`${styles.cell} ${styles.coinCell}`}
                 style={gradientStyle}
             >
-                {position.coin}
+                <span style={{ color: baseColor }}>{position.coin}</span>
                 {position.leverage.value && (
                     <span
                         className={styles.badge}
-                        style={{ color: 'var(--text1)' }}
+                        style={{
+                            color: baseColor,
+                            backgroundColor: hexToRgba(baseColor, 0.15),
+                        }}
                     >
                         {position.leverage.value}x
                     </span>
