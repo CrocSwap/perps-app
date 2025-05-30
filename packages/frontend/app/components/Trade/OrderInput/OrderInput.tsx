@@ -1,8 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { FiChevronDown } from 'react-icons/fi';
+import { GoZap } from 'react-icons/go';
+import { LuOctagonX } from 'react-icons/lu';
+import { MdKeyboardArrowLeft } from 'react-icons/md';
+import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
+import { RiBarChartHorizontalLine } from 'react-icons/ri';
+import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import { useKeydown } from '~/hooks/useKeydown';
 import { useModal, type useModalIF } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import {
@@ -10,6 +17,7 @@ import {
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
@@ -28,14 +36,6 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
-import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
-import { MdKeyboardArrowLeft } from 'react-icons/md';
-import { GoZap } from 'react-icons/go';
-import { RiBarChartHorizontalLine } from 'react-icons/ri';
-import { LuOctagonX } from 'react-icons/lu';
-import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
-import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
-import { useKeydown } from '~/hooks/useKeydown';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -60,7 +60,7 @@ const marketOrderTypes: OrderTypeOption[] = [
     {
         value: 'limit',
         label: 'Limit',
-        blurb: 'Buy/Sell at a specific price or better',
+        blurb: 'Buy/sell at a specific price or better',
         icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
     },
     {
@@ -83,13 +83,13 @@ const marketOrderTypes: OrderTypeOption[] = [
     },
     {
         value: 'scale',
-        label: 'Scale',
+        label: 'Scale Order',
         blurb: 'Multiple orders at incrementing prices',
         icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'chase_limit',
-        label: 'Chase Limit',
+        label: 'Chase Limit Order',
         blurb: 'Adjusts limit price to follow the market',
         icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
     },
