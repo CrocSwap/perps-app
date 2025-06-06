@@ -1,21 +1,22 @@
+import { useStrategiesStore, type strategyDecoratedIF } from '~/stores/StrategiesStore';
 import styles from './strategies.module.css';
 import { useNavigate } from 'react-router';
 
 export default function Strategies() {
     const navigate = useNavigate();
 
+    const { data } = useStrategiesStore();
+
     return (
         <div className={styles.strategies_page}>
             <h2>Strategies</h2>
-            <button
-                onClick={() => {
-                    navigate(
-                        '/strategies/0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
-                    );
-                }}
-            >
-                View Strategy
-            </button>
+            {
+                data.map((s: strategyDecoratedIF) => (
+                    <button onClick={() => navigate('/strategies/' + s.address)}>
+                        View {s.address}
+                    </button>
+                ))
+            }
         </div>
     );
 }

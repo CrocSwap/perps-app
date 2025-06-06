@@ -7,8 +7,9 @@ export default [
     route('trade/:marketId?', 'routes/trade.tsx'),
 
     route('strategies', 'routes/strategies/strategies.tsx'),
-    route('strategies/new', 'routes/strategies/createStrategy.tsx'),
+    route('strategies/new', 'routes/strategies/newStrategy.tsx'),
     route('strategies/:address?', 'routes/strategies/StrategyDetail.tsx'),
+    route('strategies/:address/edit', 'routes/strategies/editStrategy.tsx'),
 
     // Renders "routes/vaults/vaults.tsx" at "/vaults"
     route('vaults', 'routes/vaults/vaultsNew.tsx'),

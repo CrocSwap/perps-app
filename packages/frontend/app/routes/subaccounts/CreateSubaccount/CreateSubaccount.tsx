@@ -11,7 +11,7 @@ import {
 // interface for functional component props
 interface propsIF {
     modalControl: useModalIF;
-    create: (a: string) => void;
+    create: (a: string, g: 'discretionary') => void;
 }
 
 // main react functional component
@@ -32,10 +32,10 @@ export default function CreateSubaccount(props: propsIF) {
         if (inputRef.current) {
             const text: string = inputRef.current.value;
             if (text.length) {
-                create(inputRef.current.value);
+                create(inputRef.current.value, 'discretionary');
                 notifications.add({
                     title: 'Sub Account Created',
-                    message: inputRef.current.value,
+                    message: `Made new discretionary sub-account ${inputRef.current.value}`,
                     icon: 'check',
                 });
             }

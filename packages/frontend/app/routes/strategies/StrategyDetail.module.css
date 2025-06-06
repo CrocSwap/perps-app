@@ -90,3 +90,20 @@
 .strategy_details_graph {
     background-color: grey;
 }
+
+.remove_strategy_modal {
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-m);
+    gap: var(--gap-l);
+}
+
+.remove_strategy_modal > p {
+    text-align: center;
+}
+
+.remove_strat_modal_buttons {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-m);
+}

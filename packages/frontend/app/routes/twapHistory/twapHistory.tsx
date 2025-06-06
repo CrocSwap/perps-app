@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import HistoryTwapTable from '~/components/Trade/TwapTable/HistoryTwapTable/HistoryTwapTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
