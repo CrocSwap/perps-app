@@ -1,5 +1,6 @@
 import React, {
     createContext,
+    useCallback,
     useContext,
     useEffect,
     useRef,
@@ -7,6 +8,7 @@ import React, {
 } from 'react';
 import { useIsClient } from './useIsClient';
 import { Info, Exchange, type Environment, DEMO_USER } from '@perps-app/sdk';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 type SdkContextType = {
     info: Info | null;
@@ -24,18 +26,28 @@ export const SdkProvider: React.FC<{
     const [info, setInfo] = useState<Info | null>(null);
     const [exchange, setExchange] = useState<Exchange | null>(null);
 
+    const { internetConnected } = useTradeDataStore();
+    const internetConnectedRef = useRef(internetConnected);
+
+    const wsCloseListener = useCallback(() => {
+        if (internetConnectedRef.current) {
+            info?.wsManager?.reconnect();
+        }
+    }, []);
+
     // commit to trigger deployment
 
     useEffect(() => {
         if (!isClient) return;
         if (!info) {
-            setInfo(
-                new Info({
-                    environment,
-                    skipWs: false,
-                    // isDebug: true, // TODO: remove in prod
-                }),
-            );
+            const newInfo = new Info({
+                environment,
+                skipWs: false,
+                // isDebug: true, // TODO: remove in prod
+            });
+
+            newInfo.wsManager?.addCloseListener(wsCloseListener);
+            setInfo(newInfo);
         } else {
             info.setEnvironment(environment);
         }
@@ -54,6 +66,13 @@ export const SdkProvider: React.FC<{
             exchange.setEnvironment(environment);
         }
     }, [isClient, environment]);
+
+    useEffect(() => {
+        if (!isClient) return;
+        if (internetConnected) {
+            info?.wsManager?.reconnect();
+        }
+    }, [internetConnected, isClient]);
 
     return (
         <SdkContext.Provider value={{ info: info, exchange: exchange }}>

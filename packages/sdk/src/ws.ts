@@ -104,6 +104,7 @@ export class WebsocketManager {
     private nextWorkerIndex: number = 0;
     private numWorkers: number;
     private jsonParserWorkerBlobUrl: string | null = null;
+    private closeListeners: (() => void)[] = [];
 
     constructor(
         baseUrl: string,
@@ -301,6 +302,7 @@ export class WebsocketManager {
             this.pingInterval = null;
             this.log('stopped ping due to close');
         }
+        this.closeListeners.forEach((listener) => listener());
     };
 
     public stop() {
@@ -351,6 +353,14 @@ export class WebsocketManager {
             return;
         }
 
+        this.stashSubscriptions();
+
+        this.baseUrl = newBaseUrl;
+
+        this.connect();
+    }
+
+    private stashSubscriptions = () => {
         const oldSubscriptions = { ...this.allSubscriptions };
 
         this.stop();
@@ -366,11 +376,7 @@ export class WebsocketManager {
         }
         this.allSubscriptions = {};
         this.activeSubscriptions = {};
-
-        this.baseUrl = newBaseUrl;
-
-        this.connect();
-    }
+    };
 
     public subscribe(
         subscription: Subscription,
@@ -486,5 +492,20 @@ export class WebsocketManager {
 
     public isWsReady() {
         return this.wsReady;
+    }
+
+    public reconnect() {
+        this.stashSubscriptions();
+        setTimeout(() => {
+            this.connect();
+        }, 2000);
+    }
+
+    public addCloseListener(listener: () => void) {
+        this.closeListeners.push(listener);
+    }
+
+    public removeCloseListener(listener: () => void) {
+        this.closeListeners = this.closeListeners.filter((l) => l !== listener);
     }
 }

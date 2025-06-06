@@ -1,0 +1,39 @@
+.noConnectionIndicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    backdrop-filter: grayscale(70%) blur(var(--blur-s));
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    color: var(--text1);
+    background-color: color-mix(in srgb, var(--bg-dark1) 20%, transparent);
+}
+
+.noConnectionIndicatorContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.noConnectionIndicatorIcon {
+    margin-bottom: var(--margin-m);
+}
+
+.noConnectionIndicatorText {
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: var(--margin-s);
+    font-size: var(--font-size-l);
+}
+
+p {
+    opacity: 0.5;
+    font-size: calc(var(--font-size-m) * 0.8);
+}
