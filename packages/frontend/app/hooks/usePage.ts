@@ -4,6 +4,7 @@ import { useIsClient } from './useIsClient';
 export enum Pages {
     TRADE = 'trade',
     PORTFOLIO = 'portfolio',
+    VAULTS = 'vaults',
 }
 
 /**
@@ -23,6 +24,8 @@ export function usePage() {
                     setPage(Pages.TRADE);
                 } else if (page === Pages.PORTFOLIO) {
                     setPage(Pages.PORTFOLIO);
+                } else if (page === Pages.VAULTS) {
+                    setPage(Pages.VAULTS);
                 }
             }
         }

@@ -34,10 +34,11 @@ const filterOptions: FilterOption[] = [
 
 interface TradeTableProps {
     portfolioPage?: boolean;
+    vaultPage?: boolean;
 }
 
 export default function TradeTable(props: TradeTableProps) {
-    const { portfolioPage } = props;
+    const { portfolioPage, vaultPage } = props;
     const {
         selectedTradeTab,
         setSelectedTradeTab,
@@ -54,6 +55,8 @@ export default function TradeTable(props: TradeTableProps) {
 
     const tabs = useMemo(() => {
         if (!page) return [];
+
+        console.log('page', page);
 
         let availableTabs = [
             'Balances',
