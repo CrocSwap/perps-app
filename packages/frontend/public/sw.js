@@ -1,11 +1,7 @@
-const CACHE_NAME = 'my-app-cache-v0.0.11';
+const CACHE_NAME = 'my-app-cache-v0.0.12';
 const ASSETS_TO_CACHE = [
     '/',
-    '/index.html',
     '/favicon.ico',
-    '/manifest.json',
-    '/logo192.png',
-    '/logo512.png',
     // Add more static assets if needed
 ];
 
