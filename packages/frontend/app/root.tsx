@@ -120,7 +120,7 @@ export default function App() {
                         newWorker.state === 'installed' &&
                         navigator.serviceWorker.controller
                     ) {
-                        // New update available
+                        // prompt if new update available
                         if (
                             window.confirm(
                                 'A new version is available. Reload now?',
