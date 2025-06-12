@@ -39,7 +39,7 @@ const LabelComponent = ({
 
         const draw = () => {
             let heightAttr = canvasSize?.height;
-            let widthAttr = canvasSize.width;
+            let widthAttr = canvasSize?.width;
 
             if (overlayCanvasRef.current) {
                 const chartDiv = document.getElementById('tv_chart');
