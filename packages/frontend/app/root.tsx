@@ -111,35 +111,39 @@ export default function App() {
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').then((registration) => {
-            // Listen for updates
-            registration.onupdatefound = () => {
+            // Check if there's an updated SW waiting to activate
+            if (registration.waiting) {
+                promptUserToRefresh(registration);
+            }
+
+            // Listen for updates to the service worker
+            registration.addEventListener('updatefound', () => {
                 const newWorker = registration.installing;
-                if (!newWorker) return;
-                newWorker.onstatechange = () => {
-                    if (
-                        newWorker.state === 'installed' &&
-                        navigator.serviceWorker.controller
-                    ) {
-                        // prompt if new update available
+                if (newWorker) {
+                    newWorker.addEventListener('statechange', () => {
                         if (
-                            window.confirm(
-                                'A new version is available. Reload now?',
-                            )
+                            newWorker.state === 'installed' &&
+                            navigator.serviceWorker.controller
                         ) {
-                            newWorker.postMessage({ action: 'skipWaiting' });
+                            promptUserToRefresh(registration);
                         }
-                    }
-                };
-            };
+                    });
+                }
+            });
         });
 
-        // Listen for the service worker to skip waiting
-        let refreshing: boolean;
+        let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
             if (refreshing) return;
-            window.location.reload();
             refreshing = true;
+            window.location.reload();
         });
+    }
+
+    function promptUserToRefresh(registration: ServiceWorkerRegistration) {
+        if (window.confirm('A new version is available. Reload now?')) {
+            registration.waiting?.postMessage({ action: 'skipWaiting' });
+        }
     }
 
     return (

@@ -37,7 +37,7 @@ export default function PageHeader() {
     const navLinks = [
         { name: 'Trade', path: `/trade/${symbol}` },
         { name: 'Vaults', path: '/vaults' },
-        { name: 'PortfolioTest2', path: '/portfolio' },
+        { name: 'PortfolioTest3', path: '/portfolio' },
         { name: 'Referrals', path: '/referrals' },
         // { name: 'Points', path: '/points' },
         { name: 'Leaderboard', path: '/leaderboard' },
