@@ -12,14 +12,14 @@ import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
-import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
-import { AppProvider } from './contexts/AppContext';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -108,6 +108,39 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
     // Use memoized value to prevent unnecessary re-renders
     const { wsEnvironment } = useDebugStore();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then((registration) => {
+            // Listen for updates
+            registration.onupdatefound = () => {
+                const newWorker = registration.installing;
+                if (!newWorker) return;
+                newWorker.onstatechange = () => {
+                    if (
+                        newWorker.state === 'installed' &&
+                        navigator.serviceWorker.controller
+                    ) {
+                        // New update available
+                        if (
+                            window.confirm(
+                                'A new version is available. Reload now?',
+                            )
+                        ) {
+                            newWorker.postMessage({ action: 'skipWaiting' });
+                        }
+                    }
+                };
+            };
+        });
+
+        // Listen for the service worker to skip waiting
+        let refreshing: boolean;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            window.location.reload();
+            refreshing = true;
+        });
+    }
 
     return (
         <>
