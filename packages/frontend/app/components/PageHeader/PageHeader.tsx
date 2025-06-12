@@ -7,11 +7,11 @@ import {
 } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
+import { useApp } from '~/contexts/AppContext';
 import { type useModalIF, useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import AppOptions from '../AppOptions/AppOptions';
-import Button from '../Button/Button';
 import Modal from '../Modal/Modal';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
@@ -20,7 +20,6 @@ import NetworkDropdown from './NetworkDropdown/NetworkDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 import WalletDropdown from './WalletDropdown/WalletDropdown';
-import { useApp } from '~/contexts/AppContext';
 export default function PageHeader() {
     const { isUserConnected, setIsUserConnected } = useApp();
 
@@ -38,7 +37,7 @@ export default function PageHeader() {
     const navLinks = [
         { name: 'Trade', path: `/trade/${symbol}` },
         { name: 'Vaults', path: '/vaults' },
-        { name: 'Portfolio', path: '/portfolio' },
+        { name: 'PortfolioTest1', path: '/portfolio' },
         { name: 'Referrals', path: '/referrals' },
         // { name: 'Points', path: '/points' },
         { name: 'Leaderboard', path: '/leaderboard' },
