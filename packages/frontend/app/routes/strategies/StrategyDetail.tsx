@@ -1,6 +1,5 @@
 import Button from '~/components/Button/Button';
 import styles from './StrategyDetail.module.css';
-import OrderHistory from '../orderHistory/orderHistory';
 import { useNavigate, useParams } from 'react-router';
 import {
     useStrategiesStore,
@@ -12,6 +11,7 @@ import Modal from '~/components/Modal/Modal';
 import { FaChevronLeft } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import OrderHistory from '~/components/OrderHistory/OrderHistory';
 
 export default function Strategies() {
     // hook to manage navigation actions from this page
@@ -159,7 +159,7 @@ export default function Strategies() {
                     </div>
                     <div className={styles.strategy_details_graph}></div>
                 </div>
-                <OrderHistory />
+                <OrderHistory pageMode={false} />
                 {removeStratModalCtrl.isOpen && (
                     <Modal
                         title='Remove Strategy'
