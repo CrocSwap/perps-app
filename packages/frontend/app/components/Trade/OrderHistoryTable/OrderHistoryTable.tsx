@@ -15,10 +15,11 @@ interface OrderHistoryTableProps {
     pageMode?: boolean;
     data: OrderDataIF[];
     isFetched: boolean;
+    maxTableHeight: string | undefined;
 }
 
 export default function OrderHistoryTable(props: OrderHistoryTableProps) {
-    const { selectedFilter, pageMode, data, isFetched } = props;
+    const { selectedFilter, pageMode, data, isFetched, maxTableHeight } = props;
 
     const { symbol, filterOrderHistory } = useTradeDataStore();
 
@@ -34,7 +35,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     const viewAllLink = useMemo(() => {
         return `/orderHistory/${debugWallet.address}`;
     }, [debugWallet.address]);
-
+    console.log(maxTableHeight);
     return (
         <>
             <GenericTable<OrderDataIF, OrderDataSortBy>
@@ -61,6 +62,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                 skeletonColRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
                 defaultSortBy={'timestamp'}
                 defaultSortDirection={'desc'}
+                maxTableHeight={maxTableHeight}
             />
         </>
     );

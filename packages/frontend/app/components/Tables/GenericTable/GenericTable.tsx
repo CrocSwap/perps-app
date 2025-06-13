@@ -31,6 +31,7 @@ interface GenericTableProps<T, S> {
     defaultSortDirection?: TableSortDirection;
     heightOverride?: string;
     storageKey: string;
+    maxTableHeight: string | undefined;
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
@@ -49,9 +50,8 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         slicedLimit = 10,
         viewAllLink,
         storageKey,
-        defaultSortBy,
-        defaultSortDirection,
         heightOverride = '100%',
+        maxTableHeight,
     } = props;
 
     function safeParse<T>(value: string | null, fallback: T): T {
@@ -254,7 +254,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
-        viewAllLink && navigate(viewAllLink, { viewTransition: true });
+        if (viewAllLink) navigate(viewAllLink, { viewTransition: true });
     };
     const handleExportCsv = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -271,13 +271,14 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
             body.removeEventListener('scroll', checkShadow);
         };
     }, [tableState, checkShadow, id]);
-
+    console.log(maxTableHeight);
     return (
         <div className={styles.tableWrapper} style={{ height: heightOverride }}>
             {tableState === TableState.LOADING ? (
                 <SkeletonTable
                     rows={skeletonRows}
                     colRatios={skeletonColRatios}
+                    maxTableHeight={maxTableHeight}
                 />
             ) : (
                 <>

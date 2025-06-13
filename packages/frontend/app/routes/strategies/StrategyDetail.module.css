@@ -11,6 +11,7 @@
 .strategy_detail_page > div {
     display: flex;
     flex-direction: column;
+    height: 100%;
     gap: 20px;
     width: 1200px;
 }

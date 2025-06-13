@@ -8,7 +8,13 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
-function OrderHistory() {
+interface propsIF {
+    maxTableHeight?: string;
+}
+
+function OrderHistory(props: propsIF) {
+    const { maxTableHeight } = props;
+    console.log(maxTableHeight);
     const { address } = useParams<{ address: string }>();
 
     const [isFetched, setIsFetched] = useState(false);
@@ -58,10 +64,11 @@ function OrderHistory() {
             return fetchedHistoryData;
         }
     }, [isCurrentUser, orderHistory, fetchedHistoryData]);
-
+    console.log(maxTableHeight);
     return (
         <ExternalPage title='Order History'>
             <OrderHistoryTable
+                maxTableHeight={maxTableHeight}
                 data={tableData}
                 isFetched={isFetched}
                 pageMode={true}

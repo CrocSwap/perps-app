@@ -159,7 +159,7 @@ export default function Strategies() {
                     </div>
                     <div className={styles.strategy_details_graph}></div>
                 </div>
-                <OrderHistory />
+                <OrderHistory maxTableHeight='300px' />
                 {removeStratModalCtrl.isOpen && (
                     <Modal
                         title='Remove Strategy'
