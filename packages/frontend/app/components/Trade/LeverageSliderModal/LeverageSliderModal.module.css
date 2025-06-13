@@ -38,6 +38,8 @@
     position: relative;
     width: 100%;
     padding-bottom: var(--padding-m);
+    padding-left: var(--padding-m);
+    padding-right: var(--padding-m);
 }
 
 .sliderTrack {
@@ -120,6 +122,9 @@
 .labelContainer {
     position: relative;
     width: 100%;
+    padding-left: var(--padding-m);
+    padding-right: var(--padding-m);
+    padding-top: var(--padding-m);
 }
 
 .valueLabel {

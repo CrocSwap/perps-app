@@ -2,6 +2,7 @@
     --container-width: 303px;
     --container-height: 300px;
     --overview-container-height: 100%;
+    --not-connected-container-height: 180px;
 
     width: auto;
     height: auto;
@@ -18,7 +19,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
-    padding: var(--padding-m);
+    padding: var(--padding-s);
     border-radius: var(--radius-m, 16px);
     box-shadow: var(--dropdown-box-shadow);
     transition:
@@ -50,13 +51,14 @@
 }
 
 .notConnectedContainer {
-    height: 100%;
+    height: var(--not-connected-container-height);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     gap: var(--radius-s);
-    grid-row: 1;
 }
+
 .notConnectedText {
     color: var(--text1, #f0f0f8);
     text-align: center;

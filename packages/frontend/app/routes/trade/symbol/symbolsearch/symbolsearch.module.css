@@ -15,10 +15,12 @@
     font-size: var(--font-size-l);
     user-select: none;
     min-width: var(--search-container-width);
-    height: var(--search-container-height);
+    /* height: var(--search-container-height); */
     cursor: pointer;
-    padding: 0 var(--padding-s);
+    padding: var(--padding-s);
     border-radius: var(--radius-s);
+    height: 35px !important;
+    align-self: center;
 }
 
 .symbolSearchContainer:hover {
@@ -28,7 +30,13 @@
 .symbolIcon {
     width: var(--symbol-width-height);
     height: var(--symbol-width-height);
-    border-radius: var(--radius-m);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .symbolName {

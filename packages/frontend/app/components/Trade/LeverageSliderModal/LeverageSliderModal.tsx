@@ -124,6 +124,8 @@ export default function LeverageSliderModal({
             setValue(boundedValue);
         };
 
+        /*************  ✨ Windsurf Command ⭐  *************/
+        /*******  06236f54-2b32-4775-8149-244f4488cc3b  *******/
         const handleMouseUp = () => {
             setIsDragging(false);
         };

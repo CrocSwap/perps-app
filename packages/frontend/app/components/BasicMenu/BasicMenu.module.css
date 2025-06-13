@@ -21,7 +21,7 @@
 .menuContainer {
     position: absolute;
     animation: menuAnimation var(--ease-in-out-fast);
-    background: var(--bg-dark4);
+    background: var(--bg-dark3);
     border-radius: var(--radius-s);
     z-index: 10;
 }
@@ -31,7 +31,7 @@
 }
 
 .menuContainer.bottom {
-    top: 100%;
+    top: 130%;
 }
 
 .menuContainer.left {
@@ -50,7 +50,6 @@
 
 .menuItem:hover {
     color: var(--text1);
-    background: var(--bg-dark3);
 }
 
 .triggerWrapper {

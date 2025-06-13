@@ -1,212 +1,304 @@
-import { motion } from 'framer-motion';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useState, useRef, useEffect, type ReactNode } from 'react';
 import styles from './Tooltip.module.css';
 
-const isTouchDevice = () => {
-    if (typeof window === 'undefined') return false;
-    return (
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0 ||
-        // @ts-expect-error navigator.msMaxTouchPoints is not defined
-        navigator.msMaxTouchPoints > 0
-    );
-};
+type TooltipPosition =
+    | 'top'
+    | 'bottom'
+    | 'left'
+    | 'right'
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right';
 
 interface TooltipProps {
-    content: React.ReactNode;
-    children: React.ReactNode;
-    position?: 'top' | 'bottom' | 'left' | 'right';
+    children: ReactNode;
+    content: ReactNode;
+    position?: TooltipPosition;
     className?: string;
-    maxWidth?: string;
-    isFixed?: boolean;
+    disabled?: boolean;
+    delay?: number;
 }
 
-const Tooltip = ({
-    content,
+const Tooltip: React.FC<TooltipProps> = ({
     children,
+    content,
     position = 'top',
     className = '',
-    maxWidth = '200px',
-    isFixed = false,
-}: TooltipProps) => {
+    disabled = false,
+    delay = 0,
+}) => {
     const [isVisible, setIsVisible] = useState(false);
+    const [tooltipPosition, setTooltipPosition] = useState({ left: 0, top: 0 });
     const triggerRef = useRef<HTMLDivElement>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
-    const isTouch = isTouchDevice();
+    const timeoutRef = useRef<NodeJS.Timeout>();
+    const isMobile = useRef(false);
 
-    const calculatePosition = () => {
-        if (!tooltipRef.current || !triggerRef.current) return {};
+    // Detect if device is mobile
+    useEffect(() => {
+        isMobile.current = 'ontouchstart' in window;
+    }, []);
 
-        const tooltipRect = tooltipRef.current.getBoundingClientRect();
+    const positionTooltip = () => {
+        if (!triggerRef.current || !tooltipRef.current) return;
+
         const triggerRect = triggerRef.current.getBoundingClientRect();
+        const tooltipRect = tooltipRef.current.getBoundingClientRect();
+        const padding = 10;
+        const gap = 8;
 
-        let top = 0;
         let left = 0;
+        let top = 0;
 
+        // Calculate position based on the position prop
         switch (position) {
             case 'top':
-                left = -(tooltipRect.width - triggerRect.width) / 2;
-                top = -tooltipRect?.height - 8;
+                left =
+                    triggerRect.left +
+                    triggerRect.width / 2 -
+                    tooltipRect.width / 2;
+                top = triggerRect.top - tooltipRect.height - gap;
                 break;
+
             case 'bottom':
-                left = -(tooltipRect.width - triggerRect.width) / 2;
-                top = triggerRect?.height + 8;
+                left =
+                    triggerRect.left +
+                    triggerRect.width / 2 -
+                    tooltipRect.width / 2;
+                top = triggerRect.bottom + gap;
                 break;
+
             case 'left':
-                left = -tooltipRect.width - 8;
-                top = -(tooltipRect?.height - triggerRect?.height) / 2;
+                left = triggerRect.left - tooltipRect.width - gap;
+                top =
+                    triggerRect.top +
+                    triggerRect.height / 2 -
+                    tooltipRect.height / 2;
                 break;
+
             case 'right':
-                left = triggerRect.width + 8;
-                top = -(tooltipRect?.height - triggerRect?.height) / 2;
+                left = triggerRect.right + gap;
+                top =
+                    triggerRect.top +
+                    triggerRect.height / 2 -
+                    tooltipRect.height / 2;
+                break;
+
+            case 'top-left':
+                left = triggerRect.left;
+                top = triggerRect.top - tooltipRect.height - gap;
+                break;
+
+            case 'top-right':
+                left = triggerRect.right - tooltipRect.width;
+                top = triggerRect.top - tooltipRect.height - gap;
+                break;
+
+            case 'bottom-left':
+                left = triggerRect.left;
+                top = triggerRect.bottom + gap;
+                break;
+
+            case 'bottom-right':
+                left = triggerRect.right - tooltipRect.width;
+                top = triggerRect.bottom + gap;
                 break;
         }
 
-        // Check if tooltip would go off screen
-        const viewportPadding = 10;
-        const tooltipLeft = triggerRect.left + left;
-        const tooltipTop = triggerRect.top + top;
+        //  fallback positioning if tooltip would go off-screen
+        let finalPosition = position;
 
-        if (tooltipLeft < viewportPadding) {
-            left = left + (viewportPadding - tooltipLeft);
-        } else if (
-            tooltipLeft + tooltipRect.width >
-            window.innerWidth - viewportPadding
-        ) {
-            left =
-                left -
-                (tooltipLeft +
-                    tooltipRect.width -
-                    window.innerWidth +
-                    viewportPadding);
-        }
-
-        if (tooltipTop < viewportPadding) {
-            top = triggerRect?.height + 8; // Switch to bottom if would go off top
-        } else if (
-            tooltipTop + tooltipRect?.height >
-            window.innerHeight - viewportPadding
-        ) {
-            top = -tooltipRect?.height - 8; // Switch to top if would go off bottom
-        }
-
-        if (isFixed) {
-            top = triggerRect.top + top;
-            left = triggerRect.left + left;
-        }
-
-        return { top, left };
-    };
-
-    useEffect(() => {
-        let rafId: number;
-
-        if (isVisible) {
-            const updatePosition = () => {
-                const position = calculatePosition();
-                if (tooltipRef.current) {
-                    tooltipRef.current.style.top = `${position.top}px`;
-                    tooltipRef.current.style.left = `${position.left}px`;
+        // Check horizontal bounds
+        if (left < padding) {
+            if (position.includes('left')) {
+                // Try right variant
+                if (position === 'left') {
+                    left = triggerRect.right + gap;
+                    finalPosition = 'right';
+                } else if (position === 'top-left') {
+                    left = triggerRect.right - tooltipRect.width;
+                    finalPosition = 'top-right';
+                } else if (position === 'bottom-left') {
+                    left = triggerRect.right - tooltipRect.width;
+                    finalPosition = 'bottom-right';
                 }
-                rafId = requestAnimationFrame(updatePosition);
-            };
-
-            rafId = requestAnimationFrame(updatePosition);
-
-            return () => {
-                if (rafId) cancelAnimationFrame(rafId);
-            };
-        }
-    }, [isVisible, position]);
-
-    const handleTrigger = (show: boolean) => {
-        if (!isTouch) {
-            setIsVisible(show);
-        }
-    };
-
-    const handleClick = (e: React.MouseEvent) => {
-        if (isTouch) {
-            e.preventDefault();
-            setIsVisible(!isVisible);
-
-            const handleOutsideClick = (e: MouseEvent) => {
-                if (
-                    triggerRef.current &&
-                    !triggerRef.current.contains(e.target as Node)
-                ) {
-                    setIsVisible(false);
-                    document.removeEventListener('click', handleOutsideClick);
+            } else {
+                left = padding;
+            }
+        } else if (left + tooltipRect.width > window.innerWidth - padding) {
+            if (position.includes('right')) {
+                // Try left variant
+                if (position === 'right') {
+                    left = triggerRect.left - tooltipRect.width - gap;
+                    finalPosition = 'left';
+                } else if (position === 'top-right') {
+                    left = triggerRect.left;
+                    finalPosition = 'top-left';
+                } else if (position === 'bottom-right') {
+                    left = triggerRect.left;
+                    finalPosition = 'bottom-left';
                 }
-            };
-
-            if (!isVisible) {
-                setTimeout(() => {
-                    document.addEventListener('click', handleOutsideClick);
-                }, 0);
+            } else {
+                left = window.innerWidth - tooltipRect.width - padding;
             }
         }
+
+        // Check vertical bounds
+        if (top < padding) {
+            if (position.includes('top')) {
+                // Try bottom variant
+                if (position === 'top') {
+                    top = triggerRect.bottom + gap;
+                    finalPosition = 'bottom';
+                } else if (position === 'top-left') {
+                    top = triggerRect.bottom + gap;
+                    finalPosition =
+                        finalPosition === 'top-right'
+                            ? 'bottom-right'
+                            : 'bottom-left';
+                } else if (position === 'top-right') {
+                    top = triggerRect.bottom + gap;
+                    finalPosition =
+                        finalPosition === 'top-left'
+                            ? 'bottom-left'
+                            : 'bottom-right';
+                }
+            } else {
+                top = padding;
+            }
+        } else if (top + tooltipRect.height > window.innerHeight - padding) {
+            if (position.includes('bottom')) {
+                // Try top variant
+                if (position === 'bottom') {
+                    top = triggerRect.top - tooltipRect.height - gap;
+                    finalPosition = 'top';
+                } else if (position === 'bottom-left') {
+                    top = triggerRect.top - tooltipRect.height - gap;
+                    finalPosition =
+                        finalPosition === 'bottom-right'
+                            ? 'top-right'
+                            : 'top-left';
+                } else if (position === 'bottom-right') {
+                    top = triggerRect.top - tooltipRect.height - gap;
+                    finalPosition =
+                        finalPosition === 'bottom-left'
+                            ? 'top-left'
+                            : 'top-right';
+                }
+            } else {
+                top = window.innerHeight - tooltipRect.height - padding;
+            }
+        }
+
+        setTooltipPosition({
+            left: Math.round(left),
+            top: Math.round(top),
+        });
     };
 
-    const anim = useMemo(() => {
-        let ret;
-        switch (position) {
-            case 'top':
-                ret = {
-                    initial: { opacity: 0, y: -10 },
-                };
-                break;
-            case 'bottom':
-                ret = {
-                    initial: { opacity: 0, y: 10 },
-                };
-                break;
-            case 'left':
-                ret = {
-                    initial: { opacity: 0, x: 10 },
-                };
-                break;
-            case 'right':
-                ret = {
-                    initial: { opacity: 0, x: -10 },
-                };
-                break;
+    const showTooltip = () => {
+        if (disabled || !content) return;
+
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
         }
-        return {
-            ...ret,
-            transition: { duration: 0.1 },
-            animate: { opacity: 1, y: 0, x: 0 },
+
+        if (delay > 0) {
+            timeoutRef.current = setTimeout(() => {
+                setIsVisible(true);
+                // Position after state update
+                setTimeout(positionTooltip, 0);
+            }, delay);
+        } else {
+            setIsVisible(true);
+            // Position after state update
+            setTimeout(positionTooltip, 0);
+        }
+    };
+
+    const hideTooltip = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+        setIsVisible(false);
+    };
+
+    const handleMouseEnter = () => {
+        if (!isMobile.current) {
+            showTooltip();
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (!isMobile.current) {
+            hideTooltip();
+        }
+    };
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        e.preventDefault();
+        if (isMobile.current) {
+            showTooltip();
+            // Auto-hide after 3 seconds on mobile
+            setTimeout(hideTooltip, 3000);
+        }
+    };
+
+    // Reposition on scroll or resize
+    useEffect(() => {
+        if (!isVisible) return;
+
+        const handleScrollOrResize = () => {
+            positionTooltip();
         };
-    }, [position]);
+
+        window.addEventListener('scroll', handleScrollOrResize, {
+            passive: true,
+        });
+        window.addEventListener('resize', handleScrollOrResize);
+
+        return () => {
+            window.removeEventListener('scroll', handleScrollOrResize);
+            window.removeEventListener('resize', handleScrollOrResize);
+        };
+    }, [isVisible]);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     return (
-        <div
-            className={styles.tooltipWrapper}
-            ref={triggerRef}
-            onMouseEnter={() => handleTrigger(true)}
-            onMouseLeave={() => handleTrigger(false)}
-            onClick={handleClick}
-        >
-            {children}
+        <>
+            <div
+                ref={triggerRef}
+                className={`${styles.tooltipWrapper} ${className}`}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onTouchStart={handleTouchStart}
+            >
+                {children}
+            </div>
 
-            {isVisible && (
-                <motion.div
+            {/* Render tooltip using portal-like approach with fixed positioning */}
+            {isVisible && content && (
+                <div
                     ref={tooltipRef}
-                    {...anim}
+                    className={`${styles.tooltip} ${styles.visible} ${isMobile.current ? styles.mobileTooltip : ''}`}
                     style={{
-                        maxWidth,
-                        position: isFixed ? 'fixed' : 'absolute',
+                        left: tooltipPosition.left,
+                        top: tooltipPosition.top,
                     }}
-                    className={`
-            ${styles.tooltip}
-            ${isTouch ? styles.mobileTooltip : ''}
-            ${className}
-          `}
                 >
                     {content}
-                </motion.div>
+                </div>
             )}
-        </div>
+        </>
     );
 };
 

@@ -29,6 +29,9 @@
     width: 15px;
     animation: fadeIn 0.1s ease-in-out;
 }
+.tooltip > div {
+    z-index: 9999 !important;
+}
 .tooltip svg {
     display: none;
 }
