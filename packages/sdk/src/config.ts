@@ -16,7 +16,7 @@ export const DEFAULT_API_ENVIRONMENT: Environment = 'mock';
 
 // Default configuration values
 export const DEFAULT_SLIPPAGE = 0.05;
-export const DEFAULT_PING_INTERVAL_MS = 15 * 1000;
+export const DEFAULT_PING_INTERVAL_MS = 5 * 1000;
 export const DEFAULT_SERIALIZATION_TYPE = 'json';
 
 export const DEFAULT_RECONNECT_ATTEMPTS = 5;
