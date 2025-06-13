@@ -9,21 +9,18 @@ import {
 } from 'react-router';
 import Notifications from '~/components/Notifications/Notifications';
 import type { Route } from './+types/root';
-import PageHeader from './components/PageHeader/PageHeader';
-
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
+import PageHeader from './components/PageHeader/PageHeader';
 import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
-import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import { useTradeDataStore } from './stores/TradeDataStore';
-import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
-import { AppProvider } from './contexts/AppContext';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -173,8 +170,8 @@ export default function App() {
             <Layout>
                 <AppProvider>
                     <SdkProvider environment={wsEnvironment}>
-                      {!internetConnected && <NoConnectionIndicator />}
-                      <TutorialProvider>
+                        {!internetConnected && <NoConnectionIndicator />}
+                        <TutorialProvider>
                             <div className='root-container'>
                                 {/* Added error boundary for header */}
                                 <ComponentErrorBoundary>
