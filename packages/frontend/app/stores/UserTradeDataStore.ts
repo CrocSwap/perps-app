@@ -12,6 +12,8 @@ import type {
 } from '~/utils/UserDataIFs';
 
 export interface UserTradeDataStore {
+    internetConnected: boolean;
+    setInternetConnected: (internetConnected: boolean) => void;
     userOrders: OrderDataIF[];
     userSymbolOrders: OrderDataIF[];
     setUserOrders: (userOrders: OrderDataIF[]) => void;
@@ -43,6 +45,10 @@ export interface UserTradeDataStore {
 }
 
 export const createUserTradesSlice = (set: any, get: any) => ({
+    internetConnected: true,
+    setInternetConnected: (internetConnected: boolean) => {
+        set({ internetConnected });
+    },
     userOrders: [],
     userSymbolOrders: [],
     setUserOrders: (userOrders: OrderDataIF[]) => {

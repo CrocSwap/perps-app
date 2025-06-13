@@ -20,6 +20,10 @@ import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
+import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
+import { useTradeDataStore } from './stores/TradeDataStore';
+import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
+import { AppProvider } from './contexts/AppContext';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -108,6 +112,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
     // Use memoized value to prevent unnecessary re-renders
     const { wsEnvironment } = useDebugStore();
+    const { setInternetConnected, internetConnected } = useTradeDataStore();
+
+    useEffect(() => {
+        const onlineListener = () => {
+            setInternetConnected(true);
+        };
+        const offlineListener = () => {
+            setInternetConnected(false);
+        };
+
+        window.addEventListener('online', onlineListener);
+        window.addEventListener('offline', offlineListener);
+
+        return () => {
+            window.removeEventListener('online', onlineListener);
+            window.removeEventListener('offline', offlineListener);
+        };
+    }, []);
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').then((registration) => {
@@ -151,13 +173,13 @@ export default function App() {
             <Layout>
                 <AppProvider>
                     <SdkProvider environment={wsEnvironment}>
-                        <TutorialProvider>
+                      {!internetConnected && <NoConnectionIndicator />}
+                      <TutorialProvider>
                             <div className='root-container'>
                                 {/* Added error boundary for header */}
                                 <ComponentErrorBoundary>
                                     <PageHeader />
                                 </ComponentErrorBoundary>
-
                                 <main className='content'>
                                     {/*  Added Suspense for async content loading */}
                                     <Suspense fallback={<LoadingIndicator />}>

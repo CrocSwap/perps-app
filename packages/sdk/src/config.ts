@@ -23,4 +23,7 @@ export const DEFAULT_RECONNECT_ATTEMPTS = 5;
 export const RECONNECT_BASE_DELAY_MS = 200; // Initial delay before first reconnect attempt
 export const RECONNECT_MAX_DELAY_MS = 5000; // Maximum delay between attempts
 
+export const PONG_CHECK_TIMEOUT_MS = 2000; // default timeout for pong received check
+export const RECONNECT_TIMEOUT_MS = 2000; // timeout to trigger connect method while reconnecting
+
 export const DEMO_USER = '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00';

@@ -60,11 +60,11 @@ const LabelComponent = ({
                     widthAttr = paneCanvas.width;
 
                     if (
-                        width !== canvasSize.styleWidth ||
-                        height !== canvasSize.styleWidth
+                        width !== canvasSize?.styleWidth ||
+                        height !== canvasSize?.styleWidth
                     ) {
-                        overlayCanvasRef.current.style.width = `${canvasSize.styleWidth}px`;
-                        overlayCanvasRef.current.style.height = `${canvasSize.styleHeight}px`;
+                        overlayCanvasRef.current.style.width = `${canvasSize?.styleWidth}px`;
+                        overlayCanvasRef.current.style.height = `${canvasSize?.styleHeight}px`;
                         overlayCanvasRef.current.width = paneCanvas.width;
                         overlayCanvasRef.current.height = paneCanvas.height;
                     }

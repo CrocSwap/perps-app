@@ -1,15 +1,14 @@
 /* top-level element returned by JSX file */
 .option_line {
-    --option-line-height: 32px;
-    --active-option-width: 170px;
-    --active-option-height: 32px;
-
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
-    height: var(--option-line-height);
+    /* magic number is specified by the Figma */
+    /* needs to be specified and cannot be determined programmatically */
+    /* not in a CSS variable bc it is only consumed here */
+    height: 32px;
     font-size: var(--font-size-s);
     color: var(--text1);
 }
@@ -19,8 +18,12 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    height: inherit;
-    gap: var(--gap-s);
+    /* magic number is specified by the Figma */
+    /* needs to be specified and cannot be determined programmatically */
+    /* not in a CSS variable bc it is only consumed here */
+    width: 170px;
+    height: 100%;
+    gap: var(--gap-xs);
     overflow-y: visible;
 }
 
@@ -31,24 +34,24 @@
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
-    width: var(--active-option-width);
-    height: var(--active-option-height);
-    padding: 0 var(--padding-xs) 0 var(--padding-s);
+    min-height: 100%;
+    padding: 0 var(--padding-s);
     background-color: var(--bg-dark4);
     border-radius: var(--radius-s);
     cursor: pointer;
 }
 
+/* menu that appears when the active option is clicked */
 .options_dropdown {
-    position: relative;
     display: flex;
     flex-direction: column;
-    padding: var(--padding-xs) var(--padding-xs);
+    padding: var(--padding-xs);
     background-color: var(--bg-dark6);
     border-radius: var(--radius-s);
     z-index: calc(var(--base-z-idx-app-options) + 1);
 }
 
+/* individual items in the dropdown menu */
 .options_dropdown > * {
     padding: 0 var(--padding-s);
     border-radius: var(--radius-xs);

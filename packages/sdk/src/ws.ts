@@ -1,4 +1,8 @@
-import { DEFAULT_PING_INTERVAL_MS } from './config';
+import {
+    DEFAULT_PING_INTERVAL_MS,
+    PONG_CHECK_TIMEOUT_MS,
+    RECONNECT_TIMEOUT_MS,
+} from './config';
 import { createJsonParserWorker } from './utils/workers';
 import type { Subscription, WsMsg } from './utils/types';
 
@@ -104,6 +108,8 @@ export class WebsocketManager {
     private nextWorkerIndex: number = 0;
     private numWorkers: number;
     private jsonParserWorkerBlobUrl: string | null = null;
+    private pongReceived: boolean = false;
+    private pongTimeout: NodeJS.Timeout | null = null;
 
     constructor(
         baseUrl: string,
@@ -190,6 +196,27 @@ export class WebsocketManager {
         }
     };
 
+    private sendPing = () => {
+        if (this.stopped || !this.ws || this.ws.readyState !== WebSocket.OPEN)
+            return;
+        this.log('sending ping');
+        if (this.pongTimeout) {
+            clearTimeout(this.pongTimeout);
+            this.pongTimeout = null;
+        }
+
+        this.ws.send(JSON.stringify({ method: 'ping' }));
+
+        this.pongTimeout = setTimeout(() => {
+            if (!this.pongReceived) {
+                console.log('>>> Pong timeout, reconnecting');
+                this.reconnect();
+            }
+        }, PONG_CHECK_TIMEOUT_MS);
+
+        this.pongReceived = false;
+    };
+
     private onOpen = () => {
         this.log('onOpen');
         this.wsReady = true;
@@ -205,23 +232,19 @@ export class WebsocketManager {
 
         if (!this.stopped && this.pingInterval === null) {
             // @ts-ignore
+
             this.pingInterval = setInterval(() => {
-                if (
-                    this.stopped ||
-                    !this.ws ||
-                    this.ws.readyState !== WebSocket.OPEN
-                )
-                    return;
-                this.log('sending ping');
-                this.ws.send(JSON.stringify({ method: 'ping' }));
+                this.sendPing();
             }, DEFAULT_PING_INTERVAL_MS);
             this.log('started ping');
+            this.sendPing();
         }
     };
 
     private handleParsedMessage = (wsMsg: WsMsg, originalMessage: string) => {
         const identifier = wsMsgToIdentifier(wsMsg);
         if (identifier === 'pong') {
+            this.pongReceived = true;
             this.log('Pong response received.');
             return;
         }
@@ -351,8 +374,15 @@ export class WebsocketManager {
             return;
         }
 
-        const oldSubscriptions = { ...this.allSubscriptions };
+        this.stashSubscriptions();
 
+        this.baseUrl = newBaseUrl;
+
+        this.connect();
+    }
+
+    private stashSubscriptions = () => {
+        const oldSubscriptions = { ...this.allSubscriptions };
         this.stop();
 
         this.queuedSubscriptions = [];
@@ -366,11 +396,7 @@ export class WebsocketManager {
         }
         this.allSubscriptions = {};
         this.activeSubscriptions = {};
-
-        this.baseUrl = newBaseUrl;
-
-        this.connect();
-    }
+    };
 
     public subscribe(
         subscription: Subscription,
@@ -486,5 +512,13 @@ export class WebsocketManager {
 
     public isWsReady() {
         return this.wsReady;
+    }
+
+    public reconnect() {
+        console.log('>>> reconnecting');
+        this.stashSubscriptions();
+        setTimeout(() => {
+            this.connect();
+        }, RECONNECT_TIMEOUT_MS);
     }
 }
