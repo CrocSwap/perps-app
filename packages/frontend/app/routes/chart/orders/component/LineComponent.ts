@@ -13,6 +13,7 @@ export type LineData = {
     color: string;
     type: 'PNL' | 'LIMIT' | 'LIQ';
     labelLocations?: LabelLocation[];
+    oid?: number;
 };
 
 interface LineProps {

@@ -1,8 +1,10 @@
 .create_strategy_page {
     height: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding: var(--padding-xxl);
 
     /* this value is referenced by children to fix z-index issues */
     --create-strategy-page-z-index: 1;

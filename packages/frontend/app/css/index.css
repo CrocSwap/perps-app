@@ -68,6 +68,7 @@
     --margin-xl: 64px;
     --margin-xxl: 96px;
 
+    --padding-row: 2px;
     --padding-xs: 4px;
     --padding-s: 8px;
     --padding-m: 16px;
@@ -77,6 +78,8 @@
     --padding-xxl: 96px;
     --padding-dropdown: 0px 4px 0px 8px;
     --padding-modal: var(--padding-s) var(--padding-m) var(--padding-m);
+
+    --gap-row: 2px;
     --gap-xs: 4px;
     --gap-s: 8px;
     --gap-m: 16px;

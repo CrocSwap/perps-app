@@ -1,0 +1,34 @@
+.wsReconnectingIndicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding-bottom: var(--margin-s);
+    z-index: 1000;
+    color: var(--text1);
+    background: linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--accent1) 20%, transparent) 0%,
+        color-mix(in srgb, var(--bg-dark1) 0%, transparent) 100%
+    );
+}
+
+.wsReconnectingIndicatorContent {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--margin-m);
+}
+
+.wsLogoWrapper {
+    margin-bottom: var(--margin-m);
+}
+
+.indicatorText {
+    text-align: center;
+    margin-top: var(--margin-m);
+}

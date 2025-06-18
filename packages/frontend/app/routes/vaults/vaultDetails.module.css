@@ -1,0 +1,96 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-l);
+
+    width: 100%;
+    max-width: 1200px; /* Add a max-width to constrain the content */
+    margin-left: auto;
+    margin-right: auto;
+}
+.container header {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-m);
+    color: var(--text1, #e1eeee);
+    font-size: var(--font-size-xl, 36px);
+}
+
+.vaultSection {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-m);
+    width: 100%;
+}
+
+.vaultCard {
+    flex: 1;
+    padding: var(--padding-m);
+    border-radius: var(--radius-m);
+    background: var(--bg-dark2);
+}
+
+.vaultCard.zeroPadding {
+    padding: 0;
+}
+
+.vaultCardTitle {
+    font-size: var(--font-size-m);
+    color: var(--text2);
+    margin-bottom: var(--margin-m);
+}
+
+.vaultCardContent {
+    font-size: var(--font-size-xl);
+    color: var(--text1);
+    display: inline-block;
+}
+
+.vaultCardContentApr {
+    display: inline-block;
+    position: relative;
+}
+
+.vaultCardContentApr::after {
+    content: 'APR';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: calc(100% + var(--gap-s));
+    font-size: var(--font-size-m);
+}
+
+.aprLabel {
+    font-size: var(--font-size-m);
+    padding: 0 calc(var(--padding-s));
+    border-radius: calc(var(--radius-s) / 2);
+}
+
+.headerWrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-m);
+}
+
+.backButton {
+    padding: var(--padding-s);
+    cursor: pointer;
+    height: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--radius-m);
+}
+
+.backButton:hover {
+    background-color: var(--bg-dark4);
+}
+
+.headerRightContent {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-m);
+    margin-left: auto;
+}

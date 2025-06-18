@@ -1,0 +1,15 @@
+.content {
+    padding: var(--padding-m);
+}
+
+.titleText {
+    font-size: var(--font-size-s);
+    color: var(--text2);
+}
+
+.contentText {
+    font-size: var(--font-size-s);
+    color: var(--text1);
+    margin-bottom: var(--margin-m);
+    margin-top: var(--margin-s);
+}

@@ -31,19 +31,3 @@
     cursor: pointer;
     font-size: 1rem;
 }
-
-.buy .orderTradePrice {
-    color: var(--green);
-}
-
-.sell .orderTradePrice {
-    color: var(--red);
-}
-
-div[class*='inverse'] .buy .orderTradePrice {
-    color: var(--red);
-}
-
-div[class*='inverse'] .sell .orderTradePrice {
-    color: var(--green);
-}

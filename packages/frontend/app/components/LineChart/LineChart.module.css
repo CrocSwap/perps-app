@@ -11,8 +11,5 @@
 
 .chartContainer {
     display: grid;
-    /* grid-template-columns: 50px 850px; */
-
-    height: 250px;
-    width: 100%;
+    /* width: 100%; */
 }

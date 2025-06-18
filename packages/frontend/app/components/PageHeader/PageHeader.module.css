@@ -2,6 +2,7 @@
     --menu-button-height-width: 25px;
     --deposit-button-width: 120px;
     --deposit-button-height: 23px;
+    --help-button-width-height: 25px;
 
     width: 100%;
     height: 100%;
@@ -12,6 +13,10 @@
     justify-content: space-between;
     gap: var(--gap-l);
     position: relative;
+}
+
+.container > * {
+    transition: all 0.3s ease-in-out;
 }
 
 .container nav {
@@ -27,6 +32,26 @@
 .moreButton {
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-m, 18px);
+    white-space: nowrap;
+}
+
+.ambientmm {
+    display: flex;
+    padding: var(--gap-xs) var(--gap-s);
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: var(--radius-s, 8px);
+    border: 1px solid var(--accent1, #7371fc);
+    text-wrap: nowrap;
+    color: var(--accent1, #7371fc) !important;
+    cursor: pointer;
+    font-size: var(--font-family-m, 18px);
+}
+
+.ambientmm:hover {
+    color: color-mix(in srgb, var(--accent1) 90%, black) !important;
+    border: 1px solid color-mix(in srgb, var(--accent1) 90%, black) !important;
 }
 
 .moreButton {
@@ -34,33 +59,33 @@
     background: transparent;
     border: none;
     text-transform: capitalize;
-
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: var(--gap-s);
 }
-.moreButton svg {
-    margin: var(--margin-s) 0;
-}
+
 .container nav a:hover,
 .moreButton:hover {
     color: var(--text1);
     transition: all var(--ease-in-out-med);
 }
+
 .activeNavLink {
     color: var(--text1) !important;
 }
 
 .rightSide {
-    width: 100%;
+    width: auto;
     height: 100%;
     display: flex;
     justify-content: flex-end;
     flex-direction: row;
     align-items: center;
     gap: var(--gap-s);
+    flex-shrink: 0;
 }
+
 .menuButtonMobile {
     display: none;
     width: var(--menu-button-height-width);
@@ -68,12 +93,12 @@
     padding: var(--padding-xs);
     justify-content: center;
     align-items: center;
-
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark2, #0e0e14);
     outline: none;
     border: none;
 }
+
 .menuButton {
     display: flex;
     width: var(--menu-button-height-width);
@@ -81,7 +106,6 @@
     padding: var(--padding-xs);
     justify-content: center;
     align-items: center;
-
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark2, #0e0e14);
     outline: none;
@@ -91,13 +115,15 @@
 .menuButton svg,
 .menuButtonMobile svg,
 .walletButton svg {
-    color: var(--text2);
+    color: var(--text1);
 }
+
 .menuButtonMobile:hover > svg,
 .menuButton:hover svg,
 .walletButton:hover svg {
-    color: var(--text1) !important;
+    color: var(--text2) !important;
 }
+
 .internationalButton {
     display: flex;
     width: var(--menu-button-height-width);
@@ -114,6 +140,7 @@
 .internationalButton svg {
     stroke: var(--text2);
 }
+
 .internationalButton:hover svg {
     stroke: var(--text1) !important;
 }
@@ -129,6 +156,7 @@
     opacity: 1;
     height: 350px;
 }
+
 .walletButton {
     outline: none;
     border: none;
@@ -139,16 +167,38 @@
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
-
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark2, #0e0e14);
-    color: var(--accent1, #7371fc);
+    color: var(--text1);
     font-size: var(--font-size-s, 12px);
+    transition: all 0.3s ease-in-out;
+}
+
+.helpButton {
+    outline: none;
+    border: none;
+    display: flex;
+    flex-direction: row;
+    height: var(--help-button-height-width);
+    padding: var(--padding-xs);
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    border-radius: var(--radius-s, 8px);
+    background: var(--bg-dark2, #0e0e14);
+    color: var(--text1);
+    font-size: var(--font-size-s, 12px);
+    transition: all 0.3s ease-in-out;
 }
 
 .walletButton:hover {
     background: var(--bg-dark3, #16161c);
 }
+
+.helpButton:hover > svg {
+    fill: var(--text1);
+}
+
 .depositButton {
     width: var(--deposit-button-width);
     height: var(--deposit-button-height);
@@ -161,11 +211,12 @@
     gap: var(--gap-s);
     flex-shrink: 0;
     border-radius: var(--radius-s, 8px);
-    background: var(--accent1,);
+    background: var(--accent1);
     color: var(--text1);
     font-size: var(--font-size-m, 18px);
     padding: 1px var(--padding-s);
 }
+
 .depositButton:hover {
     background-color: color-mix(in srgb, var(--accent1) 90%, black);
 }
@@ -173,7 +224,6 @@
 .rpcButton {
     outline: none;
     border: none;
-    width: 45px;
     display: flex;
     height: var(--menu-button-height-width);
     padding: var(--padding-xs);
@@ -181,10 +231,7 @@
     gap: var(--gap-xs);
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark2, #0e0e14);
-
     color: var(--text1, #f0f0f8);
-
-    /* Main/S */
     font-size: var(--font-size-s, 12px);
 }
 
@@ -202,9 +249,9 @@
     gap: var(--gap-xs);
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark2, #0e0e14);
-
     color: var(--text2);
 }
+
 .networkButton:hover {
     color: var(--text1, #f0f0f8);
 }
@@ -214,20 +261,104 @@
         transform: translateY(0);
     }
     30% {
-        transform: translateY(-1px); /* Smaller upward movement */
+        transform: translateY(-1px);
     }
     50% {
         transform: translateY(0);
     }
     70% {
-        transform: translateY(-1px); /* Even smaller second bounce */
+        transform: translateY(-1px);
     }
     100% {
         transform: translateY(0);
     }
 }
-/* Responsive Styles */
 
+/* Desktop to Laptop Responsive Styles */
+@media (max-width: 1400px) {
+    .container {
+        gap: var(--gap-m);
+    }
+
+    .container nav {
+        gap: var(--gap-m);
+    }
+
+    .container nav a,
+    .moreButton {
+        font-size: var(--font-size-s, 14px);
+    }
+
+    .ambientmm {
+        font-size: var(--font-size-s, 14px);
+        padding: var(--gap-xs) var(--gap-xs);
+    }
+}
+
+@media (max-width: 1200px) {
+    .container {
+        gap: var(--gap-s);
+        padding: 0px var(--padding-xs);
+    }
+
+    .container nav {
+        gap: var(--gap-s);
+    }
+
+    .rightSide {
+        gap: var(--gap-xs);
+    }
+
+    .depositButton {
+        width: 100px;
+        font-size: var(--font-size-s, 14px);
+    }
+
+    .walletButton {
+        font-size: var(--font-size-xs, 10px);
+    }
+}
+
+@media (max-width: 1024px) {
+    .container nav a,
+    .moreButton {
+        font-size: var(--font-size-s);
+    }
+
+    .ambientmm {
+        font-size: var(--font-size-s);
+        padding: 4px 6px;
+    }
+
+    .depositButton {
+        width: 80px;
+        height: 20px;
+        font-size: var(--font-size-s);
+    }
+
+    .networkButton {
+        display: none;
+    }
+    .rpcButton span {
+        display: none;
+    }
+}
+
+@media (max-width: 900px) {
+    .menuButtonMobile {
+        display: flex;
+    }
+
+    .nav a:nth-child(n + 4) {
+        display: none;
+    }
+
+    .ambientmm {
+        display: none;
+    }
+}
+
+/* Mobile Styles */
 @media (max-width: 768px) {
     .nav {
         position: fixed;
@@ -261,5 +392,13 @@
         width: 100%;
         padding: var(--padding-s);
         border-radius: var(--radius-m);
+    }
+
+    .nav a {
+        display: flex !important;
+    }
+
+    .ambientmm {
+        display: flex !important;
     }
 }

@@ -43,6 +43,10 @@
     max-width: 600px;
     z-index: 2;
     margin-left: 10rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .left h1 {
@@ -60,12 +64,13 @@
 .buttons {
     display: flex;
     gap: var(--gap-m);
+    justify-content: center;
     flex-wrap: wrap;
 }
 
 .primary {
     padding: 0.75rem 2rem;
-    background: #7371fc;
+    background: var(--accent1);
     color: white;
     border: none;
     border-radius: 12px;
@@ -74,23 +79,21 @@
 }
 
 .primary:hover {
-    background: #8b89ff;
-    box-shadow: 0 0 10px rgba(115, 113, 252, 0.5);
+    background-color: color-mix(in srgb, var(--accent1) 90%, black);
 }
 
 .secondary {
     padding: 0.75rem 2rem;
     background: transparent;
-    border: 2px solid #7371fc;
-    color: #7371fc;
+    border: 2px solid var(--accent1);
+    color: var(--accent1);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .secondary:hover {
-    background: rgba(115, 113, 252, 0.1);
-    box-shadow: 0 0 10px rgba(115, 113, 252, 0.3);
+    background-color: color-mix(in srgb, var(--accent1) 4%, black);
 }
 
 .right {
@@ -173,7 +176,10 @@
 
 @media (max-width: 1024px) {
     .hero {
+        width: 100%;
+        display: flex;
         flex-direction: column;
+        align-items: center;
         text-align: center;
         padding: 3rem 1.5rem;
     }
@@ -181,6 +187,8 @@
     .left {
         max-width: 100%;
         margin-bottom: var(--margin-l);
+        margin-left: 0;
+        align-items: center;
     }
 
     .left h1 {

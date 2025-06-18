@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { WsChannels } from '~/utils/Constants';
+import { debugWallets, WsChannels } from '~/utils/Constants';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
@@ -15,6 +15,7 @@ import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
 import styles from './TradeTable.module.css';
 import { Pages, usePage } from '~/hooks/usePage';
+import { useDebugStore } from '~/stores/DebugStore';
 export interface FilterOption {
     id: string;
     label: string;
@@ -34,10 +35,11 @@ const filterOptions: FilterOption[] = [
 
 interface TradeTableProps {
     portfolioPage?: boolean;
+    vaultPage?: boolean;
 }
 
 export default function TradeTable(props: TradeTableProps) {
-    const { portfolioPage } = props;
+    const { portfolioPage, vaultPage } = props;
     const {
         selectedTradeTab,
         setSelectedTradeTab,
@@ -51,6 +53,8 @@ export default function TradeTable(props: TradeTableProps) {
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
     const { page } = usePage();
+
+    const { debugWallet, setDebugWallet } = useDebugStore();
 
     const tabs = useMemo(() => {
         if (!page) return [];
@@ -73,6 +77,18 @@ export default function TradeTable(props: TradeTableProps) {
         }
         return availableTabs;
     }, [page]);
+
+    // reset wallet on trade tables after switch back from vaults
+    useEffect(() => {
+        if (
+            !vaultPage &&
+            !debugWallets.reduce((acc, wallet) => {
+                return acc || wallet.address === debugWallet.address;
+            }, false)
+        ) {
+            setDebugWallet(debugWallets[0]);
+        }
+    }, [vaultPage]);
 
     useEffect(() => {
         if (page === Pages.TRADE) {

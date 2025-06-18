@@ -120,3 +120,11 @@
         min-width: var(--container-min-width);
     }
 }
+
+.moreInfoContainer {
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    background: var(--bg-dark3);
+    padding: var(--padding-s);
+    border-radius: var(--radius-s);
+}

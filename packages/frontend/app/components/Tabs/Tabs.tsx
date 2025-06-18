@@ -1,5 +1,12 @@
 import { motion } from 'framer-motion';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useId,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
 import styles from './Tabs.module.css';
@@ -223,8 +230,20 @@ export default function Tabs(props: TabsProps) {
         }
     };
 
+    const id = useId();
+
+    const assignLayoutId = useCallback(() => {
+        if (
+            layoutIdPrefix === 'tabIndicator' &&
+            (wrapperId === undefined || wrapperId === null || wrapperId === '')
+        ) {
+            return `${layoutIdPrefix}-${id}`;
+        }
+        return `${layoutIdPrefix}-${wrapperId || ''}`;
+    }, [wrapperId, layoutIdPrefix]);
+
     // Create a unique layoutId for this specific tabs instance
-    const layoutId = `${layoutIdPrefix}-${wrapperId || ''}`;
+    const layoutId = assignLayoutId();
 
     return (
         <div

@@ -49,8 +49,8 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         slicedLimit = 10,
         viewAllLink,
         storageKey,
-        defaultSortBy,
-        defaultSortDirection,
+        // defaultSortBy,
+        // defaultSortDirection,
         heightOverride = '100%',
     } = props;
 
@@ -273,7 +273,12 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     }, [tableState, checkShadow, id]);
 
     return (
-        <div className={styles.tableWrapper} style={{ height: heightOverride }}>
+        <div
+            className={styles.tableWrapper}
+            style={{
+                height: heightOverride,
+            }}
+        >
             {tableState === TableState.LOADING ? (
                 <SkeletonTable
                     rows={skeletonRows}

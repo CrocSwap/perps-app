@@ -14,6 +14,8 @@ export default [
     // Renders "routes/vaults/vaults.tsx" at "/vaults"
     route('vaults', 'routes/vaults/vaultsNew.tsx'),
 
+    route('vaults/:vaultAddress', 'routes/vaults/vaultDetails.tsx'),
+
     // Renders "routes/leaderboard/leaderboard.tsx" at "/leaderboard"
     route('leaderboard', 'routes/leaderboard/leaderboard.tsx'),
 

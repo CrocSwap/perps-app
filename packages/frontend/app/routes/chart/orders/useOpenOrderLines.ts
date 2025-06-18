@@ -46,6 +46,7 @@ export const useOpenOrderLines = (): LineData[] => {
                     limitPx,
                     triggerPx,
                     triggerCondition,
+                    oid,
                 } = order;
 
                 const color = side === 'buy' ? buyColor : sellColor;
@@ -103,6 +104,7 @@ export const useOpenOrderLines = (): LineData[] => {
                     quantityTextValue,
                     color,
                     type,
+                    oid,
                 };
             });
 

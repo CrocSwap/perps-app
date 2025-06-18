@@ -1,6 +1,4 @@
-import Button from '~/components/Button/Button';
 import styles from './StrategyDetail.module.css';
-import OrderHistory from '../orderHistory/orderHistory';
 import { useNavigate, useParams } from 'react-router';
 import {
     useStrategiesStore,
@@ -12,6 +10,8 @@ import Modal from '~/components/Modal/Modal';
 import { FaChevronLeft } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import OrderHistory from '~/components/OrderHistory/OrderHistory';
+import LineChart from '~/components/LineChart/LineChart';
 
 export default function Strategies() {
     // hook to manage navigation actions from this page
@@ -28,6 +28,29 @@ export default function Strategies() {
 
     // logic to control the strategy removal modal
     const removeStratModalCtrl: useModalIF = useModal();
+
+    const lineData = [
+        { time: 1743446400000, value: 101.2 },
+        { time: 1743532800000, value: 102.5 },
+        { time: 1743619200000, value: 100.8 },
+        { time: 1743705600000, value: 99.4 },
+        { time: 1743792000000, value: 101.9 },
+        { time: 1743878400000, value: 103.3 },
+        { time: 1743964800000, value: 104.0 },
+        { time: 1744051200000, value: 102.1 },
+        { time: 1744137600000, value: 100.7 },
+        { time: 1744224000000, value: 99.5 },
+        { time: 1744310400000, value: 98.9 },
+        { time: 1744396800000, value: 97.6 },
+        { time: 1744483200000, value: 99.2 },
+        { time: 1744569600000, value: 100.3 },
+        { time: 1744656000000, value: 101.0 },
+        { time: 1744742400000, value: 102.6 },
+        { time: 1744828800000, value: 104.3 },
+        { time: 1744915200000, value: 105.1 },
+        { time: 1745001600000, value: 103.7 },
+        { time: 1745088000000, value: 102.4 },
+    ];
 
     return (
         <div className={styles.strategy_detail_page}>
@@ -48,15 +71,14 @@ export default function Strategies() {
                         </div>
                     </div>
                     <div className={styles.header_right}>
-                        <p>
+                        <div>
                             Status: {strategy?.isPaused ? 'Paused' : 'Running'}
-                        </p>
+                        </div>
                         <SimpleButton
                             onClick={() =>
                                 strategy &&
                                 strategies.togglePause(strategy.address)
                             }
-                            hoverBg='accent1'
                         >
                             {strategy?.isPaused ? 'Unpause' : 'Pause'}
                         </SimpleButton>
@@ -66,19 +88,16 @@ export default function Strategies() {
                                     state: { strategy, address },
                                 })
                             }
-                            hoverBg='accent1'
                         >
                             Edit
                         </SimpleButton>
                         <SimpleButton
                             onClick={() => console.log('Strategy Transfered!')}
-                            hoverBg='accent1'
                         >
                             Transfer
                         </SimpleButton>
                         <SimpleButton
                             onClick={() => removeStratModalCtrl.open()}
-                            hoverBg='accent1'
                         >
                             Remove
                         </SimpleButton>
@@ -157,9 +176,17 @@ export default function Strategies() {
                             </div>
                         </section>
                     </div>
-                    <div className={styles.strategy_details_graph}></div>
+                    <div className={styles.strategy_details_graph}>
+                        <LineChart
+                            lineData={lineData}
+                            curve={'step'}
+                            chartName={'strategy'}
+                            width={350}
+                            height={230}
+                        />
+                    </div>
                 </div>
-                <OrderHistory />
+                <OrderHistory pageMode={false} />
                 {removeStratModalCtrl.isOpen && (
                     <Modal
                         title='Remove Strategy'
@@ -170,13 +197,14 @@ export default function Strategies() {
                                 Are you sure you want to delete this strategy?
                             </p>
                             <div className={styles.remove_strat_modal_buttons}>
-                                <Button
+                                <SimpleButton
                                     onClick={removeStratModalCtrl.close}
-                                    size='large'
+                                    bg='dark4'
+                                    hoverBg='dark2'
                                 >
                                     Cancel
-                                </Button>
-                                <Button
+                                </SimpleButton>
+                                <SimpleButton
                                     onClick={() => {
                                         if (strategy?.address) {
                                             strategies.remove(strategy.address);
@@ -184,11 +212,10 @@ export default function Strategies() {
                                             navigate('/strategies');
                                         }
                                     }}
-                                    size='large'
-                                    selected
+                                    bg='accent1'
                                 >
                                     Delete
-                                </Button>
+                                </SimpleButton>
                             </div>
                         </section>
                     </Modal>

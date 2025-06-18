@@ -178,7 +178,7 @@ function DepositDropdown(props: propsIF) {
                             Deposit
                         </SimpleButton>
                         <SimpleButton
-                            bg='dark3'
+                            bg={isDropdown ? 'dark4' : 'dark3'}
                             hoverBg='accent1'
                             onClick={handleWithdraw}
                         >

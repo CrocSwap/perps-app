@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
     LuChevronDown,
     LuChevronUp,
@@ -15,11 +16,12 @@ import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
+import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
-import NetworkDropdown from './NetworkDropdown/NetworkDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 import WalletDropdown from './WalletDropdown/WalletDropdown';
+
 export default function PageHeader() {
     const { isUserConnected, setIsUserConnected } = useApp();
 
@@ -28,8 +30,8 @@ export default function PageHeader() {
     const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
     const [isRpcDropdownOpen, setIsRpcDropdownOpen] = useState(false);
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
-    const [isNetworkDropdownOpen, setIsNetworkDropdownOpen] = useState(false);
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
+    const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
     const location = useLocation();
 
     const { symbol } = useTradeDataStore();
@@ -59,12 +61,14 @@ export default function PageHeader() {
     const depositMenuRef = useOutsideClick<HTMLDivElement>(() => {
         setIsDepositDropdownOpen(false);
     }, isDepositDropdownOpen);
-    const networkMenuRef = useOutsideClick<HTMLDivElement>(() => {
-        setIsNetworkDropdownOpen(false);
-    }, isNetworkDropdownOpen);
+
     const moreDropdownRef = useOutsideClick<HTMLDivElement>(() => {
         setIsMoreDropdownOpen(false);
     }, isMoreDropdownOpen);
+
+    const helpDropdownRef = useOutsideClick<HTMLDivElement>(() => {
+        setIsHelpDropdownOpen(false);
+    }, isHelpDropdownOpen);
 
     const walletDisplay = (
         <section
@@ -122,7 +126,7 @@ export default function PageHeader() {
                     className={styles.rpcButton}
                     onClick={() => setIsRpcDropdownOpen(!isRpcDropdownOpen)}
                 >
-                    RPC
+                    <span>RPC</span>
                     <svg
                         xmlns='http://www.w3.org/2000/svg'
                         width='16'
@@ -153,30 +157,27 @@ export default function PageHeader() {
                 Deposit
             </button>
 
-            {isDepositDropdownOpen && (
-                <DepositDropdown
-                    isUserConnected={isUserConnected}
-                    setIsUserConnected={setIsUserConnected}
-                    isDropdown
-                />
-            )}
+            {isDepositDropdownOpen && <DepositDropdown isDropdown />}
         </section>
     );
-    const networksDisplay = (
+
+    const helpDisplay = (
         <section
             style={{
                 position: 'relative',
             }}
-            ref={networkMenuRef}
+            ref={helpDropdownRef}
         >
             <button
-                className={styles.networkButton}
-                onClick={() => setIsNetworkDropdownOpen(!isNetworkDropdownOpen)}
+                className={styles.helpButton}
+                onClick={() => setIsHelpDropdownOpen(!isHelpDropdownOpen)}
             >
-                Ethereum
+                <AiOutlineQuestionCircle size={18} color='var(--text2)' />
             </button>
 
-            {isNetworkDropdownOpen && <NetworkDropdown />}
+            {isHelpDropdownOpen && (
+                <HelpDropdown setIsHelpDropdownOpen={setIsHelpDropdownOpen} />
+            )}
         </section>
     );
 
@@ -192,7 +193,11 @@ export default function PageHeader() {
                 onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
             >
                 more
-                {isMoreDropdownOpen ? <LuChevronUp /> : <LuChevronDown />}
+                {isMoreDropdownOpen ? (
+                    <LuChevronUp size={15} />
+                ) : (
+                    <LuChevronDown size={15} />
+                )}
             </button>
             {isMoreDropdownOpen && (
                 <MoreDropdown setIsMoreDropdownOpen={setIsMoreDropdownOpen} />
@@ -209,8 +214,8 @@ export default function PageHeader() {
                     <img
                         src='/images/favicon.svg'
                         alt='Perps Logo'
-                        width='90px'
-                        height='90px'
+                        width='70px'
+                        height='70px'
                     />
                 </Link>
                 <nav
@@ -243,10 +248,18 @@ export default function PageHeader() {
                         </Link>
                     ))}
                     {moreDropdownDisplay}
+                    <a
+                        href='https://ambient.finance/trade'
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className={styles.ambientmm}
+                    >
+                        Ambient AMM
+                    </a>
                 </nav>
                 <div className={styles.rightSide}>
                     {isUserConnected && depositDisplay}
-                    {isUserConnected && networksDisplay}
+
                     {isUserConnected && rpcDisplay}
                     {!isUserConnected && (
                         <button
@@ -257,6 +270,7 @@ export default function PageHeader() {
                         </button>
                     )}
                     {isUserConnected && walletDisplay}
+                    {helpDisplay}
 
                     <button
                         className={styles.internationalButton}

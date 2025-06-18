@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import styles from './ExternalPage.module.css';
 
 interface ExternalPageProps {

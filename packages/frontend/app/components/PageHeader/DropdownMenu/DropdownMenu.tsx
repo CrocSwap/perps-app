@@ -21,7 +21,6 @@ const menuItems = [
 ];
 
 const DropdownMenu = () => {
-    // Use the tutorial hook - the name stays the same!
     const { handleRestartTutorial } = useTutorial();
 
     const handleTutorialClick = () => {

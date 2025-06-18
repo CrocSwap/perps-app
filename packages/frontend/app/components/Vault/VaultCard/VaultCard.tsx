@@ -2,6 +2,7 @@ import React from 'react';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import styles from './VaultCard.module.css';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { Link } from 'react-router';
 
 interface VaultCardProps {
     name: string;
@@ -47,6 +48,13 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
                 <div className={styles.headerTextContainer}>
                     <h3>{name}</h3>
                     <h6>{description}</h6>
+                </div>
+                <div className={styles.moreInfoContainer}>
+                    <Link
+                        to={`/vaults/0xdfc24b077bc1425ad1dea75bcb6f8158e10df303`}
+                    >
+                        More Info
+                    </Link>
                 </div>
             </div>
 

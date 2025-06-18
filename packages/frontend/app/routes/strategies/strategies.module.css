@@ -56,7 +56,7 @@
     /* centralize the column spacing rule */
     /* this keeps header and data cells spaced consistently */
     --strategies-table-column-spacing: 1fr 1fr 1fr 1fr 1fr;
-    --strategies-table-row-padding: 4px var(--padding-s);
+    --strategies-table-row-padding: var(--padding-row) var(--padding-s);
 }
 
 /* all content below the highest-level tab elem */
@@ -108,7 +108,7 @@
 .table_body {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--gap-row);
 }
 
 /* data line items in the table */
@@ -119,7 +119,6 @@
     padding: var(--strategies-table-row-padding);
     border-radius: var(--radius-xs);
     cursor: pointer;
-    /* background-color: lightblue; */
 }
 
 .table_body > li:hover {

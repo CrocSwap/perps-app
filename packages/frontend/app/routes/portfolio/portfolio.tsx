@@ -60,6 +60,7 @@ function Portfolio() {
                             </h3>
                             <div
                                 className={styles.view_detail_clickable}
+                                style={{ visibility: 'hidden' }}
                                 onClick={feeScheduleModalCtrl.open}
                             >
                                 View fee schedule

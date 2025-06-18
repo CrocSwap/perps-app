@@ -209,7 +209,10 @@ export class WebsocketManager {
 
         this.pongTimeout = setTimeout(() => {
             if (!this.pongReceived) {
-                console.log('>>> Pong timeout, reconnecting');
+                // if (this.ws.readyState === 1) {
+                //     // no need to reconnect if connection state is open
+                //     return;
+                // }
                 this.reconnect();
             }
         }, PONG_CHECK_TIMEOUT_MS);
@@ -385,14 +388,22 @@ export class WebsocketManager {
         const oldSubscriptions = { ...this.allSubscriptions };
         this.stop();
 
-        this.queuedSubscriptions = [];
+        // this.queuedSubscriptions = [];
         for (const _subId in oldSubscriptions) {
             const subId = Number(_subId);
             const { subscription, callback } = oldSubscriptions[subId];
-            this.queuedSubscriptions.push({
-                subscription,
-                active: { callback, subscriptionId: subId },
-            });
+            if (
+                !this.queuedSubscriptions.some(
+                    (q) =>
+                        JSON.stringify(q.subscription) ===
+                        JSON.stringify(subscription),
+                )
+            ) {
+                this.queuedSubscriptions.push({
+                    subscription,
+                    active: { callback, subscriptionId: subId },
+                });
+            }
         }
         this.allSubscriptions = {};
         this.activeSubscriptions = {};
@@ -515,7 +526,6 @@ export class WebsocketManager {
     }
 
     public reconnect() {
-        console.log('>>> reconnecting');
         this.stashSubscriptions();
         setTimeout(() => {
             this.connect();

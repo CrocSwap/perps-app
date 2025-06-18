@@ -6,6 +6,7 @@ import {
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
+import { processVaultDetails } from '~/processors/processVault';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type {
     TwapHistoryIF,
@@ -14,6 +15,7 @@ import type {
     UserFundingIF,
     UserFundingResponseIF,
 } from '~/utils/UserDataIFs';
+import type { VaultDetailsIF } from '~/utils/VaultIFs';
 
 export type ApiCallConfig = {
     type: string;
@@ -29,6 +31,7 @@ export enum ApiEndpoints {
     TWAP_SLICE_FILLS = 'userTwapSliceFills',
     FUNDING_HISTORY = 'userFunding',
     USER_PORTFOLIO = 'portfolio',
+    VAULT_DETAILS = 'vaultDetails',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
@@ -227,6 +230,38 @@ export function useInfoApi() {
         return obj;
     };
 
+    const fetchVaultDetails = async (
+        address: string,
+        vaultAddress: string,
+    ): Promise<VaultDetailsIF> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.VAULT_DETAILS,
+                user: address,
+                vaultAddress: vaultAddress,
+            }),
+        });
+        const data = await response.json();
+        const processed = processVaultDetails(data);
+        return processed;
+    };
+
+    const fetchVaults = async (): Promise<VaultDetailsIF[]> => {
+        const response = await fetch(
+            'https://stats-data.hyperliquid.xyz/Mainnet/vaults',
+            {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            },
+        );
+
+        const data = await response.json();
+
+        return data;
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -236,5 +271,7 @@ export function useInfoApi() {
         fetchFundingHistory,
         fetchOpenOrders,
         fetchUserPortfolio,
+        fetchVaultDetails,
+        fetchVaults,
     };
 }

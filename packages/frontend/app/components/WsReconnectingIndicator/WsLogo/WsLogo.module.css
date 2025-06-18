@@ -1,0 +1,73 @@
+.wifiSymbol {
+    display: none;
+
+    --circleColor: var(--accent1);
+    --size: 40px;
+    --duration: 1s;
+    --border-width: calc(var(--size) / 8);
+
+    width: var(--size);
+    height: var(--size);
+    display: block;
+
+    transform: rotate(-45deg) translate(0px, 0px);
+}
+.wifiCircle {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    display: block;
+    width: 100%;
+    height: 100%;
+    font-size: var(--size) / 7;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border-color: var(--circleColor);
+    border-style: solid;
+    border-width: var(--border-width) var(--border-width) 0 0;
+    -webkit-border-radius: 0 100% 0 0;
+    border-radius: 0 100% 0 0;
+
+    opacity: 0;
+    animation: wifianimation var(--duration) infinite;
+}
+
+.first {
+    animation-delay: calc(var(--duration) / 4);
+    width: calc(var(--size) / 1.5);
+    height: calc(var(--size) / 1.5);
+}
+
+.second {
+    width: calc(var(--size) / 2);
+    height: calc(var(--size) / 2);
+    animation-delay: calc(var(--duration) / 8);
+}
+
+.third {
+    width: calc(var(--size) / 3);
+    height: calc(var(--size) / 3);
+}
+
+.fourth {
+    width: var(--border-width);
+    height: var(--border-width);
+    opacity: 1;
+    background-color: var(--circleColor);
+    animation: none;
+    opacity: 0.5;
+}
+
+@keyframes wifianimation {
+    0% {
+        opacity: 0.4;
+    }
+
+    5% {
+        opactiy: 1;
+    }
+
+    6% {
+        opactiy: 0.1;
+    }
+}

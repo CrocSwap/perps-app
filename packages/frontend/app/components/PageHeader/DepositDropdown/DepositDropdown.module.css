@@ -30,13 +30,14 @@
     grid-template-rows: auto 1fr;
 }
 .dropdownContainer {
-    background: var(--bg-dark2, #0e0e14);
+    background: var(--bg-dark3, #0e0e14);
     position: absolute;
     top: var(--dropdwon-top);
     right: 0;
     width: var(--container-width);
     height: var(--container-height);
 }
+
 .actionButtons {
     display: flex;
     flex-direction: column;
@@ -91,6 +92,9 @@
     transition:
         mask 0.2s ease,
         -webkit-mask 0.2s ease;
+}
+.dropdownContainer .overviewContainer {
+    background: var(--bg-dark2) !important;
 }
 
 /* When scrolled to bottom - remove fade */
