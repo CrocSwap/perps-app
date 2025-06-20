@@ -33,6 +33,8 @@ type TradeDataStore = UserTradeDataStore & {
     setSelectedTradeTab: (tab: string) => void;
     fetchedChannels: Set<string>;
     setFetchedChannels: (channels: Set<string>) => void;
+    userNonFundingLedgerUpdates: any[];
+    setUserNonFundingLedgerUpdates: (updates: any[]) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -109,6 +111,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             fetchedChannels: new Set(),
             setFetchedChannels: (channels: Set<string>) =>
                 set({ fetchedChannels: channels }),
+            userNonFundingLedgerUpdates: [],
+            setUserNonFundingLedgerUpdates: (updates: any[]) =>
+                set({ userNonFundingLedgerUpdates: updates }),
         }),
         {
             name: 'TRADE_DATA',
@@ -119,6 +124,7 @@ const useTradeDataStore = create<TradeDataStore>()(
                     state.selectedTradeTab === 'Balances'
                         ? 'Positions'
                         : state.selectedTradeTab,
+                userNonFundingLedgerUpdates: state.userNonFundingLedgerUpdates,
             }),
         },
     ),
