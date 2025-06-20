@@ -11,12 +11,13 @@
     /* centralize the column spacing rule */
     /* this keeps header and data cells spaced consistently */
     --accounts-table-column-spacing: 3fr 5fr 2fr 1fr;
-    --accounts-table-row-padding: 0 var(--padding-s);
+    --accounts-table-row-padding: var(--padding-row) var(--padding-s);
 }
 
 /* all content below the highest-level tab elem */
 .table_content {
     padding: var(--accounts-table-row-padding);
+    padding-bottom: var(--padding-s);
     height: 100%;
     max-height: 240px;
     overflow-y: auto;

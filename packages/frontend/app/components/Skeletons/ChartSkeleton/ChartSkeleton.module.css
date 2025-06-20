@@ -1,0 +1,62 @@
+.loadingWrapper {
+    float: left;
+    top: 50%;
+    left: 50%;
+    --size: 140px;
+    height: calc(var(--size) * 0.75);
+    padding: calc(var(--size) * 0.0625);
+    width: var(--size);
+    --color: color-mix(in srgb, var(--text1) 10%, transparent);
+    border-left: 1px solid var(--color);
+    border-bottom: 1px solid var(--color);
+    box-sizing: border-box;
+}
+
+@keyframes loading {
+    0% {
+        opacity: 0.1;
+    }
+    30% {
+        opacity: 0.15;
+    }
+    50% {
+        height: calc(var(--size) * 0.625);
+        margin-top: 0px;
+        opacity: 0.31;
+    }
+    80% {
+        opacity: 0.2;
+    }
+    100% {
+        opacity: 0.1;
+    }
+}
+
+.loading1,
+.loading2,
+.loading3,
+.loading4 {
+    height: calc(var(--size) * 0.0625);
+    width: calc(var(--size) * 0.1375);
+    display: inline-block;
+    margin-top: calc(var(--size) * 0.56);
+    animation: loading 2.5s infinite;
+    border-top-left-radius: calc(var(--size) * 0.0125);
+    border-top-right-radius: calc(var(--size) * 0.0125);
+    margin-left: calc(var(--size) * 0.0325);
+    opacity: 0.1;
+    background: var(--skeleton-base-color);
+}
+
+.loading1 {
+    animation-delay: 0.25s;
+}
+.loading2 {
+    animation-delay: 0.5s;
+}
+.loading3 {
+    animation-delay: 0.75s;
+}
+.loading4 {
+    animation-delay: 1s;
+}

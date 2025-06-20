@@ -168,6 +168,7 @@
     /* ------------------------------ */
     --skeleton-height: 20px;
     --skeleton-animation-duration: 1.5s;
+    --skeleton-base-color: #f0f0f0;
     --skeleton-background: linear-gradient(
         90deg,
         #f0f0f005 10%,
@@ -281,10 +282,6 @@ button::before {
     background: inherit;
     z-index: -1;
     transition: filter 0.3s ease;
-}
-
-button:hover::before {
-    /* filter: brightness(0.8); */
 }
 
 ul[role='list'],

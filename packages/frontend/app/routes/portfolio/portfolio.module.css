@@ -184,6 +184,53 @@
     font-size: var(--font-size-xs);
 }
 
+.mobileTop {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    display: none;
+    position: relative;
+}
+.mobileActionMenuContainer {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    position: absolute;
+    top: 60px;
+    right: 0;
+    padding: var(--padding-m) var(--padding-s);
+    border-radius: var(--radius-m);
+    background: var(--bg-dark2, #16161c);
+    box-shadow: var(--dropdown-box-shadow);
+
+    height: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity var(--ease-in-out-med),
+        visibility var(--ease-in-out-med);
+
+    /* ---------------------------- */
+
+    opacity: 1;
+    height: auto;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: var(--z-index-navbar-dropdown);
+}
+
+.mobileTop .detailsContent {
+    justify-content: flex-start;
+}
+.mobileTop .detailsContent h3 {
+    font-size: var(--font-size-m);
+}
+.mobileTop .actionMenuButton {
+    display: flex;
+}
 @media (max-width: 768px) {
     .container {
         overflow-y: auto;
@@ -221,5 +268,21 @@
     }
     .view_detail_clickable {
         font-size: var(--font-size-s);
+    }
+
+    .detailsContainer {
+        display: none;
+    }
+    .mobileTop {
+        display: flex;
+    }
+    .mobileActionMenuContainer {
+        display: flex;
+        flex-direction: column;
+    }
+    .mobileActionMenuContainer button {
+        text-align: center;
+        display: flex;
+        justify-content: center;
     }
 }

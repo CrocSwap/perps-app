@@ -4,6 +4,7 @@ import styles from './ReduceAndProfitToggle.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
+import ChaseDistance from '../ChaseDistance/ChaseDistance';
 
 interface PropsIF {
     isReduceOnlyEnabled: boolean;
@@ -37,6 +38,9 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         configureAmount: false,
         limitPrice: false,
     });
+    const [chaseDistance, setChaseDistance] = useState('');
+    const [chaseMode, setChaseMode] = useState<'usd' | 'symbol'>('usd');
+
     const {
         isReduceOnlyEnabled,
         isTakeProfitEnabled,
@@ -161,8 +165,23 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     onToggle={handleToggleIsChasingInterval}
                     label=''
                 />
+
                 <h3 className={styles.toggleLabel}>Max Chase Distance</h3>
             </div>
+            {isChasingIntervalEnabled && (
+                <ChaseDistance
+                    value={chaseDistance}
+                    onChange={(val) => {
+                        if (typeof val === 'string') setChaseDistance(val);
+                        else if ('target' in val)
+                            setChaseDistance(val.target.value);
+                    }}
+                    selectedMode={chaseMode}
+                    setSelectedMode={setChaseMode}
+                    symbol='ETH'
+                    ariaLabel='Chase distance input'
+                />
+            )}
         </div>
     );
 

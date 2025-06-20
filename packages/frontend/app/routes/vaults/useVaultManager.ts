@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { VaultDetailsIF } from '~/utils/VaultIFs';
 
 interface VaultData {
     id: string;
@@ -232,10 +233,28 @@ export function useVaultManager() {
         [vaults],
     );
 
+    const assignSelectedVault = useCallback((vaultDetails: VaultDetailsIF) => {
+        if (!vaults.some((v) => v.id === vaultDetails.vaultAddress)) {
+            const vault = {
+                id: vaultDetails.vaultAddress,
+                name: vaultDetails.name,
+                icon: vaults[0].icon,
+                description: vaultDetails.description,
+                apr: vaultDetails.apr,
+                totalDeposited: vaultDetails.tvl,
+                totalCapacity: vaultDetails.tvl,
+                yourDeposit: 0,
+            } as VaultData;
+            setVaults((prev) => [...prev, vault]);
+        }
+        setSelectedVaultId(vaultDetails.vaultAddress);
+    }, []);
+
     return {
         // Data
         vaults,
         selectedVault,
+        assignSelectedVault,
 
         // Modal state
         modalOpen,

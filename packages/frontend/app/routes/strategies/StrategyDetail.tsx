@@ -10,6 +10,7 @@ import Modal from '~/components/Modal/Modal';
 import { FaChevronLeft } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import TransferModal from '~/components/TransferModal/TransferModal';
 import OrderHistory from '~/components/OrderHistory/OrderHistory';
 import LineChart from '~/components/LineChart/LineChart';
 
@@ -28,6 +29,9 @@ export default function Strategies() {
 
     // logic to control the strategy removal modal
     const removeStratModalCtrl: useModalIF = useModal();
+
+    // logic to control the transfer modal
+    const transferModalCtrl: useModalIF = useModal();
 
     const lineData = [
         { time: 1743446400000, value: 101.2 },
@@ -92,12 +96,14 @@ export default function Strategies() {
                             Edit
                         </SimpleButton>
                         <SimpleButton
-                            onClick={() => console.log('Strategy Transfered!')}
+                            onClick={transferModalCtrl.open}
+                            hoverBg='accent1'
                         >
                             Transfer
                         </SimpleButton>
                         <SimpleButton
-                            onClick={() => removeStratModalCtrl.open()}
+                            onClick={removeStratModalCtrl.open}
+                            hoverBg='accent1'
                         >
                             Remove
                         </SimpleButton>
@@ -219,6 +225,9 @@ export default function Strategies() {
                             </div>
                         </section>
                     </Modal>
+                )}
+                {transferModalCtrl.isOpen && (
+                    <TransferModal closeModal={transferModalCtrl.close} />
                 )}
             </div>
         </div>

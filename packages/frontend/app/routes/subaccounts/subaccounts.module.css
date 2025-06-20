@@ -10,9 +10,6 @@
 .subaccounts_wrapper {
     display: flex;
     flex-direction: column;
-    width: fit-content;
-    align-items: center;
-    justify-content: center;
     gap: 80px;
 }
 

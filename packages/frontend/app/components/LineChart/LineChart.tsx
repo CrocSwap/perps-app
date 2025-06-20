@@ -19,8 +19,12 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     const chartWidth = width || 850;
     const chartHeight = height || 250;
 
-    const [canvasInitialWidth] = React.useState<number>(chartWidth);
-    const [canvasInitialHeight] = React.useState<number>(chartHeight);
+    const [canvasInitialHeight, setCanvasInitialHeight] = React.useState<
+        number | undefined
+    >();
+    const [canvasInitialWidth, setCanvasInitialWidth] = React.useState<
+        number | undefined
+    >();
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -33,8 +37,57 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
     const { numFormat } = useAppSettings();
 
+    // Find Y axis ticks
+    useEffect(() => {
+        if (lineData) {
+            const minPrice = d3.min(lineData, (d) => d.value);
+            const maxPrice = d3.max(lineData, (d) => d.value);
+
+            if (minPrice !== undefined && maxPrice !== undefined) {
+                const tickCount = chartHeight - 50 > 150 ? 5 : 2;
+
+                const diff = maxPrice - minPrice;
+
+                const padding = diff / 15;
+
+                const ticks = d3.ticks(
+                    minPrice - padding,
+                    maxPrice + padding,
+                    tickCount,
+                );
+
+                setYAxisTicks(() => ticks);
+            }
+        }
+    }, [lineData, chartName]);
+
+    // Calculate Y axis width based on ticks
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const context = canvas.getContext('2d');
+        if (!context) return;
+
+        if (yAxisTicks) {
+            let textMeasure = 30;
+
+            yAxisTicks?.forEach((tick) => {
+                textMeasure = Math.max(
+                    textMeasure,
+                    context.measureText(d3.format(',')(tick)).width,
+                );
+            });
+
+            const paddingFactor = textMeasure > 40 ? 1.5 : 2;
+
+            setYAxisPadding(() => textMeasure + textMeasure / paddingFactor);
+        }
+    }, [yAxisTicks]);
+
     useEffect(() => {
         if (lineData === undefined) return;
+        if (yAxisTicks === undefined || yAxisPadding === undefined) return;
 
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -51,7 +104,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const xScale = d3
                 .scaleTime()
                 .domain([new Date(minDate), new Date(maxDate + padding)])
-                .range([0, chartWidth]);
+                .range([0, chartWidth - yAxisPadding]);
 
             setXScale(() => xScale);
         }
@@ -64,18 +117,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             const padding = diff / 15;
 
-            const tickCount = chartHeight > 150 ? 5 : 2;
-
-            const ticks = d3.ticks(
-                minPrice - padding,
-                maxPrice + padding,
-                tickCount,
-            );
-
-            setYAxisTicks(() => ticks);
-
-            const roundedMax = d3.max(ticks);
-            const roundedMin = d3.min(ticks);
+            const roundedMax = d3.max(yAxisTicks);
+            const roundedMin = d3.min(yAxisTicks);
 
             if (roundedMax !== undefined && roundedMin !== undefined) {
                 const topBoundaryCanFit =
@@ -91,16 +134,22 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 const yScale = d3
                     .scaleLinear()
                     .domain([bottomBoundaryCanFit, topBoundaryCanFit])
-                    .range([chartHeight, 0]);
+                    .range([chartHeight - 50, 0]);
 
                 setYScale(() => yScale);
             }
         }
-    }, [lineData, chartName]);
+    }, [yAxisTicks, yAxisPadding, chartName]);
 
     useEffect(() => {
-        yScale && yScale.range([chartHeight, 0]);
-        xScale && xScale.range([0, chartWidth]);
+        if (yAxisPadding === undefined) return;
+        setCanvasInitialHeight(() => chartHeight - 50);
+        setCanvasInitialWidth(() => chartWidth - yAxisPadding);
+    }, [yAxisPadding]);
+
+    useEffect(() => {
+        yScale && yScale.range([chartHeight - 50, 0]);
+        xScale && xScale.range([0, chartWidth - yAxisPadding]);
     }, [chartHeight, chartWidth, yScale, xScale]);
 
     useEffect(() => {
@@ -143,11 +192,12 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .style('font-size', fontSize);
         }
 
-        if (yScale && yAxisTicks) {
+        if (yScale && yAxisTicks && yAxisPadding) {
             svgYAxis.select('g').remove();
 
             svgYAxis
                 .append('g')
+                .attr('id', 'yAxisGroup')
                 .call(d3.axisRight(yScale).tickValues(yAxisTicks))
                 .select('.domain')
                 .remove();
@@ -158,44 +208,22 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .select('g')
                 .selectAll('text')
                 .attr('fill', fillStyle)
+                .attr('x', yAxisPadding - 5)
                 .attr('shape-rendering', 'crispEdges')
                 .style('font-family', font)
+                .style('text-anchor', 'end')
                 .style('font-size', fontSize);
         }
-    }, [
-        yScale,
-        xScale,
-        numFormat,
-        lineData,
-        chartName,
-        yAxisTicks,
-        chartHeight,
-        chartWidth,
-    ]);
+    }, [yScale, xScale, numFormat, yAxisTicks, yAxisPadding]);
 
     useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const context = canvas.getContext('2d');
-        if (!context) return;
-
-        if (yAxisTicks) {
-            let textMeasure = 30;
-
-            yAxisTicks?.forEach((tick) => {
-                textMeasure = Math.max(
-                    textMeasure,
-                    context.measureText(tick.toString()).width,
-                );
-            });
-
-            setYAxisPadding(() => textMeasure + 15);
-        }
-    }, [yAxisTicks, chartName, lineData]);
-
-    useEffect(() => {
-        if (yScale && xScale && lineData) {
+        if (
+            yScale &&
+            xScale &&
+            lineData &&
+            canvasInitialHeight &&
+            canvasInitialWidth
+        ) {
             const canvas = canvasRef.current;
             if (!canvas) return;
 
@@ -206,7 +234,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const height =
                 chartHeight || canvas.getBoundingClientRect()?.height;
 
-            context.clearRect(0, 0, width, height);
+            context.clearRect(0, 0, width, height - 50);
 
             const line = d3
                 .line<{ time: number; value: number }>()
@@ -235,42 +263,56 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         lineData,
         chartName,
         yAxisTicks,
+        canvasInitialHeight,
+        canvasInitialWidth,
     ]);
 
     return (
-        <div className={styles.chartWrapper}>
-            <div
-                className={styles.chartContainer}
-                style={{
-                    gridTemplateColumns:
-                        yAxisPadding + 'px ' + chartWidth + 'px',
-                }}
-            >
-                <svg id='yAxis' height={chartHeight} />
+        <>
+            {yAxisPadding !== undefined &&
+                canvasInitialWidth !== undefined &&
+                canvasInitialHeight !== undefined && (
+                    <div className={styles.chartWrapper}>
+                        <div
+                            className={styles.chartContainer}
+                            style={{
+                                gridTemplateColumns:
+                                    yAxisPadding +
+                                    'px ' +
+                                    (chartWidth - yAxisPadding + 'px'),
+                            }}
+                        >
+                            <svg
+                                id='yAxis'
+                                height={chartHeight - 50}
+                                width={yAxisPadding}
+                            />
 
-                <canvas
-                    ref={canvasRef}
-                    style={{
-                        minWidth: '100px',
-                        minHeight: '100px',
-                        height: chartHeight + 'px',
-                        width: chartWidth + 'px',
-                        maxHeight: chartHeight + 'px',
-                        maxWidth: chartWidth + 'px',
-                    }}
-                    width={canvasInitialWidth}
-                    height={canvasInitialHeight}
-                />
-            </div>
-            <div className={styles.xAxisContainer}>
-                <svg
-                    id='xAxis'
-                    height='50'
-                    width={chartWidth + yAxisPadding}
-                    style={{ paddingLeft: yAxisPadding }}
-                />
-            </div>
-        </div>
+                            <canvas
+                                ref={canvasRef}
+                                style={{
+                                    minWidth: '100px',
+                                    minHeight: '100px',
+                                    height: chartHeight - 50 + 'px',
+                                    width: chartWidth - yAxisPadding + 'px',
+                                    maxHeight: chartHeight - 50 + 'px',
+                                    maxWidth: chartWidth - yAxisPadding + 'px',
+                                }}
+                                width={canvasInitialWidth}
+                                height={canvasInitialHeight}
+                            />
+                        </div>
+                        <div className={styles.xAxisContainer}>
+                            <svg
+                                id='xAxis'
+                                height='50'
+                                width={chartWidth}
+                                style={{ paddingLeft: yAxisPadding }}
+                            />
+                        </div>
+                    </div>
+                )}
+        </>
     );
 };
 

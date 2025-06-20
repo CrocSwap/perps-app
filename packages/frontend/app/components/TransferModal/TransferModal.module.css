@@ -1,0 +1,64 @@
+.transfer_modal {
+    display: flex;
+    flex-direction: column;
+    margin: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
+    gap: var(--gap-s);
+    /* magic number for height is specified in Figma */
+    --transfer-modal-input-height: 32px;
+}
+
+.asset_qty_input_wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--transfer-modal-input-height);
+    width: 100%;
+    padding: var(--padding-s);
+    background-color: var(--bg-dark4);
+    gap: inherit;
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-s);
+    color: var(--text1);
+}
+
+/**
+ ** something is causing global styles to hit this elem and
+ ** ... I don't know what, please let me know if anyone
+ ** ... finds a good solution and can remove the overrides
+ */
+.asset_qty_input_wrapper > input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 0 !important;
+    font-size: var(--font-size-s) !important;
+    background-color: inherit;
+    color: inherit;
+}
+
+.asset_qty_input_wrapper > div {
+    padding: var(--padding-xs);
+    color: var(--accent1);
+    cursor: pointer;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-s);
+    gap: var(--gap-row);
+    border: 1px solid var(--bg-dark4);
+}
+
+.info > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--font-size-s);
+}
+
+.info > div > p:first-child {
+    color: var(--text2);
+}

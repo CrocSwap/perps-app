@@ -89,7 +89,10 @@ export default function PerformancePanel() {
     const TabContent_ = !activeTab ? (
         LoadingContent
     ) : (
-        <div className={styles.performanceContainer}>
+        <div
+            id={'performanceContainer'}
+            className={styles.performanceContainer}
+        >
             <MetricsDisplay />
             <motion.div {...animationConfig} className={styles.perfChart}>
                 <PortfolioChartHeader

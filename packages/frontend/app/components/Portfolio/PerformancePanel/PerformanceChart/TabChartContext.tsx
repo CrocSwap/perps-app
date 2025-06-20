@@ -43,8 +43,8 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     const { fetchUserPortfolio } = useInfoApi();
 
     const [parsedKey, setParsedKey] = useState<string>();
-    const [chartWidth, setChartWidth] = useState<number>(850);
-    const [chartHeight, setChartHeight] = useState<number>(250);
+    const [chartWidth, setChartWidth] = useState<number>(900);
+    const [chartHeight, setChartHeight] = useState<number>(300);
 
     const parseUserProfileData = (data: any, key: string) => {
         const userPositionData = data.get(key) as UserPositionIF;
@@ -114,11 +114,13 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
 
         if (width < 1250) {
             setChartWidth(() => Math.max(850 - (1250 - width), 250));
+        } else {
+            setChartWidth(() => 900);
         }
     });
 
     return (
-        <>
+        <div>
             {activeTab === 'Performance' && pnlHistory && (
                 <LineChart
                     lineData={pnlHistory}
@@ -140,7 +142,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
             )}
 
             {activeTab === 'Collateral' && <CollateralPieChart />}
-        </>
+        </div>
     );
 };
 

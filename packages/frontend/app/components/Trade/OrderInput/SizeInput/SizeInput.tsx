@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import useNumFormatter from '~/hooks/useNumFormatter';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './SizeInput.module.css';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';

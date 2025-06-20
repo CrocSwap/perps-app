@@ -5,6 +5,7 @@ import AccountsTable from './AccountsTable/AccountsTable';
 import CreateSubaccount from './CreateSubaccount/CreateSubaccount';
 import styles from './subaccounts.module.css';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import TransferModal from '~/components/TransferModal/TransferModal';
 
 export function meta() {
     return [
@@ -16,6 +17,9 @@ export function meta() {
 export default function Subaccounts() {
     // logic to open and close subaccount creation modal
     const createSubaccountModal: useModalIF = useModal('closed');
+
+    // logic to open and close transfer modal
+    const transferModalCtrl: useModalIF = useModal('closed');
 
     // state data for subaccounts
     const data: useAccountsIF = useAccounts();
@@ -52,7 +56,12 @@ export default function Subaccounts() {
                 <header>
                     <h2>Sub-Accounts</h2>
                     <div className={styles.button_container}>
-                        <SimpleButton bg='dark4'>Transfer</SimpleButton>
+                        <SimpleButton
+                            bg='dark4'
+                            onClick={transferModalCtrl.open}
+                        >
+                            Transfer
+                        </SimpleButton>
                         <SimpleButton
                             bg='accent1'
                             onClick={createSubaccountModal.open}
@@ -78,6 +87,9 @@ export default function Subaccounts() {
                     modalControl={createSubaccountModal}
                     create={data.create}
                 />
+            )}
+            {transferModalCtrl.isOpen && (
+                <TransferModal closeModal={transferModalCtrl.close} />
             )}
         </div>
     );
