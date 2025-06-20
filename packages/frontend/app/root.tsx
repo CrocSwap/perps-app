@@ -9,20 +9,19 @@ import {
 } from 'react-router';
 import Notifications from '~/components/Notifications/Notifications';
 import type { Route } from './+types/root';
-import PageHeader from './components/PageHeader/PageHeader';
-
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
+import PageHeader from './components/PageHeader/PageHeader';
+import WsReconnectingIndicator from './components/WsReconnectingIndicator/WsReconnectingIndicator';
+import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
-import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import { useTradeDataStore } from './stores/TradeDataStore';
-import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
-import { AppProvider } from './contexts/AppContext';
-import WsReconnectingIndicator from './components/WsReconnectingIndicator/WsReconnectingIndicator';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -130,6 +129,43 @@ export default function App() {
             window.removeEventListener('offline', offlineListener);
         };
     }, []);
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then((registration) => {
+            // Check if there's an updated SW waiting to activate
+            if (registration.waiting) {
+                promptUserToRefresh(registration);
+            }
+
+            // Listen for updates to the service worker
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                if (newWorker) {
+                    newWorker.addEventListener('statechange', () => {
+                        if (
+                            newWorker.state === 'installed' &&
+                            navigator.serviceWorker.controller
+                        ) {
+                            promptUserToRefresh(registration);
+                        }
+                    });
+                }
+            });
+        });
+
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+        });
+    }
+
+    function promptUserToRefresh(registration: ServiceWorkerRegistration) {
+        if (window.confirm('A new version is available. Reload now?')) {
+            registration.waiting?.postMessage({ action: 'skipWaiting' });
+        }
+    }
 
     return (
         <>
