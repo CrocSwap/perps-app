@@ -123,49 +123,52 @@ export default function App() {
             process.env.NODE_ENV === 'production' &&
             'serviceWorker' in navigator
         ) {
-            window.addEventListener('load', async () => {
-                const registration =
-                    await navigator.serviceWorker.register('/sw.js');
+            let refreshing = false;
 
-                // If there's a waiting service worker, prompt immediately (unless it's the first install)
-                if (registration.waiting) {
-                    if (navigator.serviceWorker.controller) {
-                        promptUserToRefresh(registration);
-                    } else {
-                        // First install, do nothing
-                        console.log(
-                            'Service Worker initialized for the first time',
-                        );
-                    }
-                }
+            // Listen for the new service worker taking control
+            const controllerChangeHandler = () => {
+                if (refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            };
+            navigator.serviceWorker.addEventListener(
+                'controllerchange',
+                controllerChangeHandler,
+            );
 
-                // Listen for new updates
+            navigator.serviceWorker.register('/sw.js').then((registration) => {
+                // Only show update prompt if a new SW is found while the page is already controlled
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;
                     if (newWorker) {
                         newWorker.addEventListener('statechange', () => {
                             if (
                                 newWorker.state === 'installed' &&
-                                navigator.serviceWorker.controller // Only prompt if not first install
+                                navigator.serviceWorker.controller // Only if page is already controlled (not first load)
                             ) {
-                                promptUserToRefresh(registration);
+                                // Prompt user to refresh
+                                // Show your custom UI here instead of confirm()
+                                if (
+                                    window.confirm(
+                                        'A new version is available. Reload now?',
+                                    )
+                                ) {
+                                    newWorker.postMessage({
+                                        action: 'skipWaiting',
+                                    });
+                                }
                             }
                         });
                     }
                 });
-
-                // Reload when the new service worker takes control
-                let refreshing = false;
-                navigator.serviceWorker.addEventListener(
-                    'controllerchange',
-                    () => {
-                        if (!refreshing) {
-                            window.location.reload();
-                            refreshing = true;
-                        }
-                    },
-                );
             });
+
+            return () => {
+                navigator.serviceWorker.removeEventListener(
+                    'controllerchange',
+                    controllerChangeHandler,
+                );
+            };
         }
     }, []);
 
@@ -185,13 +188,6 @@ export default function App() {
             window.removeEventListener('offline', offlineListener);
         };
     }, []);
-
-    function promptUserToRefresh(registration: ServiceWorkerRegistration) {
-        // Show your custom UI here instead of confirm()
-        if (window.confirm('A new version is available. Reload now?')) {
-            registration?.waiting?.postMessage({ action: 'SKIP_WAITING' });
-        }
-    }
 
     return (
         <>
