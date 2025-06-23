@@ -125,42 +125,35 @@ export default function App() {
         ) {
             let refreshing = false;
 
-            // Listen for the new service worker taking control
             const controllerChangeHandler = () => {
                 if (refreshing) return;
                 refreshing = true;
                 window.location.reload();
             };
+
             navigator.serviceWorker.addEventListener(
                 'controllerchange',
                 controllerChangeHandler,
             );
 
             navigator.serviceWorker.register('/sw.js').then((registration) => {
-                // Only show update prompt if a new SW is found while the page is already controlled
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    if (newWorker) {
-                        newWorker.addEventListener('statechange', () => {
-                            if (
-                                newWorker.state === 'installed' &&
-                                navigator.serviceWorker.controller // Only if page is already controlled (not first load)
-                            ) {
-                                // Prompt user to refresh
-                                // Show your custom UI here instead of confirm()
+                // Only listen for updates AFTER initial installation
+                if (navigator.serviceWorker.controller) {
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                // Only prompt if new worker is installed AND page is already controlled
                                 if (
-                                    window.confirm(
-                                        'A new version is available. Reload now?',
-                                    )
+                                    newWorker.state === 'installed' &&
+                                    navigator.serviceWorker.controller
                                 ) {
-                                    newWorker.postMessage({
-                                        action: 'skipWaiting',
-                                    });
+                                    promptUserToRefresh(registration);
                                 }
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
+                }
             });
 
             return () => {
@@ -171,6 +164,18 @@ export default function App() {
             };
         }
     }, []);
+
+    function promptUserToRefresh(registration: ServiceWorkerRegistration) {
+        if (
+            window.confirm(
+                'A new version of the app is available. Reload to update?',
+            )
+        ) {
+            // Prevent multiple reloads in multi-tab scenarios
+            localStorage.setItem('updateInProgress', 'true');
+            registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
+        }
+    }
 
     useEffect(() => {
         const onlineListener = () => {
