@@ -16,6 +16,8 @@ import TwapTable from '../TwapTable/TwapTable';
 import styles from './TradeTable.module.css';
 import { Pages, usePage } from '~/hooks/usePage';
 import { useDebugStore } from '~/stores/DebugStore';
+import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
+import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 export interface FilterOption {
     id: string;
     label: string;
@@ -24,7 +26,10 @@ export interface FilterOption {
 const tradePageBlackListTabs = new Set([
     'Funding History',
     'Deposits and Withdrawals',
+    'Depositors',
 ]);
+
+const portfolioPageBlackListTabs = new Set(['Depositors']);
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -36,10 +41,12 @@ const filterOptions: FilterOption[] = [
 interface TradeTableProps {
     portfolioPage?: boolean;
     vaultPage?: boolean;
+    vaultFetched?: boolean;
+    vaultDepositors?: VaultFollowerStateIF[];
 }
 
 export default function TradeTable(props: TradeTableProps) {
-    const { portfolioPage, vaultPage } = props;
+    const { portfolioPage, vaultPage, vaultFetched, vaultDepositors } = props;
     const {
         selectedTradeTab,
         setSelectedTradeTab,
@@ -70,9 +77,17 @@ export default function TradeTable(props: TradeTableProps) {
             'Deposits and Withdrawals',
         ];
 
+        if (vaultPage) {
+            availableTabs.push('Depositors');
+        }
+
         if (page === Pages.TRADE) {
             return availableTabs.filter(
                 (tab) => !tradePageBlackListTabs.has(tab),
+            );
+        } else if (page === Pages.PORTFOLIO) {
+            return availableTabs.filter(
+                (tab) => !portfolioPageBlackListTabs.has(tab),
             );
         }
         return availableTabs;
@@ -93,6 +108,10 @@ export default function TradeTable(props: TradeTableProps) {
     useEffect(() => {
         if (page === Pages.TRADE) {
             if (tradePageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('Positions');
+            }
+        } else if (page === Pages.PORTFOLIO) {
+            if (portfolioPageBlackListTabs.has(selectedTradeTab)) {
                 handleTabChange('Positions');
             }
         }
@@ -192,6 +211,13 @@ export default function TradeTable(props: TradeTableProps) {
                 );
             case 'Deposits and Withdrawals':
                 return <DepositsWithdrawalsTable />;
+            case 'Depositors':
+                return (
+                    <VaultDepositorsTable
+                        isFetched={vaultFetched ?? false}
+                        data={vaultDepositors ?? []}
+                    />
+                );
             default:
                 return (
                     <div className={styles.emptyState}>

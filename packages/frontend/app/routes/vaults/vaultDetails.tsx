@@ -73,6 +73,7 @@ export default function VaultDetails() {
 
     useEffect(() => {
         if (vaultDetails) {
+            console.log('assignSelectedVault', vaultDetails);
             assignSelectedVault(vaultDetails);
         }
     }, [vaultDetails]);
@@ -260,7 +261,11 @@ export default function VaultDetails() {
                 </div>
 
                 {vaultAddress && <WebDataConsumer />}
-                <TradeTable vaultPage={true} />
+                <TradeTable
+                    vaultPage={true}
+                    vaultFetched={vaultDetails !== null}
+                    vaultDepositors={vaultDetails?.followers}
+                />
             </div>
 
             {modalOpen && selectedVault && (

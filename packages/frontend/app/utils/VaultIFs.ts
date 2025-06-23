@@ -1,3 +1,5 @@
+import type { TableSortDirection } from './CommonIFs';
+
 export interface VaultFollowerStateRawIF {
     allTimePnl: string;
     daysFollowing: number;
@@ -82,3 +84,49 @@ export interface VaultDetailsIF {
     capacity?: number;
     pnl?: number;
 }
+
+export type VaultDepositorSortBy =
+    | 'allTimePnl'
+    | 'daysFollowing'
+    | 'lockupUntil'
+    | 'pnl'
+    | 'user'
+    | 'vaultEntryTime'
+    | 'vaultEquity'
+    | undefined;
+
+export const sortVaultDepositors = (
+    depositors: VaultFollowerStateIF[],
+    sortBy: VaultDepositorSortBy,
+    sortDirection: TableSortDirection,
+) => {
+    if (sortDirection && sortBy) {
+        switch (sortBy) {
+            case 'allTimePnl':
+                return [...depositors].sort((a, b) =>
+                    sortDirection === 'asc'
+                        ? a.allTimePnl - b.allTimePnl
+                        : b.allTimePnl - a.allTimePnl,
+                );
+            case 'daysFollowing':
+                return [...depositors].sort((a, b) =>
+                    sortDirection === 'asc'
+                        ? a.daysFollowing - b.daysFollowing
+                        : b.daysFollowing - a.daysFollowing,
+                );
+            case 'pnl':
+                return [...depositors].sort((a, b) =>
+                    sortDirection === 'asc' ? a.pnl - b.pnl : b.pnl - a.pnl,
+                );
+            case 'vaultEquity':
+                return [...depositors].sort((a, b) =>
+                    sortDirection === 'asc'
+                        ? a.vaultEquity - b.vaultEquity
+                        : b.vaultEquity - a.vaultEquity,
+                );
+            default:
+                return depositors;
+        }
+    }
+    return depositors;
+};

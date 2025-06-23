@@ -1,0 +1,189 @@
+.rowContainer {
+    width: 100%;
+    height: var(--table-row-height);
+    padding-left: var(--padding-s);
+    gap: var(--gap-s);
+    display: grid;
+    grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+    align-items: center;
+}
+
+.headerContainer {
+    background: var(--bg-dark2);
+    width: 100%;
+    height: var(--table-header-height);
+    padding-left: var(--padding-s);
+    gap: var(--gap-s);
+    display: grid;
+    grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.cell {
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1, #f0f0f8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.headerCell {
+    color: var(--text2, #6a6a6d);
+    font-size: var(--font-size-xs, 10px);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-xs);
+    cursor: default;
+    user-select: none;
+}
+
+.headerCell.active {
+    color: var(--text1);
+}
+
+.sortable {
+    cursor: pointer;
+}
+.tpslCell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-s);
+}
+.tpslCell button {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+.cancelButton {
+    background-color: transparent;
+    color: var(--accent1, #7371fc);
+    border: none;
+    font-size: var(--font-size-s, 12px);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+
+.cancelButton:hover {
+    color: var(--text1, #f0f0f8);
+}
+
+.longDirection {
+    color: var(--green, #4cd471);
+}
+
+.shortDirection {
+    color: var(--red, #ff5c5c);
+}
+
+.cancelCell {
+    text-align: right;
+    justify-self: end;
+}
+
+@media (max-width: 1400px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+    }
+
+    .originalSizeCell {
+        display: none;
+    }
+}
+
+@media (max-width: 1200px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+    }
+
+    .triggerConditionsCell {
+        display: none;
+    }
+}
+
+@media (max-width: 1000px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+    }
+
+    .reduceOnlyCell {
+        display: none;
+    }
+}
+
+@media (max-width: 900px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+    }
+
+    .typeCell {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+    }
+
+    .priceCell {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+    }
+
+    .sizeCell {
+        display: none;
+    }
+}
+
+@media (max-width: 540px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+    }
+
+    .coinCell {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
+        padding: 0 var(--padding-xs);
+    }
+
+    .directionCell {
+        display: none;
+    }
+
+    .headerCell {
+        font-size: var(--font-size-xs);
+    }
+
+    .cell {
+        font-size: var(--font-size-s);
+    }
+
+    .cancelButton {
+        font-size: var(--font-size-s);
+    }
+}
