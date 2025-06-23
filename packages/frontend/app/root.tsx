@@ -130,7 +130,9 @@ export default function App() {
         };
     }, []);
 
-    if ('serviceWorker' in navigator) {
+    console.log(process.env.NODE_ENV, 'Environment');
+
+    if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').then((registration) => {
             // Check if there's an updated SW waiting to activate
             if (registration.waiting) {
