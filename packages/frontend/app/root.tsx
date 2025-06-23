@@ -123,50 +123,49 @@ export default function App() {
             process.env.NODE_ENV === 'production' &&
             'serviceWorker' in navigator
         ) {
-            let refreshing = false;
+            window.addEventListener('load', async () => {
+                const registration =
+                    await navigator.serviceWorker.register('/sw.js');
 
-            // Handle controller change event
-            const controllerChangeHandler = () => {
-                if (refreshing) return;
-                refreshing = true;
-                window.location.reload();
-            };
-
-            navigator.serviceWorker.addEventListener(
-                'controllerchange',
-                controllerChangeHandler,
-            );
-
-            // Register service worker
-            navigator.serviceWorker.register('/sw.js').then((registration) => {
-                // Only check for updates if controller exists (not first load)
-                if (navigator.serviceWorker.controller) {
-                    if (registration.waiting) {
+                // If there's a waiting service worker, prompt immediately (unless it's the first install)
+                if (registration.waiting) {
+                    if (navigator.serviceWorker.controller) {
                         promptUserToRefresh(registration);
+                    } else {
+                        // First install, do nothing
+                        console.log(
+                            'Service Worker initialized for the first time',
+                        );
                     }
-
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        if (newWorker) {
-                            newWorker.addEventListener('statechange', () => {
-                                if (
-                                    newWorker.state === 'installed' &&
-                                    navigator.serviceWorker.controller
-                                ) {
-                                    promptUserToRefresh(registration);
-                                }
-                            });
-                        }
-                    });
                 }
-            });
 
-            return () => {
-                navigator.serviceWorker.removeEventListener(
+                // Listen for new updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (
+                                newWorker.state === 'installed' &&
+                                navigator.serviceWorker.controller // Only prompt if not first install
+                            ) {
+                                promptUserToRefresh(registration);
+                            }
+                        });
+                    }
+                });
+
+                // Reload when the new service worker takes control
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener(
                     'controllerchange',
-                    controllerChangeHandler,
+                    () => {
+                        if (!refreshing) {
+                            window.location.reload();
+                            refreshing = true;
+                        }
+                    },
                 );
-            };
+            });
         }
     }, []);
 
@@ -188,12 +187,9 @@ export default function App() {
     }, []);
 
     function promptUserToRefresh(registration: ServiceWorkerRegistration) {
+        // Show your custom UI here instead of confirm()
         if (window.confirm('A new version is available. Reload now?')) {
-            registration.waiting?.postMessage({ action: 'skipWaiting' });
-            if (!localStorage.getItem('updateInProgress')) {
-                localStorage.setItem('updateInProgress', 'true');
-                // Show prompt and handle skipWaiting
-            }
+            registration?.waiting?.postMessage({ action: 'SKIP_WAITING' });
         }
     }
 
