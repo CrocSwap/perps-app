@@ -157,7 +157,13 @@ export default function App() {
 
         let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (refreshing) return;
+            if (refreshing) {
+                // After reloading, clear the flag
+                window.addEventListener('load', () => {
+                    localStorage.removeItem('updateInProgress');
+                });
+                return;
+            }
             refreshing = true;
             window.location.reload();
         });
@@ -166,6 +172,10 @@ export default function App() {
     function promptUserToRefresh(registration: ServiceWorkerRegistration) {
         if (window.confirm('A new version is available. Reload now?')) {
             registration.waiting?.postMessage({ action: 'skipWaiting' });
+            if (!localStorage.getItem('updateInProgress')) {
+                localStorage.setItem('updateInProgress', 'true');
+                // Show prompt and handle skipWaiting
+            }
         }
     }
 
