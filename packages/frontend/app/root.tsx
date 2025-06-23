@@ -108,10 +108,67 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-    // Use memoized value to prevent unnecessary re-renders
     const { wsEnvironment } = useDebugStore();
     const { setInternetConnected, internetConnected, wsReconnecting } =
         useTradeDataStore();
+
+    // Clear update flag on load
+    useEffect(() => {
+        localStorage.removeItem('updateInProgress');
+    }, []);
+
+    // Service worker registration and update handling
+    useEffect(() => {
+        if (
+            process.env.NODE_ENV === 'production' &&
+            'serviceWorker' in navigator
+        ) {
+            let refreshing = false;
+
+            // Handle controller change event
+            const controllerChangeHandler = () => {
+                if (refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            };
+
+            navigator.serviceWorker.addEventListener(
+                'controllerchange',
+                controllerChangeHandler,
+            );
+
+            // Register service worker
+            navigator.serviceWorker.register('/sw.js').then((registration) => {
+                // Only check for updates if controller exists (not first load)
+                if (navigator.serviceWorker.controller) {
+                    if (registration.waiting) {
+                        promptUserToRefresh(registration);
+                    }
+
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                if (
+                                    newWorker.state === 'installed' &&
+                                    navigator.serviceWorker.controller
+                                ) {
+                                    promptUserToRefresh(registration);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            return () => {
+                navigator.serviceWorker.removeEventListener(
+                    'controllerchange',
+                    controllerChangeHandler,
+                );
+            };
+        }
+    }, []);
 
     useEffect(() => {
         const onlineListener = () => {
@@ -129,43 +186,6 @@ export default function App() {
             window.removeEventListener('offline', offlineListener);
         };
     }, []);
-
-    if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then((registration) => {
-            // Check if there's an updated SW waiting to activate
-            if (registration.waiting) {
-                promptUserToRefresh(registration);
-            }
-
-            // Listen for updates to the service worker
-            registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                if (newWorker) {
-                    newWorker.addEventListener('statechange', () => {
-                        if (
-                            newWorker.state === 'installed' &&
-                            navigator.serviceWorker.controller
-                        ) {
-                            promptUserToRefresh(registration);
-                        }
-                    });
-                }
-            });
-        });
-
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (refreshing) {
-                // After reloading, clear the flag
-                window.addEventListener('load', () => {
-                    localStorage.removeItem('updateInProgress');
-                });
-                return;
-            }
-            refreshing = true;
-            window.location.reload();
-        });
-    }
 
     function promptUserToRefresh(registration: ServiceWorkerRegistration) {
         if (window.confirm('A new version is available. Reload now?')) {
