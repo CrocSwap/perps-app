@@ -112,12 +112,11 @@ export default function App() {
     const { setInternetConnected, internetConnected, wsReconnecting } =
         useTradeDataStore();
 
-    // Clear update flag on load
     useEffect(() => {
         localStorage.removeItem('updateInProgress');
     }, []);
 
-    // Service worker registration and update handling
+    // Service worker handling with first-load protection
     useEffect(() => {
         if (
             process.env.NODE_ENV === 'production' &&
@@ -137,23 +136,12 @@ export default function App() {
             );
 
             navigator.serviceWorker.register('/sw.js').then((registration) => {
-                // Only listen for updates AFTER initial installation
-                if (navigator.serviceWorker.controller) {
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        if (newWorker) {
-                            newWorker.addEventListener('statechange', () => {
-                                // Only prompt if new worker is installed AND page is already controlled
-                                if (
-                                    newWorker.state === 'installed' &&
-                                    navigator.serviceWorker.controller
-                                ) {
-                                    promptUserToRefresh(registration);
-                                }
-                            });
-                        }
-                    });
-                }
+                // Critical: Only set up update listeners AFTER initial load
+                window.setTimeout(() => {
+                    if (navigator.serviceWorker.controller) {
+                        setupUpdateListeners(registration);
+                    }
+                }, 1000);
             });
 
             return () => {
@@ -165,13 +153,32 @@ export default function App() {
         }
     }, []);
 
+    function setupUpdateListeners(registration: ServiceWorkerRegistration) {
+        // Check for existing waiting worker (from previous session)
+        if (registration.waiting) {
+            registration.update(); // Force fresh check
+        }
+
+        registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                    if (
+                        newWorker.state === 'installed' &&
+                        navigator.serviceWorker.controller
+                    ) {
+                        promptUserToRefresh(registration);
+                    }
+                });
+            }
+        });
+    }
+
     function promptUserToRefresh(registration: ServiceWorkerRegistration) {
-        if (
-            window.confirm(
-                'A new version of the app is available. Reload to update?',
-            )
-        ) {
-            // Prevent multiple reloads in multi-tab scenarios
+        // Only prompt if no update is in progress
+        if (localStorage.getItem('updateInProgress')) return;
+
+        if (window.confirm('New version available. Reload to update?')) {
             localStorage.setItem('updateInProgress', 'true');
             registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
         }
