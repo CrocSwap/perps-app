@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-app-cache-v0.0.12-7';
+const CACHE_NAME = 'my-app-cache-v0.0.12-8';
 const ASSETS_TO_CACHE = [
     '/',
     '/favicon.ico',
