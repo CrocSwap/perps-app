@@ -118,4 +118,5 @@ export enum WsChannels {
     TWAP_HISTORY = 'userTwapHistory',
     TWAP_SLICE_FILLS = 'userTwapSliceFills',
     USER_FUNDINGS = 'userFundings',
+    USER_NON_FUNDING_LEDGER_UPDATES = 'userNonFundingLedgerUpdates',
 }

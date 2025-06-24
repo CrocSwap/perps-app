@@ -1,8 +1,13 @@
 import DepositsWithdrawalsTableHeader from './DepositsWithdrawalsTableHeader';
 import DepositsWithdrawalsTableRow from './DepositsWithdrawalsTableRow';
-import { transactionsData } from './data';
+//import { transactionsData } from './data';
 import styles from './DepositsWithdrawalsTable.module.css';
+import { useEffect, useMemo, useState } from 'react';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 export default function DepositsWithdrawalsTable() {
+    const transactions = useTradeDataStore(
+        (state) => state.userNonFundingLedgerUpdates,
+    );
     const handleViewAll = () => {
         console.log('View all transactions');
     };
@@ -11,18 +16,23 @@ export default function DepositsWithdrawalsTable() {
         console.log('Export as CSV');
     };
 
+    const sortedTxs = useMemo(
+        () => [...transactions].sort((a, b) => b.time - a.time),
+        [transactions],
+    );
+
     return (
         <div className={styles.tableWrapper}>
             <DepositsWithdrawalsTableHeader />
             <div className={styles.tableBody}>
-                {transactionsData.map((transaction, index) => (
+                {sortedTxs.map((transaction, index) => (
                     <DepositsWithdrawalsTableRow
                         key={`transaction-${index}`}
                         transaction={transaction}
                     />
                 ))}
 
-                {transactionsData.length === 0 && (
+                {sortedTxs.length === 0 && (
                     <div
                         className={styles.rowContainer}
                         style={{ justifyContent: 'center', padding: '2rem 0' }}
@@ -32,7 +42,7 @@ export default function DepositsWithdrawalsTable() {
                 )}
             </div>
 
-            {transactionsData.length > 0 && (
+            {sortedTxs.length > 0 && (
                 <div className={styles.actionsContainer}>
                     <button
                         className={styles.actionLink}
