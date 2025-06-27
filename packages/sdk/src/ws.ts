@@ -110,6 +110,7 @@ export class WebsocketManager {
     private jsonParserWorkerBlobUrl: string | null = null;
     private pongReceived: boolean = false;
     private pongTimeout: NodeJS.Timeout | null = null;
+    private sleepMode: boolean = false;
 
     constructor(
         baseUrl: string,
@@ -277,6 +278,9 @@ export class WebsocketManager {
     };
 
     private onMessage = (event: MessageEvent) => {
+        if (this.sleepMode) {
+            return;
+        }
         const message = event.data;
         this.log('onMessage Raw:', message);
         if (message === 'Websocket connection established.') {
@@ -530,5 +534,26 @@ export class WebsocketManager {
         setTimeout(() => {
             this.connect();
         }, RECONNECT_TIMEOUT_MS);
+    }
+
+    public setSleepMode(sleepMode: boolean) {
+        if (this.sleepMode === sleepMode) return;
+        this.sleepMode = sleepMode;
+
+        // that block can be used to close the connection instead of ignoring messages.
+        // if (sleepMode) {
+        //     this.stashSubscriptions();
+        //     this.ws.close();
+        //     this.pongReceived = true;
+        // } else {
+        //     setTimeout(() => {
+        //         this.connect();
+        //     }, 2000);
+        // }
+    }
+
+    public stashWebsocket() {
+        this.stashSubscriptions();
+        this.ws.close();
     }
 }

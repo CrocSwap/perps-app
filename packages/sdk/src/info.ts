@@ -98,6 +98,13 @@ export class Info extends API {
         this.wsManager.stop();
     }
 
+    public stashWebsocket() {
+        if (!this.wsManager) {
+            throw new Error('Cannot call stashWebsocket since skipWs was used');
+        }
+        this.wsManager.stashWebsocket();
+    }
+
     public async userState(address: string): Promise<ClearinghouseState> {
         return this.post('/info', {
             type: 'clearinghouseState',

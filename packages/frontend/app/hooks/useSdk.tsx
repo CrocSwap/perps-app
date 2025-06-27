@@ -1,7 +1,9 @@
 import { DEMO_USER, Exchange, Info, type Environment } from '@perps-app/sdk';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useIsClient } from './useIsClient';
+import { useAppStateStore } from '~/stores/AppStateStore';
 
 type SdkContextType = {
     info: Info | null;
@@ -20,7 +22,8 @@ export const SdkProvider: React.FC<{
     const [exchange, setExchange] = useState<Exchange | null>(null);
     const [shouldReconnect, setShouldReconnect] = useState(false);
 
-    const { internetConnected, setWsReconnecting } = useTradeDataStore();
+    const { internetConnected, setWsReconnecting } = useAppStateStore();
+    const { isWsSleepMode, setIsWsSleepMode } = useDebugStore();
 
     // commit to trigger deployment
     useEffect(() => {
@@ -77,6 +80,15 @@ export const SdkProvider: React.FC<{
             clearInterval(reconnectInterval);
         };
     }, [internetConnected, isClient, info, shouldReconnect]);
+
+    useEffect(() => {
+        if (!isClient) return;
+        if (isWsSleepMode) {
+            info?.wsManager?.setSleepMode(true);
+        } else {
+            info?.wsManager?.setSleepMode(false);
+        }
+    }, [isWsSleepMode, info]);
 
     return (
         <SdkContext.Provider value={{ info: info, exchange: exchange }}>

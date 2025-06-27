@@ -8,12 +8,14 @@ import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import styles from './symbolinfo.module.css';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import SymbolSearch from './symbolsearch/symbolsearch';
+import { useAppStateStore } from '~/stores/AppStateStore';
 
 const SymbolInfo: React.FC = React.memo(() => {
     const { symbol, symbolInfo } = useTradeDataStore();
     const { formatNum, getDefaultPrecision } = useNumFormatter();
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
+    const { titleOverride } = useAppStateStore();
 
     // Memoize 24h change string and usdChange
     const changeData = useMemo(() => {
@@ -34,11 +36,13 @@ const SymbolInfo: React.FC = React.memo(() => {
         [marketId],
     );
 
-    const title = useMemo(
-        () =>
-            `${symbolInfo?.markPx ? '$' + formatNum(symbolInfo?.markPx) + ' | ' : ''} ${marketId?.toUpperCase() ? marketId?.toUpperCase() + ' | ' : ''}Ambient`,
-        [symbolInfo?.markPx, marketId],
-    );
+    const title = useMemo(() => {
+        if (titleOverride && titleOverride.length > 0) {
+            return titleOverride;
+        } else {
+            return `${symbolInfo?.markPx ? '$' + formatNum(symbolInfo?.markPx) + ' | ' : ''} ${marketId?.toUpperCase() ? marketId?.toUpperCase() + ' | ' : ''}Ambient`;
+        }
+    }, [symbolInfo?.markPx, marketId, titleOverride]);
 
     const ogImage = useMemo(
         () =>
