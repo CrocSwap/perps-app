@@ -49,10 +49,12 @@
     align-items: flex-start;
     justify-content: center;
     width: 100%;
+    height: 100%;
 }
 
 .childOfLargeContainer {
     flex: 1 1;
+    height: 100%;
 }
 
 .menuContent {
@@ -64,4 +66,13 @@
     width: 100%;
 
     /* padding-bottom: var(--padding-s); */
+}
+
+.orderBookTabSectionContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabContent {
+    flex: 1;
 }

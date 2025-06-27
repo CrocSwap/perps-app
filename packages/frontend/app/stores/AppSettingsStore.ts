@@ -69,6 +69,7 @@ export const useAppSettings = create<AppSettingsStore>()(
                 bsColor: state.bsColor,
                 numFormat: state.numFormat,
                 lang: state.lang,
+                // orderBookMode: state.orderBookMode,
             }),
         },
     ),

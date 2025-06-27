@@ -6,6 +6,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
+import { getElementHeightWithMargins } from '~/utils/Utils';
 
 interface OrderBookSectionProps {
     symbol: string;
@@ -14,7 +15,7 @@ interface OrderBookSectionProps {
 }
 
 const ORDER_ROW_HEIGHT_FALLBACK = 16;
-const ORDER_ROW_GAP = 5;
+const ORDER_ROW_GAP = 4;
 
 const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     symbol,
@@ -23,6 +24,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
 }) => {
     const [orderCount, setOrderCount] = useState(9);
     const [tradesCount, setTradesCount] = useState(25);
+    const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
 
     const { orderBookMode, setOrderBookMode } = useAppSettings();
     const orderBookModeRef = useRef(orderBookMode);
@@ -31,11 +33,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     useEffect(() => {
         orderBookModeRef.current = orderBookMode;
     }, [orderBookMode]);
-
-    const orderCountForStacked = useMemo(
-        () => Math.ceil(orderCount / 2),
-        [orderCount],
-    );
 
     const menuItems = useMemo(
         () => [
@@ -49,16 +46,20 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     const orderBookComponent = useMemo(
         () =>
             orderCount > 0 ? (
-                <div className={styles.orderbookInTab}>
-                    <OrderBook symbol={symbol} orderCount={orderCount} />
-                </div>
+                <OrderBook symbol={symbol} orderCount={orderCount} />
             ) : null,
         [orderCount, symbol],
     );
 
-    const orderBookTradesComponent = useMemo(
-        () => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />,
-        [tradesCount, symbol],
+    const orderBookTradesComponent = useCallback(
+        (maxHeight?: number) => (
+            <OrderBookTrades
+                symbol={symbol}
+                tradesCount={tradesCount}
+                maxHeight={maxHeight}
+            />
+        ),
+        [tradesCount, symbol, tradesMaxHeight],
     );
 
     const orderBookTabs = useMemo(() => ['Book', 'Trades'], []);
@@ -67,9 +68,15 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     const handleTabChange = useCallback((tab: string) => setActiveTab(tab), []);
 
     const renderTabContent = useCallback(() => {
-        if (activeTab === 'Trades') return orderBookTradesComponent;
+        if (activeTab === 'Trades')
+            return orderBookTradesComponent(tradesMaxHeight);
         return orderBookComponent;
-    }, [activeTab, orderBookComponent, orderBookTradesComponent]);
+    }, [
+        activeTab,
+        orderBookComponent,
+        orderBookTradesComponent,
+        tradesMaxHeight,
+    ]);
 
     // Height calculation logic
     const calculateOrderCount = useCallback(() => {
@@ -83,38 +90,63 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         if (!orderBookSection) return;
 
         let availableHeight = orderBookSection.getBoundingClientRect().height;
-        if (
-            window.innerHeight / availableHeight < 1.5 &&
-            window.innerHeight < 1000
-        ) {
-            availableHeight = window.innerHeight / 1.5;
-        }
 
         if (availableHeight <= 0) return;
 
-        if (orderBookModeRef.current !== 'stacked') {
-            let otherHeightSum = 0;
-            ['orderBookTabs', 'orderBookHeader1', 'orderBookHeader2'].forEach(
-                (id) => {
-                    const el = document.getElementById(id);
-                    if (el) otherHeightSum += el.getBoundingClientRect().height;
-                },
-            );
-            const calculatedOrderCount = Math.floor(
-                (availableHeight - otherHeightSum) /
-                    (orderRowHeightWithGaps * 2),
-            );
-            if (orderCount !== calculatedOrderCount)
-                setOrderCount(calculatedOrderCount);
-            setTradesCount(
-                Math.floor(availableHeight / orderRowHeightWithGaps) - 2,
-            );
-        } else {
-            const calculatedOrderCount = Math.floor(availableHeight / 1000);
-            if (orderCount !== calculatedOrderCount)
-                setOrderCount(calculatedOrderCount);
+        let otherHeightOB = 0;
+        [
+            'orderBookTabs',
+            'orderBookHeader1',
+            'orderBookHeader2',
+            'orderBookMidHeader',
+            'orderBookMidHeader2',
+            'orderBookHeaderLargeMode',
+            'orderBookHeaderStackedMode',
+        ].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) {
+                otherHeightOB += getElementHeightWithMargins(el);
+            }
+        });
+
+        let otherHeightTrades = 0;
+        [
+            'orderBookTabs',
+            'orderTradesHeader',
+            'orderTradesHeaderLargeMode',
+            'orderTradesHeaderStackedMode',
+        ].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) otherHeightTrades += getElementHeightWithMargins(el);
+        });
+
+        if (orderBookModeRef.current === 'stacked') {
+            // divide available height by 2 for stacked mode
+            availableHeight /= 2;
         }
-    }, [orderCount]);
+
+        setTradesMaxHeight(
+            availableHeight -
+                otherHeightTrades -
+                (orderBookModeRef.current === 'stacked' ? 15 : 0),
+        );
+
+        const calculatedOrderCount = Math.floor(
+            (availableHeight - otherHeightOB + ORDER_ROW_GAP * 2) /
+                (orderRowHeightWithGaps * 2),
+        );
+
+        const calculatedTradesCount = Math.floor(
+            (availableHeight - otherHeightTrades + ORDER_ROW_GAP * 2) /
+                orderRowHeightWithGaps,
+        );
+
+        if (orderCount !== calculatedOrderCount)
+            setOrderCount(calculatedOrderCount);
+        if (tradesCount !== calculatedTradesCount) {
+            setTradesCount(calculatedTradesCount - 1);
+        }
+    }, [orderCount, tradesCount, orderBookMode, activeTab]);
 
     // Resize effect
     useEffect(() => {
@@ -152,19 +184,19 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                         <div className={styles.sectionHeaderTitle}>Book</div>
                         <BasicMenu items={menuItems} icon={<BsThreeDots />} />
                     </div>
-                    <OrderBook
-                        symbol={symbol}
-                        orderCount={orderCountForStacked}
-                    />
-                    <div className={styles.sectionHeader}>
+                    <OrderBook symbol={symbol} orderCount={orderCount} />
+                    <div
+                        id={'orderTradesHeaderStackedMode'}
+                        className={styles.sectionHeader}
+                    >
                         <div className={styles.sectionHeaderTitle}>Trades</div>
                         <BasicMenu items={menuItems} icon={<BsThreeDots />} />
                     </div>
-                    {orderBookTradesComponent}
+                    {orderBookTradesComponent(tradesMaxHeight)}
                 </div>
             </div>
         ),
-        [orderCountForStacked, symbol],
+        [orderCount, symbol],
     );
 
     const largeOrderBook = useMemo(
@@ -172,15 +204,25 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
             <div className={styles.orderBookSection}>
                 <div className={styles.largeContainer}>
                     <div className={styles.childOfLargeContainer}>
-                        <div className={styles.sectionHeader}>
+                        <div
+                            id='orderBookHeaderLargeMode'
+                            className={styles.sectionHeader}
+                        >
                             <div className={styles.sectionHeaderTitle}>
                                 Book
                             </div>
                         </div>
-                        <OrderBook symbol={symbol} orderCount={orderCount} />
+                        <OrderBook
+                            symbol={symbol}
+                            heightOverride={`calc(100% - 24px)`}
+                            orderCount={orderCount}
+                        />
                     </div>
                     <div className={styles.childOfLargeContainer}>
-                        <div className={styles.sectionHeader}>
+                        <div
+                            id='orderTradesHeaderLargeMode'
+                            className={styles.sectionHeader}
+                        >
                             <div className={styles.sectionHeaderTitle}>
                                 Trades
                             </div>
@@ -189,7 +231,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                                 icon={<BsThreeDots />}
                             />
                         </div>
-                        {orderBookTradesComponent}
+                        {orderBookTradesComponent(tradesMaxHeight)}
                     </div>
                 </div>
             </div>
@@ -198,7 +240,13 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     );
 
     const orderBookTabsComponent = (
-        <div className={styles.orderBookSectionContainer}>
+        <div
+            className={
+                styles.orderBookSectionContainer +
+                ' ' +
+                styles.orderBookTabSectionContainer
+            }
+        >
             <Tabs
                 wrapperId='orderBookTabs'
                 tabs={orderBookTabs}

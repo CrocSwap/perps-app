@@ -23,6 +23,7 @@
     align-items: center;
     width: 100%;
     gap: var(--gap-xs);
+    scrollbar-width: none;
 }
 
 .orderTradesListStacked::-webkit-scrollbar {
@@ -30,13 +31,13 @@
 }
 
 .orderTradesListStacked {
-    max-height: 20vh;
+    max-height: 28vh;
     overflow-y: auto;
 }
 
 @media only screen and (min-height: 1080px) {
     .orderTradesListStacked {
-        max-height: 28vh;
+        max-height: 32vh;
     }
 }
 

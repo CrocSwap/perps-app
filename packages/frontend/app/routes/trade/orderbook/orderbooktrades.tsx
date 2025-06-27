@@ -14,11 +14,15 @@ import OrderTradeRow from './ordertraderow/ordertraderow';
 interface OrderBookTradesProps {
     symbol: string;
     tradesCount: number;
+    maxHeight?: number;
 }
+
+const TRADES_LIMIT = 50;
 
 const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
     symbol,
     tradesCount,
+    maxHeight,
 }) => {
     const { info } = useSdk();
     const { trades, setTrades } = useOrderBookStore();
@@ -31,9 +35,6 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
 
     const tradesRef = useRef<OrderBookTradeIF[]>([]);
     tradesRef.current = trades;
-
-    const tradesCountRef = useRef(tradesCount);
-    tradesCountRef.current = tradesCount;
 
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
@@ -57,16 +58,16 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
                     setTrades(
                         [...newTrades, ...tradesRef.current].slice(
                             0,
-                            tradesCountRef.current,
+                            TRADES_LIMIT,
                         ),
                     );
                 } else {
-                    setTrades(wsTrades.slice(0, tradesCountRef.current));
+                    setTrades(wsTrades.slice(0, TRADES_LIMIT));
                 }
                 setTableState(TableState.FILLED);
             }
         },
-        [tradesCount, info],
+        [info],
     );
 
     useEffect(() => {
@@ -97,7 +98,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
 
     return (
         <div className={styles.orderTradesContainer}>
-            <div className={styles.orderTradesHeader}>
+            <div id='orderTradesHeader' className={styles.orderTradesHeader}>
                 <div>Price</div>
                 <div>Size {'(' + symbol + ')'}</div>
                 <div>Time</div>
@@ -124,10 +125,19 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
                     <>
                         <div
                             className={`${styles.orderTradesList} ${orderBookMode === 'stacked' ? styles.orderTradesListStacked : ''}`}
+                            style={{
+                                ...(maxHeight && {
+                                    maxHeight: maxHeight + 'px',
+                                    overflowY: 'auto',
+                                }),
+                            }}
                         >
-                            {trades.map((trade) => (
-                                <OrderTradeRow key={trade.tid} trade={trade} />
-                            ))}
+                            {trades
+                                // .slice(0, tradesCount) // NOTE: that slicing has been removed because scrolling has been enabled
+                                .slice(0, TRADES_LIMIT)
+                                .map((trade, index) => (
+                                    <OrderTradeRow key={index} trade={trade} />
+                                ))}
                         </div>
                     </>
                 )}

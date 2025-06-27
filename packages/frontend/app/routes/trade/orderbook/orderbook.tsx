@@ -33,6 +33,7 @@ import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
+    heightOverride?: string;
 }
 
 const dummyOrder: OrderBookRowIF = {
@@ -50,7 +51,11 @@ function useOrderSlots(orders: OrderBookRowIF[]) {
     return useMemo(() => orders.map((order) => order.px), [orders]);
 }
 
-const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
+const OrderBook: React.FC<OrderBookProps> = ({
+    symbol,
+    orderCount,
+    heightOverride,
+}) => {
     const { info } = useSdk();
 
     const orderRowHeight = useMemo(() => {
@@ -281,7 +286,14 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     );
 
     return (
-        <div className={styles.orderBookContainer}>
+        <div
+            className={styles.orderBookContainer}
+            style={{
+                ...(heightOverride && {
+                    height: heightOverride,
+                }),
+            }}
+        >
             <div id={'orderBookHeader1'} className={styles.orderBookHeader}>
                 <ComboBox
                     value={selectedResolution?.val}
@@ -342,7 +354,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
             {orderBookState === TableState.LOADING && (
                 <motion.div
-                    className={styles.skeletonWrapper}
+                    className={
+                        styles.skeletonWrapper + ' ' + styles.orderSlotsWrapper
+                    }
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 10 }}
@@ -389,7 +403,46 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 10 }}
                             transition={{ duration: 0.2 }}
+                            className={styles.orderSlotsWrapper}
                         >
+                            <div
+                                className={styles.obGradientEffect}
+                                style={{
+                                    background: `linear-gradient(to bottom,  ${getBsColor().sell} 0%, var(--bg-dark2) 100%)`,
+                                }}
+                            ></div>
+                            <div
+                                className={
+                                    styles.obGradientEffect +
+                                    ' ' +
+                                    styles.smaller
+                                }
+                                style={{
+                                    background: `linear-gradient(to bottom,  ${getBsColor().sell} 0%, var(--bg-dark2) 100%)`,
+                                }}
+                            ></div>
+                            <div
+                                className={
+                                    styles.obGradientEffect +
+                                    ' ' +
+                                    styles.obGradientEffectBottom
+                                }
+                                style={{
+                                    background: `linear-gradient(to top,  ${getBsColor().buy} 0%, var(--bg-dark2) 100%)`,
+                                }}
+                            ></div>
+                            <div
+                                className={
+                                    styles.obGradientEffect +
+                                    ' ' +
+                                    styles.smaller +
+                                    ' ' +
+                                    styles.obGradientEffectBottom
+                                }
+                                style={{
+                                    background: `linear-gradient(to top,  ${getBsColor().buy} 0%, var(--bg-dark2) 100%)`,
+                                }}
+                            ></div>
                             <div className={styles.orderBookBlock}>
                                 {sellPlaceHolderCount === 1 ? (
                                     <div className={styles.orderRowWrapper}>
