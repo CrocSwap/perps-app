@@ -11,6 +11,10 @@ import {
 import { WsChannels } from '~/utils/Constants';
 import Notification from './Notification';
 import styles from './Notifications.module.css';
+import { useVersionCheck } from '~/hooks/useVersionCheck';
+import SimpleButton from '../SimpleButton/SimpleButton';
+import { MdClose } from 'react-icons/md';
+import { useKeydown } from '~/hooks/useKeydown';
 import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 
 export default function Notifications() {
@@ -21,6 +25,10 @@ export default function Notifications() {
     backgroundFillNotifRef.current = enableBackgroundFillNotif;
     const { debugWallet } = useDebugStore();
     const { info } = useSdk();
+
+    const { showReload, setShowReload } = useVersionCheck();
+
+    useKeydown('v', () => setShowReload(true));
 
     useEffect(() => {
         if (!info) return;
@@ -49,6 +57,8 @@ export default function Notifications() {
         }
     }, []);
 
+    const version = null;
+
     return (
         <div className={styles.notifications}>
             <AnimatePresence>
@@ -66,6 +76,35 @@ export default function Notifications() {
                         </motion.div>
                     ))}
             </AnimatePresence>
+            {showReload && (
+                <div className={styles.new_version_available}>
+                    <header>
+                        <div />
+                        <div>🚀</div>
+                        <MdClose
+                            onClick={() => setShowReload(false)}
+                            color='var(--text2)'
+                            size={16}
+                        />
+                    </header>
+                    <div className={styles.text_content}>
+                        <h3>New Version Available</h3>
+                        <p>
+                            {version
+                                ? `Version ${version} is ready to install with new features and improvements.`
+                                : 'A new version is ready with exciting updates and bug fixes.'}
+                        </p>
+                    </div>
+                    <SimpleButton
+                        onClick={() => {
+                            window.location.reload();
+                            setShowReload(false);
+                        }}
+                    >
+                        Update Now
+                    </SimpleButton>
+                </div>
+            )}
         </div>
     );
 }

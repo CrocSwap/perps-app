@@ -15,14 +15,12 @@ import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
 import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
-import VersionUpdateAnnouncement from './components/VersionUpdateAnnouncement/VersionUpdateAnnouncement';
 import WsReconnectingIndicator from './components/WsReconnectingIndicator/WsReconnectingIndicator';
 import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
-import { useVersionCheck } from './hooks/useVersionCheck';
 import { useDebugStore } from './stores/DebugStore';
 import { useTradeDataStore } from './stores/TradeDataStore';
 
@@ -111,8 +109,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-    const { showReload, setShowReload } = useVersionCheck();
-
     // Use memoized value to prevent unnecessary re-renders
     const { wsEnvironment } = useDebugStore();
     const { setInternetConnected, internetConnected, wsReconnecting } =
@@ -169,13 +165,6 @@ export default function App() {
                             </div>
                         </TutorialProvider>
                         <RuntimeDomManipulation />
-                        {showReload && (
-                            <VersionUpdateAnnouncement
-                                onClose={() => {
-                                    setShowReload(false);
-                                }}
-                            />
-                        )}
                     </SdkProvider>
                 </AppProvider>
             </Layout>

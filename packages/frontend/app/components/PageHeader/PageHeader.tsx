@@ -205,7 +205,11 @@ export default function PageHeader() {
         </section>
     );
 
-    const appSettingsModal: useModalIF = useModal('closed');
+    const SETTINGS_MODAL_LIMITER: string = 'settings_limiter';
+    const appSettingsModal: useModalIF = useModal({
+        defaultState: 'closed',
+        limiterSlug: SETTINGS_MODAL_LIMITER,
+    });
 
     return (
         <>
@@ -288,6 +292,7 @@ export default function PageHeader() {
                     close={appSettingsModal.close}
                     position={'center'}
                     title='Options'
+                    limiter={SETTINGS_MODAL_LIMITER}
                 >
                     <AppOptions />
                 </Modal>
