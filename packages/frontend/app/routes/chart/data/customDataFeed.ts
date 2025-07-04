@@ -102,7 +102,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                         : chartTheme.sell;
 
                     const markData = {
-                        id: index,
+                        id: element.oid,
                         time:
                             (Math.floor(element.time / floorMode) * floorMode) /
                             1000,
@@ -111,6 +111,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                             background: markerColor,
                         },
                         text: element.dir + ' at ' + element.px,
+                        px: element.px,
                         label: isBuy ? 'B' : 'S',
                         labelFontColor: 'white',
                         minSize: 15,
@@ -132,7 +133,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
             )) as any;
 
             const fillHistory = markRes.dataCache;
-            // const userWallet = markRes.user;
+            const userWallet = markRes.user;
 
             if (fillHistory) {
                 fillHistory.sort((a: any, b: any) => b.time - a.time);
@@ -145,45 +146,45 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
             ];
 
             if (markArray.length > 0) {
+                markArray.sort((a: any, b: any) => b.px - a.px);
+
                 onDataCallback(markArray);
             }
 
-            // subscribe('userFills', {
-            //     payload: {
-            //         user: userWallet,
-            //     },
-            //     handler: (payload: any) => {
-            //         if (symbolInfo.name === payload.fills[0].coin) {
-            //             getMarkFillData(
-            //                 symbolInfo.name,
-            //                 // debugWallet.address,
-            //             ).then((res: any) => {
-            //                 const fetchedData = res.dataCache;
-            //                 const diffArry: any[] = [];
+            if (!info) return console.log('SDK is not ready');
+            info.subscribe(
+                {
+                    type: WsChannels.USER_FILLS,
+                    user: userWallet,
+                },
+                (payload: any) => {
+                    if (!payload || !payload.data) return;
 
-            //                 payload.fills.forEach((fill: any) => {
-            //                     const key = fetchedData.find(
-            //                         (hs: any) => hs.hash === fill.hash,
-            //                     );
-            //                     if (key === undefined) {
-            //                         diffArry.push(fill);
-            //                     }
-            //                 });
+                    const fills = payload.data.fills;
+                    if (!fills || fills.length === 0) return;
 
-            //                 fillMarks(diffArry);
+                    const poolFills = fills.filter(
+                        (fill: any) => fill.coin === symbolInfo.name,
+                    );
 
-            //                 const markArray = [
-            //                     ...bSideOrderHistoryMarks.values(),
-            //                     ...aSideOrderHistoryMarks.values(),
-            //                 ];
+                    if (poolFills.length === 0) return;
 
-            //                 if (markArray.length > 0) {
-            //                     onDataCallback(markArray);
-            //                 }
-            //             });
-            //         }
-            //     },
-            // });
+                    poolFills.sort((a: any, b: any) => b.time - a.time);
+
+                    fillMarks(poolFills);
+
+                    const markArray = [
+                        ...bSideOrderHistoryMarks.values(),
+                        ...aSideOrderHistoryMarks.values(),
+                    ];
+
+                    if (markArray.length > 0) {
+                        markArray.sort((a: any, b: any) => b.px - a.px);
+
+                        onDataCallback(markArray);
+                    }
+                },
+            );
         },
 
         subscribeBars: (symbolInfo, resolution, onTick) => {

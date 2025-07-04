@@ -85,13 +85,14 @@ const GenericTablePagination: React.FC<GenericTablePaginationProps> = ({
                         className={styles.pageButton}
                         onClick={() => {
                             if (
-                                page < Math.floor(totalCount / rowsPerPageState)
+                                page <
+                                Math.ceil(totalCount / rowsPerPageState) - 1
                             ) {
                                 setPage(page + 1);
                             }
                         }}
                         disabled={
-                            page === Math.floor(totalCount / rowsPerPageState)
+                            page >= Math.ceil(totalCount / rowsPerPageState) - 1
                         }
                     >
                         <FaChevronRight size={20} />
