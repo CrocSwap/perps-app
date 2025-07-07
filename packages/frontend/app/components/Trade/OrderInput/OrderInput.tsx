@@ -94,10 +94,10 @@ const marketOrderTypes = [
     },
 ];
 
-const chaseOptionTypes = [
-    { value: 'bid1ask1', label: 'Bid1/Ask1' },
-    { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
-];
+// const chaseOptionTypes = [
+//     { value: 'bid1ask1', label: 'Bid1/Ask1' },
+//     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
+// ];
 
 const leverageOptions = [
     { value: 1, label: '1x' },
@@ -105,13 +105,6 @@ const leverageOptions = [
     { value: 10, label: '10x' },
     { value: 50, label: '50x' },
     { value: 100, label: '100x' },
-];
-const positionSizeOptions = [
-    { value: 0, label: '0%' },
-    { value: 25, label: '5%' },
-    { value: 50, label: '10%' },
-    { value: 75, label: '50%' },
-    { value: 100, label: '100%' },
 ];
 
 function OrderInput() {
@@ -334,10 +327,10 @@ function OrderInput() {
         console.log(`PositionSize changed to: ${value}x`);
     };
     // CHASE OPTION---------------------------------------------------
-    const handleChaseOptionChange = (value: string) => {
-        setChaseOption(value);
-        console.log(`Chase Option changed to: ${value}`);
-    };
+    // const handleChaseOptionChange = (value: string) => {
+    //     setChaseOption(value);
+    //     console.log(`Chase Option changed to: ${value}`);
+    // };
 
     // REDUCE AND PROFIT STOP LOSS -----------------------------------------------------
 
@@ -508,13 +501,11 @@ function OrderInput() {
 
     const positionSizeProps = useMemo(
         () => ({
-            options: positionSizeOptions,
             value: positionSize,
             onChange: handlePositionSizeChange,
         }),
         [positionSize, handlePositionSizeChange],
     );
-
     const priceRangeProps = useMemo(
         () => ({
             minValue: priceRangeMin,

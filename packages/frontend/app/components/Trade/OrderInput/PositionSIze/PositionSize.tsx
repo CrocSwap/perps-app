@@ -7,24 +7,28 @@ interface SizeOption {
 }
 
 interface PositionSizeProps {
-    options: SizeOption[];
     value: number;
     onChange: (value: number) => void;
     className?: string;
 }
 
 export default function PositionSize({
-    options = [
-        { value: 0, label: '0%' },
-        { value: 25, label: '5%' },
-        { value: 50, label: '10%' },
-        { value: 75, label: '50%' },
-        { value: 100, label: '100%' },
-    ],
     value = 0,
     onChange,
     className = '',
 }: PositionSizeProps) {
+    //  Visual markers and clickable positions
+    const VISUAL_MARKERS: SizeOption[] = [
+        { value: 0, label: '0%' },
+        { value: 25, label: '25%' },
+        { value: 50, label: '50%' },
+        { value: 75, label: '75%' },
+        { value: 100, label: '100%' },
+    ];
+
+    //  Drag increment step
+    const DRAG_STEP = 5;
+
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [showLabels] = useState(false);
@@ -36,9 +40,6 @@ export default function PositionSize({
         setInputValue(value.toString());
     }, [value]);
 
-    // Find the selected option index
-    const selectedIndex = options.findIndex((option) => option.value === value);
-
     // Handle dragging functionality
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -49,28 +50,14 @@ export default function PositionSize({
                 0,
                 Math.min(e.clientX - rect.left, rect.width),
             );
-            const percentage = offsetX / rect.width;
+            const percentage = (offsetX / rect.width) * 100;
 
-            // Find the closest option based on drag position
-            const position = percentage * (options.length - 1);
-            const lowerIndex = Math.floor(position);
-            const upperIndex = Math.ceil(position);
+            // Round to nearest DRAG_STEP increment
+            const newValue = Math.round(percentage / DRAG_STEP) * DRAG_STEP;
+            const clampedValue = Math.max(0, Math.min(100, newValue));
 
-            // Determine which one is closer
-            let newIndex;
-            if (upperIndex >= options.length) {
-                newIndex = options.length - 1;
-            } else if (lowerIndex < 0) {
-                newIndex = 0;
-            } else {
-                const lowerDiff = Math.abs(position - lowerIndex);
-                const upperDiff = Math.abs(upperIndex - position);
-                newIndex = lowerDiff <= upperDiff ? lowerIndex : upperIndex;
-            }
-
-            const newValue = options[newIndex].value;
-            if (newValue !== value) {
-                onChange(newValue);
+            if (clampedValue !== value) {
+                onChange(clampedValue);
             }
         };
 
@@ -83,28 +70,14 @@ export default function PositionSize({
                 0,
                 Math.min(touch.clientX - rect.left, rect.width),
             );
-            const percentage = offsetX / rect.width;
+            const percentage = (offsetX / rect.width) * 100;
 
-            // Find the closest option based on touch position
-            const position = percentage * (options.length - 1);
-            const lowerIndex = Math.floor(position);
-            const upperIndex = Math.ceil(position);
+            // Round to nearest DRAG_STEP increment
+            const newValue = Math.round(percentage / DRAG_STEP) * DRAG_STEP;
+            const clampedValue = Math.max(0, Math.min(100, newValue));
 
-            // Determine which one is closer
-            let newIndex;
-            if (upperIndex >= options.length) {
-                newIndex = options.length - 1;
-            } else if (lowerIndex < 0) {
-                newIndex = 0;
-            } else {
-                const lowerDiff = Math.abs(position - lowerIndex);
-                const upperDiff = Math.abs(upperIndex - position);
-                newIndex = lowerDiff <= upperDiff ? lowerIndex : upperIndex;
-            }
-
-            const newValue = options[newIndex].value;
-            if (newValue !== value) {
-                onChange(newValue);
+            if (clampedValue !== value) {
+                onChange(clampedValue);
             }
 
             // Prevent scrolling while dragging
@@ -140,7 +113,7 @@ export default function PositionSize({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, options, value, onChange]);
+    }, [isDragging, value, onChange, DRAG_STEP]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
@@ -153,36 +126,23 @@ export default function PositionSize({
 
         const rect = sliderRef.current.getBoundingClientRect();
         const offsetX = e.clientX - rect.left;
-        const percentage = offsetX / rect.width;
+        const percentage = (offsetX / rect.width) * 100;
 
-        // Find the closest option based on click position
-        const position = percentage * (options.length - 1);
-        const lowerIndex = Math.floor(position);
-        const upperIndex = Math.ceil(position);
+        // Find the closest visual marker for track clicks
+        const closestMarker = VISUAL_MARKERS.reduce((prev, curr) =>
+            Math.abs(curr.value - percentage) <
+            Math.abs(prev.value - percentage)
+                ? curr
+                : prev,
+        );
 
-        // Determine which one is closer
-        let newIndex;
-        if (upperIndex >= options.length) {
-            newIndex = options.length - 1;
-        } else if (lowerIndex < 0) {
-            newIndex = 0;
-        } else {
-            const lowerDiff = Math.abs(position - lowerIndex);
-            const upperDiff = Math.abs(upperIndex - position);
-            newIndex = lowerDiff <= upperDiff ? lowerIndex : upperIndex;
-        }
-
-        onChange(options[newIndex].value);
+        onChange(closestMarker.value);
     };
 
     // Get position for the knob as percentage
     const getKnobPosition = () => {
-        return selectedIndex === -1
-            ? 0
-            : (selectedIndex / (options.length - 1)) * 100;
+        return value;
     };
-
-    // Get color for the knob based on value
 
     // Handle input change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -193,14 +153,10 @@ export default function PositionSize({
     const handleInputBlur = () => {
         const newValue = parseInt(inputValue, 10);
         if (!isNaN(newValue)) {
-            // Find the closest valid option
-            const closestOption = options.reduce((prev, curr) =>
-                Math.abs(curr.value - newValue) <
-                Math.abs(prev.value - newValue)
-                    ? curr
-                    : prev,
-            );
-            onChange(closestOption.value);
+            // Round to nearest DRAG_STEP and clamp between 0-100
+            const roundedValue = Math.round(newValue / DRAG_STEP) * DRAG_STEP;
+            const clampedValue = Math.max(0, Math.min(100, roundedValue));
+            onChange(clampedValue);
         } else {
             // Reset to current value if invalid
             setInputValue(value.toString());
@@ -235,26 +191,21 @@ export default function PositionSize({
                             }}
                         ></div>
 
-                        {/* Slider markers */}
-                        {options.map((option, index) => (
+                        {/* Slider markers - only show visual markers */}
+                        {VISUAL_MARKERS.map((marker: SizeOption) => (
                             <div
-                                key={option.value}
+                                key={marker.value}
                                 className={`${styles.sliderMarker} ${
-                                    index <= selectedIndex ? styles.active : ''
+                                    marker.value <= value ? styles.active : ''
                                 } ${
-                                    index === selectedIndex
+                                    marker.value === value
                                         ? styles.sliderMarkerCurrent
                                         : ''
                                 }`}
                                 style={{
-                                    left: `${
-                                        (index / (options.length - 1)) * 100
-                                    }%`,
-                                    //   backgroundColor: index <= selectedIndex ?
-                                    //     colors[option.value.toString()] || '#FFFFFF' :
-                                    //     'transparent',
+                                    left: `${marker.value}%`,
                                     borderColor:
-                                        index <= selectedIndex
+                                        marker.value <= value
                                             ? 'transparent'
                                             : 'var(--bg-dark3)',
                                 }}
@@ -264,7 +215,7 @@ export default function PositionSize({
                         {/* Draggable knob */}
                         <div
                             ref={knobRef}
-                            className={`${styles.sliderKnob} ${selectedIndex === 0 ? styles.sliderKnobTransparent : ''}`}
+                            className={`${styles.sliderKnob} ${value === 0 ? styles.sliderKnobTransparent : ''}`}
                             style={{
                                 left: `${getKnobPosition()}%`,
                                 // borderColor: getKnobColor(),
@@ -276,22 +227,20 @@ export default function PositionSize({
 
                     {showLabels && (
                         <div className={styles.labelContainer}>
-                            {options.map((option, index) => (
+                            {VISUAL_MARKERS.map((marker: SizeOption) => (
                                 <div
-                                    key={option.value}
+                                    key={marker.value}
                                     className={styles.valueLabel}
                                     style={{
-                                        left: `${
-                                            (index / (options.length - 1)) * 100
-                                        }%`,
+                                        left: `${marker.value}%`,
                                         color:
-                                            index <= selectedIndex
+                                            marker.value <= value
                                                 ? '#FFFFFF'
                                                 : '#808080',
                                     }}
-                                    onClick={() => onChange(option.value)}
+                                    onClick={() => onChange(marker.value)}
                                 >
-                                    {option.label}
+                                    {marker.label}
                                 </div>
                             ))}
                         </div>
