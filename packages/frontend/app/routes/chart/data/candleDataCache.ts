@@ -25,9 +25,13 @@ export async function getHistoricalData(
         ).length >= candleCount;
 
     if (hasDataForRange) {
-        return cachedData.filter(
-            (bar) => bar.time >= from * 1000 && bar.time <= to * 1000,
-        );
+        const boundaryBar = Math.max(...cachedData.map((bar) => bar.time));
+
+        if (boundaryBar >= to * 1000) {
+            return cachedData.filter(
+                (bar) => bar.time >= from * 1000 && bar.time <= to * 1000,
+            );
+        }
     }
     let mergedData = undefined;
 
