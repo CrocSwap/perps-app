@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
 import { getMarkFillData } from '~/routes/chart/data/candleDataCache';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
@@ -76,7 +77,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const { showBuysSellsOnChart } = useAppOptions();
 
     const [isChartReady, setIsChartReady] = useState(false);
-
+    const { marketId } = useParams<{ marketId: string }>();
     useEffect(() => {
         const res = getChartLayout();
         setChartState(res);
@@ -183,7 +184,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
             timezone: 'Etc/UTC',
-            symbol: symbol,
+            symbol: marketId,
             fullscreen: false,
             autosize: true,
             datafeed: createDataFeed(info) as IBasicDataFeed,

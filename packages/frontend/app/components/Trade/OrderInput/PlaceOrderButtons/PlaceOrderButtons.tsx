@@ -234,15 +234,9 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                                 ease: [0.4, 0.0, 0.2, 1],
                             }}
                         >
-                            {isExpanded ? (
-                                <HiOutlineChevronDoubleUp
-                                    className={styles.scroll_icon}
-                                />
-                            ) : (
-                                <HiOutlineChevronDoubleDown
-                                    className={styles.scroll_icon}
-                                />
-                            )}
+                            <HiOutlineChevronDoubleDown
+                                className={styles.scroll_icon}
+                            />
                         </motion.div>
                     </motion.button>
                 )}

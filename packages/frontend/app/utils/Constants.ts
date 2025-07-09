@@ -120,3 +120,11 @@ export enum WsChannels {
     USER_FUNDINGS = 'userFundings',
     USER_NON_FUNDING_LEDGER_UPDATES = 'userNonFundingLedgerUpdates',
 }
+
+const SECONDS = 1000;
+const MINUTES = SECONDS * 60;
+
+export const WS_SLEEP_MODE = 0 * SECONDS;
+export const WS_SLEEP_MODE_PRICE_CHECK = 1 * MINUTES;
+// export const WS_SLEEP_MODE_STASH_CONNECTION = 0.1 * SECONDS;
+export const WS_SLEEP_MODE_STASH_CONNECTION = 30 * MINUTES;

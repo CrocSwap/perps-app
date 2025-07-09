@@ -9,6 +9,11 @@ import {
 import { processVaultDetails } from '~/processors/processVault';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type {
+    SpotMetaIF,
+    TokenDetailsIF,
+    TokenDetailsRawIF,
+} from '~/utils/SymbolInfoIFs';
+import type {
     TwapHistoryIF,
     TwapSliceFillIF,
     UserFillIF,
@@ -34,6 +39,8 @@ export enum ApiEndpoints {
     USER_PORTFOLIO = 'portfolio',
     VAULT_DETAILS = 'vaultDetails',
     USER_NON_FUNDING_LEDGER_UPDATES = 'userNonFundingLedgerUpdates',
+    SPOT_META = 'spotMeta',
+    TOKEN_DETAILS = 'tokenDetails',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
@@ -283,6 +290,55 @@ export function useInfoApi() {
         return ret;
     };
 
+    const fetchSpotMeta = async (): Promise<SpotMetaIF> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.SPOT_META,
+            }),
+        });
+        const data = await response.json();
+        return data as SpotMetaIF;
+    };
+
+    const fetchTokenId = async (tokenName: string): Promise<string> => {
+        const spotMeta = await fetchSpotMeta();
+        if (tokenName === 'BTC') {
+            tokenName = 'UBTC';
+        }
+        const token = spotMeta.tokens.find((t) => t.name === tokenName);
+        return token?.tokenId || '';
+    };
+
+    const fetchTokenDetails = async (
+        tokenId: string,
+    ): Promise<TokenDetailsIF> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.TOKEN_DETAILS,
+                tokenId: tokenId,
+            }),
+        });
+        const data = (await response.json()) as TokenDetailsRawIF;
+
+        const ret = {
+            name: data.name,
+            maxSupply: Number(data.maxSupply),
+            totalSupply: Number(data.totalSupply),
+            circulatingSupply: Number(data.circulatingSupply),
+            szDecimals: data.szDecimals,
+            weiDecimals: data.weiDecimals,
+            midPx: Number(data.midPx),
+            markPx: Number(data.markPx),
+            prevDayPx: Number(data.prevDayPx),
+        };
+
+        return ret;
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -295,5 +351,7 @@ export function useInfoApi() {
         fetchVaultDetails,
         fetchVaults,
         fetchUserNonFundingLedgerUpdates,
+        fetchTokenId,
+        fetchTokenDetails,
     };
 }

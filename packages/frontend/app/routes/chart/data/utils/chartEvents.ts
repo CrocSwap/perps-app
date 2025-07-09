@@ -8,7 +8,15 @@ export const drawingEvent = (chart: IChartingLibraryWidget) => {
 };
 
 export const drawingEventUnsubscribe = (chart: IChartingLibraryWidget) => {
-    chart?.unsubscribe('drawing_event', () => {});
+    try {
+        chart?.unsubscribe('drawing_event', () => {});
+    } catch (error) {
+        console.log(
+            '>>> NOOOOOOOOOOOOOOOOOOOOO drawingEventUnsubscribe error',
+            error,
+        );
+        console.error(error);
+    }
 };
 
 export const studyEvents = (chart: IChartingLibraryWidget) => {

@@ -20,6 +20,8 @@ interface DebugStore {
     setIsWsEnabled: (isWsEnabled: boolean) => void;
     sdkEnabled: boolean;
     setSdkEnabled: (sdkEnabled: boolean) => void;
+    isWsSleepMode: boolean;
+    setIsWsSleepMode: (isWsSleepMode: boolean) => void;
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
@@ -46,4 +48,6 @@ export const useDebugStore = create<DebugStore>((set) => ({
     setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled }),
     sdkEnabled: true,
     setSdkEnabled: (sdkEnabled: boolean) => set({ sdkEnabled }),
+    isWsSleepMode: false,
+    setIsWsSleepMode: (isWsSleepMode: boolean) => set({ isWsSleepMode }),
 }));

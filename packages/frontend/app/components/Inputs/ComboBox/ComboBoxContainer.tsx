@@ -20,6 +20,8 @@ export default function ComboBoxContainer() {
         setWsEnvironment,
         sdkEnabled,
         setSdkEnabled,
+        isWsSleepMode,
+        setIsWsSleepMode,
     } = useDebugStore();
 
     // useEffect(() => {
@@ -79,6 +81,15 @@ export default function ComboBoxContainer() {
                 <div className={styles.wsToggleButton}>
                     {' '}
                     {isWsEnabled ? 'WS' : 'WS'}
+                </div>
+            </div>
+            <div
+                className={`${styles.wsToggle} ${isWsSleepMode ? styles.wsToggleRunning : styles.wsTogglePaused}`}
+                onClick={() => setIsWsSleepMode(!isWsSleepMode)}
+            >
+                <div className={styles.wsToggleButton}>
+                    {' '}
+                    {isWsSleepMode ? 'WS Sleep' : 'WS Sleep'}
                 </div>
             </div>
 
