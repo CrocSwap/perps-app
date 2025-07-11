@@ -20,6 +20,8 @@ export default function LeverageSlider({
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [tickMarks, setTickMarks] = useState<number[]>([]);
+    const [hoverValue, setHoverValue] = useState<number | null>(null);
+    const [isHovering, setIsHovering] = useState<boolean>(false);
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
@@ -206,6 +208,39 @@ export default function LeverageSlider({
         return getColorAtPosition(getKnobPosition());
     };
 
+    // Handle mouse move over track for hover preview
+    const handleTrackMouseMove = (e: React.MouseEvent) => {
+        if (!sliderRef.current || isDragging) return;
+
+        const rect = sliderRef.current.getBoundingClientRect();
+        const offsetX = Math.max(
+            0,
+            Math.min(e.clientX - rect.left, rect.width),
+        );
+        const percentage = (offsetX / rect.width) * 100;
+
+        // Convert percentage to value (logarithmic)
+        const newValue = percentageToValue(percentage);
+
+        // Round to whole number
+        const roundedValue = Math.round(newValue);
+
+        // Ensure value is within min/max bounds
+        const boundedValue = Math.max(
+            minimumInputValue,
+            Math.min(maximumInputValue, roundedValue),
+        );
+
+        setHoverValue(boundedValue);
+        setIsHovering(true);
+    };
+
+    // Handle mouse leave from track
+    const handleTrackMouseLeave = () => {
+        setIsHovering(false);
+        setHoverValue(null);
+    };
+
     // Handle track click to set value
     const handleTrackClick = (e: React.MouseEvent) => {
         if (!sliderRef.current) return;
@@ -373,6 +408,8 @@ export default function LeverageSlider({
                         ref={sliderRef}
                         className={styles.sliderTrack}
                         onClick={handleTrackClick}
+                        onMouseMove={handleTrackMouseMove}
+                        onMouseLeave={handleTrackMouseLeave}
                     >
                         {/* Dark background track */}
                         <div className={styles.sliderBackground}></div>
@@ -461,12 +498,27 @@ export default function LeverageSlider({
                 <div className={styles.valueDisplay}>
                     <input
                         type='text'
-                        value={isNaN(parseFloat(inputValue)) ? '0' : inputValue}
+                        value={
+                            isDragging
+                                ? value.toString()
+                                : isHovering && hoverValue !== null
+                                  ? hoverValue.toString()
+                                  : isNaN(parseFloat(inputValue))
+                                    ? '0'
+                                    : inputValue
+                        }
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         onKeyDown={handleInputKeyDown}
                         className={styles.valueInput}
                         aria-label='Leverage value'
+                        style={{
+                            color:
+                                isDragging ||
+                                (isHovering && hoverValue !== null)
+                                    ? 'var(--accent1)'
+                                    : 'var(--text1)',
+                        }}
                     />
                     <span className={styles.valueSuffix}>x</span>
                 </div>

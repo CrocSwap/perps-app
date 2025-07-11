@@ -108,13 +108,6 @@ const leverageOptions = [
     { value: 50, label: '50x' },
     { value: 100, label: '100x' },
 ];
-const positionSizeOptions = [
-    { value: 0, label: '0%' },
-    { value: 25, label: '5%' },
-    { value: 50, label: '10%' },
-    { value: 75, label: '50%' },
-    { value: 100, label: '100%' },
-];
 
 // keys for content that may be rendered in tx modal
 export type modalContentT =
@@ -513,7 +506,7 @@ function OrderInput() {
 
     const positionSizeProps = useMemo(
         () => ({
-            options: positionSizeOptions,
+            step: 5,
             value: positionSize,
             onChange: handlePositionSizeChange,
         }),

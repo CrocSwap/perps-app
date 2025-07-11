@@ -6,6 +6,7 @@
 
     padding-left: var(--padding-xs);
 }
+
 .containerTitle {
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-s, 12px);
@@ -22,13 +23,24 @@
 .sliderContainer {
     flex: 1;
     position: relative;
+    padding: 0 7px;
 }
 
 .sliderTrack {
     position: relative;
     width: 100%;
-    height: 2px;
+    height: 4px;
     cursor: pointer;
+}
+
+.sliderTrack::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    bottom: -12px;
+    left: 0;
+    right: 0;
+    z-index: 1;
 }
 
 .sliderBackground {
@@ -38,6 +50,7 @@
     width: 100%;
     height: 100%;
     background-color: var(--bg-dark4);
+    border-radius: 2px;
 }
 
 .sliderActive {
@@ -47,6 +60,7 @@
     height: 100%;
     transition: width 0.2s ease;
     background: var(--accent1);
+    border-radius: 2px;
 }
 
 .sliderMarker {
@@ -56,33 +70,40 @@
     border-radius: var(--radius-s);
     top: 50%;
     transform: translate(-50%, -50%);
-    border: 2px solid;
+    border: 2px solid var(--accent1);
     z-index: 2;
-    background: transparent;
+    background: var(--accent1);
 }
 
 .sliderMarker.active {
     background: var(--accent1);
 }
 
+.sliderMarker:hover {
+    transition: aa 0.3s ease-in-out;
+    background: var(--accent2) !important;
+    border-color: var(--accent2) !important;
+}
+
 .sliderMarkerCurrent {
     display: none;
 }
+
 .sliderKnob {
     position: absolute;
     width: 14px;
     height: 14px;
     border-radius: 50%;
     top: 50%;
-
-    transform: translate(-10%, -50%);
+    transform: translate(-50%, -50%);
     border: 2px solid var(--accent1);
-    background-color: transparent;
+    background-color: var(--bg-dark1);
     z-index: 3;
     cursor: grab;
     transition: left 0.2s ease;
     outline: none;
 }
+
 .sliderKnobTransparent {
     border: 2px solid var(--bg-dark4);
     background: var(--bg-dark4);
@@ -90,8 +111,6 @@
 
 .sliderKnob:active {
     cursor: grabbing;
-    width: 0;
-    height: 0;
 }
 
 .labelContainer {
@@ -116,7 +135,6 @@
 }
 
 .valueDisplay {
-    /* position: relative; */
     width: 50px;
     display: flex;
     align-items: center;
