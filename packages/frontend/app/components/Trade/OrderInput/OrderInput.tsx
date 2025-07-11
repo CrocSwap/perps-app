@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { FiChevronDown } from 'react-icons/fi';
 import { GoZap } from 'react-icons/go';
@@ -12,6 +12,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import {
     useNotificationStore,
     type NotificationStoreIF,
@@ -35,7 +36,6 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
-import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -539,6 +539,46 @@ function OrderInput() {
         ],
     );
 
+    // fn to submit a 'Buy' market order
+    function submitMarketBuy(): void {
+        notifications.add({
+            title: 'Buy / Long Market Order Pending',
+            message: 'Buying 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmOrderModal.close();
+    }
+
+    // fn to submit a 'Sell' market order
+    function submitMarketSell(): void {
+        notifications.add({
+            title: 'Sell / Short Market Order Pending',
+            message: 'Selling 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmOrderModal.close();
+    }
+
+    // fn to submit a 'Buy' limit order
+    function submitLimitBuy(): void {
+        notifications.add({
+            title: 'Buy / Long Limit Order Pending',
+            message: 'Buying 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmOrderModal.close();
+    }
+
+    // fn to submit a 'Sell' limit order
+    function submitLimitSell(): void {
+        notifications.add({
+            title: 'Sell / Short Limit Order Pending',
+            message: 'Selling 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmOrderModal.close();
+    }
+
     // logic to dispatch a notification on demand
     const notifications: NotificationStoreIF = useNotificationStore();
 
@@ -660,11 +700,37 @@ function OrderInput() {
                         />
                     </div>
                     <PlaceOrderButtons
-                        isLimit={marketOrderType === 'limit'}
+                        buyFn={() => {
+                            if (marketOrderType === 'market') {
+                                if (activeOptions.skipOpenOrderConfirm) {
+                                    submitMarketBuy();
+                                } else {
+                                    confirmOrderModal.open('market_buy');
+                                }
+                            } else if (marketOrderType === 'limit') {
+                                if (activeOptions.skipOpenLimitConfirm) {
+                                    submitLimitBuy();
+                                } else {
+                                    confirmOrderModal.open('limit_buy');
+                                }
+                            }
+                        }}
+                        sellFn={() => {
+                            if (marketOrderType === 'market') {
+                                if (activeOptions.skipOpenOrderConfirm) {
+                                    submitMarketSell();
+                                } else {
+                                    confirmOrderModal.open('market_sell');
+                                }
+                            } else if (marketOrderType === 'limit') {
+                                if (activeOptions.skipOpenLimitConfirm) {
+                                    submitLimitSell();
+                                } else {
+                                    confirmOrderModal.open('limit_sell');
+                                }
+                            }
+                        }}
                         orderMarketPrice={marketOrderType}
-                        openModalWithContent={(c: modalContentT) =>
-                            confirmOrderModal.open(c)
-                        }
                         orderValue={orderValue}
                         leverage={leverage}
                     />
@@ -729,15 +795,7 @@ function OrderInput() {
                                             'skipOpenOrderConfirm',
                                         )
                                     }
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Buy / Long Market Order Pending',
-                                            message:
-                                                'Buying 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        confirmOrderModal.close();
-                                    }}
+                                    submitFn={submitMarketBuy}
                                 />
                             )}
                             {confirmOrderModal.content === 'market_sell' && (
@@ -747,15 +805,7 @@ function OrderInput() {
                                         qty: size,
                                         denom: 'BTC',
                                     }}
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Sell / Short Market Order Pending',
-                                            message:
-                                                'Selling 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        confirmOrderModal.close();
-                                    }}
+                                    submitFn={submitMarketSell}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
                                             'skipClosePositionConfirm',
@@ -774,22 +824,14 @@ function OrderInput() {
                                         denom: 'BTC',
                                     }}
                                     limitPrice={price}
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Buy / Long Limit Order Pending',
-                                            message:
-                                                'Buying 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        confirmOrderModal.close();
-                                    }}
+                                    submitFn={submitLimitBuy}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipOpenOrderConfirm',
+                                            'skipOpenLimitConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipOpenLimitConfirm
                                     }
                                 />
                             )}
@@ -801,22 +843,14 @@ function OrderInput() {
                                         denom: 'BTC',
                                     }}
                                     limitPrice={price}
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Sell / Short Limit Order Pending',
-                                            message:
-                                                'Selling 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        confirmOrderModal.close();
-                                    }}
+                                    submitFn={submitLimitSell}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipClosePositionConfirm',
+                                            'skipCloseLimitConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipCloseLimitConfirm
                                     }
                                 />
                             )}
@@ -828,4 +862,4 @@ function OrderInput() {
     );
 }
 
-export default React.memo(OrderInput);
+export default memo(OrderInput);

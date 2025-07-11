@@ -7,12 +7,12 @@ import type { modalContentT } from '../OrderInput';
 
 interface propsIF {
     tx: modalContentT;
+    submitFn: () => void;
     size: {
         qty: string;
         denom: string;
     };
     limitPrice?: string;
-    onClose: () => void;
     isEnabled: boolean;
     toggleEnabled: () => void;
 }
@@ -24,7 +24,7 @@ type InfoItem = {
 };
 
 export default function ConfirmationModal(props: propsIF) {
-    const { onClose, tx, isEnabled, toggleEnabled, size, limitPrice } = props;
+    const { submitFn, tx, isEnabled, toggleEnabled, size, limitPrice } = props;
 
     const dataInfo: InfoItem[] = [
         {
@@ -93,7 +93,7 @@ export default function ConfirmationModal(props: propsIF) {
             </div>
             <SimpleButton
                 bg='accent1'
-                onClick={onClose}
+                onClick={submitFn}
                 style={{ height: '47px' }}
             >
                 {tx.includes('buy') ? 'Buy / Long' : 'Sell / Short'}
