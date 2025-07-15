@@ -274,6 +274,13 @@
     }
 }
 
+.connect_wallet_modal {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 400px;
+}
+
 /* Desktop to Laptop Responsive Styles */
 @media (max-width: 1400px) {
     .container {
