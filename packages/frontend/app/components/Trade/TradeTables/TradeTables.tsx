@@ -148,6 +148,8 @@ export default function TradeTable(props: TradeTableProps) {
         setHideSmallBalances(newValue);
     };
 
+    const isSmallBalancesToggleHidden = true;
+
     const rightAlignedContent = (
         <div className={styles.tableControls}>
             {' '}
@@ -156,12 +158,13 @@ export default function TradeTable(props: TradeTableProps) {
                 selectedOption={selectedFilter}
                 onChange={handleFilterChange}
             />
-            {selectedTradeTab === 'Balances' && (
-                <ToggleSwitch
-                    isOn={hideSmallBalances}
-                    onToggle={handleToggleSmallBalances}
-                />
-            )}
+            {!isSmallBalancesToggleHidden &&
+                selectedTradeTab === 'Balances' && (
+                    <ToggleSwitch
+                        isOn={hideSmallBalances}
+                        onToggle={handleToggleSmallBalances}
+                    />
+                )}
         </div>
     );
 
