@@ -1,5 +1,6 @@
 import { reactRouter } from '@react-router/dev/vite';
 import { defineConfig, type PluginOption } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
@@ -11,7 +12,21 @@ export default defineConfig({
         ssr: false, // Explicitly disable SSR
         outDir: 'build/client',
     },
+    ssr: {
+        noExternal: ['@fogo/sessions-sdk-react'],
+    },
+    resolve: {
+        alias: {
+            'node-fetch': 'isomorphic-fetch',
+        },
+    },
     plugins: [
+        nodePolyfills({
+            include: ['buffer'],
+            globals: {
+                Buffer: true,
+            },
+        }),
         tsconfigPaths() as PluginOption,
         reactRouter(),
         VitePWA({
