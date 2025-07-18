@@ -43,12 +43,13 @@ export default function PageHeader() {
     // data to generate nav links in page header
     const navLinks = [
         { name: 'Trade', path: `/v2/trade/${symbol}` },
-        { name: 'Vaults', path: '/v2/vaults' },
+        // { name: 'Vaults', path: '/v2/vaults' },
         { name: 'Portfolio', path: '/v2/portfolio' },
-        { name: 'Referrals', path: '/v2/referrals' },
+        // { name: 'Referrals', path: '/v2/referrals' },
         // { name: 'Points', path: '/points' },
-        { name: 'Leaderboard', path: '/v2/leaderboard' },
+        // { name: 'Leaderboard', path: '/v2/leaderboard' },
         // { name: 'Strategies', path: '/strategies' },
+        { name: 'Docs', path: '/404' },
     ];
 
     // refs for dropdown menu handline
@@ -145,7 +146,7 @@ export default function PageHeader() {
                                 setIsMoreDropdownOpen(!isMoreDropdownOpen)
                             }
                         >
-                            more
+                            More
                             {isMoreDropdownOpen ? (
                                 <LuChevronUp size={15} />
                             ) : (

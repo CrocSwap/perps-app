@@ -27,7 +27,8 @@
 .detailsContainer {
     height: 100%;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* grid-template-columns: repeat(3, 1fr); */
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--gap-xs);
 }
 .detailsContent {
@@ -35,6 +36,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    user-select: none;
 }
 .detailsContent h6 {
     color: var(--base-text1, #f0f0f8);
@@ -90,12 +92,14 @@
 }
 
 .table {
-    height: var(--table-height);
+    /* height: var(--table-height); */
+    height: auto;
     overflow-y: hidden;
 }
 
 .table > div {
-    height: var(--table-height);
+    /* height: var(--table-height); */
+    height: 100%;
 }
 .mainContent {
     height: 100%;

@@ -1,6 +1,6 @@
 import { memo, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
-import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
+// import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import { useModal } from '~/hooks/useModal';
 import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
@@ -12,8 +12,9 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { MdOutlineArrowDropDownCircle } from 'react-icons/md';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import Tooltip from '~/components/Tooltip/Tooltip';
 
-const MemoizedPerformancePanel = memo(PerformancePanel);
+// const MemoizedPerformancePanel = memo(PerformancePanel);
 
 export function meta() {
     return [
@@ -104,7 +105,7 @@ function Portfolio() {
                     >
                         Withdraw
                     </SimpleButton>
-                    <SimpleButton
+                    {/* <SimpleButton
                         onClick={openSendModal}
                         className={styles.sendMobile}
                         bg='dark3'
@@ -120,7 +121,7 @@ function Portfolio() {
                         hoverBg='accent1'
                     >
                         Send
-                    </SimpleButton>
+                    </SimpleButton> */}
                 </div>
             )}
         </section>
@@ -134,7 +135,7 @@ function Portfolio() {
                 <div className={styles.column}>
                     {mobileTop}
                     <div className={styles.detailsContainer}>
-                        <div className={styles.detailsContent}>
+                        {/* <div className={styles.detailsContent}>
                             <h6>14 Day Volume</h6>
                             <h3>
                                 {formatCurrency(
@@ -144,16 +145,16 @@ function Portfolio() {
                             <div
                                 className={styles.view_detail_clickable}
                                 onClick={() => console.log('viewing volume')}
+                                style={{ visibility: 'hidden' }}
                             >
                                 View volume
                             </div>
-                        </div>
+                        </div> */}
                         <div className={styles.detailsContent}>
-                            <h6>Fees (Taker / Maker)</h6>
-                            <h3>
-                                {portfolio.fees.taker}% / {portfolio.fees.maker}
-                                %
-                            </h3>
+                            <h6>Fees</h6>
+                            <Tooltip content='Maker fees 0.1%' position='top'>
+                                <h3>Always 0.00%</h3>
+                            </Tooltip>
                             <div
                                 className={styles.view_detail_clickable}
                                 style={{ visibility: 'hidden' }}
@@ -197,20 +198,20 @@ function Portfolio() {
                                         Send
                                     </SimpleButton>
                                 </div>
-                                <SimpleButton
+                                {/* <SimpleButton
                                     onClick={openSendModal}
                                     className={styles.sendDesktop}
                                     bg='dark3'
                                     hoverBg='accent1'
                                 >
                                     Send
-                                </SimpleButton>
+                                </SimpleButton> */}
                             </div>
                         </div>
                     </div>
 
                     <section className={styles.mainContent}>
-                        <MemoizedPerformancePanel />
+                        {/* <MemoizedPerformancePanel /> */}
 
                         <div className={styles.table}>
                             <TradeTable portfolioPage />

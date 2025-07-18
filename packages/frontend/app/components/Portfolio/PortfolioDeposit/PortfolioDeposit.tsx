@@ -8,6 +8,7 @@ import TokenDropdown, {
     type Token,
 } from '~/components/TokenDropdown/TokenDropdown';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface PortfolioDepositProps {
     portfolio: {
@@ -142,14 +143,8 @@ function PortfolioDeposit({
     return (
         <div className={styles.container}>
             <div className={styles.textContent}>
-                <h4>
-                    Deposit {selectedToken.symbol} to {portfolio.name}
-                </h4>
-                <p>
-                    Deposit {selectedToken.symbol} to your {portfolio.name}{' '}
-                    portfolio. Funds will be immediately available for
-                    allocation.
-                </p>
+                <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
+                <h4>Deposit {selectedToken.symbol} from Fogo</h4>
             </div>
 
             <TokenDropdown

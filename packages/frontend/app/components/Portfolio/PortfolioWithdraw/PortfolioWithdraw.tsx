@@ -4,6 +4,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
 import styles from './PortfolioWithdraw.module.css';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface PortfolioWithdrawProps {
     portfolio: {
@@ -155,15 +156,16 @@ function PortfolioWithdraw({
     return (
         <div className={styles.container}>
             <div className={styles.textContent}>
-                <h4>
-                    Withdraw {unitValue} from {portfolio.name}
-                </h4>
-                <p>
-                    {unitValue} will be sent to your address. A{' '}
-                    {unitValue === 'USD' ? '$0.001' : '0.0001 BTC'} fee will be
-                    deducted from the {unitValue} withdrawn. Withdrawals should
-                    arrive within 5 minutes.
-                </p>
+                <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
+                <h4>Withdraw {unitValue} to Fogo</h4>
+                <div>
+                    <p>fUSD will be sent to your address.</p>
+                    <p>
+                        A {unitValue === 'USD' ? '$0.001' : '0.0001 BTC'} fee
+                        will be deducted from the fUSD withdrawn.
+                    </p>
+                    <p>Withdrawals should arrive within 5 minutes.</p>
+                </div>
             </div>
 
             <div className={styles.inputContainer}>

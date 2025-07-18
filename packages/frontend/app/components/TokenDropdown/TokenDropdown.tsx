@@ -2,12 +2,13 @@ import { useState, useRef, useEffect, memo } from 'react';
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
 import styles from './TokenDropdown.module.css';
 
-import usde from '../../assets/tokens/usde.svg';
-import usdc from '../../assets/tokens/usdc.svg';
-import usdt from '../../assets/tokens/usdt.svg';
-import dai from '../../assets/tokens/dai.svg';
-import btc from '../../assets/tokens/btc.svg';
-import eth from '../../assets/tokens/eth.svg';
+import fusd from './fusd.svg';
+// import usde from '../../assets/tokens/usde.svg';
+// import usdc from '../../assets/tokens/usdc.svg';
+// import usdt from '../../assets/tokens/usdt.svg';
+// import dai from '../../assets/tokens/dai.svg';
+// import btc from '../../assets/tokens/btc.svg';
+// import eth from '../../assets/tokens/eth.svg';
 
 // Define token interface
 export interface Token {
@@ -18,12 +19,13 @@ export interface Token {
 
 // Sample tokens - replace with your actual tokens
 export const AVAILABLE_TOKENS: Token[] = [
-    { symbol: 'USDe', name: 'USD Edge', logo: usde },
-    { symbol: 'USDC', name: 'USD Coin', logo: usdc },
-    { symbol: 'USDT', name: 'Tether USD', logo: usdt },
-    { symbol: 'DAI', name: 'Dai Stablecoin', logo: dai },
-    { symbol: 'BTC', name: 'Bitcoin', logo: btc },
-    { symbol: 'ETH', name: 'Ethereum', logo: eth },
+    { symbol: 'fUSD', name: 'fUSD', logo: fusd },
+    // { symbol: 'USDe', name: 'USD Edge', logo: usde },
+    // { symbol: 'USDC', name: 'USD Coin', logo: usdc },
+    // { symbol: 'USDT', name: 'Tether USD', logo: usdt },
+    // { symbol: 'DAI', name: 'Dai Stablecoin', logo: dai },
+    // { symbol: 'BTC', name: 'Bitcoin', logo: btc },
+    // { symbol: 'ETH', name: 'Ethereum', logo: eth },
 ];
 
 interface TokenDropdownProps {

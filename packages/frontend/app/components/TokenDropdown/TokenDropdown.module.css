@@ -54,7 +54,7 @@
     flex-direction: column;
 
     gap: var(--gap-xs);
-    padding-bottom: var(--padding-s);
+    padding: var(--padding-xs) 0;
 }
 
 .tokenLeft {
@@ -63,11 +63,13 @@
     align-items: center;
     gap: var(--gap-s);
 }
+
 .tokenItem {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--padding-dropdown);
+    padding: var(--padding-xs);
+    border-radius: var(--radius-s);
 
     cursor: pointer;
     transition: background-color 0.15s ease;

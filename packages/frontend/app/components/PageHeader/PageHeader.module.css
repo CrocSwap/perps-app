@@ -47,6 +47,7 @@
     color: var(--accent1, #7371fc) !important;
     cursor: pointer;
     font-size: var(--font-family-m, 18px);
+    visibility: hidden;
 }
 
 .ambientmm:hover {
@@ -58,11 +59,11 @@
     outline: none;
     background: transparent;
     border: none;
-    text-transform: capitalize;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: var(--gap-s);
+    display: none;
 }
 
 .container nav a:hover,
