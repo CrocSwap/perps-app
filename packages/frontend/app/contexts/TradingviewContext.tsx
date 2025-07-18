@@ -36,6 +36,7 @@ import {
 } from '~/routes/chart/data/utils/utils';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
+import { useAppStateStore } from '~/stores/AppStateStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
@@ -100,6 +101,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         setChartState(res);
     }, []);
+
+    const { liquidationsActive, setLiquidationsActive } = useAppStateStore();
 
     const defaultProps: Omit<ChartContainerProps, 'container'> = {
         symbolName: 'BTC',
@@ -252,7 +255,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         tvWidget.headerReady().then(() => {
             const liquidationsButton = tvWidget.createButton();
 
-            let isToggled = false;
+            let isToggled = liquidationsActive;
 
             const updateButtonStyle = () => {
                 const svg = getLiquidationsSvgIcon(
@@ -273,13 +276,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
             const onClick = () => {
                 isToggled = !isToggled;
+                setLiquidationsActive(isToggled);
                 updateButtonStyle();
-
-                if (isToggled) {
-                    console.log('Open');
-                } else {
-                    console.log('Close');
-                }
             };
             const onMouseEnter = () => {
                 const wrapper = liquidationsButton.querySelector(
