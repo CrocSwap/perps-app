@@ -50,7 +50,7 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
                 {order.limitPx ? formatNum(order.limitPx) : '--'}
             </div>
             <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>
-                {order.reduceOnly}
+                {order.reduceOnly === false ? 'No' : 'Yes'}
             </div>
             <div className={`${styles.cell} ${styles.triggerConditionsCell}`}>
                 {order.triggerCondition}
@@ -58,6 +58,7 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
             <div className={`${styles.cell} ${styles.tpslCell}`}>
                 {order.isTrigger ? formatNum(order.triggerPx || 0) : '--'}
             </div>
+
             <div className={`${styles.cell} ${styles.statusCell}`}>
                 {order.status}
             </div>

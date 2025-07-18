@@ -145,7 +145,6 @@ export default function GenericTable<
             return;
         }
 
-        // 2px offset has been added to handle edge scrolling cases
         const bottomNotShadowed =
             tableBody.scrollTop + tableBody.clientHeight + 2 >=
             tableBody.scrollHeight;
@@ -276,43 +275,87 @@ export default function GenericTable<
             navigate(viewAllLink, { viewTransition: true });
         }
     };
-    const handleExportCsv = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        if (tableModel) {
-            let dataToExport = data;
-            if (!pageMode && csvDataFetcher) {
-                dataToExport = await csvDataFetcher(
-                    ...(csvDataFetcherArgs as Parameters<F>),
-                );
+
+    function formatCsvCell(val: any): string {
+        if (val == null) {
+            return '--';
+        }
+
+        if (typeof val === 'number' && isFinite(val)) {
+            return val.toFixed(2);
+        }
+
+        if (typeof val === 'string') {
+            const trimmed = val.trim();
+
+            if (/^[\$£€¥]/.test(trimmed)) {
+                return `="${trimmed}"`;
             }
 
-            const headers = tableModel.filter((header) => header.exportable);
-            const csvContent = [
-                headers.map((header) => header.name).join(','),
-                ...dataToExport.map((row) =>
-                    headers
-                        .map((header) => {
-                            if (header.exportAction) {
-                                return header.exportAction(
-                                    row[header.key as keyof T] as T,
-                                );
-                            }
-                            return row[header.key as keyof T] as string;
-                        })
-                        .join(','),
-                ),
-            ].join('\n');
-            const blob = new Blob([csvContent], {
-                type: 'text/csv;charset=utf-8;',
-            });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${storageKey}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
+            if (
+                trimmed !== '' &&
+                !isNaN(Number(trimmed)) &&
+                isFinite(Number(trimmed))
+            ) {
+                return Number(trimmed).toFixed(2);
+            }
+
+            if (/^\d{1,2}\.\d{1,2}\.\d{2,4}$/.test(trimmed)) {
+                return `="${trimmed}"`;
+            }
+
+            return trimmed;
         }
-        console.log('Exporting CSV');
+
+        return String(val);
+    }
+
+    const handleExportCsv = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (!tableModel) return;
+
+        let dataToExport = data;
+        if (!pageMode && csvDataFetcher) {
+            dataToExport = await csvDataFetcher(
+                ...(csvDataFetcherArgs as Parameters<typeof csvDataFetcher>),
+            );
+        }
+
+        const headers = tableModel.filter((h) => h.exportable);
+        const delimiter = ';';
+
+        const csvRows = [
+            headers.map((h) => h.name).join(delimiter),
+
+            ...dataToExport.map((row: any) =>
+                headers
+                    .map((h) => {
+                        const raw = row[h.key];
+
+                        if (h.exportAction) {
+                            return h.exportAction(raw);
+                        }
+
+                        return formatCsvCell(raw);
+                    })
+                    .map((cell) =>
+                        /[;"\r\n]/.test(cell)
+                            ? `"${cell.replace(/"/g, '""')}"`
+                            : cell,
+                    )
+                    .join(delimiter),
+            ),
+        ];
+
+        const blob = new Blob([csvRows.join('\n')], {
+            type: 'text/csv;charset=utf-8;',
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${storageKey}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
     };
 
     useEffect(() => {

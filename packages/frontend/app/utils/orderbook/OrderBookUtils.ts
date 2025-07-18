@@ -245,6 +245,15 @@ export const sortOrderData = (
                         ? (a.triggerPx ?? 0) - (b.triggerPx ?? 0)
                         : (b.triggerPx ?? 0) - (a.triggerPx ?? 0),
                 );
+            case 'reduceOnly':
+                return [...orderData].sort((a, b) => {
+                    if (a.reduceOnly === b.reduceOnly) return 0;
+
+                    if (sortDirection === 'asc') {
+                        return a.reduceOnly ? 1 : -1;
+                    }
+                    return a.reduceOnly ? -1 : 1;
+                });
             default:
                 return orderData;
         }
