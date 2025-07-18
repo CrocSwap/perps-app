@@ -36,6 +36,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
+import { useLeverageStore } from '~/stores/LeverageStore';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -101,14 +102,6 @@ const marketOrderTypes = [
 //     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
 // ];
 
-const leverageOptions = [
-    { value: 1, label: '1x' },
-    { value: 5, label: '5x' },
-    { value: 10, label: '10x' },
-    { value: 50, label: '50x' },
-    { value: 100, label: '100x' },
-];
-
 // keys for content that may be rendered in tx modal
 export type modalContentT =
     | 'margin'
@@ -122,7 +115,7 @@ function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
 
-    const [leverage, setLeverage] = useState(100);
+    const [leverage, setLeverage] = useState(1);
     const [size, setSize] = useState('');
     const [price, setPrice] = useState('');
     const [stopPrice, setStopPrice] = useState('');
@@ -170,6 +163,8 @@ function OrderInput() {
 
     const useTotalSize = ['twap', 'chase_limit'].includes(marketOrderType);
 
+    const { validateAndApplyLeverageForMarket } = useLeverageStore();
+
     const inputDetailsData = useMemo(
         () => [
             {
@@ -211,7 +206,17 @@ function OrderInput() {
     useEffect(() => {
         setSize('');
         setPrice('');
-    }, [symbol]);
+
+        //  Apply leverage validation when symbol changes
+        if (symbol && symbolInfo?.maxLeverage) {
+            const validatedLeverage = validateAndApplyLeverageForMarket(
+                symbol,
+                symbolInfo.maxLeverage,
+                minimumInputValue,
+            );
+            setLeverage(validatedLeverage);
+        }
+    }, [symbol, symbolInfo?.maxLeverage, validateAndApplyLeverageForMarket]);
 
     const handleTypeChange = () => {
         switch (marketOrderType) {
@@ -444,11 +449,9 @@ function OrderInput() {
 
     const leverageSliderProps = useMemo(
         () => ({
-            options: leverageOptions,
             value: leverage,
             onChange: handleLeverageChange,
             minimumInputValue: minimumInputValue,
-            maximumInputValue: tempMaximumLeverageInput,
             generateRandomMaximumInput: generateRandomMaximumInput,
         }),
         [leverage, handleLeverageChange],
