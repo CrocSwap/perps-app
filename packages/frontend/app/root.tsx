@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useCallback, useEffect } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -108,9 +108,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
     );
 }
 
-export default function App() {
+export default React.memo(function App() {
     // Use memoized value to prevent unnecessary re-renders
-    const { wsEnvironment } = useDebugStore();
+    const wsEnvironment = useDebugStore(
+        useCallback((state) => state.wsEnvironment, []),
+    );
+
+    console.log('rerender');
 
     return (
         <>
@@ -171,7 +175,7 @@ export default function App() {
             </Layout>
         </>
     );
-}
+});
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     let message = 'Oops!';
