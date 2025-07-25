@@ -13,6 +13,8 @@ type AppStateStore = {
     setIsTabActive: (isTabActive: boolean) => void;
     debugToolbarOpen: boolean;
     setDebugToolbarOpen: (debugToolbarOpen: boolean) => void;
+    liquidationsActive: boolean;
+    setLiquidationsActive: (liquidationsActive: boolean) => void;
 };
 
 export const useAppStateStore = create<AppStateStore>((set) => ({
@@ -30,4 +32,7 @@ export const useAppStateStore = create<AppStateStore>((set) => ({
     debugToolbarOpen: false,
     setDebugToolbarOpen: (debugToolbarOpen: boolean) =>
         set({ debugToolbarOpen }),
+    liquidationsActive: true,
+    setLiquidationsActive: (liquidationsActive: boolean) =>
+        set({ liquidationsActive }),
 }));
