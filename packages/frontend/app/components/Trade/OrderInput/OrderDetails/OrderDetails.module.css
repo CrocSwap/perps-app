@@ -4,6 +4,7 @@
     --scroll-button-width: 24px;
     --scroll-button-height: 16px;
 
+    margin-top: var(--margin-s);
     width: 100%;
     display: flex;
     flex-direction: column;

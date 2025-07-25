@@ -12,7 +12,7 @@ import Notifications from '~/components/Notifications/Notifications';
 import type { Route } from './+types/root';
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
-import MobileFooter from './components/MobileFooter/MobileFooter';
+// import MobileFooter from './components/MobileFooter/MobileFooter';
 import PageHeader from './components/PageHeader/PageHeader';
 import WebSocketDebug from './components/WebSocketDebug/WebSocketDebug';
 import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
