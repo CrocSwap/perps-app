@@ -11,7 +11,7 @@ import {
     getPricetoPixel,
     quantityTextFormatWithComma,
 } from '../customOrderLineUtils';
-import { drawLabel, type LabelType } from '../orderLineUtils';
+import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import type { IPaneApi } from '~/tv/charting_library';
 
@@ -53,7 +53,7 @@ const LabelComponent = ({
 
     const [isDrag, setIsDrag] = useState(false);
     useEffect(() => {
-        if (!chart || !isChartReady || !ctx) return;
+        if (!chart || !isChartReady || !ctx || !canvasSize) return;
 
         let animationFrameId: number | null = null;
 
@@ -102,6 +102,7 @@ const LabelComponent = ({
                 const yPricePixel = getPricetoPixel(
                     chart,
                     line.yPrice,
+                    line.type,
                     heightAttr,
                     scaleData,
                 ).pixel;
@@ -142,11 +143,25 @@ const LabelComponent = ({
                         : []),
                 ];
 
-                const labelLocations = drawLabel(ctx, {
-                    x: xPixel,
-                    y: yPricePixel,
-                    labelOptions,
-                });
+                let labelLocations = [];
+
+                if (line.type !== 'LIQ') {
+                    labelLocations = drawLabel(ctx, {
+                        x: xPixel,
+                        y: yPricePixel,
+                        labelOptions,
+                    });
+                } else {
+                    labelLocations = drawLiqLabel(
+                        ctx,
+                        {
+                            x: xPixel,
+                            y: yPricePixel,
+                            labelOptions,
+                        },
+                        canvasSize.width,
+                    );
+                }
 
                 return {
                     ...line,

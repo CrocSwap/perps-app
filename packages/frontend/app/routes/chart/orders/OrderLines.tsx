@@ -129,6 +129,7 @@ export default function OrderLines({
             const labelInformation = getPricetoPixel(
                 chart,
                 line.yPrice,
+                line.type,
                 height,
                 scaleData,
             );

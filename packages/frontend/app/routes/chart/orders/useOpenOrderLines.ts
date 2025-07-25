@@ -106,6 +106,8 @@ export const useOpenOrderLines = (): LineData[] => {
                     color,
                     type,
                     oid,
+                    lineStyle: 3,
+                    lineWidth: 1,
                 };
             });
 

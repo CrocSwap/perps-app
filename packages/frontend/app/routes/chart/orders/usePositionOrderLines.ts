@@ -4,6 +4,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { type LineLabel } from './customOrderLineUtils';
 import type { LineData } from './component/LineComponent';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { LIQ_PRICE_LINE_COLOR } from './orderLineUtils';
 
 export const usePositionOrderLines = (): LineData[] => {
     const { chart } = useTradingView();
@@ -41,6 +42,8 @@ export const usePositionOrderLines = (): LineData[] => {
                     quantityTextValue: order.szi,
                     color: pnl > 0 ? getBsColor().buy : getBsColor().sell,
                     type: 'PNL',
+                    lineStyle: 3,
+                    lineWidth: 1,
                 });
             }
 
@@ -53,8 +56,10 @@ export const usePositionOrderLines = (): LineData[] => {
                         text: ' Liq. Price',
                     } as LineLabel,
                     quantityTextValue: undefined,
-                    color: getBsColor().sell,
+                    color: LIQ_PRICE_LINE_COLOR,
                     type: 'LIQ',
+                    lineStyle: 3,
+                    lineWidth: 2,
                 });
             }
 
