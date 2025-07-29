@@ -4,12 +4,12 @@
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
-    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr 0.7fr 0.8fr 0.8fr 0.8fr 1.2fr;
     align-items: center;
 }
 
 .rowContainer.noTpSl {
-    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr 0.7fr 0.8fr 0.8fr 1.2fr;
 }
 
 .headerContainer {
@@ -19,7 +19,7 @@
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
-    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr 0.7fr 0.8fr 0.8fr 0.8fr 1.2fr;
     align-items: center;
 
     position: sticky;
@@ -29,7 +29,7 @@
 }
 
 .headerContainer.noTpSl {
-    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr 0.7fr 0.8fr 0.8fr 1.2fr;
 }
 
 .cell {
@@ -128,7 +128,6 @@
 .headerContainer .closeCell {
     text-align: end;
     justify-self: end;
-    /* padding-right: var(--padding-s); */
 }
 
 .sizeCell,
@@ -150,15 +149,18 @@
     align-items: center;
 }
 
+/* Improved responsive breakpoints */
+
+/* 1400px - Hide funding (least important) */
 @media (max-width: 1400px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns: 0.7fr 0.9fr 0.9fr 0.9fr 0.9fr 1.5fr 0.8fr 0.9fr 0.9fr 1.2fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns: 0.7fr 0.9fr 0.9fr 0.9fr 0.9fr 1.6fr 0.8fr 0.9fr 1.2fr;
     }
 
     .fundingCell {
@@ -166,15 +168,16 @@
     }
 }
 
+/* 1200px - Hide mark price, give more space to PNL */
 @media (max-width: 1200px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns: 0.6fr 0.9fr 1fr 0.9fr 1.8fr 0.8fr 0.9fr 0.9fr 1.2fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns: 0.6fr 0.9fr 1fr 0.9fr 1.9fr 0.8fr 0.9fr 1.2fr;
     }
 
     .markPriceCell {
@@ -182,15 +185,16 @@
     }
 }
 
+/* 1000px - Hide entry price, focus on current data */
 @media (max-width: 1000px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns: 0.5fr 1fr 1fr 2fr 0.8fr 1fr 1fr 1.2fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns: 0.5fr 1fr 1fr 2.2fr 0.8fr 1fr 1.2fr;
     }
 
     .entryPriceCell {
@@ -198,50 +202,57 @@
     }
 }
 
+/* 800px - Hide liquidation price (can be accessed via modal/details) */
 @media (max-width: 800px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns: 0.4fr 1fr 1.2fr 2.4fr 1fr 1fr 1.2fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 0.8fr 1fr 0.8fr 1.2fr;
+        grid-template-columns: 0.4fr 1fr 1.3fr 2.7fr 1fr 1.2fr;
+    }
+
+    .liqPriceCell {
+        display: none;
+    }
+}
+
+/* 650px - Hide size and margin, keep essential trading info */
+@media (max-width: 650px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.4fr 1.3fr 3fr 1fr 1.2fr;
+    }
+
+    .rowContainer.noTpSl,
+    .headerContainer.noTpSl {
+        grid-template-columns: 0.4fr 1.4fr 3.4fr 1.2fr;
     }
 
     .sizeCell,
     .marginCell {
         display: none;
     }
-}
 
-@media (max-width: 650px) {
-    .rowContainer,
-    .headerContainer {
-        grid-template-columns: 0.8fr 1fr 0.8fr 1.2fr;
-    }
-
-    .rowContainer.noTpSl,
-    .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 1fr 1.2fr;
-    }
-
-    .tpslCell,
-    .liqPriceCell {
+    .tpslCell {
         display: none;
     }
 }
 
+/* 480px - Mobile first approach, show only essentials */
 @media (max-width: 480px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 1fr 1.2fr;
+        grid-template-columns: 0.3fr 1.6fr 3.6fr 1.2fr;
         padding: 0 var(--padding-xs);
+        gap: var(--gap-xs);
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 1fr 1.2fr;
+        grid-template-columns: 0.3fr 1.6fr 4fr 1.2fr;
     }
 
     .positionValueCell {
@@ -259,6 +270,43 @@
     .actionButton {
         font-size: var(--font-size-s);
         margin-right: var(--margin-xs);
+    }
+
+    /* Make PNL more prominent on mobile */
+    .pnlCell {
+        flex-direction: column;
+        gap: 2px;
+        font-size: var(--font-size-xs);
+    }
+
+    /* Adjust coin cell for mobile - minimal space needed */
+    .coinCell {
+        font-weight: 600;
+        min-width: 0;
+        font-size: var(--font-size-s);
+    }
+}
+
+/* Very small screens - minimal layout */
+@media (max-width: 360px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.3fr 4fr 1fr;
+        padding: 0 var(--padding-xs);
+    }
+
+    .rowContainer.noTpSl,
+    .headerContainer.noTpSl {
+        grid-template-columns: 0.3fr 4fr 1fr;
+    }
+
+    .positionValueCell {
+        display: none;
+    }
+
+    .pnlCell {
+        text-align: center;
+        justify-content: center;
     }
 }
 
