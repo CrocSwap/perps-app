@@ -4,11 +4,18 @@ import HistoryTwapTable from '~/components/Trade/TwapTable/HistoryTwapTable/Hist
 import { useInfoApi } from '~/hooks/useInfoApi';
 import type { TwapHistoryIF } from '~/utils/UserDataIFs';
 import ExternalPage from '~/components/ExternalPage/ExternalPage';
+import { useDebugStore } from '~/stores/DebugStore';
 
 function TwapHistory() {
     const { address } = useParams<{ address: string }>();
 
+    const walletAddress = useDebugStore((s) => s.debugWallet.address);
+
+    const targetAddress = address ?? walletAddress;
+
     const [isFetched, setIsFetched] = useState(false);
+
+    const [loading, setLoading] = useState(false);
 
     const [fetchedHistoryData, setFetchedHistoryData] = useState<
         TwapHistoryIF[]
@@ -17,13 +24,16 @@ function TwapHistory() {
     const { fetchTwapHistory } = useInfoApi();
 
     useEffect(() => {
-        if (address) {
-            fetchTwapHistory(address).then((data) => {
+        if (!targetAddress) return;
+        setLoading(true);
+        fetchTwapHistory(targetAddress)
+            .then((data) => {
                 setFetchedHistoryData(data);
                 setIsFetched(true);
-            });
-        }
-    }, [address]);
+            })
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, [targetAddress]);
 
     return (
         <ExternalPage title='TWAP History'>

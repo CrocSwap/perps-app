@@ -11,11 +11,17 @@ import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 function OrderHistory() {
     const { address } = useParams<{ address: string }>();
 
+    const walletAddress = useDebugStore((s) => s.debugWallet.address);
+
+    const targetAddress = address ?? walletAddress;
+
     const [isFetched, setIsFetched] = useState(false);
 
     const { debugWallet } = useDebugStore();
 
     const { orderHistory, fetchedChannels } = useTradeDataStore();
+
+    const [loading, setLoading] = useState(false);
 
     const orderHistoryFetched = useMemo(() => {
         return fetchedChannels.has(WsChannels.USER_HISTORICAL_ORDERS);
@@ -39,6 +45,18 @@ function OrderHistory() {
         //     return true;
         // }
     }, [address, debugWallet.address]);
+
+    useEffect(() => {
+        if (!targetAddress) return;
+        setLoading(true);
+        fetchOrderHistory(targetAddress)
+            .then((data) => {
+                setFetchedHistoryData(data);
+                setIsFetched(true);
+            })
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, [targetAddress]);
 
     useEffect(() => {
         if (!isCurrentUser && address) {

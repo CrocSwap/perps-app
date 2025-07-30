@@ -55,7 +55,9 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     }, [data, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
-        return `${EXTERNAL_PAGE_URL_PREFIX}/openOrders/${debugWallet.address}`;
+        return debugWallet.address
+            ? `${EXTERNAL_PAGE_URL_PREFIX}/openOrders/${debugWallet.address}`
+            : `${EXTERNAL_PAGE_URL_PREFIX}/openOrders`;
     }, [debugWallet.address]);
 
     return (
