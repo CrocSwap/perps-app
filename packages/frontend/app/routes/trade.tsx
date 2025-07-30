@@ -18,6 +18,7 @@ import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import LiquidationsChartSection from './trade/liquidationsChart/LiquidationsChartSection';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
@@ -37,7 +38,8 @@ export default function Trade() {
     const [activeTab, setActiveTab] = useState<TabType>('order');
     const [isMobile, setIsMobile] = useState<boolean>(false);
 
-    const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
+    const { debugToolbarOpen, setDebugToolbarOpen, liquidationsActive } =
+        useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
 
@@ -271,35 +273,51 @@ export default function Trade() {
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                     >
                         <div
-                            id='trade-page-left-section'
-                            className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper} ${debugToolbarOpen ? styles.debugToolbarOpen : ''}`}
+                            className={`${styles.chartLayout} ${liquidationsActive ? styles.liqActive : ''}`}
                         >
-                            {debugToolbarOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.2 }}
-                                    className={`${styles.debugToolbar} ${debugToolbarOpen ? styles.open : ''}`}
+                            <div
+                                id='trade-page-left-section'
+                                className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper} ${debugToolbarOpen ? styles.debugToolbarOpen : ''}`}
+                            >
+                                {debugToolbarOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.2 }}
+                                        className={`${styles.debugToolbar} ${debugToolbarOpen ? styles.open : ''}`}
+                                    >
+                                        <ComboBoxContainer />
+                                    </motion.div>
+                                )}
+                                <div
+                                    id='watchlistSection'
+                                    className={styles.watchlist}
                                 >
-                                    <ComboBoxContainer />
+                                    <WatchList />
+                                </div>
+                                <div
+                                    id='symbolInfoSection'
+                                    className={styles.symbolInfo}
+                                >
+                                    <MemoizedSymbolInfo />
+                                </div>
+                                <div id='chartSection' className={styles.chart}>
+                                    <MemoizedTradingViewWrapper />
+                                </div>
+                            </div>
+                            {liquidationsActive && (
+                                <motion.div
+                                    id='liquidationsChart'
+                                    className={styles.liquidationsChart}
+                                    initial={{ opacity: 0, x: 10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <LiquidationsChartSection symbol={symbol} />
                                 </motion.div>
                             )}
-                            <div
-                                id='watchlistSection'
-                                className={styles.watchlist}
-                            >
-                                <WatchList />
-                            </div>
-                            <div
-                                id='symbolInfoSection'
-                                className={styles.symbolInfo}
-                            >
-                                <MemoizedSymbolInfo />
-                            </div>
-                            <div id='chartSection' className={styles.chart}>
-                                <MemoizedTradingViewWrapper />
-                            </div>
                         </div>
                         <div id='orderBookSection' className={styles.orderBook}>
                             <MemoizedOrderBookSection symbol={symbol} />

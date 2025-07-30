@@ -24,6 +24,8 @@ export default function ComboBoxContainer() {
         setSdkEnabled,
         isWsSleepMode,
         setIsWsSleepMode,
+        pauseLiqAnimation,
+        setPauseLiqAnimation,
     } = useDebugStore();
 
     // useEffect(() => {
@@ -101,6 +103,14 @@ export default function ComboBoxContainer() {
             >
                 <div className={styles.sdkToggleButton}>
                     {sdkEnabled ? 'SDK' : 'SDK'}
+                </div>
+            </div>
+            <div
+                className={`${styles.wsToggle} ${pauseLiqAnimation ? styles.wsToggleRunning : styles.wsTogglePaused}`}
+                onClick={() => setPauseLiqAnimation(!pauseLiqAnimation)}
+            >
+                <div className={styles.wsToggleButton}>
+                    {pauseLiqAnimation ? 'Pause Liq' : 'Pause Liq'}
                 </div>
             </div>
             {isEstablished(sessionState) && (

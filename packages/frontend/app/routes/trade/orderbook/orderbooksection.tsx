@@ -7,6 +7,7 @@ import { getElementHeightWithMargins } from '~/utils/Utils';
 import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 
 interface propsIF {
     symbol: string;
@@ -19,10 +20,10 @@ const ORDER_ROW_GAP = 4;
 
 export default function OrderBookSection(props: propsIF) {
     const { symbol, mobileView, mobileContent } = props;
-    const [orderCount, setOrderCount] = useState(9);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
 
     const { orderBookMode, setOrderBookMode } = useAppSettings();
+    const { orderCount, setOrderCount } = useOrderBookStore();
     const orderBookModeRef = useRef(orderBookMode);
 
     // Sync ref with state

@@ -22,6 +22,8 @@ interface DebugStore {
     setSdkEnabled: (sdkEnabled: boolean) => void;
     isWsSleepMode: boolean;
     setIsWsSleepMode: (isWsSleepMode: boolean) => void;
+    pauseLiqAnimation: boolean;
+    setPauseLiqAnimation: (pauseLiqAnimation: boolean) => void;
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
@@ -50,4 +52,7 @@ export const useDebugStore = create<DebugStore>((set) => ({
     setSdkEnabled: (sdkEnabled: boolean) => set({ sdkEnabled }),
     isWsSleepMode: false,
     setIsWsSleepMode: (isWsSleepMode: boolean) => set({ isWsSleepMode }),
+    pauseLiqAnimation: false,
+    setPauseLiqAnimation: (pauseLiqAnimation: boolean) =>
+        set({ pauseLiqAnimation }),
 }));
