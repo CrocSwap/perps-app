@@ -182,7 +182,7 @@ export default function TradeTable(props: TradeTableProps) {
             case 'Positions':
                 return (
                     <PositionsTable
-                        isFetched={tradeHistoryFetched}
+                        isFetched={webDataFetched}
                         selectedFilter={selectedFilter}
                     />
                 );

@@ -148,6 +148,7 @@ export default function PageHeader() {
                         alt='Perps Logo'
                         width='70px'
                         height='70px'
+                        loading='eager'
                     />
                 </Link>
                 <nav

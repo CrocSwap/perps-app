@@ -2,6 +2,7 @@
     --dropdown-height: 32px;
     --data-content-height: 16px;
     --button-height: 25px;
+    --trade-type-toggle-width-height: 32px;
 
     display: flex;
     width: 100%;
@@ -89,6 +90,9 @@
     border-radius: var(--radius-s);
     cursor: pointer;
     border: none;
+
+    width: var(--trade-type-toggle-width-height);
+    height: var(--trade-type-toggle-width-height);
 }
 
 .priceDistributionContainer {
@@ -140,8 +144,9 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: var(--padding-s) 0px;
-    font-size: var(--font-size-m);
+    /* padding: var(--padding-s) 0px;
+    font-size: var(--font-size-m); */
+    height: 32px;
 }
 
 .launchpad > header > div {
@@ -178,6 +183,7 @@
     scrollbar-width: thin;
     scrollbar-color: var(--accent1) transparent;
     scrollbar-gutter: auto;
+    padding-top: var(--padding-m);
 }
 
 .launchpad_clickables::-webkit-scrollbar {

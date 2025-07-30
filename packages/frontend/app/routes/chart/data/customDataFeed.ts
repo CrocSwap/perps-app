@@ -24,7 +24,10 @@ const subscriptions = new Map<
     { subId: number; unsubscribe: () => void }
 >();
 
-export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
+export const createDataFeed = (
+    info: Info | null,
+    addToFetchedChannels: (channel: string) => void,
+): IDatafeedChartApi =>
     ({
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
             onResult([]);
@@ -160,45 +163,48 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
             }
 
             if (!info) return console.log('SDK is not ready');
-            info.subscribe(
-                {
-                    type: WsChannels.USER_FILLS,
-                    user: userWallet,
-                },
-                (payload: any) => {
-                    if (!payload || !payload.data) return;
+            setTimeout(() => {
+                info.subscribe(
+                    {
+                        type: WsChannels.USER_FILLS,
+                        user: userWallet,
+                    },
+                    (payload: any) => {
+                        addToFetchedChannels(WsChannels.USER_FILLS);
+                        if (!payload || !payload.data) return;
 
-                    const fills = payload.data.fills;
-                    if (!fills || fills.length === 0) return;
+                        const fills = payload.data.fills;
+                        if (!fills || fills.length === 0) return;
 
-                    const poolFills = fills.filter(
-                        (fill: any) => fill.coin === symbolInfo.name,
-                    );
+                        const poolFills = fills.filter(
+                            (fill: any) => fill.coin === symbolInfo.name,
+                        );
 
-                    if (poolFills.length === 0) return;
+                        if (poolFills.length === 0) return;
 
-                    poolFills.sort((a: any, b: any) => b.time - a.time);
+                        poolFills.sort((a: any, b: any) => b.time - a.time);
 
-                    fillMarks(poolFills);
+                        fillMarks(poolFills);
 
-                    updateMarkDataWithSubscription(
-                        symbolInfo.name,
-                        poolFills,
-                        userWallet,
-                    );
+                        updateMarkDataWithSubscription(
+                            symbolInfo.name,
+                            poolFills,
+                            userWallet,
+                        );
 
-                    const markArray = [
-                        ...bSideOrderHistoryMarks.values(),
-                        ...aSideOrderHistoryMarks.values(),
-                    ];
+                        const markArray = [
+                            ...bSideOrderHistoryMarks.values(),
+                            ...aSideOrderHistoryMarks.values(),
+                        ];
 
-                    if (markArray.length > 0) {
-                        markArray.sort((a: any, b: any) => b.px - a.px);
+                        if (markArray.length > 0) {
+                            markArray.sort((a: any, b: any) => b.px - a.px);
 
-                        onDataCallback(markArray);
-                    }
-                },
-            );
+                            onDataCallback(markArray);
+                        }
+                    },
+                );
+            }, 500);
         },
 
         subscribeBars: (symbolInfo, resolution, onTick, listenerGuid) => {

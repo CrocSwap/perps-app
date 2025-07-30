@@ -153,3 +153,31 @@
     color: var(--text1);
     padding: var(--padding-xs);
 }
+.modalInputContainer {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-dark4) !important;
+    border-radius: var(--radius-s);
+    margin-bottom: var(--gap-m);
+}
+
+.modalValueInput {
+    background-color: transparent;
+    width: 100%;
+    height: 33px;
+    border: none;
+    border-radius: var(--radius-s);
+    color: var(--text1);
+    font-size: var(--font-size-s);
+    text-align: center;
+    outline: none;
+    padding: 0 var(--padding-s);
+}
+
+.modalSliderContainer {
+    position: relative;
+    width: 100%;
+    padding-bottom: var(--padding-m);
+    padding-left: var(--padding-m);
+    padding-right: var(--padding-m);
+}

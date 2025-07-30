@@ -46,6 +46,7 @@ type TradeDataStore = UserTradeDataStore & {
     isTradeInfoExpanded: boolean;
     setIsTradeInfoExpanded: (shouldExpand: boolean) => void;
     updateSymbolInfo: (symbolInfo: TokenDetailsIF) => void; // used for updating symbol info from REST API while ws is sleeping
+    addToFetchedChannels: (channel: string) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -143,6 +144,9 @@ const useTradeDataStore = create<TradeDataStore>()(
                         tokenDetails.markPx - currentSymbolInfo.markPx;
                     set({ symbolInfo: currentSymbolInfo });
                 }
+            },
+            addToFetchedChannels: (channel: string) => {
+                get().fetchedChannels.add(channel);
             },
         }),
         {

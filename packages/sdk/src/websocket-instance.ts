@@ -479,11 +479,13 @@ export class WebSocketInstance {
         }
 
         for (const activeSub of activeSubscriptions) {
-            activeSub.callback(msg);
             if (activeSub.multiCallbacks) {
                 for (const callback of activeSub.multiCallbacks) {
+                    console.log('>>> calling multi callback', callback);
                     callback(msg);
                 }
+            } else {
+                activeSub.callback(msg);
             }
         }
     };
@@ -493,81 +495,111 @@ export class WebSocketInstance {
         callback: Callback,
         existingId?: number,
     ) => {
-        const subscriptionId = existingId ?? this.subscriptionIdCounter++;
-        this.allSubscriptions[subscriptionId] = { subscription, callback };
         const identifier = subscriptionToIdentifier(subscription);
 
-        if (!this.activeSubscriptions[identifier]) {
-            this.activeSubscriptions[identifier] = [];
-        }
+        const existingSubs = this.activeSubscriptions[identifier] || [];
+        if (existingSubs.length > 0) {
+            const sub = existingSubs[0];
+            // if that subscription is not a multi callback subscription, check if the callback is the same
+            if (!sub.multiCallbacks || sub.multiCallbacks.length === 0) {
+                // return sub id if callback is the same
+                if (sub.callback.toString() === callback.toString()) {
+                    const unsubscribe = () => {
+                        this.unsubscribe(
+                            subscription,
+                            callback,
+                            sub.subscriptionId,
+                        );
+                    };
 
-        const existingActiveSubscriptions =
-            this.activeSubscriptions[identifier];
-        let activeSubscription: ActiveSubscription | undefined;
+                    return { unsubscribe };
+                } else {
+                    // if the callback is different, add it to the multi callbacks
+                    sub.multiCallbacks = [sub.callback, callback];
 
-        if (existingActiveSubscriptions.length > 0) {
-            // special handling for userEvents and orderUpdates
-            if (identifier === 'userEvents' || identifier === 'orderUpdates') {
-                this.log(
-                    `Skipping duplicate subscription for ${identifier}. Only one subscription allowed.`,
-                );
-                activeSubscription = existingActiveSubscriptions[0];
-                if (!activeSubscription.multiCallbacks) {
-                    activeSubscription.multiCallbacks = [];
+                    const unsubscribe = () => {
+                        this.unsubscribe(
+                            subscription,
+                            callback,
+                            sub.subscriptionId,
+                        );
+                    };
+
+                    return { unsubscribe };
                 }
-                activeSubscription.multiCallbacks.push(callback);
             } else {
-                const activeSubscriptionsToAdd =
-                    existingActiveSubscriptions.filter(
-                        (sub) =>
-                            JSON.stringify(sub.subscription) ===
-                            JSON.stringify(subscription),
-                    );
-
-                if (activeSubscriptionsToAdd.length > 0) {
-                    activeSubscription = activeSubscriptionsToAdd[0];
-                    if (!activeSubscription.multiCallbacks) {
-                        activeSubscription.multiCallbacks = [];
+                let found = false;
+                sub.multiCallbacks.map((c: Callback) => {
+                    if (JSON.stringify(c) === JSON.stringify(callback)) {
+                        found = true;
+                        return;
                     }
-                    activeSubscription.multiCallbacks.push(callback);
+                });
+                if (!found) {
+                    sub.multiCallbacks.push(callback);
                 }
+
+                const unsubscribe = () => {
+                    this.unsubscribe(
+                        subscription,
+                        callback,
+                        sub.subscriptionId,
+                    );
+                };
+
+                return { unsubscribe };
             }
         }
 
-        if (!activeSubscription) {
-            activeSubscription = {
-                callback,
-                subscriptionId,
-                subscription,
-            };
-            existingActiveSubscriptions.push(activeSubscription);
-        }
+        const subscriptionId = existingId ?? this.subscriptionIdCounter++;
 
-        if (!this.wsReady) {
-            this.log('subscription queued', subscription);
-            this.queuedSubscriptions.push({
-                subscription,
-                active: activeSubscription,
-            });
+        this.allSubscriptions[subscriptionId] = { subscription, callback };
+
+        if (!this.wsReady || this.ws.readyState !== WebSocket.OPEN) {
+            this.log('enqueueing subscription', subscription, subscriptionId);
+            if (
+                !this.queuedSubscriptions.some(
+                    (q) => q.active.subscriptionId === subscriptionId,
+                )
+            ) {
+                this.queuedSubscriptions.push({
+                    subscription,
+                    active: { callback, subscriptionId, subscription },
+                });
+            }
         } else {
-            // Check if we already sent this exact subscription
-            const isDuplicate = existingActiveSubscriptions.some(
-                (sub) =>
-                    JSON.stringify(sub.subscription) ===
-                    JSON.stringify(subscription),
-            );
+            this.log('subscribing', subscription, subscriptionId);
+            const identifier = subscriptionToIdentifier(subscription);
 
-            if (!isDuplicate || existingActiveSubscriptions.length === 1) {
-                console.log(`[${this.socketName}] subscribing`, subscription);
+            if (identifier === 'userEvents' || identifier === 'orderUpdates') {
+                if (
+                    this.activeSubscriptions[identifier] &&
+                    this.activeSubscriptions[identifier].length > 0 &&
+                    !this.activeSubscriptions[identifier].some(
+                        (s) => s.subscriptionId === subscriptionId,
+                    )
+                ) {
+                    throw new Error(
+                        `Cannot subscribe to ${identifier} multiple times with different IDs`,
+                    );
+                }
+            }
+
+            if (!this.activeSubscriptions[identifier]) {
+                this.activeSubscriptions[identifier] = [];
+            }
+            if (
+                !this.activeSubscriptions[identifier].some(
+                    (s) => s.subscriptionId === subscriptionId,
+                )
+            ) {
+                this.activeSubscriptions[identifier].push({
+                    callback,
+                    subscriptionId,
+                    subscription,
+                });
                 this.ws.send(
-                    JSON.stringify({
-                        method: 'subscribe',
-                        subscription,
-                    }),
-                );
-            } else {
-                this.log(
-                    `Already subscribed to ${identifier}, skipping duplicate subscription`,
+                    JSON.stringify({ method: 'subscribe', subscription }),
                 );
             }
         }
@@ -658,6 +690,7 @@ export class WebSocketInstance {
     };
 
     public stop = () => {
+        console.log('>>> stop');
         this.stopped = true;
         if (this.ws) {
             this.ws.close();
@@ -680,6 +713,10 @@ export class WebSocketInstance {
             URL.revokeObjectURL(this.jsonParserWorkerBlobUrl);
             this.jsonParserWorkerBlobUrl = null;
         }
+
+        this.wsReady = false;
+        this.queuedSubscriptions = [];
+        this.activeSubscriptions = {};
     };
 
     public enableSleepMode = () => {

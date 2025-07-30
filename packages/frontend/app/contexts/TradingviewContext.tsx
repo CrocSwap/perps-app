@@ -78,7 +78,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
-    const { symbol } = useTradeDataStore();
+    const { symbol, addToFetchedChannels } = useTradeDataStore();
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
@@ -204,7 +204,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const initChart = useCallback(() => {
         if (!info) return;
 
-        dataFeedRef.current = createDataFeed(info);
+        dataFeedRef.current = createDataFeed(info, addToFetchedChannels);
 
         const processedSymbol = processSymbolUrlParam(marketId || 'BTC');
 

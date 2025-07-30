@@ -143,6 +143,8 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             ],
         );
 
+        const isLinkDisabled = position.coin.toLowerCase() !== 'btc';
+
         return (
             <div
                 className={`${styles.rowContainer} ${!showTpSl ? styles.noTpSl : ''}`}
@@ -154,9 +156,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     <span
                         style={{
                             color: baseColor,
-                            cursor: 'pointer',
+                            cursor: isLinkDisabled ? 'default' : 'pointer',
                         }}
-                        onClick={handleCoinClick}
+                        onClick={isLinkDisabled ? undefined : handleCoinClick}
                     >
                         {position.coin}
                     </span>

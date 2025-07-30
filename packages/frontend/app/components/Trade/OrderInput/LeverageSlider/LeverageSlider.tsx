@@ -9,7 +9,11 @@ interface LeverageSliderProps {
     onChange: (value: number) => void;
     className?: string;
     minimumInputValue?: number;
-    generateRandomMaximumInput: () => void;
+    generateRandomMaximumInput?: () => void;
+    // NEW: Modal mode props
+    modalMode?: boolean;
+    maxLeverage?: number;
+    hideTitle?: boolean;
 }
 
 const LEVERAGE_CONFIG = {
@@ -64,6 +68,11 @@ export default function LeverageSlider({
     onChange,
     className = '',
     minimumInputValue = 1,
+    generateRandomMaximumInput,
+    // NEW: Modal mode props with defaults
+    modalMode = false,
+    maxLeverage,
+    hideTitle = false,
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
@@ -73,11 +82,12 @@ export default function LeverageSlider({
         getPreferredLeverage,
     } = useLeverageStore();
 
-    // Use maxLeverage from symbolInfo, fallback to default if not available
-    const maximumInputValue =
-        symbolInfo?.coin === 'BTC'
-            ? 100
-            : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
+    // Use maxLeverage from props (modal mode) or symbolInfo, fallback to default if not available
+    const maximumInputValue = modalMode
+        ? maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE
+        : symbolInfo?.coin === 'BTC'
+          ? 100
+          : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
 
     // Always default to 1x leverage if no value provided
     const currentValue = value ?? 1;
@@ -132,14 +142,20 @@ export default function LeverageSlider({
     };
 
     const handleLeverageChange = (newLeverage: number) => {
-        // Update the preferred leverage in store with the exact value (no rounding)
-        setPreferredLeverage(newLeverage);
+        // In modal mode, skip store updates
+        if (!modalMode) {
+            // Update the preferred leverage in store with the exact value (no rounding)
+            setPreferredLeverage(newLeverage);
+        }
 
-        // Also call the parent onChange with the exact value
+        // Always call the parent onChange with the exact value
         onChange(newLeverage);
     };
 
     const handleMarketChange = useCallback(() => {
+        // Skip market change logic in modal mode
+        if (modalMode) return;
+
         const effectiveSymbol = symbolInfo?.coin;
         const currentMaxLeverage =
             effectiveSymbol === 'BTC' ? 100 : symbolInfo?.maxLeverage;
@@ -195,12 +211,15 @@ export default function LeverageSlider({
         currentMarket,
         minimumInputValue,
         hasInitializedLeverage,
+        modalMode, // Add modalMode to dependencies
     ]);
 
-    // Market change detection and leverage validation
+    // Market change detection and leverage validation (skip in modal mode)
     useEffect(() => {
-        handleMarketChange();
-    }, [handleMarketChange]);
+        if (!modalMode) {
+            handleMarketChange();
+        }
+    }, [handleMarketChange, modalMode]);
 
     // Handle smooth leverage changes during dragging (no rounding)
     const handleSmoothLeverageChange = (newLeverage: number) => {
@@ -215,14 +234,14 @@ export default function LeverageSlider({
 
     // Initialize input value on first render and notify parent if no value was provided
     useEffect(() => {
-        if (inputValue === '') {
+        if (inputValue === '' && !modalMode) {
             setInputValue(formatValue(currentValue));
             // If no value was provided, set it to 1x
             if (value === undefined || value === null) {
                 handleLeverageChange(1);
             }
         }
-    }, [maximumInputValue]);
+    }, [maximumInputValue, modalMode]);
 
     // Generate tick marks using centralized logic
     useEffect(() => {
@@ -509,7 +528,7 @@ export default function LeverageSlider({
         };
 
         const handleMouseUp = () => {
-            if (isDragging) {
+            if (isDragging && !modalMode) {
                 // Keep the exact value when dragging ends (no rounding/snapping)
                 setPreferredLeverage(currentValue);
             }
@@ -517,7 +536,7 @@ export default function LeverageSlider({
         };
 
         const handleTouchEnd = () => {
-            if (isDragging) {
+            if (isDragging && !modalMode) {
                 // Keep the exact value when dragging ends (no rounding/snapping)
                 setPreferredLeverage(currentValue);
             }
@@ -545,7 +564,13 @@ export default function LeverageSlider({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, minimumInputValue, maximumInputValue, currentValue]);
+    }, [
+        isDragging,
+        minimumInputValue,
+        maximumInputValue,
+        currentValue,
+        modalMode,
+    ]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         (e.target as HTMLElement).focus();
@@ -602,11 +627,164 @@ export default function LeverageSlider({
             #EF5350 100%)`;
     };
 
+    if (modalMode) {
+        // Modal layout: Input at top, slider below
+        return (
+            <div
+                className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
+            >
+                {!hideTitle && (
+                    <h3 className={styles.containerTitle}>Leverage</h3>
+                )}
+
+                {/* Input at top for modal mode */}
+                <div className={styles.modalInputContainer}>
+                    <input
+                        type='text'
+                        value={
+                            isDragging ? formatValue(currentValue) : inputValue
+                        }
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
+                        onKeyDown={handleInputKeyDown}
+                        className={styles.modalValueInput}
+                        aria-label='Leverage value'
+                        style={{
+                            color: isDragging ? getKnobColor() : 'inherit',
+                        }}
+                        placeholder=''
+                    />
+                </div>
+
+                {/* Slider container for modal mode */}
+                <div className={styles.modalSliderContainer}>
+                    <div
+                        ref={sliderRef}
+                        className={styles.sliderTrack}
+                        onClick={handleTrackClick}
+                        onMouseMove={handleTrackMouseMove}
+                        onMouseLeave={handleTrackMouseLeave}
+                    >
+                        {/* Dark background track */}
+                        <div className={styles.sliderBackground}></div>
+
+                        {/* Active colored portion - using fixed position gradient */}
+                        <div
+                            className={styles.sliderActive}
+                            style={{
+                                width: `${getKnobPosition()}%`,
+                                background: createGradientString(),
+                                backgroundSize: `${100 / (getKnobPosition() / 100)}% 100%`,
+                                backgroundPosition: 'left center',
+                            }}
+                        ></div>
+
+                        {/* Slider markers */}
+                        {tickMarks.map((tickValue, index) => {
+                            const position = valueToPercentage(tickValue);
+                            const isActive = tickValue <= currentValue;
+                            const isCurrent =
+                                Math.abs(tickValue - value) <
+                                SLIDER_CONFIG.CURRENT_VALUE_THRESHOLD;
+                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
+                            const isHovered =
+                                hoveredTickIndex === index ||
+                                (hoverValue === tickValue && isHovering);
+                            const tickColor = getColorAtPosition(position);
+
+                            return (
+                                <div
+                                    key={index}
+                                    className={`${styles.sliderMarker} ${
+                                        isActive ? styles.active : ''
+                                    } ${
+                                        isCurrent
+                                            ? styles.sliderMarkerCurrent
+                                            : ''
+                                    } ${
+                                        isHovered
+                                            ? styles.sliderMarkerHovered
+                                            : ''
+                                    }`}
+                                    style={{
+                                        left: `${position}%`,
+                                        backgroundColor:
+                                            isActive || isHovered
+                                                ? tickColor
+                                                : 'transparent',
+                                        borderColor:
+                                            isActive || isHovered
+                                                ? 'transparent'
+                                                : `rgba(255, 255, 255, ${UI_CONFIG.INACTIVE_TICK_OPACITY})`,
+                                    }}
+                                    onMouseEnter={() => handleTickHover(index)}
+                                    onMouseLeave={handleTickLeave}
+                                ></div>
+                            );
+                        })}
+
+                        {/* Draggable knob */}
+                        <div
+                            ref={knobRef}
+                            className={styles.sliderKnob}
+                            style={{
+                                left: `${getKnobPosition()}%`,
+                                borderColor: getKnobColor(),
+                                backgroundColor: 'transparent',
+                            }}
+                            onMouseDown={handleKnobMouseDown}
+                            onTouchStart={handleKnobMouseDown}
+                            tabIndex={-1}
+                        ></div>
+                    </div>
+
+                    <div className={styles.labelContainer}>
+                        {tickMarks.map((tickValue, index) => {
+                            const position = valueToPercentage(tickValue);
+                            const isActive = tickValue <= value;
+                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
+                            const isHovered =
+                                hoveredTickIndex === index ||
+                                (hoverValue === tickValue && isHovering);
+                            const tickColor = getColorAtPosition(position);
+
+                            return (
+                                <div
+                                    key={index}
+                                    className={`${styles.valueLabel} ${
+                                        isHovered
+                                            ? styles.valueLabelHovered
+                                            : ''
+                                    }`}
+                                    style={{
+                                        left: `${position}%`,
+                                        color:
+                                            isActive || isHovered
+                                                ? tickColor
+                                                : UI_CONFIG.INACTIVE_LABEL_COLOR,
+                                    }}
+                                    onClick={() =>
+                                        handleLeverageChange(tickValue)
+                                    }
+                                    onMouseEnter={() => handleTickHover(index)}
+                                    onMouseLeave={handleTickLeave}
+                                >
+                                    {formatLabelValue(tickValue)}x
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Regular layout: Slider and input side by side
     return (
         <div
             className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
         >
-            <h3 className={styles.containerTitle}>Leverage</h3>
+            {!hideTitle && <h3 className={styles.containerTitle}>Leverage</h3>}
 
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
