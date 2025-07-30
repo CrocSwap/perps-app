@@ -19,11 +19,22 @@
     cursor: pointer;
     flex-shrink: 0;
     gap: var(--gap-s);
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.dropdownToggle:hover {
+    background: var(--bg-dark2, #24242e);
+}
+
+.dropdownToggle:focus-visible {
+    box-shadow: 0 0 0 2px var(--accent-color, #4f46e5);
 }
 
 .dropdownToggle.disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    background: var(--bg-dark3, #1c1c22) !important;
 }
 
 .selectedText {
@@ -36,42 +47,57 @@
 
 .dropdownToggle svg {
     color: var(--text2);
+    transition: color 0.2s ease;
+    flex-shrink: 0;
 }
 
-.dropdownToggle:hover svg {
+.dropdownToggle:hover:not(.disabled) svg {
     color: var(--text1);
 }
+
 .dropdownMenu {
     position: absolute;
     top: 100%;
     left: 0;
     width: 100%;
     margin-top: var(--margin-xs);
-    padding: 0;
+    padding: var(--padding-xs) 0;
     background: var(--bg-dark3, #1c1c22);
     border-radius: var(--radius-xs);
     list-style: none;
-    z-index: 10;
+    z-index: 1000;
     max-height: 200px;
     overflow-y: auto;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    padding-bottom: var(--padding-s);
-    gap: var(--gap-xs);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    overflow-x: hidden;
 }
 
 .dropdownItem {
     display: flex;
-    height: 15px;
-    padding: 0 var(--padding-s);
+    min-height: 32px;
+    padding: var(--padding-xs) var(--padding-s);
     align-items: center;
     cursor: pointer;
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-s, 12px);
-    transition: background-color 0.15s ease;
+    transition: all 0.15s ease;
+    position: relative;
+    user-select: none;
 }
 
 .dropdownItem.selected {
     color: var(--text1, #f0f0f8);
+}
+
+.dropdownItem.selected::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent-color, #4f46e5);
 }
 
 .dropdownItem:hover {
@@ -81,8 +107,8 @@
 .noOptions {
     padding: var(--padding-s);
     text-align: center;
-    color: var(---text2, #bcbcc4);
-    font-size: var(--Font-Size-Font-S, 12px);
+    color: var(--text2, #bcbcc4);
+    font-size: var(--font-size-s, 12px);
     font-style: italic;
 }
 
@@ -98,6 +124,11 @@
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-xs);
 }
+
+.dropdownMenu::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 .orderDropdownWrapper {
     display: flex;
     align-items: center;
