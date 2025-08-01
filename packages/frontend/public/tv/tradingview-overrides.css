@@ -9,3 +9,7 @@
 .chart-gui-wrapper canvas[data-name='pane-canvas'] {
     background: #0e0e14 !important;
 }
+
+[data-outside-boundary-for='symbol-search-items-dialog'] {
+    display: none !important;
+}
