@@ -12,6 +12,7 @@
         "typecheck": "react-router typegen && tsc",
         "prebuild": "node scripts/copy-tv.js",
         "predev": "node scripts/copy-tv.js",
+        "preview": "vite preview",
         "prestart": "node scripts/copy-tv.js",
         "lint": "eslint app --ext .js,.jsx,.ts,.tsx",
         "lint:fix": "eslint app --ext .js,.jsx,.ts,.tsx --fix",

@@ -45,7 +45,8 @@ export default defineConfig({
             output: {
                 manualChunks: (id) => {
                     if (id.includes('node_modules')) {
-                        if (id.includes('sessions') || id.includes('solana')) {
+                        // Group sessions related packages
+                        if (id.includes('sessions')) {
                             return 'vendor_sessions';
                         }
                         return 'vendor';
