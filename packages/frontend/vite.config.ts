@@ -8,9 +8,55 @@ const appName = 'Ambient Perps';
 const appDescription = 'A modern, performant app for perpetual contracts.';
 
 export default defineConfig({
+    optimizeDeps: {
+        include: [
+            'react',
+            'react-dom',
+            'react-router',
+            'react-router-dom',
+            '@remix-run/router',
+        ],
+        esbuildOptions: {
+            // This helps avoid "Cannot read property 'x' of undefined" errors
+            define: {
+                global: 'globalThis',
+            },
+        },
+    },
     build: {
-        ssr: false, // Explicitly disable SSR
+        ssr: false,
         outDir: 'build/client',
+        sourcemap: false,
+        minify: 'esbuild',
+        target: 'esnext',
+        reportCompressedSize: false,
+        cssCodeSplit: true,
+        commonjsOptions: {
+            include: /node_modules/,
+            transformMixedEsModules: true,
+        },
+        rollupOptions: {
+            onwarn(warning, defaultHandler) {
+                if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+                    return;
+                }
+                defaultHandler(warning);
+            },
+            output: {
+                manualChunks: (id) => {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('sessions')) {
+                            return 'vendor_sessions';
+                        }
+                        return 'vendor';
+                    }
+                },
+                chunkFileNames: 'assets/js/[name]-[hash].js',
+                entryFileNames: 'assets/js/[name]-[hash].js',
+                assetFileNames: 'assets/[ext]/[name]-[hash][extname]',
+            },
+        },
+        chunkSizeWarningLimit: 1000,
     },
     ssr: {
         noExternal: ['@fogo/sessions-sdk-react'],
