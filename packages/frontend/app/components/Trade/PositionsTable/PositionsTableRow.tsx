@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import ShareModal from '~/components/ShareModal/ShareModal';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
-import { useMarketOrderService } from '~/hooks/useMarketOrderService';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
@@ -96,10 +96,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             modalCtrl.open();
         }, [modalCtrl]);
 
-        // const openLeverageModal = useCallback(() => {
-        //     setModalContent('leverage');
-        //     modalCtrl.open();
-        // }, [modalCtrl]);
+        const openLeverageModal = useCallback(() => {
+            setModalContent('leverage');
+            modalCtrl.open();
+        }, [modalCtrl]);
 
         // Memoize modal content
         const renderModalContent = useCallback(() => {
@@ -219,18 +219,19 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     >
                         {position.coin}
                     </span>
-                    {/* {position.leverage.value && (
-                        <span
-                            className={styles.badge}
-                            onClick={openLeverageModal}
-                            style={{
-                                color: baseColor,
-                                backgroundColor: hexToRgba(baseColor, 0.15),
-                            }}
-                        >
-                            {position.leverage.value}x
-                        </span>
-                    )} */}
+                    {position.leverage.value &&
+                        position.coin.toLowerCase() === 'btc' && (
+                            <span
+                                className={styles.badge}
+                                onClick={openLeverageModal}
+                                style={{
+                                    color: baseColor,
+                                    backgroundColor: hexToRgba(baseColor, 0.15),
+                                }}
+                            >
+                                {position.leverage.value}x
+                            </span>
+                        )}
                 </div>
                 <div
                     className={`${styles.cell} ${styles.sizeCell}`}

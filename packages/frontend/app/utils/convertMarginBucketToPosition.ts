@@ -1,5 +1,7 @@
 import type { MarginBucketAvail } from '@crocswap-libs/ambient-ember';
+import { useEffect } from 'react';
 import type { PositionIF } from '~/utils/position/PositionIFs';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
 /**
  * Convert a MarginBucketAvail from RPC to PositionIF format for display
@@ -10,6 +12,7 @@ import type { PositionIF } from '~/utils/position/PositionIFs';
 export function convertMarginBucketToPosition(
     marginBucket: MarginBucketAvail,
     marketId: bigint = 64n,
+    symbolInfo: SymbolInfoIF | null,
 ): PositionIF | null {
     // If no position exists, return null
     if (marginBucket.netPosition === 0n) {
@@ -19,7 +22,8 @@ export function convertMarginBucketToPosition(
     // Convert bigint values to numbers with proper decimal scaling
     const netPositionNum = Number(marginBucket.netPosition) / 1e8; // 8 decimals for position size
     const avgEntryPriceNum = Number(marginBucket.avgEntryPrice) / 1e6; // 6 decimals for price (matches on-chain format)
-    const markPriceNum = Number(marginBucket.markPrice) / 1e6; // 6 decimals for price (matches on-chain format)
+    // const markPriceNum = Number(marginBucket.markPrice) / 1e6; // 6 decimals for price (matches on-chain format)
+    const markPriceNum = symbolInfo?.markPx || 0;
     const committedCollateralNum =
         Number(marginBucket.committedCollateral) / 1e6; // 6 decimals for USDC
     const unrealizedPnlNum = Number(marginBucket.unrealizedPnl) / 1e6; // 6 decimals for USDC
@@ -30,6 +34,22 @@ export function convertMarginBucketToPosition(
     // Calculate leverage based on position value and committed collateral
     const leverage =
         committedCollateralNum > 0 ? positionValue / committedCollateralNum : 0;
+
+    useEffect(() => {
+        console.log({
+            leverage,
+            committedCollateralNum,
+            positionValue,
+            markPriceNum,
+            netPositionNum,
+        });
+    }, [
+        leverage,
+        committedCollateralNum,
+        positionValue,
+        markPriceNum,
+        netPositionNum,
+    ]);
 
     // Calculate max leverage from effective IM basis points
     // IM% = 100 / maxLeverage, so maxLeverage = 10000 / imBps
