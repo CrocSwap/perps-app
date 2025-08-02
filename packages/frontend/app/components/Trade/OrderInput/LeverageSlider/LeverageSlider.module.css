@@ -9,7 +9,34 @@
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-s, 12px);
 }
+.titleWithWarning {
+    position: relative;
+}
 
+.minimumWarning {
+    position: absolute;
+    top: 100%;
+    left: 0;
+
+    background-color: rgba(239, 83, 80, 0.1);
+    color: var(--red);
+    font-size: var(--font-size-s, 12px);
+    white-space: nowrap;
+    z-index: 10;
+    /* Optional: Add a subtle animation */
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 .sliderWithValue {
     display: flex;
     align-items: center;

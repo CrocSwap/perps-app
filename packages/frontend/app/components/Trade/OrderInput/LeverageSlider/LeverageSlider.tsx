@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
@@ -14,6 +20,7 @@ interface LeverageSliderProps {
     modalMode?: boolean;
     maxLeverage?: number;
     hideTitle?: boolean;
+    minimumValue?: number;
 }
 
 const LEVERAGE_CONFIG = {
@@ -73,6 +80,7 @@ export default function LeverageSlider({
     modalMode = false,
     maxLeverage,
     hideTitle = false,
+    minimumValue,
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
@@ -88,6 +96,9 @@ export default function LeverageSlider({
         : symbolInfo?.coin === 'BTC'
           ? 100
           : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
+
+    const effectiveMinimum =
+        minimumValue !== undefined ? minimumValue : minimumInputValue;
 
     // Always default to 1x leverage if no value provided
     const currentValue = value ?? 1;
@@ -143,8 +154,87 @@ export default function LeverageSlider({
     };
 
     const constrainValue = (val: number): number => {
-        return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
+        return Math.max(effectiveMinimum, Math.min(maximumInputValue, val));
     };
+
+    const [showMinimumWarning, setShowMinimumWarning] = useState(false);
+    const [warningTimeout, setWarningTimeout] = useState<NodeJS.Timeout | null>(
+        null,
+    );
+    const [hasShownMinimumWarning, setHasShownMinimumWarning] = useState(false);
+
+    // Check conditions for showing minimum warning
+    const shouldShowInteractiveWarning = useMemo(() => {
+        if (minimumValue === undefined) return false;
+
+        // Show if user is dragging AND current value is below minimum
+        const isDraggingBelowMinimum =
+            isDragging && currentValue <= minimumValue + 0.01;
+
+        // Show if user is hovering below minimum (but not dragging)
+        const isHoveringBelowMinimum =
+            !isDragging &&
+            isHovering &&
+            hoverValue !== null &&
+            hoverValue <= minimumValue + 0.01;
+
+        return isDraggingBelowMinimum || isHoveringBelowMinimum;
+    }, [minimumValue, currentValue, isDragging, isHovering, hoverValue]);
+
+    // Effect to handle warning display logic
+    useEffect(() => {
+        if (minimumValue === undefined) return;
+
+        const isCurrentAtMinimum = Math.abs(currentValue - minimumValue) < 0.01;
+
+        if (shouldShowInteractiveWarning) {
+            // Show immediately for interactive conditions and stop any auto-hide
+            setShowMinimumWarning(true);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+        } else if (isCurrentAtMinimum && !hasShownMinimumWarning) {
+            // Show warning when reaching minimum for the first time, then auto-hide after 3 seconds
+            setShowMinimumWarning(true);
+            setHasShownMinimumWarning(true);
+
+            const timeout = setTimeout(() => {
+                setShowMinimumWarning(false);
+                setWarningTimeout(null);
+            }, 3000);
+
+            setWarningTimeout(timeout);
+        } else if (!isCurrentAtMinimum) {
+            // Reset the "has shown" flag and hide warning when user moves above minimum
+            setHasShownMinimumWarning(false);
+            setShowMinimumWarning(false);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+        } else if (!shouldShowInteractiveWarning && hasShownMinimumWarning) {
+            // Hide warning when interactive conditions stop and we've already shown the minimum warning
+            setShowMinimumWarning(false);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+        }
+
+        return () => {
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+            }
+        };
+    }, [
+        currentValue,
+        minimumValue,
+        shouldShowInteractiveWarning,
+        hasShownMinimumWarning,
+        warningTimeout,
+    ]);
+
     const announceValueChange = (value: number) => {
         const formattedValue = formatValue(value);
         setAnnounceText('');
@@ -719,7 +809,14 @@ export default function LeverageSlider({
                 className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
             >
                 {!hideTitle && (
-                    <h3 className={styles.containerTitle}>Leverage</h3>
+                    <div className={styles.titleWithWarning}>
+                        <h3 className={styles.containerTitle}>Leverage</h3>
+                        {showMinimumWarning && (
+                            <div className={styles.minimumWarning}>
+                                Minimum leverage reached
+                            </div>
+                        )}
+                    </div>
                 )}
 
                 {/* Input at top for modal mode */}
@@ -922,8 +1019,16 @@ export default function LeverageSlider({
         <div
             className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
         >
-            {!hideTitle && <h3 className={styles.containerTitle}>Leverage</h3>}
-
+            {!hideTitle && (
+                <div className={styles.titleWithWarning}>
+                    <h3 className={styles.containerTitle}>Leverage</h3>
+                    {showMinimumWarning && (
+                        <div className={styles.minimumWarning}>
+                            Minimum leverage reached
+                        </div>
+                    )}
+                </div>
+            )}
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
@@ -1106,6 +1211,7 @@ export default function LeverageSlider({
                     <span className={styles.valueSuffix}>x</span>
                 </div>
             </div>
+
             <div
                 aria-live='assertive'
                 aria-atomic='true'
