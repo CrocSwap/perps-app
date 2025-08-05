@@ -243,10 +243,11 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     };
 
     const getWarningMessage = () => {
-        if (Math.abs(notionalSymbolQtyNum) < 1e-8) return 'Size cannot be zero';
+        if (Math.abs(notionalSymbolQtyNum) < 1e-8)
+            return 'Size cannot be zero.';
         if (notionalSymbolQtyNum > originalSize)
-            return 'Size cannot exceed your position size';
-        if (notionalSymbolQtyNum < 0) return 'Please enter a valid size';
+            return 'Size cannot exceed your position size.';
+        if (notionalSymbolQtyNum < 0) return 'Please enter a valid size.';
         return '';
     };
 
