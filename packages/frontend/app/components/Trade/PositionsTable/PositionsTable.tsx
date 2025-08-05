@@ -11,13 +11,13 @@ import { sortPositionData } from '~/utils/position/PositionUtils';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
 
-interface PositionsTableProps {
+interface propsIF {
     pageMode?: boolean;
     isFetched: boolean;
     selectedFilter?: string;
 }
 
-export default function PositionsTable(props: PositionsTableProps) {
+export default function PositionsTable(props: propsIF) {
     const { pageMode, isFetched, selectedFilter } = props;
     const { coinPriceMap, symbol } = useTradeDataStore();
     const { positions } = useUnifiedMarginData();

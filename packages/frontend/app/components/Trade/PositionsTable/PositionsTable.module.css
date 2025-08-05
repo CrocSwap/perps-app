@@ -70,25 +70,6 @@
     cursor: pointer;
 }
 
-.actionButton {
-    background-color: transparent;
-    color: var(--accent1, #7371fc);
-    border: none;
-    font-size: var(--font-size-s, 12px);
-    cursor: pointer;
-    transition: color 0.2s ease;
-    white-space: nowrap;
-    margin-right: var(--margin-s);
-}
-
-.actionButton:hover {
-    color: var(--text1, #f0f0f8);
-}
-
-.actionContainer {
-    display: flex;
-}
-
 /* Specific cell classes */
 .coinCell {
     display: flex;
@@ -116,12 +97,27 @@
     border: none;
     cursor: pointer;
 }
+
+/* cell with buttons to close a position */
 .closeCell {
-    width: 70%;
+    width: 100%;
     display: flex;
-    text-align: end;
-    justify-self: end;
-    align-items: end;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: var(--gap-s);
+}
+
+/* normal styling of buttons to close a position */
+.closeCell > button {
+    color: var(--accent1, #7371fc);
+    font-size: var(--font-size-s, 12px);
+    transition: color 0.2s ease;
+}
+
+/* hover state for styling of buttons to close a position */
+.closeCell > button:hover {
+    color: var(--text1, #f0f0f8);
 }
 
 .headerContainer .closeCell {
