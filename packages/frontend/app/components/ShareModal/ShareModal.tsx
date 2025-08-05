@@ -90,7 +90,7 @@ export default function ShareModal(props: propsIF) {
                             >
                                 {(memPosition.szi > 0 ? 'Long' : 'Short') +
                                     ' ' +
-                                    memPosition.leverage.value}
+                                    Math.floor(memPosition.leverage.value)}
                                 x
                             </div>
                         </div>
