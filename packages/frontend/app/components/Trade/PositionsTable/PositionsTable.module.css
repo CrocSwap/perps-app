@@ -88,6 +88,8 @@
 
 .actionContainer {
     display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
 }
 
 /* Specific cell classes */

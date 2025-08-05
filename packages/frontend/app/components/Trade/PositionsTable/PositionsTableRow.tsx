@@ -341,16 +341,12 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         </button>
                     </div>
                 )}
-                <div className={`${styles.cell} ${styles.closeCell}`}>
+                <div
+                    className={`${styles.cell} ${styles.closeCell}`}
+                    style={{ justifyContent: 'flex-end' }}
+                >
                     <div className={styles.actionContainer}>
                         {/* <button className={styles.actionButton}>Limit</button> */}
-                        <button
-                            className={styles.actionButton}
-                            onClick={handleMarketClose}
-                            disabled={isClosing}
-                        >
-                            {isClosing ? 'Closing...' : 'Market'}
-                        </button>
                         <button
                             className={styles.actionButton}
                             onClick={() => {
@@ -359,6 +355,13 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             }}
                         >
                             Limit
+                        </button>
+                        <button
+                            className={styles.actionButton}
+                            onClick={handleMarketClose}
+                            disabled={isClosing}
+                        >
+                            {isClosing ? 'Closing...' : 'Market'}
                         </button>
                     </div>
                 </div>
