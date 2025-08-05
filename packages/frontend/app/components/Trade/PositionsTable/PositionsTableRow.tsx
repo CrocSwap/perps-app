@@ -346,19 +346,19 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         {/* <button className={styles.actionButton}>Limit</button> */}
                         <button
                             className={styles.actionButton}
-                            onClick={handleMarketClose}
-                            disabled={isClosing}
-                        >
-                            {isClosing ? 'Closing...' : 'Market'}
-                        </button>
-                        <button
-                            className={styles.actionButton}
                             onClick={() => {
                                 setModalContent('limitChase');
                                 modalCtrl.open();
                             }}
                         >
                             Limit
+                        </button>
+                        <button
+                            className={styles.actionButton}
+                            onClick={handleMarketClose}
+                            disabled={isClosing}
+                        >
+                            {isClosing ? 'Closing...' : 'Market'}
                         </button>
                     </div>
                 </div>
