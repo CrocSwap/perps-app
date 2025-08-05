@@ -7,16 +7,17 @@
     background: var(--bg-dark3, #1c1c22);
     font-size: var(--Font-Size-Font-S, 12px);
     height: 32px;
-
     color: var(--text2);
-
     display: grid;
     grid-template-columns: auto 1fr 50px;
     gap: var(--gap-xs);
+    cursor: pointer;
 }
+
 .modalContainer {
     border: 1px solid var(--bg-dark4);
 }
+
 .sizeInputContainer input {
     background-color: transparent;
     outline: none;
@@ -24,8 +25,8 @@
     text-align: right;
     color: var(--text1);
     cursor: pointer;
-    background-color: yellow;
 }
+
 .tokenButton {
     background-color: transparent;
     outline: none;
@@ -38,9 +39,11 @@
     gap: var(--gap-s);
     z-index: 5;
 }
+
 .tokenButton svg {
     fill: var(--text2);
 }
+
 .tokenButton:hover svg {
     fill: white;
 }

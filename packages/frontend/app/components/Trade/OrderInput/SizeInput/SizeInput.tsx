@@ -50,13 +50,31 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         [setSelectedMode, symbol],
     );
 
+    // Handle container click to focus input
+    const handleContainerClick = useCallback(() => {
+        console.log('Container clicked'); // Add this for debugging
+        const inputId = isModal
+            ? 'modal-trade-module-size-input'
+            : 'trade-module-size-input';
+        const input = document.getElementById(inputId);
+        console.log('Input found:', input); // Add this too
+        if (input) {
+            input.focus();
+        }
+    }, [isModal]);
+
     return (
         <div
             className={`${styles.sizeInputContainer} ${isModal && styles.modalContainer}`}
+            onClick={handleContainerClick}
         >
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
             <NumFormattedInput
-                id='trade-module-size-input'
+                id={
+                    isModal
+                        ? 'modal-trade-module-size-input'
+                        : 'trade-module-size-input'
+                }
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -66,7 +84,10 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 placeholder='Enter Size'
                 onFocus={onFocus}
             />
-            <button className={styles.tokenButton}>
+            <button
+                className={styles.tokenButton}
+                onClick={(e) => e.stopPropagation()}
+            >
                 <ComboBox
                     key={selectedMode}
                     value={
