@@ -3,8 +3,8 @@ import {
     PONG_CHECK_TIMEOUT_MS,
     RECONNECT_TIMEOUT_MS,
 } from './config';
-import { createJsonParserWorker } from './utils/workers';
 import type { Subscription, WsMsg } from './utils/types';
+import { createJsonParserWorker } from './utils/workers';
 
 export type Callback = (msg: WsMsg) => void;
 export type ErrCallback = (msg: WsMsg) => void;
@@ -41,15 +41,15 @@ function subscriptionToIdentifier(subscription: Subscription): string {
         case 'allMids':
             return 'allMids';
         case 'l2Book':
-            return `l2Book:${subscription.coin.toLowerCase()}`;
+            return `l2Book:${subscription.coin?.toLowerCase()}`;
         case 'trades':
-            return `trades:${subscription.coin.toLowerCase()}`;
+            return `trades:${subscription.coin?.toLowerCase()}`;
         case 'userEvents':
             return 'userEvents';
         case 'userFills':
             return `userFills:${subscription.user?.toLowerCase()}`;
         case 'candle':
-            return `candle:${subscription.coin.toLowerCase()},${subscription.interval}`;
+            return `candle:${subscription.coin?.toLowerCase()},${subscription.interval}`;
         case 'orderUpdates':
             return 'orderUpdates';
         case 'userFundings':
@@ -78,11 +78,11 @@ function wsMsgToIdentifier(wsMsg: WsMsg): string | undefined {
         case 'allMids':
             return 'allMids';
         case 'l2Book':
-            return `l2Book:${wsMsg.data.coin.toLowerCase()}`;
+            return `l2Book:${wsMsg.data.coin?.toLowerCase()}`;
         case 'trades':
             const trades = wsMsg.data;
             if (!Array.isArray(trades) || trades.length === 0) return undefined;
-            return `trades:${trades[0].coin.toLowerCase()}`;
+            return `trades:${trades[0].coin?.toLowerCase()}`;
         case 'user':
             return 'userEvents';
         case 'userFills':

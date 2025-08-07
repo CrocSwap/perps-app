@@ -202,28 +202,31 @@ const OrderBookMultiSocket: React.FC<OrderBookProps> = ({
         if (!info) return;
 
         setOrderBookState(TableState.LOADING);
-        if (selectedResolution) {
-            const subscription = {
-                type: 'l2Book' as const,
-                coin: symbol,
-                ...(selectedResolution.nsigfigs
-                    ? { nSigFigs: selectedResolution.nsigfigs }
-                    : {}),
-                ...(selectedResolution.mantissa
-                    ? { mantissa: selectedResolution.mantissa }
-                    : {}),
-            };
+        console.log({ selectedResolution });
+        const selectedResolutionOrFallback = selectedResolution || {
+            nsigfigs: null,
+            val: 1,
+            mantissa: null,
+        };
+        const subscription = {
+            type: 'l2Book' as const,
+            coin: 'BTC' as const,
+            // coin: symbol ,
+            ...(selectedResolutionOrFallback.nsigfigs
+                ? { nSigFigs: selectedResolutionOrFallback.nsigfigs }
+                : {}),
+            ...(selectedResolutionOrFallback.mantissa
+                ? { mantissa: selectedResolutionOrFallback.mantissa }
+                : {}),
+        };
 
-            // Subscribe using info - will automatically route to market socket
-            const { unsubscribe } = info.subscribe(
-                subscription,
-                postOrderBookRaw,
-            );
+        console.log({ subscription });
+        // Subscribe using info - will automatically route to market socket
+        const { unsubscribe } = info.subscribe(subscription, postOrderBookRaw);
 
-            return () => {
-                unsubscribe();
-            };
-        }
+        return () => {
+            unsubscribe();
+        };
     }, [selectedResolution, info, symbol, postOrderBookRaw]);
 
     const midHeader = useCallback(

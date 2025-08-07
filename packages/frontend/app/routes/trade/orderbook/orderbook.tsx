@@ -205,22 +205,28 @@ const OrderBook: React.FC<OrderBookProps> = ({
     useEffect(() => {
         if (!info || !symbol) return;
         setOrderBookState(TableState.LOADING);
-        if (selectedResolution) {
-            const subKey = {
-                type: 'l2Book' as const,
-                coin: symbol,
-                ...(selectedResolution.nsigfigs
-                    ? { nSigFigs: selectedResolution.nsigfigs }
-                    : {}),
-                ...(selectedResolution.mantissa
-                    ? { mantissa: selectedResolution.mantissa }
-                    : {}),
-            };
-            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
-            return () => {
-                unsubscribe();
-            };
-        }
+        console.log({ selectedResolution });
+        const selectedResolutionOrFallback = selectedResolution || {
+            nsigfigs: null,
+            val: 1,
+            mantissa: null,
+        };
+        const subKey = {
+            type: 'l2Book' as const,
+            coin: 'BTC' as const,
+            // coin: symbol,
+            ...(selectedResolutionOrFallback.nsigfigs
+                ? { nSigFigs: selectedResolutionOrFallback.nsigfigs }
+                : {}),
+            ...(selectedResolutionOrFallback.mantissa
+                ? { mantissa: selectedResolutionOrFallback.mantissa }
+                : {}),
+        };
+        console.log({ subKey });
+        const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+        return () => {
+            unsubscribe();
+        };
     }, [selectedResolution, info, symbol, postOrderBookRaw]);
 
     const midHeader = useCallback(
