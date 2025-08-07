@@ -202,7 +202,6 @@ const OrderBookMultiSocket: React.FC<OrderBookProps> = ({
         if (!info) return;
 
         setOrderBookState(TableState.LOADING);
-        console.log({ selectedResolution });
         const selectedResolutionOrFallback = selectedResolution || {
             nsigfigs: null,
             val: 1,
@@ -218,16 +217,15 @@ const OrderBookMultiSocket: React.FC<OrderBookProps> = ({
             ...(selectedResolutionOrFallback.mantissa
                 ? { mantissa: selectedResolutionOrFallback.mantissa }
                 : {}),
-        };
+        } as const;
 
-        console.log({ subscription });
         // Subscribe using info - will automatically route to market socket
         const { unsubscribe } = info.subscribe(subscription, postOrderBookRaw);
 
         return () => {
             unsubscribe();
         };
-    }, [selectedResolution, info, symbol, postOrderBookRaw]);
+    }, [selectedResolution, info, postOrderBookRaw]);
 
     const midHeader = useCallback(
         (id: string) => (
