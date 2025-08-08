@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
@@ -19,6 +19,7 @@ import {
 } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
+import { isRepositioningSameLine } from '../../data/utils/utils';
 
 interface LabelProps {
     lines: LineData[];
@@ -60,6 +61,7 @@ const LabelComponent = ({
     const { executeLimitOrder } = useLimitOrderService();
     const { add } = useNotificationStore();
     const ctx = overlayCanvasRef.current?.getContext('2d');
+    const isCompletedReposition = useRef(false);
 
     const [isDrag, setIsDrag] = useState(false);
     useEffect(() => {
@@ -118,12 +120,15 @@ const LabelComponent = ({
                 ).pixel;
 
                 const xPixel = widthAttr * line.xLoc;
+                const isSelected =
+                    line.oid === selectedLine?.parentLine.oid &&
+                    isCompletedReposition.current;
 
                 const labelOptions = [
                     {
                         type: 'Main' as LabelType,
                         text: formatLineLabel(line.textValue),
-                        backgroundColor: '#D1D1D1',
+                        backgroundColor: isSelected ? 'grey' : '#D1D1D1',
                         textColor: '#3C91FF',
                         borderColor: line.color,
                     },
@@ -145,7 +150,9 @@ const LabelComponent = ({
                               {
                                   type: 'Cancel' as LabelType,
                                   text: ' X ',
-                                  backgroundColor: '#D1D1D1',
+                                  backgroundColor: isSelected
+                                      ? 'grey'
+                                      : '#D1D1D1',
                                   textColor: '#3C91FF',
                                   borderColor: '#3C91FF',
                               },
@@ -207,6 +214,7 @@ const LabelComponent = ({
         zoomChanged,
         canvasSize,
         selectedLine,
+        isCompletedReposition.current,
     ]);
 
     useEffect(() => {
@@ -222,8 +230,10 @@ const LabelComponent = ({
             );
 
             if (isLabel) {
-                if (overlayCanvasRef.current)
+                if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
+                    overlayCanvasRef.current.style.cursor = 'pointer';
+                }
             } else {
                 if (overlayCanvasRef.current)
                     overlayCanvasRef.current.style.pointerEvents = 'none';
@@ -383,8 +393,12 @@ const LabelComponent = ({
                         );
 
                         if (found) {
-                            console.log({ found });
-                            if (found.parentLine.oid)
+                            const checkReposition = !isRepositioningSameLine(
+                                selectedLine,
+                                found,
+                                isCompletedReposition.current,
+                            );
+                            if (found.parentLine.oid && checkReposition)
                                 handleCancel(found.parentLine.oid);
                             console.log(found.parentLine.textValue);
                         }
@@ -435,12 +449,38 @@ const LabelComponent = ({
             if (isLabel) {
                 tempSelectedLine = isLabel;
                 originalPrice = isLabel.parentLine.yPrice;
+
+                if (
+                    isRepositioningSameLine(
+                        selectedLine,
+                        tempSelectedLine,
+                        isCompletedReposition.current,
+                    )
+                ) {
+                    if (overlayCanvasRef.current)
+                        overlayCanvasRef.current.style.cursor = 'not-allowed';
+
+                    return;
+                }
+                if (overlayCanvasRef.current)
+                    overlayCanvasRef.current.style.cursor = 'pointer';
+
                 setSelectedLine(isLabel);
                 setIsDrag(true);
             }
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
+            if (
+                isRepositioningSameLine(
+                    selectedLine,
+                    tempSelectedLine,
+                    isCompletedReposition.current,
+                )
+            ) {
+                return;
+            }
+
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
                 canvas.getBoundingClientRect(),
@@ -480,7 +520,12 @@ const LabelComponent = ({
                 !tempSelectedLine ||
                 originalPrice === undefined ||
                 tempSelectedLine.parentLine.oid === undefined ||
-                tempSelectedLine.parentLine.side === undefined
+                tempSelectedLine.parentLine.side === undefined ||
+                isRepositioningSameLine(
+                    selectedLine,
+                    tempSelectedLine,
+                    isCompletedReposition.current,
+                )
             ) {
                 return;
             }
@@ -505,6 +550,7 @@ const LabelComponent = ({
                     // ... other required parameters
                 } as LimitOrderParams; // Cast to the correct type
 
+                isCompletedReposition.current = true;
                 const limitOrderResult =
                     await executeLimitOrder(newOrderParams);
 
@@ -549,15 +595,18 @@ const LabelComponent = ({
                             : 'Unknown error occurred',
                     icon: 'error',
                 });
-            }
+            } finally {
+                isCompletedReposition.current = false;
 
-            tempSelectedLine = undefined;
-            setIsDrag(false);
-            setTimeout(() => {
-                if (overlayCanvasRef.current) {
-                    overlayCanvasRef.current.style.pointerEvents = 'none';
-                }
-            }, 300);
+                tempSelectedLine = undefined;
+                setIsDrag(false);
+                setTimeout(() => {
+                    if (overlayCanvasRef.current) {
+                        overlayCanvasRef.current.style.pointerEvents = 'none';
+                        overlayCanvasRef.current.style.cursor = 'default';
+                    }
+                }, 300);
+            }
         };
 
         const dragLines = d3
