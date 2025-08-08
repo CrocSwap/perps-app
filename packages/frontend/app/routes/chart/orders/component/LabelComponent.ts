@@ -420,7 +420,11 @@ const LabelComponent = ({
                 }
             }
         };
-    }, [chart, JSON.stringify(drawnLabelsRef.current)]);
+    }, [
+        chart,
+        JSON.stringify(drawnLabelsRef.current),
+        isCompletedReposition.current,
+    ]);
 
     function roundDownToTenth(value: number) {
         return Math.floor(value * 10) / 10;
@@ -476,7 +480,8 @@ const LabelComponent = ({
                     selectedLine,
                     tempSelectedLine,
                     isCompletedReposition.current,
-                )
+                ) ||
+                tempSelectedLine === undefined
             ) {
                 return;
             }
