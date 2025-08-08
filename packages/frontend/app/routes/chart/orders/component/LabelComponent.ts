@@ -451,13 +451,10 @@ const LabelComponent = ({
             );
 
             if (isLabel) {
-                tempSelectedLine = isLabel;
-                originalPrice = isLabel.parentLine.yPrice;
-
                 if (
                     isRepositioningSameLine(
                         selectedLine,
-                        tempSelectedLine,
+                        isLabel,
                         isCompletedReposition.current,
                     )
                 ) {
@@ -466,6 +463,9 @@ const LabelComponent = ({
 
                     return;
                 }
+                tempSelectedLine = isLabel;
+                originalPrice = isLabel.parentLine.yPrice;
+
                 if (overlayCanvasRef.current)
                     overlayCanvasRef.current.style.cursor = 'pointer';
 
