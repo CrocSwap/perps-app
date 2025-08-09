@@ -32,7 +32,7 @@
 .dropdownContainer {
     background: var(--bg-dark3, #0e0e14);
     position: absolute;
-    top: var(--dropdwon-top);
+    top: var(--dropdown-top);
     right: 0;
     width: var(--container-width);
     height: var(--container-height);

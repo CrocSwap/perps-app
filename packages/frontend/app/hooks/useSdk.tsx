@@ -101,6 +101,8 @@ export const SdkProvider: React.FC<{
 
     useEffect(() => {
         if (!internetConnected) {
+            stashSubscriptions();
+            stashWebsocket();
             setShouldReconnect(true);
         }
     }, [internetConnected]);

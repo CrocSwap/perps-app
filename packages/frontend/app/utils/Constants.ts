@@ -146,6 +146,8 @@ export const EXTERNAL_PAGE_URL_PREFIX = '/v2';
 
 export const MIN_VISIBLE_ORDER_LABEL_RATIO = 0.8;
 
+export const MIN_POSITION_USD_SIZE = 0.01;
+
 export const MARKET_API_URL =
     import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';

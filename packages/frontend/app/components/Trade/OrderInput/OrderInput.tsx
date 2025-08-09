@@ -36,7 +36,7 @@ import {
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
-import { blockExplorer } from '~/utils/Constants';
+import { blockExplorer, MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
@@ -495,17 +495,23 @@ function OrderInput({
         return formatNum(usdAvailableToTrade, 2);
     }, [usdAvailableToTrade, activeGroupSeparator]);
 
+    const currentPositionLessThanMinPositionSize =
+        Math.abs(currentPositionNotionalSize) * (markPx || 1) <
+        MIN_POSITION_USD_SIZE;
+
     const displayNumCurrentPosition = useMemo(() => {
-        return formatNum(
-            currentPositionNotionalSize,
-            6,
-            false,
-            false,
-            false,
-            false,
-            10000,
-            true,
-        );
+        return currentPositionLessThanMinPositionSize
+            ? formatNum(0, 2)
+            : formatNum(
+                  currentPositionNotionalSize,
+                  6,
+                  false,
+                  false,
+                  false,
+                  false,
+                  10000,
+                  true,
+              );
     }, [currentPositionNotionalSize, activeGroupSeparator]);
 
     const inputDetailsData = useMemo(

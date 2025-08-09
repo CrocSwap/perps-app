@@ -129,6 +129,14 @@ export class WebSocketInstance {
             errorCallback?: ErrCallback;
         }
     > = {};
+    private backupSubscriptions: Record<
+        number,
+        {
+            subscription: Subscription;
+            callback: Callback;
+            errorCallback?: ErrCallback;
+        }
+    > = {};
     private pingInterval: number | null = null;
     private stopped: boolean = false;
     private isDebug: boolean;
@@ -145,6 +153,10 @@ export class WebSocketInstance {
     private firstMessageLogged: boolean = false;
     private isConnecting: boolean = false;
     private reconnectTimeout: NodeJS.Timeout | null = null;
+    private reconnectAttempts: number = 0;
+    private readonly maxReconnectAttempts = 20; // Maximum number of reconnection attempts before giving up
+    private readonly initialReconnectDelay = 1000; // Start with 1 second
+    private readonly maxReconnectDelay = 30000; // Max 30 seconds between attempts
 
     // New properties for multi-socket support
     private readonly socketType: SocketType;
@@ -290,6 +302,69 @@ export class WebSocketInstance {
         }
     };
 
+    private fillQueuedSubs = () => {
+        for (const sub of Object.values(this.activeSubscriptions)) {
+            for (const activeSub of sub) {
+                if (
+                    this.queuedSubscriptions.some(
+                        (q) =>
+                            subscriptionToIdentifier(q.subscription) ===
+                            subscriptionToIdentifier(activeSub.subscription),
+                    )
+                ) {
+                    continue;
+                }
+                this.queuedSubscriptions.push({
+                    subscription: activeSub.subscription,
+                    active: activeSub,
+                });
+            }
+        }
+        for (const subId of Object.keys(this.allSubscriptions)) {
+            const sub = this.allSubscriptions[Number(subId)];
+            if (
+                this.queuedSubscriptions.some(
+                    (q) =>
+                        subscriptionToIdentifier(q.subscription) ===
+                        subscriptionToIdentifier(sub.subscription),
+                )
+            ) {
+                continue;
+            }
+            this.queuedSubscriptions.push({
+                subscription: sub.subscription,
+                active: {
+                    callback: sub.callback,
+                    subscriptionId: Number(subId),
+                    subscription: sub.subscription,
+                    errorCallback: sub.errorCallback,
+                },
+            });
+        }
+
+        for (const subId of Object.keys(this.backupSubscriptions)) {
+            const sub = this.backupSubscriptions[Number(subId)];
+            if (
+                this.queuedSubscriptions.some(
+                    (q) =>
+                        subscriptionToIdentifier(q.subscription) ===
+                        subscriptionToIdentifier(sub.subscription),
+                )
+            ) {
+                continue;
+            }
+            this.queuedSubscriptions.push({
+                subscription: sub.subscription,
+                active: {
+                    callback: sub.callback,
+                    subscriptionId: Number(subId),
+                    subscription: sub.subscription,
+                    errorCallback: sub.errorCallback,
+                },
+            });
+        }
+    };
+
     private sendPing = () => {
         if (
             this.stopped ||
@@ -312,6 +387,18 @@ export class WebSocketInstance {
                     `>>> [${this.socketName}] pong reconnect`,
                     new Date().toISOString(),
                 );
+                for (const subId of Object.keys(this.allSubscriptions)) {
+                    const sub = this.allSubscriptions[Number(subId)];
+                    this.backupSubscriptions[Number(subId)] = sub;
+                }
+
+                this.fillQueuedSubs();
+
+                console.log('>>> queued subs', this.queuedSubscriptions);
+                console.log(
+                    '>>> .............. . .- .- . -. -. - .- .- . ........ ',
+                );
+
                 this.reconnect();
             }
         }, PONG_CHECK_TIMEOUT_MS);
@@ -320,10 +407,16 @@ export class WebSocketInstance {
     };
 
     private onOpen = () => {
-        console.log(`[${this.socketName}] onOpen`);
+        console.log(`>>> [${this.socketName}] onOpen`);
+        console.log(
+            `>>> [${this.socketName}] queuedSubscriptions`,
+            this.queuedSubscriptions,
+        );
+        console.log(`>>> [${this.socketName}] ..................... `);
         this.wsReady = true;
         this.isConnecting = false;
         this.firstMessageLogged = false;
+        this.reconnectAttempts = 0; // Reset reconnect attempts on successful connection
         this.onConnectionChange?.(true);
 
         // send queued subs
@@ -403,7 +496,7 @@ export class WebSocketInstance {
 
     private onClose = (event: CloseEvent) => {
         console.log(
-            `[${this.socketName}] onClose - Code: ${event.code}, Reason: ${event.reason}, Clean: ${event.wasClean}`,
+            `>>> [${this.socketName}] onClose - Code: ${event.code}, Reason: ${event.reason}, Clean: ${event.wasClean}`,
         );
         this.wsReady = false;
         this.isConnecting = false;
@@ -425,11 +518,40 @@ export class WebSocketInstance {
                 `>>> [${this.socketName}] close reconnect`,
                 new Date().toISOString(),
             );
+            // Calculate delay with exponential backoff and jitter
+            const baseDelay = Math.min(
+                this.initialReconnectDelay *
+                    Math.pow(2, this.reconnectAttempts),
+                this.maxReconnectDelay,
+            );
+            const jitter = Math.random() * 1000; // Add up to 1s of jitter
+            const delay = Math.min(baseDelay + jitter, this.maxReconnectDelay);
+
+            console.log(
+                `>>> [${this.socketName}] Reconnecting in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`,
+            );
+
             this.reconnectTimeout = setTimeout(() => {
+                console.log('>>> reconnecting isStopped?', this.stopped);
                 if (!this.stopped) {
-                    this.connect(); // Call connect directly instead of reconnect
+                    this.reconnectAttempts++;
+                    this.fillQueuedSubs();
+
+                    console.log(
+                        '>>> -------------BEFORE RECONNECT------------------------------- ',
+                    );
+                    console.log('>>> queued subs', this.queuedSubscriptions);
+                    console.log(
+                        '>>> -------------------------------------------- ',
+                    );
+
+                    setTimeout(() => {
+                        this.activeSubscriptions = {};
+                        this.allSubscriptions = {};
+                        this.connect(); // Call connect directly instead of reconnect
+                    }, 200);
                 }
-            }, RECONNECT_TIMEOUT_MS);
+            }, delay);
         }
     };
 
@@ -548,6 +670,10 @@ export class WebSocketInstance {
         errorCallback?: ErrCallback,
     ) => {
         const identifier = subscriptionToIdentifier(subscription);
+
+        if (this.socketName === 'market') {
+            console.log('>>> subscribe', subscription, callback, existingId);
+        }
 
         const existingSubs = this.activeSubscriptions[identifier] || [];
         if (existingSubs.length > 0) {

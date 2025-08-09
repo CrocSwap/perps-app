@@ -277,7 +277,7 @@ export default function Trade() {
             <TradeRouteHandler />
             <WebDataConsumer />
             {symbol && (
-                <div className={styles.container}>
+                <div className={styles.containerNew}>
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                     >
@@ -315,35 +315,23 @@ export default function Trade() {
                         <div id='orderBookSection' className={styles.orderBook}>
                             <MemoizedOrderBookSection symbol={symbol} />
                         </div>
-                        <div
-                            id='tradeModulesSection'
-                            className={styles.tradeModules}
-                        >
-                            <OrderInput
-                                marginBucket={marginBucket}
-                                isAnyPortfolioModalOpen={
-                                    isAnyPortfolioModalOpen
-                                }
-                            />
-                        </div>
                     </section>
-                    <section
-                        id={'bottomSection'}
-                        className={styles.containerBottom}
-                    >
-                        <div className={styles.table} id='tutorial-trade-table'>
-                            <MemoizedTradeTable />
-                        </div>
-                        <div className={styles.wallet}>
-                            <DepositDropdown
-                                marginBucket={marginBucket}
-                                openDepositModal={openDepositModal}
-                                openWithdrawModal={openWithdrawModal}
-                                PortfolioModalsRenderer={
-                                    PortfolioModalsRenderer
-                                }
-                            />
-                        </div>
+                    <section className={styles.table} id='tutorial-trade-table'>
+                        <MemoizedTradeTable />
+                    </section>
+                    <section className={styles.order_input}>
+                        <OrderInput
+                            marginBucket={marginBucket}
+                            isAnyPortfolioModalOpen={isAnyPortfolioModalOpen}
+                        />
+                    </section>
+                    <section className={styles.wallet}>
+                        <DepositDropdown
+                            marginBucket={marginBucket}
+                            openDepositModal={openDepositModal}
+                            openWithdrawModal={openWithdrawModal}
+                            PortfolioModalsRenderer={PortfolioModalsRenderer}
+                        />
                     </section>
                 </div>
             )}

@@ -54,6 +54,8 @@ const UI_CONFIG = {
     MIN_SAFE_LOG_VALUE: 0.1,
 } as const;
 
+const WARNING_TIMEOUT_IN_MS = 2000;
+
 export default function LeverageSlider({
     value,
     onChange,
@@ -130,9 +132,11 @@ export default function LeverageSlider({
     // Warning state management
     const [sliderBelowMinimumLeverage, setSliderBelowMinimumLeverage] =
         useState(false);
-    const [warningTimeout, setWarningTimeout] = useState<NodeJS.Timeout | null>(
+    const [warningStartTime, setWarningStartTime] = useState<number | null>(
         null,
     );
+    const [minimumWarningShown, setMinimumWarningShown] = useState(false);
+    const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const sliderBelowMinimumLeverageDebounced = useDebounce(
         sliderBelowMinimumLeverage,
@@ -142,13 +146,75 @@ export default function LeverageSlider({
     const shouldShowMinimumConstraints =
         minimumValue !== undefined && minimumValue > 1;
 
+    // Clear any existing timeout
+    useEffect(() => {
+        return () => {
+            if (warningTimeoutRef.current) {
+                clearTimeout(warningTimeoutRef.current);
+                warningTimeoutRef.current = null;
+            }
+        };
+    }, []);
+
+    // Track when warning state changes
+    useEffect(() => {
+        const shouldShowWarning =
+            shouldShowMinimumConstraints &&
+            (sliderBelowMinimumLeverage
+                ? isDragging
+                    ? true
+                    : sliderBelowMinimumLeverageDebounced
+                : false);
+
+        if (shouldShowWarning) {
+            // Clear any existing timeout when showing warning
+            if (warningTimeoutRef.current) {
+                clearTimeout(warningTimeoutRef.current);
+                warningTimeoutRef.current = null;
+            }
+
+            if (!warningStartTime) {
+                // Start showing warning
+                setWarningStartTime(Date.now());
+                setMinimumWarningShown(true);
+            }
+        } else if (warningStartTime) {
+            // If warning is being hidden, ensure it's been shown for at least 2 seconds
+            const timeShown = Date.now() - warningStartTime;
+            const remainingTime = Math.max(
+                0,
+                WARNING_TIMEOUT_IN_MS - timeShown,
+            );
+
+            if (remainingTime > 0) {
+                // Set a timeout to hide the warning after the remaining time
+                warningTimeoutRef.current = setTimeout(() => {
+                    setWarningStartTime(null);
+                    setMinimumWarningShown(false);
+                    warningTimeoutRef.current = null;
+                }, remainingTime);
+            } else {
+                // Already shown for 2+ seconds, can hide immediately
+                setWarningStartTime(null);
+                setMinimumWarningShown(false);
+            }
+        }
+    }, [
+        sliderBelowMinimumLeverage,
+        sliderBelowMinimumLeverageDebounced,
+        isDragging,
+        shouldShowMinimumConstraints,
+        warningStartTime,
+    ]);
+
     const showMinimumWarning =
         shouldShowMinimumConstraints &&
-        (sliderBelowMinimumLeverage
-            ? isDragging
-                ? true
-                : sliderBelowMinimumLeverageDebounced
-            : false);
+        (minimumWarningShown ||
+            (sliderBelowMinimumLeverage
+                ? isDragging
+                    ? true
+                    : sliderBelowMinimumLeverageDebounced
+                : false));
 
     const [hasShownMinimumWarning, setHasShownMinimumWarning] = useState(false);
 
@@ -515,48 +581,50 @@ export default function LeverageSlider({
     useEffect(() => {
         if (!shouldShowMinimumConstraints) {
             setSliderBelowMinimumLeverage(false);
-            if (warningTimeout) {
-                clearTimeout(warningTimeout);
-                setWarningTimeout(null);
+            if (warningTimeoutRef.current) {
+                clearTimeout(warningTimeoutRef.current);
+                warningTimeoutRef.current = null;
             }
             return;
         }
-        const isCurrentAtMinimum = Math.abs(currentValue - minimumValue) < 0.01;
+
+        const isCurrentAtMinimum = minimumValue
+            ? Math.abs(currentValue - minimumValue) < 0.01
+            : false;
 
         if (shouldShowInteractiveWarning) {
             setSliderBelowMinimumLeverage(true);
-            if (warningTimeout) {
-                clearTimeout(warningTimeout);
-                setWarningTimeout(null);
+            if (warningTimeoutRef.current) {
+                clearTimeout(warningTimeoutRef.current);
+                warningTimeoutRef.current = null;
             }
         } else if (isCurrentAtMinimum && !hasShownMinimumWarning) {
             setSliderBelowMinimumLeverage(true);
             setHasShownMinimumWarning(true);
 
-            const timeout = setTimeout(() => {
+            warningTimeoutRef.current = setTimeout(() => {
                 setSliderBelowMinimumLeverage(false);
-                setWarningTimeout(null);
+                warningTimeoutRef.current = null;
             }, 3000);
-
-            setWarningTimeout(timeout);
         } else if (!isCurrentAtMinimum) {
             setHasShownMinimumWarning(false);
             setSliderBelowMinimumLeverage(false);
-            if (warningTimeout) {
-                clearTimeout(warningTimeout);
-                setWarningTimeout(null);
+            if (warningTimeoutRef.current) {
+                clearTimeout(warningTimeoutRef.current);
+                warningTimeoutRef.current = null;
             }
         } else if (!shouldShowInteractiveWarning && hasShownMinimumWarning) {
             setSliderBelowMinimumLeverage(false);
-            if (warningTimeout) {
-                clearTimeout(warningTimeout);
-                setWarningTimeout(null);
+            if (warningTimeoutRef.current) {
+                clearTimeout(warningTimeoutRef.current);
+                warningTimeoutRef.current = null;
             }
         }
 
         return () => {
-            if (warningTimeout) {
-                clearTimeout(warningTimeout);
+            if (warningTimeoutRef.current) {
+                clearTimeout(warningTimeoutRef.current);
+                warningTimeoutRef.current = null;
             }
         };
     }, [
@@ -564,7 +632,6 @@ export default function LeverageSlider({
         minimumValue,
         shouldShowInteractiveWarning,
         hasShownMinimumWarning,
-        warningTimeout,
         shouldShowMinimumConstraints,
     ]);
 
@@ -677,6 +744,17 @@ export default function LeverageSlider({
             const newValue = percentageToValue(percentage);
             setUnconstrainedSliderValue(newValue);
             const boundedValue = constrainValue(newValue);
+
+            // Reset warning state if user moves above minimum value
+            if (minimumValue && newValue > minimumValue) {
+                setSliderBelowMinimumLeverage(false);
+                if (warningTimeoutRef.current) {
+                    clearTimeout(warningTimeoutRef.current);
+                    warningTimeoutRef.current = null;
+                }
+                setWarningStartTime(null);
+                setMinimumWarningShown(false);
+            }
 
             handleSmoothLeverageChange(boundedValue);
         };

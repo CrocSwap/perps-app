@@ -17,6 +17,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import styles from './DepositDropdown.module.css';
 
 interface propsIF {
@@ -112,6 +113,9 @@ function DepositDropdown(props: propsIF) {
     // Memoize color values
     const bsColor = useMemo(() => getBsColor(), [getBsColor]);
 
+    const unrealizedPnlLessThanMinPositionSize =
+        Math.abs(unrealizedPnlNum) < MIN_POSITION_USD_SIZE;
+
     // Memoize overview data
     const overviewData = useMemo(
         () => [
@@ -124,13 +128,15 @@ function DepositDropdown(props: propsIF) {
             {
                 label: 'Unrealized PNL',
                 tooltipContent: 'Unrealized profits and losses',
-                value: formatNum(unrealizedPnlNum, 2, true, true),
+                value: unrealizedPnlLessThanMinPositionSize
+                    ? formatNum(0, 2, true, true)
+                    : formatNum(unrealizedPnlNum, 2, true, true),
                 color:
-                    unrealizedPnlNum > 0
-                        ? bsColor.buy
-                        : unrealizedPnlNum < 0
-                          ? bsColor.sell
-                          : 'var(--text-)',
+                    !unrealizedPnlNum || unrealizedPnlLessThanMinPositionSize
+                        ? 'var(--text-)'
+                        : unrealizedPnlNum > 0
+                          ? bsColor.buy
+                          : bsColor.sell,
             },
             // {
             //     label: 'Cross Margin Ratio',

@@ -18,6 +18,7 @@ import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
+import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -144,6 +145,13 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             } else if (modalContent === 'limitChase') {
                 return (
                     <LimitCloseModal
+                        position={position}
+                        close={modalCtrl.close}
+                    />
+                );
+            } else if (modalContent === 'marketClose') {
+                return (
+                    <MarketCloseModal
                         position={position}
                         close={modalCtrl.close}
                     />
@@ -356,12 +364,21 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 <div className={`${styles.cell} ${styles.closeCell}`}>
                     <div className={styles.actionContainer}>
                         {/* <button className={styles.actionButton}>Limit</button> */}
-                        <button
+                        {/* <button
                             className={styles.actionButton}
                             onClick={handleMarketClose}
                             disabled={isClosing}
                         >
                             {isClosing ? 'Closing...' : 'Market'}
+                        </button> */}
+                        <button
+                            className={styles.actionButton}
+                            onClick={() => {
+                                setModalContent('marketClose');
+                                modalCtrl.open();
+                            }}
+                        >
+                            Market
                         </button>
                         <button
                             className={styles.actionButton}

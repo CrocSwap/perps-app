@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import { useLimitOrderService } from '~/hooks/useLimitOrderService';
+import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import {
     type NotificationStoreIF,
@@ -13,42 +13,33 @@ import { blockExplorer } from '~/utils/Constants';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
-import PriceInput from '../OrderInput/PriceInput/PriceInput';
 import SizeInput from '../OrderInput/SizeInput/SizeInput';
-import styles from './LimitCloseModal.module.css';
+import styles from './MarketCloseModal.module.css';
 
 interface PropsIF {
     close: () => void;
     position: PositionIF;
 }
 
-export default function LimitCloseModal({ close, position }: PropsIF) {
-    const { parseFormattedNum, formatNumWithOnlyDecimals, formatNum } =
-        useNumFormatter();
+export default function MarketCloseModal({ close, position }: PropsIF) {
+    const { formatNumWithOnlyDecimals } = useNumFormatter();
 
     const { symbolInfo } = useTradeDataStore();
 
-    const MIN_ORDER_VALUE = 1;
-
-    const { executeLimitOrder } = useLimitOrderService();
+    const { executeMarketOrder } = useMarketOrderService();
+    const { buys, sells } = useOrderBookStore();
 
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
-    const isPositionLong = position.szi > 0;
+    const { parseFormattedNum, formatNum } = useNumFormatter();
 
-    const { buys, sells } = useOrderBookStore();
+    const MIN_ORDER_VALUE = 1;
+
+    const isPositionLong = position.szi > 0;
 
     const markPx = symbolInfo?.markPx;
 
-    const getMidPrice = () => {
-        if (!buys.length || !sells.length) return null;
-        const midPrice = (buys[0].px + sells[0].px) / 2;
-        return midPrice;
-    };
-
-    const [price, setPrice] = useState(String(getMidPrice()));
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
-    const [isMidModeActive, setIsMidModeActive] = useState(false);
 
     const originalSize = Math.abs(position.szi);
 
@@ -59,25 +50,18 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const [isOverLimit, setIsOverLimit] = useState(false);
     const [isEditingSizeInput, setIsEditingSizeInput] = useState(false);
 
-    // the useeffect was updating and reformatting user input so I added this to track it to differentiate between the input and the slider
+    // Track if the last change was from the slider
     const lastChangedBySlider = useRef(true);
 
-    const estimatedPNL = isPositionLong
-        ? notionalSymbolQtyNum * (parseFormattedNum(price) - position.entryPx)
-        : notionalSymbolQtyNum * (position.entryPx - parseFormattedNum(price));
+    const estimatedPNL = !markPx
+        ? 0
+        : isPositionLong
+          ? notionalSymbolQtyNum * (markPx - position.entryPx)
+          : notionalSymbolQtyNum * (position.entryPx - markPx);
 
-    useEffect(() => {
-        if (isMidModeActive) {
-            setMidPriceAsPriceInput();
-        }
-    }, [
-        isMidModeActive,
-        !buys.length,
-        !sells.length,
-        buys?.[0]?.px,
-        sells?.[0]?.px,
-        markPx,
-    ]);
+    const isLessThanMinValue = useMemo(() => {
+        return notionalSymbolQtyNum * (markPx || 1) < MIN_ORDER_VALUE;
+    }, [markPx, notionalSymbolQtyNum]);
 
     // Initialize sizeDisplay based on selectedMode
     useEffect(() => {
@@ -153,17 +137,6 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         }
     }, [positionSize, originalSize]);
 
-    useEffect(() => {
-        console.log(
-            'Mode switched to:',
-            selectedMode,
-            'sizeDisplay:',
-            sizeDisplay,
-            'markPx:',
-            markPx,
-        );
-    }, [selectedMode]);
-
     const handleSizeChange = (
         val: string | React.ChangeEvent<HTMLInputElement>,
     ) => {
@@ -225,12 +198,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         return () => clearTimeout(timeout);
     }, [sizeDisplay, isEditingSizeInput]);
 
-    function roundDownToTenth(value: number) {
-        return Math.floor(value * 10) / 10;
-    }
-
     const handlePositionSizeChange = (val: number) => {
-        // for slider input
         lastChangedBySlider.current = true;
         setPositionSize(val);
         setIsOverLimit(val === 0);
@@ -245,29 +213,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         return '';
     };
 
-    const setMidPriceAsPriceInput = () => {
-        if (buys.length > 0 && sells.length > 0) {
-            const resolution = buys[0].px - buys[1].px;
-            const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
-            if (!midOrMarkPrice) return;
-            const formattedMidPrice = formatNumWithOnlyDecimals(
-                midOrMarkPrice,
-                6,
-                true,
-            );
-            setPrice(formattedMidPrice);
-            setIsMidModeActive(true);
-        }
-    };
     const notifications: NotificationStoreIF = useNotificationStore();
 
-    const limitPrice = parseFormattedNum(price);
-
-    const isLessThanMinValue = useMemo(() => {
-        return notionalSymbolQtyNum * limitPrice < MIN_ORDER_VALUE;
-    }, [limitPrice, notionalSymbolQtyNum]);
-
-    async function submitLimitOrder(side: 'buy' | 'sell'): Promise<void> {
+    // fn to execute market close
+    async function executeMarketClose(): Promise<void> {
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
             notifications.add({
@@ -279,40 +228,34 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             return;
         }
 
-        // Validate price
-        if (!limitPrice || limitPrice <= 0) {
-            notifications.add({
-                title: 'Invalid Price',
-                message: 'Please enter a valid limit price',
-                icon: 'error',
-            });
-            close();
-            return;
-        }
-
         setIsProcessingOrder(true);
 
-        const usdValueOfOrderStr = formatNum(
-            notionalSymbolQtyNum * limitPrice,
-            2,
-            true,
-            true,
-        );
-
-        console.log({ usdValueOfOrderStr });
-
         try {
-            // Execute limit order
-            const result = await executeLimitOrder({
+            // Get order book prices for the closing order
+            const closingSide = isPositionLong ? 'sell' : 'buy';
+            const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
+            const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
+
+            // Execute market order in opposite direction to close position
+            const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
-                price: roundDownToTenth(limitPrice),
-                side,
+                side: closingSide,
+                leverage: position.leverage?.value,
+                bestBidPrice: closingSide === 'sell' ? bestBidPrice : undefined,
+                bestAskPrice: closingSide === 'buy' ? bestAskPrice : undefined,
             });
+
+            const usdValueOfOrderStr = formatNum(
+                notionalSymbolQtyNum * (markPx || 0),
+                2,
+                true,
+                true,
+            );
 
             if (result.success) {
                 notifications.add({
-                    title: 'Limit Order Placed',
-                    message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    title: 'Position Closed',
+                    message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -321,8 +264,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 });
             } else {
                 notifications.add({
-                    title: 'Limit Order Failed',
-                    message: result.error || 'Failed to place limit order',
+                    title: 'Close Failed',
+                    message: result.error || 'Failed to close position',
                     icon: 'error',
                     removeAfter: 10000,
                     txLink: result.signature
@@ -331,9 +274,9 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 });
             }
         } catch (error) {
-            console.error(`❌ Error submitting limit ${side} order:`, error);
+            console.error('❌ Error closing position:', error);
             notifications.add({
-                title: 'Limit Order Failed',
+                title: 'Close Failed',
                 message:
                     error instanceof Error
                         ? error.message
@@ -350,12 +293,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const handleConfirm = () => {
         if (isProcessingOrder || isOverLimit) return;
 
-        console.log('confirm');
-        if (isPositionLong) {
-            submitLimitOrder('sell');
-        } else {
-            submitLimitOrder('buy');
-        }
+        console.log('confirm market close');
+        executeMarketClose();
     };
 
     useEffect(() => {
@@ -412,34 +351,13 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     }, [positionSize, isProcessingOrder, isOverLimit, close]);
 
     return (
-        <Modal title='Limit Close' close={close}>
+        <Modal title='Market Close' close={close}>
             <div className={styles.container}>
                 <p className={styles.description}>
-                    This will send an order to close your position at the limit
-                    price.
+                    This will send an order to close your position at the
+                    current market price.
                 </p>
                 <div className={styles.content}>
-                    <PriceInput
-                        value={price}
-                        onChange={(val) => {
-                            setIsMidModeActive(false);
-                            if (typeof val === 'string') {
-                                setPrice(val);
-                            } else if (val?.target?.value !== undefined) {
-                                setPrice(val.target.value);
-                            }
-                        }}
-                        onBlur={(e) => console.log('Price blur', e)}
-                        onKeyDown={(e) => console.log('Price keydown', e.key)}
-                        className=''
-                        ariaLabel='price-input'
-                        showMidButton={true}
-                        setMidPriceAsPriceInput={setMidPriceAsPriceInput}
-                        isMidModeActive={isMidModeActive}
-                        setIsMidModeActive={setIsMidModeActive}
-                        isModal
-                    />
-
                     <SizeInput
                         value={sizeDisplay}
                         onChange={handleSizeChange}
@@ -466,7 +384,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                             </div>
                         )}
                     </div>
-                    {price && (
+                    {markPx && (
                         <p
                             className={
                                 estimatedPNL >= 0

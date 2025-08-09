@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import type { LineData } from './component/LineComponent';
 import { type LineLabel } from './customOrderLineUtils';
 import { LIQ_PRICE_LINE_COLOR } from './orderLineUtils';
@@ -20,6 +21,7 @@ export const usePositionOrderLines = (): LineData[] => {
     const filteredPositions = useMemo(() => {
         return positions
             .filter((i) => i.coin === symbol)
+            .filter((i) => Math.abs(i.szi) * i.entryPx > MIN_POSITION_USD_SIZE)
             .map((i) => ({
                 price: i.entryPx,
                 pnl: i.unrealizedPnl,

@@ -5,11 +5,11 @@ import {
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useState } from 'react';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import {
-    DFLT_EMBER_MARKET,
-    getUserMarginBucket,
-    USD_MINT,
-} from '@crocswap-libs/ambient-ember';
+// import {
+//     DFLT_EMBER_MARKET,
+//     getUserMarginBucket,
+//     USD_MINT,
+// } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
@@ -27,6 +27,9 @@ import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
+import { useShortScreen } from '~/hooks/useMediaQuery';
+// import WalletDropdown from './WalletDropdown/WalletDropdown';
+import DepositDropdown from './DepositDropdown/DepositDropdown';
 
 export default function PageHeader() {
     const sessionState = useSession();
@@ -104,7 +107,9 @@ export default function PageHeader() {
         [],
     );
 
-    const { openDepositModal, PortfolioModalsRenderer } = usePortfolioModals();
+    const isShortScreen: boolean = useShortScreen();
+
+    const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } = usePortfolioModals();
 
     // Update TradeDataStore when unified margin data changes
     useEffect(() => {
@@ -198,10 +203,25 @@ export default function PageHeader() {
                         >
                             <button
                                 className={styles.depositButton}
-                                onClick={() => openDepositModal()}
+                                onClick={() => {
+                                    if (isShortScreen) {
+                                        setIsDepositDropdownOpen(!isDepositDropdownOpen);
+                                    } else {
+                                        openDepositModal();
+                                    }
+                                }}
                             >
-                                Deposit
+                                { isShortScreen ? 'Transfer' : 'Deposit' }
                             </button>
+                            {isDepositDropdownOpen && (
+                                <DepositDropdown
+                                    isDropdown
+                                    marginBucket={marginBucket}
+                                    openDepositModal={openDepositModal}
+                                    openWithdrawModal={openWithdrawModal}
+                                    PortfolioModalsRenderer={PortfolioModalsRenderer}
+                                />
+                            )}
                         </section>
                     )}
 
