@@ -1,4 +1,4 @@
-.mainContainer {
+.order_input {
     --dropdown-height: 32px;
     --data-content-height: 16px;
     --button-height: 25px;
@@ -14,6 +14,8 @@
 
     border-radius: var(--radius-m);
     background-color: var(--bg-dark2, #111117);
+    /* this prevents an overflow in the DOM during animation */
+    overflow-x: hidden;
 }
 
 .mainContent {

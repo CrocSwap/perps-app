@@ -35,6 +35,7 @@ import {
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import { blockExplorer, MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
@@ -237,7 +238,10 @@ function OrderInput({
 
     const { buys, sells } = useOrderBookStore();
 
-    const markPx = symbolInfo?.markPx;
+    // backup mark price for when symbolInfo not available
+    // Get Pyth price for the current symbol
+    const pythPriceData = usePythPrice(symbol);
+    const markPx = symbolInfo?.markPx || pythPriceData?.price;
 
     const {
         parseFormattedNum,
@@ -1300,7 +1304,7 @@ function OrderInput({
                 // });
             }
             // Get best ask price for buy order
-            const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
+            const bestAskPrice = sells.length > 0 ? sells[0].px : markPx;
 
             // Execute the market buy order
             const result = await executeMarketOrder({
@@ -1384,7 +1388,7 @@ function OrderInput({
                 // });
             }
             // Get best bid price for sell order
-            const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
+            const bestBidPrice = buys.length > 0 ? buys[0].px : markPx;
 
             // Execute the market sell order
             const result = await executeMarketOrder({
@@ -1395,9 +1399,8 @@ function OrderInput({
             });
 
             const usdValueOfOrderStr = formatNum(
-                roundDownToHundredth(
-                    notionalSymbolQtyNum * (bestBidPrice || 1),
-                ),
+                Math.round(notionalSymbolQtyNum * (bestBidPrice || 1) * 100) /
+                    100,
                 2,
                 true,
                 true,
@@ -1490,7 +1493,7 @@ function OrderInput({
             });
 
             const usdValueOfOrderStr = formatNum(
-                roundDownToHundredth(notionalSymbolQtyNum * limitPrice),
+                Math.round(notionalSymbolQtyNum * (markPx || 1) * 100) / 100,
                 2,
                 true,
                 true,
@@ -1581,7 +1584,7 @@ function OrderInput({
             });
 
             const usdValueOfOrderStr = formatNum(
-                roundDownToHundredth(notionalSymbolQtyNum * limitPrice),
+                Math.round(notionalSymbolQtyNum * (markPx || 1) * 100) / 100,
                 2,
                 true,
                 true,
@@ -1634,10 +1637,10 @@ function OrderInput({
     // hook to bind action to close launchpad to the DOM
     useKeydown('Escape', () => setShowLaunchpad(false));
 
-    const formattedSizeDisplay = formatNum(
-        parseFormattedNum(sizeDisplay),
-        selectedMode === 'symbol' ? 6 : 2,
-    );
+    // const formattedSizeDisplay = formatNum(
+    //     parseFormattedNum(sizeDisplay),
+    //     selectedMode === 'symbol' ? 6 : 2,
+    // );
 
     const [submitButtonRecentlyClicked, setSubmitButtonRecentlyClicked] =
         useState(false);
@@ -1927,7 +1930,7 @@ function OrderInput({
               : 'Submit';
 
     return (
-        <div ref={orderInputRef} className={styles.mainContainer}>
+        <div ref={orderInputRef} className={styles.order_input}>
             <AnimatePresence mode='wait'>
                 {showLaunchpad ? (
                     <motion.div
@@ -2153,12 +2156,19 @@ function OrderInput({
                         <ConfirmationModal
                             tx='market_buy'
                             size={{
-                                qty: formattedSizeDisplay,
-                                denom:
-                                    selectedMode === 'symbol'
-                                        ? symbolInfo?.coin || ''
-                                        : 'USD',
+                                qty: formatNum(
+                                    notionalSymbolQtyNum,
+                                    6,
+                                    false,
+                                    false,
+                                    false,
+                                    false,
+                                    0,
+                                    true,
+                                ),
+                                denom: symbolInfo?.coin || '',
                             }}
+                            usdOrderValue={usdOrderValue}
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             toggleEnabled={() =>
                                 activeOptions.toggle('skipOpenOrderConfirm')
@@ -2173,12 +2183,19 @@ function OrderInput({
                         <ConfirmationModal
                             tx='market_sell'
                             size={{
-                                qty: formattedSizeDisplay,
-                                denom:
-                                    selectedMode === 'symbol'
-                                        ? symbolInfo?.coin || ''
-                                        : 'USD',
+                                qty: formatNum(
+                                    notionalSymbolQtyNum,
+                                    6,
+                                    false,
+                                    false,
+                                    false,
+                                    false,
+                                    0,
+                                    true,
+                                ),
+                                denom: symbolInfo?.coin || '',
                             }}
+                            usdOrderValue={usdOrderValue}
                             submitFn={submitMarketSell}
                             toggleEnabled={() =>
                                 activeOptions.toggle('skipOpenOrderConfirm')
@@ -2193,13 +2210,29 @@ function OrderInput({
                         <ConfirmationModal
                             tx='limit_buy'
                             size={{
-                                qty: formattedSizeDisplay,
-                                denom:
-                                    selectedMode === 'symbol'
-                                        ? symbolInfo?.coin || ''
-                                        : 'USD',
+                                qty: formatNum(
+                                    notionalSymbolQtyNum,
+                                    6,
+                                    false,
+                                    false,
+                                    false,
+                                    false,
+                                    0,
+                                    true,
+                                ),
+                                denom: symbolInfo?.coin || '',
                             }}
-                            limitPrice={price}
+                            usdOrderValue={usdOrderValue}
+                            limitPrice={formatNum(
+                                parseFormattedNum(price),
+                                2,
+                                true,
+                                true,
+                                false,
+                                false,
+                                0,
+                                true,
+                            )}
                             submitFn={submitLimitBuy}
                             toggleEnabled={() =>
                                 activeOptions.toggle('skipOpenOrderConfirm')
@@ -2214,13 +2247,29 @@ function OrderInput({
                         <ConfirmationModal
                             tx='limit_sell'
                             size={{
-                                qty: formattedSizeDisplay,
-                                denom:
-                                    selectedMode === 'symbol'
-                                        ? symbolInfo?.coin || ''
-                                        : 'USD',
+                                qty: formatNum(
+                                    notionalSymbolQtyNum,
+                                    6,
+                                    false,
+                                    false,
+                                    false,
+                                    false,
+                                    0,
+                                    true,
+                                ),
+                                denom: symbolInfo?.coin || '',
                             }}
-                            limitPrice={price}
+                            usdOrderValue={usdOrderValue}
+                            limitPrice={formatNum(
+                                parseFormattedNum(price),
+                                2,
+                                true,
+                                true,
+                                false,
+                                false,
+                                0,
+                                true,
+                            )}
                             submitFn={submitLimitSell}
                             toggleEnabled={() =>
                                 activeOptions.toggle('skipOpenOrderConfirm')

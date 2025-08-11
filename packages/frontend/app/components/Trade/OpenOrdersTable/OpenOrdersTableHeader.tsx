@@ -14,12 +14,16 @@ interface OpenOrdersTableHeaderProps {
     sortBy: OrderDataSortBy;
     sortDirection: TableSortDirection;
     sortClickHandler: (key: OrderDataSortBy) => void;
+    hasActiveOrders?: boolean;
+    onCancelAll?: () => void;
 }
 
 export default function OpenOrdersTableHeader({
     sortBy,
     sortDirection,
     sortClickHandler,
+    hasActiveOrders = false,
+    onCancelAll,
 }: OpenOrdersTableHeaderProps) {
     const showTpSl = false;
 
@@ -95,7 +99,7 @@ export default function OpenOrdersTableHeader({
               ]
             : []),
         {
-            name: 'Cancel',
+            name: 'Cancel All',
             key: 'cancel',
             sortable: false,
             className: styles.cancelCell,
@@ -116,15 +120,32 @@ export default function OpenOrdersTableHeader({
                         }
                     }}
                 >
-                    {header.name}
-                    {header.sortable && (
-                        <SortIcon
-                            sortDirection={
-                                sortDirection && header.key === sortBy
-                                    ? sortDirection
+                    {header.key === 'cancel' ? (
+                        <button
+                            className={`${styles.cancelButton} ${!hasActiveOrders ? styles.disabled : ''}`}
+                            onClick={
+                                hasActiveOrders && onCancelAll
+                                    ? onCancelAll
                                     : undefined
                             }
-                        />
+                            disabled={!hasActiveOrders}
+                            type='button'
+                        >
+                            Cancel All
+                        </button>
+                    ) : (
+                        <>
+                            {header.name}
+                            {header.sortable && (
+                                <SortIcon
+                                    sortDirection={
+                                        sortDirection && header.key === sortBy
+                                            ? sortDirection
+                                            : undefined
+                                    }
+                                />
+                            )}
+                        </>
                     )}
                 </div>
             ))}

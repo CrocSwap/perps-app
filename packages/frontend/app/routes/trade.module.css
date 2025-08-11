@@ -107,8 +107,7 @@ body {
 }
 
 .containerTop.orderBookLarge {
-    grid-template-columns:
-        1fr var(--order-book-width-desktop-large-doubled);
+    grid-template-columns: 1fr var(--order-book-width-desktop-large-doubled);
 }
 
 .containerBottom {
@@ -191,15 +190,11 @@ body {
 /* Desktop styles (1920px and above) */
 @media only screen and (min-width: 1920px) {
     .containerTop {
-        grid-template-columns: 1fr var(--order-book-width-desktop-large) var(
-                --trade-module-width-desktop-large
-            );
+        grid-template-columns: 1fr var(--order-book-width-desktop-large);
     }
 
     .containerTop.orderBookLarge {
-        grid-template-columns:
-            1fr var(--order-book-width-desktop-large-doubled)
-            var(--trade-module-width-desktop-large);
+        grid-template-columns: 1fr var(--order-book-width-desktop-large-doubled);
     }
     .containerBottom {
         grid-template-columns: 1fr var(

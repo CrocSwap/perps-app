@@ -87,11 +87,12 @@
 .cancelButton:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    color: var(--text2);
 }
 
-.cancelButton:disabled:hover {
+/* .cancelButton:disabled:hover {
     color: var(--accent1, #7371fc);
-}
+} */
 
 .longDirection {
     color: var(--green, #4cd471);

@@ -16,9 +16,10 @@ export default defineConfig({
         noExternal: ['@fogo/sessions-sdk-react'],
     },
     resolve: {
-        alias: {
-            'node-fetch': 'isomorphic-fetch',
-        },
+        alias: [
+            { find: '~', replacement: '/app' },
+            { find: 'node-fetch', replacement: 'isomorphic-fetch' },
+        ],
     },
     plugins: [
         nodePolyfills({

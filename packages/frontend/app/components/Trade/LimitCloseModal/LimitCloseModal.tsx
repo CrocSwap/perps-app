@@ -28,6 +28,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
     const { symbolInfo } = useTradeDataStore();
 
+    const markPx = symbolInfo?.markPx || 1;
+
     const MIN_ORDER_VALUE = 1;
 
     const { executeLimitOrder } = useLimitOrderService();
@@ -37,8 +39,6 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const isPositionLong = position.szi > 0;
 
     const { buys, sells } = useOrderBookStore();
-
-    const markPx = symbolInfo?.markPx;
 
     const getMidPrice = () => {
         if (!buys.length || !sells.length) return null;
@@ -293,13 +293,11 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         setIsProcessingOrder(true);
 
         const usdValueOfOrderStr = formatNum(
-            notionalSymbolQtyNum * limitPrice,
+            notionalSymbolQtyNum * markPx,
             2,
             true,
             true,
         );
-
-        console.log({ usdValueOfOrderStr });
 
         try {
             // Execute limit order

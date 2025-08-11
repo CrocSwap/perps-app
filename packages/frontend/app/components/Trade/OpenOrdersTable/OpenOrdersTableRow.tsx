@@ -4,6 +4,7 @@ import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
@@ -37,6 +38,8 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
     const { executeCancelOrder } = useCancelOrderService();
     const [isCancelling, setIsCancelling] = useState(false);
 
+    const markPx = useTradeDataStore((state) => state.symbolInfo?.markPx || 1);
+
     const showTpSl = false;
 
     const handleCancel = async () => {
@@ -65,7 +68,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             });
 
             const usdValueOfOrderStr = formatNum(
-                order.sz * order.limitPx,
+                order.sz * markPx,
                 2,
                 true,
                 true,

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
-import { filter } from 'd3';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import useNumFormatter from '~/hooks/useNumFormatter';
