@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './TakeProfitsModal.module.css';
 import { BsChevronDown } from 'react-icons/bs';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
@@ -14,10 +14,12 @@ interface TPSLFormData {
     configureAmount: boolean;
     limitPrice: boolean;
 }
+
 interface PropIF {
     closeTPModal: () => void;
     position: PositionIF;
 }
+
 export default function TakeProfitsModal(props: PropIF) {
     const { closeTPModal, position } = props;
 
@@ -31,6 +33,63 @@ export default function TakeProfitsModal(props: PropIF) {
         configureAmount: false,
         limitPrice: false,
     });
+
+    const calculateExpectedProfit = (): number | null => {
+        console.log('Calculate expected profit:', {
+            gain: formData.gain,
+            currency: formData.gainCurrency,
+            position: position,
+        });
+        return null;
+    };
+
+    const calculateExpectedLoss = (): number | null => {
+        console.log('Calculate expected loss:', {
+            loss: formData.loss,
+            currency: formData.lossCurrency,
+            position: position,
+        });
+        return null;
+    };
+
+    const updateTPPriceFromGain = (gainValue: string) => {
+        console.log('Update TP price from gain:', {
+            gain: gainValue,
+            currency: formData.gainCurrency,
+            position: position,
+        });
+    };
+
+    const updateSLPriceFromLoss = (lossValue: string) => {
+        console.log('Update SL price from loss:', {
+            loss: lossValue,
+            currency: formData.lossCurrency,
+            position: position,
+        });
+    };
+
+    const placeTakeProfitOrder = async (): Promise<void> => {
+        console.log('Place Take Profit order:', {
+            coin: position.coin,
+            price: formData.tpPrice,
+            quantity: Math.abs(position.szi),
+            side: position.szi > 0 ? 'sell' : 'buy',
+            configureAmount: formData.configureAmount,
+            limitPrice: formData.limitPrice,
+        });
+    };
+
+    const placeStopLossOrder = async (): Promise<void> => {
+        console.log('Place Stop Loss order:', {
+            coin: position.coin,
+            price: formData.slPrice,
+            quantity: Math.abs(position.szi),
+            side: position.szi > 0 ? 'sell' : 'buy',
+            configureAmount: formData.configureAmount,
+            limitPrice: formData.limitPrice,
+        });
+    };
+
     const infoData = [
         { label: 'Market', value: position.coin },
         {
@@ -38,7 +97,7 @@ export default function TakeProfitsModal(props: PropIF) {
             value: `${Math.abs(position.szi)} ${position.coin}`,
         },
         { label: 'Entry Price', value: position.entryPx.toLocaleString() },
-        { label: 'Mark Price', value: 'Loading...' },
+        { label: 'Mark Price', value: '...' },
     ];
 
     const handleInputChange = (
@@ -49,6 +108,12 @@ export default function TakeProfitsModal(props: PropIF) {
             ...prev,
             [field]: value,
         }));
+
+        if (field === 'gain' && typeof value === 'string') {
+            updateTPPriceFromGain(value);
+        } else if (field === 'loss' && typeof value === 'string') {
+            updateSLPriceFromLoss(value);
+        }
     };
 
     const handleCurrencyToggle = (field: 'gainCurrency' | 'lossCurrency') => {
@@ -56,25 +121,66 @@ export default function TakeProfitsModal(props: PropIF) {
             ...prev,
             [field]: prev[field] === '$' ? '%' : '$',
         }));
+
+        console.log(
+            `${field} changed to:`,
+            formData[field] === '$' ? '%' : '$',
+        );
+
+        // Recalculate price when currency changes
+        if (field === 'gainCurrency' && formData.gain) {
+            updateTPPriceFromGain(formData.gain);
+        } else if (field === 'lossCurrency' && formData.loss) {
+            updateSLPriceFromLoss(formData.loss);
+        }
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (!isFormValid()) {
             return;
         }
+
         console.log('Form submitted:', formData);
-        closeTPModal();
+
+        try {
+            if (formData.tpPrice) {
+                await placeTakeProfitOrder();
+            }
+
+            if (formData.slPrice) {
+                await placeStopLossOrder();
+            }
+
+            closeTPModal();
+        } catch (error) {
+            console.error('Error placing TP/SL orders:', error);
+        }
     };
 
     const isFormValid = () => {
-        // Check if at least one TP or SL pair is filled
-        const hasTpData =
-            formData.tpPrice.trim() !== '' && formData.gain.trim() !== '';
-        const hasSlData =
-            formData.slPrice.trim() !== '' && formData.loss.trim() !== '';
-
+        const hasTpData = formData.tpPrice.trim() !== '';
+        const hasSlData = formData.slPrice.trim() !== '';
         return hasTpData || hasSlData;
     };
+
+    const expectedProfit = useMemo(() => {
+        console.log('Calculate expected profit:', {
+            gain: formData.gain,
+            currency: formData.gainCurrency,
+            position: position,
+        });
+        return null;
+    }, [formData.gain, formData.gainCurrency, position]);
+
+    const expectedLoss = useMemo(() => {
+        console.log('Calculate expected loss:', {
+            loss: formData.loss,
+            currency: formData.lossCurrency,
+            position: position,
+        });
+        return null;
+    }, [formData.loss, formData.lossCurrency, position]);
+
     return (
         <div className={styles.container}>
             <section className={styles.infoContainer}>
@@ -95,7 +201,7 @@ export default function TakeProfitsModal(props: PropIF) {
                             onChange={(e) =>
                                 handleInputChange('tpPrice', e.target.value)
                             }
-                            placeholder='0.00'
+                            placeholder='Take Profit Price'
                         />
                     </div>
                     <div className={styles.inputWithDropdown}>
@@ -105,7 +211,7 @@ export default function TakeProfitsModal(props: PropIF) {
                             onChange={(e) =>
                                 handleInputChange('gain', e.target.value)
                             }
-                            placeholder='0.00'
+                            placeholder='Gain'
                         />
                         <button
                             onClick={() => handleCurrencyToggle('gainCurrency')}
@@ -118,6 +224,9 @@ export default function TakeProfitsModal(props: PropIF) {
                 {formData.gain && (
                     <span className={styles.expectedProfitText}>
                         Expected Profit:{' '}
+                        {expectedProfit
+                            ? `$${expectedProfit.toFixed(2)}`
+                            : 'Calculating...'}
                     </span>
                 )}
 
@@ -129,7 +238,7 @@ export default function TakeProfitsModal(props: PropIF) {
                             onChange={(e) =>
                                 handleInputChange('slPrice', e.target.value)
                             }
-                            placeholder='0.00'
+                            placeholder='Stop Loss Price'
                         />
                     </div>
                     <div className={styles.inputWithDropdown}>
@@ -139,7 +248,7 @@ export default function TakeProfitsModal(props: PropIF) {
                             onChange={(e) =>
                                 handleInputChange('loss', e.target.value)
                             }
-                            placeholder='0.00'
+                            placeholder='Loss'
                         />
                         <button
                             onClick={() => handleCurrencyToggle('lossCurrency')}
@@ -151,7 +260,10 @@ export default function TakeProfitsModal(props: PropIF) {
                 </div>
                 {formData.loss && (
                     <span className={styles.expectedProfitText}>
-                        Expected Profit
+                        Expected Loss:{' '}
+                        {expectedLoss
+                            ? `$${expectedLoss.toFixed(2)}`
+                            : 'Calculating...'}
                     </span>
                 )}
             </section>
@@ -180,6 +292,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     reverse
                 />
             </section>
+
             <button
                 className={`${styles.confirmButton} ${!isFormValid() ? styles.disabled : ''}`}
                 onClick={handleConfirm}

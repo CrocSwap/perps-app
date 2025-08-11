@@ -46,6 +46,16 @@
 
 /* form container */
 
+.formContainer input[type='number']::-webkit-outer-spin-button,
+.formContainer input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.formContainer input[type='number'] {
+    -moz-appearance: textfield;
+}
+
 .formContainer {
     display: flex;
     flex-direction: column;

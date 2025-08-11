@@ -39,7 +39,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { executeMarketOrder } = useMarketOrderService();
         const [isClosing, setIsClosing] = useState(false);
 
-        const showTpSl = false;
+        const showTpSl = true;
 
         const modalCtrl = useModal('closed');
         const [modalContent, setModalContent] = useState<string>('share');
