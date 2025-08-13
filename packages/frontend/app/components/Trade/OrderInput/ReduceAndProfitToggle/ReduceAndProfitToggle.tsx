@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
@@ -16,6 +16,25 @@ interface PropsIF {
     handleToggleRandomize: (newState?: boolean) => void;
     handleToggleIsChasingInterval: (newState?: boolean) => void;
     marketOrderType: string;
+
+    // TP/SL functionality
+    takeProfitPrice?: string;
+    setTakeProfitPrice?: (price: string) => void;
+    stopLossPrice?: string;
+    setStopLossPrice?: (price: string) => void;
+    takeProfitGain?: string;
+    setTakeProfitGain?: (gain: string) => void;
+    stopLossLoss?: string;
+    setStopLossLoss?: (loss: string) => void;
+    tpGainCurrency?: '$' | '%';
+    setTpGainCurrency?: (currency: '$' | '%') => void;
+    slLossCurrency?: '$' | '%';
+    setSlLossCurrency?: (currency: '$' | '%') => void;
+
+    markPx?: number;
+    symbol?: string;
+    notionalSymbolQtyNum?: number;
+    tradeDirection?: 'buy' | 'sell';
 }
 interface TPSLFormData {
     tpPrice: string;
@@ -28,16 +47,6 @@ interface TPSLFormData {
     limitPrice: boolean;
 }
 export default function ReduceAndProfitToggle(props: PropsIF) {
-    const [formData, setFormData] = useState<TPSLFormData>({
-        tpPrice: '',
-        slPrice: '',
-        gain: '',
-        loss: '',
-        gainCurrency: '$',
-        lossCurrency: '$',
-        configureAmount: false,
-        limitPrice: false,
-    });
     const [chaseDistance, setChaseDistance] = useState('');
     const [chaseMode, setChaseMode] = useState<'usd' | 'symbol'>('usd');
 
@@ -51,104 +60,177 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         handleToggleRandomize,
         isChasingIntervalEnabled,
         handleToggleIsChasingInterval,
+
+        // TP/SL props
+        takeProfitPrice = '',
+        setTakeProfitPrice,
+        stopLossPrice = '',
+        setStopLossPrice,
+        takeProfitGain = '',
+        setTakeProfitGain,
+        stopLossLoss = '',
+        setStopLossLoss,
+        tpGainCurrency = '$',
+        setTpGainCurrency,
+        slLossCurrency = '$',
+        setSlLossCurrency,
+        markPx,
+        symbol,
+        notionalSymbolQtyNum,
+        tradeDirection,
     } = props;
 
-    const handleInputChange = (
-        field: keyof TPSLFormData,
-        value: string | boolean,
-    ) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
+    const calculateExpectedProfit = (): number | null => {
+        console.log('Calculate expected profit:', {
+            takeProfitPrice,
+            takeProfitGain,
+            tpGainCurrency,
+        });
+        return null;
+    };
+
+    const calculateExpectedLoss = (): number | null => {
+        console.log('Calculate expected loss:', {
+            stopLossPrice,
+            stopLossLoss,
+            slLossCurrency,
+        });
+        return null;
+    };
+
+    const updatePriceFromGain = (gainValue: string) => {
+        console.log('Update TP price from gain:', gainValue, tpGainCurrency);
+        if (setTakeProfitPrice) {
+            // setTakeProfitPrice(calculatedPrice);
+        }
+    };
+
+    const updatePriceFromLoss = (lossValue: string) => {
+        console.log('Update SL price from loss:', lossValue, slLossCurrency);
+        if (setStopLossPrice) {
+            // setStopLossPrice(calculatedPrice);
+        }
     };
 
     const handleCurrencyToggle = (field: 'gainCurrency' | 'lossCurrency') => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: prev[field] === '$' ? '%' : '$',
-        }));
+        if (field === 'gainCurrency' && setTpGainCurrency) {
+            const newCurrency = tpGainCurrency === '$' ? '%' : '$';
+            setTpGainCurrency(newCurrency);
+            console.log('TP currency changed to:', newCurrency);
+        } else if (field === 'lossCurrency' && setSlLossCurrency) {
+            const newCurrency = slLossCurrency === '$' ? '%' : '$';
+            setSlLossCurrency(newCurrency);
+            console.log('SL currency changed to:', newCurrency);
+        }
     };
 
+    const expectedProfit = useMemo(() => {
+        console.log('Calculate expected profit:', {
+            takeProfitPrice,
+            takeProfitGain,
+            tpGainCurrency,
+        });
+        return null;
+    }, [takeProfitPrice, takeProfitGain, tpGainCurrency]);
+
+    const expectedLoss = useMemo(() => {
+        console.log('Calculate expected loss:', {
+            stopLossPrice,
+            stopLossLoss,
+            slLossCurrency,
+        });
+        return null;
+    }, [stopLossPrice, stopLossLoss, slLossCurrency]);
     const formDisplay = (
         <section className={styles.formContainer}>
+            {/* Take Profit Row */}
             <div className={styles.formRow}>
                 <div className={styles.inputWithoutDropdown}>
                     <input
                         type='number'
-                        value={formData.tpPrice}
-                        onChange={(e) =>
-                            handleInputChange('tpPrice', e.target.value)
-                        }
-                        placeholder='0.00'
+                        value={takeProfitPrice}
+                        onChange={(e) => {
+                            console.log('TP price changed:', e.target.value);
+                            setTakeProfitPrice?.(e.target.value);
+                        }}
+                        placeholder='Take Profit Price'
                     />
                 </div>
                 <div className={styles.inputWithDropdown}>
                     <input
                         type='number'
-                        value={formData.gain}
-                        onChange={(e) =>
-                            handleInputChange('gain', e.target.value)
-                        }
-                        placeholder='0.00'
+                        value={takeProfitGain}
+                        onChange={(e) => {
+                            console.log('TP gain changed:', e.target.value);
+                            setTakeProfitGain?.(e.target.value);
+                            updatePriceFromGain(e.target.value);
+                        }}
+                        placeholder='Gain'
                     />
                     <button
                         onClick={() => handleCurrencyToggle('gainCurrency')}
                     >
-                        <span>{formData.gainCurrency}</span>
+                        <span>{tpGainCurrency}</span>
                         <BsChevronDown size={16} />
                     </button>
                 </div>
             </div>
-            {formData.gain && (
+            {takeProfitGain && (
                 <span className={styles.expectedProfitText}>
                     Expected Profit:{' '}
+                    {expectedProfit
+                        ? `$${expectedProfit.toFixed(2)}`
+                        : 'Calculating...'}
                 </span>
             )}
 
+            {/* Stop Loss Row */}
             <div className={styles.formRow}>
                 <div className={styles.inputWithoutDropdown}>
                     <input
                         type='number'
-                        value={formData.slPrice}
-                        onChange={(e) =>
-                            handleInputChange('slPrice', e.target.value)
-                        }
-                        placeholder='0.00'
+                        value={stopLossPrice}
+                        onChange={(e) => {
+                            console.log('SL price changed:', e.target.value);
+                            setStopLossPrice?.(e.target.value);
+                        }}
+                        placeholder='Stop Loss Price'
                     />
                 </div>
                 <div className={styles.inputWithDropdown}>
                     <input
                         type='number'
-                        value={formData.loss}
-                        onChange={(e) =>
-                            handleInputChange('loss', e.target.value)
-                        }
-                        placeholder='0.00'
+                        value={stopLossLoss}
+                        onChange={(e) => {
+                            console.log('SL loss changed:', e.target.value);
+                            setStopLossLoss?.(e.target.value);
+                            updatePriceFromLoss(e.target.value);
+                        }}
+                        placeholder='Loss'
                     />
                     <button
                         onClick={() => handleCurrencyToggle('lossCurrency')}
                     >
-                        <span>{formData.lossCurrency}</span>
+                        <span>{slLossCurrency}</span>
                         <BsChevronDown size={16} />
                     </button>
                 </div>
             </div>
-            {formData.loss && (
+            {stopLossLoss && (
                 <span className={styles.expectedProfitText}>
-                    Expected Profit
+                    Expected Loss:{' '}
+                    {expectedLoss
+                        ? `$${expectedLoss.toFixed(2)}`
+                        : 'Calculating...'}
                 </span>
             )}
         </section>
     );
 
-    // temporarily disable tp/sl
-    const showTakeProfitToggle = [''].includes(marketOrderType);
-    // const showTakeProfitToggle = ['market', 'limit'].includes(marketOrderType);
+    const showTakeProfitToggle = ['market', 'limit'].includes(marketOrderType);
     const showReduceToggle = marketOrderType !== 'chase_limit';
     const showChasingInterval = marketOrderType === 'chase_limit';
     const showChaseDistance = false;
-
     const showRandomizeToggle = marketOrderType === 'twap';
 
     const chasingIntervalToggle = showChasingInterval && (
@@ -170,7 +252,6 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         onToggle={handleToggleIsChasingInterval}
                         label=''
                     />
-
                     <h3 className={styles.toggleLabel}>Max Chase Distance</h3>
                 </div>
             )}
@@ -204,10 +285,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                 </div>
             )}
             {showReduceToggle && (
-                <div
-                    className={styles.reduceToggleContent}
-                    // onClick={() => handleToggleReduceOnly()}
-                >
+                <div className={styles.reduceToggleContent}>
                     <ToggleSwitch
                         isOn={isReduceOnlyEnabled}
                         onToggle={handleToggleReduceOnly}
@@ -219,7 +297,13 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             {showTakeProfitToggle && (
                 <div
                     className={styles.reduceToggleContent}
-                    onClick={() => handleToggleProfitOnly()}
+                    onClick={() => {
+                        console.log(
+                            'TP/SL toggle clicked, current state:',
+                            isTakeProfitEnabled,
+                        );
+                        handleToggleProfitOnly();
+                    }}
                 >
                     <ToggleSwitch
                         isOn={isTakeProfitEnabled}

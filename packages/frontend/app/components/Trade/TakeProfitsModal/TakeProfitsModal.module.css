@@ -129,3 +129,12 @@
     color: var(--green);
     font-size: var(--font-size-s);
 }
+.formContainer input[type='number']::-webkit-outer-spin-button,
+.formContainer input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.formContainer input[type='number'] {
+    -moz-appearance: textfield;
+}

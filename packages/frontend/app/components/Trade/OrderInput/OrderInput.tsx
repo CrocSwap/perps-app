@@ -214,6 +214,14 @@ function OrderInput({
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
+    // Take Profit / Stop Loss state
+    const [takeProfitPrice, setTakeProfitPrice] = useState('');
+    const [stopLossPrice, setStopLossPrice] = useState('');
+    const [takeProfitGain, setTakeProfitGain] = useState('');
+    const [stopLossLoss, setStopLossLoss] = useState('');
+    const [tpGainCurrency, setTpGainCurrency] = useState<'$' | '%'>('$');
+    const [slLossCurrency, setSlLossCurrency] = useState<'$' | '%'>('$');
+
     const minNotionalUsdOrderSize = 0.99;
     const maxNotionalUsdOrderSize = 100_000;
 
@@ -1138,6 +1146,22 @@ function OrderInput({
             handleToggleRandomize,
             isChasingIntervalEnabled,
             handleToggleIsChasingInterval: handleToggleChasingInterval,
+            takeProfitPrice,
+            setTakeProfitPrice,
+            stopLossPrice,
+            setStopLossPrice,
+            takeProfitGain,
+            setTakeProfitGain,
+            stopLossLoss,
+            setStopLossLoss,
+            tpGainCurrency,
+            setTpGainCurrency,
+            slLossCurrency,
+            setSlLossCurrency,
+            markPx,
+            symbol,
+            notionalSymbolQtyNum,
+            tradeDirection,
         }),
         [
             isReduceOnlyEnabled,
@@ -1149,6 +1173,16 @@ function OrderInput({
             handleToggleRandomize,
             isChasingIntervalEnabled,
             handleToggleChasingInterval,
+            takeProfitPrice,
+            stopLossPrice,
+            takeProfitGain,
+            stopLossLoss,
+            tpGainCurrency,
+            slLossCurrency,
+            markPx,
+            symbol,
+            notionalSymbolQtyNum,
+            tradeDirection,
         ],
     );
 
@@ -1262,6 +1296,18 @@ function OrderInput({
             priceRangeTotalOrders,
         ],
     );
+
+    async function handleTakeProfitStopLoss(): Promise<void> {
+        console.log('TP/SL ');
+
+        if (isTakeProfitEnabled && takeProfitPrice) {
+            console.log('Place take profit order at:', takeProfitPrice);
+        }
+
+        if (isTakeProfitEnabled && stopLossPrice) {
+            console.log('Place stop loss order at:', stopLossPrice);
+        }
+    }
 
     // fn to submit a 'Buy' market order
     async function submitMarketBuy(): Promise<void> {

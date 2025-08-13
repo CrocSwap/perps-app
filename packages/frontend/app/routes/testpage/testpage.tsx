@@ -1,5 +1,6 @@
 import PortfolioWithdraw from '~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw';
 import styles from './testpage.module.css';
+import TakeProfitsModal from '~/components/Trade/TakeProfitsModal/TakeProfitsModal';
 
 export default function testpage() {
     return (
