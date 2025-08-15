@@ -122,6 +122,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
                 trades[0].coin === symbol && (
                     <>
                         <div
+                            id='order-trades-list-container'
                             className={`${styles.orderTradesList} ${orderBookMode === 'stacked' ? styles.orderTradesListStacked : ''}`}
                             style={{
                                 ...(maxHeight && {

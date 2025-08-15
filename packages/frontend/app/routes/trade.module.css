@@ -114,9 +114,14 @@ body {
     height: 100%;
     display: grid;
     grid-template-rows: 40px 40px 1fr;
-    width: 100%;
+    min-width: 0;
+    /* width: 100%; */
 
     gap: var(--gap-s);
+}
+
+.containerTopLeft > * {
+    min-width: 0;
 }
 
 .containerTopLeft.debugToolbarOpen {
@@ -134,6 +139,7 @@ body {
 .chart,
 .symbolInfo,
 .orderBook,
+.liquidationsChart,
 .tradeModules {
     background: var(--bg-dark2);
     height: 100%;
@@ -145,6 +151,7 @@ body {
 
 .orderBook,
 .tradeModules,
+.liquidationsChart,
 .symbolSectionWrapper {
     overflow: hidden;
     max-height: calc(
@@ -166,6 +173,24 @@ body {
     overflow: hidden;
 }
 
+.chartLayout {
+    transition: all 0.2s ease-in-out;
+    display: grid;
+    gap: var(--gap-s);
+    grid-template-columns: minmax(0, 1fr);
+    height: 100%;
+}
+
+.chartLayout.liqActive {
+    grid-template-columns: minmax(0, 1fr) var(--order-book-width-desktop-small);
+}
+
+.liquidationsChart {
+    position: relative;
+    align-items: flex-start;
+    overflow: hidden;
+}
+
 .chart {
     max-height: 61vh;
     overflow: hidden;
@@ -174,6 +199,10 @@ body {
 /* Desktop styles (1920px and above) */
 @media only screen and (min-width: 1920px) {
     .containerTop {
+        grid-template-columns: 1fr var(--order-book-width-desktop-large);
+    }
+
+    .chartLayout.liqActive {
         grid-template-columns: 1fr var(--order-book-width-desktop-large);
     }
 

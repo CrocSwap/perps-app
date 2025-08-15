@@ -26,6 +26,8 @@ interface DebugStore {
     setIsDebugWalletActive: (isDebugWalletActive: boolean) => void;
     usePythOracle: boolean;
     setUsePythOracle: (usePythOracle: boolean) => void;
+    pauseLiqAnimation: boolean;
+    setPauseLiqAnimation: (pauseLiqAnimation: boolean) => void;
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
@@ -59,4 +61,7 @@ export const useDebugStore = create<DebugStore>((set) => ({
         set({ isDebugWalletActive }),
     usePythOracle: true, // Default to Pyth as requested
     setUsePythOracle: (usePythOracle: boolean) => set({ usePythOracle }),
+    pauseLiqAnimation: false,
+    setPauseLiqAnimation: (pauseLiqAnimation: boolean) =>
+        set({ pauseLiqAnimation }),
 }));
