@@ -152,6 +152,10 @@ export const MARKET_API_URL =
     import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
+export const ORDERBOOK_POLL_URL =
+    import.meta.env.VITE_ORDERBOOK_POLL_URL ||
+    'https://throbbing-disk-07bc.doug-fa5.workers.dev';
+
 export const MARKET_INFO_ENDPOINT =
     import.meta.env.VITE_MARKET_INFO_ENDPOINT || MARKET_API_URL + '/info';
 
