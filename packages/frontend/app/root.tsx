@@ -166,6 +166,7 @@ export default function App() {
     const { wsEnvironment } = useDebugStore();
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
+
     return (
         <>
             <Layout>

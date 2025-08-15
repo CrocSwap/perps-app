@@ -26,6 +26,10 @@ interface DebugStore {
     setIsDebugWalletActive: (isDebugWalletActive: boolean) => void;
     usePythOracle: boolean;
     setUsePythOracle: (usePythOracle: boolean) => void;
+    manualAddressEnabled: boolean;
+    setManualAddressEnabled: (manualAddressEnabled: boolean) => void;
+    manualAddress: string;
+    setManualAddress: (manualAddress: string) => void;
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
@@ -59,4 +63,13 @@ export const useDebugStore = create<DebugStore>((set) => ({
         set({ isDebugWalletActive }),
     usePythOracle: true, // Default to Pyth as requested
     setUsePythOracle: (usePythOracle: boolean) => set({ usePythOracle }),
+    manualAddressEnabled: false,
+    setManualAddressEnabled: (manualAddressEnabled: boolean) => {
+        if (!manualAddressEnabled) {
+            set({ manualAddress: '' });
+        }
+        set({ manualAddressEnabled });
+    },
+    manualAddress: '',
+    setManualAddress: (manualAddress: string) => set({ manualAddress }),
 }));

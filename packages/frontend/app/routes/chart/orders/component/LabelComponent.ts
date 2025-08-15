@@ -578,6 +578,8 @@ const LabelComponent = ({
                 });
             }
 
+            console.log({ type, orderId, newPrice });
+
             tempSelectedLine = undefined;
             setIsDrag(false);
             setTimeout(() => {

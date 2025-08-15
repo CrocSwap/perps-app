@@ -165,3 +165,25 @@
 .walletSelector.passive {
     opacity: 0.5;
 }
+
+.manualAddressInput {
+    background-color: var(--bg-dark4);
+    border: none;
+    color: var(--text1);
+    font-size: var(--font-size-s);
+    padding: var(--padding-xs);
+    border-radius: var(--radius-xs);
+    width: 21rem;
+}
+
+.manualAddressInput:focus {
+    outline: none;
+}
+
+.manualAddressInput.valid {
+    border: 1px solid var(--green);
+}
+
+.manualAddressInput.invalid {
+    border: 1px solid var(--red);
+}

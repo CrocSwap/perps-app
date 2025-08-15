@@ -51,6 +51,7 @@ export class WebSocketPool {
     private sockets: Map<string, WebSocketInstance> = new Map();
     private config: WebSocketPoolConfig;
     private customChannelMapping: Record<string, string> = {};
+    private useMarketOnly: boolean = false;
 
     constructor(config: WebSocketPoolConfig) {
         this.config = config;
@@ -122,6 +123,10 @@ export class WebSocketPool {
     private getSocketForSubscription(
         subscription: Subscription,
     ): WebSocketInstance | undefined {
+        if (this.useMarketOnly) {
+            return this.sockets.get('market');
+        }
+
         const channelType = subscription.type;
 
         // Check custom mapping first
@@ -321,6 +326,10 @@ export class WebSocketPool {
             }, 200);
         });
     }
+
+    public setUseMarketOnly(useMarketOnly: boolean) {
+        this.useMarketOnly = useMarketOnly;
+    }
 }
 
 /**
@@ -329,6 +338,7 @@ export class WebSocketPool {
  */
 export class MultiSocketInfo {
     private pool: WebSocketPool;
+    private useMarketOnly: boolean = false;
 
     constructor(
         endpoints: WebSocketEndpoints | string,
@@ -396,5 +406,10 @@ export class MultiSocketInfo {
     // [22-07-2025] returns all active subs for stashing in useSdk hook
     public getActiveSubscriptions() {
         return this.pool.getActiveSubscriptions();
+    }
+
+    public setUseMarketOnly(useMarketOnly: boolean) {
+        this.useMarketOnly = useMarketOnly;
+        this.pool.setUseMarketOnly(useMarketOnly);
     }
 }

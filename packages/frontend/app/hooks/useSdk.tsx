@@ -51,7 +51,7 @@ export const SdkProvider: React.FC<{
         setIsWsStashed,
         isTabActive,
     } = useAppStateStore();
-    const { isWsSleepMode } = useDebugStore();
+    const { isWsSleepMode, isDebugWalletActive } = useDebugStore();
 
     useEffect(() => {
         if (!isClient) return;
@@ -98,6 +98,17 @@ export const SdkProvider: React.FC<{
             exchange.setEnvironment(environment);
         }
     }, [isClient, environment, marketEndpoint, userEndpoint]);
+
+    useEffect(() => {
+        if (info) {
+            info.setUseMarketOnly(isDebugWalletActive);
+        }
+    }, [isDebugWalletActive]);
+
+    useEffect(() => {
+        console.log('>>> useSdk | marketEndpoint', marketEndpoint);
+        console.log('>>> useSdk | userEndpoint', userEndpoint);
+    }, [marketEndpoint, userEndpoint]);
 
     useEffect(() => {
         if (!internetConnected) {

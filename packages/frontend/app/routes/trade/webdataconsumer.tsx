@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { useMarketOrderLog } from '~/hooks/useMarketOrderLog';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -16,8 +16,10 @@ import {
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
@@ -34,7 +36,15 @@ import type {
 } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
-    const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
+    const { debugWallet, isDebugWalletActive } = useDebugStore();
+
+    const DUMMY_ADDRESS = useMemo(() => {
+        if (isDebugWalletActive) {
+            return debugWallet.address;
+        }
+        return '0x0000000000000000000000000000000000000000';
+    }, [isDebugWalletActive, debugWallet]);
+
     const {
         favKeys,
         setFavCoins,
@@ -77,6 +87,9 @@ export default function WebDataConsumer() {
     // Initialize market order log pre-fetching
     useMarketOrderLog();
 
+    const { setPositions: setUnifiedPositions, setBalance: setUnifiedBalance } =
+        useUnifiedMarginStore();
+
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
     const userBalancesRef = useRef<UserBalanceIF[]>([]);
@@ -97,6 +110,9 @@ export default function WebDataConsumer() {
     const fetchedChannelsRef = useRef<Set<string>>(new Set());
 
     const notifiedOrdersRef = useRef<Set<number>>(new Set());
+
+    const debugWalletActiveRef = useRef<boolean>(false);
+    debugWalletActiveRef.current = isDebugWalletActive;
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -283,6 +299,11 @@ export default function WebDataConsumer() {
             if (accountOverviewRef.current) {
                 setAccountOverview(accountOverviewRef.current);
             }
+            if (debugWalletActiveRef.current) {
+                setPositions(positionsRef.current);
+                setUnifiedPositions(positionsRef.current);
+                setUserBalances(userBalancesRef.current);
+            }
             setFetchedChannels(new Set([...fetchedChannelsRef.current]));
         }, 1000);
 
@@ -363,6 +384,11 @@ export default function WebDataConsumer() {
             // This ensures market data always comes from the market endpoint
             setCoins(data.data.coins);
             setCoinPriceMap(data.data.coinPriceMap);
+
+            if (debugWalletActiveRef.current) {
+                positionsRef.current = data.data.positions;
+                userBalancesRef.current = data.data.userBalances;
+            }
         },
         [setCoins, setCoinPriceMap],
     );
@@ -777,7 +803,7 @@ export default function WebDataConsumer() {
 
     // Update positions in TradeDataStore when unified data changes
     useEffect(() => {
-        if (unifiedPositions) {
+        if (unifiedPositions && !debugWalletActiveRef.current) {
             setPositions(unifiedPositions);
         }
     }, [unifiedPositions, setPositions]);

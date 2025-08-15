@@ -15,6 +15,7 @@ import {
     type TableSortDirection,
 } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
+import { useDebugStore } from '~/stores/DebugStore';
 
 interface GenericTableProps<
     T,
@@ -97,6 +98,9 @@ export default function GenericTable<
         const stored = localStorage.getItem(sortByKey);
         return safeParse<S>(stored, props.defaultSortBy as S);
     });
+
+    const { manualAddressEnabled, manualAddress, isDebugWalletActive } =
+        useDebugStore();
 
     const [sortDirection, setSortDirection] = useState<TableSortDirection>(
         () => {
@@ -384,8 +388,19 @@ export default function GenericTable<
     }, [tableState, checkShadow, id]);
 
     const isSessionEstablished = useMemo(() => {
+        if (manualAddressEnabled) {
+            return manualAddress && manualAddress.length > 0;
+        }
+        if (isDebugWalletActive) {
+            return true;
+        }
         return isEstablished(sessionState);
-    }, [sessionState]);
+    }, [
+        sessionState,
+        manualAddressEnabled,
+        manualAddress,
+        isDebugWalletActive,
+    ]);
 
     return (
         <div
