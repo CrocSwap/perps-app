@@ -13,12 +13,13 @@ import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { blockExplorer } from '~/utils/Constants';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
+import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
-import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -196,17 +197,39 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 });
 
                 if (result.success) {
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Market Close Order Placed',
+                                orderType: 'Market',
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Position Closed',
                         message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
                         icon: 'check',
+                        txLink: result.signature
+                            ? blockExplorer + result.signature
+                            : undefined,
                     });
                 } else {
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Market Close Order Failed',
+                                orderType: 'Market',
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Close Failed',
                         message: String(
                             result.error || 'Failed to close position',
                         ),
+                        txLink: result.signature
+                            ? blockExplorer + result.signature
+                            : undefined,
                         icon: 'error',
                     });
                 }

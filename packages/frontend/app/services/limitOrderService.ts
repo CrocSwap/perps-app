@@ -5,6 +5,7 @@ import {
     buildOrderEntryTransaction,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
+import { marketOrderLogManager } from './MarketOrderLogManager';
 
 export interface LimitOrderResult {
     success: boolean;
@@ -19,6 +20,7 @@ export interface LimitOrderParams {
     side: 'buy' | 'sell';
     leverage?: number; // Optional leverage multiplier for calculating userSetImBps
     replaceOrderId?: bigint; // Optional order ID to replace an existing order
+    reduceOnly?: boolean; // Optional reduce-only flag
 }
 
 /**
@@ -87,6 +89,15 @@ export class LimitOrderService {
                 );
             }
 
+            // Get the cached market order log page to avoid RPC call
+            const cachedLogPage = marketOrderLogManager.getCachedLogPage();
+            if (cachedLogPage !== undefined) {
+                console.log(
+                    '  - Using cached marketOrderLogPage:',
+                    cachedLogPage,
+                );
+            }
+
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
                 console.log('  - Building limit BUY order...');
@@ -103,6 +114,8 @@ export class LimitOrderService {
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
+                    marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 const transaction = buildOrderEntryTransaction(
@@ -127,6 +140,8 @@ export class LimitOrderService {
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
+                    marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 console.log('  - Order parameters:', orderParams);

@@ -335,6 +335,7 @@ function PortfolioWithdraw({
                 bg='accent1'
                 onClick={handleWithdraw}
                 disabled={isButtonDisabled}
+                className={`plausible-event-name=Withdraw+Button+Click plausible-event-maxActive=${maxModeActive}`}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'

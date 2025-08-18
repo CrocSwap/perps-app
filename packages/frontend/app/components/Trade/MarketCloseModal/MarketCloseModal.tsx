@@ -253,8 +253,19 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             );
 
             if (result.success) {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Order Placed',
+                            orderType: 'Market',
+                        },
+                    });
+                }
                 notifications.add({
-                    title: 'Position Closed',
+                    title:
+                        positionSize < 100
+                            ? `${positionSize}% of Position Closed`
+                            : 'Position Closed',
                     message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
                     icon: 'check',
                     txLink: result.signature
@@ -263,6 +274,14 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     removeAfter: 5000,
                 });
             } else {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Order Failed',
+                            orderType: 'Market',
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Close Failed',
                     message: result.error || 'Failed to close position',

@@ -99,3 +99,10 @@
 .details_viewport::after {
     display: none;
 }
+
+/* remove this element from DOM at low screen heights */
+@media only screen and (max-height: 580px) {
+    .order_details {
+        display: none;
+    }
+}

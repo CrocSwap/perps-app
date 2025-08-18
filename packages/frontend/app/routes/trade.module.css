@@ -26,10 +26,6 @@ body {
 .market_data {
     grid-area: market_data;
     height: 100%;
-    /* max-height: calc(
-        100vh - var(--trade-tables-height-desktop) -
-            var(--header-height-desktop) - var(--gap-s)
-    ); */
     display: grid;
     grid-template-rows: 40px 40px 1fr;
     grid-template-columns: 1fr var(--order-book-width-desktop-small);
@@ -41,18 +37,6 @@ body {
     gap: var(--gap-s);
     overflow: hidden;
 }
-
-/* .watchlist {
-    grid-area: watchlist;
-}
-
-.symbolInfo {
-    grid-area: symbol_info;
-}
-
-.chart {
-    grid-area: chart;
-} */
 
 .order_book {
     grid-area: order_book;
@@ -78,7 +62,7 @@ body {
     overflow: hidden;
 }
 
-@media (max-height: 700px) {
+@media (max-height: 750px) {
     /* expand the order input to the full right col on short screens */
     .containerNew {
         grid-template-areas:

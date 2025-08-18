@@ -287,3 +287,10 @@
 .submit_button:disabled:hover {
     background: var(--bg-dark4, #27272c) !important;
 }
+
+/* remove an element from DOM at low screen heights */
+@media only screen and (max-height: 470px) {
+    .inputDetailsDataContainer {
+        display: none;
+    }
+}

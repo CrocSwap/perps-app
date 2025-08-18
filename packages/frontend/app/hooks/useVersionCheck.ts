@@ -4,6 +4,10 @@ export function useVersionCheck() {
     const [showReload, setShowReload] = useState(false);
     const currentVersion = useRef(null);
 
+    // const isProduction = process.env.CONTEXT === 'production';
+    const isDeployPreview = import.meta.env.VITE_CONTEXT === 'deploy-preview';
+    const isBranchDeploy = import.meta.env.VITE_CONTEXT === 'branch-deploy';
+
     useEffect(() => {
         fetch('/version.json', { cache: 'no-store' })
             .then((res) => res.json())
@@ -25,7 +29,8 @@ export function useVersionCheck() {
                         }
                     });
             },
-            5 * 60 * 1000, // Check every 5 minutes
+            // check every 30 seconds in deploy preview or branch-deploy and every 5 minutes elsewhere
+            isDeployPreview || isBranchDeploy ? 30 * 1000 : 5 * 60 * 1000,
         );
 
         return () => clearInterval(interval);

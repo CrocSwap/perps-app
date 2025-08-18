@@ -1,12 +1,20 @@
 import { instructions } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import { useRef } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    type ChangeEvent,
+} from 'react';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 import ComboBox from './ComboBox';
 import styles from './ComboBox.module.css';
+import Tooltip from '~/components/Tooltip/Tooltip';
+import { PublicKey } from '@solana/web3.js';
 export default function ComboBoxContainer() {
     const { symbol, selectedCurrency, setSelectedCurrency } =
         useTradeDataStore();
@@ -30,6 +38,10 @@ export default function ComboBoxContainer() {
         setIsDebugWalletActive,
         usePythOracle,
         setUsePythOracle,
+        manualAddressEnabled,
+        setManualAddressEnabled,
+        manualAddress,
+        setManualAddress,
     } = useDebugStore();
 
     // useEffect(() => {
@@ -40,6 +52,42 @@ export default function ComboBoxContainer() {
     const currencies = ['USD', 'BTC', 'ETH'];
 
     const sessionState = useSession();
+    const [validManualAddress, setValidManualAddress] = useState(false);
+    const [addressInputVal, setAddressInputVal] = useState('');
+
+    const manualAddressInputKeyListener = useCallback(
+        (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setManualAddressEnabled(false);
+                setManualAddress('');
+                setAddressInputVal('');
+            }
+        },
+        [setManualAddressEnabled, setManualAddress],
+    );
+
+    const manualAddressInputChangeListener = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => {
+            const val = e.target.value;
+            try {
+                new PublicKey(val);
+                setValidManualAddress(true);
+                setManualAddress(e.target.value);
+            } catch (e) {
+                if (val === '' || val === undefined) {
+                    setManualAddress('');
+                } else {
+                    setValidManualAddress(false);
+                }
+            }
+            setAddressInputVal(e.target.value);
+        },
+        [setManualAddress],
+    );
+
+    useEffect(() => {
+        setAddressInputVal('');
+    }, [isDebugWalletActive]);
 
     return (
         <section className={styles.comboBoxContainers}>
@@ -102,33 +150,71 @@ export default function ComboBoxContainer() {
             </div>
 
             <div className={styles.divider} />
-            <div
-                className={`${styles.walletSelector} ${!isDebugWalletActive ? styles.passive : ' '}`}
-            >
-                <ComboBox
-                    value={debugWallet.label}
-                    options={debugWallets}
-                    fieldName='label'
-                    onChange={(value) =>
-                        setDebugWallet({
-                            label: value,
-                            address:
-                                debugWallets.find(
-                                    (wallet) => wallet.label === value,
-                                )?.address || '',
-                        })
-                    }
-                />
-            </div>
+
             <div
                 className={`${styles.sdkToggle} ${isDebugWalletActive ? styles.active : styles.disabled}`}
                 onClick={() => setIsDebugWalletActive(!isDebugWalletActive)}
             >
-                <div className={styles.sdkToggleButton}>
-                    {isDebugWalletActive ? 'Debug Wallet' : 'Sessions Wallet'}
-                </div>
+                <Tooltip
+                    content={`${isDebugWalletActive ? 'HyperLiquid data is being used' : userAddress}`}
+                >
+                    <div className={styles.sdkToggleButton}>
+                        {isDebugWalletActive
+                            ? 'Debug Wallet'
+                            : 'Sessions Wallet'}
+                    </div>
+                </Tooltip>
             </div>
-            <div className={styles.subInfo}>{userAddress}</div>
+            {isDebugWalletActive ? (
+                <div
+                    className={`${styles.walletSelector} ${!isDebugWalletActive ? styles.passive : ' '}`}
+                >
+                    <ComboBox
+                        value={debugWallet.label}
+                        options={debugWallets}
+                        fieldName='label'
+                        onChange={(value) =>
+                            setDebugWallet({
+                                label: value,
+                                address:
+                                    debugWallets.find(
+                                        (wallet) => wallet.label === value,
+                                    )?.address || '',
+                            })
+                        }
+                    />
+                </div>
+            ) : (
+                <div className={styles.addressSection}>
+                    {manualAddressEnabled ? (
+                        <>
+                            <input
+                                className={`${styles.manualAddressInput}
+                                ${addressInputVal && addressInputVal.length > 0 ? (validManualAddress ? styles.valid : styles.invalid) : ''}
+                                `}
+                                type='text'
+                                value={addressInputVal}
+                                onChange={manualAddressInputChangeListener}
+                                onKeyDown={manualAddressInputKeyListener}
+                                autoFocus
+                            />
+                        </>
+                    ) : (
+                        <Tooltip content='Double click to edit'>
+                            <div
+                                onDoubleClick={() =>
+                                    setManualAddressEnabled(true)
+                                }
+                                className={styles.subInfo}
+                            >
+                                {userAddress && userAddress.length > 0
+                                    ? userAddress
+                                    : 'Double click to add address manually'}
+                            </div>
+                        </Tooltip>
+                    )}
+                </div>
+            )}
 
             <div className={styles.divider} />
             {isEstablished(sessionState) && (

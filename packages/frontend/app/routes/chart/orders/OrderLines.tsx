@@ -5,7 +5,10 @@ import LineComponent, { type LineData } from './component/LineComponent';
 import LabelComponent from './component/LabelComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import type { IPaneApi } from '~/tv/charting_library';
-import type { LabelLocationData } from '../overlayCanvas/overlayCanvasUtils';
+import {
+    getMainSeriesPaneIndex,
+    type LabelLocationData,
+} from '../overlayCanvas/overlayCanvasUtils';
 import { getPricetoPixel } from './customOrderLineUtils';
 import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
 
@@ -69,7 +72,9 @@ export default function OrderLines({
         if (!chart || !scaleData) return;
 
         const chartRef = chart.activeChart();
-        const priceScalePane = chartRef.getPanes()[0] as IPaneApi;
+        const paneIndex = getMainSeriesPaneIndex(chart);
+        if (paneIndex === null) return;
+        const priceScalePane = chartRef.getPanes()[paneIndex] as IPaneApi;
         const priceScale = priceScalePane.getMainSourcePriceScale();
         if (!priceScale) return;
 

@@ -89,10 +89,6 @@ export const useLeverageStore = create<LeverageStore>()(
                     marketLeveragePreferences: updatedPreferences,
                     currentLeverage: leverage,
                 });
-
-                console.log(
-                    `Saved preferred leverage for ${state.currentMarket}: ${leverage}x`,
-                );
             },
 
             selectLeverage: () => {

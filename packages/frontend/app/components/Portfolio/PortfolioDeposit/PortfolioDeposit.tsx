@@ -286,6 +286,7 @@ function PortfolioDeposit(props: propsIF) {
                 bg='accent1'
                 onClick={handleDeposit}
                 disabled={isButtonDisabled || isSizeInvalid}
+                className={`plausible-event-name=Deposit+Button+Click plausible-event-maxActive=${maxActive}`}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'

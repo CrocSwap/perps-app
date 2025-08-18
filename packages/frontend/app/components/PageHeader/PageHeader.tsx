@@ -3,7 +3,7 @@ import {
     SessionButton,
     useSession,
 } from '@fogo/sessions-sdk-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
 // import {
 //     DFLT_EMBER_MARKET,
@@ -14,11 +14,12 @@ import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
+import { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
@@ -27,7 +28,6 @@ import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
-import { useShortScreen } from '~/hooks/useMediaQuery';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 
@@ -52,6 +52,13 @@ export default function PageHeader() {
 
     // Use unified margin data
     const { marginBucket } = useUnifiedMarginData();
+
+    useEffect(() => {
+        // track initial site landing
+        if (typeof plausible === 'function') {
+            plausible('Landing');
+        }
+    }, []);
 
     // data to generate nav links in page header
     const navLinks = [
@@ -109,12 +116,32 @@ export default function PageHeader() {
 
     const isShortScreen: boolean = useShortScreen();
 
-    const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } = usePortfolioModals();
+    const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
+        usePortfolioModals();
 
     // Update TradeDataStore when unified margin data changes
     useEffect(() => {
         setMarginBucket(marginBucket);
     }, [marginBucket, setMarginBucket]);
+
+    // Holds previous user connection status
+    const prevIsUserConnected = useRef(isUserConnected);
+
+    useEffect(() => {
+        if (prevIsUserConnected.current === false && isUserConnected === true) {
+            if (typeof plausible === 'function') {
+                plausible('Login');
+            }
+        } else if (
+            prevIsUserConnected.current === true &&
+            isUserConnected === false
+        ) {
+            if (typeof plausible === 'function') {
+                plausible('Logout');
+            }
+        }
+        prevIsUserConnected.current = isUserConnected;
+    }, [isUserConnected]);
 
     return (
         <>
@@ -205,13 +232,15 @@ export default function PageHeader() {
                                 className={styles.depositButton}
                                 onClick={() => {
                                     if (isShortScreen) {
-                                        setIsDepositDropdownOpen(!isDepositDropdownOpen);
+                                        setIsDepositDropdownOpen(
+                                            !isDepositDropdownOpen,
+                                        );
                                     } else {
                                         openDepositModal();
                                     }
                                 }}
                             >
-                                { isShortScreen ? 'Transfer' : 'Deposit' }
+                                {isShortScreen ? 'Transfer' : 'Deposit'}
                             </button>
                             {isDepositDropdownOpen && (
                                 <DepositDropdown
@@ -219,7 +248,9 @@ export default function PageHeader() {
                                     marginBucket={marginBucket}
                                     openDepositModal={openDepositModal}
                                     openWithdrawModal={openWithdrawModal}
-                                    PortfolioModalsRenderer={PortfolioModalsRenderer}
+                                    PortfolioModalsRenderer={
+                                        PortfolioModalsRenderer
+                                    }
                                 />
                             )}
                         </section>
@@ -260,7 +291,12 @@ export default function PageHeader() {
                             )}
                         </section>
                     )}
-                    <SessionButton />
+                    <span
+                        className={`${!isUserConnected ? 'plausible-event-name=Login+Button+Click plausible-event-location=Page+Header' : ''}`}
+                    >
+                        <SessionButton />
+                    </span>
+
                     {isUserConnected && (
                         <section
                             style={{ position: 'relative' }}

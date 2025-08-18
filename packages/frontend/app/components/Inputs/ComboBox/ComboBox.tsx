@@ -71,7 +71,11 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                 <div
                     ref={comboBoxValueRef}
                     className={styles.comboBoxValueContainer}
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.nativeEvent.stopImmediatePropagation();
+                        setIsOpen(!isOpen);
+                    }}
                 >
                     <div className={styles.comboBoxValue}>
                         {modifyValue ? modifyValue(value) : value}{' '}

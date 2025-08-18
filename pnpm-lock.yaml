@@ -21,8 +21,8 @@ importers:
   packages/frontend:
     dependencies:
       '@crocswap-libs/ambient-ember':
-        specifier: ^0.1.57
-        version: 0.1.57(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
+        specifier: ^0.1.58
+        version: 0.1.58(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@fogo/sessions-idls':
         specifier: ^0.0.3
         version: 0.0.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
@@ -811,8 +811,8 @@ packages:
     peerDependencies:
       '@solana/web3.js': ^1.69.0
 
-  '@crocswap-libs/ambient-ember@0.1.57':
-    resolution: {integrity: sha512-CbeRnHAX1Hj8SmRz72a3ZgvvR5vqukJ0xTrrErH/gksXQvXnuO5gKhH44tuXhHm7w9P3SNmkQNo17Mild/7jog==}
+  '@crocswap-libs/ambient-ember@0.1.58':
+    resolution: {integrity: sha512-z3BJL0RRXgiDUrhlkwycUpx6fGX80JFSX1qCr1qOXsUT6C04sGta5pZ1Tm2DygRmDWCJW7fwd2P8pFh9fPRztg==}
 
   '@d3fc/d3fc-annotation@3.0.16':
     resolution: {integrity: sha512-4tA7RHLUbj/i3KqWRqCVDOHi435qBRXbAFrAajVYM2juNzFdX5RCoF3opyXKOFncs339caxgeySGStTVfulO9w==}
@@ -8801,7 +8801,7 @@ snapshots:
       bn.js: 5.2.2
       buffer-layout: 1.2.2
 
-  '@crocswap-libs/ambient-ember@0.1.57(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
+  '@crocswap-libs/ambient-ember@0.1.58(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/borsh': 0.31.1(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))
       '@noble/ed25519': 2.3.0

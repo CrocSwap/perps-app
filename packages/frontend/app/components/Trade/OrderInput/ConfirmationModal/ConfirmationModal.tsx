@@ -177,7 +177,7 @@ export default function ConfirmationModal(props: propsIF) {
                 />
             </div>
             <button
-                className={styles.confirmButton}
+                className={`plausible-event-name=Confirm+Button+Click plausible-event-skipConfirm=${!isEnabled} plausible-event-orderType=${tx.includes('limit') ? 'limit' : 'market'} ${styles.confirmButton}`}
                 onClick={isProcessing ? undefined : submitFn}
                 style={{
                     height: '47px',

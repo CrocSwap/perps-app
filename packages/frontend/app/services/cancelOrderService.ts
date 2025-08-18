@@ -3,6 +3,7 @@ import {
     buildCancelOrderTransaction,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
+import { marketOrderLogManager } from './MarketOrderLogManager';
 
 export interface CancelOrderResult {
     success: boolean;
@@ -56,6 +57,15 @@ export class CancelOrderService {
                     ? params.orderId
                     : BigInt(params.orderId);
 
+            // Get the cached market order log page to avoid RPC call
+            const cachedLogPage = marketOrderLogManager.getCachedLogPage();
+            if (cachedLogPage !== undefined) {
+                console.log(
+                    '  - Using cached marketOrderLogPage:',
+                    cachedLogPage,
+                );
+            }
+
             const transaction = await buildCancelOrderTransaction(
                 this.connection,
                 {
@@ -64,6 +74,7 @@ export class CancelOrderService {
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
+                    marketOrderLogPage: cachedLogPage,
                 },
             );
 
@@ -138,6 +149,9 @@ export class CancelOrderService {
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
                 };
             }
         } catch (error) {
