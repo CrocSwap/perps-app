@@ -44,7 +44,7 @@ export function useMediaQuery(query: string): boolean {
     return matches;
 }
 
-export function useShortScreen(breakpoint: number = 700): boolean {
+export function useShortScreen(breakpoint: number = 750): boolean {
     return useMediaQuery(`(max-height: ${breakpoint}px)`);
 }
 

@@ -14,6 +14,7 @@ export interface DepositServiceResult {
     error?: string;
     signature?: string;
     confirmed?: boolean;
+    timeOfSubmission?: number;
 }
 
 export interface UserBalance {
@@ -234,6 +235,8 @@ export class DepositService {
                 })),
             );
 
+            const timeOfSubmission = Date.now();
+
             // Send the transaction
             console.log('  - Calling sendTransaction with instructions...');
             console.log('  - Instructions array:', instructions);
@@ -254,6 +257,7 @@ export class DepositService {
                     success: true,
                     signature: transactionResult.signature,
                     confirmed: transactionResult.confirmed,
+                    timeOfSubmission,
                 };
             } else {
                 const errorMessage =
@@ -265,6 +269,7 @@ export class DepositService {
                     success: false,
                     error: errorMessage,
                     signature: transactionResult.signature,
+                    timeOfSubmission,
                 };
             }
         } catch (error) {

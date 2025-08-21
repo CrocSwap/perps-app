@@ -654,7 +654,6 @@ export class WebSocketInstance {
         for (const activeSub of activeSubscriptions) {
             if (activeSub.multiCallbacks) {
                 for (const callback of activeSub.multiCallbacks) {
-                    console.log('>>> calling multi callback', callback);
                     callback(msg);
                 }
             } else {

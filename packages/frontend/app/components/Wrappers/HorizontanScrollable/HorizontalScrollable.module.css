@@ -1,19 +1,17 @@
 .horizontalScrollable {
-    /* white-space: nowrap; */
-    overflow: auto;
-    /* max-width: 50%; */
-    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    scroll-behavior: smooth; /* Smooth scrolling for supported browsers */
-    border-radius: 0 !important;
+    -webkit-overflow-scrolling: touch;
 }
 
 .horizontalScrollableContent {
-    display: block;
-    width: fit-content;
+    min-width: max-content;
     position: relative;
 }
 

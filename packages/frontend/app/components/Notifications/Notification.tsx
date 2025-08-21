@@ -43,45 +43,74 @@ export default function Notification(props: propsIF) {
 
     // Debounce hover state changes
     useEffect(() => {
+        // Store the current debounce timer ref to avoid race conditions
+        let currentTimer = debounceTimerRef.current;
+
         if (isHovered || shouldPauseDismissal) {
             // Clear any pending debounce timer when hovering starts
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
+            if (currentTimer) {
+                clearTimeout(currentTimer);
                 debounceTimerRef.current = null;
             }
             setIsDebouncedHovered(true);
         } else {
             // Set a timer to update hover state after debounce period
-            debounceTimerRef.current = setTimeout(() => {
-                setIsDebouncedHovered(false);
-                debounceTimerRef.current = null;
+            currentTimer = setTimeout(() => {
+                // Only update state if the timer hasn't been cleared
+                if (debounceTimerRef.current === currentTimer) {
+                    setIsDebouncedHovered(false);
+                    debounceTimerRef.current = null;
+                }
             }, 500); // 500ms debounce
+
+            // Store the new timer reference
+            debounceTimerRef.current = currentTimer;
         }
 
+        // Cleanup function to clear the current timer on unmount or when dependencies change
         return () => {
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
+            if (currentTimer) {
+                clearTimeout(currentTimer);
+                // Only clear the ref if it still points to the current timer
+                if (debounceTimerRef.current === currentTimer) {
+                    debounceTimerRef.current = null;
+                }
             }
         };
     }, [isHovered, shouldPauseDismissal]);
 
     // Setup auto-dismiss timer, but only when not hovered and not in group hover state
     useEffect(() => {
-        if (!isDebouncedHovered) {
-            timeoutRef.current = setTimeout(
-                () => dismiss(data.slug),
-                Math.max(0, DISMISS_AFTER - (Date.now() - createdAt.current)),
-            );
-        } else if (timeoutRef.current) {
+        // Clear any existing timeout when dependencies change
+        if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
         }
 
+        // Only set new timeout if not hovered
+        if (!isDebouncedHovered) {
+            const timeElapsed = Date.now() - createdAt.current;
+            const timeRemaining = Math.max(0, DISMISS_AFTER - timeElapsed);
+
+            // Only set timeout if there's time remaining
+            if (timeRemaining > 0) {
+                timeoutRef.current = setTimeout(() => {
+                    dismiss(data.slug);
+                }, timeRemaining);
+            } else {
+                // If time has already elapsed, dismiss immediately
+                dismiss(data.slug);
+            }
+        }
+
+        // Cleanup function to clear timeout on unmount or when dependencies change
         return () => {
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
             }
         };
-    }, [dismiss, isDebouncedHovered, data.slug]);
+    }, [dismiss, isDebouncedHovered, data.slug, DISMISS_AFTER]); // Added DISMISS_AFTER to dependencies
 
     // px size at which to render SVG icons
     const ICON_SIZE = 24;
@@ -145,7 +174,12 @@ export default function Notification(props: propsIF) {
             <header>
                 <div className={styles.header_content}>
                     {data.icon === 'spinner' && (
-                        <ImSpinner8 size={ICON_SIZE} color='var(--accent1)' />
+                        <div className={styles.rotate}>
+                            <ImSpinner8
+                                size={ICON_SIZE}
+                                color='var(--accent1)'
+                            />
+                        </div>
                     )}
                     {data.icon === 'check' && (
                         <IoCheckmarkCircleOutline

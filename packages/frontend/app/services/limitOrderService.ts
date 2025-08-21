@@ -5,12 +5,14 @@ import {
     buildOrderEntryTransaction,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
+import { marketOrderLogManager } from './MarketOrderLogManager';
 
 export interface LimitOrderResult {
     success: boolean;
     error?: string;
     signature?: string;
     confirmed?: boolean;
+    timeOfSubmission?: number;
 }
 
 export interface LimitOrderParams {
@@ -19,6 +21,7 @@ export interface LimitOrderParams {
     side: 'buy' | 'sell';
     leverage?: number; // Optional leverage multiplier for calculating userSetImBps
     replaceOrderId?: bigint; // Optional order ID to replace an existing order
+    reduceOnly?: boolean; // Optional reduce-only flag
 }
 
 /**
@@ -87,6 +90,15 @@ export class LimitOrderService {
                 );
             }
 
+            // Get the cached market order log page to avoid RPC call
+            const cachedLogPage = marketOrderLogManager.getCachedLogPage();
+            if (cachedLogPage !== undefined) {
+                console.log(
+                    '  - Using cached marketOrderLogPage:',
+                    cachedLogPage,
+                );
+            }
+
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
                 console.log('  - Building limit BUY order...');
@@ -103,6 +115,8 @@ export class LimitOrderService {
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
+                    marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 const transaction = buildOrderEntryTransaction(
@@ -127,6 +141,8 @@ export class LimitOrderService {
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
+                    marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 console.log('  - Order parameters:', orderParams);
@@ -204,6 +220,7 @@ export class LimitOrderService {
 
             // Send the transaction using Fogo session
             console.log('  - Calling sendTransaction...');
+            const timeOfSubmission = Date.now();
             const transactionResult = await sendTransaction(instructions);
 
             console.log('📥 Transaction result:', transactionResult);
@@ -221,6 +238,7 @@ export class LimitOrderService {
                     success: true,
                     signature: transactionResult.signature,
                     confirmed: transactionResult.confirmed,
+                    timeOfSubmission,
                 };
             } else {
                 const errorMessage =
@@ -230,7 +248,10 @@ export class LimitOrderService {
                 return {
                     success: false,
                     error: errorMessage,
-                    signature: transactionResult.signature,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
+                    timeOfSubmission,
                 };
             }
         } catch (error) {

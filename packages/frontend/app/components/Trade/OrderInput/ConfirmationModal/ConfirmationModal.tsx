@@ -177,7 +177,7 @@ export default function ConfirmationModal(props: propsIF) {
                 />
             </div>
             <button
-                className={styles.confirmButton}
+                className={`${styles.confirmButton}`}
                 onClick={isProcessing ? undefined : submitFn}
                 style={{
                     height: '47px',

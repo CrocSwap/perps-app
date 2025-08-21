@@ -1,6 +1,6 @@
 {
     "name": "@perps-app/frontend",
-    "version": "0.1.18-1",
+    "version": "0.1.25-4",
     "private": true,
     "type": "module",
     "scripts": {
@@ -18,7 +18,7 @@
         "generate-pwa-assets": "pwa-assets-generator"
     },
     "dependencies": {
-        "@crocswap-libs/ambient-ember": "^0.1.57",
+        "@crocswap-libs/ambient-ember": "^0.1.58",
         "@fogo/sessions-idls": "^0.0.3",
         "@fogo/sessions-sdk": "^0.0.9",
         "@fogo/sessions-sdk-react": "^0.0.14",

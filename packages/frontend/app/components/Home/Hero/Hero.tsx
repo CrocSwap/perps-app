@@ -5,9 +5,7 @@ import styles from './Hero.module.css';
 export default function Hero() {
     return (
         <div className={styles.hero_container}>
-            {/* Animated Background with multiple layers for depth */}
             <div className={styles.animated_background}>
-                {/* Primary animation layer */}
                 <AnimatedPath
                     className={styles.animated_path_primary}
                     color1='#1E1E24'
@@ -39,7 +37,13 @@ export default function Hero() {
                 /> */}
             </div>
 
-            {/* Hero Content */}
+            {/* Mobile-only floating elements */}
+            <div className={styles.floating_elements}>
+                <div className={styles.floating_circle}></div>
+                <div className={styles.floating_circle}></div>
+                <div className={styles.floating_circle}></div>
+            </div>
+
             <div className={styles.hero_heading}>
                 <h2>
                     Zero-to-<span>One</span>{' '}
@@ -52,7 +56,70 @@ export default function Hero() {
                 combining unique DeFi native products with a user experience
                 rivaling CEXes
             </p>
-            <TradeButton />
+
+            <div className={styles.desktop_trade_button}>
+                <TradeButton />
+            </div>
+
+            {/* Desktop stats */}
+            {/* <div className={styles.hero_stats_container}>
+                <div className={styles.hero_stats}>
+                    <h2>$2.4B</h2>
+                    <p>Total Volume</p>
+                </div>
+                <div className={styles.hero_stats}>
+                    <h2>50K+</h2>
+                    <p>Active Users</p>
+                </div>
+            </div> */}
+
+            {/* Mobile hero content wrapper - only visible on mobile */}
+            <div className={styles.mobile_hero_content}>
+                {/* Top section */}
+                <div className={styles.mobile_hero_top}>
+                    {/* Animated icon/logo placeholder */}
+                    <div className={styles.hero_icon}>
+                        <img
+                            src='/images/favicon.svg'
+                            alt='Perps Logo'
+                            width='70px'
+                            height='70px'
+                            loading='eager'
+                        />
+                    </div>
+
+                    {/* Mobile Hero Content */}
+                    <div className={styles.mobile_hero_heading}>
+                        <h2>
+                            Zero-to-<span>One</span>{' '}
+                        </h2>
+                        <h2>Decentralized Trading Protocol</h2>
+                    </div>
+
+                    <p>
+                        Ambient is an entirely new kind of decentralized perp
+                        DEX combining unique DeFi native products with a user
+                        experience rivaling CEXes
+                    </p>
+                </div>
+
+                {/* Bottom section */}
+                <div className={styles.mobile_hero_bottom}>
+                    <TradeButton />
+
+                    {/* Mobile stats cards */}
+                    {/* <div className={styles.mobile_hero_stats_container}>
+                        <div className={styles.mobile_hero_stats}>
+                            <h3>$2.4B</h3>
+                            <p>Total Volume</p>
+                        </div>
+                        <div className={styles.mobile_hero_stats}>
+                            <h3>50K+</h3>
+                            <p>Active Users</p>
+                        </div>
+                    </div> */}
+                </div>
+            </div>
         </div>
     );
 }

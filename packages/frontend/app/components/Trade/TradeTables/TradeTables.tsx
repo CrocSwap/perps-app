@@ -18,6 +18,7 @@ import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import { useApp } from '~/contexts/AppContext';
 import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
 import styles from './TradeTable.module.css';
+import { useDebugStore } from '~/stores/DebugStore';
 export interface FilterOption {
     id: string;
     label: string;
@@ -62,6 +63,7 @@ export default function TradeTable(props: TradeTableProps) {
     } = useTradeDataStore();
 
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
+    const { isDebugWalletActive } = useDebugStore();
     // const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
     const { assignDefaultAddress } = useApp();
@@ -166,7 +168,11 @@ export default function TradeTable(props: TradeTableProps) {
             case 'Positions':
                 return (
                     <PositionsTable
-                        isFetched={!positionsLoading || lastUpdateTime > 0}
+                        isFetched={
+                            !isDebugWalletActive
+                                ? !positionsLoading || lastUpdateTime > 0
+                                : webDataFetched
+                        }
                         selectedFilter={selectedFilter}
                     />
                 );

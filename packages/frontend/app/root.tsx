@@ -29,6 +29,7 @@ import {
     RPC_ENDPOINT,
     USER_WS_ENDPOINT,
 } from './utils/Constants';
+import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -81,6 +82,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
             }
         };
     }, []);
+
+    const isProduction = import.meta.env.VITE_CONTEXT === 'production';
 
     return (
         <html lang='en'>
@@ -145,11 +148,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
-                <script
-                    defer
-                    data-domain='perps.ambient.finance'
-                    src='https://plausible.io/js/script.js'
-                ></script>
+                {isProduction && (
+                    <script
+                        defer
+                        data-domain='perps.ambient.finance'
+                        src='https://plausible.io/js/script.pageview-props.tagged-events.js'
+                    ></script>
+                )}
             </head>
             <body>
                 {children}
@@ -166,6 +171,7 @@ export default function App() {
     const { wsEnvironment } = useDebugStore();
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
+
     return (
         <>
             <Layout>
@@ -184,45 +190,47 @@ export default function App() {
                     enableUnlimited={true}
                 >
                     <AppProvider>
-                        <SdkProvider
-                            environment={wsEnvironment}
-                            marketEndpoint={MARKET_WS_ENDPOINT}
-                            userEndpoint={USER_WS_ENDPOINT}
-                        >
-                            <TutorialProvider>
-                                <WsConnectionChecker />
-                                <WebSocketDebug />
-                                <div className='root-container'>
-                                    {/* Added error boundary for header */}
-                                    <ComponentErrorBoundary>
-                                        <PageHeader />
-                                    </ComponentErrorBoundary>
-                                    <main
-                                        className={`content ${isHomePage ? 'home-page' : ''}`}
-                                    >
-                                        {/*  Added Suspense for async content loading */}
-                                        <Suspense
-                                            fallback={<LoadingIndicator />}
+                        <UnifiedMarginDataProvider>
+                            <SdkProvider
+                                environment={wsEnvironment}
+                                marketEndpoint={MARKET_WS_ENDPOINT}
+                                userEndpoint={USER_WS_ENDPOINT}
+                            >
+                                <TutorialProvider>
+                                    <WsConnectionChecker />
+                                    <WebSocketDebug />
+                                    <div className='root-container'>
+                                        {/* Added error boundary for header */}
+                                        <ComponentErrorBoundary>
+                                            <PageHeader />
+                                        </ComponentErrorBoundary>
+                                        <main
+                                            className={`content ${isHomePage ? 'home-page' : ''}`}
                                         >
-                                            <ComponentErrorBoundary>
-                                                <Outlet />
-                                            </ComponentErrorBoundary>
-                                        </Suspense>
-                                    </main>
-                                    {/* <ComponentErrorBoundary>
+                                            {/*  Added Suspense for async content loading */}
+                                            <Suspense
+                                                fallback={<LoadingIndicator />}
+                                            >
+                                                <ComponentErrorBoundary>
+                                                    <Outlet />
+                                                </ComponentErrorBoundary>
+                                            </Suspense>
+                                        </main>
+                                        {/* <ComponentErrorBoundary>
                                         <footer className='mobile-footer'>
                                             <MobileFooter />
                                         </footer>
                                     </ComponentErrorBoundary> */}
 
-                                    {/* Added error boundary for notifications */}
-                                    <ComponentErrorBoundary>
-                                        <Notifications />
-                                    </ComponentErrorBoundary>
-                                </div>
-                            </TutorialProvider>
-                            <RuntimeDomManipulation />
-                        </SdkProvider>
+                                        {/* Added error boundary for notifications */}
+                                        <ComponentErrorBoundary>
+                                            <Notifications />
+                                        </ComponentErrorBoundary>
+                                    </div>
+                                </TutorialProvider>
+                                <RuntimeDomManipulation />
+                            </SdkProvider>
+                        </UnifiedMarginDataProvider>
                     </AppProvider>
                 </FogoSessionProvider>
             </Layout>

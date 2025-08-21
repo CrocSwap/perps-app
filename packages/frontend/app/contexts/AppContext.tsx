@@ -33,8 +33,15 @@ export interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const [isUserConnected, setIsUserConnected] = useState(false);
 
-    const { isDebugWalletActive, debugWallet, setDebugWallet } =
-        useDebugStore();
+    const {
+        isDebugWalletActive,
+        debugWallet,
+        setDebugWallet,
+        manualAddressEnabled,
+        manualAddress,
+        setManualAddressEnabled,
+        setManualAddress,
+    } = useDebugStore();
 
     const { setUserAddress } = useUserDataStore();
 
@@ -49,7 +56,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }, []);
 
     const bindEmptyAddress = () => {
-        setUserAddress(debugWallets[2].address);
+        if (isDebugWalletActive) {
+            setUserAddress(debugWallets[2].address);
+        } else {
+            setUserAddress('');
+        }
         resetUserData();
     };
 
@@ -64,6 +75,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                 setUserAddress(walletToSet.address);
                 setDebugWallet(walletToSet);
             }
+            setManualAddressEnabled(false);
+            setManualAddress('');
         } else {
             if (fogoAddress === '') {
                 bindEmptyAddress();
@@ -91,6 +104,21 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             setUserAddress(debugWallet.address);
         }
     }, [debugWallet, isDebugWalletActive]);
+
+    useEffect(() => {
+        if (
+            manualAddressEnabled &&
+            manualAddress !== '' &&
+            manualAddress !== undefined
+        ) {
+            setUserAddress(manualAddress);
+        } else {
+            if (isDebugWalletActive) {
+            } else {
+                setUserAddress(fogoAddress);
+            }
+        }
+    }, [manualAddressEnabled, manualAddress, isDebugWalletActive]);
 
     return (
         <AppContext.Provider

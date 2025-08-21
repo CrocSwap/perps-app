@@ -51,9 +51,20 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         [setSelectedMode, symbol],
     );
 
+    // autofocus trade-module-size-input when user clicks anywhere in sizeInputContainer except for the tokenButton
+    const handleContainerClick = useCallback((e: React.MouseEvent) => {
+        const sizeInput = document.getElementById(
+            'trade-module-size-input',
+        ) as HTMLInputElement;
+
+        sizeInput.focus();
+        sizeInput.select();
+    }, []);
+
     return (
         <div
             className={`${styles.sizeInputContainer} ${isModal && styles.modalContainer}`}
+            onClick={handleContainerClick}
         >
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
             <NumFormattedInput
@@ -68,7 +79,14 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 onFocus={onFocus}
                 autoFocus={props.autoFocus}
             />
-            <button className={styles.tokenButton}>
+            <button
+                className={styles.tokenButton}
+                id='trade-module-token-button'
+                onClick={(e) => {
+                    e.stopPropagation();
+                    e.nativeEvent.stopImmediatePropagation();
+                }}
+            >
                 <ComboBox
                     key={selectedMode}
                     value={

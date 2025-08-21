@@ -3,9 +3,10 @@ import { LuPen } from 'react-icons/lu';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import { useNotificationStore } from '~/stores/NotificationStore';
+import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
@@ -71,27 +72,49 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
 
         setIsCancelling(true);
 
+        const slug = makeSlug(10);
         try {
-            // Show pending notification
-            // notifications.add({
-            //     title: 'Cancel Order Pending',
-            //     message: `Cancelling order for ${order.sz} ${order.coin}`,
-            //     icon: 'spinner',
-            // });
-
-            // Execute the cancel order
-            const result = await executeCancelOrder({
-                orderId: order.oid,
-            });
-
             const usdValueOfOrderStr = formatNum(
                 order.sz * markPx,
                 2,
                 true,
                 true,
             );
+            // Show pending notification
+            notifications.add({
+                title: 'Cancel Order Pending',
+                message: `Cancelling order for ${usdValueOfOrderStr} of ${order.coin}`,
+                icon: 'spinner',
+                slug,
+                removeAfter: 60000,
+            });
+
+            const timeOfTxBuildStart = Date.now();
+            // Execute the cancel order
+            const result = await executeCancelOrder({
+                orderId: order.oid,
+            });
 
             if (result.success) {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Cancel Success',
+                            orderType: 'Limit',
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
@@ -122,6 +145,25 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     onCancel(order.timestamp, order.coin);
                 }
             } else {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Cancel Fail',
+                            orderType: 'Limit',
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show error notification
                 notifications.add({
                     title: 'Cancel Failed',
@@ -152,6 +194,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             }
         } catch (error) {
             console.error('❌ Error cancelling order:', error);
+            notifications.remove(slug);
             notifications.add({
                 title: 'Cancel Failed',
                 message:

@@ -133,6 +133,8 @@
 }
 
 .comboBoxContainers {
+    --svg-width-height: 25px;
+    --svg-padding: 4.5px;
     width: 100%;
     justify-content: flex-start;
 
@@ -164,4 +166,34 @@
 
 .walletSelector.passive {
     opacity: 0.5;
+}
+
+.manualAddressInput {
+    background-color: var(--bg-dark4);
+    border: none;
+    color: var(--text1);
+    font-size: var(--font-size-s);
+    padding: var(--padding-xs);
+    border-radius: var(--radius-xs);
+    width: 21rem;
+}
+
+.manualAddressInput:focus {
+    outline: none;
+}
+
+.manualAddressInput.valid {
+    border: 1px solid var(--green);
+}
+
+.manualAddressInput.invalid {
+    border: 1px solid var(--red);
+}
+
+.itemWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-s);
 }

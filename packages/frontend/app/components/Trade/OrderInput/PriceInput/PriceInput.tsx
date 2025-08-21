@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import styles from './PriceInput.module.css';
 
@@ -29,6 +30,16 @@ export default function PriceInput(props: PropsIF) {
         isModal = false,
     } = props;
 
+    // autofocus trade-module-price-input when user clicks anywhere in priceInputContainer except for the midButton
+    const handleContainerClick = useCallback((e: React.MouseEvent) => {
+        const priceInput = document.getElementById(
+            'trade-module-price-input',
+        ) as HTMLInputElement;
+
+        priceInput.focus();
+        priceInput.select();
+    }, []);
+
     return (
         <div
             className={`${styles.priceInputContainer}
@@ -36,9 +47,11 @@ export default function PriceInput(props: PropsIF) {
              ${isModal ? styles.modalContainer : ''}
 
               `}
+            onClick={handleContainerClick}
         >
             <span>Price</span>
             <NumFormattedInput
+                id='trade-module-price-input'
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -50,7 +63,9 @@ export default function PriceInput(props: PropsIF) {
             {showMidButton && (
                 <button
                     className={`${styles.midButton} ${isMidModeActive ? styles.midButtonActive : ''}`}
-                    onClick={() => {
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.nativeEvent.stopImmediatePropagation();
                         if (!isMidModeActive) {
                             setMidPriceAsPriceInput();
                             setIsMidModeActive(true);

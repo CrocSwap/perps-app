@@ -1,14 +1,19 @@
 import * as d3 from 'd3';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import type { LimitOrderParams } from '~/services/limitOrderService';
-import { useNotificationStore } from '~/stores/NotificationStore';
+import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import {
     findLimitLabelAtPosition,
+    getMainSeriesPaneIndex,
+    getPaneCanvasAndIFrameDoc,
     getXandYLocationForChartDrag,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
@@ -56,9 +61,12 @@ const LabelComponent = ({
 
     const notifications = useNotificationStore();
 
+    const { formatNum } = useNumFormatter();
+
+    const symbolInfo = useTradeDataStore((state) => state.symbolInfo);
+
     const { executeCancelOrder } = useCancelOrderService();
     const { executeLimitOrder } = useLimitOrderService();
-    const { add } = useNotificationStore();
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const [isDrag, setIsDrag] = useState(false);
@@ -72,32 +80,25 @@ const LabelComponent = ({
             let widthAttr = canvasSize?.width;
 
             if (overlayCanvasRef.current) {
-                const chartDiv = document.getElementById('tv_chart');
-                const iframe = chartDiv?.querySelector(
-                    'iframe',
-                ) as HTMLIFrameElement;
-                const iframeDoc =
-                    iframe?.contentDocument || iframe?.contentWindow?.document;
+                const { iframeDoc, paneCanvas } =
+                    getPaneCanvasAndIFrameDoc(chart);
 
-                if (iframeDoc) {
-                    const paneCanvas = iframeDoc.querySelector(
-                        'canvas[data-name="pane-canvas"]',
-                    ) as HTMLCanvasElement;
-                    const width = overlayCanvasRef.current.style.width;
-                    const height = overlayCanvasRef.current.style?.height;
+                if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
 
-                    heightAttr = paneCanvas?.height;
-                    widthAttr = paneCanvas.width;
+                const width = overlayCanvasRef.current.style.width;
+                const height = overlayCanvasRef.current.style?.height;
 
-                    if (
-                        width !== canvasSize?.styleWidth ||
-                        height !== canvasSize?.styleWidth
-                    ) {
-                        overlayCanvasRef.current.style.width = `${canvasSize?.styleWidth}px`;
-                        overlayCanvasRef.current.style.height = `${canvasSize?.styleHeight}px`;
-                        overlayCanvasRef.current.width = paneCanvas.width;
-                        overlayCanvasRef.current.height = paneCanvas.height;
-                    }
+                heightAttr = paneCanvas?.height;
+                widthAttr = paneCanvas.width;
+
+                if (
+                    width !== canvasSize?.styleWidth ||
+                    height !== canvasSize?.styleWidth
+                ) {
+                    overlayCanvasRef.current.style.width = `${canvasSize?.styleWidth}px`;
+                    overlayCanvasRef.current.style.height = `${canvasSize?.styleHeight}px`;
+                    overlayCanvasRef.current.width = paneCanvas.width;
+                    overlayCanvasRef.current.height = paneCanvas.height;
                 }
             }
 
@@ -209,7 +210,7 @@ const LabelComponent = ({
         selectedLine,
     ]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!isDrag) {
             const overlayOffsetX = overlayCanvasMousePositionRef.current.x;
             const overlayOffsetY = overlayCanvasMousePositionRef.current.y;
@@ -230,7 +231,8 @@ const LabelComponent = ({
             }
         }
     }, [
-        overlayCanvasMousePositionRef.current,
+        overlayCanvasMousePositionRef.current.x,
+        overlayCanvasMousePositionRef.current.y,
         JSON.stringify(drawnLabelsRef.current),
         isDrag,
     ]);
@@ -243,51 +245,39 @@ const LabelComponent = ({
                     .crossHairMoved()
                     .subscribe(null, ({ offsetX, offsetY }) => {
                         if (chart) {
-                            const chartDiv =
-                                document.getElementById('tv_chart');
-                            const iframe = chartDiv?.querySelector(
-                                'iframe',
-                            ) as HTMLIFrameElement;
+                            const { paneCanvas } =
+                                getPaneCanvasAndIFrameDoc(chart);
 
-                            const iframeDoc = iframe.contentDocument;
+                            if (!paneCanvas) return;
 
-                            if (iframeDoc) {
-                                const paneCanvas = iframeDoc.querySelector(
-                                    'canvas[data-name="pane-canvas"]',
-                                ) as HTMLCanvasElement;
+                            const rect = paneCanvas?.getBoundingClientRect();
 
-                                const rect =
-                                    paneCanvas?.getBoundingClientRect();
+                            if (rect && paneCanvas && offsetX && offsetY) {
+                                const cssOffsetX = offsetX - rect.left;
+                                const cssOffsetY = offsetY - rect.top;
 
-                                if (rect && paneCanvas && offsetX && offsetY) {
-                                    const cssOffsetX = offsetX - rect.left;
-                                    const cssOffsetY = offsetY - rect.top;
+                                const scaleY =
+                                    paneCanvas?.height / rect?.height;
+                                const scaleX = paneCanvas.width / rect.width;
 
-                                    const scaleY =
-                                        paneCanvas?.height / rect?.height;
-                                    const scaleX =
-                                        paneCanvas.width / rect.width;
+                                const overlayOffsetX = cssOffsetX * scaleX;
+                                const overlayOffsetY = cssOffsetY * scaleY;
 
-                                    const overlayOffsetX = cssOffsetX * scaleX;
-                                    const overlayOffsetY = cssOffsetY * scaleY;
+                                const isLabel = findLimitLabelAtPosition(
+                                    overlayOffsetX,
+                                    overlayOffsetY,
+                                    drawnLabelsRef.current,
+                                    false,
+                                );
+                                overlayCanvasMousePositionRef.current = {
+                                    x: overlayOffsetX,
+                                    y: overlayOffsetY,
+                                };
 
-                                    const isLabel = findLimitLabelAtPosition(
-                                        overlayOffsetX,
-                                        overlayOffsetY,
-                                        drawnLabelsRef.current,
-                                        false,
-                                    );
-
-                                    overlayCanvasMousePositionRef.current = {
-                                        x: overlayOffsetX,
-                                        y: overlayOffsetY,
-                                    };
-
-                                    if (isLabel) {
-                                        if (overlayCanvasRef.current)
-                                            overlayCanvasRef.current.style.pointerEvents =
-                                                'auto';
-                                    }
+                                if (isLabel) {
+                                    if (overlayCanvasRef.current)
+                                        overlayCanvasRef.current.style.pointerEvents =
+                                            'auto';
                                 }
                             }
                         }
@@ -296,8 +286,8 @@ const LabelComponent = ({
         }
     }, [chart, drawnLabelsRef.current, isDrag]);
 
-    const handleCancel = async (orderId: number) => {
-        if (!orderId) {
+    const handleCancel = async (order: LineData) => {
+        if (!order.oid) {
             notifications.add({
                 title: 'Cancel Failed',
                 message: 'Order ID not found',
@@ -306,36 +296,92 @@ const LabelComponent = ({
             return;
         }
 
+        const slug = makeSlug(10);
+
+        const usdValueOfOrderStr = formatNum(
+            (order.quantityTextValue || 0) * (symbolInfo?.markPx || 1),
+            2,
+            true,
+            true,
+        );
         try {
             // Show pending notification
             notifications.add({
                 title: 'Cancel Order Pending',
-                message: `Cancelling order`,
+                message: `Cancelling ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                 icon: 'spinner',
+                slug,
+                removeAfter: 60000,
             });
 
+            const timeOfTxBuildStart = Date.now();
             // Execute the cancel order
             const result = await executeCancelOrder({
-                orderId,
+                orderId: order.oid,
             });
 
             if (result.success) {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Cancel Success',
+                            orderType: 'Limit',
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
-                    message: `Successfully cancelled order`,
+                    message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                     icon: 'check',
+                    txLink: result.signature
+                        ? blockExplorer + result.signature
+                        : undefined,
                 });
             } else {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Cancel Fail',
+                            orderType: 'Limit',
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show error notification
                 notifications.add({
                     title: 'Cancel Failed',
                     message: String(result.error || 'Failed to cancel order'),
                     icon: 'error',
+                    txLink: result.signature
+                        ? blockExplorer + result.signature
+                        : undefined,
                 });
             }
         } catch (error) {
             console.error('❌ Error cancelling order:', error);
+            notifications.remove(slug);
             notifications.add({
                 title: 'Cancel Failed',
                 message:
@@ -344,6 +390,19 @@ const LabelComponent = ({
                         : 'Unknown error occurred',
                 icon: 'error',
             });
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Limit Cancel Fail',
+                        orderType: 'Limit',
+                        direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         }
     };
 
@@ -385,7 +444,7 @@ const LabelComponent = ({
                         if (found) {
                             console.log({ found });
                             if (found.parentLine.oid)
-                                handleCancel(found.parentLine.oid);
+                                handleCancel(found.parentLine);
                             console.log(found.parentLine.textValue);
                         }
                     }
@@ -449,9 +508,11 @@ const LabelComponent = ({
             let advancedValue = scaleData?.yScale.invert(clientY);
 
             if (chart) {
-                const priceScalePane = chart
-                    .activeChart()
-                    .getPanes()[0] as IPaneApi;
+                const paneIndex = getMainSeriesPaneIndex(chart);
+                if (paneIndex === null) return;
+                const priceScalePane = chart.activeChart().getPanes()[
+                    paneIndex
+                ] as IPaneApi;
 
                 const priceScale = priceScalePane.getMainSourcePriceScale();
                 if (priceScale) {
@@ -490,7 +551,24 @@ const LabelComponent = ({
             const quantity = tempSelectedLine.parentLine.quantityTextValue;
             const side = tempSelectedLine.parentLine.side;
 
+            const slug = makeSlug(10);
+
             try {
+                const usdValueOfOrderStr = formatNum(
+                    (quantity || 0) * (symbolInfo?.markPx || 1),
+                    2,
+                    true,
+                    true,
+                );
+                // Show pending notification
+                notifications.add({
+                    title: 'Limit Order Update Pending',
+                    message: `Updating ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
+                    icon: 'spinner',
+                    slug,
+                    removeAfter: 60000,
+                });
+
                 // If cancel was successful, create a new order with the updated price
                 // Note: You'll need to provide the correct order parameters based on your application's needs
                 const newOrderParams: LimitOrderParams = {
@@ -505,6 +583,7 @@ const LabelComponent = ({
                     // ... other required parameters
                 } as LimitOrderParams; // Cast to the correct type
 
+                const timeOfTxBuildStart = Date.now();
                 const limitOrderResult =
                     await executeLimitOrder(newOrderParams);
 
@@ -515,7 +594,26 @@ const LabelComponent = ({
                         limitOrderResult.error,
                     );
                     // Show error notification to user
-                    add({
+                    notifications.remove(slug);
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Limit Update Fail',
+                                orderType: 'Limit',
+                                direction: side === 'buy' ? 'Buy' : 'Sell',
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    limitOrderResult.timeOfSubmission,
+                                ),
+                                txDuration: getDurationSegment(
+                                    limitOrderResult.timeOfSubmission,
+                                    Date.now(),
+                                ),
+                                txSignature: limitOrderResult.signature,
+                            },
+                        });
+                    }
+                    notifications.add({
                         title: 'Failed to update order',
                         message:
                             limitOrderResult.error || 'Unknown error occurred',
@@ -527,10 +625,28 @@ const LabelComponent = ({
                     });
                 } else {
                     // Show success notification
-                    add({
+                    notifications.remove(slug);
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Limit Update Success',
+                                orderType: 'Limit',
+                                direction: side === 'buy' ? 'Buy' : 'Sell',
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    limitOrderResult.timeOfSubmission,
+                                ),
+                                txDuration: getDurationSegment(
+                                    limitOrderResult.timeOfSubmission,
+                                    Date.now(),
+                                ),
+                                txSignature: limitOrderResult.signature,
+                            },
+                        });
+                    }
+                    notifications.add({
                         title: 'Order updated',
-                        message:
-                            'The order has been successfully updated with the new price.',
+                        message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
                         icon: 'check',
                         removeAfter: 10000,
                         txLink: limitOrderResult.signature
@@ -541,7 +657,8 @@ const LabelComponent = ({
             } catch (error) {
                 setSelectedLine(undefined);
                 console.error('Error updating order:', error);
-                add({
+                notifications.remove(slug);
+                notifications.add({
                     title: 'Error updating order',
                     message:
                         error instanceof Error
@@ -549,6 +666,19 @@ const LabelComponent = ({
                             : 'Unknown error occurred',
                     icon: 'error',
                 });
+                if (typeof plausible === 'function') {
+                    plausible('Offchain Failure', {
+                        props: {
+                            actionType: 'Limit Update Fail',
+                            orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
+                            errorMessage:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                        },
+                    });
+                }
             }
 
             tempSelectedLine = undefined;
