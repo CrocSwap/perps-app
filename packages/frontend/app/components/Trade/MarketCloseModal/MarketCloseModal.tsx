@@ -15,6 +15,8 @@ import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 import SizeInput from '../OrderInput/SizeInput/SizeInput';
 import styles from './MarketCloseModal.module.css';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 interface PropsIF {
     close: () => void;
@@ -224,6 +226,17 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 message: 'Please enter a valid order size',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 987671676764,
+                        title: 'Invalid Order Size',
+                        message: 'Please enter a valid order size',
+                        icon: 'error',
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             close();
             return;
         }
@@ -262,6 +275,21 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         : undefined,
                     removeAfter: 5000,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 7864796646,
+                            title: 'Position Closed',
+                            message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
+                            icon: 'check',
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                            removeAfter: 5000,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             } else {
                 notifications.add({
                     title: 'Close Failed',
@@ -272,6 +300,21 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 648774867,
+                            title: 'Close Failed',
+                            message: result.error || 'Failed to close position',
+                            icon: 'error',
+                            removeAfter: 10000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             }
         } catch (error) {
             console.error('❌ Error closing position:', error);
@@ -284,6 +327,21 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 icon: 'error',
                 removeAfter: 10000,
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 6741674678741,
+                        title: 'Close Failed',
+                        message:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                        icon: 'error',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
         } finally {
             setIsProcessingOrder(false);
             close();

@@ -16,6 +16,8 @@ import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 import PriceInput from '../OrderInput/PriceInput/PriceInput';
 import SizeInput from '../OrderInput/SizeInput/SizeInput';
 import styles from './LimitCloseModal.module.css';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 interface PropsIF {
     close: () => void;
@@ -275,6 +277,18 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 message: 'Please enter a valid order size',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 514351358,
+                        title: 'Deposit Failed',
+                        message: 'Please enter a valid order size',
+                        icon: 'error',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             close();
             return;
         }
@@ -286,6 +300,18 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 message: 'Please enter a valid limit price',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 6764167,
+                        title: 'Invalid Price',
+                        message: 'Please enter a valid limit price',
+                        icon: 'error',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             close();
             return;
         }
@@ -317,6 +343,21 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         : undefined,
                     removeAfter: 5000,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 6764167,
+                            title: 'Limit Order Placed',
+                            message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                            icon: 'error',
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                            removeAfter: 5000,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
@@ -327,6 +368,22 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 65462446467,
+                            title: 'Limit Order Failed',
+                            message:
+                                result.error || 'Failed to place limit order',
+                            icon: 'error',
+                            removeAfter: 10000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             }
         } catch (error) {
             console.error(`❌ Error submitting limit ${side} order:`, error);
@@ -339,6 +396,21 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 icon: 'error',
                 removeAfter: 10000,
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 6764167,
+                        title: 'Limit Order Failed',
+                        message:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                        icon: 'error',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
         } finally {
             setIsProcessingOrder(false);
             close();

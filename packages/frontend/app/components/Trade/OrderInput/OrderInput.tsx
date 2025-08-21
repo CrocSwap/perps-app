@@ -56,6 +56,8 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 export interface OrderTypeOption {
     value: string;
@@ -1272,6 +1274,17 @@ function OrderInput({
                 message: 'Please enter a valid order size',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 971235468,
+                        title: 'Invalid Order Size',
+                        message: 'Please enter a valid order size',
+                        icon: 'error',
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             confirmOrderModal.close();
             return;
         }
@@ -1318,6 +1331,36 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 3489196786,
+                            title: 'Buy Order Successful',
+                            message: `Successfully bought ${usdValueOfOrderStr} of ${symbol}`,
+                            icon: 'check',
+                            removeAfter: 5000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 971235468,
+                            title: 'Buy Order Successful',
+                            message: `Successfully bought ${usdValueOfOrderStr} of ${symbol}`,
+                            icon: 'check',
+                            removeAfter: 5000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             } else {
                 // Show error notification
                 notifications.add({
@@ -1329,6 +1372,21 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 971235468,
+                            title: 'Buy Order Failed',
+                            message: result.error || 'Transaction failed',
+                            icon: 'error',
+                            removeAfter: 10000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             }
         } catch (error) {
             console.error('❌ Error submitting market buy order:', error);
@@ -1341,6 +1399,21 @@ function OrderInput({
                 icon: 'error',
                 removeAfter: 10000,
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 4986713,
+                        title: 'Buy Order Failed',
+                        message:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                        icon: 'error',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
         } finally {
             setIsProcessingOrder(false);
             confirmOrderModal.close();
@@ -1356,6 +1429,17 @@ function OrderInput({
                 message: 'Please enter a valid order size',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 6417614713,
+                        title: 'Invalid Order Size',
+                        message: 'Please enter a valid order size',
+                        icon: 'error',
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             confirmOrderModal.close();
             return;
         }
@@ -1401,6 +1485,21 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 714357616815,
+                            title: 'Sell Order Successful',
+                            message: `Successfully sold ${usdValueOfOrderStr} of ${symbol}`,
+                            icon: 'check',
+                            removeAfter: 5000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             } else {
                 // Show error notification
                 notifications.add({
@@ -1412,6 +1511,21 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 7143143716815,
+                            title: 'Sell Order Failed',
+                            message: result.error || 'Transaction failed',
+                            icon: 'error',
+                            removeAfter: 10000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             }
         } catch (error) {
             console.error('❌ Error submitting market sell order:', error);
@@ -1424,6 +1538,21 @@ function OrderInput({
                 icon: 'error',
                 removeAfter: 10000,
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 1786745718674,
+                        title: 'Sell Order Failed',
+                        message:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                        icon: 'error',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
         } finally {
             setIsProcessingOrder(false);
             confirmOrderModal.close();
@@ -1439,6 +1568,17 @@ function OrderInput({
                 message: 'Please enter a valid order size',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 1786745718674,
+                        title: 'Invalid Order Size',
+                        message: 'Please enter a valid order size',
+                        icon: 'error',
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             confirmOrderModal.close();
             return;
         }
@@ -1451,6 +1591,17 @@ function OrderInput({
                 message: 'Please enter a valid limit price',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 14786745718674,
+                        title: 'Invalid Price',
+                        message: 'Please enter a valid limit price',
+                        icon: 'error',
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             confirmOrderModal.close();
             return;
         }
@@ -1493,6 +1644,17 @@ function OrderInput({
                         : undefined,
                     removeAfter: 5000,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 14786745718674,
+                            title: 'Invalid Price',
+                            message: 'Please enter a valid limit price',
+                            icon: 'error',
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
@@ -1503,6 +1665,22 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 14786745718674,
+                            title: 'Limit Order Failed',
+                            message:
+                                result.error || 'Failed to place limit order',
+                            icon: 'error',
+                            removeAfter: 10000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             }
         } catch (error) {
             console.error('❌ Error submitting limit buy order:', error);
@@ -1515,6 +1693,21 @@ function OrderInput({
                 icon: 'error',
                 removeAfter: 10000,
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 14786745718674,
+                        title: 'Limit Order Failed',
+                        message:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                        icon: 'error',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
         } finally {
             setIsProcessingOrder(false);
             confirmOrderModal.close();
@@ -1530,6 +1723,17 @@ function OrderInput({
                 message: 'Please enter a valid order size',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 657687868761874,
+                        title: 'Invalid Order Size',
+                        message: 'Please enter a valid order size',
+                        icon: 'error',
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             confirmOrderModal.close();
             return;
         }
@@ -1542,6 +1746,17 @@ function OrderInput({
                 message: 'Please enter a valid limit price',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 657687868761874,
+                        title: 'Invalid Price',
+                        message: 'Please enter a valid limit price',
+                        icon: 'error',
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             confirmOrderModal.close();
             return;
         }
@@ -1584,6 +1799,21 @@ function OrderInput({
                         : undefined,
                     removeAfter: 5000,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 657687868761874,
+                            title: 'Limit Order Placed',
+                            message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
+                            icon: 'check',
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                            removeAfter: 5000,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
@@ -1594,6 +1824,22 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 657687868761874,
+                            title: 'Limit Order Failed',
+                            message:
+                                result.error || 'Failed to place limit order',
+                            icon: 'error',
+                            removeAfter: 10000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             }
         } catch (error) {
             console.error('❌ Error submitting limit sell order:', error);
@@ -1606,6 +1852,21 @@ function OrderInput({
                 icon: 'error',
                 removeAfter: 10000,
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 657687868761874,
+                        title: 'Limit Order Failed',
+                        message:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                        icon: 'error',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
         } finally {
             setIsProcessingOrder(false);
             confirmOrderModal.close();

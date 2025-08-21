@@ -9,6 +9,8 @@ import { blockExplorer } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 export interface OpenOrderData {
     time: string;
@@ -49,6 +51,21 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 message: 'Order ID not found',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 6768767673,
+                        title: 'Cancel All Failed',
+                        message:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                        icon: 'error',
+                        removeAfter: 5000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
             return;
         }
 
@@ -85,7 +102,21 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         : undefined,
                     removeAfter: 5000,
                 });
-
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 6768767673,
+                            title: 'Order Cancelled',
+                            message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
+                            icon: 'check',
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                            removeAfter: 5000,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
                 // Call the original onCancel callback if provided
                 if (onCancel) {
                     onCancel(order.timestamp, order.coin);
@@ -101,6 +132,23 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         : undefined,
                     removeAfter: 5000,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 971235468,
+                            title: 'Cancel Failed',
+                            message: String(
+                                result.error || 'Failed to cancel order',
+                            ),
+                            icon: 'error',
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                            removeAfter: 5000,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             }
         } catch (error) {
             console.error('❌ Error cancelling order:', error);
@@ -112,6 +160,20 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         : 'Unknown error occurred',
                 icon: 'error',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 971235468,
+                        title: 'Cancel Failed',
+                        message:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                        icon: 'error',
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
         } finally {
             setIsCancelling(false);
         }

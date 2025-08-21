@@ -12,8 +12,11 @@ import TokenDropdown, {
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { toast } from 'sonner';
 import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
+import React from 'react';
+import Notification from '~/components/Notifications/Notification';
 
 interface propsIF {
     portfolio: {
@@ -137,6 +140,21 @@ function PortfolioDeposit(props: propsIF) {
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 514351358,
+                            title: 'Deposit Failed',
+                            message: result.error || 'Transaction failed',
+                            icon: 'error',
+                            removeAfter: 10000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             } else {
                 setTransactionStatus('success');
 
@@ -150,6 +168,25 @@ function PortfolioDeposit(props: propsIF) {
                         : undefined,
                     removeAfter: 5000,
                 });
+                // add toast with Sonner
+                toast.custom(
+                    () => (
+                        <Notification
+                            data={{
+                                slug: 55,
+                                title: 'Deposit Successful',
+                                message: `Successfully deposited ${formatNum(depositInputNum, 2, true, false)} fUSD`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                                removeAfter: 5000,
+                            }}
+                            dismiss={(num: number) => console.log(num)}
+                        />
+                    ),
+                    { duration: Infinity },
+                );
 
                 // Close modal on success - notification will show after modal closes
                 if (props.onClose) {

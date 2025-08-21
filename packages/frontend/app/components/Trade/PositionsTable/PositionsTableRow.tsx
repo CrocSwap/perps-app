@@ -19,6 +19,8 @@ import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
 import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -201,6 +203,21 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
                         icon: 'check',
                     });
+                    toast.custom(() => (
+                        <Notification
+                            data={{
+                                slug: 657687868761874,
+                                title: 'Limit Order Failed',
+                                message:
+                                    error instanceof Error
+                                        ? error.message
+                                        : 'Unknown error occurred',
+                                icon: 'error',
+                                removeAfter: 10000,
+                            }}
+                            dismiss={(num: number) => console.log(num)}
+                        />
+                    ));
                 } else {
                     notifications.add({
                         title: 'Close Failed',

@@ -9,6 +9,8 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer } from '~/utils/Constants';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 interface propsIF {
     portfolio: {
@@ -199,6 +201,21 @@ function PortfolioWithdraw({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 514351358,
+                            title: 'Withdraw Failed',
+                            message: result.error || 'Transaction failed',
+                            icon: 'error',
+                            removeAfter: 10000,
+                            txLink: result.signature
+                                ? `${blockExplorer}/tx/${result.signature}`
+                                : undefined,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
             } else {
                 setTransactionStatus('success');
 
@@ -212,7 +229,18 @@ function PortfolioWithdraw({
                         : undefined,
                     removeAfter: 5000,
                 });
-
+                toast.custom(() => (
+                    <Notification
+                        data={{
+                            slug: 489712651,
+                            title: 'Withdrawal Successful',
+                            message: `Successfully withdrew ${formatNum(withdrawInputNum, 2, true, false)} fUSD`,
+                            icon: 'check',
+                            removeAfter: 10000,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ));
                 // Close modal on success - notification will show after modal closes
                 if (onClose) {
                     onClose();

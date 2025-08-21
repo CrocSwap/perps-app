@@ -19,6 +19,7 @@ import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialCo
 import { useTutorial } from '~/hooks/useTutorial';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
+import { Toaster } from 'sonner';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
@@ -340,6 +341,7 @@ export default function Trade() {
                 onComplete={handleTutorialComplete}
                 onSkip={handleTutorialSkip}
             />
+            <Toaster position='bottom-left' />
         </>
     );
 }

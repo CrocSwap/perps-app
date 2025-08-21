@@ -11,6 +11,8 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 interface LeverageSliderModalProps {
     currentLeverage: number;
@@ -115,6 +117,24 @@ export default function LeverageSliderModal({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                // add toast with Sonner
+                toast.custom(
+                    () => (
+                        <Notification
+                            data={{
+                                slug: 54893187612,
+                                title: 'Leverage Updated',
+                                message: `Successfully set leverage to ${value.toFixed(1)}x`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={(num: number) => console.log(num)}
+                        />
+                    ),
+                    { duration: Infinity },
+                );
 
                 // Close modal on success
                 onClose();
@@ -123,13 +143,33 @@ export default function LeverageSliderModal({
 
                 // Show error notification and close modal
                 notificationStore.add({
+                    slug: 7651894531,
                     title: 'Transaction Failed',
                     message: result.error || 'Failed to update leverage',
-                    icon: 'xmark',
+                    icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                // add toast with Sonner
+                toast.custom(
+                    () => (
+                        <Notification
+                            data={{
+                                slug: 984237412384843,
+                                title: 'Transaction Failed',
+                                message:
+                                    result.error || 'Failed to update leverage',
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={(num: number) => console.log(num)}
+                        />
+                    ),
+                    { duration: Infinity },
+                );
                 onClose();
             }
         } catch (error) {
@@ -145,6 +185,18 @@ export default function LeverageSliderModal({
                 message: errorMessage,
                 icon: 'xmark',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 489712651,
+                        title: 'Transaction Error',
+                        message: errorMessage,
+                        icon: 'check',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
         } finally {
             setIsProcessing(false);
         }

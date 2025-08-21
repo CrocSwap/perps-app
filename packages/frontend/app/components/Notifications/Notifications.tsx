@@ -17,6 +17,7 @@ import { WsChannels } from '~/utils/Constants';
 import SimpleButton from '../SimpleButton/SimpleButton';
 import Notification from './Notification';
 import styles from './Notifications.module.css';
+import { toast } from 'sonner';
 
 interface NewsItemIF {
     headline: string;
@@ -88,6 +89,18 @@ export default function Notifications() {
                 message: message,
                 icon: 'check',
             });
+            toast.custom(() => (
+                <Notification
+                    data={{
+                        slug: 489712651,
+                        title: title,
+                        message: message,
+                        icon: 'check',
+                        removeAfter: 10000,
+                    }}
+                    dismiss={(num: number) => console.log(num)}
+                />
+            ));
         }
     }, []);
 
