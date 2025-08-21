@@ -433,7 +433,6 @@ export default function WebDataConsumer() {
                         order.order,
                         order.status,
                     );
-                    console.log(processedOrder);
                     if (processedOrder) {
                         orders.push(processedOrder);
                     }

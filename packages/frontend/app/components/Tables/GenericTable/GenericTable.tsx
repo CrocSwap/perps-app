@@ -3,19 +3,26 @@ import {
     SessionButton,
     useSession,
 } from '@fogo/sessions-sdk-react';
-import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useId,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { useIsClient } from '~/hooks/useIsClient';
+import { useDebugStore } from '~/stores/DebugStore';
 import {
     TableState,
     type HeaderCell,
     type TableSortDirection,
 } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
-import { useDebugStore } from '~/stores/DebugStore';
 
 interface GenericTableProps<
     T,
@@ -61,6 +68,7 @@ export default function GenericTable<
 
     const sessionState = useSession();
 
+    const sessionButtonRef = useRef<HTMLDivElement>(null);
     const {
         data,
         noDataMessage,
@@ -402,6 +410,20 @@ export default function GenericTable<
         isDebugWalletActive,
     ]);
 
+    useEffect(() => {
+        const button = sessionButtonRef.current;
+        if (button) {
+            const handleClick = () => {
+                localStorage.setItem(
+                    'loginButtonClickTime',
+                    Date.now().toString(),
+                );
+            };
+            button.addEventListener('click', handleClick);
+            return () => button.removeEventListener('click', handleClick);
+        }
+    }, []);
+
     return (
         <div
             className={`${styles.tableWrapper} ${
@@ -442,6 +464,7 @@ export default function GenericTable<
                 {!isSessionEstablished && (
                     <div
                         className={`plausible-event-name=Login+Button+Click plausible-event-location=Generic+Table ${styles.sessionButtonContainer}`}
+                        ref={sessionButtonRef}
                     >
                         <SessionButton />
                     </div>

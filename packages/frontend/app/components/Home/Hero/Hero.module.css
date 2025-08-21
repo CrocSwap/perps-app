@@ -16,7 +16,6 @@
         rgba(115, 113, 252, 0.2) 0%,
         rgba(115, 113, 252, 0) 100%
     );
-    max-width: 120rem;
     margin: 0 auto;
     padding: 0 12px;
     overflow: hidden;

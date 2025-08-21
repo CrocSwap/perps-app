@@ -30,6 +30,11 @@ interface DebugStore {
     setManualAddressEnabled: (manualAddressEnabled: boolean) => void;
     manualAddress: string;
     setManualAddress: (manualAddress: string) => void;
+
+    useMockLeverage: boolean;
+    setUseMockLeverage: (useMockLeverage: boolean) => void;
+    mockMinimumLeverage: number;
+    setMockMinimumLeverage: (mockMinimumLeverage: number) => void;
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
@@ -72,4 +77,9 @@ export const useDebugStore = create<DebugStore>((set) => ({
     },
     manualAddress: '',
     setManualAddress: (manualAddress: string) => set({ manualAddress }),
+    useMockLeverage: false,
+    setUseMockLeverage: (useMockLeverage: boolean) => set({ useMockLeverage }),
+    mockMinimumLeverage: 1,
+    setMockMinimumLeverage: (mockMinimumLeverage: number) =>
+        set({ mockMinimumLeverage }),
 }));

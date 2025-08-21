@@ -29,12 +29,32 @@ import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 
 export default function PageHeader() {
     const sessionState = useSession();
 
     const isUserConnected = isEstablished(sessionState);
+
+    const sessionButtonRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        const button = sessionButtonRef.current;
+        if (button) {
+            const handleClick = () => {
+                if (!isUserConnected) {
+                    localStorage.setItem(
+                        'loginButtonClickTime',
+                        Date.now().toString(),
+                    );
+                }
+            };
+
+            button.addEventListener('click', handleClick);
+            return () => button.removeEventListener('click', handleClick);
+        }
+    }, [isUserConnected]);
 
     // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,17 +68,19 @@ export default function PageHeader() {
     const location = useLocation();
 
     // symbol for active market
-    const { symbol, setMarginBucket } = useTradeDataStore();
+    const { symbol } = useTradeDataStore();
 
     // Use unified margin data
     const { marginBucket } = useUnifiedMarginData();
 
-    useEffect(() => {
-        // track initial site landing
-        if (typeof plausible === 'function') {
-            plausible('Landing');
-        }
-    }, []);
+    const landingTime = useRef<number>(Date.now());
+
+    // useEffect(() => {
+    //     // track initial site landing
+    //     if (typeof plausible === 'function') {
+    //         plausible('Landing');
+    //     }
+    // }, []);
 
     // data to generate nav links in page header
     const navLinks = [
@@ -119,25 +141,39 @@ export default function PageHeader() {
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();
 
-    // Update TradeDataStore when unified margin data changes
-    useEffect(() => {
-        setMarginBucket(marginBucket);
-    }, [marginBucket, setMarginBucket]);
-
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
 
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
-                plausible('Login');
+                const loginButtonClickTime = Number(
+                    localStorage.getItem('loginButtonClickTime'),
+                );
+                plausible('Session Established', {
+                    props: {
+                        loginTime: loginButtonClickTime
+                            ? getDurationSegment(
+                                  loginButtonClickTime,
+                                  Date.now(),
+                              )
+                            : 'no login button clicked',
+                        loginRefreshTime: !loginButtonClickTime
+                            ? getDurationSegment(
+                                  landingTime.current,
+                                  Date.now(),
+                              )
+                            : 'not refreshed',
+                    },
+                });
             }
+            localStorage.removeItem('loginButtonClickTime');
         } else if (
             prevIsUserConnected.current === true &&
             isUserConnected === false
         ) {
             if (typeof plausible === 'function') {
-                plausible('Logout');
+                plausible('Session Ended');
             }
         }
         prevIsUserConnected.current = isUserConnected;
@@ -293,6 +329,7 @@ export default function PageHeader() {
                     )}
                     <span
                         className={`${!isUserConnected ? 'plausible-event-name=Login+Button+Click plausible-event-location=Page+Header' : ''}`}
+                        ref={sessionButtonRef}
                     >
                         <SessionButton />
                     </span>

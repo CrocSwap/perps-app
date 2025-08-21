@@ -7,6 +7,7 @@ export interface WithdrawServiceResult {
     error?: string;
     signature?: string;
     confirmed?: boolean;
+    timeOfSubmission?: number;
 }
 
 export interface AvailableWithdrawBalance {
@@ -224,12 +225,13 @@ export class WithdrawService {
                 userWalletKey, // user (wallet key)
                 sessionPublicKey, // actor (session key for signing)
                 undefined, // target (not needed for withdraw)
-                undefined, // rent payer (not needed for withdraw)
+                // rent payer (not needed for withdraw)
             );
 
             // Extract instructions from the transaction
             const instructions = transaction.instructions;
 
+            const timeOfSubmission = Date.now();
             console.log('📤 Sending withdraw transaction:');
             console.log('  - Instructions array:', instructions);
             const transactionResult = await sendTransaction(instructions);
@@ -249,6 +251,7 @@ export class WithdrawService {
                     success: true,
                     signature: transactionResult.signature,
                     confirmed: transactionResult.confirmed,
+                    timeOfSubmission,
                 };
             } else {
                 const errorMessage =
@@ -259,6 +262,10 @@ export class WithdrawService {
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
+                    timeOfSubmission,
                 };
             }
         } catch (error) {

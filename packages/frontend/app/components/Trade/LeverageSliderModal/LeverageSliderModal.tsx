@@ -5,9 +5,9 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 // import Tooltip from '~/components/Tooltip/Tooltip';
 import { calcLeverageFloor } from '@crocswap-libs/ambient-ember';
 import { useSetUserMarginService } from '~/hooks/useSetUserMarginService';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
@@ -35,14 +35,17 @@ export default function LeverageSliderModal({
     const setPreferredLeverage = useLeverageStore(
         (state) => state.setPreferredLeverage,
     );
-    const { marginBucket } = useTradeDataStore();
+    const { marginBucket } = useUnifiedMarginData();
     const [leverageFloor, setLeverageFloor] = useState<number>();
 
     const { isLoading, error, executeSetUserMargin } =
         useSetUserMarginService();
 
     useEffect(() => {
-        if (!marginBucket) return;
+        if (!marginBucket) {
+            setLeverageFloor(undefined);
+            return;
+        }
         const leverageFloor = calcLeverageFloor(marginBucket, 10_000_000n);
         setLeverageFloor(10_000 / Number(leverageFloor));
     }, [marginBucket]);
@@ -125,7 +128,7 @@ export default function LeverageSliderModal({
                 notificationStore.add({
                     title: 'Transaction Failed',
                     message: result.error || 'Failed to update leverage',
-                    icon: 'xmark',
+                    icon: 'error',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -143,7 +146,7 @@ export default function LeverageSliderModal({
             notificationStore.add({
                 title: 'Transaction Error',
                 message: errorMessage,
-                icon: 'xmark',
+                icon: 'error',
             });
         } finally {
             setIsProcessing(false);

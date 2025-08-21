@@ -190,7 +190,8 @@ body {
 
 /* Tablet styles */
 @media only screen and (max-width: 1080px) and (min-width: 769px) {
-    .containerTop {
+    .containerTop,
+    .containerTop.orderBookLarge {
         grid-template-columns: 1fr;
     }
 

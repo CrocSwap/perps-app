@@ -14,6 +14,7 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
@@ -185,6 +186,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
                 const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
 
+                const timeOfTxBuildStart = Date.now();
                 // Execute market order in opposite direction
                 const result = await executeMarketOrder({
                     quantity: Math.abs(position.szi), // Use absolute value of position size
@@ -200,8 +202,21 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Market Close Order Placed',
+                                actionType: 'Market Close Success',
                                 orderType: 'Market',
+                                direction: closingSide,
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    result.timeOfSubmission,
+                                ),
+                                txDuration: getDurationSegment(
+                                    result.timeOfSubmission,
+                                    Date.now(),
+                                ),
+                                txSignature: result.signature,
+                                explorerLink: result.signature
+                                    ? blockExplorer + '/tx/' + result.signature
+                                    : undefined,
                             },
                         });
                     }
@@ -217,8 +232,21 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Market Close Order Failed',
+                                actionType: 'Market Close Fail',
                                 orderType: 'Market',
+                                direction: closingSide,
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    result.timeOfSubmission,
+                                ),
+                                txDuration: getDurationSegment(
+                                    result.timeOfSubmission,
+                                    Date.now(),
+                                ),
+                                txSignature: result.signature,
+                                explorerLink: result.signature
+                                    ? blockExplorer + '/tx/' + result.signature
+                                    : undefined,
                             },
                         });
                     }

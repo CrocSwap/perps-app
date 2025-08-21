@@ -1,12 +1,49 @@
+import type { MarginBucketAvail } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    createContext,
+    useContext,
+} from 'react';
 import { unifiedMarginPollingManager } from '~/services/UnifiedMarginPollingManager';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import { RPC_ENDPOINT } from '~/utils/Constants';
+import type { PositionIF } from '~/utils/position/PositionIFs';
+import type { UserBalanceIF } from '~/utils/UserDataIFs';
 
-export function useUnifiedMarginData() {
+interface UnifiedMarginDataContextType {
+    marginBucket: MarginBucketAvail | null;
+    balance: UserBalanceIF | null;
+    positions: PositionIF[];
+    isLoading: boolean;
+    error: string | null;
+    lastUpdateTime: number;
+    forceRefresh: () => Promise<void>;
+}
+
+export const UnifiedMarginDataContext =
+    createContext<UnifiedMarginDataContextType>({
+        marginBucket: null,
+        balance: null,
+        positions: [],
+        isLoading: false,
+        error: null,
+        lastUpdateTime: 0,
+        forceRefresh: () => Promise.resolve(),
+    });
+
+export interface UnifiedMarginDataProviderProps {
+    children: React.ReactNode;
+}
+
+export const UnifiedMarginDataProvider: React.FC<
+    UnifiedMarginDataProviderProps
+> = ({ children }) => {
     const sessionState = useSession();
     const hasSubscribedRef = useRef(false);
     const lastSessionStateRef = useRef<boolean>(false);
@@ -35,6 +72,14 @@ export function useUnifiedMarginData() {
         return connection;
     }, []);
 
+    // backup side effect to clear margin bucket if set after logout
+    useEffect(() => {
+        if (!isSessionEstablished && !isDebugWalletActive && !!marginBucket) {
+            const store = useUnifiedMarginStore.getState();
+            store.setMarginBucket(null);
+        }
+    }, [isSessionEstablished, isDebugWalletActive, marginBucket]);
+
     useEffect(() => {
         // Track session state changes
         const sessionChanged =
@@ -42,12 +87,12 @@ export function useUnifiedMarginData() {
         lastSessionStateRef.current = isSessionEstablished;
 
         if (!isSessionEstablished || isDebugWalletActive) {
+            const store = useUnifiedMarginStore.getState();
+            store.setMarginBucket(null);
             // Only unsubscribe if we were actually subscribed
             if (hasSubscribedRef.current) {
                 hasSubscribedRef.current = false;
                 // Clear the store first
-                const store = useUnifiedMarginStore.getState();
-                store.setMarginBucket(null);
                 store.setBalance(null);
                 store.setPositions([]);
                 store.setError(null);
@@ -156,13 +201,21 @@ export function useUnifiedMarginData() {
         return unifiedMarginPollingManager.forceRefresh();
     }, [isSessionEstablished]);
 
-    return {
-        marginBucket,
-        balance,
-        positions,
-        isLoading,
-        error,
-        lastUpdateTime,
-        forceRefresh,
-    };
-}
+    return (
+        <UnifiedMarginDataContext.Provider
+            value={{
+                marginBucket,
+                balance,
+                positions,
+                isLoading,
+                error,
+                lastUpdateTime,
+                forceRefresh,
+            }}
+        >
+            {children}
+        </UnifiedMarginDataContext.Provider>
+    );
+};
+
+export const useUnifiedMarginData = () => useContext(UnifiedMarginDataContext);

@@ -153,7 +153,7 @@
 .minimumLabel {
     position: absolute;
     top: 12px;
-    transform: translateX(-130%);
+    /* transform: translateX(-130%); */
     background-color: rgba(255, 255, 255, 0.95);
     color: #333;
     font-size: var(--font-size-xs);

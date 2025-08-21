@@ -13,6 +13,7 @@ import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface propsIF {
@@ -106,6 +107,8 @@ function PortfolioDeposit(props: propsIF) {
             return;
         }
 
+        const timeOfTxBuildStart = Date.now();
+
         try {
             // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) => {
@@ -126,6 +129,24 @@ function PortfolioDeposit(props: propsIF) {
 
             // Check if the result indicates failure
             if (result && result.success === false) {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Deposit Fail',
+                            maxActive: maxActive,
+                            errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
                 notificationStore.add({
@@ -140,6 +161,23 @@ function PortfolioDeposit(props: propsIF) {
             } else {
                 setTransactionStatus('success');
 
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Deposit Success',
+                            maxActive: maxActive,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show success notification
                 notificationStore.add({
                     title: 'Deposit Successful',
@@ -159,6 +197,18 @@ function PortfolioDeposit(props: propsIF) {
         } catch (error) {
             setTransactionStatus('failed');
             setError(error instanceof Error ? error.message : 'Deposit failed');
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Deposit Fail',
+                        maxActive: maxActive,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         }
     }, [availableBalance, onDeposit, formatNum, depositInputNum, maxActive]);
 
@@ -286,7 +336,6 @@ function PortfolioDeposit(props: propsIF) {
                 bg='accent1'
                 onClick={handleDeposit}
                 disabled={isButtonDisabled || isSizeInvalid}
-                className={`plausible-event-name=Deposit+Button+Click plausible-event-maxActive=${maxActive}`}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'

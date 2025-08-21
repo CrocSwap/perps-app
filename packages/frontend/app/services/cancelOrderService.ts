@@ -10,6 +10,7 @@ export interface CancelOrderResult {
     error?: string;
     signature?: string;
     confirmed?: boolean;
+    timeOfSubmission?: number;
 }
 
 export interface CancelOrderParams {
@@ -118,6 +119,7 @@ export class CancelOrderService {
 
             console.log('📤 Sending cancel order transaction...');
 
+            const timeOfSubmission = Date.now();
             console.log(transaction);
             // Send the transaction
             const transactionResult = await sendTransaction(
@@ -139,6 +141,7 @@ export class CancelOrderService {
                     success: true,
                     signature: transactionResult.signature,
                     confirmed: transactionResult.confirmed,
+                    timeOfSubmission,
                 };
             } else {
                 const errorMessage =
@@ -152,6 +155,7 @@ export class CancelOrderService {
                     signature: transactionResult.signature
                         ? transactionResult.signature
                         : undefined,
+                    timeOfSubmission,
                 };
             }
         } catch (error) {

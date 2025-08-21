@@ -13,6 +13,7 @@ export interface MarketOrderResult {
     error?: string;
     signature?: string;
     confirmed?: boolean;
+    timeOfSubmission?: number;
 }
 
 export interface MarketOrderParams {
@@ -247,6 +248,8 @@ export class MarketOrderService {
                 })),
             );
 
+            const timeOfSubmission = Date.now();
+
             // Send the transaction using Fogo session
             console.log('  - Calling sendTransaction...');
             const transactionResult = await sendTransaction(instructions);
@@ -262,10 +265,12 @@ export class MarketOrderService {
                     '✅ Order transaction successful:',
                     transactionResult.signature,
                 );
+
                 return {
                     success: true,
                     signature: transactionResult.signature,
                     confirmed: transactionResult.confirmed,
+                    timeOfSubmission,
                 };
             } else {
                 const errorMessage =
@@ -275,7 +280,10 @@ export class MarketOrderService {
                 return {
                     success: false,
                     error: errorMessage,
-                    signature: transactionResult.signature,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
+                    timeOfSubmission,
                 };
             }
         } catch (error) {

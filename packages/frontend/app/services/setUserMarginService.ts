@@ -134,6 +134,9 @@ export class SetUserMarginService {
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
                 };
             }
         } catch (error) {

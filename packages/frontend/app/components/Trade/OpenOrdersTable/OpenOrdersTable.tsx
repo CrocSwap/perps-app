@@ -6,6 +6,7 @@ import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type {
     OrderDataIF,
     OrderDataSortBy,
@@ -52,6 +53,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
                 icon: 'spinner',
                 slug,
+                removeAfter: 60000,
             });
 
             const cancelPromises = filteredOrders.map(async (order) => {
@@ -84,6 +86,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 }
             });
 
+            const timeOfSubmission = Date.now();
             // Wait for all cancel operations to complete
             const results = await Promise.allSettled(cancelPromises);
 
@@ -143,8 +146,16 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             if (typeof plausible === 'function') {
                                 plausible('Onchain Action', {
                                     props: {
-                                        actionType: 'Limit Order Cancelled',
+                                        actionType: 'Limit Cancel Success',
                                         orderType: 'Limit',
+                                        direction:
+                                            order.side === 'buy'
+                                                ? 'Buy'
+                                                : 'Sell',
+                                        txDuration: getDurationSegment(
+                                            timeOfSubmission,
+                                            Date.now(),
+                                        ),
                                     },
                                 });
                             }
@@ -164,8 +175,12 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'All Limit Orders Cancelled',
+                                actionType: 'Limit Cancel All Success',
                                 orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }
@@ -194,8 +209,13 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Partial Limit Orders Cancelled',
+                                actionType:
+                                    'Limit Order Cancel All Partial Success',
                                 orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }
@@ -213,8 +233,12 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Cancel All Failed',
+                                actionType: 'Limit Cancel All Fail',
                                 orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }
