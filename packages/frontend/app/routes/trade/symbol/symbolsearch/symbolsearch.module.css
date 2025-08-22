@@ -53,3 +53,7 @@
 .comboBoxIconOpen {
     transform: rotate(180deg);
 }
+
+.symbolIcon img {
+    max-height: 100%;
+}

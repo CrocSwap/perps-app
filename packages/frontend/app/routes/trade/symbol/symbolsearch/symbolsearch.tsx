@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { tokenBackgroundMap } from '~/assets/tokens/tokenBackgroundMap';
+import { tokenIcons } from '~/assets/tokens';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import SymbolList from './symbollist/symbollist';
@@ -48,7 +49,10 @@ const SymbolSearch: React.FunctionComponent = () => {
                         // }}
                     >
                         <img
-                            src={`https://app.hyperliquid.xyz/coins/${symbolFileName}.svg`}
+                            src={
+                                tokenIcons[symbolFileName.toUpperCase()] ||
+                                `https://app.hyperliquid.xyz/coins/${symbolFileName}.svg`
+                            }
                             alt={symbolFileName}
                         />
                     </div>

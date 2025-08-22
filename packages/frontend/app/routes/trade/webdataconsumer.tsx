@@ -52,11 +52,9 @@ export default function WebDataConsumer() {
         symbol,
         symbolInfo,
         setSymbolInfo,
-        setCoins,
         coins,
         setPositions,
         setUserBalances,
-        setCoinPriceMap,
         setAccountOverview,
         accountOverview,
         setOrderHistory,
@@ -184,7 +182,7 @@ export default function WebDataConsumer() {
         // Also subscribe to webData2 on market socket for market data
         // This ensures market data comes from the market endpoint even when user endpoint is different
         let unsubscribeMarketData: (() => void) | undefined;
-        if (info.multiSocketInfo) {
+        if (info.multiSocketInfo && isDebugWalletActive) {
             const marketSocket = info.multiSocketInfo.getMarketSocket();
             if (marketSocket) {
                 const marketDataCallback = (msg: any) => {
@@ -326,7 +324,7 @@ export default function WebDataConsumer() {
             unsubscribeUserFundings();
             unsubscribeUserNonFundingLedgerUpdates();
         };
-    }, [userAddress, info]);
+    }, [userAddress, info, isDebugWalletActive]);
 
     useEffect(() => {
         acccountOverviewPrevRef.current = accountOverview;
@@ -341,11 +339,11 @@ export default function WebDataConsumer() {
 
             // When using multi-socket mode, market data comes from market socket
             // So we only process user data from the user socket's webData2
-            if (!info?.multiSocketInfo) {
-                // Legacy mode: process all data from single socket
-                setCoins(data.data.coins);
-                setCoinPriceMap(data.data.coinPriceMap);
-            }
+            // if (!info?.multiSocketInfo) {
+            //     // Legacy mode: process all data from single socket
+            //     setCoins(data.data.coins);
+            //     setCoinPriceMap(data.data.coinPriceMap);
+            // }
 
             if (
                 isEstablished(sessionState) &&
@@ -360,13 +358,7 @@ export default function WebDataConsumer() {
             fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
             setFetchedChannels(new Set([...fetchedChannelsRef.current]));
         },
-        [
-            setCoins,
-            setCoinPriceMap,
-            info?.multiSocketInfo,
-            sessionState,
-            setFetchedChannels,
-        ],
+        [info?.multiSocketInfo, sessionState, setFetchedChannels],
     );
 
     const postWebData2 = useWorker<WebData2Output>(
@@ -380,17 +372,12 @@ export default function WebDataConsumer() {
             // Update last data timestamp
             lastDataTimestampRef.current = Date.now();
 
-            // Only update market data (coins and price map)
-            // This ensures market data always comes from the market endpoint
-            setCoins(data.data.coins);
-            setCoinPriceMap(data.data.coinPriceMap);
-
             if (debugWalletActiveRef.current) {
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
             }
         },
-        [setCoins, setCoinPriceMap],
+        [],
     );
 
     const postWebData2MarketOnly = useWorker<WebData2Output>(

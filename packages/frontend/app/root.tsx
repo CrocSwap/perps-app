@@ -29,6 +29,7 @@ import {
     RPC_ENDPOINT,
     USER_WS_ENDPOINT,
 } from './utils/Constants';
+import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
@@ -191,6 +192,7 @@ export default function App() {
                 >
                     <AppProvider>
                         <UnifiedMarginDataProvider>
+                        <MarketDataProvider>
                             <SdkProvider
                                 environment={wsEnvironment}
                                 marketEndpoint={MARKET_WS_ENDPOINT}
@@ -230,6 +232,7 @@ export default function App() {
                                 </TutorialProvider>
                                 <RuntimeDomManipulation />
                             </SdkProvider>
+                        </MarketDataProvider>
                         </UnifiedMarginDataProvider>
                     </AppProvider>
                 </FogoSessionProvider>

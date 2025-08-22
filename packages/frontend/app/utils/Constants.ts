@@ -152,6 +152,13 @@ export const MARKET_API_URL =
     import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
+export const POLLING_API_URL =
+    import.meta.env.VITE_POLLING_API_URL ||
+    'https://throbbing-disk-07bc.doug-fa5.workers.dev';
+
+export const POLLING_API_INFO_ENDPOINT =
+    import.meta.env.POLLING_API_INFO_ENDPOINT || `${POLLING_API_URL}/info`;
+
 export const MARKET_INFO_ENDPOINT =
     import.meta.env.VITE_MARKET_INFO_ENDPOINT || MARKET_API_URL + '/info';
 
@@ -200,3 +207,10 @@ export const API_URLS = {
 
 export type Environment = keyof typeof API_URLS;
 export const DEFAULT_API_ENVIRONMENT: Environment = 'mock';
+
+export const TIMEOUT_OB_POLLING =
+    import.meta.env.VITE_TIMEOUT_OB_POLLING || 0.5 * SECONDS;
+export const TIMEOUT_MARKET_DATA_POLLING =
+    import.meta.env.VITE_TIMEOUT_MARKET_DATA_POLLING || 2 * SECONDS;
+export const TIMEOUT_CANDLE_POLLING =
+    import.meta.env.VITE_TIMEOUT_CANDLE_POLLING || 1 * SECONDS;

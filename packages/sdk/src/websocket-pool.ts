@@ -84,7 +84,7 @@ export class WebSocketPool {
                 isDebug: this.config.isDebug,
                 numWorkers: this.config.numWorkers,
                 pingInterval: this.config.pingInterval,
-                autoConnect: false, // Don't connect immediately
+                autoConnect: true, // Don't connect immediately
             };
             socketsToCreate.push(['user', userConfig]);
         }
@@ -99,7 +99,7 @@ export class WebSocketPool {
                     isDebug: this.config.isDebug,
                     numWorkers: this.config.numWorkers,
                     pingInterval: this.config.pingInterval,
-                    autoConnect: false, // Don't connect immediately
+                    autoConnect: true, // Don't connect immediately
                 };
                 socketsToCreate.push([name, customConfig]);
             }
@@ -111,9 +111,10 @@ export class WebSocketPool {
         });
 
         // Connect all sockets in parallel
-        console.log('Connecting all WebSocket instances in parallel...');
         this.sockets.forEach((socket) => {
-            socket.connect();
+            if (socket.isAutoConnect()) {
+                socket.connect();
+            }
         });
     }
 
@@ -330,6 +331,15 @@ export class WebSocketPool {
     public setUseMarketOnly(useMarketOnly: boolean) {
         this.useMarketOnly = useMarketOnly;
     }
+
+    public hardUnsubscribe(
+        subscription: Subscription,
+        callback: Callback,
+    ): void {
+        this.sockets.forEach((socket) => {
+            socket.hardUnsubscribe(subscription, callback);
+        });
+    }
 }
 
 /**
@@ -411,5 +421,12 @@ export class MultiSocketInfo {
     public setUseMarketOnly(useMarketOnly: boolean) {
         this.useMarketOnly = useMarketOnly;
         this.pool.setUseMarketOnly(useMarketOnly);
+    }
+
+    public hardUnsubscribe(
+        subscription: Subscription,
+        callback: Callback,
+    ): void {
+        this.pool.hardUnsubscribe(subscription, callback);
     }
 }

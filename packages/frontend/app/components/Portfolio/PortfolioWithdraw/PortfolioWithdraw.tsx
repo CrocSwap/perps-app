@@ -8,6 +8,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import packageJson from '../../../../package.json';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
 import { toast } from 'sonner';
@@ -195,6 +196,7 @@ function PortfolioWithdraw({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Withdrawal Fail',
                             maxActive: maxModeActive,
                             errorMessage: result.error || 'Transaction failed',
@@ -242,6 +244,7 @@ function PortfolioWithdraw({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Withdrawal Success',
                             maxActive: maxModeActive,
                             txBuildDuration: getDurationSegment(
@@ -291,6 +294,7 @@ function PortfolioWithdraw({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Withdrawal Fail',
                         maxActive: maxModeActive,
                         errorMessage:

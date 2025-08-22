@@ -210,17 +210,16 @@ body {
         border-radius: var(--radius-m, 16px);
         background: var(--bg-dark2, #111117);
     }
+
     .container {
         grid-template-rows: 1fr;
-        height: 100vh;
-        height: 100svh; /* Added for mobile browser support */
+        height: 100dvh;
         gap: 0;
     }
 
     .containerTop {
         grid-template-columns: 1fr;
-        height: 100vh;
-        height: 100svh; /* Added for mobile browser support */
+        height: 100dvh;
         gap: 0;
         border-radius: 0;
         padding-top: 120px;
@@ -272,15 +271,13 @@ body {
         top: 150px;
         left: 0;
         width: 100%;
-        height: calc(
-            100svh - 145px - 40px
-        ); /* Calculate remaining height, accounting for 40px footer */
+        height: calc(100dvh - 150px);
         background: var(--bg-dark1);
-        overflow-y: auto !important; /* Make the content scrollable */
+        overflow-y: auto !important;
         display: none;
         border-radius: 0;
-        padding-bottom: 60px !important; /* Add bottom padding to ensure all content is visible */
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        padding-bottom: 20px !important;
+        -webkit-overflow-scrolling: touch;
     }
 
     .mobileSection.active {
@@ -356,8 +353,4 @@ body {
     .containerBottom {
         display: none;
     }
-}
-
-.debugToolbar {
-    transition: all 0.2s ease-in-out;
 }

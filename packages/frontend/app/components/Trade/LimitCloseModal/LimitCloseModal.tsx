@@ -11,6 +11,7 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import packageJson from '../../../../package.json';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
@@ -339,6 +340,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Close Success',
                             orderType: 'Limit',
                             direction: side === 'buy' ? 'Buy' : 'Sell',
@@ -378,6 +380,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Close Fail',
                             orderType: 'Limit',
                             direction: side === 'buy' ? 'Buy' : 'Sell',
@@ -421,6 +424,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Limit Close Fail',
                         orderType: 'Limit',
                         direction: side === 'buy' ? 'Buy' : 'Sell',

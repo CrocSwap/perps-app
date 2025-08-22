@@ -19,6 +19,10 @@ export const MARKET_API_URL =
     import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
+export const PROXY_API_URL =
+    import.meta.env.VITE_POLLING_API_URL ||
+    'https://throbbing-disk-07bc.doug-fa5.workers.dev';
+
 export const MARKET_WS_ENDPOINT =
     import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
@@ -51,7 +55,7 @@ export const API_URLS = {
 
     local: 'http://localhost:9153',
 
-    hl: MARKET_API_URL,
+    hl: PROXY_API_URL,
 };
 
 export type Environment = keyof typeof API_URLS;

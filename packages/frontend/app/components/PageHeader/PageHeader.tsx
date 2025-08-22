@@ -31,6 +31,7 @@ import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
+import packageJson from '../../../package.json';
 
 export default function PageHeader() {
     const sessionState = useSession();
@@ -74,13 +75,6 @@ export default function PageHeader() {
     const { marginBucket } = useUnifiedMarginData();
 
     const landingTime = useRef<number>(Date.now());
-
-    // useEffect(() => {
-    //     // track initial site landing
-    //     if (typeof plausible === 'function') {
-    //         plausible('Landing');
-    //     }
-    // }, []);
 
     // data to generate nav links in page header
     const navLinks = [
@@ -152,6 +146,7 @@ export default function PageHeader() {
                 );
                 plausible('Session Established', {
                     props: {
+                        version: packageJson.version,
                         loginTime: loginButtonClickTime
                             ? getDurationSegment(
                                   loginButtonClickTime,
@@ -163,7 +158,7 @@ export default function PageHeader() {
                                   landingTime.current,
                                   Date.now(),
                               )
-                            : 'not refreshed',
+                            : 'login button clicked',
                     },
                 });
             }
@@ -173,7 +168,9 @@ export default function PageHeader() {
             isUserConnected === false
         ) {
             if (typeof plausible === 'function') {
-                plausible('Session Ended');
+                plausible('Session Ended', {
+                    props: { version: packageJson.version },
+                });
             }
         }
         prevIsUserConnected.current = isUserConnected;

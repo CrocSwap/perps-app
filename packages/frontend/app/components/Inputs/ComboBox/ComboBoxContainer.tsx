@@ -220,6 +220,7 @@ export default function ComboBoxContainer() {
                                             )?.address || '',
                                     })
                                 }
+                                cssPositioning='fixed'
                             />
                         </div>
                     ) : (

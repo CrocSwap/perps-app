@@ -32,6 +32,29 @@ export const mapResolutionToInterval = (resolution: string): string => {
     return mapping[resolution] || '1d';
 };
 
+export const convertResolutionToIntervalParam = (
+    resolution: string,
+): string => {
+    if (!resolution || resolution.length === 0) return '1d';
+    if (resolution === '1W') return '1w';
+    if (resolution === '1M') return '1M';
+    else if (resolution.indexOf('D') > -1) {
+        return resolution.toLowerCase();
+    }
+
+    const minutesVal = Number(resolution.replace(/[^0-9]/g, ''));
+
+    if (minutesVal >= 60) {
+        return `${minutesVal / 60}h`;
+    }
+
+    if (minutesVal >= 1) {
+        return `${minutesVal}m`;
+    }
+
+    return resolution;
+};
+
 export function resolutionToSeconds(resolution: string): number {
     if (resolution === '1D') return 86400;
     if (resolution === '3D') return 3 * 86400;

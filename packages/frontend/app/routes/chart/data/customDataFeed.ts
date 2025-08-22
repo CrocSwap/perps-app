@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Info } from '@perps-app/sdk';
 import type {
     IDatafeedChartApi,
@@ -5,7 +7,11 @@ import type {
     Mark,
     OnReadyCallback,
 } from '~/tv/charting_library/charting_library';
-import { WsChannels } from '~/utils/Constants';
+import {
+    POLLING_API_URL,
+    TIMEOUT_CANDLE_POLLING,
+    WsChannels,
+} from '~/utils/Constants';
 import {
     getHistoricalData,
     getMarkColorData,
@@ -15,15 +21,13 @@ import {
 } from './candleDataCache';
 import { processWSCandleMessage } from './processChartData';
 import {
+    convertResolutionToIntervalParam,
     mapResolutionToInterval,
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
 
-const subscriptions = new Map<
-    string,
-    { subId: number; unsubscribe: () => void }
->();
+const subscriptions = new Map<string, { unsubscribe: () => void }>();
 
 export type CustomDataFeedType = IDatafeedChartApi & {
     updateUserAddress: (address: string) => void;
@@ -221,33 +225,57 @@ export const createDataFeed = (
         },
 
         subscribeBars: (symbolInfo, resolution, onTick, listenerGuid) => {
+            console.log(
+                '>>> subscribeBars',
+                symbolInfo,
+                resolution,
+                onTick,
+                listenerGuid,
+            );
             if (!info) return console.log('SDK is not ready');
-            const unsubscribe = info.subscribe(
-                {
-                    type: WsChannels.CANDLE,
-                    coin: symbolInfo.ticker || '',
-                    interval: mapResolutionToInterval(resolution),
-                },
-                (payload: any) => {
-                    if (
-                        symbolInfo.ticker &&
-                        payload.data.s === symbolInfo.ticker
-                    ) {
-                        const tick = processWSCandleMessage(payload.data);
-                        onTick(tick);
 
-                        updateCandleCache(symbolInfo.ticker, resolution, tick);
-                    }
-                },
-            ) as { subId: number; unsubscribe: () => void };
-            subscriptions.set(listenerGuid, unsubscribe);
+            const intervalParam = convertResolutionToIntervalParam(resolution);
 
-            // subscribeOnStream(symbolInfo, resolution, onTick);
+            const poller = setInterval(() => {
+                const currentTime = new Date().getTime();
+                fetch(`${POLLING_API_URL}/info`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: 'candleSnapshot',
+                        req: {
+                            coin: symbolInfo.ticker,
+                            interval: intervalParam,
+                            endTime: currentTime,
+                            startTime: currentTime - 1000 * 10,
+                        },
+                    }),
+                }).then((res) => {
+                    res.json().then((data) => {
+                        const candleData = data[0];
+                        if (
+                            symbolInfo.ticker &&
+                            candleData.s === symbolInfo.ticker
+                        ) {
+                            const tick = processWSCandleMessage(candleData);
+                            onTick(tick);
+                            updateCandleCache(
+                                symbolInfo.ticker,
+                                resolution,
+                                tick,
+                            );
+                        }
+                    });
+                });
+            }, TIMEOUT_CANDLE_POLLING);
+            const unsubscribe = () => clearInterval(poller);
+            subscriptions.set(listenerGuid, { unsubscribe });
         },
 
         unsubscribeBars: (listenerGuid) => {
             const subscription = subscriptions.get(listenerGuid);
-
             if (subscription) {
                 try {
                     subscription.unsubscribe();

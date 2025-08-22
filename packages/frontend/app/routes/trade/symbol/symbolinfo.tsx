@@ -90,6 +90,9 @@ const SymbolInfo: React.FC = React.memo(() => {
                         <HorizontalScrollable
                             excludes={['tutorial-pool-explorer']}
                             wrapperId='trade-page-left-section'
+                            autoScroll={true}
+                            autoScrollSpeed={50} // 3px per frame = ~180px/sec
+                            autoScrollDelay={1000}
                         >
                             <div
                                 className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}

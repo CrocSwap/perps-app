@@ -8,11 +8,54 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;
+    position: relative;
+}
+
+/* Hide scrollbar for webkit browsers */
+.horizontalScrollable::-webkit-scrollbar {
+    display: none;
+}
+
+/* Auto-scrolling state for mobile */
+.horizontalScrollable.autoScrolling {
+    overflow-x: auto; /* Still allow manual scrolling */
+    overflow-y: hidden;
+}
+
+/* Hide scrollbar during auto-scroll but keep functionality */
+.horizontalScrollable.autoScrolling::-webkit-scrollbar {
+    display: none;
 }
 
 .horizontalScrollableContent {
     min-width: max-content;
     position: relative;
+    display: flex;
+}
+
+/* Animated content for mobile auto-scroll */
+.animatedContent {
+    animation: infiniteScroll linear infinite;
+    animation-play-state: running;
+    /* Allow pointer events so users can still interact */
+    pointer-events: auto;
+}
+
+/* CSS Animation for smooth infinite scroll */
+@keyframes infiniteScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(
+            -50%
+        ); /* Move by half since we duplicate content */
+    }
+}
+
+/* Pause animation on hover/interaction */
+.animatedContent:hover {
+    animation-play-state: paused !important;
 }
 
 .scrollArrow {
@@ -75,4 +118,16 @@
     margin: auto;
     max-width: 100% !important;
     width: 100% !important;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .horizontalScrollable {
+        scroll-behavior: smooth;
+    }
+
+    /* Hide scroll arrows on mobile when auto-scroll is enabled */
+    .horizontalScrollable.autoScrolling .scrollButtonsWrapper {
+        display: none;
+    }
 }

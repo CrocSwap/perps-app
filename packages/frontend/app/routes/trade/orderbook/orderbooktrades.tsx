@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { Info } from '@perps-app/sdk';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import { useSdk } from '~/hooks/useSdk';
@@ -25,6 +26,9 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
     const { info } = useSdk();
     const { trades, setTrades } = useOrderBookStore();
 
+    const infoRef = useRef<Info | null>(null);
+    infoRef.current = info;
+
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
     );
@@ -36,6 +40,18 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
 
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
+
+    useEffect(() => {
+        return () => {
+            infoRef.current?.hardUnsubscribe(
+                {
+                    type: WsChannels.ORDERBOOK_TRADES,
+                    coin: symbolRef.current,
+                },
+                postOrderBookTrades,
+            );
+        };
+    }, []);
 
     const mergeTrades = useCallback(
         (wsTrades: OrderBookTradeIF[]) => {
@@ -65,16 +81,16 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
                 setTableState(TableState.FILLED);
             }
         },
-        [info],
+        [setTrades],
     );
 
     useEffect(() => {
-        if (!info) return;
+        if (!infoRef.current) return;
         if (!symbol || symbol.length === 0) return;
 
         setTableState(TableState.LOADING);
 
-        const { unsubscribe } = info.subscribe(
+        const { unsubscribe } = infoRef.current.subscribe(
             {
                 type: WsChannels.ORDERBOOK_TRADES,
                 coin: symbol,
@@ -82,14 +98,16 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
             postOrderBookTrades,
         );
 
-        return unsubscribe;
-    }, [symbol, info]);
+        return () => {
+            unsubscribe();
+        };
+    }, [symbol]);
 
     const postOrderBookTrades = useCallback(
         (payload: any) => {
             mergeTrades(processTrades(payload.data));
         },
-        [trades],
+        [mergeTrades, processTrades],
     );
 
     const loaderLen = 30;

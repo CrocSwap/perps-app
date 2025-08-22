@@ -460,6 +460,7 @@ export type MetaAndAssetCtxsData = [
     },
     {
         dayNtlVlm: string;
+        dayBaseVlm: string;
         funding: string;
         impactPxs: string[];
         markPx: string;

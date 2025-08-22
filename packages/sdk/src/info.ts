@@ -339,6 +339,15 @@ export class Info extends API {
         }
     }
 
+    public hardUnsubscribe(
+        subscription: Subscription,
+        callback: Callback,
+    ): void {
+        if (this.useMultiSocket) {
+            this.multiSocketInfo?.hardUnsubscribe(subscription, callback);
+        }
+    }
+
     public nameToAsset(name: string): number {
         return this.coinToAsset[this.nameToCoin[name]];
     }

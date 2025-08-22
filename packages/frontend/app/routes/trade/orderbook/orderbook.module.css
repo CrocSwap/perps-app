@@ -96,3 +96,9 @@
     top: auto;
     bottom: 0;
 }
+
+@media (max-width: 768px) {
+    .orderSlotsWrapper {
+        justify-content: flex-start;
+    }
+}
