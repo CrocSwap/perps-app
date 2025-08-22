@@ -10,7 +10,6 @@ import { useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
-import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
@@ -40,7 +39,6 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { buys, sells } = useOrderBookStore();
         const { formatNum } = useNumFormatter();
         const { getBsColor } = useAppSettings();
-        const notifications = useNotificationStore();
         const { executeMarketOrder } = useMarketOrderService();
         const [isClosing, setIsClosing] = useState(false);
 
@@ -172,6 +170,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
         // Handle market close
         const handleMarketClose = useCallback(async () => {
+            // ID to allow all notifications within the same toast
+            const toastId: string = crypto.randomUUID();
+
             if (isClosing || !position.szi) return;
 
             setIsClosing(true);
@@ -224,29 +225,23 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             },
                         });
                     }
-                    notifications.add({
-                        title: 'Position Closed',
-                        message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
-                        icon: 'check',
-                        txLink: result.signature
-                            ? blockExplorer + result.signature
-                            : undefined,
-                    });
-                    toast.custom(() => (
-                        <Notification
-                            data={{
-                                slug: 657687868761874,
-                                title: 'Limit Order Failed',
-                                message:
-                                    error instanceof Error
-                                        ? error.message
-                                        : 'Unknown error occurred',
-                                icon: 'error',
-                                removeAfter: 10000,
-                            }}
-                            dismiss={(num: number) => console.log(num)}
-                        />
-                    ));
+                    toast.custom(
+                        (t) => (
+                            <Notification
+                                data={{
+                                    slug: 657687868761874,
+                                    title: 'Position Closed',
+                                    message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
+                                    icon: 'check',
+                                    txLink: result.signature
+                                        ? blockExplorer + result.signature
+                                        : undefined,
+                                }}
+                                dismiss={() => toast.dismiss(t)}
+                            />
+                        ),
+                        { id: toastId },
+                    );
                 } else {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
@@ -270,39 +265,51 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             },
                         });
                     }
-                    notifications.add({
-                        title: 'Close Failed',
-                        message: String(
-                            result.error || 'Failed to close position',
+                    toast.custom(
+                        (t) => (
+                            <Notification
+                                data={{
+                                    slug: 676417674167964,
+                                    title: 'Close Failed',
+                                    message: String(
+                                        result.error ||
+                                            'Failed to close position',
+                                    ),
+                                    txLink: result.signature
+                                        ? blockExplorer + result.signature
+                                        : undefined,
+                                    icon: 'error',
+                                }}
+                                dismiss={() => toast.dismiss(t)}
+                            />
                         ),
-                        txLink: result.signature
-                            ? blockExplorer + result.signature
-                            : undefined,
-                        icon: 'error',
-                    });
+                        { id: toastId },
+                    );
                 }
             } catch (error) {
                 console.error('❌ Error closing position:', error);
-                notifications.add({
-                    title: 'Close Failed',
-                    message: String(
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error occurred',
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 676417674167964,
+                                title: 'Close Failed',
+                                message: String(
+                                    error instanceof Error
+                                        ? error.message
+                                        : 'Unknown error occurred',
+                                ),
+                                icon: 'error',
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
                     ),
-                    icon: 'error',
-                });
+                    { id: toastId },
+                );
             } finally {
                 setIsClosing(false);
             }
-        }, [
-            position,
-            executeMarketOrder,
-            notifications,
-            isClosing,
-            buys,
-            sells,
-        ]);
+        }, [position, executeMarketOrder, isClosing, buys, sells]);
 
         // Memoize funding values and tooltip
         const fundingToShow = useMemo(
