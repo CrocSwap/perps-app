@@ -7,12 +7,10 @@ import {
 } from '~/stores/StrategiesStore';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { type useAccountsIF, useAccounts } from '~/stores/AccountsStore';
-import {
-    type NotificationStoreIF,
-    useNotificationStore,
-} from '~/stores/NotificationStore';
 import { useState } from 'react';
 import { FaChevronLeft } from 'react-icons/fa';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 export interface textInputIF {
     label: string;
@@ -83,8 +81,6 @@ export default function CreateStrategy(props: propsT) {
     // TODO:    write a function to validate inputs on change and
     // TODO:    ... and enable disable the CTA accordingly
 
-    // logic to dispatch a notification for sub-account creation
-    const notifications: NotificationStoreIF = useNotificationStore();
     // state data for subaccounts
     const subAccounts: useAccountsIF = useAccounts();
 
@@ -100,6 +96,9 @@ export default function CreateStrategy(props: propsT) {
     const [side, setSide] = useState(strategy.side);
     const [totalSize, setTotalSize] = useState(strategy.totalSize);
     const [orderSize, setOrderSize] = useState(strategy.orderSize);
+
+    // ID to allow all notifications within the same toast
+    const toastId: number = Date.now();
 
     return (
         <div className={styles.create_strategy_page}>
@@ -216,11 +215,22 @@ export default function CreateStrategy(props: propsT) {
                                             values,
                                         );
                                         subAccounts.create(name, 'strategy');
-                                        notifications.add({
-                                            title: 'Sub Account Created',
-                                            message: `Made new strategy Sub-Account ${name}`,
-                                            icon: 'check',
-                                        });
+                                        toast.custom(
+                                            (t) => (
+                                                <Notification
+                                                    data={{
+                                                        slug: 97123176875468,
+                                                        title: 'Sub Account Created',
+                                                        message: `Made new strategy Sub-Account ${name}`,
+                                                        icon: 'check',
+                                                    }}
+                                                    dismiss={() =>
+                                                        toast.dismiss(t)
+                                                    }
+                                                />
+                                            ),
+                                            { id: toastId },
+                                        );
                                     }
                                     navigate('/strategies');
                                 }}
