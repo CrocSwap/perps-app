@@ -2,7 +2,6 @@ import { useMemo, useRef, useState } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
@@ -32,8 +31,6 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     const { executeCancelOrder } = useCancelOrderService();
     const { formatNum } = useNumFormatter();
 
-    const notifications = useNotificationStore();
-
     const handleCancel = (time: number, coin: string) => {
         if (onCancel) {
             onCancel(time, coin);
@@ -41,34 +38,32 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     };
 
     const handleCancelAll = async () => {
+        // ID to allow all notifications within the same toast
+        const toastId: string = crypto.randomUUID();
+
         if (filteredOrders.length === 0) {
             return;
         }
 
         setIsCancellingAll(true);
 
-        const slug = makeSlug(10);
-
         try {
             // Show initial notification
-            notifications.add({
-                title: 'Cancelling All Orders',
-                message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
-                icon: 'spinner',
-                slug,
-                removeAfter: 60000,
-            });
-            toast.custom(() => (
-                <Notification
-                    data={{
-                        title: 'Cancelling All Orders',
-                        message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
-                        icon: 'spinner',
-                        slug,
-                    }}
-                    dismiss={(num: number) => console.log(num)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 317975149126,
+                            title: 'Cancelling All Orders',
+                            message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
+                            icon: 'spinner',
+                            removeAfter: 60000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
 
             const cancelPromises = filteredOrders.map(async (order) => {
                 if (!order.oid) {
@@ -125,13 +120,11 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         failedOrders.push(
                             `${cancelResult.order.coin} (${cancelResult.error})`,
                         );
-                        notifications.remove(slug);
                     }
                 } else {
                     failureCount++;
                     const order = filteredOrders[index];
                     failedOrders.push(`${order.coin} (${result.reason})`);
-                    notifications.remove(slug);
                 }
             });
 
@@ -156,7 +149,6 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 true,
                             );
                             const order = result.value.order;
-                            notifications.remove(slug);
                             if (typeof plausible === 'function') {
                                 plausible('Onchain Action', {
                                     props: {
@@ -174,34 +166,27 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                     },
                                 });
                             }
-                            notifications.add({
-                                title: 'Order Cancelled',
-                                message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${order.coin}`,
-                                icon: 'check',
-                                removeAfter: 5000,
-                                txLink: successOrderSignature
-                                    ? `${blockExplorer}/tx/${successOrderSignature}`
-                                    : undefined,
-                            });
-                            toast.custom(() => (
-                                <Notification
-                                    data={{
-                                        slug: 65416576514678,
-                                        title: 'Order Cancelled',
-                                        message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
-                                        icon: 'check',
-                                        removeAfter: 5000,
-                                        txLink: successOrderSignature
-                                            ? `${blockExplorer}/tx/${successOrderSignature}`
-                                            : undefined,
-                                    }}
-                                    dismiss={(num: number) => console.log(num)}
-                                />
-                            ));
+                            toast.custom(
+                                (t) => (
+                                    <Notification
+                                        data={{
+                                            slug: 654616576514678,
+                                            title: 'Order Cancelled',
+                                            message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${order.coin}`,
+                                            icon: 'check',
+                                            removeAfter: 5000,
+                                            txLink: successOrderSignature
+                                                ? `${blockExplorer}/tx/${successOrderSignature}`
+                                                : undefined,
+                                        }}
+                                        dismiss={() => toast.dismiss(t)}
+                                    />
+                                ),
+                                { id: toastId },
+                            );
                         }
                     });
                 } else {
-                    notifications.remove(slug);
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
@@ -215,30 +200,24 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             },
                         });
                     }
-                    notifications.add({
-                        title: 'All Orders Cancelled',
-                        message: `Successfully cancelled all ${successCount} orders`,
-                        icon: 'check',
-                        removeAfter: 5000,
-                        txLink: successOrderSignature
-                            ? `${blockExplorer}/tx/${successOrderSignature}`
-                            : undefined,
-                    });
-                    toast.custom(() => (
-                        <Notification
-                            data={{
-                                slug: 65416576514678,
-                                title: 'All Orders Cancelled',
-                                message: `Successfully cancelled all ${successCount} orders`,
-                                icon: 'check',
-                                removeAfter: 5000,
-                                txLink: successOrderSignature
-                                    ? `${blockExplorer}/tx/${successOrderSignature}`
-                                    : undefined,
-                            }}
-                            dismiss={(num: number) => console.log(num)}
-                        />
-                    ));
+                    toast.custom(
+                        (t) => (
+                            <Notification
+                                data={{
+                                    slug: 65416576514678,
+                                    title: 'All Orders Cancelled',
+                                    message: `Successfully cancelled all ${successCount} orders`,
+                                    icon: 'check',
+                                    removeAfter: 5000,
+                                    txLink: successOrderSignature
+                                        ? `${blockExplorer}/tx/${successOrderSignature}`
+                                        : undefined,
+                                }}
+                                dismiss={() => toast.dismiss(t)}
+                            />
+                        ),
+                        { id: toastId },
+                    );
                 }
             } else {
                 let failedOrderSignature: string | undefined;
@@ -251,7 +230,6 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     }
                 });
                 if (successCount > 0 && failureCount > 0) {
-                    notifications.remove(slug);
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
@@ -266,32 +244,25 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             },
                         });
                     }
-                    notifications.add({
-                        title: 'Partial Success',
-                        message: `Cancelled ${successCount} orders, ${failureCount} failed`,
-                        icon: 'error',
-                        removeAfter: 8000,
-                        txLink: failedOrderSignature
-                            ? `${blockExplorer}/tx/${failedOrderSignature}`
-                            : undefined,
-                    });
-                    toast.custom(() => (
-                        <Notification
-                            data={{
-                                slug: 9867416768,
-                                title: 'Partial Success',
-                                message: `Cancelled ${successCount} orders, ${failureCount} failed`,
-                                icon: 'error',
-                                removeAfter: 8000,
-                                txLink: failedOrderSignature
-                                    ? `${blockExplorer}/tx/${failedOrderSignature}`
-                                    : undefined,
-                            }}
-                            dismiss={(num: number) => console.log(num)}
-                        />
-                    ));
+                    toast.custom(
+                        (t) => (
+                            <Notification
+                                data={{
+                                    slug: 9867416768,
+                                    title: 'Partial Success',
+                                    message: `Cancelled ${successCount} orders, ${failureCount} failed`,
+                                    icon: 'error',
+                                    removeAfter: 8000,
+                                    txLink: failedOrderSignature
+                                        ? `${blockExplorer}/tx/${failedOrderSignature}`
+                                        : undefined,
+                                }}
+                                dismiss={() => toast.dismiss(t)}
+                            />
+                        ),
+                        { id: toastId },
+                    );
                 } else {
-                    notifications.remove(slug);
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
@@ -305,59 +276,46 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             },
                         });
                     }
-                    notifications.add({
-                        title: 'Cancel All Failed',
-                        message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
-                        icon: 'error',
-                        removeAfter: 8000,
-                        txLink: failedOrderSignature
-                            ? `${blockExplorer}/tx/${failedOrderSignature}`
-                            : undefined,
-                    });
-                    toast.custom(() => (
-                        <Notification
-                            data={{
-                                slug: 9867416768,
-                                title: 'Cancel All Failed',
-                                message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
-                                icon: 'error',
-                                removeAfter: 8000,
-                                txLink: failedOrderSignature
-                                    ? `${blockExplorer}/tx/${failedOrderSignature}`
-                                    : undefined,
-                            }}
-                            dismiss={(num: number) => console.log(num)}
-                        />
-                    ));
+                    toast.custom(
+                        (t) => (
+                            <Notification
+                                data={{
+                                    slug: 986741671686768,
+                                    title: 'Cancel All Failed',
+                                    message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
+                                    icon: 'error',
+                                    removeAfter: 8000,
+                                    txLink: failedOrderSignature
+                                        ? `${blockExplorer}/tx/${failedOrderSignature}`
+                                        : undefined,
+                                }}
+                                dismiss={() => toast.dismiss(t)}
+                            />
+                        ),
+                        { id: toastId },
+                    );
                 }
             }
         } catch (error) {
             console.error('❌ Error during cancel all operation:', error);
-            notifications.remove(slug);
-            notifications.add({
-                title: 'Cancel All Failed',
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : 'Unknown error occurred',
-                icon: 'error',
-                removeAfter: 5000,
-            });
-            toast.custom(() => (
-                <Notification
-                    data={{
-                        slug: 6768767673,
-                        title: 'Cancel All Failed',
-                        message:
-                            error instanceof Error
-                                ? error.message
-                                : 'Unknown error occurred',
-                        icon: 'error',
-                        removeAfter: 5000,
-                    }}
-                    dismiss={(num: number) => console.log(num)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 6768767673,
+                            title: 'Cancel All Failed',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                            icon: 'error',
+                            removeAfter: 5000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
         } finally {
             setIsCancellingAll(false);
         }
