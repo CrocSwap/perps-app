@@ -79,6 +79,9 @@ function PortfolioDeposit(props: propsIF) {
     }, [availableBalance]);
 
     const handleDeposit = useCallback(async () => {
+        // ID to allow all notifications within the same toast
+        const toastId: string = crypto.randomUUID();
+
         setError(null);
         setTransactionStatus('pending');
 
@@ -152,21 +155,24 @@ function PortfolioDeposit(props: propsIF) {
                 }
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
-                toast.custom((t) => (
-                    <Notification
-                        data={{
-                            slug: 514351358,
-                            title: 'Deposit Failed',
-                            message: result.error || 'Transaction failed',
-                            icon: 'error',
-                            removeAfter: 10000,
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                        }}
-                        dismiss={() => toast.dismiss(t)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 514351358,
+                                title: 'Deposit Failed',
+                                message: result.error || 'Transaction failed',
+                                icon: 'error',
+                                removeAfter: 10000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             } else {
                 setTransactionStatus('success');
 
@@ -189,21 +195,24 @@ function PortfolioDeposit(props: propsIF) {
                     });
                 }
                 // add toast with Sonner
-                toast.custom((t) => (
-                    <Notification
-                        data={{
-                            slug: 55,
-                            title: 'Deposit Successful',
-                            message: `Successfully deposited ${formatNum(depositInputNum, 2, true, false)} fUSD`,
-                            icon: 'check',
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                            removeAfter: 5000,
-                        }}
-                        dismiss={() => toast.dismiss(t)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 55,
+                                title: 'Deposit Successful',
+                                message: `Successfully deposited ${formatNum(depositInputNum, 2, true, false)} fUSD`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                                removeAfter: 5000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
 
                 // Close modal on success - notification will show after modal closes
                 if (props.onClose) {
