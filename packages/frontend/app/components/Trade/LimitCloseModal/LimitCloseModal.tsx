@@ -3,10 +3,6 @@ import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import {
-    type NotificationStoreIF,
-    useNotificationStore,
-} from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
@@ -263,7 +259,6 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             setIsMidModeActive(true);
         }
     };
-    const notifications: NotificationStoreIF = useNotificationStore();
 
     const limitPrice = parseFormattedNum(price);
 
@@ -272,48 +267,46 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     }, [limitPrice, notionalSymbolQtyNum]);
 
     async function submitLimitOrder(side: 'buy' | 'sell'): Promise<void> {
+        // ID to allow all notifications within the same toast
+        const toastId: string = crypto.randomUUID();
+
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
-            notifications.add({
-                title: 'Invalid Order Size',
-                message: 'Please enter a valid order size',
-                icon: 'error',
-            });
-            toast.custom(() => (
-                <Notification
-                    data={{
-                        slug: 514351358,
-                        title: 'Deposit Failed',
-                        message: 'Please enter a valid order size',
-                        icon: 'error',
-                        removeAfter: 10000,
-                    }}
-                    dismiss={(num: number) => console.log(num)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 514351358,
+                            title: 'Deposit Failed',
+                            message: 'Please enter a valid order size',
+                            icon: 'error',
+                            removeAfter: 10000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
             close();
             return;
         }
 
         // Validate price
         if (!limitPrice || limitPrice <= 0) {
-            notifications.add({
-                title: 'Invalid Price',
-                message: 'Please enter a valid limit price',
-                icon: 'error',
-            });
-            toast.custom(() => (
-                <Notification
-                    data={{
-                        slug: 6764167,
-                        title: 'Invalid Price',
-                        message: 'Please enter a valid limit price',
-                        icon: 'error',
-                        removeAfter: 10000,
-                    }}
-                    dismiss={(num: number) => console.log(num)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 6764167,
+                            title: 'Invalid Price',
+                            message: 'Please enter a valid limit price',
+                            icon: 'error',
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
             close();
             return;
         }
@@ -352,30 +345,24 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         },
                     });
                 }
-                notifications.add({
-                    title: `${side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Limit Order Placed`,
-                    message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
-                    icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                    removeAfter: 5000,
-                });
-                toast.custom(() => (
-                    <Notification
-                        data={{
-                            slug: 6764167,
-                            title: 'Limit Order Placed',
-                            message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
-                            icon: 'error',
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                            removeAfter: 5000,
-                        }}
-                        dismiss={(num: number) => console.log(num)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 6764167,
+                                title: `${side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Limit Order Placed`,
+                                message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                                removeAfter: 5000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             } else {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
@@ -393,31 +380,26 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         },
                     });
                 }
-                notifications.add({
-                    title: 'Limit Order Failed',
-                    message: result.error || 'Failed to place limit order',
-                    icon: 'error',
-                    removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
-                toast.custom(() => (
-                    <Notification
-                        data={{
-                            slug: 65462446467,
-                            title: 'Limit Order Failed',
-                            message:
-                                result.error || 'Failed to place limit order',
-                            icon: 'error',
-                            removeAfter: 10000,
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                        }}
-                        dismiss={(num: number) => console.log(num)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 65462446467,
+                                title: 'Limit Order Failed',
+                                message:
+                                    result.error ||
+                                    'Failed to place limit order',
+                                icon: 'error',
+                                removeAfter: 10000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             }
         } catch (error) {
             console.error(`❌ Error submitting limit ${side} order:`, error);
@@ -435,30 +417,24 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     },
                 });
             }
-            notifications.add({
-                title: 'Limit Order Failed',
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : 'Unknown error occurred',
-                icon: 'error',
-                removeAfter: 10000,
-            });
-            toast.custom(() => (
-                <Notification
-                    data={{
-                        slug: 6764167,
-                        title: 'Limit Order Failed',
-                        message:
-                            error instanceof Error
-                                ? error.message
-                                : 'Unknown error occurred',
-                        icon: 'error',
-                        removeAfter: 10000,
-                    }}
-                    dismiss={(num: number) => console.log(num)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 6764167,
+                            title: 'Limit Order Failed',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                            icon: 'error',
+                            removeAfter: 10000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
         } finally {
             setIsProcessingOrder(false);
             close();
