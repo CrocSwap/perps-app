@@ -1486,29 +1486,28 @@ function OrderInput({
 
     // fn to submit a 'Sell' market order
     async function submitMarketSell(): Promise<void> {
+        // ID to allow all notifications within the same toast
+        const toastId: string = crypto.randomUUID();
+
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
-            notifications.add({
-                title: 'Invalid Order Size',
-                message: 'Please enter a valid order size',
-                icon: 'error',
-            });
-            toast.custom((t) => (
-                <Notification
-                    data={{
-                        slug: 6417614713,
-                        title: 'Invalid Order Size',
-                        message: 'Please enter a valid order size',
-                        icon: 'error',
-                    }}
-                    dismiss={() => toast.dismiss(t)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 6417614713,
+                            title: 'Invalid Order Size',
+                            message: 'Please enter a valid order size',
+                            icon: 'error',
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
             confirmOrderModal.close();
             return;
         }
-
-        const slug = makeSlug(10);
 
         try {
             // Get best bid price for sell order
@@ -1523,13 +1522,21 @@ function OrderInput({
             setIsProcessingOrder(true);
             if (activeOptions.skipOpenOrderConfirm) {
                 confirmOrderModal.close();
-                notifications.add({
-                    title: 'Sell Order Pending',
-                    message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
-                    icon: 'spinner',
-                    slug,
-                    removeAfter: 60000,
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 6417614713,
+                                title: 'Sell Order Pending',
+                                message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
+                                icon: 'spinner',
+                                removeAfter: 60000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             }
 
             const timeOfTxBuildStart = Date.now();
@@ -1544,7 +1551,6 @@ function OrderInput({
             });
 
             if (result.success) {
-                notifications.remove(slug);
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
@@ -1567,32 +1573,25 @@ function OrderInput({
                     });
                 }
                 // Show success notification
-                notifications.add({
-                    title: 'Sell Order Successful',
-                    message: `Successfully sold ${usdValueOfOrderStr} of ${symbol}`,
-                    icon: 'check',
-                    removeAfter: 5000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
-                toast.custom((t) => (
-                    <Notification
-                        data={{
-                            slug: 714357616815,
-                            title: 'Sell Order Successful',
-                            message: `Successfully sold ${usdValueOfOrderStr} of ${symbol}`,
-                            icon: 'check',
-                            removeAfter: 5000,
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                        }}
-                        dismiss={() => toast.dismiss(t)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 714357616815,
+                                title: 'Sell Order Successful',
+                                message: `Successfully sold ${usdValueOfOrderStr} of ${symbol}`,
+                                icon: 'check',
+                                removeAfter: 5000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             } else {
-                notifications.remove(slug);
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
@@ -1616,33 +1615,26 @@ function OrderInput({
                     });
                 }
                 // Show error notification
-                notifications.add({
-                    title: 'Sell Order Failed',
-                    message: result.error || 'Transaction failed',
-                    icon: 'error',
-                    removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
-                toast.custom((t) => (
-                    <Notification
-                        data={{
-                            slug: 7143143716815,
-                            title: 'Sell Order Failed',
-                            message: result.error || 'Transaction failed',
-                            icon: 'error',
-                            removeAfter: 10000,
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                        }}
-                        dismiss={() => toast.dismiss(t)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 7143143716815,
+                                title: 'Sell Order Failed',
+                                message: result.error || 'Transaction failed',
+                                icon: 'error',
+                                removeAfter: 10000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             }
         } catch (error) {
-            notifications.remove(slug);
             console.error('❌ Error submitting market sell order:', error);
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
@@ -1660,30 +1652,24 @@ function OrderInput({
                     },
                 });
             }
-            notifications.add({
-                title: 'Sell Order Failed',
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : 'Unknown error occurred',
-                icon: 'error',
-                removeAfter: 10000,
-            });
-            toast.custom((t) => (
-                <Notification
-                    data={{
-                        slug: 1786745718674,
-                        title: 'Sell Order Failed',
-                        message:
-                            error instanceof Error
-                                ? error.message
-                                : 'Unknown error occurred',
-                        icon: 'error',
-                        removeAfter: 10000,
-                    }}
-                    dismiss={() => toast.dismiss(t)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 1786745718674,
+                            title: 'Sell Order Failed',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                            icon: 'error',
+                            removeAfter: 10000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
         } finally {
             setIsProcessingOrder(false);
             confirmOrderModal.close();
