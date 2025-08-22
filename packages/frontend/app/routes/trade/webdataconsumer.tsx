@@ -2,6 +2,7 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { toast } from 'sonner';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { useMarketOrderLog } from '~/hooks/useMarketOrderLog';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -17,7 +18,6 @@ import {
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
 import { useDebugStore } from '~/stores/DebugStore';
-import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -34,6 +34,7 @@ import type {
     UserFillIF,
     UserFundingIF,
 } from '~/utils/UserDataIFs';
+import Notification from '~/components/Notifications/Notification';
 
 export default function WebDataConsumer() {
     const { debugWallet, isDebugWalletActive } = useDebugStore();
@@ -98,7 +99,6 @@ export default function WebDataConsumer() {
     const userFundingsRef = useRef<UserFundingIF[]>([]);
     const activeTwapsRef = useRef<ActiveTwapIF[]>([]);
     const userNonFundingLedgerUpdatesRef = useRef<TransactionData[]>([]);
-    const notificationStore = useNotificationStore();
     const { formatNum } = useNumFormatter();
 
     const { info } = useSdk();
@@ -537,6 +537,9 @@ export default function WebDataConsumer() {
 
     const postUserFills = useCallback(
         (payload: any) => {
+            // ID to allow all notifications within the same toast
+            const toastId: number = Date.now();
+
             const data = payload.data as UserFillsData;
 
             console.log('[USER FILLS] Received subscription data:', {
@@ -606,13 +609,21 @@ export default function WebDataConsumer() {
 
                             // Add to notified orders before showing notification
                             notifiedOrdersRef.current.add(fill.oid);
-
-                            notificationStore.add({
-                                title: `${fill.side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Order Filled`,
-                                message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px, fill.px > 10_000 ? 0 : 2, true, true)}`,
-                                icon: 'check',
-                                removeAfter: 5000,
-                            });
+                            toast.custom(
+                                (t) => (
+                                    <Notification
+                                        data={{
+                                            slug: 4,
+                                            title: `${fill.side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Order Filled`,
+                                            message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px, fill.px > 10_000 ? 0 : 2, true, true)}`,
+                                            icon: 'check',
+                                            removeAfter: 5000,
+                                        }}
+                                        dismiss={() => toast.dismiss(t)}
+                                    />
+                                ),
+                                { id: toastId },
+                            );
                         }
                     });
                 }
