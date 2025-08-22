@@ -5,7 +5,6 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import packageJson from '../../../../package.json';
@@ -32,7 +31,6 @@ function PortfolioWithdraw({
     onClose,
     isProcessing = false,
 }: propsIF) {
-    const notificationStore = useNotificationStore();
     const [rawInputString, setRawInputString] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [transactionStatus, setTransactionStatus] = useState<
@@ -214,16 +212,7 @@ function PortfolioWithdraw({
                 }
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
-                notificationStore.add({
-                    title: 'Withdrawal Failed',
-                    message: result.error || 'Transaction failed',
-                    icon: 'error',
-                    removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
-                toast.custom(() => (
+                toast.custom((t) => (
                     <Notification
                         data={{
                             slug: 514351358,
@@ -235,7 +224,7 @@ function PortfolioWithdraw({
                                 ? `${blockExplorer}/tx/${result.signature}`
                                 : undefined,
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ));
             } else {
@@ -260,16 +249,7 @@ function PortfolioWithdraw({
                     });
                 }
                 // Show success notification
-                notificationStore.add({
-                    title: 'Withdrawal Successful',
-                    message: `Successfully withdrew ${formatNum(withdrawInputNum, 2, true, false)} fUSD`,
-                    icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                    removeAfter: 5000,
-                });
-                toast.custom(() => (
+                toast.custom((t) => (
                     <Notification
                         data={{
                             slug: 489712651,
@@ -278,7 +258,7 @@ function PortfolioWithdraw({
                             icon: 'check',
                             removeAfter: 10000,
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ));
                 // Close modal on success - notification will show after modal closes
@@ -311,7 +291,6 @@ function PortfolioWithdraw({
         onWithdraw,
         validateAmount,
         onClose,
-        notificationStore,
     ]);
 
     // Memoize info items to prevent recreating on each render
