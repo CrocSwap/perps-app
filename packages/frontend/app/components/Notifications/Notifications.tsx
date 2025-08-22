@@ -93,8 +93,7 @@ export default function Notifications() {
 
     return (
         <div className={styles.notifications}>
-            {/* {showReload && ( */}
-            {
+            {showReload && (
                 <div className={styles.new_version_available}>
                     <header>
                         <div />
@@ -122,9 +121,8 @@ export default function Notifications() {
                         Update Now
                     </SimpleButton>
                 </div>
-            }
-            {/* {unseen.messages.length > 0 && !userClosedNews && ( */}
-            {
+            )}
+            {unseen.messages.length > 0 && !userClosedNews && (
                 <div className={styles.news}>
                     <header>
                         <h4>Announcements</h4>
@@ -148,7 +146,7 @@ export default function Notifications() {
                         )}
                     </ul>
                 </div>
-            }
+            )}
         </div>
     );
 }
