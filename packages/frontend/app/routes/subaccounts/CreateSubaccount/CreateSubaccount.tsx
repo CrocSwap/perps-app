@@ -3,11 +3,9 @@ import styles from './CreateSubaccount.module.css';
 import Modal from '~/components/Modal/Modal';
 import type { useModalIF } from '~/hooks/useModal';
 import { useKeydown } from '~/hooks/useKeydown';
-import {
-    useNotificationStore,
-    type NotificationStoreIF,
-} from '~/stores/NotificationStore';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 // interface for functional component props
 interface propsIF {
@@ -25,20 +23,29 @@ export default function CreateSubaccount(props: propsIF) {
     // string to link `<label>` and `<input>` fields
     const INPUT_ID_FOR_DOM = 'create_subaccount_input_field';
 
-    // logic to dispatch a notification for sub-account creation
-    const notifications: NotificationStoreIF = useNotificationStore();
-
     // fn to handle subaccount creation
     function createSubaccount(): void {
+        // ID to allow all notifications within the same toast
+        const toastId: number = Date.now();
+
         if (inputRef.current) {
             const text: string = inputRef.current.value;
             if (text.length) {
                 create(inputRef.current.value, 'discretionary');
-                notifications.add({
-                    title: 'Sub Account Created',
-                    message: `Made new discretionary sub-account ${inputRef.current.value}`,
-                    icon: 'check',
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 97123567167468,
+                                title: 'Sub Account Created',
+                                message: `Made new discretionary sub-account ${inputRef.current.value}`,
+                                icon: 'check',
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             }
         }
         modalControl.close();
