@@ -1305,7 +1305,7 @@ function OrderInput({
             //     icon: 'error',
             // });
             toast.custom(
-                () => (
+                (t) => (
                     <Notification
                         data={{
                             slug: 971235468,
@@ -1313,7 +1313,7 @@ function OrderInput({
                             message: 'Please enter a valid order size',
                             icon: 'error',
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ),
                 { id: toastId },
@@ -1346,7 +1346,7 @@ function OrderInput({
                 //     removeAfter: 60000,
                 // });
                 toast.custom(
-                    () => (
+                    (t) => (
                         <Notification
                             data={{
                                 slug: 971235468,
@@ -1354,7 +1354,7 @@ function OrderInput({
                                 message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
                                 icon: 'spinner',
                             }}
-                            dismiss={(num: number) => console.log(num)}
+                            dismiss={() => toast.dismiss(t)}
                         />
                     ),
                     { id: toastId },
@@ -1406,7 +1406,7 @@ function OrderInput({
                 //         : undefined,
                 // });
                 toast.custom(
-                    () => (
+                    (t) => (
                         <Notification
                             data={{
                                 slug: 3489196786,
@@ -1418,7 +1418,7 @@ function OrderInput({
                                     ? `${blockExplorer}/tx/${result.signature}`
                                     : undefined,
                             }}
-                            dismiss={(num: number) => console.log(num)}
+                            dismiss={() => toast.dismiss(t)}
                         />
                     ),
                     { id: toastId },
@@ -1458,7 +1458,7 @@ function OrderInput({
                         : undefined,
                 });
                 toast.custom(
-                    () => (
+                    (t) => (
                         <Notification
                             data={{
                                 slug: 971235468,
@@ -1470,7 +1470,7 @@ function OrderInput({
                                     ? `${blockExplorer}/tx/${result.signature}`
                                     : undefined,
                             }}
-                            dismiss={(num: number) => console.log(num)}
+                            dismiss={() => toast.dismiss(t)}
                         />
                     ),
                     { id: toastId },
@@ -1505,7 +1505,7 @@ function OrderInput({
             //     removeAfter: 10000,
             // });
             toast.custom(
-                () => (
+                (t) => (
                     <Notification
                         data={{
                             slug: 4986713,
@@ -1517,7 +1517,7 @@ function OrderInput({
                             icon: 'error',
                             removeAfter: 10000,
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ),
                 { id: toastId },
@@ -1537,7 +1537,7 @@ function OrderInput({
                 message: 'Please enter a valid order size',
                 icon: 'error',
             });
-            toast.custom(() => (
+            toast.custom((t) => (
                 <Notification
                     data={{
                         slug: 6417614713,
@@ -1545,7 +1545,7 @@ function OrderInput({
                         message: 'Please enter a valid order size',
                         icon: 'error',
                     }}
-                    dismiss={(num: number) => console.log(num)}
+                    dismiss={() => toast.dismiss(t)}
                 />
             ));
             confirmOrderModal.close();
@@ -1620,7 +1620,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
-                toast.custom(() => (
+                toast.custom((t) => (
                     <Notification
                         data={{
                             slug: 714357616815,
@@ -1632,7 +1632,7 @@ function OrderInput({
                                 ? `${blockExplorer}/tx/${result.signature}`
                                 : undefined,
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ));
             } else {
@@ -1669,7 +1669,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
-                toast.custom(() => (
+                toast.custom((t) => (
                     <Notification
                         data={{
                             slug: 7143143716815,
@@ -1681,7 +1681,7 @@ function OrderInput({
                                 ? `${blockExplorer}/tx/${result.signature}`
                                 : undefined,
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ));
             }
@@ -1713,7 +1713,7 @@ function OrderInput({
                 icon: 'error',
                 removeAfter: 10000,
             });
-            toast.custom(() => (
+            toast.custom((t) => (
                 <Notification
                     data={{
                         slug: 1786745718674,
@@ -1725,7 +1725,7 @@ function OrderInput({
                         icon: 'error',
                         removeAfter: 10000,
                     }}
-                    dismiss={(num: number) => console.log(num)}
+                    dismiss={() => toast.dismiss(t)}
                 />
             ));
         } finally {
@@ -1743,7 +1743,7 @@ function OrderInput({
                 message: 'Please enter a valid order size',
                 icon: 'error',
             });
-            toast.custom(() => (
+            toast.custom((t) => (
                 <Notification
                     data={{
                         slug: 1786745718674,
@@ -1751,7 +1751,7 @@ function OrderInput({
                         message: 'Please enter a valid order size',
                         icon: 'error',
                     }}
-                    dismiss={(num: number) => console.log(num)}
+                    dismiss={() => toast.dismiss(t)}
                 />
             ));
             confirmOrderModal.close();
@@ -1766,7 +1766,7 @@ function OrderInput({
                 message: 'Please enter a valid limit price',
                 icon: 'error',
             });
-            toast.custom(() => (
+            toast.custom((t) => (
                 <Notification
                     data={{
                         slug: 14786745718674,
@@ -1774,7 +1774,7 @@ function OrderInput({
                         message: 'Please enter a valid limit price',
                         icon: 'error',
                     }}
-                    dismiss={(num: number) => console.log(num)}
+                    dismiss={() => toast.dismiss(t)}
                 />
             ));
             confirmOrderModal.close();
@@ -1845,7 +1845,7 @@ function OrderInput({
                         : undefined,
                     removeAfter: 5000,
                 });
-                toast.custom(() => (
+                toast.custom((t) => (
                     <Notification
                         data={{
                             slug: 14786745718674,
@@ -1853,7 +1853,7 @@ function OrderInput({
                             message: 'Please enter a valid limit price',
                             icon: 'error',
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ));
             } else {
@@ -1890,7 +1890,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
-                toast.custom(() => (
+                toast.custom((t) => (
                     <Notification
                         data={{
                             slug: 14786745718674,
@@ -1903,7 +1903,7 @@ function OrderInput({
                                 ? `${blockExplorer}/tx/${result.signature}`
                                 : undefined,
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ));
             }
@@ -1935,7 +1935,7 @@ function OrderInput({
                 icon: 'error',
                 removeAfter: 10000,
             });
-            toast.custom(() => (
+            toast.custom((t) => (
                 <Notification
                     data={{
                         slug: 14786745718674,
@@ -1947,7 +1947,7 @@ function OrderInput({
                         icon: 'error',
                         removeAfter: 10000,
                     }}
-                    dismiss={(num: number) => console.log(num)}
+                    dismiss={() => toast.dismiss(t)}
                 />
             ));
         } finally {
@@ -1965,7 +1965,7 @@ function OrderInput({
                 message: 'Please enter a valid order size',
                 icon: 'error',
             });
-            toast.custom(() => (
+            toast.custom((t) => (
                 <Notification
                     data={{
                         slug: 657687868761874,
@@ -1973,7 +1973,7 @@ function OrderInput({
                         message: 'Please enter a valid order size',
                         icon: 'error',
                     }}
-                    dismiss={(num: number) => console.log(num)}
+                    dismiss={() => toast.dismiss(t)}
                 />
             ));
             confirmOrderModal.close();
@@ -1988,7 +1988,7 @@ function OrderInput({
                 message: 'Please enter a valid limit price',
                 icon: 'error',
             });
-            toast.custom(() => (
+            toast.custom((t) => (
                 <Notification
                     data={{
                         slug: 657687868761874,
@@ -1996,7 +1996,7 @@ function OrderInput({
                         message: 'Please enter a valid limit price',
                         icon: 'error',
                     }}
-                    dismiss={(num: number) => console.log(num)}
+                    dismiss={() => toast.dismiss(t)}
                 />
             ));
             confirmOrderModal.close();
@@ -2067,7 +2067,7 @@ function OrderInput({
                         : undefined,
                     removeAfter: 5000,
                 });
-                toast.custom(() => (
+                toast.custom((t) => (
                     <Notification
                         data={{
                             slug: 657687868761874,
@@ -2079,7 +2079,7 @@ function OrderInput({
                                 : undefined,
                             removeAfter: 5000,
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ));
             } else {
@@ -2112,7 +2112,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
-                toast.custom(() => (
+                toast.custom((t) => (
                     <Notification
                         data={{
                             slug: 657687868761874,
@@ -2125,7 +2125,7 @@ function OrderInput({
                                 ? `${blockExplorer}/tx/${result.signature}`
                                 : undefined,
                         }}
-                        dismiss={(num: number) => console.log(num)}
+                        dismiss={() => toast.dismiss(t)}
                     />
                 ));
             }
@@ -2157,7 +2157,7 @@ function OrderInput({
                 icon: 'error',
                 removeAfter: 10000,
             });
-            toast.custom(() => (
+            toast.custom((t) => (
                 <Notification
                     data={{
                         slug: 657687868761874,
@@ -2169,7 +2169,7 @@ function OrderInput({
                         icon: 'error',
                         removeAfter: 10000,
                     }}
-                    dismiss={(num: number) => console.log(num)}
+                    dismiss={() => toast.dismiss(t)}
                 />
             ));
         } finally {
