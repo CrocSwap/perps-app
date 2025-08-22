@@ -343,7 +343,6 @@ export default function Trade() {
                 onComplete={handleTutorialComplete}
                 onSkip={handleTutorialSkip}
             />
-            <Toaster position='bottom-right' />
         </>
     );
 }
