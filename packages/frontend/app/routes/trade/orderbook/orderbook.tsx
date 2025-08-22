@@ -222,6 +222,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                 subKey,
                 postOrderBookRaw,
                 TIMEOUT_OB_POLLING,
+                true,
             );
             return () => {
                 unsubscribeFromPoller('info', subKey);
