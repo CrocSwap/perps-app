@@ -1778,21 +1778,24 @@ function OrderInput({
                         },
                     });
                 }
-                toast.custom((t) => (
-                    <Notification
-                        data={{
-                            slug: 14786745718674,
-                            title: 'Buy / Long Limit Order Placed',
-                            message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
-                            icon: 'check',
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                            removeAfter: 5000,
-                        }}
-                        dismiss={() => toast.dismiss(t)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 14786745718674,
+                                title: 'Buy / Long Limit Order Placed',
+                                message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                                removeAfter: 5000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             } else {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
@@ -1856,21 +1859,24 @@ function OrderInput({
                     },
                 });
             }
-            toast.custom((t) => (
-                <Notification
-                    data={{
-                        slug: 14786745718674,
-                        title: 'Limit Order Failed',
-                        message:
-                            error instanceof Error
-                                ? error.message
-                                : 'Unknown error occurred',
-                        icon: 'error',
-                        removeAfter: 10000,
-                    }}
-                    dismiss={() => toast.dismiss(t)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 14786745718674,
+                            title: 'Limit Order Failed',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                            icon: 'error',
+                            removeAfter: 10000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
         } finally {
             setIsProcessingOrder(false);
             confirmOrderModal.close();
@@ -1984,21 +1990,24 @@ function OrderInput({
                         },
                     });
                 }
-                toast.custom((t) => (
-                    <Notification
-                        data={{
-                            slug: 657687868761874,
-                            title: 'Limit Order Placed',
-                            message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
-                            icon: 'check',
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                            removeAfter: 5000,
-                        }}
-                        dismiss={() => toast.dismiss(t)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 657687868761874,
+                                title: 'Limit Order Placed',
+                                message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                                removeAfter: 5000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             } else {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
@@ -2019,22 +2028,26 @@ function OrderInput({
                         },
                     });
                 }
-                toast.custom((t) => (
-                    <Notification
-                        data={{
-                            slug: 657687868761874,
-                            title: 'Limit Order Failed',
-                            message:
-                                result.error || 'Failed to place limit order',
-                            icon: 'error',
-                            removeAfter: 10000,
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                        }}
-                        dismiss={() => toast.dismiss(t)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 657687868761874,
+                                title: 'Limit Order Failed',
+                                message:
+                                    result.error ||
+                                    'Failed to place limit order',
+                                icon: 'error',
+                                removeAfter: 10000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             }
         } catch (error) {
             console.error('❌ Error submitting limit sell order:', error);
@@ -2054,21 +2067,24 @@ function OrderInput({
                     },
                 });
             }
-            toast.custom((t) => (
-                <Notification
-                    data={{
-                        slug: 657687868761874,
-                        title: 'Limit Order Failed',
-                        message:
-                            error instanceof Error
-                                ? error.message
-                                : 'Unknown error occurred',
-                        icon: 'error',
-                        removeAfter: 10000,
-                    }}
-                    dismiss={() => toast.dismiss(t)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 657687868761874,
+                            title: 'Limit Order Failed',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                            icon: 'error',
+                            removeAfter: 10000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
         } finally {
             setIsProcessingOrder(false);
             confirmOrderModal.close();
