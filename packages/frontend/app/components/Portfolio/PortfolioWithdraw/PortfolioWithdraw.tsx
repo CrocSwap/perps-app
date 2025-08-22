@@ -264,6 +264,9 @@ function PortfolioWithdraw({
                                 message: `Successfully withdrew ${formatNum(withdrawInputNum, 2, true, false)} fUSD`,
                                 icon: 'check',
                                 removeAfter: 10000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
                             }}
                             dismiss={() => toast.dismiss(t)}
                         />
