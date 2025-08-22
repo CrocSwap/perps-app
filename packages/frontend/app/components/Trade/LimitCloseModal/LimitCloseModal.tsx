@@ -268,7 +268,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
     async function submitLimitOrder(side: 'buy' | 'sell'): Promise<void> {
         // ID to allow all notifications within the same toast
-        const toastId: string = crypto.randomUUID();
+        const toastId: number = Date.now();
 
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {

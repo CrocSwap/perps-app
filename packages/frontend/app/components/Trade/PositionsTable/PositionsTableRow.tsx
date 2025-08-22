@@ -171,7 +171,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         // Handle market close
         const handleMarketClose = useCallback(async () => {
             // ID to allow all notifications within the same toast
-            const toastId: string = crypto.randomUUID();
+            const toastId: number = Date.now();
 
             if (isClosing || !position.szi) return;
 

@@ -39,7 +39,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
 
     const handleCancelAll = async () => {
         // ID to allow all notifications within the same toast
-        const toastId: string = crypto.randomUUID();
+        const toastId: number = Date.now();
 
         if (filteredOrders.length === 0) {
             return;

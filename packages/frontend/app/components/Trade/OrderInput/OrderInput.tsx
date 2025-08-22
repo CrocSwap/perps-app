@@ -1290,7 +1290,7 @@ function OrderInput({
     // fn to submit a 'Buy' market order
     async function submitMarketBuy(): Promise<void> {
         // ID to allow all notifications within the same toast
-        const toastId: string = crypto.randomUUID();
+        const toastId: number = Date.now();
 
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
@@ -1482,7 +1482,7 @@ function OrderInput({
     // fn to submit a 'Sell' market order
     async function submitMarketSell(): Promise<void> {
         // ID to allow all notifications within the same toast
-        const toastId: string = crypto.randomUUID();
+        const toastId: number = Date.now();
 
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
@@ -1674,7 +1674,7 @@ function OrderInput({
     // fn to submit a 'Buy' limit order
     async function submitLimitBuy(): Promise<void> {
         // ID to allow all notifications within the same toast
-        const toastId: string = crypto.randomUUID();
+        const toastId: number = Date.now();
 
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
@@ -1886,7 +1886,7 @@ function OrderInput({
     // fn to submit a 'Sell' limit order
     async function submitLimitSell(): Promise<void> {
         // ID to allow all notifications within the same toast
-        const toastId: string = crypto.randomUUID();
+        const toastId: number = Date.now();
 
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {

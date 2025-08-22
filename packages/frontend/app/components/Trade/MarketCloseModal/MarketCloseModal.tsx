@@ -218,7 +218,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     // fn to execute market close
     async function executeMarketClose(): Promise<void> {
         // ID to allow all notifications within the same toast
-        const toastId: string = crypto.randomUUID();
+        const toastId: number = Date.now();
 
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {

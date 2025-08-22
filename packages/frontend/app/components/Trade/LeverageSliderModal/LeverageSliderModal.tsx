@@ -68,7 +68,7 @@ export default function LeverageSliderModal({
 
     const handleConfirm = useCallback(async () => {
         // ID to allow all notifications within the same toast
-        const toastId: string = crypto.randomUUID();
+        const toastId: number = Date.now();
 
         setIsProcessing(true);
         setTransactionStatus('pending');
