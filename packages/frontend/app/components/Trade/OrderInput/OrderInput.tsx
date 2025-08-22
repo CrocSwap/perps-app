@@ -929,6 +929,10 @@ function OrderInput({
         }
     }, [sizeDisplay, isEditingSizeInput]);
 
+    useEffect(() => {
+        updateSliderAfterOrder();
+    }, [usdAvailableToTrade]);
+
     const handleSizeInputBlur = useCallback(() => {
         handleSizeInputUpdate();
         setIsEditingSizeInput(false);
@@ -1290,6 +1294,10 @@ function OrderInput({
         ],
     );
 
+    const updateSliderAfterOrder = useCallback(() => {
+        if (!isEditingSizeInput) handleSizeInputUpdate();
+    }, [isEditingSizeInput, handleSizeInputUpdate]);
+
     // fn to submit a 'Buy' market order
     async function submitMarketBuy(): Promise<void> {
         // Validate position size
@@ -1372,6 +1380,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                updateSliderAfterOrder();
             } else {
                 notifications.remove(slug);
                 if (typeof plausible === 'function') {
@@ -1522,6 +1531,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                updateSliderAfterOrder();
             } else {
                 notifications.remove(slug);
                 if (typeof plausible === 'function') {
