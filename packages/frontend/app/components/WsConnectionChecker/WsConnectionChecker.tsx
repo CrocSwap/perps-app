@@ -47,27 +47,28 @@ export default function WsConnectionChecker() {
             setInternetConnected(false);
         };
         const visibilityListener = () => {
-            if (document.visibilityState === 'hidden') {
-                isTabPassive.current = true;
-                if (sleepModeTimeout.current) {
-                    clearTimeout(sleepModeTimeout.current);
-                }
-                sleepModeTimeout.current = setTimeout(() => {
-                    if (isTabPassive.current) {
-                        console.log('>>> sleep mode', new Date().toISOString());
-                        setIsWsSleepMode(true);
-                        setIsTabActive(false);
-                    }
-                }, WS_SLEEP_MODE);
-            } else {
-                console.log('>>> resume mode', new Date().toISOString());
-                isTabPassive.current = false;
-                if (sleepModeTimeout.current) {
-                    clearTimeout(sleepModeTimeout.current);
-                }
-                setIsWsSleepMode(false);
-                setIsTabActive(true);
-            }
+            console.log('>>> sleep mode has been disabled');
+            // if (document.visibilityState === 'hidden') {
+            //     isTabPassive.current = true;
+            //     if (sleepModeTimeout.current) {
+            //         clearTimeout(sleepModeTimeout.current);
+            //     }
+            //     sleepModeTimeout.current = setTimeout(() => {
+            //         if (isTabPassive.current) {
+            //             console.log('>>> sleep mode', new Date().toISOString());
+            //             setIsWsSleepMode(true);
+            //             setIsTabActive(false);
+            //         }
+            //     }, WS_SLEEP_MODE);
+            // } else {
+            //     console.log('>>> resume mode', new Date().toISOString());
+            //     isTabPassive.current = false;
+            //     if (sleepModeTimeout.current) {
+            //         clearTimeout(sleepModeTimeout.current);
+            //     }
+            //     setIsWsSleepMode(false);
+            //     setIsTabActive(true);
+            // }
         };
 
         window.addEventListener('online', onlineListener);
