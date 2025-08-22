@@ -3,10 +3,6 @@ import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import {
-    type NotificationStoreIF,
-    useNotificationStore,
-} from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -219,28 +215,27 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         return '';
     };
 
-    const notifications: NotificationStoreIF = useNotificationStore();
-
     // fn to execute market close
     async function executeMarketClose(): Promise<void> {
+        // ID to allow all notifications within the same toast
+        const toastId: string = crypto.randomUUID();
+
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
-            notifications.add({
-                title: 'Invalid Order Size',
-                message: 'Please enter a valid order size',
-                icon: 'error',
-            });
-            toast.custom(() => (
-                <Notification
-                    data={{
-                        slug: 987671676764,
-                        title: 'Invalid Order Size',
-                        message: 'Please enter a valid order size',
-                        icon: 'error',
-                    }}
-                    dismiss={(num: number) => console.log(num)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 987671676764,
+                            title: 'Invalid Order Size',
+                            message: 'Please enter a valid order size',
+                            icon: 'error',
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
             close();
             return;
         }
@@ -290,33 +285,27 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         },
                     });
                 }
-                notifications.add({
-                    title:
-                        positionSize < 100
-                            ? `${positionSize}% of Position Closed`
-                            : 'Position Closed',
-                    message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
-                    icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                    removeAfter: 5000,
-                });
-                toast.custom(() => (
-                    <Notification
-                        data={{
-                            slug: 7864796646,
-                            title: 'Position Closed',
-                            message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
-                            icon: 'check',
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                            removeAfter: 5000,
-                        }}
-                        dismiss={(num: number) => console.log(num)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 7864796646,
+                                title:
+                                    positionSize < 100
+                                        ? `${positionSize}% of Position Closed`
+                                        : 'Position Closed',
+                                message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                                removeAfter: 5000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             } else {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
@@ -338,57 +327,46 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         },
                     });
                 }
-                notifications.add({
-                    title: 'Close Failed',
-                    message: result.error || 'Failed to close position',
-                    icon: 'error',
-                    removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
-                toast.custom(() => (
-                    <Notification
-                        data={{
-                            slug: 648774867,
-                            title: 'Close Failed',
-                            message: result.error || 'Failed to close position',
-                            icon: 'error',
-                            removeAfter: 10000,
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                        }}
-                        dismiss={(num: number) => console.log(num)}
-                    />
-                ));
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 648774867,
+                                title: 'Close Failed',
+                                message:
+                                    result.error || 'Failed to close position',
+                                icon: 'error',
+                                removeAfter: 10000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             }
         } catch (error) {
             console.error('❌ Error closing position:', error);
-            notifications.add({
-                title: 'Close Failed',
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : 'Unknown error occurred',
-                icon: 'error',
-                removeAfter: 10000,
-            });
-            toast.custom(() => (
-                <Notification
-                    data={{
-                        slug: 6741674678741,
-                        title: 'Close Failed',
-                        message:
-                            error instanceof Error
-                                ? error.message
-                                : 'Unknown error occurred',
-                        icon: 'error',
-                        removeAfter: 10000,
-                    }}
-                    dismiss={(num: number) => console.log(num)}
-                />
-            ));
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 6741674678741,
+                            title: 'Close Failed',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                            icon: 'error',
+                            removeAfter: 10000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
