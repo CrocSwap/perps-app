@@ -1279,24 +1279,30 @@ function OrderInput({
 
     // fn to submit a 'Buy' market order
     async function submitMarketBuy(): Promise<void> {
+        // ID to allow all notifications within the same toast
+        const toastId: string = crypto.randomUUID();
+
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
-            notifications.add({
-                title: 'Invalid Order Size',
-                message: 'Please enter a valid order size',
-                icon: 'error',
-            });
-            toast.custom(() => (
-                <Notification
-                    data={{
-                        slug: 971235468,
-                        title: 'Invalid Order Size',
-                        message: 'Please enter a valid order size',
-                        icon: 'error',
-                    }}
-                    dismiss={(num: number) => console.log(num)}
-                />
-            ));
+            // notifications.add({
+            //     title: 'Invalid Order Size',
+            //     message: 'Please enter a valid order size',
+            //     icon: 'error',
+            // });
+            toast.custom(
+                () => (
+                    <Notification
+                        data={{
+                            slug: 971235468,
+                            title: 'Invalid Order Size',
+                            message: 'Please enter a valid order size',
+                            icon: 'error',
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ),
+                { id: toastId },
+            );
             confirmOrderModal.close();
             return;
         }
@@ -1317,13 +1323,27 @@ function OrderInput({
             );
             if (activeOptions.skipOpenOrderConfirm) {
                 confirmOrderModal.close();
-                notifications.add({
-                    title: 'Buy Order Pending',
-                    message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
-                    icon: 'spinner',
-                    slug,
-                    removeAfter: 60000,
-                });
+                // notifications.add({
+                //     title: 'Buy Order Pending',
+                //     message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
+                //     icon: 'spinner',
+                //     slug,
+                //     removeAfter: 60000,
+                // });
+                toast.custom(
+                    () => (
+                        <Notification
+                            data={{
+                                slug: 971235468,
+                                title: 'Buy Order Pending',
+                                message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
+                                icon: 'spinner',
+                            }}
+                            dismiss={(num: number) => console.log(num)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             }
 
             const timeOfTxBuildStart = Date.now();
@@ -1338,7 +1358,7 @@ function OrderInput({
             });
 
             if (result.success) {
-                notifications.remove(slug);
+                // notifications.remove(slug);
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
@@ -1360,47 +1380,35 @@ function OrderInput({
                     });
                 }
                 // Show success notification
-                notifications.add({
-                    title: 'Buy Order Successful',
-                    message: `Successfully bought ${usdValueOfOrderStr} of ${symbol}`,
-                    icon: 'check',
-                    removeAfter: 5000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
-                toast.custom(() => (
-                    <Notification
-                        data={{
-                            slug: 3489196786,
-                            title: 'Buy Order Successful',
-                            message: `Successfully bought ${usdValueOfOrderStr} of ${symbol}`,
-                            icon: 'check',
-                            removeAfter: 5000,
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                        }}
-                        dismiss={(num: number) => console.log(num)}
-                    />
-                ));
-                toast.custom(() => (
-                    <Notification
-                        data={{
-                            slug: 971235468,
-                            title: 'Buy Order Successful',
-                            message: `Successfully bought ${usdValueOfOrderStr} of ${symbol}`,
-                            icon: 'check',
-                            removeAfter: 5000,
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                        }}
-                        dismiss={(num: number) => console.log(num)}
-                    />
-                ));
+                // notifications.add({
+                //     title: 'Buy Order Successful',
+                //     message: `Successfully bought ${usdValueOfOrderStr} of ${symbol}`,
+                //     icon: 'check',
+                //     removeAfter: 5000,
+                //     txLink: result.signature
+                //         ? `${blockExplorer}/tx/${result.signature}`
+                //         : undefined,
+                // });
+                toast.custom(
+                    () => (
+                        <Notification
+                            data={{
+                                slug: 3489196786,
+                                title: 'Buy Order Successful',
+                                message: `Successfully bought ${usdValueOfOrderStr} of ${symbol}`,
+                                icon: 'check',
+                                removeAfter: 5000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={(num: number) => console.log(num)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             } else {
-                notifications.remove(slug);
+                // notifications.remove(slug);
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
@@ -1432,21 +1440,24 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
-                toast.custom(() => (
-                    <Notification
-                        data={{
-                            slug: 971235468,
-                            title: 'Buy Order Failed',
-                            message: result.error || 'Transaction failed',
-                            icon: 'error',
-                            removeAfter: 10000,
-                            txLink: result.signature
-                                ? `${blockExplorer}/tx/${result.signature}`
-                                : undefined,
-                        }}
-                        dismiss={(num: number) => console.log(num)}
-                    />
-                ));
+                toast.custom(
+                    () => (
+                        <Notification
+                            data={{
+                                slug: 971235468,
+                                title: 'Buy Order Failed',
+                                message: result.error || 'Transaction failed',
+                                icon: 'error',
+                                removeAfter: 10000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={(num: number) => console.log(num)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             }
         } catch (error) {
             console.error('❌ Error submitting market buy order:', error);
@@ -1466,30 +1477,33 @@ function OrderInput({
                     },
                 });
             }
-            notifications.add({
-                title: 'Buy Order Failed',
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : 'Unknown error occurred',
-                icon: 'error',
-                removeAfter: 10000,
-            });
-            toast.custom(() => (
-                <Notification
-                    data={{
-                        slug: 4986713,
-                        title: 'Buy Order Failed',
-                        message:
-                            error instanceof Error
-                                ? error.message
-                                : 'Unknown error occurred',
-                        icon: 'error',
-                        removeAfter: 10000,
-                    }}
-                    dismiss={(num: number) => console.log(num)}
-                />
-            ));
+            // notifications.add({
+            //     title: 'Buy Order Failed',
+            //     message:
+            //         error instanceof Error
+            //             ? error.message
+            //             : 'Unknown error occurred',
+            //     icon: 'error',
+            //     removeAfter: 10000,
+            // });
+            toast.custom(
+                () => (
+                    <Notification
+                        data={{
+                            slug: 4986713,
+                            title: 'Buy Order Failed',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                            icon: 'error',
+                            removeAfter: 10000,
+                        }}
+                        dismiss={(num: number) => console.log(num)}
+                    />
+                ),
+                { id: toastId },
+            );
         } finally {
             setIsProcessingOrder(false);
             confirmOrderModal.close();
