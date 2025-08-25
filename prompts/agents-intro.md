@@ -146,7 +146,6 @@ WebSocket messages are processed in Web Workers to prevent blocking the main thr
 - **UserDataStore**: User authentication, wallet connection
 - **OrderBookStore**: Order book state and updates
 - **PositionsStore**: User positions and P&L
-- **NotificationStore**: In-app notifications
 
 ### Hooks (`packages/frontend/app/hooks/`)
 

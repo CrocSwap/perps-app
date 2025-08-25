@@ -6,11 +6,23 @@ import {
     IoClose,
 } from 'react-icons/io5';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import type { notificationIF } from '~/stores/NotificationStore';
 import styles from './Notification.module.css';
 
 interface propsIF {
-    data: notificationIF;
+    data: {
+        // title text for the toast
+        title: string;
+        // message body text for the toast
+        message: string;
+        // string indicating the icon to consume (defined in this file)
+        icon: string;
+        // id for individual toasts, used for updates and dismissal
+        toastId: number;
+        // time after with to remove a toast
+        removeAfter?: number;
+        // link to open if the user clicks the toast (optional)
+        txLink?: string;
+    };
     dismiss: (id: number) => void;
     onMouseEnter?: (slug: number) => void;
     onMouseLeave?: (slug: number) => void;
