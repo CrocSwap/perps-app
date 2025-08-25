@@ -202,7 +202,7 @@ export class DepositService {
             // Validate amount first
             const validation = this.validateDepositAmount(amount);
             if (!validation.isValid) {
-                // Note: Notifications are handled by the component using NotificationStore
+                // Note: Notifications are handled by the component using Sonner
                 return {
                     success: false,
                     error: validation.message,

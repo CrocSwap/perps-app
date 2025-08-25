@@ -209,7 +209,6 @@ export class WithdrawService {
             // Validate amount first
             const validation = this.validateWithdrawAmount(amount);
             if (!validation.isValid) {
-                // Note: Notifications are handled by the component using NotificationStore
                 return {
                     success: false,
                     error: validation.message,
