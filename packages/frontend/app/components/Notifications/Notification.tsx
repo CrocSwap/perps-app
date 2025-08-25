@@ -95,11 +95,11 @@ export default function Notification(props: propsIF) {
             // Only set timeout if there's time remaining
             if (timeRemaining > 0) {
                 timeoutRef.current = setTimeout(() => {
-                    dismiss(data.slug);
+                    dismiss(data.toastId);
                 }, timeRemaining);
             } else {
                 // If time has already elapsed, dismiss immediately
-                dismiss(data.slug);
+                dismiss(data.toastId);
             }
         }
 
@@ -110,7 +110,7 @@ export default function Notification(props: propsIF) {
                 timeoutRef.current = null;
             }
         };
-    }, [dismiss, isDebouncedHovered, data.slug, DISMISS_AFTER]); // Added DISMISS_AFTER to dependencies
+    }, [dismiss, isDebouncedHovered, data.toastId, DISMISS_AFTER]); // Added DISMISS_AFTER to dependencies
 
     // px size at which to render SVG icons
     const ICON_SIZE = 24;
@@ -164,11 +164,11 @@ export default function Notification(props: propsIF) {
             className={styles.notification}
             onMouseEnter={() => {
                 setIsHovered(true);
-                onMouseEnter?.(data.slug);
+                onMouseEnter?.(data.toastId);
             }}
             onMouseLeave={() => {
                 setIsHovered(false);
-                onMouseLeave?.(data.slug);
+                onMouseLeave?.(data.toastId);
             }}
         >
             <header>
@@ -198,7 +198,7 @@ export default function Notification(props: propsIF) {
                 <IoClose
                     className={styles.close}
                     size={ICON_SIZE}
-                    onClick={() => dismiss(data.slug)}
+                    onClick={() => dismiss(data.toastId)}
                 />
             </header>
             <p>{formatMessage(data.message)}</p>
