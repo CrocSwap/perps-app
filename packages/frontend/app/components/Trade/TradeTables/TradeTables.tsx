@@ -19,6 +19,7 @@ import { useApp } from '~/contexts/AppContext';
 import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
 import styles from './TradeTable.module.css';
 import { useDebugStore } from '~/stores/DebugStore';
+import useMediaQuery from '~/hooks/useMediaQuery';
 export interface FilterOption {
     id: string;
     label: string;
@@ -76,6 +77,7 @@ export default function TradeTable(props: TradeTableProps) {
         lastUpdateTime,
     } = useUnifiedMarginData();
 
+    const isMobile = useMediaQuery('(max-width: 480px)');
     const tabs = useMemo(() => {
         if (!page) return [];
 
@@ -94,17 +96,40 @@ export default function TradeTable(props: TradeTableProps) {
             availableTabs.push('Depositors');
         }
 
+        // Filter for different pages
+        let filteredTabs;
         if (page === Pages.TRADE) {
-            return availableTabs.filter(
+            filteredTabs = availableTabs.filter(
                 (tab) => !tradePageBlackListTabs.has(tab),
             );
         } else if (page === Pages.PORTFOLIO) {
-            return availableTabs.filter(
+            filteredTabs = availableTabs.filter(
                 (tab) => !portfolioPageBlackListTabs.has(tab),
             );
+        } else {
+            filteredTabs = availableTabs;
         }
-        return availableTabs;
-    }, [page]);
+
+        if (isMobile) {
+            return filteredTabs.filter(
+                (tab) => tab === 'Positions' || tab === 'Open Orders',
+            );
+        }
+
+        return filteredTabs;
+    }, [page, vaultPage]);
+
+    //  this useEffect is to handle tab switching when screen size changes
+    useEffect(() => {
+        // If we're on mobile and current tab isn't allowed, switch to Positions
+        if (
+            isMobile &&
+            selectedTradeTab !== 'Positions' &&
+            selectedTradeTab !== 'Open Orders'
+        ) {
+            handleTabChange('Positions');
+        }
+    }, [selectedTradeTab]);
 
     // reset wallet on trade tables after switch back from vaults
     useEffect(() => {

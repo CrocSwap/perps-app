@@ -19,6 +19,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import styles from './DepositDropdown.module.css';
+import packageJson from '../../../../package.json';
 
 interface propsIF {
     marginBucket: MarginBucketAvail | null;
@@ -233,7 +234,7 @@ function DepositDropdown(props: propsIF) {
                             Connect your wallet to start trading with zero gas.
                         </p>
                         <span
-                            className={`plausible-event-name=Login+Button+Click plausible-event-location=Account+Overview`}
+                            className={`plausible-event-name=Login+Button+Click plausible-event-location=Account+Overview plausible-event-version=${packageJson.version}`}
                             ref={sessionButtonRef}
                         >
                             <SessionButton />

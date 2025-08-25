@@ -43,3 +43,36 @@
 .symbolInfoField:hover .tooltip svg {
     display: flex;
 }
+
+.mobilePopupBackdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9998;
+    backdrop-filter: blur(0.3px);
+}
+
+.mobilePopup {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--dark2);
+    background-color: red;
+    color: var(--text2);
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    z-index: 9999;
+    animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}

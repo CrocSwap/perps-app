@@ -63,7 +63,9 @@ const DropdownMenu = ({ setIsDropdownMenuOpen }: DropdownMenuProps) => {
             >
                 Tutorial <IoIosInformationCircle size={22} />
             </button> */}
-            <div className={styles.version}>Version: {packageJson.version}</div>
+            <div className={styles.version}>
+                Version: {packageJson.version.split('-')[0]}
+            </div>
             {isEstablished(sessionState) && (
                 <button
                     className={styles.logoutButton}
