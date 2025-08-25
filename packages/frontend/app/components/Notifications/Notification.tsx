@@ -17,11 +17,6 @@ interface propsIF {
     shouldPauseDismissal?: boolean;
 }
 
-//  TODO:   @emily get rid of the `slug` value, take the ID from
-//  TODO:   ... the toast dispatch, and plug that into the removal
-//  TODO:   ... hardware, plus see if we can get rid of the 'dismiss'
-//  TODO:   ... prop by calling `toast.dismiss` locally
-
 export default function Notification(props: propsIF) {
     const {
         data,
