@@ -5,7 +5,6 @@ import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import type { LimitOrderParams } from '~/services/limitOrderService';
-import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { blockExplorer } from '~/utils/Constants';
@@ -25,6 +24,9 @@ import {
 } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
+import { toast } from 'sonner';
+import type { makeSlug } from '~/stores/NotificationStore';
+import Notification from '~/components/Notifications/Notification';
 
 interface LabelProps {
     lines: LineData[];
@@ -59,8 +61,6 @@ const LabelComponent = ({
     overlayCanvasMousePositionRef,
 }: LabelProps) => {
     const { chart, isChartReady } = useTradingView();
-
-    const notifications = useNotificationStore();
 
     const { formatNum } = useNumFormatter();
 
@@ -288,16 +288,26 @@ const LabelComponent = ({
     }, [chart, drawnLabelsRef.current, isDrag]);
 
     const handleCancel = async (order: LineData) => {
+        // ID to allow all notifications within the same toast
+        const toastId: number = Date.now();
+
         if (!order.oid) {
-            notifications.add({
-                title: 'Cancel Failed',
-                message: 'Order ID not found',
-                icon: 'error',
-            });
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 976867168,
+                            title: 'Cancel Failed',
+                            message: 'Order ID not found',
+                            icon: 'error',
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
             return;
         }
-
-        const slug = makeSlug(10);
 
         const usdValueOfOrderStr = formatNum(
             (order.quantityTextValue || 0) * (symbolInfo?.markPx || 1),
@@ -307,13 +317,21 @@ const LabelComponent = ({
         );
         try {
             // Show pending notification
-            notifications.add({
-                title: 'Cancel Order Pending',
-                message: `Cancelling ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
-                icon: 'spinner',
-                slug,
-                removeAfter: 60000,
-            });
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 957123549647,
+                            title: 'Cancel Order Pending',
+                            message: `Cancelling ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
+                            icon: 'spinner',
+                            removeAfter: 60000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
 
             const timeOfTxBuildStart = Date.now();
             // Execute the cancel order
@@ -322,7 +340,6 @@ const LabelComponent = ({
             });
 
             if (result.success) {
-                notifications.remove(slug);
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
@@ -343,16 +360,24 @@ const LabelComponent = ({
                     });
                 }
                 // Show success notification
-                notifications.add({
-                    title: 'Order Cancelled',
-                    message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
-                    icon: 'check',
-                    txLink: result.signature
-                        ? blockExplorer + result.signature
-                        : undefined,
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 9571671886647,
+                                title: 'Order Cancelled',
+                                message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? blockExplorer + result.signature
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             } else {
-                notifications.remove(slug);
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
@@ -373,26 +398,45 @@ const LabelComponent = ({
                     });
                 }
                 // Show error notification
-                notifications.add({
-                    title: 'Cancel Failed',
-                    message: String(result.error || 'Failed to cancel order'),
-                    icon: 'error',
-                    txLink: result.signature
-                        ? blockExplorer + result.signature
-                        : undefined,
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 95716718847,
+                                title: 'Cancel Failed',
+                                message: String(
+                                    result.error || 'Failed to cancel order',
+                                ),
+                                icon: 'error',
+                                txLink: result.signature
+                                    ? blockExplorer + result.signature
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             }
         } catch (error) {
             console.error('❌ Error cancelling order:', error);
-            notifications.remove(slug);
-            notifications.add({
-                title: 'Cancel Failed',
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : 'Unknown error occurred',
-                icon: 'error',
-            });
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            slug: 95716718847,
+                            title: 'Cancel Failed',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                            icon: 'error',
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId },
+            );
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
@@ -541,6 +585,9 @@ const LabelComponent = ({
         };
 
         const handleDragEnd = async () => {
+            // ID to allow all notifications within the same toast
+            const toastId: number = Date.now();
+
             if (
                 !tempSelectedLine ||
                 originalPrice === undefined ||
@@ -555,8 +602,6 @@ const LabelComponent = ({
             const quantity = tempSelectedLine.parentLine.quantityTextValue;
             const side = tempSelectedLine.parentLine.side;
 
-            const slug = makeSlug(10);
-
             try {
                 const usdValueOfOrderStr = formatNum(
                     (quantity || 0) * (symbolInfo?.markPx || 1),
@@ -565,13 +610,21 @@ const LabelComponent = ({
                     true,
                 );
                 // Show pending notification
-                notifications.add({
-                    title: 'Limit Order Update Pending',
-                    message: `Updating ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
-                    icon: 'spinner',
-                    slug,
-                    removeAfter: 60000,
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 95716718847,
+                                title: 'Limit Order Update Pending',
+                                message: `Updating ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
+                                icon: 'spinner',
+                                removeAfter: 60000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
 
                 // If cancel was successful, create a new order with the updated price
                 // Note: You'll need to provide the correct order parameters based on your application's needs
@@ -598,7 +651,6 @@ const LabelComponent = ({
                         limitOrderResult.error,
                     );
                     // Show error notification to user
-                    notifications.remove(slug);
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
@@ -618,19 +670,28 @@ const LabelComponent = ({
                             },
                         });
                     }
-                    notifications.add({
-                        title: 'Failed to update order',
-                        message:
-                            limitOrderResult.error || 'Unknown error occurred',
-                        icon: 'error',
-                        removeAfter: 10000,
-                        txLink: limitOrderResult.signature
-                            ? `${blockExplorer}/tx/${limitOrderResult.signature}`
-                            : undefined,
-                    });
+                    toast.custom(
+                        (t) => (
+                            <Notification
+                                data={{
+                                    slug: 9571617188427,
+                                    title: 'Failed to update order',
+                                    message:
+                                        limitOrderResult.error ||
+                                        'Unknown error occurred',
+                                    icon: 'error',
+                                    removeAfter: 10000,
+                                    txLink: limitOrderResult.signature
+                                        ? `${blockExplorer}/tx/${limitOrderResult.signature}`
+                                        : undefined,
+                                }}
+                                dismiss={() => toast.dismiss(t)}
+                            />
+                        ),
+                        { id: toastId },
+                    );
                 } else {
                     // Show success notification
-                    notifications.remove(slug);
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
@@ -650,28 +711,45 @@ const LabelComponent = ({
                             },
                         });
                     }
-                    notifications.add({
-                        title: 'Order updated',
-                        message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
-                        icon: 'check',
-                        removeAfter: 10000,
-                        txLink: limitOrderResult.signature
-                            ? `${blockExplorer}/tx/${limitOrderResult.signature}`
-                            : undefined,
-                    });
+                    toast.custom(
+                        (t) => (
+                            <Notification
+                                data={{
+                                    slug: 9577188427,
+                                    title: 'Order updated',
+                                    message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
+                                    icon: 'check',
+                                    removeAfter: 10000,
+                                    txLink: limitOrderResult.signature
+                                        ? `${blockExplorer}/tx/${limitOrderResult.signature}`
+                                        : undefined,
+                                }}
+                                dismiss={() => toast.dismiss(t)}
+                            />
+                        ),
+                        { id: toastId },
+                    );
                 }
             } catch (error) {
                 setSelectedLine(undefined);
                 console.error('Error updating order:', error);
-                notifications.remove(slug);
-                notifications.add({
-                    title: 'Error updating order',
-                    message:
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown error occurred',
-                    icon: 'error',
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 77188427,
+                                title: 'Error updating order',
+                                message:
+                                    error instanceof Error
+                                        ? error.message
+                                        : 'Unknown error occurred',
+                                icon: 'error',
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
                 if (typeof plausible === 'function') {
                     plausible('Offchain Failure', {
                         props: {

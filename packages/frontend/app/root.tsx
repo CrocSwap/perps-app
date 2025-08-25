@@ -31,6 +31,7 @@ import {
 } from './utils/Constants';
 import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
+import { Toaster } from 'sonner';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -192,47 +193,50 @@ export default function App() {
                 >
                     <AppProvider>
                         <UnifiedMarginDataProvider>
-                        <MarketDataProvider>
-                            <SdkProvider
-                                environment={wsEnvironment}
-                                marketEndpoint={MARKET_WS_ENDPOINT}
-                                userEndpoint={USER_WS_ENDPOINT}
-                            >
-                                <TutorialProvider>
-                                    <WsConnectionChecker />
-                                    <WebSocketDebug />
-                                    <div className='root-container'>
-                                        {/* Added error boundary for header */}
-                                        <ComponentErrorBoundary>
-                                            <PageHeader />
-                                        </ComponentErrorBoundary>
-                                        <main
-                                            className={`content ${isHomePage ? 'home-page' : ''}`}
-                                        >
-                                            {/*  Added Suspense for async content loading */}
-                                            <Suspense
-                                                fallback={<LoadingIndicator />}
+                            <MarketDataProvider>
+                                <SdkProvider
+                                    environment={wsEnvironment}
+                                    marketEndpoint={MARKET_WS_ENDPOINT}
+                                    userEndpoint={USER_WS_ENDPOINT}
+                                >
+                                    <TutorialProvider>
+                                        <WsConnectionChecker />
+                                        <WebSocketDebug />
+                                        <div className='root-container'>
+                                            {/* Added error boundary for header */}
+                                            <ComponentErrorBoundary>
+                                                <PageHeader />
+                                            </ComponentErrorBoundary>
+                                            <main
+                                                className={`content ${isHomePage ? 'home-page' : ''}`}
                                             >
-                                                <ComponentErrorBoundary>
-                                                    <Outlet />
-                                                </ComponentErrorBoundary>
-                                            </Suspense>
-                                        </main>
-                                        {/* <ComponentErrorBoundary>
+                                                {/*  Added Suspense for async content loading */}
+                                                <Suspense
+                                                    fallback={
+                                                        <LoadingIndicator />
+                                                    }
+                                                >
+                                                    <ComponentErrorBoundary>
+                                                        <Outlet />
+                                                    </ComponentErrorBoundary>
+                                                </Suspense>
+                                            </main>
+                                            {/* <ComponentErrorBoundary>
                                         <footer className='mobile-footer'>
                                             <MobileFooter />
                                         </footer>
                                     </ComponentErrorBoundary> */}
 
-                                        {/* Added error boundary for notifications */}
-                                        <ComponentErrorBoundary>
-                                            <Notifications />
-                                        </ComponentErrorBoundary>
-                                    </div>
-                                </TutorialProvider>
-                                <RuntimeDomManipulation />
-                            </SdkProvider>
-                        </MarketDataProvider>
+                                            {/* Added error boundary for notifications */}
+                                            <ComponentErrorBoundary>
+                                                <Notifications />
+                                                <Toaster position='bottom-right' />
+                                            </ComponentErrorBoundary>
+                                        </div>
+                                    </TutorialProvider>
+                                    <RuntimeDomManipulation />
+                                </SdkProvider>
+                            </MarketDataProvider>
                         </UnifiedMarginDataProvider>
                     </AppProvider>
                 </FogoSessionProvider>

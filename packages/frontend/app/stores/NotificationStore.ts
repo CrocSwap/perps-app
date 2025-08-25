@@ -50,7 +50,7 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
     // raw data consumed by the app
     notifications: [],
     // fn to add a new population to state
-    add: (data: notificatioSlugOptionalT): void =>
+    add: (data: notificatioSlugOptionalT): void => {
         set({
             notifications: [
                 ...get().notifications,
@@ -58,7 +58,8 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
                     ? (data as notificationIF)
                     : { ...data, slug: makeSlug(14) },
             ].slice(-MAX_NOTIFICATIONS),
-        }),
+        });
+    },
     // fn to remove an existing element from the data array
     remove: (id: number): void =>
         set({

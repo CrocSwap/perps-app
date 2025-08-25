@@ -11,11 +11,13 @@ import TokenDropdown, {
 } from '~/components/TokenDropdown/TokenDropdown';
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useNotificationStore } from '~/stores/NotificationStore';
+import { toast } from 'sonner';
 import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import packageJson from '../../../../package.json';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
+import React from 'react';
+import Notification from '~/components/Notifications/Notification';
 
 interface propsIF {
     portfolio: {
@@ -32,7 +34,6 @@ interface propsIF {
 
 function PortfolioDeposit(props: propsIF) {
     const { portfolio, onDeposit, isProcessing = false } = props;
-    const notificationStore = useNotificationStore();
     const {
         formatNum,
         parseFormattedWithOnlyDecimals,
@@ -78,6 +79,9 @@ function PortfolioDeposit(props: propsIF) {
     }, [availableBalance]);
 
     const handleDeposit = useCallback(async () => {
+        // ID to allow all notifications within the same toast
+        const toastId: number = Date.now();
+
         setError(null);
         setTransactionStatus('pending');
 
@@ -151,15 +155,24 @@ function PortfolioDeposit(props: propsIF) {
                 }
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
-                notificationStore.add({
-                    title: 'Deposit Failed',
-                    message: result.error || 'Transaction failed',
-                    icon: 'error',
-                    removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 514351358,
+                                title: 'Deposit Failed',
+                                message: result.error || 'Transaction failed',
+                                icon: 'error',
+                                removeAfter: 10000,
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
             } else {
                 setTransactionStatus('success');
 
@@ -181,16 +194,25 @@ function PortfolioDeposit(props: propsIF) {
                         },
                     });
                 }
-                // Show success notification
-                notificationStore.add({
-                    title: 'Deposit Successful',
-                    message: `Successfully deposited ${formatNum(depositInputNum, 2, true, false)} fUSD`,
-                    icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                    removeAfter: 5000,
-                });
+                // add toast with Sonner
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 55,
+                                title: 'Deposit Successful',
+                                message: `Successfully deposited ${formatNum(depositInputNum, 2, true, false)} fUSD`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                                removeAfter: 5000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
 
                 // Close modal on success - notification will show after modal closes
                 if (props.onClose) {

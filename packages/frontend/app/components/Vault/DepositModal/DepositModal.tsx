@@ -4,8 +4,9 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDepositService } from '~/hooks/useDepositService';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
-import { useNotificationStore } from '~/stores/NotificationStore';
 import styles from './DepositModal.module.css';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 interface DepositModalProps {
     vault: {
@@ -24,7 +25,6 @@ export default function DepositModal({
     onDeposit,
     onClose,
 }: DepositModalProps) {
-    const notificationStore = useNotificationStore();
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [selectedToken] = useState('USDe');
@@ -76,6 +76,9 @@ export default function DepositModal({
     }, [maxAvailableAmount]);
 
     const handleDeposit = useCallback(async () => {
+        // ID to allow all notifications within the same toast
+        const toastId: number = Date.now();
+
         const depositAmount = parseFloat(amount);
         setError(null);
         setIsProcessing(true);
@@ -128,11 +131,20 @@ export default function DepositModal({
                 setAmount('');
 
                 // Show success notification
-                notificationStore.add({
-                    title: 'Deposit Successful',
-                    message: `Successfully deposited ${formatNum(depositAmount, 2, true, false)} fUSD`,
-                    icon: 'check',
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                slug: 976726871235468,
+                                title: 'Deposit Successful',
+                                message: `Successfully deposited ${formatNum(depositAmount, 2, true, false)} fUSD`,
+                                icon: 'check',
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId },
+                );
 
                 // Close modal on success - notification will show after modal closes
                 onClose();
