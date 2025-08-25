@@ -296,7 +296,7 @@ const LabelComponent = ({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 976867168,
+                            toastId,
                             title: 'Cancel Failed',
                             message: 'Order ID not found',
                             icon: 'error',
@@ -321,7 +321,7 @@ const LabelComponent = ({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 957123549647,
+                            toastId,
                             title: 'Cancel Order Pending',
                             message: `Cancelling ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                             icon: 'spinner',
@@ -364,7 +364,7 @@ const LabelComponent = ({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 9571671886647,
+                                toastId,
                                 title: 'Order Cancelled',
                                 message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                                 icon: 'check',
@@ -402,7 +402,7 @@ const LabelComponent = ({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 95716718847,
+                                toastId,
                                 title: 'Cancel Failed',
                                 message: String(
                                     result.error || 'Failed to cancel order',
@@ -424,7 +424,7 @@ const LabelComponent = ({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 95716718847,
+                            toastId,
                             title: 'Cancel Failed',
                             message:
                                 error instanceof Error
@@ -614,7 +614,7 @@ const LabelComponent = ({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 95716718847,
+                                toastId,
                                 title: 'Limit Order Update Pending',
                                 message: `Updating ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
                                 icon: 'spinner',
@@ -674,7 +674,7 @@ const LabelComponent = ({
                         (t) => (
                             <Notification
                                 data={{
-                                    slug: 9571617188427,
+                                    toastId,
                                     title: 'Failed to update order',
                                     message:
                                         limitOrderResult.error ||
@@ -715,7 +715,7 @@ const LabelComponent = ({
                         (t) => (
                             <Notification
                                 data={{
-                                    slug: 9577188427,
+                                    toastId,
                                     title: 'Order updated',
                                     message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
                                     icon: 'check',
@@ -737,7 +737,7 @@ const LabelComponent = ({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 77188427,
+                                toastId,
                                 title: 'Error updating order',
                                 message:
                                     error instanceof Error

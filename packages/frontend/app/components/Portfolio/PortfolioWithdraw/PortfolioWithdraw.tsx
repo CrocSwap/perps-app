@@ -219,7 +219,7 @@ function PortfolioWithdraw({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 514351358,
+                                toastId,
                                 title: 'Withdraw Failed',
                                 message: result.error || 'Transaction failed',
                                 icon: 'error',
@@ -259,7 +259,7 @@ function PortfolioWithdraw({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 489712651,
+                                toastId,
                                 title: 'Withdrawal Successful',
                                 message: `Successfully withdrew ${formatNum(withdrawInputNum, 2, true, false)} fUSD`,
                                 icon: 'check',

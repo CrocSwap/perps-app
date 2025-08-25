@@ -36,7 +36,7 @@ export default function CreateSubaccount(props: propsIF) {
                     (t) => (
                         <Notification
                             data={{
-                                slug: 971235496867168,
+                                toastId,
                                 title: 'Sub Account Created',
                                 message: `Made new discretionary sub-account ${inputRef.current?.value}`,
                                 icon: 'check',

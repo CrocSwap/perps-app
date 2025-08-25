@@ -226,7 +226,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 987671676764,
+                            toastId,
                             title: 'Invalid Order Size',
                             message: 'Please enter a valid order size',
                             icon: 'error',
@@ -289,7 +289,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     (t) => (
                         <Notification
                             data={{
-                                slug: 7864796646,
+                                toastId,
                                 title:
                                     positionSize < 100
                                         ? `${positionSize}% of Position Closed`
@@ -331,7 +331,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     (t) => (
                         <Notification
                             data={{
-                                slug: 648774867,
+                                toastId,
                                 title: 'Close Failed',
                                 message:
                                     result.error || 'Failed to close position',
@@ -353,7 +353,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 6741674678741,
+                            toastId,
                             title: 'Close Failed',
                             message:
                                 error instanceof Error

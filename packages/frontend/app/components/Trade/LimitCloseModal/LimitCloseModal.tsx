@@ -276,7 +276,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 514351358,
+                            toastId,
                             title: 'Deposit Failed',
                             message: 'Please enter a valid order size',
                             icon: 'error',
@@ -297,7 +297,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 6764167,
+                            toastId,
                             title: 'Invalid Price',
                             message: 'Please enter a valid limit price',
                             icon: 'error',
@@ -349,7 +349,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     (t) => (
                         <Notification
                             data={{
-                                slug: 6764167,
+                                toastId,
                                 title: `${side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Limit Order Placed`,
                                 message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
                                 icon: 'check',
@@ -384,7 +384,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     (t) => (
                         <Notification
                             data={{
-                                slug: 65462446467,
+                                toastId,
                                 title: 'Limit Order Failed',
                                 message:
                                     result.error ||
@@ -421,7 +421,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 6764167,
+                            toastId,
                             title: 'Limit Order Failed',
                             message:
                                 error instanceof Error

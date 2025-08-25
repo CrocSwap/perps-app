@@ -159,7 +159,7 @@ function PortfolioDeposit(props: propsIF) {
                     (t) => (
                         <Notification
                             data={{
-                                slug: 514351358,
+                                toastId,
                                 title: 'Deposit Failed',
                                 message: result.error || 'Transaction failed',
                                 icon: 'error',
@@ -199,7 +199,7 @@ function PortfolioDeposit(props: propsIF) {
                     (t) => (
                         <Notification
                             data={{
-                                slug: 55,
+                                toastId,
                                 title: 'Deposit Successful',
                                 message: `Successfully deposited ${formatNum(depositInputNum, 2, true, false)} fUSD`,
                                 icon: 'check',

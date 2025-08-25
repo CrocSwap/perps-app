@@ -135,7 +135,7 @@ export default function DepositModal({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 976726871235468,
+                                toastId,
                                 title: 'Deposit Successful',
                                 message: `Successfully deposited ${formatNum(depositAmount, 2, true, false)} fUSD`,
                                 icon: 'check',

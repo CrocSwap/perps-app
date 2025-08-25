@@ -53,7 +53,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 6768767673,
+                            toastId,
                             title: 'Cancel Failed',
                             message: 'Order ID not found',
                             icon: 'error',
@@ -80,7 +80,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 67698767673,
+                            toastId,
                             title: 'Cancel Order Pending',
                             message: `Cancelling order for ${usdValueOfOrderStr} of ${order.coin}`,
                             icon: 'spinner',
@@ -123,7 +123,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     (t) => (
                         <Notification
                             data={{
-                                slug: 6768767673,
+                                toastId,
                                 title: 'Order Cancelled',
                                 message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
                                 icon: 'check',
@@ -166,7 +166,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     (t) => (
                         <Notification
                             data={{
-                                slug: 971235468,
+                                toastId,
                                 title: 'Cancel Failed',
                                 message: String(
                                     result.error || 'Failed to cancel order',
@@ -189,7 +189,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 971235468,
+                            toastId,
                             title: 'Cancel Failed',
                             message:
                                 error instanceof Error

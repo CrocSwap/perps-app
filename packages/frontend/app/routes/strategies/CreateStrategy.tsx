@@ -219,7 +219,7 @@ export default function CreateStrategy(props: propsT) {
                                             (t) => (
                                                 <Notification
                                                     data={{
-                                                        slug: 97123176875468,
+                                                        toastId,
                                                         title: 'Sub Account Created',
                                                         message: `Made new strategy Sub-Account ${name}`,
                                                         icon: 'check',

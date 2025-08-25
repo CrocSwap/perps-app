@@ -1298,7 +1298,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 971235468,
+                            toastId,
                             title: 'Invalid Order Size',
                             message: 'Please enter a valid order size',
                             icon: 'error',
@@ -1330,7 +1330,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 971235468,
+                                toastId,
                                 title: 'Buy Order Pending',
                                 message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
                                 icon: 'spinner',
@@ -1380,7 +1380,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 3489196786,
+                                toastId,
                                 title: 'Buy Order Successful',
                                 message: `Successfully bought ${usdValueOfOrderStr} of ${symbol}`,
                                 icon: 'check',
@@ -1422,7 +1422,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 971235468,
+                                toastId,
                                 title: 'Buy Order Failed',
                                 message: result.error || 'Transaction failed',
                                 icon: 'error',
@@ -1459,7 +1459,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 4986713,
+                            toastId,
                             title: 'Buy Order Failed',
                             message:
                                 error instanceof Error
@@ -1490,7 +1490,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 6417614713,
+                            toastId,
                             title: 'Invalid Order Size',
                             message: 'Please enter a valid order size',
                             icon: 'error',
@@ -1521,7 +1521,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 6417614713,
+                                toastId,
                                 title: 'Sell Order Pending',
                                 message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
                                 icon: 'spinner',
@@ -1572,7 +1572,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 714357616815,
+                                toastId,
                                 title: 'Sell Order Successful',
                                 message: `Successfully sold ${usdValueOfOrderStr} of ${symbol}`,
                                 icon: 'check',
@@ -1614,7 +1614,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 7143143716815,
+                                toastId,
                                 title: 'Sell Order Failed',
                                 message: result.error || 'Transaction failed',
                                 icon: 'error',
@@ -1651,7 +1651,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 1786745718674,
+                            toastId,
                             title: 'Sell Order Failed',
                             message:
                                 error instanceof Error
@@ -1682,7 +1682,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 1786745718674,
+                            toastId,
                             title: 'Invalid Order Size',
                             message: 'Please enter a valid order size',
                             icon: 'error',
@@ -1703,7 +1703,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 14786745718674,
+                            toastId,
                             title: 'Invalid Price',
                             message: 'Please enter a valid limit price',
                             icon: 'error',
@@ -1732,7 +1732,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 14786745718674,
+                            toastId,
                             title: 'Buy / Long Limit Order Pending',
                             message: `Placing limit order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
                             icon: 'spinner',
@@ -1782,7 +1782,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 14786745718674,
+                                toastId,
                                 title: 'Buy / Long Limit Order Placed',
                                 message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
                                 icon: 'check',
@@ -1824,7 +1824,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 14786745718674,
+                                toastId,
                                 title: 'Limit Order Failed',
                                 message:
                                     result.error ||
@@ -1863,7 +1863,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 14786745718674,
+                            toastId,
                             title: 'Limit Order Failed',
                             message:
                                 error instanceof Error
@@ -1894,7 +1894,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 657687868761874,
+                            toastId,
                             title: 'Invalid Order Size',
                             message: 'Please enter a valid order size',
                             icon: 'error',
@@ -1915,7 +1915,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 657687868761874,
+                            toastId,
                             title: 'Invalid Price',
                             message: 'Please enter a valid limit price',
                             icon: 'error',
@@ -1944,7 +1944,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 657687868761874,
+                            toastId,
                             title: 'Sell / Short Limit Order Pending',
                             message: `Placing limit order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
                             icon: 'spinner',
@@ -1994,7 +1994,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 657687868761874,
+                                toastId,
                                 title: 'Limit Order Placed',
                                 message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
                                 icon: 'check',
@@ -2032,7 +2032,7 @@ function OrderInput({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 657687868761874,
+                                toastId,
                                 title: 'Limit Order Failed',
                                 message:
                                     result.error ||
@@ -2071,7 +2071,7 @@ function OrderInput({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 657687868761874,
+                            toastId,
                             title: 'Limit Order Failed',
                             message:
                                 error instanceof Error

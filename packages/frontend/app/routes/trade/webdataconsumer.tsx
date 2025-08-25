@@ -613,7 +613,7 @@ export default function WebDataConsumer() {
                                 (t) => (
                                     <Notification
                                         data={{
-                                            slug: 4,
+                                            toastId,
                                             title: `${fill.side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Order Filled`,
                                             message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px, fill.px > 10_000 ? 0 : 2, true, true)}`,
                                             icon: 'check',

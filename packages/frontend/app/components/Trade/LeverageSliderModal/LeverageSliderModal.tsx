@@ -117,7 +117,7 @@ export default function LeverageSliderModal({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 54893187612,
+                                toastId,
                                 title: 'Leverage Updated',
                                 message: `Successfully set leverage to ${value.toFixed(1)}x`,
                                 icon: 'check',
@@ -141,7 +141,7 @@ export default function LeverageSliderModal({
                     (t) => (
                         <Notification
                             data={{
-                                slug: 984237412384843,
+                                toastId,
                                 title: 'Transaction Failed',
                                 message:
                                     result.error || 'Failed to update leverage',
@@ -169,7 +169,7 @@ export default function LeverageSliderModal({
                 (t) => (
                     <Notification
                         data={{
-                            slug: 489712651,
+                            toastId,
                             title: 'Transaction Error',
                             message: errorMessage,
                             icon: 'error',

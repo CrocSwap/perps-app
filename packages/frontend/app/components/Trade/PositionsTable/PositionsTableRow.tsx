@@ -229,7 +229,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         (t) => (
                             <Notification
                                 data={{
-                                    slug: 657687868761874,
+                                    toastId,
                                     title: 'Position Closed',
                                     message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
                                     icon: 'check',
@@ -269,7 +269,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         (t) => (
                             <Notification
                                 data={{
-                                    slug: 676417674167964,
+                                    toastId,
                                     title: 'Close Failed',
                                     message: String(
                                         result.error ||
@@ -292,7 +292,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     (t) => (
                         <Notification
                             data={{
-                                slug: 676417674167964,
+                                toastId,
                                 title: 'Close Failed',
                                 message: String(
                                     error instanceof Error

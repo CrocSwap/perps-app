@@ -53,7 +53,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 317975149126,
+                            toastId,
                             title: 'Cancelling All Orders',
                             message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
                             icon: 'spinner',
@@ -170,7 +170,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 (t) => (
                                     <Notification
                                         data={{
-                                            slug: 654616576514678,
+                                            toastId,
                                             title: 'Order Cancelled',
                                             message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${order.coin}`,
                                             icon: 'check',
@@ -204,7 +204,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         (t) => (
                             <Notification
                                 data={{
-                                    slug: 65416576514678,
+                                    toastId,
                                     title: 'All Orders Cancelled',
                                     message: `Successfully cancelled all ${successCount} orders`,
                                     icon: 'check',
@@ -248,7 +248,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         (t) => (
                             <Notification
                                 data={{
-                                    slug: 9867416768,
+                                    toastId,
                                     title: 'Partial Success',
                                     message: `Cancelled ${successCount} orders, ${failureCount} failed`,
                                     icon: 'error',
@@ -280,7 +280,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         (t) => (
                             <Notification
                                 data={{
-                                    slug: 986741671686768,
+                                    toastId,
                                     title: 'Cancel All Failed',
                                     message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
                                     icon: 'error',
@@ -302,7 +302,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 (t) => (
                     <Notification
                         data={{
-                            slug: 6768767673,
+                            toastId,
                             title: 'Cancel All Failed',
                             message:
                                 error instanceof Error

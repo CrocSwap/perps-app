@@ -13,7 +13,7 @@ export interface notificationIF {
     icon: icons;
     // unique ID for the tx used to generate the card, used for
     // ... updating and removing cards
-    slug: number;
+    toastId: number;
     // time in ms to wait before removing the notification
     removeAfter?: number;
     // link to explorer
@@ -21,8 +21,8 @@ export interface notificationIF {
 }
 
 // type to allow new notification creation without manual fingerprinting
-type notificatioSlugOptionalT = Omit<notificationIF, 'slug'> & {
-    slug?: number;
+type notificatioSlugOptionalT = Omit<notificationIF, 'toastId'> & {
+    toastId?: number;
     removeAfter?: number;
     txLink?: string;
 };
@@ -54,9 +54,9 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
         set({
             notifications: [
                 ...get().notifications,
-                data.slug
+                data.toastId
                     ? (data as notificationIF)
-                    : { ...data, slug: makeSlug(14) },
+                    : { ...data, toastId: makeSlug(14) },
             ].slice(-MAX_NOTIFICATIONS),
         });
     },
@@ -64,7 +64,7 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
     remove: (id: number): void =>
         set({
             notifications: get().notifications.filter(
-                (n: notificationIF) => n.slug !== id,
+                (n: notificationIF) => n.toastId !== id,
             ),
         }),
     // fn to clear all notifications from state
