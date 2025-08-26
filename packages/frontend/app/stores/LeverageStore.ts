@@ -150,16 +150,10 @@ export const useLeverageStore = create<LeverageStore>()(
                     // Use stored preference for this specific market
                     targetLeverage = storedPreference;
                     isUsingStoredPreference = true;
-                    console.log(
-                        `Using stored preference for ${marketSymbol}: ${targetLeverage}x`,
-                    );
                 } else {
                     // No preference exists for this market, calculate fresh default
                     targetLeverage =
                         get().getDefaultLeverageForMarket(maxLeverage);
-                    console.log(
-                        `Using default leverage for ${marketSymbol}: ${targetLeverage}x (calculated from max ${maxLeverage}x)`,
-                    );
 
                     // DON'T save the default as a preference yet - only save when user manually changes
                 }
@@ -184,10 +178,6 @@ export const useLeverageStore = create<LeverageStore>()(
                     set({
                         marketLeveragePreferences: updatedPreferences,
                     });
-
-                    console.log(
-                        `Adjusted stored preference for ${marketSymbol} from ${targetLeverage}x to ${validatedLeverage}x due to market limits`,
-                    );
                 }
 
                 // Update state with new market and validated leverage

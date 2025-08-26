@@ -7,18 +7,20 @@ import { getElementHeightWithMargins } from '~/utils/Utils';
 import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
+import type { TabType } from '~/routes/trade';
 
 interface propsIF {
     symbol: string;
     mobileView?: boolean;
     mobileContent?: 'orderBook' | 'recentTrades';
+    switchTab?: (tab: TabType) => void;
 }
 
 const ORDER_ROW_HEIGHT_FALLBACK = 16;
 const ORDER_ROW_GAP = 4;
 
 export default function OrderBookSection(props: propsIF) {
-    const { symbol, mobileView, mobileContent } = props;
+    const { symbol, mobileView, mobileContent, switchTab } = props;
     const [orderCount, setOrderCount] = useState(9);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
 
@@ -42,9 +44,13 @@ export default function OrderBookSection(props: propsIF) {
     const orderBookComponent = useMemo(
         () =>
             orderCount > 0 ? (
-                <OrderBook symbol={symbol} orderCount={orderCount} />
+                <OrderBook
+                    symbol={symbol}
+                    orderCount={orderCount}
+                    switchTab={switchTab}
+                />
             ) : null,
-        [orderCount, symbol],
+        [orderCount, symbol, switchTab],
     );
 
     const orderBookTradesComponent = useCallback(

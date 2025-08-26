@@ -668,10 +668,6 @@ export default function LeverageSlider({
                 currentMaxLeverage !== maximumInputValue;
 
             if (shouldUpdate) {
-                console.log(
-                    `LeverageSlider: Correcting leverage for ${effectiveSymbol} due to maxLeverage change`,
-                );
-
                 const validatedLeverage = validateAndApplyLeverageForMarket(
                     effectiveSymbol,
                     currentMaxLeverage,

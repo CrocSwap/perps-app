@@ -460,17 +460,17 @@ export default function WebDataConsumer() {
 
                     // Then, update or add new orders (this will overwrite with latest status)
                     orders.forEach((order) => {
-                        const existingOrder = orderMap.get(order.oid);
-                        console.log(
-                            '[ORDER HISTORY] Update - Order status change:',
-                            {
-                                oid: order.oid,
-                                coin: order.coin,
-                                oldStatus: existingOrder?.status,
-                                newStatus: order.status,
-                                isNewOrder: !existingOrder,
-                            },
-                        );
+                        // const existingOrder = orderMap.get(order.oid);
+                        // console.log(
+                        //     '[ORDER HISTORY] Update - Order status change:',
+                        //     {
+                        //         oid: order.oid,
+                        //         coin: order.coin,
+                        //         oldStatus: existingOrder?.status,
+                        //         newStatus: order.status,
+                        //         isNewOrder: !existingOrder,
+                        //     },
+                        // );
                         orderMap.set(order.oid, order);
                     });
 

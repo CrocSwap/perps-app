@@ -81,6 +81,7 @@ const OrderRow: React.FC<OrderRowProps> = ({
     };
     return (
         <div
+            id={`order-row-${order.px}`}
             className={`${styles.orderRow} ${userSlots.has(formattedPrice) ? styles.userOrder : ''}`}
             onClick={handleClick}
         >

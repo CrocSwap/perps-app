@@ -32,16 +32,26 @@ export default function PriceInput(props: PropsIF) {
 
     // autofocus trade-module-price-input when user clicks anywhere in priceInputContainer except for the midButton
     const handleContainerClick = useCallback((e: React.MouseEvent) => {
+        // Don't focus if user is selecting text
+        const selection = window.getSelection();
+        if (selection && selection.toString().length > 0) {
+            return;
+        }
+
         const priceInput = document.getElementById(
             'trade-module-price-input',
         ) as HTMLInputElement;
 
-        priceInput.focus();
-        priceInput.select();
+        // Only focus if the click target is the container itself (not a child element)
+        if (e.target === e.currentTarget) {
+            priceInput.focus();
+            priceInput.select();
+        }
     }, []);
 
     return (
         <div
+            id='trade-module-price-input-container'
             className={`${styles.priceInputContainer}
              ${showMidButton ? styles.chaseLimit : ''}
              ${isModal ? styles.modalContainer : ''}
