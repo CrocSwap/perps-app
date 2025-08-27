@@ -29,11 +29,11 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
+// import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 import type { TabType } from '~/routes/trade';
+import { useSdk } from '~/hooks/useSdk';
 
 interface OrderBookProps {
-    symbol: string;
     orderCount: number;
     heightOverride?: string;
     switchTab?: (tab: TabType) => void;
@@ -55,12 +55,13 @@ function useOrderSlots(orders: OrderBookRowIF[]) {
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({
-    symbol,
     orderCount,
     heightOverride,
     switchTab,
 }) => {
-    const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
+    // TODO: Can be uncommented if we want to use the rest poller
+    // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
+    const { info } = useSdk();
 
     const orderClickDisabled = false;
 
@@ -93,6 +94,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         symbolInfo,
         setObChosenPrice,
         setObChosenAmount,
+        symbol,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
@@ -206,32 +208,41 @@ const OrderBook: React.FC<OrderBookProps> = ({
         }
     }, [symbol, symbolInfo?.coin]);
 
+    const subKey = useMemo(() => {
+        if (!selectedResolution) return undefined;
+        return {
+            type: 'l2Book' as const,
+            coin: symbol,
+            ...(selectedResolution.nsigfigs
+                ? { nSigFigs: selectedResolution.nsigfigs }
+                : {}),
+            ...(selectedResolution.mantissa
+                ? { mantissa: selectedResolution.mantissa }
+                : {}),
+        };
+    }, [selectedResolution, symbol]);
+
     useEffect(() => {
-        if (!symbol) return;
+        console.log('>>> orderbook subKey', subKey);
+        if (!subKey || !info) return;
         setOrderBookState(TableState.LOADING);
-        if (selectedResolution) {
-            const subKey = {
-                type: 'l2Book' as const,
-                coin: symbol,
-                ...(selectedResolution.nsigfigs
-                    ? { nSigFigs: selectedResolution.nsigfigs }
-                    : {}),
-                ...(selectedResolution.mantissa
-                    ? { mantissa: selectedResolution.mantissa }
-                    : {}),
-            };
-            subscribeToPoller(
-                'info',
-                subKey,
-                postOrderBookRaw,
-                TIMEOUT_OB_POLLING,
-                true,
-            );
+        if (subKey) {
+            // subscribeToPoller(
+            //     'info',
+            //     subKey,
+            //     postOrderBookRaw,
+            //     TIMEOUT_OB_POLLING,
+            //     true,
+            // );
+
+            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+
             return () => {
-                unsubscribeFromPoller('info', subKey);
+                // unsubscribeFromPoller('info', subKey);
+                unsubscribe();
             };
         }
-    }, [selectedResolution, symbol]);
+    }, [subKey, info]);
 
     const midHeader = useCallback(
         (id: string) => (

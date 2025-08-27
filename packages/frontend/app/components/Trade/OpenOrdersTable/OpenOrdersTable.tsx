@@ -6,7 +6,6 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
-import packageJson from '../../../../package.json';
 import type {
     OrderDataIF,
     OrderDataSortBy,
@@ -152,9 +151,9 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             if (typeof plausible === 'function') {
                                 plausible('Onchain Action', {
                                     props: {
-                                        version: packageJson.version,
                                         actionType: 'Limit Cancel Success',
                                         orderType: 'Limit',
+                                        success: true,
                                         direction:
                                             order.side === 'buy'
                                                 ? 'Buy'
@@ -190,9 +189,9 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                version: packageJson.version,
                                 actionType: 'Limit Cancel All Success',
                                 orderType: 'Limit',
+                                success: true,
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
                                     Date.now(),
@@ -233,10 +232,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                version: packageJson.version,
                                 actionType:
                                     'Limit Order Cancel All Partial Success',
                                 orderType: 'Limit',
+                                success: false,
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
                                     Date.now(),
@@ -266,9 +265,9 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                version: packageJson.version,
                                 actionType: 'Limit Cancel All Fail',
                                 orderType: 'Limit',
+                                success: false,
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
                                     Date.now(),

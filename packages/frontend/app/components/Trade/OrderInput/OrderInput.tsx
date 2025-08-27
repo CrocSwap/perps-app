@@ -28,7 +28,6 @@ import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import packageJson from '../../../../package.json';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -1402,12 +1401,12 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Market Success',
                             direction: 'Buy',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            success: true,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -1443,13 +1442,13 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Market Fail',
                             direction: 'Buy',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage: result.error || 'Transaction failed',
+                            success: false,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -1487,7 +1486,6 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        version: packageJson.version,
                         actionType: 'Market Fail',
                         direction: 'Buy',
                         orderType: 'Market',
@@ -1497,6 +1495,7 @@ function OrderInput({
                             error instanceof Error
                                 ? error.message
                                 : 'Unknown error occurred',
+                        success: false,
                     },
                 });
             }
@@ -1594,12 +1593,12 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Market Success',
                             direction: 'Sell',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            success: true,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -1635,13 +1634,13 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Market Fail',
                             direction: 'Sell',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage: result.error || 'Transaction failed',
+                            success: false,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -1679,7 +1678,6 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        version: packageJson.version,
                         actionType: 'Market Fail',
                         direction: 'Sell',
                         orderType: 'Market',
@@ -1689,6 +1687,7 @@ function OrderInput({
                             error instanceof Error
                                 ? error.message
                                 : 'Unknown error occurred',
+                        success: false,
                     },
                 });
             }
@@ -1805,12 +1804,12 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Success',
                             orderType: 'Limit',
                             direction: 'Buy',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            success: true,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -1845,7 +1844,6 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Fail',
                             orderType: 'Limit',
                             direction: 'Buy',
@@ -1853,6 +1851,7 @@ function OrderInput({
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage:
                                 result.error || 'Failed to place limit order',
+                            success: false,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -1891,7 +1890,6 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        version: packageJson.version,
                         actionType: 'Limit Fail',
                         orderType: 'Limit',
                         direction: 'Buy',
@@ -1901,6 +1899,7 @@ function OrderInput({
                             error instanceof Error
                                 ? error.message
                                 : 'Unknown error occurred',
+                        success: false,
                     },
                 });
             }
@@ -2017,12 +2016,12 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Success',
                             orderType: 'Limit',
                             direction: 'Sell',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            success: true,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -2057,7 +2056,6 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Fail',
                             orderType: 'Limit',
                             direction: 'Sell',
@@ -2065,6 +2063,7 @@ function OrderInput({
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage:
                                 result.error || 'Failed to place limit order',
+                            success: false,
                             txDuration: getDurationSegment(
                                 result.timeOfSubmission,
                                 Date.now(),
@@ -2099,7 +2098,6 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        version: packageJson.version,
                         actionType: 'Limit Fail',
                         orderType: 'Limit',
                         direction: 'Sell',
@@ -2109,6 +2107,7 @@ function OrderInput({
                             error instanceof Error
                                 ? error.message
                                 : 'Unknown error occurred',
+                        success: false,
                     },
                 });
             }

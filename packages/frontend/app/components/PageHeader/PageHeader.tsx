@@ -31,7 +31,6 @@ import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
-import packageJson from '../../../package.json';
 
 export default function PageHeader() {
     const sessionState = useSession();
@@ -146,7 +145,6 @@ export default function PageHeader() {
                 );
                 plausible('Session Established', {
                     props: {
-                        version: packageJson.version,
                         loginTime: loginButtonClickTime
                             ? getDurationSegment(
                                   loginButtonClickTime,
@@ -168,9 +166,7 @@ export default function PageHeader() {
             isUserConnected === false
         ) {
             if (typeof plausible === 'function') {
-                plausible('Session Ended', {
-                    props: { version: packageJson.version },
-                });
+                plausible('Session Ended');
             }
         }
         prevIsUserConnected.current = isUserConnected;
@@ -325,7 +321,7 @@ export default function PageHeader() {
                         </section>
                     )}
                     <span
-                        className={`${!isUserConnected ? `plausible-event-name=Login+Button+Click plausible-event-location=Page+Header plausible-event-version=${packageJson.version}` : ''}`}
+                        className={`${!isUserConnected ? `plausible-event-name=Login+Button+Click plausible-event-location=Page+Header` : ''}`}
                         ref={sessionButtonRef}
                     >
                         <SessionButton />

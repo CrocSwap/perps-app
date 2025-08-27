@@ -33,6 +33,7 @@ import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 // import { Toaster } from 'sonner';
 import ToasterSonner from './components/Toaster/Toaster_Sonner';
+import packageJson from '../package.json';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -154,6 +155,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 {isProduction && (
                     <script
                         defer
+                        event-version={packageJson.version}
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>

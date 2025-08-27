@@ -11,18 +11,15 @@ import { WsChannels } from '~/utils/Constants';
 import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './orderbooktrades.module.css';
 import OrderTradeRow from './ordertraderow/ordertraderow';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 interface OrderBookTradesProps {
-    symbol: string;
     maxHeight?: number;
 }
 
 const TRADES_LIMIT = 50;
 
-const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
-    symbol,
-    maxHeight,
-}) => {
+const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ maxHeight }) => {
     const { info } = useSdk();
     const { trades, setTrades } = useOrderBookStore();
 
@@ -34,6 +31,8 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
     );
 
     const { orderBookMode } = useAppSettings();
+
+    const { symbol } = useTradeDataStore();
 
     const tradesRef = useRef<OrderBookTradeIF[]>([]);
     tradesRef.current = trades;

@@ -7,7 +7,6 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
-import packageJson from '../../../../package.json';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
@@ -333,8 +332,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Close Success',
+                            success: true,
                             orderType: 'Limit',
                             direction: side === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
@@ -367,8 +366,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Close Fail',
+                            success: false,
                             orderType: 'Limit',
                             direction: side === 'buy' ? 'Buy' : 'Sell',
                             errorMessage: result.error || 'Transaction failed',
@@ -406,8 +405,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        version: packageJson.version,
                         actionType: 'Limit Close Fail',
+                        success: false,
                         orderType: 'Limit',
                         direction: side === 'buy' ? 'Buy' : 'Sell',
                         errorMessage:

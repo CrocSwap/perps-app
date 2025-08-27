@@ -23,7 +23,6 @@ import {
     type TableSortDirection,
 } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
-import packageJson from '../../../../package.json';
 
 interface GenericTableProps<
     T,
@@ -464,7 +463,7 @@ export default function GenericTable<
                 )}
                 {!isSessionEstablished && (
                     <div
-                        className={`plausible-event-name=Login+Button+Click plausible-event-location=Generic+Table ${styles.sessionButtonContainer} plausible-event-version=${packageJson.version}`}
+                        className={`plausible-event-name=Login+Button+Click plausible-event-location=Generic+Table ${styles.sessionButtonContainer}`}
                         ref={sessionButtonRef}
                     >
                         <SessionButton />

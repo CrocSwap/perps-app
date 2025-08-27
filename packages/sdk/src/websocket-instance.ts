@@ -617,6 +617,9 @@ export class WebSocketInstance {
             return;
         }
         if (msg.channel === 'error') {
+            if (!msg.data) {
+                return;
+            }
             const jsonMatch = msg.data.match(/\{.*\}$/);
 
             if (jsonMatch) {

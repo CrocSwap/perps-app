@@ -14,7 +14,6 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
-import packageJson from '../../../../package.json';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
@@ -206,10 +205,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                version: packageJson.version,
                                 actionType: 'Market Close Success',
                                 orderType: 'Market',
                                 direction: closingSide,
+                                success: true,
                                 txBuildDuration: getDurationSegment(
                                     timeOfTxBuildStart,
                                     result.timeOfSubmission,
@@ -246,10 +245,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                version: packageJson.version,
                                 actionType: 'Market Close Fail',
                                 orderType: 'Market',
                                 direction: closingSide,
+                                success: false,
                                 txBuildDuration: getDurationSegment(
                                     timeOfTxBuildStart,
                                     result.timeOfSubmission,
