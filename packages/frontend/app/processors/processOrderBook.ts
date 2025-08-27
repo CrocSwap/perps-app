@@ -11,6 +11,12 @@ export function processOrderBookMessage(data: L2BookData): {
     sells: OrderBookRowIF[];
     buys: OrderBookRowIF[];
 } {
+    if (!data?.levels) {
+        return {
+            sells: [],
+            buys: [],
+        };
+    }
     const buysRaw = data.levels[0];
     const sellsRaw = data.levels[1];
 

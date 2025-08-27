@@ -53,12 +53,21 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
 
     // autofocus trade-module-size-input when user clicks anywhere in sizeInputContainer except for the tokenButton
     const handleContainerClick = useCallback((e: React.MouseEvent) => {
+        // Don't focus if user is selecting text
+        const selection = window.getSelection();
+        if (selection && selection.toString().length > 0) {
+            return;
+        }
+
         const sizeInput = document.getElementById(
             'trade-module-size-input',
         ) as HTMLInputElement;
 
-        sizeInput.focus();
-        sizeInput.select();
+        // Only focus if the click target is the container itself (not a child element)
+        if (e.target === e.currentTarget) {
+            sizeInput.focus();
+            sizeInput.select();
+        }
     }, []);
 
     return (

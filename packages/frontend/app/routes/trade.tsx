@@ -28,7 +28,7 @@ const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
 
-type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
+export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
 export default function Trade() {
     const { symbol } = useTradeDataStore();
@@ -182,11 +182,12 @@ export default function Trade() {
                         symbol={symbol}
                         mobileView={true}
                         mobileContent='orderBook'
+                        switchTab={switchTab}
                     />
                 )}
             </div>
         ),
-        [symbol, activeTab],
+        [symbol, activeTab, switchTab],
     );
 
     const mobileRecentTradesView = useMemo(
