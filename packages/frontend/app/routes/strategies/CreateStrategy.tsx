@@ -229,7 +229,7 @@ export default function CreateStrategy(props: propsT) {
                                                     }
                                                 />
                                             ),
-                                            { id: toastId },
+                                            { id: toastId, duration: 60000 },
                                         );
                                     }
                                     navigate('/strategies');

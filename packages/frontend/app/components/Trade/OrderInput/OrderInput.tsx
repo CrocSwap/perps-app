@@ -1306,7 +1306,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             confirmOrderModal.close();
             return;
@@ -1338,7 +1338,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
 
@@ -1392,7 +1392,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             } else {
                 if (typeof plausible === 'function') {
@@ -1434,7 +1434,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
         } catch (error) {
@@ -1471,7 +1471,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         } finally {
             setIsProcessingOrder(false);
@@ -1498,7 +1498,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             confirmOrderModal.close();
             return;
@@ -1530,7 +1530,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
 
@@ -1584,7 +1584,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             } else {
                 if (typeof plausible === 'function') {
@@ -1626,7 +1626,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
         } catch (error) {
@@ -1663,7 +1663,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         } finally {
             setIsProcessingOrder(false);
@@ -1690,7 +1690,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             confirmOrderModal.close();
             return;
@@ -1711,7 +1711,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             confirmOrderModal.close();
             return;
@@ -1741,7 +1741,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         }
 
@@ -1794,7 +1794,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             } else {
                 if (typeof plausible === 'function') {
@@ -1838,7 +1838,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
         } catch (error) {
@@ -1875,7 +1875,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         } finally {
             setIsProcessingOrder(false);
@@ -1902,7 +1902,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             confirmOrderModal.close();
             return;
@@ -1923,7 +1923,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             confirmOrderModal.close();
             return;
@@ -1953,7 +1953,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         }
 
@@ -2006,7 +2006,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             } else {
                 if (typeof plausible === 'function') {
@@ -2046,7 +2046,7 @@ function OrderInput({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
         } catch (error) {
@@ -2083,7 +2083,7 @@ function OrderInput({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         } finally {
             setIsProcessingOrder(false);

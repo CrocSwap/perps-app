@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { ImSpinner8 } from 'react-icons/im';
 import {
     IoAlertCircleOutline,
@@ -30,99 +30,10 @@ interface propsIF {
 }
 
 export default function Notification(props: propsIF) {
-    const {
-        data,
-        dismiss,
-        onMouseEnter,
-        onMouseLeave,
-        shouldPauseDismissal = false,
-    } = props;
+    const { data, dismiss } = props;
+
     // create and memoize the UNIX time when this element was mounted
-    const createdAt = useRef<number>(Date.now());
-
     const { getBsColor } = useAppSettings();
-
-    // time period (ms) after which to auto-dismiss the notification
-    const DISMISS_AFTER = data.removeAfter || 5000;
-
-    // logic to remove this elem from the DOM after a timeout, yes the
-    const [isHovered, setIsHovered] = useState(false);
-    const timeoutRef = useRef<NodeJS.Timeout>(null);
-
-    // Track if we're in the middle of a debounce
-    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-    const [isDebouncedHovered, setIsDebouncedHovered] = useState(false);
-
-    // Debounce hover state changes
-    useEffect(() => {
-        // Store the current debounce timer ref to avoid race conditions
-        let currentTimer = debounceTimerRef.current;
-
-        if (isHovered || shouldPauseDismissal) {
-            // Clear any pending debounce timer when hovering starts
-            if (currentTimer) {
-                clearTimeout(currentTimer);
-                debounceTimerRef.current = null;
-            }
-            setIsDebouncedHovered(true);
-        } else {
-            // Set a timer to update hover state after debounce period
-            currentTimer = setTimeout(() => {
-                // Only update state if the timer hasn't been cleared
-                if (debounceTimerRef.current === currentTimer) {
-                    setIsDebouncedHovered(false);
-                    debounceTimerRef.current = null;
-                }
-            }, 500); // 500ms debounce
-
-            // Store the new timer reference
-            debounceTimerRef.current = currentTimer;
-        }
-
-        // Cleanup function to clear the current timer on unmount or when dependencies change
-        return () => {
-            if (currentTimer) {
-                clearTimeout(currentTimer);
-                // Only clear the ref if it still points to the current timer
-                if (debounceTimerRef.current === currentTimer) {
-                    debounceTimerRef.current = null;
-                }
-            }
-        };
-    }, [isHovered, shouldPauseDismissal]);
-
-    // Setup auto-dismiss timer, but only when not hovered and not in group hover state
-    useEffect(() => {
-        // Clear any existing timeout when dependencies change
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
-
-        // Only set new timeout if not hovered
-        if (!isDebouncedHovered) {
-            const timeElapsed = Date.now() - createdAt.current;
-            const timeRemaining = Math.max(0, DISMISS_AFTER - timeElapsed);
-
-            // Only set timeout if there's time remaining
-            if (timeRemaining > 0) {
-                timeoutRef.current = setTimeout(() => {
-                    dismiss(data.toastId);
-                }, timeRemaining);
-            } else {
-                // If time has already elapsed, dismiss immediately
-                dismiss(data.toastId);
-            }
-        }
-
-        // Cleanup function to clear timeout on unmount or when dependencies change
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-            }
-        };
-    }, [dismiss, isDebouncedHovered, data.toastId, DISMISS_AFTER]); // Added DISMISS_AFTER to dependencies
 
     // px size at which to render SVG icons
     const ICON_SIZE = 24;
@@ -172,17 +83,7 @@ export default function Notification(props: propsIF) {
     }
 
     return (
-        <section
-            className={styles.notification}
-            onMouseEnter={() => {
-                setIsHovered(true);
-                onMouseEnter?.(data.toastId);
-            }}
-            onMouseLeave={() => {
-                setIsHovered(false);
-                onMouseLeave?.(data.toastId);
-            }}
-        >
+        <section className={styles.notification}>
             <header>
                 <div className={styles.header_content}>
                     {data.icon === 'spinner' && (

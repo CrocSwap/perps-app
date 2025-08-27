@@ -622,7 +622,7 @@ export default function WebDataConsumer() {
                                         dismiss={() => toast.dismiss(t)}
                                     />
                                 ),
-                                { id: toastId },
+                                { id: toastId, duration: 60000 },
                             );
                         }
                     });

@@ -61,7 +61,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             return;
         }
@@ -89,7 +89,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
 
             const timeOfTxBuildStart = Date.now();
@@ -135,7 +135,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
                 // Call the original onCancel callback if provided
                 if (onCancel) {
@@ -180,7 +180,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
         } catch (error) {
@@ -200,7 +200,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         } finally {
             setIsCancelling(false);

@@ -143,7 +143,7 @@ export default function DepositModal({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
 
                 // Close modal on success - notification will show after modal closes

@@ -44,7 +44,7 @@ export default function CreateSubaccount(props: propsIF) {
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
         }

@@ -304,7 +304,7 @@ const LabelComponent = ({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             return;
         }
@@ -330,7 +330,7 @@ const LabelComponent = ({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
 
             const timeOfTxBuildStart = Date.now();
@@ -375,7 +375,7 @@ const LabelComponent = ({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             } else {
                 if (typeof plausible === 'function') {
@@ -415,7 +415,7 @@ const LabelComponent = ({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
         } catch (error) {
@@ -435,7 +435,7 @@ const LabelComponent = ({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
@@ -623,7 +623,7 @@ const LabelComponent = ({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
 
                 // If cancel was successful, create a new order with the updated price
@@ -688,7 +688,7 @@ const LabelComponent = ({
                                 dismiss={() => toast.dismiss(t)}
                             />
                         ),
-                        { id: toastId },
+                        { id: toastId, duration: 60000 },
                     );
                 } else {
                     // Show success notification
@@ -727,7 +727,7 @@ const LabelComponent = ({
                                 dismiss={() => toast.dismiss(t)}
                             />
                         ),
-                        { id: toastId },
+                        { id: toastId, duration: 60000 },
                     );
                 }
             } catch (error) {
@@ -748,7 +748,7 @@ const LabelComponent = ({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
                 if (typeof plausible === 'function') {
                     plausible('Offchain Failure', {

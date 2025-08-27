@@ -240,7 +240,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 dismiss={() => toast.dismiss(t)}
                             />
                         ),
-                        { id: toastId },
+                        { id: toastId, duration: 60000 },
                     );
                 } else {
                     if (typeof plausible === 'function') {
@@ -283,7 +283,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 dismiss={() => toast.dismiss(t)}
                             />
                         ),
-                        { id: toastId },
+                        { id: toastId, duration: 60000 },
                     );
                 }
             } catch (error) {
@@ -304,7 +304,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             } finally {
                 setIsClosing(false);

@@ -128,7 +128,7 @@ export default function LeverageSliderModal({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
 
                 // Close modal on success
@@ -153,7 +153,7 @@ export default function LeverageSliderModal({
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
                 onClose();
             }
@@ -177,7 +177,7 @@ export default function LeverageSliderModal({
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         } finally {
             setIsProcessing(false);

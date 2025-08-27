@@ -1,27 +1,28 @@
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import styles from './testpage.module.css';
 import Notification from '~/components/Notifications/Notification';
 import { useKeydown } from '~/hooks/useKeydown';
+import { useRef } from 'react';
 
 export default function testpage() {
+    const toastId = useRef<number>(1);
     useKeydown('n', () => {
-        toast.custom(() => (
-            <Notification
-                data={{
-                    slug: 514351358,
-                    title: 'Deposit Failed',
-                    message: 'Deposit Failed :(',
-                    icon: 'error',
-                    removeAfter: 10000,
-                }}
-                dismiss={(num: number) => console.log(num)}
-            />
-        ));
+        toast.custom(
+            (t) => (
+                <Notification
+                    data={{
+                        toastId: toastId.current,
+                        title: 'Deposit Failed',
+                        message: 'Deposit Failed :(',
+                        icon: 'error',
+                    }}
+                    dismiss={() => toast.dismiss(t)}
+                />
+            ),
+            { duration: 2000 },
+        );
+        toastId.current++;
     });
 
-    return (
-        <div className={styles.testpage}>
-            <Toaster position='bottom-right' />
-        </div>
-    );
+    return <div className={styles.testpage}></div>;
 }

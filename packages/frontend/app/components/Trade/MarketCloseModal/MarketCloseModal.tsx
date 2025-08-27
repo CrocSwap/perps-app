@@ -234,7 +234,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             close();
             return;
@@ -304,7 +304,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             } else {
                 if (typeof plausible === 'function') {
@@ -344,7 +344,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
         } catch (error) {
@@ -365,7 +365,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {

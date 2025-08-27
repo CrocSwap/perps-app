@@ -285,7 +285,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             close();
             return;
@@ -305,7 +305,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
             close();
             return;
@@ -361,7 +361,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             } else {
                 if (typeof plausible === 'function') {
@@ -398,7 +398,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                             dismiss={() => toast.dismiss(t)}
                         />
                     ),
-                    { id: toastId },
+                    { id: toastId, duration: 60000 },
                 );
             }
         } catch (error) {
@@ -433,7 +433,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         } finally {
             setIsProcessingOrder(false);

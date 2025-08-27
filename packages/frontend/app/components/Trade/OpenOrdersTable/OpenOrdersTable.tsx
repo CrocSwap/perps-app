@@ -62,7 +62,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
 
             const cancelPromises = filteredOrders.map(async (order) => {
@@ -182,7 +182,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                         dismiss={() => toast.dismiss(t)}
                                     />
                                 ),
-                                { id: toastId },
+                                { id: toastId, duration: 60000 },
                             );
                         }
                     });
@@ -216,7 +216,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 dismiss={() => toast.dismiss(t)}
                             />
                         ),
-                        { id: toastId },
+                        { id: toastId, duration: 60000 },
                     );
                 }
             } else {
@@ -260,7 +260,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 dismiss={() => toast.dismiss(t)}
                             />
                         ),
-                        { id: toastId },
+                        { id: toastId, duration: 60000 },
                     );
                 } else {
                     if (typeof plausible === 'function') {
@@ -292,7 +292,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 dismiss={() => toast.dismiss(t)}
                             />
                         ),
-                        { id: toastId },
+                        { id: toastId, duration: 60000 },
                     );
                 }
             }
@@ -314,7 +314,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         dismiss={() => toast.dismiss(t)}
                     />
                 ),
-                { id: toastId },
+                { id: toastId, duration: 60000 },
             );
         } finally {
             setIsCancellingAll(false);
