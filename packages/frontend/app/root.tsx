@@ -31,6 +31,8 @@ import {
 } from './utils/Constants';
 import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
+// import { Toaster } from 'sonner';
+import ToasterSonner from './components/Toaster/Toaster_Sonner';
 import packageJson from '../package.json';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
@@ -231,6 +233,8 @@ export default function App() {
                                             {/* Added error boundary for notifications */}
                                             <ComponentErrorBoundary>
                                                 <Notifications />
+                                                {/* <Toaster position='bottom-right' /> */}
+                                                <ToasterSonner />
                                             </ComponentErrorBoundary>
                                         </div>
                                     </TutorialProvider>

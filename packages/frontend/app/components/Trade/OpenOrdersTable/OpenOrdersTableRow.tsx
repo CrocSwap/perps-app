@@ -3,13 +3,14 @@ import { LuPen } from 'react-icons/lu';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 export interface OpenOrderData {
     time: string;
@@ -35,7 +36,6 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
 
     const { formatNum } = useNumFormatter();
     const { getBsColor } = useAppSettings();
-    const notifications = useNotificationStore();
     const { executeCancelOrder } = useCancelOrderService();
     const [isCancelling, setIsCancelling] = useState(false);
 
@@ -44,18 +44,29 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
     const showTpSl = false;
 
     const handleCancel = async () => {
+        // ID to allow all notifications within the same toast
+        const toastId: number = Date.now();
+
         if (!order.oid) {
-            notifications.add({
-                title: 'Cancel Failed',
-                message: 'Order ID not found',
-                icon: 'error',
-            });
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            toastId,
+                            title: 'Cancel Failed',
+                            message: 'Order ID not found',
+                            icon: 'error',
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId, duration: 60000 },
+            );
             return;
         }
 
         setIsCancelling(true);
 
-        const slug = makeSlug(10);
         try {
             const usdValueOfOrderStr = formatNum(
                 order.sz * markPx,
@@ -64,13 +75,21 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 true,
             );
             // Show pending notification
-            notifications.add({
-                title: 'Cancel Order Pending',
-                message: `Cancelling order for ${usdValueOfOrderStr} of ${order.coin}`,
-                icon: 'spinner',
-                slug,
-                removeAfter: 60000,
-            });
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            toastId,
+                            title: 'Cancel Order Pending',
+                            message: `Cancelling order for ${usdValueOfOrderStr} of ${order.coin}`,
+                            icon: 'spinner',
+                            removeAfter: 60000,
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId, duration: 60000 },
+            );
 
             const timeOfTxBuildStart = Date.now();
             // Execute the cancel order
@@ -79,7 +98,6 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             });
 
             if (result.success) {
-                notifications.remove(slug);
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
@@ -100,22 +118,29 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     });
                 }
                 // Show success notification
-                notifications.add({
-                    title: 'Order Cancelled',
-                    message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
-                    icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                    removeAfter: 5000,
-                });
-
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                toastId,
+                                title: 'Order Cancelled',
+                                message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                                removeAfter: 5000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId, duration: 60000 },
+                );
                 // Call the original onCancel callback if provided
                 if (onCancel) {
                     onCancel(order.timestamp, order.coin);
                 }
             } else {
-                notifications.remove(slug);
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
@@ -136,27 +161,46 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     });
                 }
                 // Show error notification
-                notifications.add({
-                    title: 'Cancel Failed',
-                    message: String(result.error || 'Failed to cancel order'),
-                    icon: 'error',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                    removeAfter: 5000,
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                toastId,
+                                title: 'Cancel Failed',
+                                message: String(
+                                    result.error || 'Failed to cancel order',
+                                ),
+                                icon: 'error',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                                removeAfter: 5000,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId, duration: 60000 },
+                );
             }
         } catch (error) {
             console.error('❌ Error cancelling order:', error);
-            notifications.remove(slug);
-            notifications.add({
-                title: 'Cancel Failed',
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : 'Unknown error occurred',
-                icon: 'error',
-            });
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            toastId,
+                            title: 'Cancel Failed',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                            icon: 'error',
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId, duration: 60000 },
+            );
         } finally {
             setIsCancelling(false);
         }

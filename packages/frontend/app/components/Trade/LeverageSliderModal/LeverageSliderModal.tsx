@@ -7,10 +7,11 @@ import { calcLeverageFloor } from '@crocswap-libs/ambient-ember';
 import { useSetUserMarginService } from '~/hooks/useSetUserMarginService';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useLeverageStore } from '~/stores/LeverageStore';
-import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer } from '~/utils/Constants';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
+import { toast } from 'sonner';
+import Notification from '~/components/Notifications/Notification';
 
 interface LeverageSliderModalProps {
     currentLeverage: number;
@@ -31,7 +32,6 @@ export default function LeverageSliderModal({
         'idle' | 'pending' | 'success' | 'failed'
     >('idle');
 
-    const notificationStore = useNotificationStore();
     const setPreferredLeverage = useLeverageStore(
         (state) => state.setPreferredLeverage,
     );
@@ -67,6 +67,9 @@ export default function LeverageSliderModal({
     };
 
     const handleConfirm = useCallback(async () => {
+        // ID to allow all notifications within the same toast
+        const toastId: number = Date.now();
+
         setIsProcessing(true);
         setTransactionStatus('pending');
 
@@ -110,14 +113,23 @@ export default function LeverageSliderModal({
                 }
 
                 // Show success notification
-                notificationStore.add({
-                    title: 'Leverage Updated',
-                    message: `Successfully set leverage to ${value.toFixed(1)}x`,
-                    icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                toastId,
+                                title: 'Leverage Updated',
+                                message: `Successfully set leverage to ${value.toFixed(1)}x`,
+                                icon: 'check',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId, duration: 60000 },
+                );
 
                 // Close modal on success
                 onClose();
@@ -125,14 +137,24 @@ export default function LeverageSliderModal({
                 setTransactionStatus('failed');
 
                 // Show error notification and close modal
-                notificationStore.add({
-                    title: 'Transaction Failed',
-                    message: result.error || 'Failed to update leverage',
-                    icon: 'error',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
+                toast.custom(
+                    (t) => (
+                        <Notification
+                            data={{
+                                toastId,
+                                title: 'Transaction Failed',
+                                message:
+                                    result.error || 'Failed to update leverage',
+                                icon: 'error',
+                                txLink: result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
+                                    : undefined,
+                            }}
+                            dismiss={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { id: toastId, duration: 60000 },
+                );
                 onClose();
             }
         } catch (error) {
@@ -143,22 +165,24 @@ export default function LeverageSliderModal({
                     : 'Failed to update leverage';
 
             // Show error notification
-            notificationStore.add({
-                title: 'Transaction Error',
-                message: errorMessage,
-                icon: 'error',
-            });
+            toast.custom(
+                (t) => (
+                    <Notification
+                        data={{
+                            toastId,
+                            title: 'Transaction Error',
+                            message: errorMessage,
+                            icon: 'error',
+                        }}
+                        dismiss={() => toast.dismiss(t)}
+                    />
+                ),
+                { id: toastId, duration: 60000 },
+            );
         } finally {
             setIsProcessing(false);
         }
-    }, [
-        value,
-        executeSetUserMargin,
-        setPreferredLeverage,
-        onConfirm,
-        onClose,
-        notificationStore,
-    ]);
+    }, [value, executeSetUserMargin, setPreferredLeverage, onConfirm, onClose]);
 
     return (
         <Modal title='Adjust Leverage' close={onClose}>

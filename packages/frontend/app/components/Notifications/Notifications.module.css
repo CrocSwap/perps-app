@@ -2,8 +2,8 @@
 .notifications {
     /* remove the element from the normal layout flow */
     position: absolute;
-    /* render element slightly up and left from bottom-right corner */
-    bottom: 10px;
+    /* render element slightly down left from top-right corner */
+    top: calc(var(--header-height-desktop) + 10px);
     right: 10px;
     /* display notifications in a column */
     display: flex;
