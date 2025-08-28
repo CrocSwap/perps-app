@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
 
@@ -26,10 +27,11 @@ const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
 
-type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
+export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
 export default function Trade() {
-    const { symbol, marginBucket } = useTradeDataStore();
+    const { symbol } = useTradeDataStore();
+    const { marginBucket } = useUnifiedMarginData();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
@@ -179,11 +181,12 @@ export default function Trade() {
                         symbol={symbol}
                         mobileView={true}
                         mobileContent='orderBook'
+                        switchTab={switchTab}
                     />
                 )}
             </div>
         ),
-        [symbol, activeTab],
+        [symbol, activeTab, switchTab],
     );
 
     const mobileRecentTradesView = useMemo(

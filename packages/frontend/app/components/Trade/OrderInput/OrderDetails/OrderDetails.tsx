@@ -60,7 +60,12 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                         return '-';
                     }
 
-                    return formatNum(humanReadablePrice);
+                    return formatNum(
+                        humanReadablePrice,
+                        humanReadablePrice > 10_000 ? 0 : 2,
+                        true,
+                        true,
+                    );
                 })(),
             },
             orderMarketPrice === 'scale' && {

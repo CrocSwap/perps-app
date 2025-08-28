@@ -75,8 +75,23 @@ function DepositDropdown(props: propsIF) {
         }
     }, [marginBucket]);
 
+    const sessionButtonRef = useRef<HTMLSpanElement>(null);
     const sessionState = useSession();
     const isUserConnected = isEstablished(sessionState);
+
+    useEffect(() => {
+        const button = sessionButtonRef.current;
+        if (button) {
+            const handleClick = () => {
+                localStorage.setItem(
+                    'loginButtonClickTime',
+                    Date.now().toString(),
+                );
+            };
+            button.addEventListener('click', handleClick);
+            return () => button.removeEventListener('click', handleClick);
+        }
+    }, []);
 
     const {
         //   accountOverview,
@@ -217,7 +232,12 @@ function DepositDropdown(props: propsIF) {
                         <p className={styles.notConnectedText}>
                             Connect your wallet to start trading with zero gas.
                         </p>
-                        <SessionButton />
+                        <span
+                            className={`plausible-event-name=Login+Button+Click plausible-event-location=Account+Overview`}
+                            ref={sessionButtonRef}
+                        >
+                            <SessionButton />
+                        </span>
                     </div>
                 )}
                 {isUserConnected && (

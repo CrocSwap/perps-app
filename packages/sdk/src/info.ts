@@ -42,6 +42,7 @@ export class Info extends API {
     public environment: Environment;
     public baseUrl: string;
     private useMultiSocket: boolean = false;
+    private useMarketOnly: boolean = false;
 
     constructor(options: InfoOptions) {
         super(options.environment);
@@ -338,7 +339,23 @@ export class Info extends API {
         }
     }
 
+    public hardUnsubscribe(
+        subscription: Subscription,
+        callback: Callback,
+    ): void {
+        if (this.useMultiSocket) {
+            this.multiSocketInfo?.hardUnsubscribe(subscription, callback);
+        }
+    }
+
     public nameToAsset(name: string): number {
         return this.coinToAsset[this.nameToCoin[name]];
+    }
+
+    public setUseMarketOnly(useMarketOnly: boolean) {
+        this.useMarketOnly = useMarketOnly;
+        if (this.useMultiSocket) {
+            this.multiSocketInfo?.setUseMarketOnly(useMarketOnly);
+        }
     }
 }

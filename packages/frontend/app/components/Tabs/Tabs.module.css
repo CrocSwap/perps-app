@@ -199,6 +199,11 @@
 @media (max-width: 480px) {
     .tab {
         padding: 2px var(--padding-s);
+        flex: 1;
+    }
+    .tabsList {
+        display: flex;
+        width: 100%;
     }
 
     .scrollArrow {

@@ -1,6 +1,7 @@
 {
+    "$schema": "https://json.schemastore.org/package.json",
     "name": "@perps-app/frontend",
-    "version": "0.1.16",
+    "version": "0.1.35-Aug-27",
     "private": true,
     "type": "module",
     "scripts": {
@@ -18,10 +19,11 @@
         "generate-pwa-assets": "pwa-assets-generator"
     },
     "dependencies": {
-        "@crocswap-libs/ambient-ember": "^0.1.57",
+        "@crocswap-libs/ambient-ember": "^0.1.59",
         "@fogo/sessions-idls": "^0.0.3",
         "@fogo/sessions-sdk": "^0.0.9",
-        "@fogo/sessions-sdk-react": "^0.0.14",
+        "@fogo/sessions-sdk-react": "^0.0.15",
+        "@fuul/sdk": "^7.0.3",
         "@netlify/functions": "3.0.4",
         "@perps-app/sdk": "workspace:*",
         "@pythnetwork/hermes-client": "^2.0.0",

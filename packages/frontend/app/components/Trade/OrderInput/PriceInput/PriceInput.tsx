@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import styles from './PriceInput.module.css';
 
@@ -29,16 +30,38 @@ export default function PriceInput(props: PropsIF) {
         isModal = false,
     } = props;
 
+    // autofocus trade-module-price-input when user clicks anywhere in priceInputContainer except for the midButton
+    const handleContainerClick = useCallback((e: React.MouseEvent) => {
+        // Don't focus if user is selecting text
+        const selection = window.getSelection();
+        if (selection && selection.toString().length > 0) {
+            return;
+        }
+
+        const priceInput = document.getElementById(
+            'trade-module-price-input',
+        ) as HTMLInputElement;
+
+        // Only focus if the click target is the container itself (not a child element)
+        if (e.target === e.currentTarget) {
+            priceInput.focus();
+            priceInput.select();
+        }
+    }, []);
+
     return (
         <div
+            id='trade-module-price-input-container'
             className={`${styles.priceInputContainer}
              ${showMidButton ? styles.chaseLimit : ''}
              ${isModal ? styles.modalContainer : ''}
 
               `}
+            onClick={handleContainerClick}
         >
             <span>Price</span>
             <NumFormattedInput
+                id='trade-module-price-input'
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -50,7 +73,9 @@ export default function PriceInput(props: PropsIF) {
             {showMidButton && (
                 <button
                     className={`${styles.midButton} ${isMidModeActive ? styles.midButtonActive : ''}`}
-                    onClick={() => {
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.nativeEvent.stopImmediatePropagation();
                         if (!isMidModeActive) {
                             setMidPriceAsPriceInput();
                             setIsMidModeActive(true);

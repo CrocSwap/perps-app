@@ -10,7 +10,7 @@ import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useSdk } from '~/hooks/useSdk';
+import { useRestPoller } from '~/hooks/useRestPoller';
 import { useWorker } from '~/hooks/useWorker';
 import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -29,11 +29,14 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
+// import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
+import type { TabType } from '~/routes/trade';
+import { useSdk } from '~/hooks/useSdk';
 
 interface OrderBookProps {
-    symbol: string;
     orderCount: number;
     heightOverride?: string;
+    switchTab?: (tab: TabType) => void;
 }
 
 const dummyOrder: OrderBookRowIF = {
@@ -48,14 +51,16 @@ const dummyOrder: OrderBookRowIF = {
 
 // Custom hook to memoize slot arrays
 function useOrderSlots(orders: OrderBookRowIF[]) {
-    return useMemo(() => orders.map((order) => order.px), [orders]);
+    return useMemo(() => orders?.map((order) => order.px), [orders]);
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({
-    symbol,
     orderCount,
     heightOverride,
+    switchTab,
 }) => {
+    // TODO: Can be uncommented if we want to use the rest poller
+    // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
     const { info } = useSdk();
 
     const orderClickDisabled = false;
@@ -80,8 +85,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const rowLockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // No useMemo for simple arithmetic
-    const buyPlaceHolderCount = Math.max(orderCount - buys.length, 0);
-    const sellPlaceHolderCount = Math.max(orderCount - sells.length, 0);
+    const buyPlaceHolderCount = Math.max(orderCount - buys?.length || 0, 0);
+    const sellPlaceHolderCount = Math.max(orderCount - sells?.length || 0, 0);
 
     const {
         userOrders,
@@ -89,6 +94,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         symbolInfo,
         setObChosenPrice,
         setObChosenAmount,
+        symbol,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
@@ -202,26 +208,41 @@ const OrderBook: React.FC<OrderBookProps> = ({
         }
     }, [symbol, symbolInfo?.coin]);
 
+    const subKey = useMemo(() => {
+        if (!selectedResolution) return undefined;
+        return {
+            type: 'l2Book' as const,
+            coin: symbol,
+            ...(selectedResolution.nsigfigs
+                ? { nSigFigs: selectedResolution.nsigfigs }
+                : {}),
+            ...(selectedResolution.mantissa
+                ? { mantissa: selectedResolution.mantissa }
+                : {}),
+        };
+    }, [selectedResolution, symbol]);
+
     useEffect(() => {
-        if (!info || !symbol) return;
+        console.log('>>> orderbook subKey', subKey);
+        if (!subKey || !info) return;
         setOrderBookState(TableState.LOADING);
-        if (selectedResolution) {
-            const subKey = {
-                type: 'l2Book' as const,
-                coin: symbol,
-                ...(selectedResolution.nsigfigs
-                    ? { nSigFigs: selectedResolution.nsigfigs }
-                    : {}),
-                ...(selectedResolution.mantissa
-                    ? { mantissa: selectedResolution.mantissa }
-                    : {}),
-            };
+        if (subKey) {
+            // subscribeToPoller(
+            //     'info',
+            //     subKey,
+            //     postOrderBookRaw,
+            //     TIMEOUT_OB_POLLING,
+            //     true,
+            // );
+
             const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+
             return () => {
+                // unsubscribeFromPoller('info', subKey);
                 unsubscribe();
             };
         }
-    }, [selectedResolution, info, symbol, postOrderBookRaw]);
+    }, [subKey, info]);
 
     const midHeader = useCallback(
         (id: string) => (
@@ -269,8 +290,33 @@ const OrderBook: React.FC<OrderBookProps> = ({
             rowLockTimeoutRef.current = setTimeout(() => {
                 lockOrderBook.current = false;
             }, 1000);
+
+            if (switchTab) {
+                const obRow = document.getElementById('order-row-' + order.px);
+                obRow?.classList.add('divPulse');
+                setTimeout(() => {
+                    obRow?.classList.remove('divPulse');
+                    switchTab('order' as TabType);
+                    setTimeout(() => {
+                        const orderElem = document.getElementById(
+                            'trade-module-price-input-container',
+                        );
+                        orderElem?.classList.add('divPulse');
+                        setTimeout(() => {
+                            orderElem?.classList.remove('divPulse');
+                        }, 800);
+                    }, 400);
+                }, 400);
+            }
         },
-        [buys, sells, orderCount, setObChosenPrice, setObChosenAmount],
+        [
+            buys,
+            sells,
+            orderCount,
+            setObChosenPrice,
+            setObChosenAmount,
+            switchTab,
+        ],
     );
 
     const getRandWidth = useCallback(

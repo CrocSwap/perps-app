@@ -163,6 +163,8 @@ export class WebSocketInstance {
     private readonly socketName: string;
     private onConnectionChange?: (connected: boolean) => void;
 
+    private readonly autoConnect: boolean;
+
     constructor(config: WebSocketInstanceConfig) {
         this.isDebug = config.isDebug ?? false;
         this.baseUrl = config.baseUrl;
@@ -170,6 +172,7 @@ export class WebSocketInstance {
         this.socketType = config.socketType;
         this.socketName = config.socketName ?? config.socketType;
         this.pingIntervalMs = config.pingInterval ?? DEFAULT_PING_INTERVAL_MS;
+        this.autoConnect = config.autoConnect ?? true;
 
         // Bind methods to ensure proper context
         this.onOpen = this.onOpen.bind(this);
@@ -614,6 +617,9 @@ export class WebSocketInstance {
             return;
         }
         if (msg.channel === 'error') {
+            if (!msg.data) {
+                return;
+            }
             const jsonMatch = msg.data.match(/\{.*\}$/);
 
             if (jsonMatch) {
@@ -654,7 +660,6 @@ export class WebSocketInstance {
         for (const activeSub of activeSubscriptions) {
             if (activeSub.multiCallbacks) {
                 for (const callback of activeSub.multiCallbacks) {
-                    console.log('>>> calling multi callback', callback);
                     callback(msg);
                 }
             } else {
@@ -669,6 +674,10 @@ export class WebSocketInstance {
         existingId?: number,
         errorCallback?: ErrCallback,
     ) => {
+        if (!this.wsReady && !this.autoConnect) {
+            this.connect();
+        }
+
         const identifier = subscriptionToIdentifier(subscription);
 
         if (this.socketName === 'market') {
@@ -959,10 +968,27 @@ export class WebSocketInstance {
 
     // [22-07-2025] is being used while re-initializing ws
     public addToQueuedSubs(subscription: ActiveSubscription) {
-        console.log('>>> add to queue');
         this.queuedSubscriptions.push({
             subscription: subscription.subscription,
             active: subscription,
+        });
+    }
+
+    public isAutoConnect(): boolean {
+        return this.autoConnect;
+    }
+
+    public hardUnsubscribe(sub: Subscription, callback: Callback) {
+        const identifier = subscriptionToIdentifier(sub);
+        const activeSubscriptions = this.activeSubscriptions[identifier];
+        if (!activeSubscriptions) {
+            return;
+        }
+
+        activeSubscriptions.map((s) => {
+            if (s.callback === callback) {
+                this.unsubscribe(sub, callback, s.subscriptionId);
+            }
         });
     }
 }

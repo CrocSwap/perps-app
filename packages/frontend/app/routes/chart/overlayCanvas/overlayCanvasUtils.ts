@@ -4,6 +4,18 @@ import type { LabelLocation } from '../orders/orderLineUtils';
 
 export type LabelLocationData = { label: LabelLocation; parentLine: LineData };
 
+type ScaleData = {
+    yScale: d3.ScaleLinear<number, number>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    scaleSymlog: any;
+};
+
+export const scaleDataRef: { current: ScaleData | null } = {
+    current: null,
+};
+
+export const mousePositionRef = { current: { x: 0, y: 0 } };
+
 export function findLimitLabelAtPosition(
     x: number,
     y: number,
@@ -60,7 +72,11 @@ export const getPixelToPrice = (
     const dpr = window.devicePixelRatio || 1;
     const textHeight = 15 * dpr;
 
-    const priceScalePane = chart.activeChart().getPanes()[0] as IPaneApi;
+    const paneIndex = getMainSeriesPaneIndex(chart);
+    if (paneIndex === null) return null;
+    const priceScalePane = chart.activeChart().getPanes()[
+        paneIndex
+    ] as IPaneApi;
     const priceScale = priceScalePane.getMainSourcePriceScale();
 
     if (!priceScale) return null;
@@ -111,3 +127,42 @@ export const getPixelToPrice = (
         return price;
     }
 };
+
+export function getMainSeriesPaneIndex(
+    chart: IChartingLibraryWidget,
+): number | null {
+    const panes = chart.activeChart().getPanes();
+    for (const pane of panes) {
+        if (pane.hasMainSeries()) {
+            return pane.paneIndex();
+        }
+    }
+    return null;
+}
+export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
+    iframeDoc: Document | null;
+    paneCanvas: HTMLCanvasElement | null;
+} {
+    const chartDiv = document.getElementById('tv_chart');
+    const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
+    const iframeDoc =
+        iframe?.contentDocument || iframe?.contentWindow?.document;
+
+    if (!iframeDoc) {
+        return { iframeDoc: null, paneCanvas: null };
+    }
+
+    const paneCanvases = iframeDoc.querySelectorAll<HTMLCanvasElement>(
+        'canvas[data-name="pane-canvas"]',
+    );
+
+    const paneIndex = getMainSeriesPaneIndex(chart);
+    if (paneIndex === null || paneIndex === undefined) {
+        return { iframeDoc, paneCanvas: null };
+    }
+
+    return {
+        iframeDoc,
+        paneCanvas: paneCanvases[paneIndex] ?? null,
+    };
+}

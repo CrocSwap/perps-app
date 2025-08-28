@@ -1,4 +1,5 @@
 import type { L2BookData, OrderData } from '@perps-app/sdk/src/utils/types';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
     OrderBookRowIF,
     OrderBookTradeIF,
@@ -10,6 +11,12 @@ export function processOrderBookMessage(data: L2BookData): {
     sells: OrderBookRowIF[];
     buys: OrderBookRowIF[];
 } {
+    if (!data?.levels) {
+        return {
+            sells: [],
+            buys: [],
+        };
+    }
     const buysRaw = data.levels[0];
     const sellsRaw = data.levels[1];
 
@@ -79,6 +86,7 @@ export function processUserOrder(
     status: string,
 ): OrderDataIF | null {
     if (data) {
+        const markPx = useTradeDataStore.getState().symbolInfo?.markPx;
         return {
             coin: data.coin,
             cloid: data.cloid,
@@ -103,7 +111,7 @@ export function processUserOrder(
             triggerPx: data.triggerPx ? parseNum(data.triggerPx) : undefined,
             triggerCondition: data.triggerCondition,
             orderType: data.orderType || '',
-            orderValue: parseNum(data.sz * data.limitPx),
+            orderValue: Math.round(data.sz * (markPx || 1) * 100) / 100,
         };
     }
 

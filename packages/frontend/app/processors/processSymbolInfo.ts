@@ -33,6 +33,7 @@ export const processSymbolInfo = (payload: SymbolInfoRawIF): SymbolInfoIF => {
             ),
             szDecimals: payload.szDecimals,
             maxLeverage: payload.maxLeverage,
+            symbol: payload.coin,
         };
     } catch (error) {
         console.error('Error processing symbol info', error);

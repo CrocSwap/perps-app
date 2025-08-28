@@ -8,8 +8,10 @@ import {
     useNotificationStore,
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
@@ -24,7 +26,7 @@ interface PropsIF {
 export default function MarketCloseModal({ close, position }: PropsIF) {
     const { formatNumWithOnlyDecimals } = useNumFormatter();
 
-    const { symbolInfo } = useTradeDataStore();
+    const { symbolInfo, symbol } = useTradeDataStore();
 
     const { executeMarketOrder } = useMarketOrderService();
     const { buys, sells } = useOrderBookStore();
@@ -36,8 +38,9 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     const MIN_ORDER_VALUE = 1;
 
     const isPositionLong = position.szi > 0;
+    const pythPriceData = usePythPrice(symbol);
 
-    const markPx = symbolInfo?.markPx;
+    const markPx = symbolInfo?.markPx || pythPriceData?.price;
 
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
@@ -233,9 +236,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         try {
             // Get order book prices for the closing order
             const closingSide = isPositionLong ? 'sell' : 'buy';
-            const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
-            const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
+            const bestBidPrice = buys.length > 0 ? buys[0].px : markPx;
+            const bestAskPrice = sells.length > 0 ? sells[0].px : markPx;
 
+            const timeOfTxBuildStart = Date.now();
             // Execute market order in opposite direction to close position
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
@@ -253,8 +257,30 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             );
 
             if (result.success) {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Success',
+                            orderType: 'Market',
+                            success: true,
+                            direction: closingSide === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 notifications.add({
-                    title: 'Position Closed',
+                    title:
+                        positionSize < 100
+                            ? `${positionSize}% of Position Closed`
+                            : 'Position Closed',
                     message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
                     icon: 'check',
                     txLink: result.signature
@@ -263,6 +289,26 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     removeAfter: 5000,
                 });
             } else {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Fail',
+                            orderType: 'Market',
+                            success: false,
+                            errorMessage: result.error || 'Transaction failed',
+                            direction: closingSide === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Close Failed',
                     message: result.error || 'Failed to close position',
@@ -284,6 +330,19 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 icon: 'error',
                 removeAfter: 10000,
             });
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Market Close Fail',
+                        orderType: 'Market',
+                        success: false,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         } finally {
             setIsProcessingOrder(false);
             close();

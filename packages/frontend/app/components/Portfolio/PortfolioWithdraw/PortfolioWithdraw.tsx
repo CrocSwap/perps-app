@@ -7,6 +7,7 @@ import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
 
@@ -166,6 +167,7 @@ function PortfolioWithdraw({
             return;
         }
 
+        const timeOfTxBuildStart = Date.now();
         try {
             // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) => {
@@ -179,7 +181,7 @@ function PortfolioWithdraw({
             });
 
             // Race between the withdraw and the timeout
-            const result = await Promise.race([
+            const result: any = await Promise.race([
                 maxModeActive || userAtTheirMax
                     ? onWithdraw()
                     : onWithdraw(withdrawInputNum),
@@ -188,6 +190,25 @@ function PortfolioWithdraw({
 
             // Check if the result indicates failure
             if (result && result.success === false) {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Withdrawal Fail',
+                            success: false,
+                            maxActive: maxModeActive,
+                            errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
                 notificationStore.add({
@@ -202,6 +223,24 @@ function PortfolioWithdraw({
             } else {
                 setTransactionStatus('success');
 
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Withdrawal Success',
+                            success: true,
+                            maxActive: maxModeActive,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show success notification
                 notificationStore.add({
                     title: 'Withdrawal Successful',
@@ -223,6 +262,19 @@ function PortfolioWithdraw({
             setError(
                 error instanceof Error ? error.message : 'Withdrawal failed',
             );
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Withdrawal Fail',
+                        success: false,
+                        maxActive: maxModeActive,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         }
     }, [
         withdrawInputNum,

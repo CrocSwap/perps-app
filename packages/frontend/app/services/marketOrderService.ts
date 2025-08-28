@@ -6,12 +6,14 @@ import {
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { MARKET_ORDER_PRICE_OFFSET_USD } from '~/utils/Constants';
+import { marketOrderLogManager } from './MarketOrderLogManager';
 
 export interface MarketOrderResult {
     success: boolean;
     error?: string;
     signature?: string;
     confirmed?: boolean;
+    timeOfSubmission?: number;
 }
 
 export interface MarketOrderParams {
@@ -20,6 +22,7 @@ export interface MarketOrderParams {
     leverage?: number; // Optional leverage multiplier for calculating userSetImBps
     bestBidPrice?: number; // Best bid price from order book (for sell orders)
     bestAskPrice?: number; // Best ask price from order book (for buy orders)
+    reduceOnly?: boolean; // Optional reduce-only flag
 }
 
 /**
@@ -75,6 +78,15 @@ export class MarketOrderService {
                 console.log('  - Calculated userSetImBps:', userSetImBps);
             }
 
+            // Get the cached market order log page to avoid RPC call
+            const cachedLogPage = marketOrderLogManager.getCachedLogPage();
+            if (cachedLogPage !== undefined) {
+                console.log(
+                    '  - Using cached marketOrderLogPage:',
+                    cachedLogPage,
+                );
+            }
+
             // Calculate fill prices based on order book
             let fillPrice: bigint;
             if (params.side === 'buy') {
@@ -118,6 +130,8 @@ export class MarketOrderService {
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
                 console.log('  - Building market BUY order...');
+                console.log('  - Log page:', cachedLogPage);
+
                 const orderParams: any = {
                     marketId: marketId,
                     orderId: orderId,
@@ -132,6 +146,8 @@ export class MarketOrderService {
                     keeper: sessionPublicKey,
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
+                    marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 const transaction = buildOrderEntryTransaction(
@@ -158,6 +174,8 @@ export class MarketOrderService {
                     keeper: sessionPublicKey,
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true, // Ensure fill at market is included
+                    marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 const transaction = buildOrderEntryTransaction(
@@ -230,6 +248,8 @@ export class MarketOrderService {
                 })),
             );
 
+            const timeOfSubmission = Date.now();
+
             // Send the transaction using Fogo session
             console.log('  - Calling sendTransaction...');
             const transactionResult = await sendTransaction(instructions);
@@ -245,10 +265,12 @@ export class MarketOrderService {
                     '✅ Order transaction successful:',
                     transactionResult.signature,
                 );
+
                 return {
                     success: true,
                     signature: transactionResult.signature,
                     confirmed: transactionResult.confirmed,
+                    timeOfSubmission,
                 };
             } else {
                 const errorMessage =
@@ -258,7 +280,10 @@ export class MarketOrderService {
                 return {
                     success: false,
                     error: errorMessage,
-                    signature: transactionResult.signature,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
+                    timeOfSubmission,
                 };
             }
         } catch (error) {

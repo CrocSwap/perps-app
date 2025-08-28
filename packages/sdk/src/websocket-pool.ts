@@ -51,6 +51,7 @@ export class WebSocketPool {
     private sockets: Map<string, WebSocketInstance> = new Map();
     private config: WebSocketPoolConfig;
     private customChannelMapping: Record<string, string> = {};
+    private useMarketOnly: boolean = false;
 
     constructor(config: WebSocketPoolConfig) {
         this.config = config;
@@ -83,7 +84,7 @@ export class WebSocketPool {
                 isDebug: this.config.isDebug,
                 numWorkers: this.config.numWorkers,
                 pingInterval: this.config.pingInterval,
-                autoConnect: false, // Don't connect immediately
+                autoConnect: true, // Don't connect immediately
             };
             socketsToCreate.push(['user', userConfig]);
         }
@@ -98,7 +99,7 @@ export class WebSocketPool {
                     isDebug: this.config.isDebug,
                     numWorkers: this.config.numWorkers,
                     pingInterval: this.config.pingInterval,
-                    autoConnect: false, // Don't connect immediately
+                    autoConnect: true, // Don't connect immediately
                 };
                 socketsToCreate.push([name, customConfig]);
             }
@@ -110,9 +111,10 @@ export class WebSocketPool {
         });
 
         // Connect all sockets in parallel
-        console.log('Connecting all WebSocket instances in parallel...');
         this.sockets.forEach((socket) => {
-            socket.connect();
+            if (socket.isAutoConnect()) {
+                socket.connect();
+            }
         });
     }
 
@@ -122,6 +124,10 @@ export class WebSocketPool {
     private getSocketForSubscription(
         subscription: Subscription,
     ): WebSocketInstance | undefined {
+        if (this.useMarketOnly) {
+            return this.sockets.get('market');
+        }
+
         const channelType = subscription.type;
 
         // Check custom mapping first
@@ -321,6 +327,19 @@ export class WebSocketPool {
             }, 200);
         });
     }
+
+    public setUseMarketOnly(useMarketOnly: boolean) {
+        this.useMarketOnly = useMarketOnly;
+    }
+
+    public hardUnsubscribe(
+        subscription: Subscription,
+        callback: Callback,
+    ): void {
+        this.sockets.forEach((socket) => {
+            socket.hardUnsubscribe(subscription, callback);
+        });
+    }
 }
 
 /**
@@ -329,6 +348,7 @@ export class WebSocketPool {
  */
 export class MultiSocketInfo {
     private pool: WebSocketPool;
+    private useMarketOnly: boolean = false;
 
     constructor(
         endpoints: WebSocketEndpoints | string,
@@ -396,5 +416,17 @@ export class MultiSocketInfo {
     // [22-07-2025] returns all active subs for stashing in useSdk hook
     public getActiveSubscriptions() {
         return this.pool.getActiveSubscriptions();
+    }
+
+    public setUseMarketOnly(useMarketOnly: boolean) {
+        this.useMarketOnly = useMarketOnly;
+        this.pool.setUseMarketOnly(useMarketOnly);
+    }
+
+    public hardUnsubscribe(
+        subscription: Subscription,
+        callback: Callback,
+    ): void {
+        this.pool.hardUnsubscribe(subscription, callback);
     }
 }

@@ -1,4 +1,5 @@
 import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
+import { getMainSeriesPaneIndex } from '../overlayCanvas/overlayCanvasUtils';
 
 export type LineLabelType =
     | 'PNL'
@@ -87,8 +88,12 @@ export const getPricetoPixel = (
     const dpr = window.devicePixelRatio || 1;
     const textHeight = (lineType === 'LIQ' ? 18 : 15) * dpr;
     let pixel = 0;
-    const priceScalePane = chart.activeChart().getPanes()[0] as IPaneApi;
 
+    const paneIndex = getMainSeriesPaneIndex(chart);
+    if (paneIndex === null) return { pixel: 0, chartHeight: 0, textHeight: 0 };
+    const priceScalePane = chart.activeChart().getPanes()[
+        paneIndex
+    ] as IPaneApi;
     const priceScale = priceScalePane.getMainSourcePriceScale();
     if (priceScale) {
         const priceRange = priceScale.getVisiblePriceRange();

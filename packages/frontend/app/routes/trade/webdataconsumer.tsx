@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
-import { filter } from 'd3';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
+import { useMarketOrderLog } from '~/hooks/useMarketOrderLog';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
@@ -16,8 +16,10 @@ import {
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
@@ -34,7 +36,15 @@ import type {
 } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
-    const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
+    const { debugWallet, isDebugWalletActive } = useDebugStore();
+
+    const DUMMY_ADDRESS = useMemo(() => {
+        if (isDebugWalletActive) {
+            return debugWallet.address;
+        }
+        return '0x0000000000000000000000000000000000000000';
+    }, [isDebugWalletActive, debugWallet]);
+
     const {
         favKeys,
         setFavCoins,
@@ -42,11 +52,9 @@ export default function WebDataConsumer() {
         symbol,
         symbolInfo,
         setSymbolInfo,
-        setCoins,
         coins,
         setPositions,
         setUserBalances,
-        setCoinPriceMap,
         setAccountOverview,
         accountOverview,
         setOrderHistory,
@@ -74,6 +82,12 @@ export default function WebDataConsumer() {
     // Use unified margin data for both balance and positions
     const { positions: unifiedPositions } = useUnifiedMarginData();
 
+    // Initialize market order log pre-fetching
+    useMarketOrderLog();
+
+    const { setPositions: setUnifiedPositions, setBalance: setUnifiedBalance } =
+        useUnifiedMarginStore();
+
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
     const userBalancesRef = useRef<UserBalanceIF[]>([]);
@@ -94,6 +108,9 @@ export default function WebDataConsumer() {
     const fetchedChannelsRef = useRef<Set<string>>(new Set());
 
     const notifiedOrdersRef = useRef<Set<number>>(new Set());
+
+    const debugWalletActiveRef = useRef<boolean>(false);
+    debugWalletActiveRef.current = isDebugWalletActive;
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -165,7 +182,7 @@ export default function WebDataConsumer() {
         // Also subscribe to webData2 on market socket for market data
         // This ensures market data comes from the market endpoint even when user endpoint is different
         let unsubscribeMarketData: (() => void) | undefined;
-        if (info.multiSocketInfo) {
+        if (info.multiSocketInfo && isDebugWalletActive) {
             const marketSocket = info.multiSocketInfo.getMarketSocket();
             if (marketSocket) {
                 const marketDataCallback = (msg: any) => {
@@ -280,6 +297,11 @@ export default function WebDataConsumer() {
             if (accountOverviewRef.current) {
                 setAccountOverview(accountOverviewRef.current);
             }
+            if (debugWalletActiveRef.current) {
+                setPositions(positionsRef.current);
+                setUnifiedPositions(positionsRef.current);
+                setUserBalances(userBalancesRef.current);
+            }
             setFetchedChannels(new Set([...fetchedChannelsRef.current]));
         }, 1000);
 
@@ -302,7 +324,7 @@ export default function WebDataConsumer() {
             unsubscribeUserFundings();
             unsubscribeUserNonFundingLedgerUpdates();
         };
-    }, [userAddress, info]);
+    }, [userAddress, info, isDebugWalletActive]);
 
     useEffect(() => {
         acccountOverviewPrevRef.current = accountOverview;
@@ -317,11 +339,11 @@ export default function WebDataConsumer() {
 
             // When using multi-socket mode, market data comes from market socket
             // So we only process user data from the user socket's webData2
-            if (!info?.multiSocketInfo) {
-                // Legacy mode: process all data from single socket
-                setCoins(data.data.coins);
-                setCoinPriceMap(data.data.coinPriceMap);
-            }
+            // if (!info?.multiSocketInfo) {
+            //     // Legacy mode: process all data from single socket
+            //     setCoins(data.data.coins);
+            //     setCoinPriceMap(data.data.coinPriceMap);
+            // }
 
             if (
                 isEstablished(sessionState) &&
@@ -336,13 +358,7 @@ export default function WebDataConsumer() {
             fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
             setFetchedChannels(new Set([...fetchedChannelsRef.current]));
         },
-        [
-            setCoins,
-            setCoinPriceMap,
-            info?.multiSocketInfo,
-            sessionState,
-            setFetchedChannels,
-        ],
+        [info?.multiSocketInfo, sessionState, setFetchedChannels],
     );
 
     const postWebData2 = useWorker<WebData2Output>(
@@ -356,12 +372,12 @@ export default function WebDataConsumer() {
             // Update last data timestamp
             lastDataTimestampRef.current = Date.now();
 
-            // Only update market data (coins and price map)
-            // This ensures market data always comes from the market endpoint
-            setCoins(data.data.coins);
-            setCoinPriceMap(data.data.coinPriceMap);
+            if (debugWalletActiveRef.current) {
+                positionsRef.current = data.data.positions;
+                userBalancesRef.current = data.data.userBalances;
+            }
         },
-        [setCoins, setCoinPriceMap],
+        [],
     );
 
     const postWebData2MarketOnly = useWorker<WebData2Output>(
@@ -404,7 +420,6 @@ export default function WebDataConsumer() {
                         order.order,
                         order.status,
                     );
-                    console.log(processedOrder);
                     if (processedOrder) {
                         orders.push(processedOrder);
                     }
@@ -445,17 +460,17 @@ export default function WebDataConsumer() {
 
                     // Then, update or add new orders (this will overwrite with latest status)
                     orders.forEach((order) => {
-                        const existingOrder = orderMap.get(order.oid);
-                        console.log(
-                            '[ORDER HISTORY] Update - Order status change:',
-                            {
-                                oid: order.oid,
-                                coin: order.coin,
-                                oldStatus: existingOrder?.status,
-                                newStatus: order.status,
-                                isNewOrder: !existingOrder,
-                            },
-                        );
+                        // const existingOrder = orderMap.get(order.oid);
+                        // console.log(
+                        //     '[ORDER HISTORY] Update - Order status change:',
+                        //     {
+                        //         oid: order.oid,
+                        //         coin: order.coin,
+                        //         oldStatus: existingOrder?.status,
+                        //         newStatus: order.status,
+                        //         isNewOrder: !existingOrder,
+                        //     },
+                        // );
                         orderMap.set(order.oid, order);
                     });
 
@@ -584,7 +599,7 @@ export default function WebDataConsumer() {
                         if (!notifiedOrdersRef.current.has(fill.oid)) {
                             const usdValueOfFillStr = formatNum(
                                 fill.sz * fill.px,
-                                2,
+                                fill.px > 10_000 ? 0 : 2,
                                 true,
                                 true,
                             );
@@ -593,8 +608,8 @@ export default function WebDataConsumer() {
                             notifiedOrdersRef.current.add(fill.oid);
 
                             notificationStore.add({
-                                title: 'Order Filled',
-                                message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px)}`,
+                                title: `${fill.side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Order Filled`,
+                                message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px, fill.px > 10_000 ? 0 : 2, true, true)}`,
                                 icon: 'check',
                                 removeAfter: 5000,
                             });
@@ -774,7 +789,7 @@ export default function WebDataConsumer() {
 
     // Update positions in TradeDataStore when unified data changes
     useEffect(() => {
-        if (unifiedPositions) {
+        if (unifiedPositions && !debugWalletActiveRef.current) {
             setPositions(unifiedPositions);
         }
     }, [unifiedPositions, setPositions]);

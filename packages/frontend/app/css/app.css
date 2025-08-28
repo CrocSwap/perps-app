@@ -55,6 +55,7 @@
         /* Mobile: header, content,  footer */
         /* grid-template-rows: 56px 1fr 56px;  */
         grid-template-rows: 56px 1fr; /* Mobile: header, content,  footer */
+        overflow-x: hidden;
     }
 
     /* Show the footer only on mobile with proper positioning */

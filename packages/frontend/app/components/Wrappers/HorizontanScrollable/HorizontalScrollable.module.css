@@ -1,20 +1,61 @@
 .horizontalScrollable {
-    /* white-space: nowrap; */
-    overflow: auto;
-    /* max-width: 50%; */
-    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    scroll-behavior: smooth; /* Smooth scrolling for supported browsers */
-    border-radius: 0 !important;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+}
+
+/* Hide scrollbar for webkit browsers */
+.horizontalScrollable::-webkit-scrollbar {
+    display: none;
+}
+
+/* Auto-scrolling state for mobile */
+.horizontalScrollable.autoScrolling {
+    overflow-x: auto; /* Still allow manual scrolling */
+    overflow-y: hidden;
+}
+
+/* Hide scrollbar during auto-scroll but keep functionality */
+.horizontalScrollable.autoScrolling::-webkit-scrollbar {
+    display: none;
 }
 
 .horizontalScrollableContent {
-    display: block;
-    width: fit-content;
+    min-width: max-content;
     position: relative;
+    display: flex;
+}
+
+/* Animated content for mobile auto-scroll */
+.animatedContent {
+    animation: infiniteScroll linear infinite;
+    animation-play-state: running;
+    /* Allow pointer events so users can still interact */
+    pointer-events: auto;
+}
+
+/* CSS Animation for smooth infinite scroll */
+@keyframes infiniteScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(
+            -50%
+        ); /* Move by half since we duplicate content */
+    }
+}
+
+/* Pause animation on hover/interaction */
+.animatedContent:hover {
+    animation-play-state: paused !important;
 }
 
 .scrollArrow {
@@ -77,4 +118,16 @@
     margin: auto;
     max-width: 100% !important;
     width: 100% !important;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .horizontalScrollable {
+        scroll-behavior: smooth;
+    }
+
+    /* Hide scroll arrows on mobile when auto-scroll is enabled */
+    .horizontalScrollable.autoScrolling .scrollButtonsWrapper {
+        display: none;
+    }
 }

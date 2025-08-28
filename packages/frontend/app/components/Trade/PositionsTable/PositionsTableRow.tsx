@@ -13,12 +13,14 @@ import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
+import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
-import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -184,6 +186,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
                 const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
 
+                const timeOfTxBuildStart = Date.now();
                 // Execute market order in opposite direction
                 const result = await executeMarketOrder({
                     quantity: Math.abs(position.szi), // Use absolute value of position size
@@ -196,17 +199,67 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 });
 
                 if (result.success) {
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Market Close Success',
+                                orderType: 'Market',
+                                direction: closingSide,
+                                success: true,
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    result.timeOfSubmission,
+                                ),
+                                txDuration: getDurationSegment(
+                                    result.timeOfSubmission,
+                                    Date.now(),
+                                ),
+                                txSignature: result.signature,
+                                explorerLink: result.signature
+                                    ? blockExplorer + '/tx/' + result.signature
+                                    : undefined,
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Position Closed',
                         message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
                         icon: 'check',
+                        txLink: result.signature
+                            ? blockExplorer + result.signature
+                            : undefined,
                     });
                 } else {
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Market Close Fail',
+                                orderType: 'Market',
+                                direction: closingSide,
+                                success: false,
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    result.timeOfSubmission,
+                                ),
+                                txDuration: getDurationSegment(
+                                    result.timeOfSubmission,
+                                    Date.now(),
+                                ),
+                                txSignature: result.signature,
+                                explorerLink: result.signature
+                                    ? blockExplorer + '/tx/' + result.signature
+                                    : undefined,
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Close Failed',
                         message: String(
                             result.error || 'Failed to close position',
                         ),
+                        txLink: result.signature
+                            ? blockExplorer + result.signature
+                            : undefined,
                         icon: 'error',
                     });
                 }

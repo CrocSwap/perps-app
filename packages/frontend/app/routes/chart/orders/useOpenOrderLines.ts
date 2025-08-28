@@ -95,7 +95,7 @@ export const useOpenOrderLines = (): LineData[] => {
                     if (triggerPx) {
                         yPrice = triggerPx;
                     }
-                    quantityTextValue = sz ?? pnlSzi ?? 0;
+                    quantityTextValue = sz || pnlSzi || 0;
                 }
 
                 return {

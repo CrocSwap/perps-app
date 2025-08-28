@@ -7,18 +7,19 @@ import { getElementHeightWithMargins } from '~/utils/Utils';
 import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
+import type { TabType } from '~/routes/trade';
 
 interface propsIF {
-    symbol: string;
     mobileView?: boolean;
     mobileContent?: 'orderBook' | 'recentTrades';
+    switchTab?: (tab: TabType) => void;
 }
 
 const ORDER_ROW_HEIGHT_FALLBACK = 16;
 const ORDER_ROW_GAP = 4;
 
 export default function OrderBookSection(props: propsIF) {
-    const { symbol, mobileView, mobileContent } = props;
+    const { mobileView, mobileContent, switchTab } = props;
     const [orderCount, setOrderCount] = useState(9);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
 
@@ -42,16 +43,14 @@ export default function OrderBookSection(props: propsIF) {
     const orderBookComponent = useMemo(
         () =>
             orderCount > 0 ? (
-                <OrderBook symbol={symbol} orderCount={orderCount} />
+                <OrderBook orderCount={orderCount} switchTab={switchTab} />
             ) : null,
-        [orderCount, symbol],
+        [orderCount, switchTab],
     );
 
     const orderBookTradesComponent = useCallback(
-        (maxHeight?: number) => (
-            <OrderBookTrades symbol={symbol} maxHeight={maxHeight} />
-        ),
-        [symbol, tradesMaxHeight],
+        (maxHeight?: number) => <OrderBookTrades maxHeight={maxHeight} />,
+        [tradesMaxHeight],
     );
 
     const orderBookTabs = useMemo(() => ['Book', 'Trades'], []);
@@ -72,7 +71,10 @@ export default function OrderBookSection(props: propsIF) {
 
     // Height calculation logic
     const calculateOrderCount = useCallback(() => {
-        const orderBookSection = document.getElementById('orderBookSection');
+        let orderBookSection = document.getElementById('orderBookSection');
+        if (!orderBookSection) {
+            orderBookSection = document.getElementById('orderBookContainer');
+        }
         const dummyOrderRow = document.getElementById('dummyOrderRow');
         const orderRowHeight =
             dummyOrderRow?.getBoundingClientRect().height ||
@@ -186,7 +188,7 @@ export default function OrderBookSection(props: propsIF) {
                             icon={<BsThreeDots size={14} />}
                         />
                     </div>
-                    <OrderBook symbol={symbol} orderCount={orderCount} />
+                    <OrderBook orderCount={orderCount} />
                     <div
                         id={'orderTradesHeaderStackedMode'}
                         className={styles.sectionHeader}
@@ -201,7 +203,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount, symbol, tradesMaxHeight],
+        [orderCount, tradesMaxHeight],
     );
 
     const largeOrderBook = useMemo(
@@ -218,7 +220,6 @@ export default function OrderBookSection(props: propsIF) {
                             </div>
                         </div>
                         <OrderBook
-                            symbol={symbol}
                             heightOverride={`calc(100% - 24px)`}
                             orderCount={orderCount}
                         />
@@ -241,7 +242,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount, symbol],
+        [orderCount],
     );
 
     const orderBookTabsComponent = (
@@ -268,7 +269,7 @@ export default function OrderBookSection(props: propsIF) {
     // Mobile view logic
     if (mobileView) {
         if (mobileContent === 'orderBook') return orderBookComponent;
-        if (mobileContent === 'recentTrades') return orderBookTradesComponent;
+        if (mobileContent === 'recentTrades') return orderBookTradesComponent();
     }
 
     // Desktop view logic

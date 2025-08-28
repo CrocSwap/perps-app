@@ -25,7 +25,7 @@ import type {
 } from '~/utils/UserDataIFs';
 import type { VaultDetailsIF } from '~/utils/VaultIFs';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
-import { MARKET_INFO_ENDPOINT } from '~/utils/Constants';
+import { POLLING_API_INFO_ENDPOINT } from '~/utils/Constants';
 
 export type ApiCallConfig = {
     type: string;
@@ -49,7 +49,7 @@ export enum ApiEndpoints {
     TOKEN_DETAILS = 'tokenDetails',
 }
 
-const apiUrl = MARKET_INFO_ENDPOINT;
+const apiUrl = POLLING_API_INFO_ENDPOINT;
 
 export function useInfoApi() {
     const fetchData = async (config: ApiCallConfig) => {

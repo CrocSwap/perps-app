@@ -4,8 +4,11 @@ import styles from './symbolinfofield.module.css';
 import { motion } from 'framer-motion';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { LuCircleHelp } from 'react-icons/lu';
+import { LuCircleHelp, LuX } from 'react-icons/lu';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
+import { useMobile } from '~/hooks/useMediaQuery';
+import { createPortal } from 'react-dom';
 
 interface SymbolInfoFieldProps {
     label: string;
@@ -27,6 +30,8 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
     tooltipContent,
 }) => {
     const { getBsColor } = useAppSettings();
+    const [showMobilePopup, setShowMobilePopup] = useState(false);
+    const isMobile = useMobile();
 
     const getValueColor = () => {
         if (type === 'positive') {
@@ -36,6 +41,12 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
             return getBsColor().sell;
         }
         return 'var(--text1)';
+    };
+
+    const handleFieldClick = () => {
+        if (isMobile && tooltipContent) {
+            setShowMobilePopup(true);
+        }
     };
 
     const renderValue = () => {
@@ -67,33 +78,70 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
             );
         }
         return (
-            <>
-                <div
-                    className={`${styles.symbolInfoFieldValue} ${valueClass}`}
-                    style={{ color: getValueColor() }}
-                >
-                    {value}
-                </div>
-            </>
+            <div
+                className={`${styles.symbolInfoFieldValue} ${valueClass}`}
+                style={{ color: getValueColor() }}
+            >
+                {value}
+            </div>
         );
     };
 
     return (
-        <div className={styles.symbolInfoFieldWrapper}>
-            <Tooltip content={tooltipContent} position='bottom'>
-                <div className={`${styles.symbolInfoField}`}>
-                    <div className={styles.symbolInfoFieldLabel}>
-                        {label}
-                        {tooltipContent && (
-                            <div className={styles.tooltip}>
-                                <LuCircleHelp size={12} />
+        <>
+            <div className={styles.symbolInfoFieldWrapper}>
+                {/* Desktop: Use existing Tooltip component */}
+                {!isMobile ? (
+                    <Tooltip content={tooltipContent} position='bottom'>
+                        <div className={`${styles.symbolInfoField}`}>
+                            <div className={styles.symbolInfoFieldLabel}>
+                                {label}
+                                {tooltipContent && (
+                                    <div className={styles.tooltip}>
+                                        <LuCircleHelp size={12} />
+                                    </div>
+                                )}
                             </div>
-                        )}
+                            {renderValue()}
+                        </div>
+                    </Tooltip>
+                ) : (
+                    /* Mobile: Simple click to show bottom popup */
+                    <div
+                        className={`${styles.symbolInfoField} ${isMobile && tooltipContent ? styles.mobileClickable : ''}`}
+                        onClick={handleFieldClick}
+                    >
+                        <div className={styles.symbolInfoFieldLabel}>
+                            {label}
+                            {tooltipContent && (
+                                <div className={styles.tooltip}>
+                                    <LuCircleHelp size={12} />
+                                </div>
+                            )}
+                        </div>
+                        {renderValue()}
                     </div>
-                    {renderValue()}
-                </div>
-            </Tooltip>
-        </div>
+                )}
+            </div>
+
+            {/* Mobile bottom popup - rendered as portal to escape container constraints */}
+            {showMobilePopup &&
+                createPortal(
+                    <>
+                        {/* Backdrop */}
+                        <div
+                            className={styles.mobilePopupBackdrop}
+                            onClick={() => setShowMobilePopup(false)}
+                        />
+
+                        {/* Simple bottom popup */}
+                        <div className={styles.mobilePopup}>
+                            {tooltipContent}
+                        </div>
+                    </>,
+                    document.body,
+                )}
+        </>
     );
 };
 

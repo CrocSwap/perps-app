@@ -10,6 +10,7 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
@@ -28,6 +29,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
     const { symbolInfo } = useTradeDataStore();
 
+    const markPx = symbolInfo?.markPx || 1;
+
     const MIN_ORDER_VALUE = 1;
 
     const { executeLimitOrder } = useLimitOrderService();
@@ -37,8 +40,6 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const isPositionLong = position.szi > 0;
 
     const { buys, sells } = useOrderBookStore();
-
-    const markPx = symbolInfo?.markPx;
 
     const getMidPrice = () => {
         if (!buys.length || !sells.length) return null;
@@ -293,14 +294,13 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         setIsProcessingOrder(true);
 
         const usdValueOfOrderStr = formatNum(
-            notionalSymbolQtyNum * limitPrice,
+            notionalSymbolQtyNum * markPx,
             2,
             true,
             true,
         );
 
-        console.log({ usdValueOfOrderStr });
-
+        const timeOfSubmission = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -310,9 +310,24 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             });
 
             if (result.success) {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Close Success',
+                            success: true,
+                            orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 notifications.add({
-                    title: 'Limit Order Placed',
-                    message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    title: `${side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Limit Order Placed`,
+                    message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -320,6 +335,22 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     removeAfter: 5000,
                 });
             } else {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Close Fail',
+                            success: false,
+                            orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
+                            errorMessage: result.error || 'Transaction failed',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
@@ -332,6 +363,20 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             }
         } catch (error) {
             console.error(`❌ Error submitting limit ${side} order:`, error);
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Limit Close Fail',
+                        success: false,
+                        orderType: 'Limit',
+                        direction: side === 'buy' ? 'Buy' : 'Sell',
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
             notifications.add({
                 title: 'Limit Order Failed',
                 message:
