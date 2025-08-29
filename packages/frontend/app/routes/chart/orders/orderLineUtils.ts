@@ -91,7 +91,7 @@ export function drawLiqLabel(
     const labelLocations: LabelLocation[] = [];
 
     for (let i = 0; i < labelOptions.length; i++) {
-        const { text, backgroundColor, type } = labelOptions[i];
+        const { text, backgroundColor, type, textColor } = labelOptions[i];
         const textMetrics = ctx.measureText(text);
         const textWidth = textMetrics.width;
         const segmentWidth = textWidth + padding * 2 + 15;
@@ -102,35 +102,17 @@ export function drawLiqLabel(
         ctx.strokeStyle = LIQ_PRICE_LINE_COLOR;
         ctx.strokeRect(cursorX, y, segmentWidth, height);
 
-        // Liq. Price
-        ctx.fillStyle = LIQ_PRICE_LINE_COLOR;
-        ctx.fillText(text, x + segmentWidth / 2, y + height / 2);
+        if (type === 'Main') {
+            // Liq. Price
+            ctx.fillStyle = LIQ_PRICE_LINE_COLOR;
+            ctx.fillText(text, cursorX + segmentWidth / 2, y + height / 2);
+        }
 
-        const warningIconTopBuffer = 1 * dpr;
-        const warningIconRightBuffer = 15 * dpr;
-        const iconY = y + warningIconTopBuffer;
-        const iconX = chartWidth - warningIconRightBuffer;
-        const radius = WARNING_ICON_RADIUS * dpr;
-        const strokeCircleRADIUS = WARNING_ICON_RADIUS + 2 * dpr;
-
-        // Warning Icon
-        ctx.beginPath();
-        ctx.arc(iconX, y + height / 2, strokeCircleRADIUS, 0, 2 * Math.PI);
-        ctx.fillStyle = 'black';
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(iconX, y + height / 2, radius, 0, 2 * Math.PI);
-        ctx.fillStyle = LIQ_PRICE_WARNING_COLOR;
-        ctx.fill();
-
-        // !
-        ctx.font = `bold ${15 * dpr}px sans-serif`;
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('!', iconX, iconY + height / 2);
-
+        if (type === 'Quantity') {
+            // Liq Price Value
+            ctx.fillStyle = textColor;
+            ctx.fillText(text, cursorX + segmentWidth / 2, y + height / 2);
+        }
         labelLocations.push({
             type,
             x: cursorX,
@@ -140,6 +122,31 @@ export function drawLiqLabel(
         });
         cursorX += segmentWidth;
     }
+
+    const warningIconTopBuffer = 1 * dpr;
+    const warningIconRightBuffer = 15 * dpr;
+    const iconY = y + warningIconTopBuffer;
+    const iconX = chartWidth - warningIconRightBuffer;
+    const radius = WARNING_ICON_RADIUS * dpr;
+    const strokeCircleRADIUS = WARNING_ICON_RADIUS + 2 * dpr;
+
+    // Warning Icon
+    ctx.beginPath();
+    ctx.arc(iconX, y + height / 2, strokeCircleRADIUS, 0, 2 * Math.PI);
+    ctx.fillStyle = 'black';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(iconX, y + height / 2, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = LIQ_PRICE_WARNING_COLOR;
+    ctx.fill();
+
+    // !
+    ctx.font = `bold ${15 * dpr}px sans-serif`;
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('!', iconX, iconY + height / 2);
 
     ctx.restore();
 

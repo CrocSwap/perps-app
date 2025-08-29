@@ -103,6 +103,8 @@ export const useOpenOrderLines = (): LineData[] => {
                     yPrice,
                     textValue: label,
                     quantityTextValue,
+                    quantityText:
+                        quantityTextFormatWithComma(quantityTextValue),
                     color,
                     type,
                     oid,

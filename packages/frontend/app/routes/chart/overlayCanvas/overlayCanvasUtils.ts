@@ -23,7 +23,7 @@ export function findLimitLabelAtPosition(
     isCancel: boolean,
 ): { label: LabelLocation; parentLine: LineData } | null {
     for (let i = drawnLabels.length - 1; i >= 0; i--) {
-        if (drawnLabels[i].type !== 'LIMIT') continue;
+        if (drawnLabels[i].type === 'PNL') continue;
         const labelLocs = drawnLabels[i].labelLocations;
         if (!labelLocs) continue;
 

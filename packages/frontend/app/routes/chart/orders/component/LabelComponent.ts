@@ -17,11 +17,7 @@ import {
     getXandYLocationForChartDrag,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
-import {
-    formatLineLabel,
-    getPricetoPixel,
-    quantityTextFormatWithComma,
-} from '../customOrderLineUtils';
+import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 
@@ -128,13 +124,11 @@ const LabelComponent = ({
                         textColor: '#3C91FF',
                         borderColor: line.color,
                     },
-                    ...(line.quantityTextValue
+                    ...(line.quantityText
                         ? [
                               {
                                   type: 'Quantity' as LabelType,
-                                  text: quantityTextFormatWithComma(
-                                      line.quantityTextValue,
-                                  ),
+                                  text: line.quantityText,
                                   backgroundColor: '#000000',
                                   textColor: '#FFFFFF',
                                   borderColor: '#3C91FF',
@@ -538,16 +532,7 @@ const LabelComponent = ({
             setSelectedLine(tempSelectedLine);
         };
 
-        const handleDragEnd = async () => {
-            if (
-                !tempSelectedLine ||
-                originalPrice === undefined ||
-                tempSelectedLine.parentLine.oid === undefined ||
-                tempSelectedLine.parentLine.side === undefined
-            ) {
-                return;
-            }
-
+        async function limitOrderDragEnd(tempSelectedLine: LabelLocationData) {
             const orderId = tempSelectedLine.parentLine.oid;
             const newPrice = tempSelectedLine.parentLine.yPrice;
             const quantity = tempSelectedLine.parentLine.quantityTextValue;
@@ -555,6 +540,7 @@ const LabelComponent = ({
 
             const slug = makeSlug(10);
 
+            if (!orderId || !side) return;
             try {
                 const usdValueOfOrderStr = formatNum(
                     (quantity || 0) * (symbolInfo?.markPx || 1),
@@ -685,7 +671,28 @@ const LabelComponent = ({
                     });
                 }
             }
+        }
 
+        function liqPriceDragEnd(tempSelectedLine: LabelLocationData) {
+            console.log(
+                'Liq. Price Line dragend',
+                tempSelectedLine.parentLine.yPrice,
+            );
+            setSelectedLine(undefined);
+        }
+
+        const handleDragEnd = async () => {
+            if (!tempSelectedLine || originalPrice === undefined) {
+                return;
+            }
+
+            if (tempSelectedLine.parentLine.type === 'LIMIT') {
+                limitOrderDragEnd(tempSelectedLine);
+            }
+
+            if (tempSelectedLine.parentLine.type === 'LIQ') {
+                liqPriceDragEnd(tempSelectedLine);
+            }
             tempSelectedLine = undefined;
             setIsDrag(false);
             setTimeout(() => {
