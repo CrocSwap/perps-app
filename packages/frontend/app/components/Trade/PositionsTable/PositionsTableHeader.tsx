@@ -21,7 +21,7 @@ export default function PositionsTableHeader({
     sortDirection,
     sortClickHandler,
 }: PositionsTableHeaderProps) {
-    const showTpSl = false;
+    const showTpSl = true;
 
     const tableHeaders: HeaderCell[] = [
         {
