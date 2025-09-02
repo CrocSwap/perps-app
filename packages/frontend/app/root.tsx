@@ -25,6 +25,7 @@ import { useDebugStore } from './stores/DebugStore';
 
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
 import {
+    FUUL_API_KEY,
     MARKET_WS_ENDPOINT,
     RPC_ENDPOINT,
     USER_WS_ENDPOINT,
@@ -33,6 +34,8 @@ import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import packageJson from '../package.json';
 import { getResolutionSegment } from './utils/functions/getSegment';
+import { Fuul } from '@fuul/sdk';
+
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -164,6 +167,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
             setInnerWidth(window.innerWidth);
         }
     }, []);
+
+    useEffect(() => {
+        if (FUUL_API_KEY) {
+            Fuul.init({
+                apiKey: FUUL_API_KEY,
+            });
+        }
+    }, [FUUL_API_KEY]);
 
     return (
         <html lang='en'>
