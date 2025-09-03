@@ -1,5 +1,5 @@
 import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
-import { AnimatePresence, motion } from 'framer-motion'; // <-- Import Framer Motion
+import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useLocation } from 'react-router';
@@ -24,7 +24,18 @@ interface NewsItemIF {
     id: string;
 }
 
+/** Stack layout constants */
+const STACK_ITEM_HEIGHT = 112;
+const STACK_COLLAPSED = 10; // vertical overlap
+const STACK_GAP = 36; // expanded gap
+
+/** Focus behavior */
+const FOCUS_SCALE = 1.02;
+const DIMMED_OPACITY = 0.55;
+
 export default function Notifications() {
+    // const isTallScreen = useMediaQuery('(min-height: 1080px)');
+    const maxVisible = 5;
     const { enableTxNotifications, enableBackgroundFillNotif } =
         useAppOptions();
     const data: NotificationStoreIF = useNotificationStore();
@@ -37,125 +48,60 @@ export default function Notifications() {
     const [hoveredNotifications, setHoveredNotifications] = useState<
         Set<number>
     >(new Set());
+    const [expanded, setExpanded] = useState(false);
+    const [focusedSlug, setFocusedSlug] = useState<number | null>(null);
 
     const handleMouseEnter = useCallback((slug: number) => {
         setHoveredNotifications((prev) => {
-            // If the slug is already in the set, return previous state to prevent unnecessary re-renders
-            if (prev.has(slug)) {
-                console.log(
-                    `[Hover] Already hovering over notification ${slug}`,
-                );
-                return prev;
-            }
-
-            // Create a new set with the new slug
-            const newSet = new Set(prev);
-            newSet.add(slug);
-            console.log(
-                `[Hover] Added hover for notification ${slug}, current hovers:`,
-                Array.from(newSet),
-            );
-            return newSet;
+            if (prev.has(slug)) return prev;
+            const next = new Set(prev);
+            next.add(slug);
+            return next;
         });
     }, []);
 
     const handleMouseLeave = useCallback((slug: number) => {
         setHoveredNotifications((prev) => {
-            // If the set is already empty, return it as is
-            if (prev.size === 0) {
-                console.log(
-                    `[Hover] MouseLeave on ${slug} but no hover states exist`,
-                );
-                return prev;
-            }
-
-            // If the slug isn't in the set, return previous state to prevent unnecessary re-renders
-            if (!prev.has(slug)) {
-                console.log(
-                    `[Hover] MouseLeave on ${slug} but it's not in hover states:`,
-                    Array.from(prev),
-                );
-                return prev;
-            }
-
-            // Create a new set without the slug
-            const newSet = new Set(prev);
-            newSet.delete(slug);
-
-            // Return a new empty set if no hovers remain, otherwise return the updated set
-            const result =
-                newSet.size === 0 ? new Set<number>() : new Set(newSet);
-            console.log(
-                `[Hover] Removed hover for notification ${slug}, remaining hovers:`,
-                result.size === 0 ? 'none' : Array.from(result),
-            );
-
-            return result;
+            if (!prev.has(slug)) return prev;
+            const next = new Set(prev);
+            next.delete(slug);
+            return next.size === 0 ? new Set() : next;
         });
     }, []);
 
-    // Effect to clean up hover states when notifications change
+    // Clean hover states when notifications change
     useEffect(() => {
         const currentSlugs = new Set(data.notifications.map((n) => n.slug));
-
         setHoveredNotifications((prev) => {
-            // If there are no hovered notifications, nothing to do
             if (prev.size === 0) return prev;
-
-            // Check if any hovered notifications no longer exist
-            const hasStaleHovers = Array.from(prev).some(
-                (slug) => !currentSlugs.has(slug),
-            );
-
-            // If all hovered notifications still exist, return previous state
-            if (!hasStaleHovers) return prev;
-
-            // Create a new set with only the hover states for existing notifications
             const updated = new Set<number>();
-            let hasChanges = false;
-
-            prev.forEach((slug) => {
-                if (currentSlugs.has(slug)) {
-                    updated.add(slug);
-                } else {
-                    hasChanges = true;
-                }
-            });
-
-            // Only update state if there were actual changes
-            if (!hasChanges) return prev;
+            prev.forEach((slug) => currentSlugs.has(slug) && updated.add(slug));
             return updated.size > 0 ? updated : new Set<number>();
         });
+        setFocusedSlug((prev) =>
+            prev && currentSlugs.has(prev) ? prev : null,
+        );
     }, [data.notifications]);
 
     const handleDismiss = useCallback(
         (slug: number) => {
-            // Remove the notification from hoveredNotifications when dismissed
             setHoveredNotifications((prev) => {
-                // If the slug isn't in the set, return previous state
                 if (!prev.has(slug)) return prev;
-
-                // Create a new set without the slug
-                const newSet = new Set(prev);
-                newSet.delete(slug);
-
-                // If the set is empty, return a new empty set to ensure reference changes
-                return newSet.size === 0 ? new Set() : newSet;
+                const next = new Set(prev);
+                next.delete(slug);
+                return next.size === 0 ? new Set() : next;
             });
-            // Call the original remove function
+            if (focusedSlug === slug) setFocusedSlug(null);
             data.remove(slug);
         },
-        [data.remove],
+        [data.remove, focusedSlug],
     );
 
     useEffect(() => {
         if (!info) return;
         if (!userAddress || userAddress === '') return;
         const { unsubscribe } = info.subscribe(
-            {
-                type: WsChannels.NOTIFICATION,
-                user: userAddress,
-            },
+            { type: WsChannels.NOTIFICATION, user: userAddress },
             postNotification,
         );
         return unsubscribe;
@@ -167,114 +113,153 @@ export default function Notifications() {
         if (backgroundFillNotifRef.current && notification) {
             const title = notification.split(':')[0];
             const message = notification.split(':')[1];
-            data.add({
-                title: title,
-                message: message,
-                icon: 'check',
-            });
+            data.add({ title, message, icon: 'check' });
         }
     }, []);
 
     const version = null;
 
-    // logic to fetch news data asynchronously
+    // Fetch announcements
     const [news, setNews] = useState<NewsItemIF[]>([]);
     useEffect(() => {
-        fetch('/announcements.json', { cache: 'no-store' })
-            .then((res) => res.json())
-            .then((formatted) => {
-                setNews(formatted.news);
-            });
-        const interval = setInterval(
-            () => {
-                fetch('/announcements.json', { cache: 'no-store' })
-                    .then((res) => res.json())
-                    .then((formatted) => {
-                        setNews(formatted.news);
-                    });
-            },
-            5 * 60 * 1000,
-        );
+        const fetchNews = () =>
+            fetch('/announcements.json', { cache: 'no-store' })
+                .then((res) => res.json())
+                .then((formatted) => setNews(formatted.news));
+        fetchNews();
+        const interval = setInterval(fetchNews, 5 * 60 * 1000);
         return () => clearInterval(interval);
     }, []);
 
-    // logic to prevent a user from seeing a news item repeatedly
     const alreadyViewed = useViewed();
 
-    // apply filter to messages received by the app
     const unseen: {
-        messages: {
-            headline: string;
-            body: string;
-        }[];
+        messages: { headline: string; body: string }[];
         hashes: string[];
     } = useMemo(() => {
-        // output variable for human-readable messages
-        const messages: {
-            headline: string;
-            body: string;
-        }[] = [];
-        // output variable for message hashes
+        const messages: { headline: string; body: string }[] = [];
         const hashes: string[] = [];
-        // iterate over news items, handle ones not previously seen
-        news.forEach((n: NewsItemIF) => {
+        news.forEach((n) => {
             if (!alreadyViewed.checkIfViewed(n.id)) {
-                messages.push({
-                    headline: n.headline,
-                    body: n.body,
-                });
+                messages.push({ headline: n.headline, body: n.body });
                 hashes.push(n.id);
             }
         });
-        // return output variables
-        return {
-            messages,
-            hashes,
-        };
-    }, [
-        // recalculate for changes in the base data set
-        news,
-        // recalculate for changes in the list of viewed messages
-        alreadyViewed,
-    ]);
+        return { messages, hashes };
+    }, [news, alreadyViewed]);
 
     const [userClosedNews, setUserClosedNews] = useState<boolean>(false);
-
     const { pathname } = useLocation();
+
+    // Last N notifications, oldest at index 0
+    const visible = useMemo(
+        () => data.notifications.slice(-maxVisible),
+        [data.notifications, maxVisible],
+    );
+
+    const shouldPause =
+        expanded ||
+        (data.notifications.length <= 3 && hoveredNotifications.size > 0);
 
     if (pathname === '/') {
         return <></>;
     }
 
     return (
-        <div className={styles.notifications}>
-            <AnimatePresence>
+        <div
+            className={styles.notifications}
+            onMouseEnter={() => setExpanded(true)}
+            onMouseLeave={() => {
+                setExpanded(false);
+                setFocusedSlug(null);
+            }}
+            aria-label='Notifications'
+        >
+            <AnimatePresence initial={false}>
                 {enableTxNotifications &&
-                    data.notifications.map((n: notificationIF) => (
-                        <motion.div
-                            key={JSON.stringify(n)} // Ensure uniqueness
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            transition={{
-                                duration: 0.3,
-                            }}
-                            layout // Optional: enables smooth stacking animations
-                        >
-                            <Notification
+                    visible.map((n: notificationIF, i: number) => {
+                        const count = visible.length;
+                        const indexFromTop = i; // 0 = oldest
+                        const indexFromBottom = count - 1 - i; // 0 = NEWEST  ✅
+
+                        const isTop = indexFromBottom === 0;
+
+                        const yCollapsed = indexFromTop * STACK_COLLAPSED;
+                        const yExpanded =
+                            indexFromTop * (STACK_ITEM_HEIGHT + STACK_GAP);
+
+                        const isFocused = expanded && focusedSlug === n.slug;
+                        const isDimmed =
+                            expanded &&
+                            focusedSlug !== null &&
+                            focusedSlug !== n.slug;
+
+                        // ensure top card never fades
+                        const baseOpacityCollapsed = isTop
+                            ? 1
+                            : Math.max(0.75, 1 - indexFromTop * 0.1);
+
+                        const targetOpacity = isDimmed
+                            ? DIMMED_OPACITY
+                            : expanded
+                              ? 1
+                              : baseOpacityCollapsed;
+
+                        return (
+                            <motion.div
                                 key={n.slug}
-                                data={n}
-                                dismiss={handleDismiss}
-                                onMouseEnter={handleMouseEnter}
-                                onMouseLeave={handleMouseLeave}
-                                shouldPauseDismissal={
-                                    data.notifications.length <= 3 &&
-                                    hoveredNotifications.size > 0
-                                }
-                            />
-                        </motion.div>
-                    ))}
+                                className={styles.notificationWrapper}
+                                initial={{ opacity: 1, y: 10 }}
+                                animate={{
+                                    y: -1 * (expanded ? yExpanded : yCollapsed),
+                                    opacity: targetOpacity,
+                                    scale: isFocused ? FOCUS_SCALE : 1,
+                                }}
+                                exit={{ opacity: 0, y: 10 }}
+                                transition={{
+                                    y: {
+                                        type: 'spring',
+                                        stiffness: 380,
+                                        damping: 28,
+                                        mass: 0.7,
+                                    },
+                                    opacity: { duration: 0.18 },
+                                    scale: { duration: 0.18 },
+                                }}
+                                layout='position'
+                                style={{
+                                    position: 'absolute',
+                                    right: 0,
+                                    bottom: 0,
+                                    width: '100%',
+                                    zIndex: 1000 + indexFromTop,
+                                    minHeight: STACK_ITEM_HEIGHT,
+                                    pointerEvents: 'auto',
+                                    transformOrigin: 'right bottom',
+                                    willChange: 'transform, opacity',
+                                }}
+                                onMouseEnter={() => {
+                                    if (expanded) setFocusedSlug(n.slug);
+                                }}
+                                onMouseLeave={() => {
+                                    if (focusedSlug === n.slug)
+                                        setFocusedSlug(null);
+                                }}
+                            >
+                                <Notification
+                                    key={n.slug}
+                                    data={n}
+                                    dismiss={handleDismiss}
+                                    onMouseEnter={handleMouseEnter}
+                                    onMouseLeave={handleMouseLeave}
+                                    shouldPauseDismissal={shouldPause}
+                                    staggerIndex={indexFromTop}
+                                />
+                            </motion.div>
+                        );
+                    })}
             </AnimatePresence>
+
             {showReload && (
                 <div className={styles.new_version_available}>
                     <header>
@@ -304,6 +289,7 @@ export default function Notifications() {
                     </SimpleButton>
                 </div>
             )}
+
             {unseen.messages.length > 0 && !userClosedNews && (
                 <div className={styles.news}>
                     <header>
@@ -318,14 +304,12 @@ export default function Notifications() {
                         />
                     </header>
                     <ul>
-                        {unseen.messages.map(
-                            (n: { headline: string; body: string }) => (
-                                <li>
-                                    <h5>{n.headline}</h5>
-                                    <p>{n.body}</p>
-                                </li>
-                            ),
-                        )}
+                        {unseen.messages.map((n) => (
+                            <li key={n.headline}>
+                                <h5>{n.headline}</h5>
+                                <p>{n.body}</p>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             )}
