@@ -363,11 +363,40 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 .onIntervalChanged()
                 .subscribe(null, (interval: ResolutionString) => {
                     setChartInterval(interval);
+
+                    console.log(
+                        `User selected resolution: ${intervalToLabel(interval)}`,
+                    );
                 });
 
             setChart(tvWidget);
         });
     }, [chartState, info]);
+
+    const intervalToLabel = (interval: string): string => {
+        if (!isNaN(Number(interval))) {
+            const minutes = Number(interval);
+            if (minutes < 60)
+                return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+            if (minutes === 60) return '1 hour';
+            if (minutes % 60 === 0) return `${minutes / 60} hours`;
+            return `${minutes} minutes`;
+        }
+
+        switch (interval) {
+            case 'D':
+            case '1D':
+                return '1 day';
+            case 'W':
+            case '1W':
+                return '1 week';
+            case 'M':
+            case '1M':
+                return '1 month';
+            default:
+                return interval;
+        }
+    };
 
     useEffect(() => {
         initChart();
