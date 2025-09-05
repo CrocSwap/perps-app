@@ -51,7 +51,16 @@ const DropdownMenu = ({ setIsDropdownMenuOpen }: DropdownMenuProps) => {
                 <div
                     key={JSON.stringify(item)}
                     className={styles.menuItem}
-                    onClick={() => window.open(item.url, '_blank')}
+                    onClick={() => {
+                        window.open(item.url, '_blank');
+                        if (typeof plausible === 'function') {
+                            plausible('External Link Clicked', {
+                                props: {
+                                    linkType: item.name,
+                                },
+                            });
+                        }
+                    }}
                 >
                     <span>{item.name}</span>
                     <span>{item.icon}</span>

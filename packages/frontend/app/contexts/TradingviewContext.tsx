@@ -363,6 +363,14 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 .onIntervalChanged()
                 .subscribe(null, (interval: ResolutionString) => {
                     setChartInterval(interval);
+                    if (typeof plausible === 'function') {
+                        plausible('Resolution Update', {
+                            props: {
+                                resolutionType: 'chart',
+                                resolution: interval,
+                            },
+                        });
+                    }
                 });
 
             setChart(tvWidget);
