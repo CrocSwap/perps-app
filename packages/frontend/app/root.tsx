@@ -33,6 +33,7 @@ import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import packageJson from '../package.json';
 import { getResolutionSegment } from './utils/functions/getSegment';
+import MobileFooter from './components/MobileFooter/MobileFooter';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -310,11 +311,11 @@ export default function App() {
                                                     </ComponentErrorBoundary>
                                                 </Suspense>
                                             </main>
-                                            {/* <ComponentErrorBoundary>
-                                        <footer className='mobile-footer'>
-                                            <MobileFooter />
-                                        </footer>
-                                    </ComponentErrorBoundary> */}
+                                            <ComponentErrorBoundary>
+                                                <footer className='mobile-footer'>
+                                                    <MobileFooter />
+                                                </footer>
+                                            </ComponentErrorBoundary>
 
                                             {/* Added error boundary for notifications */}
                                             <ComponentErrorBoundary>
