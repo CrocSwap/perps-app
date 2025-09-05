@@ -14,6 +14,13 @@ import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import OptionLineSelect from './OptionLineSelect';
+import { useTranslation } from 'react-i18next';
+
+const languageOptions = {
+    en: 'English 🇺🇸',
+    es: 'Español 🇪🇸',
+    zh: '中文 🇨🇳',
+};
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -24,6 +31,7 @@ export default function AppOptions() {
     const activeOptions: useAppOptionsIF = useAppOptions();
     const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
         useAppSettings();
+    const { i18n, t } = useTranslation();
 
     // !important:  this file instantiates children directly instead of using
     // !important:  ... .map() functions so we can easily mix different types
@@ -159,6 +167,27 @@ export default function AppOptions() {
                         },
                     )}
                 />
+                <OptionLineSelect
+                    text='Language'
+                    active={
+                        <div>
+                            {
+                                languageOptions[
+                                    (i18n?.language?.split('-')[0] ||
+                                        'en') as keyof typeof languageOptions
+                                ]
+                            }
+                        </div>
+                    }
+                    options={Object.entries(languageOptions).map(
+                        (lang: [string, string]) => {
+                            return {
+                                readable: <div>{lang[1]}</div>,
+                                set: () => i18n.changeLanguage(lang[0]),
+                            };
+                        },
+                    )}
+                />
             </ul>
             <div
                 className={styles.apply_defaults}
@@ -167,6 +196,20 @@ export default function AppOptions() {
                     setNumFormat(NumFormatTypes[0]);
                     setBsColor('default');
                     useAppSettings.getState().resetLayoutHeights();
+
+                    // reset language to browser default or English if unsupported
+                    const browserLanguages = navigator.languages || [
+                        navigator.language,
+                    ];
+                    const supportedLanguages = Object.keys(languageOptions); // ['en', 'es']
+                    const defaultLanguage =
+                        browserLanguages
+                            .map((lang) => lang.split('-')[0]) // Convert 'en-US' to 'en'
+                            .find((lang) =>
+                                supportedLanguages.includes(lang),
+                            ) || 'en';
+                    i18n.changeLanguage(defaultLanguage);
+
                     if (typeof plausible === 'function') {
                         plausible('Trade Table Resize', {
                             props: {
@@ -176,7 +219,7 @@ export default function AppOptions() {
                     }
                 }}
             >
-                Apply Defaults
+                {t('common.applyDefaults')}
             </div>
 
             {/* <div

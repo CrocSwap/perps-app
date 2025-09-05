@@ -1,0 +1,76 @@
+{
+    "common": {
+        "yes": "Yes",
+        "no": "No",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "close": "Close",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "applyDefaults": "Apply Defaults",
+        "learnMore": "Learn More"
+    },
+    "navigation": {
+        "home": "Home",
+        "about": "About",
+        "contact": "Contact",
+        "settings": "Settings",
+        "profile": "Profile",
+        "logout": "Logout",
+        "trade": "Trade",
+        "chart": "Chart",
+        "book": "Book",
+        "recent": "Recent",
+        "positions": "Positions"
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Register",
+        "email": "Email",
+        "password": "Password",
+        "forgotPassword": "Forgot Password?",
+        "loginSuccess": "Login successful",
+        "loginError": "Invalid credentials"
+    },
+    "forms": {
+        "name": "Name",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone",
+        "address": "Address",
+        "submit": "Submit",
+        "required": "This field is required"
+    },
+    "messages": {
+        "welcome": "Welcome",
+        "hello": "Hello {{name}}!",
+        "goodbye": "Goodbye",
+        "thankYou": "Thank you",
+        "pleaseWait": "Please wait..."
+    },
+    "home": {
+        "title": "Trade Perps With Ambient",
+        "subtitle": "Fast execution. Zero taker fees. Up to 100x leverage.",
+        "startTrading": "Start Trading",
+        "learnMore": "Learn More",
+        "hero": {
+            "heading1": "Zero-to-",
+            "one": "One",
+            "heading2": "Decentralized Trading Protocol",
+            "description": "Ambient is an entirely new kind of decentralized perp DEX combining unique DeFi native products with a user experience rivaling CEXes",
+            "stats": {
+                "totalVolume": "Total Volume",
+                "activeUsers": "Active Users"
+            }
+        }
+    },
+    "referrals": {
+        "title": "Referrals",
+        "description": "Refer users to earn rewards. Affiliates earn greater rewards.",
+        "tradersReferred": "Traders Referred",
+        "rewardsEarned": "Rewards Earned"
+    }
+}

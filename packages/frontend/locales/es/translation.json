@@ -1,0 +1,76 @@
+{
+    "common": {
+        "yes": "Sí",
+        "no": "No",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "close": "Cerrar",
+        "loading": "Cargando...",
+        "error": "Error",
+        "success": "Éxito",
+        "applyDefaults": "Aplicar Predeterminados",
+        "learnMore": "Aprende más"
+    },
+    "navigation": {
+        "home": "Inicio",
+        "about": "Acerca de",
+        "contact": "Contacto",
+        "settings": "Configuración",
+        "profile": "Perfil",
+        "logout": "Cerrar sesión",
+        "trade": "Operar",
+        "chart": "Gráfico",
+        "book": "Libro",
+        "recent": "Recientes",
+        "positions": "Posiciones"
+    },
+    "auth": {
+        "login": "Iniciar sesión",
+        "register": "Registrarse",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "loginSuccess": "Inicio de sesión exitoso",
+        "loginError": "Credenciales inválidas"
+    },
+    "forms": {
+        "name": "Nombre",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "phone": "Teléfono",
+        "address": "Dirección",
+        "submit": "Enviar",
+        "required": "Este campo es obligatorio"
+    },
+    "messages": {
+        "welcome": "Bienvenido",
+        "hello": "¡Hola {{name}}!",
+        "goodbye": "Adiós",
+        "thankYou": "Gracias",
+        "pleaseWait": "Por favor espera..."
+    },
+    "home": {
+        "title": "Opera con Futuros en Ambient",
+        "subtitle": "Ejecución rápida. Sin comisiones de taker. Hasta 100x de apalancamiento.",
+        "startTrading": "Comenzar a operar",
+        "learnMore": "Aprende más",
+        "hero": {
+            "heading1": "De Cero a ",
+            "one": "Uno",
+            "heading2": "Protocolo de Trading Descentralizado",
+            "description": "Ambient es un nuevo tipo de DEX de futuros descentralizado que combina productos nativos de DeFi únicos con una experiencia de usuario que rivaliza con los CEX",
+            "stats": {
+                "totalVolume": "Volumen Total",
+                "activeUsers": "Usuarios Activos"
+            }
+        }
+    },
+    "referrals": {
+        "title": "Referidos",
+        "description": "Recomienda usuarios y gana recompensas. Los afiliados obtienen mayores beneficios.",
+        "tradersReferred": "Traders referidos",
+        "rewardsEarned": "Recompensas ganadas"
+    }
+}

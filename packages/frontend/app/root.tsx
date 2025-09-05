@@ -1,4 +1,5 @@
 import React, { Suspense, useEffect, useState } from 'react';
+import './i18n'; // i18n MUST be imported before any components
 import {
     isRouteErrorResponse,
     Links,

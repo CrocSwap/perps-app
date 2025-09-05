@@ -1,0 +1,76 @@
+{
+    "common": {
+        "yes": "是",
+        "no": "否",
+        "cancel": "取消",
+        "save": "保存",
+        "delete": "删除",
+        "edit": "编辑",
+        "close": "关闭",
+        "loading": "加载中...",
+        "error": "错误",
+        "success": "成功",
+        "applyDefaults": "应用默认值",
+        "learnMore": "了解更多"
+    },
+    "navigation": {
+        "home": "首页",
+        "about": "关于",
+        "contact": "联系我们",
+        "settings": "设置",
+        "profile": "个人资料",
+        "logout": "退出登录",
+        "trade": "交易",
+        "chart": "图表",
+        "book": "订单簿",
+        "recent": "最近",
+        "positions": "持仓"
+    },
+    "auth": {
+        "login": "登录",
+        "register": "注册",
+        "email": "电子邮箱",
+        "password": "密码",
+        "forgotPassword": "忘记密码？",
+        "loginSuccess": "登录成功",
+        "loginError": "登录凭证无效"
+    },
+    "forms": {
+        "name": "姓名",
+        "firstName": "名字",
+        "lastName": "姓氏",
+        "phone": "电话",
+        "address": "地址",
+        "submit": "提交",
+        "required": "此字段为必填项"
+    },
+    "messages": {
+        "welcome": "欢迎",
+        "hello": "你好，{{name}}！",
+        "goodbye": "再见",
+        "thankYou": "谢谢",
+        "pleaseWait": "请稍候..."
+    },
+    "home": {
+        "title": "使用Ambient交易永续合约",
+        "subtitle": "快速执行。零手续费。高达100倍杠杆。",
+        "startTrading": "开始交易",
+        "learnMore": "了解更多",
+        "hero": {
+            "heading1": "从零到一的",
+            "one": "一",
+            "heading2": "去中心化交易协议",
+            "description": "Ambient是一种全新的去中心化永续合约DEX，结合了独特的DeFi原生产品和媲美中心化交易所的用户体验",
+            "stats": {
+                "totalVolume": "总交易量",
+                "activeUsers": "活跃用户"
+            }
+        }
+    },
+    "referrals": {
+        "title": "推荐计划",
+        "description": "推荐用户赚取奖励。推荐人可获得更高奖励。",
+        "tradersReferred": "已推荐交易者",
+        "rewardsEarned": "已获奖励"
+    }
+}

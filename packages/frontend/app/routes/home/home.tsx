@@ -1,6 +1,7 @@
 // Optimized Hero Section
 import { type CSSProperties, type JSX } from 'react';
 import { Link, useNavigation } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import styles from './home.module.css';
 
 import { motion } from 'framer-motion';
@@ -125,6 +126,7 @@ export function meta() {
 }
 
 export default function Home(): JSX.Element {
+    const { t } = useTranslation();
     // const [hasVisited, setHasVisited] = useState(false);
 
     // useEffect(() => {
@@ -153,7 +155,7 @@ export default function Home(): JSX.Element {
                 className={styles.primary}
                 viewTransition
             >
-                {isNavigating ? 'Loading...' : 'Start Trading'}
+                {isNavigating ? t('common.loading') : t('home.startTrading')}
             </Link>
         );
     }
@@ -185,11 +187,13 @@ export default function Home(): JSX.Element {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: 'easeOut' }}
             >
-                <h1>Trade Perps With Ambient</h1>
-                <p>Fast execution. Zero taker fees. Up to 100x leverage.</p>
+                <h1>{t('home.title')}</h1>
+                <p>{t('home.subtitle')}</p>
                 <div className={styles.buttons}>
                     <TradeButton symbol={symbol} />
-                    <button className={styles.secondary}>Learn More</button>
+                    <button className={styles.secondary}>
+                        {t('home.learnMore')}
+                    </button>
                 </div>
             </motion.div>
 
