@@ -351,6 +351,15 @@ export function formatLineLabel(label: LineLabel): string {
     }
 }
 
+export const formatLiquidationPrice = (
+    liquidationPx: number | null,
+    formatFn: (value: number) => string,
+): string => {
+    if (liquidationPx === null) return '-';
+    if (liquidationPx <= 0) return '0';
+    if (liquidationPx > 1_000_000) return '>' + formatFn(1_000_000);
+    return formatFn(liquidationPx);
+};
 export function isInsideTextBounds(
     hoverX: number,
     hoverY: number,

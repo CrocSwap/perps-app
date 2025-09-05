@@ -53,8 +53,14 @@ export default function OrderLines({
     useEffect(() => {
         let matchFound = false;
 
-        const updatedLines = openLines.map((line) => {
-            if (selectedLine && line.oid === selectedLine.parentLine.oid) {
+        const linesData = [...openLines, ...positionLines];
+
+        const updatedLines = linesData.map((line) => {
+            if (
+                line.type !== 'PNL' &&
+                selectedLine &&
+                line.oid === selectedLine.parentLine.oid
+            ) {
                 matchFound = true;
                 return selectedLine.parentLine;
             }
@@ -65,7 +71,7 @@ export default function OrderLines({
             setSelectedLine(undefined);
         }
 
-        setLines([...updatedLines, ...positionLines]);
+        setLines(updatedLines);
     }, [openLines, positionLines, selectedLine]);
 
     useEffect(() => {
