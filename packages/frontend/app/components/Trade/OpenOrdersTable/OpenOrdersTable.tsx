@@ -6,7 +6,7 @@ import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import type {
     OrderDataIF,
     OrderDataSortBy,

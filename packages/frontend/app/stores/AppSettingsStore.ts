@@ -34,42 +34,61 @@ export const bsColorSets: { [x: string]: colorSetIF } = {
 export type colorSetNames = keyof typeof bsColorSets;
 
 type AppSettingsStore = {
+    // Existing settings
     orderBookMode: 'tab' | 'stacked' | 'large';
     setOrderBookMode: (mode: 'tab' | 'stacked' | 'large') => void;
+
     numFormat: NumFormat;
     setNumFormat: (numFormat: NumFormat) => void;
+    getNumFormat: () => NumFormat;
+
     lang: LangType;
     setLang: (lang: LangType) => void;
+
     bsColor: colorSetNames;
     setBsColor: (c: colorSetNames) => void;
     getBsColor: () => colorSetIF;
+
+    chartTopHeight: number | null;
+    setChartTopHeight: (h: number | null) => void;
+    resetLayoutHeights: () => void;
 };
 
 const LS_KEY = 'VISUAL_SETTINGS';
+const DEFAULT_CHART_TOP_HEIGHT: number | null = null;
 
 export const useAppSettings = create<AppSettingsStore>()(
     persist(
         (set, get) => ({
             orderBookMode: 'tab',
-            setOrderBookMode: (mode: 'tab' | 'stacked' | 'large') =>
-                set({ orderBookMode: mode }),
+            setOrderBookMode: (mode) => set({ orderBookMode: mode }),
+
             numFormat: NumFormatTypes[0],
-            setNumFormat: (numFormat: NumFormat) => set({ numFormat }),
+            setNumFormat: (numFormat) => set({ numFormat }),
             getNumFormat: () => get().numFormat,
+
             lang: Langs[0],
-            setLang: (lang: LangType) => set({ lang }),
+            setLang: (lang) => set({ lang }),
+
             bsColor: 'default',
-            setBsColor: (c: colorSetNames) => set({ bsColor: c }),
+            setBsColor: (c) => set({ bsColor: c }),
             getBsColor: () => bsColorSets[get().bsColor],
+
+            chartTopHeight: DEFAULT_CHART_TOP_HEIGHT,
+            setChartTopHeight: (h) => set({ chartTopHeight: h }),
+            resetLayoutHeights: () =>
+                set({ chartTopHeight: DEFAULT_CHART_TOP_HEIGHT }),
         }),
         {
             name: LS_KEY,
             storage: createJSONStorage(() => localStorage),
+            version: 1,
             partialize: (state) => ({
                 bsColor: state.bsColor,
                 numFormat: state.numFormat,
                 lang: state.lang,
                 // orderBookMode: state.orderBookMode,
+                chartTopHeight: state.chartTopHeight,
             }),
         },
     ),

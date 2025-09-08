@@ -1,3 +1,4 @@
+/* ========= Desktop (unchanged base styles) ========= */
 .container {
     height: 100%;
     display: flex;
@@ -53,20 +54,107 @@
     display: grid;
     grid-template-columns: 1fr 3fr;
     gap: var(--gap-s);
-
     height: 346px;
 }
+
 @media (max-width: 1568px) {
     .container {
         margin-top: var(--margin-m);
     }
 }
+
+/* ========= Tablet polish (<=1024px) ========= */
+/* Keep the two-column spirit, but make it touch-friendly and fluid. */
+@media (max-width: 1024px) {
+    .container {
+        /* safe-area & fluid breathing room without changing desktop */
+        padding-left: clamp(16px, 4vw, 28px);
+        padding-right: clamp(16px, 4vw, 28px);
+        padding-bottom: calc(env(safe-area-inset-bottom) + var(--padding-m));
+        gap: clamp(24px, 4vw, 36px);
+    }
+
+    .container header {
+        /* scale down big header gracefully */
+        font-size: clamp(24px, 4.5vw, 32px);
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+    }
+
+    .container header p {
+        font-size: clamp(13px, 2.6vw, 16px);
+        line-height: 1.5;
+    }
+
+    /* KPI tiles get card treatment, no JSX changes */
+    .detailsContainer {
+        gap: clamp(16px, 4vw, 24px);
+        flex-wrap: wrap;
+    }
+
+    .detailsContent {
+        padding: clamp(10px, 2.8vw, 14px) clamp(12px, 3.2vw, 16px);
+        border: 1px solid color-mix(in oklab, #ffffff 12%, transparent);
+        border-radius: 16px;
+        background: color-mix(in oklab, #141420 88%, #1c1c2a 12%);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+        min-width: min(46%, 340px);
+        flex: 1 1 auto;
+    }
+
+    .detailsContent h6 {
+        font-size: clamp(12px, 2.2vw, 14px);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        margin: 0;
+        opacity: 0.85;
+    }
+
+    .detailsContent h3 {
+        font-size: clamp(22px, 4.8vw, 30px);
+        letter-spacing: -0.02em;
+        margin: 2px 0 0 0;
+    }
+
+    /* Wider gutter, natural height; keep two columns where it fits */
+    .tableContainer {
+        grid-template-columns: 1fr 2fr;
+        gap: clamp(10px, 2.8vw, 16px);
+        height: auto;
+        max-height: none;
+    }
+
+    /* Panel “cards” without altering your structure */
+    .tableContainer > div {
+        border: 1px solid color-mix(in oklab, #ffffff 12%, transparent);
+        border-radius: 16px;
+        background: color-mix(in oklab, #0f0f18 90%, #161622 10%);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 260px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    /* Allow children (CodeTabs / ReferralsTabs) to scroll independently if they overflow */
+    .tableContainer > div > * {
+        min-width: 0;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+}
+
+/* ========= Phone layout (<=768px) ========= */
+/* Stack, add thumb-friendly feedback, and keep it airy. */
 @media (max-width: 768px) {
     .container {
         margin-top: 0;
         overflow-y: auto;
         height: auto;
         max-height: none;
+        gap: clamp(20px, 5vw, 28px);
+        padding-top: calc(env(safe-area-inset-top) + 12px);
     }
 
     .tableContainer {
@@ -78,19 +166,23 @@
     }
 
     .tableContainer > div {
-        min-height: 200px;
-        margin-bottom: 20px;
+        min-height: 220px;
+        margin-bottom: 12px;
+        transition: transform 0.15s ease;
+    }
+    .tableContainer > div:active {
+        transform: scale(0.99);
     }
 
     .detailsContainer {
-        display: flex;
         flex-direction: column;
         gap: var(--gap-s);
-        align-items: flex-start;
+        align-items: stretch;
     }
 
     .detailsContent {
-        padding: var(--padding-s) 0;
+        padding: 12px 14px;
+        min-width: 100%;
     }
 
     .detailsContent h6 {
@@ -103,5 +195,68 @@
 
     .detailsContent a {
         font-size: var(--font-size-s);
+    }
+}
+
+/* Accessibility niceties */
+@media (prefers-reduced-motion: reduce) {
+    .tableContainer > div {
+        transition: none;
+    }
+}
+/* ===== Compact KPI chips on phones ===== */
+@media (max-width: 768px) {
+    /* put them side-by-side to save vertical space */
+    .detailsContainer {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px; /* tighter gap */
+        align-items: stretch;
+    }
+
+    /* strip the card bulk */
+    .detailsContent {
+        padding: 8px 10px; /* was larger */
+        border-radius: 12px; /* smaller corners */
+        border: 1px solid color-mix(in oklab, #ffffff 10%, transparent);
+        background: color-mix(in oklab, #0f0f18 92%, #161622 8%);
+        box-shadow: none; /* remove shadow */
+        gap: 4px; /* tighter vertical gap */
+        min-height: auto;
+    }
+
+    /* label: tiny, uppercase, muted */
+    .detailsContent h6 {
+        font-size: 11px;
+        line-height: 1.2;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        opacity: 0.75;
+        margin: 0;
+    }
+
+    /* value: smaller but still clear */
+    .detailsContent h3 {
+        font-size: clamp(16px, 5.2vw, 20px); /* was 36px desktop */
+        line-height: 1.2;
+        margin: 0;
+        letter-spacing: -0.01em;
+    }
+}
+
+/* super small devices — tighten a bit more */
+@media (max-width: 380px) {
+    .detailsContainer {
+        gap: 6px;
+    }
+    .detailsContent {
+        padding: 6px 8px;
+        border-radius: 10px;
+    }
+    .detailsContent h6 {
+        font-size: 10px;
+    }
+    .detailsContent h3 {
+        font-size: 16px;
     }
 }

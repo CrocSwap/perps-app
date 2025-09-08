@@ -5,6 +5,7 @@ import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './SizeInput.module.css';
 
 interface PropsIF {
+    inputId?: string;
     value: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement> | string) => void;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
@@ -13,16 +14,19 @@ interface PropsIF {
     ariaLabel?: string;
     useTotalSize: boolean;
     symbol: string;
-    selectedMode: OrderBookMode;
-    setSelectedMode: React.Dispatch<React.SetStateAction<OrderBookMode>>;
+    selectedDenom: OrderBookMode;
+    setSelectedDenom: React.Dispatch<React.SetStateAction<OrderBookMode>>;
     onFocus: () => void;
+    onUnfocus?: () => void;
     isModal?: boolean;
     autoFocus?: boolean;
+    isEditing?: boolean;
 }
 
 const SizeInput: React.FC<PropsIF> = React.memo((props) => {
     const {
         value,
+        inputId,
         onChange,
         onBlur,
         onKeyDown,
@@ -30,10 +34,12 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         ariaLabel,
         useTotalSize,
         symbol,
-        selectedMode,
-        setSelectedMode,
+        selectedDenom,
+        setSelectedDenom,
         onFocus,
+        onUnfocus,
         isModal = false,
+        isEditing = false,
     } = props;
 
     // temporarily only show BTC in the limit close modal
@@ -46,10 +52,23 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
     // Memoized ComboBox onChange handler
     const handleComboBoxChange = useCallback(
         (val: string) => {
-            setSelectedMode(val === symbol.toUpperCase() ? 'symbol' : 'usd');
+            setSelectedDenom(val === symbol.toUpperCase() ? 'symbol' : 'usd');
         },
-        [setSelectedMode, symbol],
+        [setSelectedDenom, symbol],
     );
+
+    // Handle blur when isEditing becomes false
+    React.useEffect(() => {
+        if (!isEditing) {
+            const input = document.getElementById(
+                'trade-module-size-input',
+            ) as HTMLInputElement;
+            if (document.activeElement === input) {
+                input.blur();
+                onUnfocus?.();
+            }
+        }
+    }, [isEditing, onUnfocus]);
 
     // autofocus trade-module-size-input when user clicks anywhere in sizeInputContainer except for the tokenButton
     const handleContainerClick = useCallback((e: React.MouseEvent) => {
@@ -77,7 +96,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         >
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
             <NumFormattedInput
-                id='trade-module-size-input'
+                id={inputId || 'trade-module-size-input'}
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -97,9 +116,9 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 }}
             >
                 <ComboBox
-                    key={selectedMode}
+                    key={selectedDenom}
                     value={
-                        selectedMode === 'usd' ? 'USD' : symbol.toUpperCase()
+                        selectedDenom === 'usd' ? 'USD' : symbol.toUpperCase()
                     }
                     options={comboBoxOptions}
                     onChange={handleComboBoxChange}

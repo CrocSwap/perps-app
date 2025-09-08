@@ -208,6 +208,16 @@ export default function Notification(props: propsIF) {
                     target='_blank'
                     rel='noopener noreferrer'
                     className={styles.txLink}
+                    onClick={() => {
+                        if (typeof plausible === 'function') {
+                            plausible('External Link Clicked', {
+                                props: {
+                                    linkType:
+                                        'block explorer link from notification',
+                                },
+                            });
+                        }
+                    }}
                 >
                     View on explorer
                 </a>

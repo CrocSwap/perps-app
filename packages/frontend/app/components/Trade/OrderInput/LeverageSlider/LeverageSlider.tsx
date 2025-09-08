@@ -13,6 +13,7 @@ import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
 import InputField from './InputField';
 import styles from './LeverageSlider.module.css';
 import SliderTrack from './SliderTrack';
+import { BTC_MAX_LEVERAGE } from '~/utils/Constants';
 
 interface LeverageSliderProps {
     value: number;
@@ -24,6 +25,8 @@ interface LeverageSliderProps {
     maxLeverage?: number;
     hideTitle?: boolean;
     minimumValue?: number;
+    isDragging: boolean;
+    setIsDragging: (value: boolean) => void;
 }
 
 const LEVERAGE_CONFIG = {
@@ -66,6 +69,8 @@ export default function LeverageSlider({
     hideTitle = false,
     minimumValue,
     onClick,
+    isDragging,
+    setIsDragging,
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
@@ -78,7 +83,7 @@ export default function LeverageSlider({
     const maximumInputValue = modalMode
         ? maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE
         : symbolInfo?.coin === 'BTC'
-          ? 100
+          ? BTC_MAX_LEVERAGE
           : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
 
     const effectiveMinimum =
@@ -88,7 +93,6 @@ export default function LeverageSlider({
     const [inputValue, setInputValue] = useState<string>(
         currentValue.toString(),
     );
-    const [isDragging, setIsDragging] = useState<boolean>(false);
     const [tickMarks, setTickMarks] = useState<number[]>([]);
     const [hoverValue, setHoverValue] = useState<number | null>(null);
     const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -638,7 +642,9 @@ export default function LeverageSlider({
     const handleMarketChange = useCallback(() => {
         const effectiveSymbol = symbolInfo?.coin;
         const currentMaxLeverage =
-            effectiveSymbol === 'BTC' ? 100 : symbolInfo?.maxLeverage;
+            effectiveSymbol === 'BTC'
+                ? BTC_MAX_LEVERAGE
+                : symbolInfo?.maxLeverage;
 
         if (!effectiveSymbol || !currentMaxLeverage) {
             return;

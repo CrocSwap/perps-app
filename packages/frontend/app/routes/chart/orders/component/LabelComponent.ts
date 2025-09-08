@@ -9,7 +9,7 @@ import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { blockExplorer } from '~/utils/Constants';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import {
     findLimitLabelAtPosition,
     getMainSeriesPaneIndex,

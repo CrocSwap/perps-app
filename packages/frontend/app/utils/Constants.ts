@@ -134,6 +134,12 @@ const MINUTES = SECONDS * 60;
 
 export const MIN_DEPOSIT_AMOUNT = 1;
 
+export const MIN_ORDER_VALUE = 1;
+
+export const MAX_BTC_NOTIONAL = 1;
+
+export const BTC_MAX_LEVERAGE = 100;
+
 // Delay before entering sleep mode when tab becomes hidden
 // Set to 5 seconds to avoid triggering on brief tab switches
 export const WS_SLEEP_MODE = 5 * SECONDS;

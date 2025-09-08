@@ -13,7 +13,7 @@ import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface propsIF {

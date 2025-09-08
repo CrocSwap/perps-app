@@ -13,13 +13,14 @@ interface propsIF {
     mobileView?: boolean;
     mobileContent?: 'orderBook' | 'recentTrades';
     switchTab?: (tab: TabType) => void;
+    chartTopHeight?: number;
 }
 
 const ORDER_ROW_HEIGHT_FALLBACK = 16;
 const ORDER_ROW_GAP = 4;
 
 export default function OrderBookSection(props: propsIF) {
-    const { mobileView, mobileContent, switchTab } = props;
+    const { mobileView, mobileContent, switchTab, chartTopHeight } = props;
     const [orderCount, setOrderCount] = useState(9);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
 
@@ -163,6 +164,12 @@ export default function OrderBookSection(props: propsIF) {
             if (timeoutId) clearTimeout(timeoutId);
         };
     }, [calculateOrderCount]);
+
+    useEffect(() => {
+        if (chartTopHeight) {
+            calculateOrderCount();
+        }
+    }, [chartTopHeight, calculateOrderCount]);
 
     // Menu content
     const menuContent = useMemo(

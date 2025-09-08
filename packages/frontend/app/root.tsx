@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -32,6 +32,7 @@ import {
 import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import packageJson from '../package.json';
+import { getResolutionSegment } from './utils/functions/getSegment';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -50,14 +51,81 @@ class ComponentErrorBoundary extends React.Component<
 
     componentDidCatch(error: Error, info: React.ErrorInfo) {
         console.error('Component error:', error, info);
+
+        // Log error to Plausible
+        if (
+            typeof window !== 'undefined' &&
+            typeof window.plausible === 'function'
+        ) {
+            // Truncate componentStack to be less than 2000 bytes
+            const maxBytes = 2000;
+            let componentStack = info.componentStack || '';
+
+            // Convert to Buffer to handle multi-byte characters correctly
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(componentStack);
+
+            if (encoded.length > maxBytes) {
+                // Create a new Uint8Array with maxBytes length
+                const truncated = new Uint8Array(maxBytes);
+                // Copy the first maxBytes - 3 bytes (for '...')
+                truncated.set(encoded.subarray(0, maxBytes - 3));
+                // Add ellipsis
+                truncated.set([0x2e, 0x2e, 0x2e], maxBytes - 3);
+                // Convert back to string
+                componentStack = new TextDecoder('utf-8', {
+                    fatal: false,
+                }).decode(truncated);
+            }
+
+            window.plausible('Component Error', {
+                props: {
+                    errorMessage: error.message,
+                    componentStack: componentStack,
+                    errorName: error.name,
+                },
+            });
+        }
     }
 
     render() {
         if (this.state.hasError) {
             return (
-                <div className='component-error'>
-                    <h3>Something went wrong</h3>
-                    <button onClick={() => this.setState({ hasError: false })}>
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        textAlign: 'center',
+                        padding: '20px',
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
+                        backgroundColor: 'var(--dark2)',
+                    }}
+                >
+                    <h3 style={{ marginBottom: '16px' }}>
+                        Something went wrong
+                    </h3>
+                    <button
+                        onClick={() => this.setState({ hasError: false })}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--accent1)',
+                            cursor: 'pointer',
+                            padding: '0',
+                            font: 'inherit',
+                            textDecoration: 'underline',
+                            display: 'inline',
+                            marginTop: '8px',
+                        }}
+                    >
                         Try Again
                     </button>
                 </div>
@@ -86,6 +154,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
     }, []);
 
     const isProduction = import.meta.env.VITE_CONTEXT === 'production';
+
+    const [innerHeight, setInnerHeight] = useState<number>();
+    const [innerWidth, setInnerWidth] = useState<number>();
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setInnerHeight(window.innerHeight);
+            setInnerWidth(window.innerWidth);
+        }
+    }, []);
 
     return (
         <html lang='en'>
@@ -154,6 +232,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <script
                         defer
                         event-version={packageJson.version}
+                        event-windowHeight={
+                            innerHeight
+                                ? getResolutionSegment(innerHeight)
+                                : undefined
+                        }
+                        event-windowWidth={
+                            innerWidth
+                                ? getResolutionSegment(innerWidth)
+                                : undefined
+                        }
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>

@@ -10,9 +10,7 @@ import daiImage from '../../assets/tokens/dai.svg';
 import ethImage from '../../assets/tokens/eth.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 import Hero from '~/components/Home/Hero/Hero';
-import Section1 from '~/components/Home/Section1/Section1';
-import Investors from '~/components/Home/Investors/Investors';
-import Section2 from '~/components/Home/Section2/Section2';
+import TradeButton from '~/components/Home/TradeButton/TradeButton';
 
 interface FloatingTokenProps {
     src: string;
@@ -125,38 +123,8 @@ export function meta() {
 }
 
 export default function Home(): JSX.Element {
-    // const [hasVisited, setHasVisited] = useState(false);
-
-    // useEffect(() => {
-    //     try {
-    //         const visited = sessionStorage.getItem('hasVisitedHome') === 'true';
-    //         setHasVisited(visited);
-
-    //         if (!visited) {
-    //             sessionStorage.setItem('hasVisitedHome', 'true');
-    //         }
-    //     } catch (e) {
-    //         console.error('Session storage error:', e);
-    //     }
-    // }, []);
-
-    const navigation = useNavigation();
-
     const { symbol } = useTradeDataStore();
 
-    function TradeButton({ symbol }: { symbol: string }) {
-        const isNavigating = navigation.state !== 'idle';
-
-        return (
-            <Link
-                to={`/v2/trade/${symbol}`}
-                className={styles.primary}
-                viewTransition
-            >
-                {isNavigating ? 'Loading...' : 'Start Trading'}
-            </Link>
-        );
-    }
     const showOnlyHero = true;
 
     if (showOnlyHero) return <Hero />;
@@ -188,7 +156,7 @@ export default function Home(): JSX.Element {
                 <h1>Trade Perps With Ambient</h1>
                 <p>Fast execution. Zero taker fees. Up to 100x leverage.</p>
                 <div className={styles.buttons}>
-                    <TradeButton symbol={symbol} />
+                    <TradeButton />
                     <button className={styles.secondary}>Learn More</button>
                 </div>
             </motion.div>

@@ -463,7 +463,7 @@ export default function GenericTable<
                 )}
                 {!isSessionEstablished && (
                     <div
-                        className={`plausible-event-name=Login+Button+Click plausible-event-location=Generic+Table ${styles.sessionButtonContainer}`}
+                        className={`plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Generic+Table ${styles.sessionButtonContainer}`}
                         ref={sessionButtonRef}
                     >
                         <SessionButton />

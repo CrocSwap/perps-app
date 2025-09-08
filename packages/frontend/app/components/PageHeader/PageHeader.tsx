@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 // } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -29,10 +29,32 @@ import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
+import { useUserDataStore } from '~/stores/UserDataStore';
 
 export default function PageHeader() {
+    // logic to read a URL referral code and set in state + local storage
+    const [searchParams] = useSearchParams();
+    const userDataStore = useUserDataStore();
+    useEffect(() => {
+        const REFERRAL_CODE_URL_PARAM = 'referral';
+        const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
+        const referralCode =
+            searchParams.get(REFERRAL_CODE_URL_PARAM) ||
+            searchParams.get(ALTERNATE_REFERRAL_CODE_URL_PARAM);
+        if (referralCode) {
+            userDataStore.setReferralCode(referralCode);
+            const newSearchParams = new URLSearchParams(
+                searchParams.toString(),
+            );
+            newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
+            newSearchParams.delete(ALTERNATE_REFERRAL_CODE_URL_PARAM);
+            const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
+            window.history.replaceState({}, '', newUrl); // remove referral code from URL
+        }
+    }, [searchParams]);
+
     const sessionState = useSession();
 
     const isUserConnected = isEstablished(sessionState);
@@ -321,7 +343,7 @@ export default function PageHeader() {
                         </section>
                     )}
                     <span
-                        className={`${!isUserConnected ? `plausible-event-name=Login+Button+Click plausible-event-location=Page+Header` : ''}`}
+                        className={`${!isUserConnected ? `plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Page+Header` : ''}`}
                         ref={sessionButtonRef}
                     >
                         <SessionButton />

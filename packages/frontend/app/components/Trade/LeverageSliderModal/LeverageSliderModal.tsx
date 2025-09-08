@@ -8,7 +8,7 @@ import { useSetUserMarginService } from '~/hooks/useSetUserMarginService';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
-import { blockExplorer } from '~/utils/Constants';
+import { blockExplorer, BTC_MAX_LEVERAGE } from '~/utils/Constants';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
 
@@ -47,19 +47,20 @@ export default function LeverageSliderModal({
             return;
         }
         const leverageFloor = calcLeverageFloor(marginBucket, 10_000_000n);
-        setLeverageFloor(10_000 / Number(leverageFloor));
+        const newLeverageFloor = 10_000 / Number(leverageFloor);
+        setLeverageFloor(Math.min(newLeverageFloor, BTC_MAX_LEVERAGE));
     }, [marginBucket]);
 
     // const currentMarket = useLeverageStore((state) => state.currentMarket);
 
     // Update local state if currentLeverage prop changes
     useEffect(() => {
-        setValue(currentLeverage);
+        setValue(Math.min(currentLeverage, BTC_MAX_LEVERAGE));
     }, [currentLeverage]);
 
     const handleSliderChange = (newValue: number) => {
         // Update the leverage in the store immediately as the slider changes
-        setValue(newValue);
+        setValue(Math.min(newValue, BTC_MAX_LEVERAGE));
     };
 
     const handleSliderClick = (newLeverage: number) => {
@@ -160,6 +161,9 @@ export default function LeverageSliderModal({
         notificationStore,
     ]);
 
+    const [isLeverageBeingDragged, setIsLeverageBeingDragged] =
+        useState<boolean>(false);
+
     return (
         <Modal title='Adjust Leverage' close={onClose}>
             <div className={styles.leverageSliderContainer}>
@@ -174,6 +178,8 @@ export default function LeverageSliderModal({
                         hideTitle={true}
                         className={styles.modalSlider}
                         minimumValue={leverageFloor}
+                        isDragging={isLeverageBeingDragged}
+                        setIsDragging={setIsLeverageBeingDragged}
                     />
                 </div>
 

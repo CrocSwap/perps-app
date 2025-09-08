@@ -408,14 +408,6 @@ export default function WebDataConsumer() {
             ) {
                 const orders: OrderDataIF[] = [];
                 data.orderHistory.forEach((order: any) => {
-                    console.log('[ORDER HISTORY] Processing order:', {
-                        oid: order.order?.oid,
-                        status: order.status,
-                        coin: order.order?.coin,
-                        side: order.order?.side,
-                        sz: order.order?.sz,
-                        limitPx: order.order?.limitPx,
-                    });
                     const processedOrder = processUserOrder(
                         order.order,
                         order.status,

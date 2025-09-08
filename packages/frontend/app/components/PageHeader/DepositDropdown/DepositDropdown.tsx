@@ -233,7 +233,7 @@ function DepositDropdown(props: propsIF) {
                             Connect your wallet to start trading with zero gas.
                         </p>
                         <span
-                            className={`plausible-event-name=Login+Button+Click plausible-event-location=Account+Overview`}
+                            className={`plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Account+Overview`}
                             ref={sessionButtonRef}
                         >
                             <SessionButton />

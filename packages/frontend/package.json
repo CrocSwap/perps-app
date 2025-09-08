@@ -1,7 +1,7 @@
 {
     "$schema": "https://json.schemastore.org/package.json",
     "name": "@perps-app/frontend",
-    "version": "0.1.35-Aug-27",
+    "version": "0.2.5-Sep-5",
     "private": true,
     "type": "module",
     "scripts": {
@@ -20,9 +20,9 @@
     },
     "dependencies": {
         "@crocswap-libs/ambient-ember": "^0.1.59",
-        "@fogo/sessions-idls": "^0.0.3",
-        "@fogo/sessions-sdk": "^0.0.9",
-        "@fogo/sessions-sdk-react": "^0.0.15",
+        "@fogo/sessions-idls": "^0.0.4",
+        "@fogo/sessions-sdk": "^0.0.12",
+        "@fogo/sessions-sdk-react": "^0.0.20",
         "@fuul/sdk": "^7.0.3",
         "@netlify/functions": "3.0.4",
         "@perps-app/sdk": "workspace:*",
@@ -40,6 +40,7 @@
         "framer-motion": "^12.12.1",
         "isbot": "^5.1.27",
         "isomorphic-fetch": "^3.0.0",
+        "re-resizable": "^6.11.2",
         "react": "^19",
         "react-dom": "^19",
         "react-icons": "^5.5.0",
