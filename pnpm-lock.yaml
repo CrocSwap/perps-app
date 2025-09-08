@@ -38,6 +38,9 @@ importers:
       '@netlify/functions':
         specifier: 3.0.4
         version: 3.0.4
+      '@noble/hashes':
+        specifier: ^1.3.0
+        version: 1.8.0
       '@perps-app/sdk':
         specifier: workspace:*
         version: link:../sdk
@@ -16623,7 +16626,7 @@ snapshots:
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/curves': 1.8.1
-      '@noble/hashes': 1.7.1
+      '@noble/hashes': 1.8.0
       '@scure/bip32': 1.6.2
       '@scure/bip39': 1.5.4
       abitype: 1.0.8(typescript@5.9.2)(zod@3.25.76)
