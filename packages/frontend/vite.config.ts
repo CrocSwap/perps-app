@@ -11,6 +11,9 @@ export default defineConfig({
     build: {
         ssr: false, // Explicitly disable SSR
         outDir: 'build/client',
+        rollupOptions: {
+            external: ['@noble/hashes/sha2', '@noble/hashes'],
+        },
     },
     ssr: {
         noExternal: ['@fogo/sessions-sdk-react'],
