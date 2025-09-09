@@ -1,21 +1,129 @@
-/* container in which to populate notifications */
 .notifications {
-    /* remove the element from the normal layout flow */
-    position: absolute;
-    /* render element slightly up and left from bottom-right corner */
-    bottom: 10px;
-    right: 10px;
-    /* display notifications in a column */
-    display: flex;
-    flex-direction: column;
-    /* slight vertical gap between elements */
-    gap: 15px;
-    /* added to show notifications above other elements on trade page */
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    width: min(420px, 92vw);
+    pointer-events: none;
+    --item-h: 112px;
+    --collapsed-offset: 10px;
+    --expanded-gap: 36px;
     z-index: 100;
+}
 
-    --notification-layer-width: 380px;
+.notifications > * {
+    pointer-events: auto;
+}
 
-    max-width: var(--notification-layer-width);
+.notificationWrapper {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(24, 26, 32, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 10px 20px rgba(0, 0, 0, 0.35);
+    transition:
+        box-shadow 0.18s ease,
+        filter 0.18s ease,
+        background 0.18s ease;
+    isolation: isolate;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.notificationWrapper > * {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    margin: 0 !important;
+    border-radius: inherit;
+}
+
+.notificationWrapper::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: -6px;
+    height: 12px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.35);
+    filter: blur(2px);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.notificationWrapper:first-child::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(24, 26, 32, 1);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.notificationWrapper:first-child::after {
+    display: none;
+}
+
+.notificationWrapper:nth-child(2) {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 14px 24px rgba(0, 0, 0, 0.36);
+}
+
+.notificationWrapper:nth-child(3) {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 18px 28px rgba(0, 0, 0, 0.4);
+}
+
+.notificationWrapper:nth-child(4) {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 22px 32px rgba(0, 0, 0, 0.42);
+}
+
+.notificationWrapper:nth-child(5) {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 26px 36px rgba(0, 0, 0, 0.44);
+}
+
+.notificationWrapper:nth-child(2)::after {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.notificationWrapper:nth-child(3)::after {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.notificationWrapper:nth-child(4)::after {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.notificationWrapper:nth-child(5)::after {
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.notificationWrapper:last-child::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(24, 26, 32, 1);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.notificationWrapper:last-child::after {
+    display: none;
 }
 
 .new_version_available {
@@ -77,13 +185,15 @@
 .news {
     display: flex;
     flex-direction: column;
-    width: var(--notification-layer-width);
+    width: 380px;
+    max-width: 100%;
     max-height: 40vh;
     padding: var(--padding-m);
     background-color: var(--bg-dark3);
     border: 1px solid var(--bg-dark6);
     border-radius: var(--radius-s);
     gap: var(--gap-s);
+    margin-top: 12px;
 }
 
 .news > header {
@@ -102,6 +212,8 @@
     gap: var(--gap-s);
     list-style-type: none;
     overflow-y: auto;
+    margin: 0;
+    padding: 0;
 }
 
 .news > ul > li {

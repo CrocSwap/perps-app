@@ -15,6 +15,7 @@ interface propsIF {
     onMouseEnter?: (slug: number) => void;
     onMouseLeave?: (slug: number) => void;
     shouldPauseDismissal?: boolean;
+    staggerIndex?: number;
 }
 
 export default function Notification(props: propsIF) {
@@ -24,6 +25,7 @@ export default function Notification(props: propsIF) {
         onMouseEnter,
         onMouseLeave,
         shouldPauseDismissal = false,
+        staggerIndex = 0,
     } = props;
     // create and memoize the UNIX time when this element was mounted
     const createdAt = useRef<number>(Date.now());
@@ -31,8 +33,11 @@ export default function Notification(props: propsIF) {
     const { getBsColor } = useAppSettings();
 
     // time period (ms) after which to auto-dismiss the notification
-    const DISMISS_AFTER = data.removeAfter || 5000;
 
+    const BASE_LIFETIME = 8000;
+    const STAGGER_STEP = 2000;
+    const DISMISS_AFTER =
+        (data.removeAfter ?? BASE_LIFETIME) + staggerIndex * STAGGER_STEP;
     // logic to remove this elem from the DOM after a timeout, yes the
     const [isHovered, setIsHovered] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout>(null);
