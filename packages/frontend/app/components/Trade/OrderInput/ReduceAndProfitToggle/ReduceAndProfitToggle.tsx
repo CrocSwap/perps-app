@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { BsChevronDown } from 'react-icons/bs';
 import { LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import ChaseDistance from '../ChaseDistance/ChaseDistance';
 import styles from './ReduceAndProfitToggle.module.css';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 
 interface PropsIF {
     isReduceOnlyEnabled: boolean;
@@ -31,25 +31,13 @@ interface PropsIF {
     slLossCurrency?: '$' | '%';
     setSlLossCurrency?: (currency: '$' | '%') => void;
 
-    markPx?: number;
-    symbol?: string;
-    notionalSymbolQtyNum?: number;
-    tradeDirection?: 'buy' | 'sell';
+    markPx: number;
+    symbol: string;
+    notionalSymbolQtyNum: number;
+    tradeDirection: 'buy' | 'sell';
 }
-interface TPSLFormData {
-    tpPrice: string;
-    slPrice: string;
-    gain: string;
-    loss: string;
-    gainCurrency: '$' | '%';
-    lossCurrency: '$' | '%';
-    configureAmount: boolean;
-    limitPrice: boolean;
-}
-export default function ReduceAndProfitToggle(props: PropsIF) {
-    const [chaseDistance, setChaseDistance] = useState('');
-    const [chaseMode, setChaseMode] = useState<'usd' | 'symbol'>('usd');
 
+export default function ReduceAndProfitToggle(props: PropsIF) {
     const {
         isReduceOnlyEnabled,
         isTakeProfitEnabled,
@@ -74,73 +62,146 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         setTpGainCurrency,
         slLossCurrency = '$',
         setSlLossCurrency,
+
         markPx,
-        symbol,
+
         notionalSymbolQtyNum,
         tradeDirection,
     } = props;
+    const [chaseDistance, setChaseDistance] = useState('');
+    const [chaseMode, setChaseMode] = useState<'usd' | 'symbol'>('usd');
+    const currencyOptions: Array<'$' | '%'> = ['$', '%'];
 
     const calculateExpectedProfit = (): number | null => {
-        console.log('Calculate expected profit:', {
-            takeProfitPrice,
-            takeProfitGain,
-            tpGainCurrency,
-        });
-        return null;
-    };
+        if (!takeProfitPrice && !takeProfitGain) return null;
 
+        let targetPrice: number;
+
+        if (takeProfitPrice) {
+            targetPrice = parseFloat(takeProfitPrice);
+        } else if (takeProfitGain && markPx) {
+            const gain = parseFloat(takeProfitGain);
+            if (tpGainCurrency === '$') {
+                targetPrice =
+                    tradeDirection === 'buy'
+                        ? markPx + gain / notionalSymbolQtyNum
+                        : markPx - gain / notionalSymbolQtyNum;
+            } else {
+                const multiplier =
+                    tradeDirection === 'buy' ? 1 + gain / 100 : 1 - gain / 100;
+                targetPrice = markPx * multiplier;
+            }
+        } else {
+            return null;
+        }
+
+        if (!markPx || !notionalSymbolQtyNum) return null;
+
+        const priceDiff =
+            tradeDirection === 'buy'
+                ? targetPrice - markPx
+                : markPx - targetPrice;
+
+        return priceDiff * notionalSymbolQtyNum;
+    };
     const calculateExpectedLoss = (): number | null => {
-        console.log('Calculate expected loss:', {
-            stopLossPrice,
-            stopLossLoss,
-            slLossCurrency,
-        });
-        return null;
+        if (!stopLossPrice && !stopLossLoss) return null;
+
+        let targetPrice: number;
+
+        if (stopLossPrice) {
+            targetPrice = parseFloat(stopLossPrice);
+        } else if (stopLossLoss && markPx) {
+            const loss = parseFloat(stopLossLoss);
+            if (slLossCurrency === '$') {
+                // Dollar amount loss per unit
+                targetPrice =
+                    tradeDirection === 'buy'
+                        ? markPx - loss / notionalSymbolQtyNum
+                        : markPx + loss / notionalSymbolQtyNum;
+            } else {
+                // Percentage loss
+                const multiplier =
+                    tradeDirection === 'buy' ? 1 - loss / 100 : 1 + loss / 100;
+                targetPrice = markPx * multiplier;
+            }
+        } else {
+            return null;
+        }
+
+        if (!markPx || !notionalSymbolQtyNum) return null;
+
+        const priceDiff =
+            tradeDirection === 'buy'
+                ? markPx - targetPrice
+                : targetPrice - markPx;
+
+        return priceDiff * notionalSymbolQtyNum;
     };
 
     const updatePriceFromGain = (gainValue: string) => {
-        console.log('Update TP price from gain:', gainValue, tpGainCurrency);
-        if (setTakeProfitPrice) {
-            // setTakeProfitPrice(calculatedPrice);
+        if (!markPx || !gainValue || !notionalSymbolQtyNum) return;
+
+        const gain = parseFloat(gainValue);
+        let newPrice: number;
+
+        if (tpGainCurrency === '$') {
+            newPrice =
+                tradeDirection === 'buy'
+                    ? markPx + gain / notionalSymbolQtyNum
+                    : markPx - gain / notionalSymbolQtyNum;
+        } else {
+            const multiplier =
+                tradeDirection === 'buy' ? 1 + gain / 100 : 1 - gain / 100;
+            newPrice = markPx * multiplier;
         }
+
+        setTakeProfitPrice?.(newPrice.toFixed(6));
     };
 
     const updatePriceFromLoss = (lossValue: string) => {
-        console.log('Update SL price from loss:', lossValue, slLossCurrency);
-        if (setStopLossPrice) {
-            // setStopLossPrice(calculatedPrice);
-        }
-    };
+        if (!markPx || !lossValue || !notionalSymbolQtyNum) return;
 
-    const handleCurrencyToggle = (field: 'gainCurrency' | 'lossCurrency') => {
-        if (field === 'gainCurrency' && setTpGainCurrency) {
-            const newCurrency = tpGainCurrency === '$' ? '%' : '$';
-            setTpGainCurrency(newCurrency);
-            console.log('TP currency changed to:', newCurrency);
-        } else if (field === 'lossCurrency' && setSlLossCurrency) {
-            const newCurrency = slLossCurrency === '$' ? '%' : '$';
-            setSlLossCurrency(newCurrency);
-            console.log('SL currency changed to:', newCurrency);
+        const loss = parseFloat(lossValue);
+        let newPrice: number;
+
+        if (slLossCurrency === '$') {
+            // Dollar amount loss per unit
+            newPrice =
+                tradeDirection === 'buy'
+                    ? markPx - loss / notionalSymbolQtyNum
+                    : markPx + loss / notionalSymbolQtyNum;
+        } else {
+            // Percentage loss
+            const multiplier =
+                tradeDirection === 'buy' ? 1 - loss / 100 : 1 + loss / 100;
+            newPrice = markPx * multiplier;
         }
+
+        setStopLossPrice?.(newPrice.toFixed(6));
     };
 
     const expectedProfit = useMemo(() => {
-        console.log('Calculate expected profit:', {
-            takeProfitPrice,
-            takeProfitGain,
-            tpGainCurrency,
-        });
-        return null;
-    }, [takeProfitPrice, takeProfitGain, tpGainCurrency]);
+        return calculateExpectedProfit();
+    }, [
+        takeProfitPrice,
+        takeProfitGain,
+        tpGainCurrency,
+        markPx,
+        notionalSymbolQtyNum,
+        tradeDirection,
+    ]);
 
     const expectedLoss = useMemo(() => {
-        console.log('Calculate expected loss:', {
-            stopLossPrice,
-            stopLossLoss,
-            slLossCurrency,
-        });
-        return null;
-    }, [stopLossPrice, stopLossLoss, slLossCurrency]);
+        return calculateExpectedLoss();
+    }, [
+        stopLossPrice,
+        stopLossLoss,
+        slLossCurrency,
+        markPx,
+        notionalSymbolQtyNum,
+        tradeDirection,
+    ]);
     const formDisplay = (
         <section className={styles.formContainer}>
             {/* Take Profit Row */}
@@ -167,12 +228,18 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         }}
                         placeholder='Gain'
                     />
-                    <button
-                        onClick={() => handleCurrencyToggle('gainCurrency')}
-                    >
-                        <span>{tpGainCurrency}</span>
-                        <BsChevronDown size={16} />
-                    </button>
+                    <ComboBox
+                        value={tpGainCurrency}
+                        options={currencyOptions}
+                        onChange={(val) => {
+                            const currency = val as '$' | '%';
+                            setTpGainCurrency?.(currency);
+                            if (takeProfitGain) {
+                                updatePriceFromGain(takeProfitGain);
+                            }
+                        }}
+                        cssPositioning='fixed'
+                    />
                 </div>
             </div>
             {takeProfitGain && (
@@ -208,12 +275,18 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         }}
                         placeholder='Loss'
                     />
-                    <button
-                        onClick={() => handleCurrencyToggle('lossCurrency')}
-                    >
-                        <span>{slLossCurrency}</span>
-                        <BsChevronDown size={16} />
-                    </button>
+                    <ComboBox
+                        value={slLossCurrency}
+                        options={currencyOptions}
+                        onChange={(val) => {
+                            const currency = val as '$' | '%';
+                            setSlLossCurrency?.(currency);
+                            if (stopLossLoss) {
+                                updatePriceFromLoss(stopLossLoss);
+                            }
+                        }}
+                        cssPositioning='fixed'
+                    />
                 </div>
             </div>
             {stopLossLoss && (

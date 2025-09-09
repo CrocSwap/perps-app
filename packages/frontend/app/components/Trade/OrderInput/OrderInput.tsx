@@ -1031,9 +1031,9 @@ function OrderInput({
             setTpGainCurrency,
             slLossCurrency,
             setSlLossCurrency,
-            markPx,
-            symbol,
-            notionalQtyNum,
+            markPx: markPx || 0,
+            symbol: symbol || '',
+            notionalSymbolQtyNum: notionalQtyNum,
             tradeDirection,
         }),
         [

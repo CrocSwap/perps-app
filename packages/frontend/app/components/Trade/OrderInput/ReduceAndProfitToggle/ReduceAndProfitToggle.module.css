@@ -81,6 +81,7 @@
     padding: var(--padding-xs) var(--padding-s);
     border-radius: var(--radius-s);
 }
+
 .formRow input {
     width: 100%;
     height: 100%;

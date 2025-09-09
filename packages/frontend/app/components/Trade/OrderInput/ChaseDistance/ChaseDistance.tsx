@@ -37,8 +37,9 @@ const ChaseDistance: React.FC<PropsIF> = React.memo((props) => {
     );
 
     const handleComboBoxChange = useCallback(
-        (val: string) => {
-            setSelectedMode(val === symbol.toUpperCase() ? 'symbol' : 'usd');
+        (val: string | number) => {
+            const s = String(val);
+            setSelectedMode(s === symbol.toUpperCase() ? 'symbol' : 'usd');
         },
         [setSelectedMode, symbol],
     );
