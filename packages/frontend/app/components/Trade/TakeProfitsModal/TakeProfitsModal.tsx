@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import styles from './TakeProfitsModal.module.css';
-import { BsChevronDown } from 'react-icons/bs';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
@@ -35,44 +34,196 @@ export default function TakeProfitsModal(props: PropIF) {
         configureAmount: false,
         limitPrice: false,
     });
+    const [tpSource, setTpSource] = useState<'price' | 'gain' | null>(null);
+    const [slSource, setSlSource] = useState<'price' | 'loss' | null>(null);
 
+    // THIS IS JUST FOR WARNING VALIDATIONS-------------------------------------------
+    const [tpPriceFocused, setTpPriceFocused] = useState(false);
+    const [tpPriceTouched, setTpPriceTouched] = useState(false);
+    const [gainFocused, setGainFocused] = useState(false);
+    const [gainTouched, setGainTouched] = useState(false);
+
+    const [slPriceFocused, setSlPriceFocused] = useState(false);
+    const [slPriceTouched, setSlPriceTouched] = useState(false);
+    const [lossFocused, setLossFocused] = useState(false);
+    const [lossTouched, setLossTouched] = useState(false);
+
+    // Show validation when the field driving the target has been blurred at least once
+    const showTpValidation = useMemo(() => {
+        if (tpSource === 'price') {
+            return !!formData.tpPrice && tpPriceTouched && !tpPriceFocused;
+        }
+        if (tpSource === 'gain') {
+            return !!formData.gain && gainTouched && !gainFocused;
+        }
+        // If no explicit source yet, only show after either candidate is blurred with a value
+        return (
+            (!!formData.tpPrice && tpPriceTouched && !tpPriceFocused) ||
+            (!!formData.gain && gainTouched && !gainFocused)
+        );
+    }, [
+        tpSource,
+        formData.tpPrice,
+        formData.gain,
+        tpPriceTouched,
+        tpPriceFocused,
+        gainTouched,
+        gainFocused,
+    ]);
+
+    const showSlValidation = useMemo(() => {
+        if (slSource === 'price') {
+            return !!formData.slPrice && slPriceTouched && !slPriceFocused;
+        }
+        if (slSource === 'loss') {
+            return !!formData.loss && lossTouched && !lossFocused;
+        }
+        return (
+            (!!formData.slPrice && slPriceTouched && !slPriceFocused) ||
+            (!!formData.loss && lossTouched && !lossFocused)
+        );
+    }, [
+        slSource,
+        formData.slPrice,
+        formData.loss,
+        slPriceTouched,
+        slPriceFocused,
+        lossTouched,
+        lossFocused,
+    ]);
+
+    // END OF VALIDATION---------------------------------------------------------------
     const currencyOptions: Array<'$' | '%'> = ['$', '%'];
-    const currentPrice = markPrice || position.entryPx;
-    const positionSize = Math.abs(position.szi);
+
+    const baseForPnL = position.entryPx;
+    const displayPrice = markPrice || position.entryPx;
+
+    const qty = Math.abs(position.szi);
     const isLong = position.szi > 0;
 
-    const calculateExpectedProfit = (): number | null => {
-        console.log('Calculate expected profit:', {
-            gain: formData.gain,
-            currency: formData.gainCurrency,
-            position: position,
-        });
-        return null;
+    const tpFromGain = useMemo(() => {
+        if (!formData.gain) return undefined;
+        const gain = parseFloat(formData.gain);
+        if (!Number.isFinite(gain) || !qty) return undefined;
+        if (formData.gainCurrency === '$') {
+            const priceChange = gain / qty;
+            return isLong ? baseForPnL + priceChange : baseForPnL - priceChange;
+        } else {
+            const pct = gain / 100;
+            return baseForPnL * (isLong ? 1 + pct : 1 - pct);
+        }
+    }, [formData.gain, formData.gainCurrency, qty, isLong, baseForPnL]);
+
+    const slFromLoss = useMemo(() => {
+        if (!formData.loss) return undefined;
+        const loss = parseFloat(formData.loss);
+        if (!Number.isFinite(loss) || !qty) return undefined;
+        if (formData.lossCurrency === '$') {
+            const priceChange = loss / qty;
+            return isLong ? baseForPnL - priceChange : baseForPnL + priceChange;
+        } else {
+            const pct = loss / 100;
+            return baseForPnL * (isLong ? 1 - pct : 1 + pct);
+        }
+    }, [formData.loss, formData.lossCurrency, qty, isLong, baseForPnL]);
+
+    const tpTarget = useMemo(() => {
+        const priceVal = formData.tpPrice
+            ? parseFloat(formData.tpPrice)
+            : undefined;
+        if (tpSource === 'gain') return tpFromGain;
+        if (tpSource === 'price') return priceVal;
+        // fallback: prefer gain if present
+        return tpFromGain ?? priceVal;
+    }, [tpSource, formData.tpPrice, tpFromGain]);
+
+    const slTarget = useMemo(() => {
+        const priceVal = formData.slPrice
+            ? parseFloat(formData.slPrice)
+            : undefined;
+        if (slSource === 'loss') return slFromLoss;
+        if (slSource === 'price') return priceVal;
+        // fallback: prefer loss if present
+        return slFromLoss ?? priceVal;
+    }, [slSource, formData.slPrice, slFromLoss]);
+
+    const pnlAt = (target: number) => {
+        const diff = isLong ? target - baseForPnL : baseForPnL - target;
+        return diff * qty;
     };
 
-    const calculateExpectedLoss = (): number | null => {
-        console.log('Calculate expected loss:', {
-            loss: formData.loss,
-            currency: formData.lossCurrency,
-            position: position,
-        });
-        return null;
+    const expectedProfit = useMemo(() => {
+        return Number.isFinite(tpTarget as number)
+            ? pnlAt(tpTarget as number)
+            : null;
+    }, [tpTarget, baseForPnL, qty, isLong]);
+
+    const expectedLoss = useMemo(() => {
+        if (!Number.isFinite(slTarget as number)) return null;
+        const raw = pnlAt(slTarget as number);
+        return Math.abs(raw);
+    }, [slTarget, baseForPnL, qty, isLong]);
+
+    const tpInvalid =
+        Number.isFinite(tpTarget as number) &&
+        ((isLong && (tpTarget as number) <= baseForPnL) ||
+            (!isLong && (tpTarget as number) >= baseForPnL));
+
+    const slInvalid =
+        Number.isFinite(slTarget as number) &&
+        ((isLong && (slTarget as number) >= baseForPnL) ||
+            (!isLong && (slTarget as number) <= baseForPnL));
+    const pctAway = (target?: number) =>
+        target ? Math.abs((target - baseForPnL) / baseForPnL) : 0;
+
+    const OUTLIER_PCT = 0.5; // 30% away from entry price triggers warning
+    const tpOutlier =
+        Number.isFinite(tpTarget as number) &&
+        pctAway(tpTarget as number) >= OUTLIER_PCT;
+    const slOutlier =
+        Number.isFinite(slTarget as number) &&
+        pctAway(slTarget as number) >= OUTLIER_PCT;
+
+    const updateTPPriceFromGain = (gainValue: string, currency?: '$' | '%') => {
+        if (!gainValue || !qty) return;
+        const gain = parseFloat(gainValue);
+        const currencyToUse = currency || formData.gainCurrency;
+
+        let newPrice: number;
+        if (currencyToUse === '$') {
+            // gain is TOTAL $ PnL for the whole position
+            const priceChange = gain / qty;
+            newPrice = isLong
+                ? baseForPnL + priceChange
+                : baseForPnL - priceChange;
+        } else {
+            // percentage gain
+            const pct = gain / 100;
+            newPrice = baseForPnL * (isLong ? 1 + pct : 1 - pct);
+        }
+
+        setFormData((prev) => ({ ...prev, tpPrice: newPrice.toFixed(6) }));
     };
 
-    const updateTPPriceFromGain = (gainValue: string) => {
-        console.log('Update TP price from gain:', {
-            gain: gainValue,
-            currency: formData.gainCurrency,
-            position: position,
-        });
-    };
+    const updateSLPriceFromLoss = (lossValue: string, currency?: '$' | '%') => {
+        if (!lossValue || !qty) return;
+        const loss = parseFloat(lossValue);
+        const currencyToUse = currency || formData.lossCurrency;
 
-    const updateSLPriceFromLoss = (lossValue: string) => {
-        console.log('Update SL price from loss:', {
-            loss: lossValue,
-            currency: formData.lossCurrency,
-            position: position,
-        });
+        let newPrice: number;
+        if (currencyToUse === '$') {
+            // loss is TOTAL $ PnL for the whole position
+            const priceChange = loss / qty;
+            newPrice = isLong
+                ? baseForPnL - priceChange
+                : baseForPnL + priceChange;
+        } else {
+            // percentage loss
+            const pct = loss / 100;
+            newPrice = baseForPnL * (isLong ? 1 - pct : 1 + pct);
+        }
+
+        setFormData((prev) => ({ ...prev, slPrice: newPrice.toFixed(6) }));
     };
 
     const placeTakeProfitOrder = async (): Promise<void> => {
@@ -103,8 +254,8 @@ export default function TakeProfitsModal(props: PropIF) {
             label: 'Position',
             value: `${Math.abs(position.szi)} ${position.coin}`,
         },
-        { label: 'Entry Price', value: position.entryPx.toLocaleString() },
-        { label: 'Mark Price', value: '...' },
+        { label: 'Entry Price', value: baseForPnL.toLocaleString() },
+        { label: 'Mark Price', value: displayPrice.toLocaleString() },
     ];
 
     const handleInputChange = (
@@ -116,12 +267,19 @@ export default function TakeProfitsModal(props: PropIF) {
             [field]: value,
         }));
 
-        if (field === 'gain' && typeof value === 'string') {
+        if (field === 'tpPrice' && typeof value === 'string') {
+            setTpSource('price');
+        } else if (field === 'gain' && typeof value === 'string') {
+            setTpSource('gain');
             updateTPPriceFromGain(value);
+        } else if (field === 'slPrice' && typeof value === 'string') {
+            setSlSource('price');
         } else if (field === 'loss' && typeof value === 'string') {
+            setSlSource('loss');
             updateSLPriceFromLoss(value);
         }
     };
+
     const handleCurrencyChange = (
         field: 'gainCurrency' | 'lossCurrency',
         newCurrency: '$' | '%',
@@ -131,30 +289,12 @@ export default function TakeProfitsModal(props: PropIF) {
             [field]: newCurrency,
         }));
 
-        // Recalculate price when currency changes
         if (field === 'gainCurrency' && formData.gain) {
-            setTimeout(() => updateTPPriceFromGain(formData.gain), 0);
+            setTpSource('gain');
+            updateTPPriceFromGain(formData.gain, newCurrency);
         } else if (field === 'lossCurrency' && formData.loss) {
-            setTimeout(() => updateSLPriceFromLoss(formData.loss), 0);
-        }
-    };
-
-    const handleCurrencyToggle = (field: 'gainCurrency' | 'lossCurrency') => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: prev[field] === '$' ? '%' : '$',
-        }));
-
-        console.log(
-            `${field} changed to:`,
-            formData[field] === '$' ? '%' : '$',
-        );
-
-        // Recalculate price when currency changes
-        if (field === 'gainCurrency' && formData.gain) {
-            updateTPPriceFromGain(formData.gain);
-        } else if (field === 'lossCurrency' && formData.loss) {
-            updateSLPriceFromLoss(formData.loss);
+            setSlSource('loss');
+            updateSLPriceFromLoss(formData.loss, newCurrency);
         }
     };
 
@@ -181,28 +321,25 @@ export default function TakeProfitsModal(props: PropIF) {
     };
 
     const isFormValid = () => {
-        const hasTpData = formData.tpPrice.trim() !== '';
-        const hasSlData = formData.slPrice.trim() !== '';
-        return hasTpData || hasSlData;
+        const hasTp =
+            formData.tpPrice.trim() !== '' || formData.gain.trim() !== '';
+        const hasSl =
+            formData.slPrice.trim() !== '' || formData.loss.trim() !== '';
+        const somethingSet = hasTp || hasSl;
+
+        const tpOk = !tpInvalid;
+        const slOk = !slInvalid;
+
+        // If TP is set, it must be valid; same for SL. If not set, ignore validity.
+        const tpIsSet =
+            formData.tpPrice.trim() !== '' || formData.gain.trim() !== '';
+        const slIsSet =
+            formData.slPrice.trim() !== '' || formData.loss.trim() !== '';
+
+        const validWhenSet = (!tpIsSet || tpOk) && (!slIsSet || slOk);
+
+        return somethingSet && validWhenSet;
     };
-
-    const expectedProfit = useMemo(() => {
-        console.log('Calculate expected profit:', {
-            gain: formData.gain,
-            currency: formData.gainCurrency,
-            position: position,
-        });
-        return null;
-    }, [formData.gain, formData.gainCurrency, position]);
-
-    const expectedLoss = useMemo(() => {
-        console.log('Calculate expected loss:', {
-            loss: formData.loss,
-            currency: formData.lossCurrency,
-            position: position,
-        });
-        return null;
-    }, [formData.loss, formData.lossCurrency, position]);
 
     return (
         <div className={styles.container}>
@@ -217,16 +354,25 @@ export default function TakeProfitsModal(props: PropIF) {
 
             <section className={styles.formContainer}>
                 <div className={styles.formRow}>
-                    <div className={styles.inputWithoutDropdown}>
+                    <div
+                        className={`${styles.inputWithoutDropdown} ${showTpValidation && tpInvalid ? styles.fieldError : ''} ${showTpValidation && tpOutlier && !tpInvalid ? styles.fieldWarning : ''}`}
+                    >
                         <input
                             type='number'
                             value={formData.tpPrice}
                             onChange={(e) =>
                                 handleInputChange('tpPrice', e.target.value)
                             }
+                            onFocus={() => setTpPriceFocused(true)}
+                            onBlur={() => {
+                                setTpPriceFocused(false);
+                                setTpPriceTouched(true);
+                            }}
+                            aria-invalid={tpInvalid || undefined}
                             placeholder='Take Profit Price'
                         />
                     </div>
+
                     <div className={styles.inputWithDropdown}>
                         <input
                             type='number'
@@ -234,8 +380,14 @@ export default function TakeProfitsModal(props: PropIF) {
                             onChange={(e) =>
                                 handleInputChange('gain', e.target.value)
                             }
+                            onFocus={() => setGainFocused(true)}
+                            onBlur={() => {
+                                setGainFocused(false);
+                                setGainTouched(true);
+                            }}
                             placeholder='Gain'
                         />
+
                         <ComboBox
                             value={formData.gainCurrency}
                             options={currencyOptions}
@@ -249,26 +401,41 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
-                {formData.gain && (
+                {(formData.tpPrice || formData.gain) && (
                     <span className={styles.expectedProfitText}>
                         Expected Profit:{' '}
-                        {expectedProfit
-                            ? `$${expectedProfit.toFixed(2)}`
-                            : 'Calculating...'}
+                        {expectedProfit == null
+                            ? '—'
+                            : `$${expectedProfit.toFixed(2)}`}
+                        {tpInvalid && showTpValidation && (
+                            <span className={styles.validationError}>
+                                {' '}
+                                • TP must be {isLong ? 'above' : 'below'} entry
+                            </span>
+                        )}
                     </span>
                 )}
 
                 <div className={styles.formRow}>
-                    <div className={styles.inputWithoutDropdown}>
+                    <div
+                        className={`${styles.inputWithoutDropdown} ${showSlValidation && slInvalid ? styles.fieldError : ''} ${showSlValidation && slOutlier && !slInvalid ? styles.fieldWarning : ''}`}
+                    >
                         <input
                             type='number'
                             value={formData.slPrice}
                             onChange={(e) =>
                                 handleInputChange('slPrice', e.target.value)
                             }
+                            onFocus={() => setSlPriceFocused(true)}
+                            onBlur={() => {
+                                setSlPriceFocused(false);
+                                setSlPriceTouched(true);
+                            }}
+                            aria-invalid={slInvalid || undefined}
                             placeholder='Stop Loss Price'
                         />
                     </div>
+
                     <div className={styles.inputWithDropdown}>
                         <input
                             type='number'
@@ -276,8 +443,14 @@ export default function TakeProfitsModal(props: PropIF) {
                             onChange={(e) =>
                                 handleInputChange('loss', e.target.value)
                             }
+                            onFocus={() => setLossFocused(true)}
+                            onBlur={() => {
+                                setLossFocused(false);
+                                setLossTouched(true);
+                            }}
                             placeholder='Loss'
                         />
+
                         <ComboBox
                             value={formData.lossCurrency}
                             options={currencyOptions}
@@ -291,12 +464,18 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
-                {formData.loss && (
+                {(formData.slPrice || formData.loss) && (
                     <span className={styles.expectedProfitText}>
                         Expected Loss:{' '}
-                        {expectedLoss
-                            ? `$${expectedLoss.toFixed(2)}`
-                            : 'Calculating...'}
+                        {expectedLoss == null
+                            ? '—'
+                            : `-$${expectedLoss.toFixed(2)}`}
+                        {slInvalid && showSlValidation && (
+                            <span className={styles.validationError}>
+                                {' '}
+                                • SL must be {isLong ? 'below' : 'above'} entry
+                            </span>
+                        )}
                     </span>
                 )}
             </section>
@@ -325,6 +504,22 @@ export default function TakeProfitsModal(props: PropIF) {
                     reverse
                 />
             </section>
+            <div className={styles.warningContainer}>
+                {!tpInvalid && tpOutlier && showTpValidation && (
+                    <span className={styles.warningText}>
+                        {' '}
+                        TP is {(pctAway(tpTarget as number) * 100).toFixed(1)}%
+                        from entry — double-check your input
+                    </span>
+                )}
+                {!slInvalid && slOutlier && showSlValidation && (
+                    <span className={styles.warningText}>
+                        {' '}
+                        SL is {(pctAway(slTarget as number) * 100).toFixed(1)}%
+                        from entry — double-check your input
+                    </span>
+                )}
+            </div>
 
             <button
                 className={`${styles.confirmButton} ${!isFormValid() ? styles.disabled : ''}`}

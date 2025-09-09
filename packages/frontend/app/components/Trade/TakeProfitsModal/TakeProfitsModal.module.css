@@ -138,3 +138,40 @@
 .formContainer input[type='number'] {
     -moz-appearance: textfield;
 }
+.validationError {
+    color: var(--sell);
+    margin-left: 6px;
+    font-size: var(--font-size-s);
+}
+
+.fieldError {
+    outline: 1px solid var(--sell);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--sell) 20%, transparent);
+    border-radius: var(--radius-s);
+}
+
+.fieldWarning {
+    outline: 1px solid var(--red);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 20%, transparent);
+    border-radius: var(--radius-s);
+}
+
+.warningText {
+    color: var(--red,);
+
+    font-size: var(--font-size-s);
+}
+
+.expectedLossText {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    color: var(--sell);
+    font-size: var(--font-size-s);
+}
+.warningContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--gap-xs);
+}

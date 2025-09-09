@@ -163,7 +163,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 );
             }
             return null;
-        }, [modalContent, modalCtrl.close, position]);
+        }, [modalContent, modalCtrl.close, position, coinPriceMap]);
 
         // Memoize navigation handler
         const handleCoinClick = useCallback(() => {
