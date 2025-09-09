@@ -3,6 +3,7 @@ import styles from './TakeProfitsModal.module.css';
 import { BsChevronDown } from 'react-icons/bs';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import type { PositionIF } from '~/utils/UserDataIFs';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 
 interface TPSLFormData {
     tpPrice: string;
@@ -18,10 +19,11 @@ interface TPSLFormData {
 interface PropIF {
     closeTPModal: () => void;
     position: PositionIF;
+    markPrice?: number;
 }
 
 export default function TakeProfitsModal(props: PropIF) {
-    const { closeTPModal, position } = props;
+    const { closeTPModal, position, markPrice } = props;
 
     const [formData, setFormData] = useState<TPSLFormData>({
         tpPrice: position.tp ? position.tp.toString() : '',
@@ -33,6 +35,11 @@ export default function TakeProfitsModal(props: PropIF) {
         configureAmount: false,
         limitPrice: false,
     });
+
+    const currencyOptions: Array<'$' | '%'> = ['$', '%'];
+    const currentPrice = markPrice || position.entryPx;
+    const positionSize = Math.abs(position.szi);
+    const isLong = position.szi > 0;
 
     const calculateExpectedProfit = (): number | null => {
         console.log('Calculate expected profit:', {
@@ -113,6 +120,22 @@ export default function TakeProfitsModal(props: PropIF) {
             updateTPPriceFromGain(value);
         } else if (field === 'loss' && typeof value === 'string') {
             updateSLPriceFromLoss(value);
+        }
+    };
+    const handleCurrencyChange = (
+        field: 'gainCurrency' | 'lossCurrency',
+        newCurrency: '$' | '%',
+    ) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: newCurrency,
+        }));
+
+        // Recalculate price when currency changes
+        if (field === 'gainCurrency' && formData.gain) {
+            setTimeout(() => updateTPPriceFromGain(formData.gain), 0);
+        } else if (field === 'lossCurrency' && formData.loss) {
+            setTimeout(() => updateSLPriceFromLoss(formData.loss), 0);
         }
     };
 
@@ -213,12 +236,17 @@ export default function TakeProfitsModal(props: PropIF) {
                             }
                             placeholder='Gain'
                         />
-                        <button
-                            onClick={() => handleCurrencyToggle('gainCurrency')}
-                        >
-                            <span>{formData.gainCurrency}</span>
-                            <BsChevronDown size={16} />
-                        </button>
+                        <ComboBox
+                            value={formData.gainCurrency}
+                            options={currencyOptions}
+                            onChange={(val) =>
+                                handleCurrencyChange(
+                                    'gainCurrency',
+                                    val as '$' | '%',
+                                )
+                            }
+                            cssPositioning='fixed'
+                        />
                     </div>
                 </div>
                 {formData.gain && (
@@ -250,12 +278,17 @@ export default function TakeProfitsModal(props: PropIF) {
                             }
                             placeholder='Loss'
                         />
-                        <button
-                            onClick={() => handleCurrencyToggle('lossCurrency')}
-                        >
-                            <span>{formData.lossCurrency}</span>
-                            <BsChevronDown size={16} />
-                        </button>
+                        <ComboBox
+                            value={formData.lossCurrency}
+                            options={currencyOptions}
+                            onChange={(val) =>
+                                handleCurrencyChange(
+                                    'lossCurrency',
+                                    val as '$' | '%',
+                                )
+                            }
+                            cssPositioning='fixed'
+                        />
                     </div>
                 </div>
                 {formData.loss && (

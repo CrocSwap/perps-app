@@ -143,6 +143,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         <TakeProfitsModal
                             closeTPModal={modalCtrl.close}
                             position={position}
+                            markPrice={coinPriceMap.get(position.coin) ?? 0}
                         />
                     </Modal>
                 );
