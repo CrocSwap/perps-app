@@ -1,10 +1,5 @@
-import {
-    FaDiscord,
-    // FaFileAlt,
-    // FaMediumM,
-    // FaQuestionCircle,
-    FaTwitter,
-} from 'react-icons/fa';
+import { FaDiscord } from 'react-icons/fa';
+import { RiTwitterXFill } from 'react-icons/ri';
 // import { IoIosInformationCircle } from 'react-icons/io';
 // import { useTutorial } from '~/hooks/useTutorial';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
@@ -15,8 +10,8 @@ import { externalURLs } from '~/utils/Constants';
 const menuItems = [
     // { name: 'Docs', icon: <FaFileAlt /> },
     {
-        name: 'Twitter',
-        icon: <FaTwitter />,
+        name: '𝕏 / Twitter',
+        icon: <RiTwitterXFill />,
         url: externalURLs.twitter,
     },
     {

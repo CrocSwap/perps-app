@@ -1,6 +1,6 @@
-/* ========= Desktop (unchanged base styles) ========= */
+/* ========= Desktop base (relaxed to avoid clipping) ========= */
 .container {
-    height: 100%;
+    /* let main.content control scrolling; do NOT clamp here */
     display: flex;
     flex-direction: column;
     gap: 48px;
@@ -8,8 +8,7 @@
     margin: 0 auto;
     margin-top: 96px;
     padding-bottom: var(--padding-m);
-    /* overflow-y: hidden; */
-    max-height: calc(100vh - 300px);
+    /* removed: height:100%; max-height: calc(100vh - 300px); */
 }
 
 .container header {
@@ -31,12 +30,14 @@
     flex-direction: row;
     align-items: center;
     gap: 5rem;
+    min-height: 0; /* allow shrink inside scroll parents */
 }
 
 .detailsContent {
     display: flex;
     flex-direction: column;
     gap: var(--gap-m);
+    min-height: 0;
 }
 
 .detailsContent h6 {
@@ -50,11 +51,12 @@
 }
 
 .tableContainer {
-    height: 100%;
+    /* grid, but no fixed height; let it grow */
     display: grid;
     grid-template-columns: 1fr 3fr;
     gap: var(--gap-s);
-    height: 346px;
+    /* removed fixed heights */
+    min-height: 0; /* critical for scrollable children */
 }
 
 @media (max-width: 1568px) {
@@ -63,19 +65,21 @@
     }
 }
 
-/* ========= Tablet polish (<=1024px) ========= */
-/* Keep the two-column spirit, but make it touch-friendly and fluid. */
+/* ========= Tablet (<=1024px) ========= */
 @media (max-width: 1024px) {
     .container {
-        /* safe-area & fluid breathing room without changing desktop */
         padding-left: clamp(16px, 4vw, 28px);
         padding-right: clamp(16px, 4vw, 28px);
-        padding-bottom: calc(env(safe-area-inset-bottom) + var(--padding-m));
+        /* add some bottom room; footer height is 56px fallback */
+        padding-bottom: calc(
+            env(safe-area-inset-bottom) + var(--footer-h, 56px)
+        );
         gap: clamp(24px, 4vw, 36px);
+        /* ensure no clamps */
+        /* height: auto; max-height: none; — implicit now */
     }
 
     .container header {
-        /* scale down big header gracefully */
         font-size: clamp(24px, 4.5vw, 32px);
         line-height: 1.15;
         letter-spacing: -0.01em;
@@ -86,10 +90,10 @@
         line-height: 1.5;
     }
 
-    /* KPI tiles get card treatment, no JSX changes */
     .detailsContainer {
         gap: clamp(16px, 4vw, 24px);
         flex-wrap: wrap;
+        min-height: 0;
     }
 
     .detailsContent {
@@ -100,6 +104,7 @@
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
         min-width: min(46%, 340px);
         flex: 1 1 auto;
+        min-height: 0;
     }
 
     .detailsContent h6 {
@@ -116,15 +121,14 @@
         margin: 2px 0 0 0;
     }
 
-    /* Wider gutter, natural height; keep two columns where it fits */
     .tableContainer {
         grid-template-columns: 1fr 2fr;
         gap: clamp(10px, 2.8vw, 16px);
-        height: auto;
-        max-height: none;
+        /* no height/max-height here */
+        min-height: 0;
     }
 
-    /* Panel “cards” without altering your structure */
+    /* Panels behave and can scroll inside */
     .tableContainer > div {
         border: 1px solid color-mix(in oklab, #ffffff 12%, transparent);
         border-radius: 16px;
@@ -132,43 +136,57 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        /* min height but allow shrink */
         min-height: 260px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     }
 
-    /* Allow children (CodeTabs / ReferralsTabs) to scroll independently if they overflow */
+    /* children (CodeTabs / ReferralsTabs) may overflow; allow scrolling */
     .tableContainer > div > * {
         min-width: 0;
+        min-height: 0;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
         scroll-behavior: smooth;
     }
 }
 
-/* ========= Phone layout (<=768px) ========= */
-/* Stack, add thumb-friendly feedback, and keep it airy. */
+/* ========= Phone (<=768px) ========= */
 @media (max-width: 768px) {
     .container {
         margin-top: 0;
-        overflow-y: auto;
-        height: auto;
-        max-height: none;
+        /* main.content owns the scroll; this is just spacing */
         gap: clamp(20px, 5vw, 28px);
         padding-top: calc(env(safe-area-inset-top) + 12px);
+        padding-left: clamp(12px, 4vw, 16px);
+        padding-right: clamp(12px, 4vw, 16px);
+        padding-bottom: calc(
+            env(safe-area-inset-bottom) + var(--footer-h, 56px)
+        );
+        /* ensure zero clamps */
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        min-height: 0;
+    }
+    .container::-webkit-scrollbar {
+        display: none !important; /* Chrome, Safari, and Opera */
     }
 
     .tableContainer {
         display: flex;
         flex-direction: column;
         gap: var(--gap-s);
-        max-height: none;
         height: auto;
+        max-height: none;
+        min-height: 0;
     }
 
     .tableContainer > div {
         min-height: 220px;
         margin-bottom: 12px;
         transition: transform 0.15s ease;
+        min-width: 0;
     }
     .tableContainer > div:active {
         transform: scale(0.99);
@@ -178,6 +196,7 @@
         flex-direction: column;
         gap: var(--gap-s);
         align-items: stretch;
+        min-height: 0;
     }
 
     .detailsContent {
@@ -204,28 +223,26 @@
         transition: none;
     }
 }
+
 /* ===== Compact KPI chips on phones ===== */
 @media (max-width: 768px) {
-    /* put them side-by-side to save vertical space */
     .detailsContainer {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px; /* tighter gap */
+        gap: 8px;
         align-items: stretch;
     }
 
-    /* strip the card bulk */
     .detailsContent {
-        padding: 8px 10px; /* was larger */
-        border-radius: 12px; /* smaller corners */
+        padding: 8px 10px;
+        border-radius: 12px;
         border: 1px solid color-mix(in oklab, #ffffff 10%, transparent);
         background: color-mix(in oklab, #0f0f18 92%, #161622 8%);
-        box-shadow: none; /* remove shadow */
-        gap: 4px; /* tighter vertical gap */
+        box-shadow: none;
+        gap: 4px;
         min-height: auto;
     }
 
-    /* label: tiny, uppercase, muted */
     .detailsContent h6 {
         font-size: 11px;
         line-height: 1.2;
@@ -235,9 +252,8 @@
         margin: 0;
     }
 
-    /* value: smaller but still clear */
     .detailsContent h3 {
-        font-size: clamp(16px, 5.2vw, 20px); /* was 36px desktop */
+        font-size: clamp(16px, 5.2vw, 20px);
         line-height: 1.2;
         margin: 0;
         letter-spacing: -0.01em;

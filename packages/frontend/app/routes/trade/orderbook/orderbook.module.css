@@ -98,7 +98,20 @@
 }
 
 @media (max-width: 768px) {
+    .orderBookContainer {
+        min-height: 0;
+    }
+
     .orderSlotsWrapper {
-        justify-content: flex-start;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+    }
+
+    .ratioBar,
+    .obGradientEffect {
+        pointer-events: none;
     }
 }

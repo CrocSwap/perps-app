@@ -1,3 +1,7 @@
+:root {
+    --footer-h: 56px; /* mobile footer height */
+}
+
 html,
 body {
     overscroll-behavior-x: none;
@@ -185,15 +189,14 @@ body {
         background: var(--bg-dark2, #111117);
     }
 
+    /* Do not clamp to 100dvh; fixed sections will handle height */
     .container {
         grid-template-rows: 1fr;
-        height: 100dvh;
         gap: 0;
     }
 
     .containerTop {
         grid-template-columns: 1fr;
-        height: 100dvh;
         gap: 0;
         border-radius: 0;
         padding-top: 120px;
@@ -204,7 +207,7 @@ body {
         position: fixed;
         top: 105px;
         left: 0;
-        width: 100%;
+        right: 0;
         height: 40px;
         background: var(--bg-dark1);
         z-index: 200;
@@ -240,12 +243,14 @@ body {
         color: var(--text1);
     }
 
+    /* KEY FIX: respect the fixed footer space */
     .mobileSection {
         position: fixed;
         top: 150px;
         left: 0;
-        width: 100%;
-        height: calc(100dvh - 150px);
+        right: 0;
+        bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+        height: auto; /* top/bottom define the box */
         background: var(--bg-dark1);
         overflow-y: auto !important;
         display: none;

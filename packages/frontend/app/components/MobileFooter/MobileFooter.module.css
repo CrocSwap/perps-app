@@ -1,4 +1,6 @@
 .footer {
+    overflow: hidden;
+    box-sizing: border-box;
     display: flex;
     height: 56px;
     padding: 0 var(--padding-s);
@@ -12,6 +14,7 @@
     background: var(--bg-dark2, #111117);
 
     border-radius: var(--radius-m, 16px) var(--radius-m, 16px) 0 0;
+    border-top: 1px solid var(--bg-dark4);
 }
 
 .navItem {
@@ -25,6 +28,11 @@
     height: 100%;
 }
 
+.active .icon,
+.active .label {
+    color: var(--accent1, #7371fc);
+}
+
 .iconWrapper {
     display: flex;
     flex-direction: column;
@@ -32,7 +40,7 @@
     justify-content: center;
     gap: var(--gap-xs);
     width: 100%;
-    height: 100%;
+    padding-block: 6px;
 }
 
 .icon {
@@ -41,16 +49,24 @@
     justify-content: center;
     align-items: center;
 }
+.icon svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
 
 .label {
     color: var(--text1, #f0f0f8);
     text-align: center;
     font-size: var(--font-size-s, 12px);
+    line-height: 1;
+    margin: 0;
+    padding: 0;
 }
 
 .navItem:hover .icon,
 .navItem:hover .label,
-.navItem:active .icon,
+/* .navItem:active .icon, */
 .navItem:active .label {
     color: var(--base-accent1, #7371fc);
 }
@@ -64,7 +80,7 @@
 }
 
 /* Active state for navigation items */
-.navItem[aria-current='page'] .icon,
+/* .navItem[aria-current='page'] .icon,
 .navItem[aria-current='page'] .label {
     color: var(--accent1, #7371fc);
-}
+} */
