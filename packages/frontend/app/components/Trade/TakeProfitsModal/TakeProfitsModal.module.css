@@ -200,3 +200,9 @@
     justify-content: center;
     gap: var(--gap-xs);
 }
+.amountReadout {
+    width: 100%;
+    font-size: var(--font-size-s);
+    text-align: right;
+    color: var(--green);
+}

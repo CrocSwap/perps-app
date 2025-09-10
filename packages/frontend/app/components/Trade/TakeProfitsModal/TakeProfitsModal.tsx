@@ -3,6 +3,8 @@ import styles from './TakeProfitsModal.module.css';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import PositionSize from '../OrderInput/PositionSIze/PositionSize';
+import { useEffect } from 'react';
 
 interface TPSLFormData {
     tpPrice: string;
@@ -19,10 +21,31 @@ interface PropIF {
     closeTPModal: () => void;
     position: PositionIF;
     markPrice?: number;
+    baseSymbol?: string;
+    qtyStep?: number;
 }
 
 export default function TakeProfitsModal(props: PropIF) {
-    const { closeTPModal, position, markPrice } = props;
+    const { closeTPModal, position, markPrice, baseSymbol, qtyStep } = props;
+
+    const totalBase = Math.abs(position.szi ?? 0);
+    const baseStep = qtyStep ?? 1e-8;
+    const labelSym = baseSymbol ?? position.coin;
+
+    const [configureAmount, setConfigureAmount] = useState<boolean>(false);
+    const [applyPct, setApplyPct] = useState<number>(100);
+
+    const roundToStep = (x: number, step: number) =>
+        Math.floor((x + Number.EPSILON) / step) * step;
+
+    useEffect(() => {
+        if (!configureAmount) setApplyPct(100);
+    }, [configureAmount]);
+
+    const applyBase = useMemo(() => {
+        const raw = (applyPct / 100) * totalBase;
+        return roundToStep(raw, baseStep);
+    }, [applyPct, totalBase, baseStep]);
 
     const [formData, setFormData] = useState<TPSLFormData>({
         tpPrice: position.tp ? position.tp.toString() : '',
@@ -492,16 +515,32 @@ export default function TakeProfitsModal(props: PropIF) {
 
             <section className={styles.toggleContainer}>
                 <ToggleSwitch
-                    isOn={formData.configureAmount}
-                    onToggle={(newState) =>
-                        handleInputChange(
-                            'configureAmount',
-                            newState ?? !formData.configureAmount,
-                        )
-                    }
+                    isOn={configureAmount}
+                    onToggle={(v) => {
+                        const next = v ?? !configureAmount;
+                        setConfigureAmount(next);
+                    }}
                     label='Configure Amount'
                     reverse
                 />
+
+                {configureAmount && (
+                    <>
+                        <PositionSize
+                            value={applyPct}
+                            onChange={setApplyPct}
+                            isModal
+                            className={styles.positionSizeRow}
+                        />
+                        <div className={styles.amountReadout}>
+                            {applyBase} {labelSym}{' '}
+                            <span className={styles.subtext}>
+                                ({applyPct}% of {totalBase} {labelSym})
+                            </span>
+                        </div>
+                    </>
+                )}
+
                 <ToggleSwitch
                     isOn={formData.limitPrice}
                     onToggle={(newState) =>
