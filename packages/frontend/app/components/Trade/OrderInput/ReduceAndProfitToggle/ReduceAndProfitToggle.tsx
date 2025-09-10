@@ -207,6 +207,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             {/* Take Profit Row */}
             <div className={styles.formRow}>
                 <div className={styles.inputWithoutDropdown}>
+                    <p>SL Price</p>
                     <input
                         type='number'
                         value={takeProfitPrice}
@@ -214,10 +215,10 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                             console.log('TP price changed:', e.target.value);
                             setTakeProfitPrice?.(e.target.value);
                         }}
-                        placeholder='Take Profit Price'
                     />
                 </div>
                 <div className={styles.inputWithDropdown}>
+                    <p>Gain</p>
                     <input
                         type='number'
                         value={takeProfitGain}
@@ -226,7 +227,6 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                             setTakeProfitGain?.(e.target.value);
                             updatePriceFromGain(e.target.value);
                         }}
-                        placeholder='Gain'
                     />
                     <ComboBox
                         value={tpGainCurrency}
@@ -254,6 +254,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             {/* Stop Loss Row */}
             <div className={styles.formRow}>
                 <div className={styles.inputWithoutDropdown}>
+                    <p>SL Price</p>
                     <input
                         type='number'
                         value={stopLossPrice}
@@ -261,10 +262,10 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                             console.log('SL price changed:', e.target.value);
                             setStopLossPrice?.(e.target.value);
                         }}
-                        placeholder='Stop Loss Price'
                     />
                 </div>
                 <div className={styles.inputWithDropdown}>
+                    <p>Loss</p>
                     <input
                         type='number'
                         value={stopLossLoss}
@@ -273,7 +274,6 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                             setStopLossLoss?.(e.target.value);
                             updatePriceFromLoss(e.target.value);
                         }}
-                        placeholder='Loss'
                     />
                     <ComboBox
                         value={slLossCurrency}
@@ -358,34 +358,26 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                 </div>
             )}
             {showReduceToggle && (
-                <div className={styles.reduceToggleContent}>
+                <div
+                    className={styles.reduceToggleContent}
+                    onClick={() => handleToggleReduceOnly()}
+                >
                     <ToggleSwitch
                         isOn={isReduceOnlyEnabled}
                         onToggle={handleToggleReduceOnly}
-                        label=''
+                        label='Reduce Only'
+                        reverse
                     />
-                    <h3 className={styles.toggleLabel}>Reduce Only</h3>
                 </div>
             )}
             {showTakeProfitToggle && (
-                <div
-                    className={styles.reduceToggleContent}
-                    onClick={() => {
-                        console.log(
-                            'TP/SL toggle clicked, current state:',
-                            isTakeProfitEnabled,
-                        );
-                        handleToggleProfitOnly();
-                    }}
-                >
+                <div className={styles.reduceToggleContent}>
                     <ToggleSwitch
                         isOn={isTakeProfitEnabled}
                         onToggle={handleToggleProfitOnly}
-                        label=''
+                        label='Take Profit / Stop Loss'
+                        reverse
                     />
-                    <h3 className={styles.toggleLabel}>
-                        Take Profit / Stop Loss
-                    </h3>
                 </div>
             )}
             {chasingIntervalToggle}

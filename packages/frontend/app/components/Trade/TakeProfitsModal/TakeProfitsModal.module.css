@@ -1,6 +1,6 @@
 .container {
     --container-width: 439px;
-    --input-height: 32px;
+    --input-height: 36px;
 
     width: var(--container-width);
     padding: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
@@ -54,6 +54,29 @@
     height: var(--input-height);
     padding: var(--padding-xs) var(--padding-s);
     border-radius: var(--radius-s);
+}
+.inputWithoutDropdown {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+    justify-content: flex-start;
+    background: var(--bg-dark4);
+}
+
+.inputWithoutDropdown p,
+.inputWithDropdown p {
+    margin: 0;
+    white-space: nowrap;
+    color: var(--text2);
+}
+
+.inputWithoutDropdown input,
+.inputWithDropdown input {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    background: transparent;
+    text-align: right;
 }
 .formRow input {
     width: 100%;
@@ -121,7 +144,9 @@
     color: var(--text2);
     font-size: var(--font-size-s);
 }
-
+.expectedProfitContainer {
+    height: 15px;
+}
 .expectedProfitText {
     width: 100%;
     display: flex;

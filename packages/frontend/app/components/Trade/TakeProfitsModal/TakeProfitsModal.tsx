@@ -357,6 +357,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     <div
                         className={`${styles.inputWithoutDropdown} ${showTpValidation && tpInvalid ? styles.fieldError : ''} ${showTpValidation && tpOutlier && !tpInvalid ? styles.fieldWarning : ''}`}
                     >
+                        <p>TP Price</p>
                         <input
                             type='number'
                             value={formData.tpPrice}
@@ -369,11 +370,11 @@ export default function TakeProfitsModal(props: PropIF) {
                                 setTpPriceTouched(true);
                             }}
                             aria-invalid={tpInvalid || undefined}
-                            placeholder='Take Profit Price'
                         />
                     </div>
 
                     <div className={styles.inputWithDropdown}>
+                        <p>Gain</p>
                         <input
                             type='number'
                             value={formData.gain}
@@ -385,7 +386,6 @@ export default function TakeProfitsModal(props: PropIF) {
                                 setGainFocused(false);
                                 setGainTouched(true);
                             }}
-                            placeholder='Gain'
                         />
 
                         <ComboBox
@@ -401,25 +401,31 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
-                {(formData.tpPrice || formData.gain) && (
-                    <span className={styles.expectedProfitText}>
-                        Expected Profit:{' '}
-                        {expectedProfit == null
-                            ? '—'
-                            : `$${expectedProfit.toFixed(2)}`}
-                        {tpInvalid && showTpValidation && (
-                            <span className={styles.validationError}>
-                                {' '}
-                                • TP must be {isLong ? 'above' : 'below'} entry
-                            </span>
-                        )}
-                    </span>
-                )}
+                <div className={styles.expectedProfitContainer}>
+                    {(formData.tpPrice || formData.gain) && (
+                        <span className={styles.expectedProfitText}>
+                            Expected Profit:{' '}
+                            {expectedProfit == null
+                                ? '—'
+                                : `$${expectedProfit.toFixed(2)}`}
+                            {tpInvalid && showTpValidation && (
+                                <span className={styles.validationError}>
+                                    {' '}
+                                    • TP must be {isLong
+                                        ? 'above'
+                                        : 'below'}{' '}
+                                    entry
+                                </span>
+                            )}
+                        </span>
+                    )}
+                </div>
 
                 <div className={styles.formRow}>
                     <div
                         className={`${styles.inputWithoutDropdown} ${showSlValidation && slInvalid ? styles.fieldError : ''} ${showSlValidation && slOutlier && !slInvalid ? styles.fieldWarning : ''}`}
                     >
+                        <p>SL Price</p>
                         <input
                             type='number'
                             value={formData.slPrice}
@@ -432,11 +438,11 @@ export default function TakeProfitsModal(props: PropIF) {
                                 setSlPriceTouched(true);
                             }}
                             aria-invalid={slInvalid || undefined}
-                            placeholder='Stop Loss Price'
                         />
                     </div>
 
                     <div className={styles.inputWithDropdown}>
+                        <p>Loss</p>
                         <input
                             type='number'
                             value={formData.loss}
@@ -448,7 +454,6 @@ export default function TakeProfitsModal(props: PropIF) {
                                 setLossFocused(false);
                                 setLossTouched(true);
                             }}
-                            placeholder='Loss'
                         />
 
                         <ComboBox
@@ -464,20 +469,25 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
-                {(formData.slPrice || formData.loss) && (
-                    <span className={styles.expectedProfitText}>
-                        Expected Loss:{' '}
-                        {expectedLoss == null
-                            ? '—'
-                            : `-$${expectedLoss.toFixed(2)}`}
-                        {slInvalid && showSlValidation && (
-                            <span className={styles.validationError}>
-                                {' '}
-                                • SL must be {isLong ? 'below' : 'above'} entry
-                            </span>
-                        )}
-                    </span>
-                )}
+                <div className={styles.expectedProfitContainer}>
+                    {(formData.slPrice || formData.loss) && (
+                        <span className={styles.expectedProfitText}>
+                            Expected Loss:{' '}
+                            {expectedLoss == null
+                                ? '—'
+                                : `-$${expectedLoss.toFixed(2)}`}
+                            {slInvalid && showSlValidation && (
+                                <span className={styles.validationError}>
+                                    {' '}
+                                    • SL must be {isLong
+                                        ? 'below'
+                                        : 'above'}{' '}
+                                    entry
+                                </span>
+                            )}
+                        </span>
+                    )}
+                </div>
             </section>
 
             <section className={styles.toggleContainer}>

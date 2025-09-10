@@ -12,6 +12,7 @@
     font-size: var(--font-size-s, 12px);
     color: var(--text1);
     user-select: none;
+    cursor: pointer;
 }
 .toggleLabel {
     color: var(--text1, #f0f0f8);
@@ -80,6 +81,30 @@
     height: var(--input-height);
     padding: var(--padding-xs) var(--padding-s);
     border-radius: var(--radius-s);
+}
+.inputWithoutDropdown {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+    justify-content: flex-start;
+    background: var(--bg-dark4);
+}
+
+.inputWithoutDropdown p,
+.inputWithDropdown p {
+    margin: 0;
+    white-space: nowrap;
+    color: var(--text2);
+    font-size: var(--font-size-s);
+}
+
+.inputWithoutDropdown input,
+.inputWithDropdown input {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    background: transparent;
+    text-align: right;
 }
 
 .formRow input {
