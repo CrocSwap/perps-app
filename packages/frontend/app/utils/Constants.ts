@@ -223,3 +223,7 @@ export const TIMEOUT_CANDLE_POLLING =
 
 export const SPLIT_TEST_VERSION =
     import.meta.env.VITE_SPLIT_TEST_VERSION || 'control';
+
+export const SHOULD_LOG_ANALYTICS =
+    import.meta.env.VITE_SHOULD_LOG_ANALYTICS &&
+    import.meta.env.VITE_SHOULD_LOG_ANALYTICS.toLowerCase() === 'true';
