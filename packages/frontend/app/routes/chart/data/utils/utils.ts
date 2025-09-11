@@ -357,3 +357,97 @@ export const getLiquidationsSvgIcon = (color: string) => `
     <g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M12 0.827576L12.8878 2.53967C14.1035 4.88434 15.5212 6.51667 16.8024 7.99192C16.9893 8.20708 17.1733 8.41891 17.3533 8.62911C18.7331 10.2403 20 11.8793 20 14.1696C20 18.5172 16.395 22 12 22C7.60499 22 4 18.5172 4 14.1696C4 11.8793 5.26687 10.2403 6.64671 8.62911C6.82673 8.41891 7.0107 8.20708 7.19757 7.99191C8.47882 6.51667 9.89649 4.88434 11.1122 2.53967L12 0.827576ZM8.16579 9.93003C6.7748 11.5543 6 12.6877 6 14.1696C6 17.3667 8.66302 20 12 20C15.337 20 18 17.3667 18 14.1696C18 12.6877 17.2252 11.5543 15.8342 9.93003C15.664 9.73133 15.4862 9.5269 15.3024 9.31552C14.2961 8.15864 13.1087 6.79342 12 5.0167C10.8913 6.79342 9.70387 8.15864 8.69763 9.31552C8.51377 9.5269 8.33596 9.73133 8.16579 9.93003Z" fill="${color}"/> </g>
     </svg>
 `;
+
+export const tvResolutionToMinutes = (resolution: ResolutionString) => {
+    let coef = 1;
+
+    if (!resolution) return 1;
+
+    if (resolution.includes('D')) {
+        coef = 24 * 60;
+    } else if (resolution.includes('W')) {
+        coef = 24 * 60 * 7;
+    } else if (resolution.includes('M')) {
+        coef = 60 * 24 * 30;
+    }
+
+    const intervalNum = Number(resolution.replace(/[^0-9]/g, ''));
+
+    return intervalNum * coef;
+};
+
+export const getCurrentCandleTime = (resolution: ResolutionString) => {
+    const now = new Date();
+
+    // Parse resolution to get interval in minutes
+    const intervalMinutes = tvResolutionToMinutes(resolution);
+
+    // Calculate the start time of the current candle
+    const currentMinutes = now.getUTCMinutes();
+    const currentHours = now.getUTCHours();
+    const currentDate = now.getUTCDate();
+    const currentMonth = now.getUTCMonth();
+    const currentYear = now.getUTCFullYear();
+
+    let candleStartTime;
+
+    if (intervalMinutes < 60) {
+        // For minute-based intervals (1, 5, 15, 30 minutes)
+        const intervalStart =
+            Math.floor(currentMinutes / intervalMinutes) * intervalMinutes;
+        candleStartTime = new Date(
+            Date.UTC(
+                currentYear,
+                currentMonth,
+                currentDate,
+                currentHours,
+                intervalStart,
+                0,
+                0,
+            ),
+        );
+    } else if (intervalMinutes < 1440) {
+        // For hour-based intervals (1H, 4H, etc.)
+        const intervalHours = intervalMinutes / 60;
+        const hourStart =
+            Math.floor(currentHours / intervalHours) * intervalHours;
+        candleStartTime = new Date(
+            Date.UTC(
+                currentYear,
+                currentMonth,
+                currentDate,
+                hourStart,
+                0,
+                0,
+                0,
+            ),
+        );
+    } else {
+        // For daily and above (1D, 1W, 1M)
+        if (resolution === '1D') {
+            candleStartTime = new Date(
+                Date.UTC(currentYear, currentMonth, currentDate, 0, 0, 0, 0),
+            );
+        } else if (resolution === '1W') {
+            const dayOfWeek = now.getUTCDay();
+            const daysToMonday = (dayOfWeek + 6) % 7; // Days since Monday
+            candleStartTime = new Date(
+                Date.UTC(
+                    currentYear,
+                    currentMonth,
+                    currentDate - daysToMonday,
+                    0,
+                    0,
+                    0,
+                    0,
+                ),
+            );
+        } else if (resolution === '1M') {
+            candleStartTime = new Date(
+                Date.UTC(currentYear, currentMonth, 1, 0, 0, 0, 0),
+            );
+        }
+    }
+
+    return candleStartTime?.getTime() || 0;
+};

@@ -16,11 +16,19 @@ export const RECONNECT_TIMEOUT_MS = 500; // timeout to trigger connect method wh
 export const DEMO_USER = '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00';
 
 export const MARKET_API_URL =
-    import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_PROXY_URL ||
+    import.meta.env.VITE_MARKET_API_URL ||
+    'https://hyper-proxy-1080663129748.europe-west1.run.app';
+// 'https://api.hyperliquid.xyz';
+// import.meta.env.VITE_MARKET_API_URL || 'http://localhost:8080';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const PROXY_API_URL =
-    import.meta.env.VITE_POLLING_API_URL || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_PROXY_URL ||
+    import.meta.env.VITE_POLLING_API_URL ||
+    'https://hyper-proxy-1080663129748.europe-west1.run.app';
+// 'https://api.hyperliquid.xyz';
+// import.meta.env.VITE_POLLING_API_URL || 'http://localhost:8080';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const MARKET_WS_ENDPOINT =

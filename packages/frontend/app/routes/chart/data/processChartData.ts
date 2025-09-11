@@ -2,6 +2,7 @@ import type {
     Bar,
     ResolutionString,
 } from '~/tv/charting_library/charting_library';
+import { getCurrentCandleTime } from './utils/utils';
 
 // transforms ws candle data to Bar object
 export const processWSCandleMessage = (payload: any): Bar => {
@@ -25,6 +26,31 @@ export const processWSCandleMessage = (payload: any): Bar => {
             volume: 0,
         };
     }
+};
+
+export const processLastCandleWithPx = (
+    lastCandle: Bar,
+    px: number,
+    resolution: ResolutionString,
+    isNewCandle?: boolean,
+): Bar => {
+    const time = getCurrentCandleTime(resolution);
+    if (isNewCandle) {
+        return {
+            open: lastCandle.close,
+            close: px,
+            high: px,
+            low: px,
+            time,
+        };
+    }
+    return {
+        ...lastCandle,
+        close: px,
+        high: px > lastCandle.high ? px : lastCandle.high,
+        low: px < lastCandle.low ? px : lastCandle.low,
+        time,
+    };
 };
 
 export const mapResolutionToInterval = (resolution: ResolutionString) => {
