@@ -1,11 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import styles from './TakeProfitsModal.module.css';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
-import { useEffect } from 'react';
-import { useRef } from 'react';
 
 interface TPSLFormData {
     tpPrice: string;
@@ -37,33 +35,12 @@ export default function TakeProfitsModal(props: PropIF) {
     const [applyPct, setApplyPct] = useState<number>(100);
 
     // Refs for each input
-    const tpPriceRef = useRef<HTMLInputElement>(null);
     const gainRef = useRef<HTMLInputElement>(null);
-    const slPriceRef = useRef<HTMLInputElement>(null);
     const lossRef = useRef<HTMLInputElement>(null);
-    const tpLimitRef = useRef<HTMLInputElement>(null);
-    const slLimitRef = useRef<HTMLInputElement>(null);
-
-    // Reusable props: clicking the container focuses the input (but don't steal clicks
-    // from nested interactive elements like the combobox button/listbox)
-    const focusContainer = (ref: React.RefObject<HTMLInputElement>) => ({
-        onMouseDown: (e: React.MouseEvent) => {
-            const t = e.target as HTMLElement;
-            if (t.closest('input,button,[role="button"],[role="listbox"]'))
-                return;
-            e.preventDefault();
-            ref.current?.focus();
-        },
-        onClick: (e: React.MouseEvent) => {
-            const t = e.target as HTMLElement;
-            if (t.closest('input,button,[role="button"],[role="listbox"]'))
-                return;
-            ref.current?.focus();
-        },
-    });
 
     const roundToStep = (x: number, step: number) =>
-        Math.floor((x + Number.EPSILON) / step) * step;
+        Math.round((x + Number.EPSILON) / step) * step;
+
     const pxStep = useMemo(() => {
         const ref = markPrice || position.entryPx;
         if (ref >= 100000) return 10;
@@ -274,47 +251,40 @@ export default function TakeProfitsModal(props: PropIF) {
     const slOutlier =
         Number.isFinite(slTarget as number) &&
         pctAway(slTarget as number) >= OUTLIER_PCT;
+    const snap = (v: number) => String(roundToStep(v, pxStep));
 
     const updateTPPriceFromGain = (gainValue: string, currency?: '$' | '%') => {
         if (!gainValue || !qty) return;
         const gain = parseFloat(gainValue);
-        const currencyToUse = currency || formData.gainCurrency;
-
+        const cur = currency ?? formData.gainCurrency;
         let newPrice: number;
-        if (currencyToUse === '$') {
-            // gain is TOTAL $ PnL for the whole position
+        if (cur === '$') {
             const priceChange = gain / qty;
             newPrice = isLong
                 ? baseForPnL + priceChange
                 : baseForPnL - priceChange;
         } else {
-            // percentage gain
             const pct = gain / 100;
             newPrice = baseForPnL * (isLong ? 1 + pct : 1 - pct);
         }
-
-        setFormData((prev) => ({ ...prev, tpPrice: newPrice.toFixed(6) }));
+        setFormData((p) => ({ ...p, tpPrice: snap(newPrice) }));
     };
 
     const updateSLPriceFromLoss = (lossValue: string, currency?: '$' | '%') => {
         if (!lossValue || !qty) return;
         const loss = parseFloat(lossValue);
-        const currencyToUse = currency || formData.lossCurrency;
-
+        const cur = currency ?? formData.lossCurrency;
         let newPrice: number;
-        if (currencyToUse === '$') {
-            // loss is TOTAL $ PnL for the whole position
+        if (cur === '$') {
             const priceChange = loss / qty;
             newPrice = isLong
                 ? baseForPnL - priceChange
                 : baseForPnL + priceChange;
         } else {
-            // percentage loss
             const pct = loss / 100;
             newPrice = baseForPnL * (isLong ? 1 - pct : 1 + pct);
         }
-
-        setFormData((prev) => ({ ...prev, slPrice: newPrice.toFixed(6) }));
+        setFormData((p) => ({ ...p, slPrice: snap(newPrice) }));
     };
 
     const placeTakeProfitOrder = async (): Promise<void> => {
@@ -434,18 +404,20 @@ export default function TakeProfitsModal(props: PropIF) {
 
     return (
         <div className={styles.container}>
+            {/* --- INFO HEADER --- */}
             <section className={styles.infoContainer}>
-                {infoData.map((item, index) => (
-                    <div key={index} className={styles.infoItem}>
+                {infoData.map((item) => (
+                    <div key={item.label} className={styles.infoItem}>
                         <p>{item.label}</p>
                         <p>{item.value}</p>
                     </div>
                 ))}
             </section>
 
+            {/* --- FORM CONTAINER --- */}
             <section className={styles.formContainer}>
+                {/* TP Row */}
                 <div className={styles.formRow}>
-                    {/* TP Price — wrap the whole field in a <label> so any click focuses the input */}
                     <label
                         className={`${styles.inputWithoutDropdown} ${showTpValidation && tpInvalid ? styles.fieldError : ''} ${showTpValidation && tpOutlier && !tpInvalid ? styles.fieldWarning : ''}`}
                         htmlFor='tpPrice'
@@ -459,15 +431,24 @@ export default function TakeProfitsModal(props: PropIF) {
                                 handleInputChange('tpPrice', e.target.value)
                             }
                             onFocus={() => setTpPriceFocused(true)}
-                            onBlur={() => {
+                            onBlur={(e) => {
                                 setTpPriceFocused(false);
                                 setTpPriceTouched(true);
+                                const n = parsePx(e.currentTarget.value);
+                                if (Number.isFinite(n)) {
+                                    const snapped = String(
+                                        roundToStep(n, pxStep),
+                                    );
+                                    if (snapped !== e.currentTarget.value) {
+                                        e.currentTarget.value = snapped;
+                                        handleInputChange('tpPrice', snapped);
+                                    }
+                                }
                             }}
                             aria-invalid={tpInvalid || undefined}
                         />
                     </label>
 
-                    {/* Gain — composite field (input + ComboBox). Click anywhere (except ComboBox) to focus input */}
                     <div
                         className={styles.inputWithDropdown}
                         role='group'
@@ -532,30 +513,39 @@ export default function TakeProfitsModal(props: PropIF) {
                     )}
                 </div>
 
+                {/* SL Row */}
                 <div className={styles.formRow}>
-                    {/* TP Price — wrap the whole field in a <label> so any click focuses the input */}
                     <label
-                        className={`${styles.inputWithoutDropdown} ${showTpValidation && tpInvalid ? styles.fieldError : ''} ${showTpValidation && tpOutlier && !tpInvalid ? styles.fieldWarning : ''}`}
-                        htmlFor='tpPrice'
+                        className={`${styles.inputWithoutDropdown} ${showSlValidation && slInvalid ? styles.fieldError : ''} ${showSlValidation && slOutlier && !slInvalid ? styles.fieldWarning : ''}`}
+                        htmlFor='slPrice'
                     >
-                        <span>TP Price</span>
+                        <span>SL Price</span>
                         <input
-                            id='tpPrice'
+                            id='slPrice'
                             type='number'
-                            value={formData.tpPrice}
+                            value={formData.slPrice}
                             onChange={(e) =>
-                                handleInputChange('tpPrice', e.target.value)
+                                handleInputChange('slPrice', e.target.value)
                             }
-                            onFocus={() => setTpPriceFocused(true)}
-                            onBlur={() => {
-                                setTpPriceFocused(false);
-                                setTpPriceTouched(true);
+                            onFocus={() => setSlPriceFocused(true)}
+                            onBlur={(e) => {
+                                setSlPriceFocused(false);
+                                setSlPriceTouched(true);
+                                const n = parsePx(e.currentTarget.value);
+                                if (Number.isFinite(n)) {
+                                    const snapped = String(
+                                        roundToStep(n, pxStep),
+                                    );
+                                    if (snapped !== e.currentTarget.value) {
+                                        e.currentTarget.value = snapped;
+                                        handleInputChange('slPrice', snapped);
+                                    }
+                                }
                             }}
-                            aria-invalid={tpInvalid || undefined}
+                            aria-invalid={slInvalid || undefined}
                         />
                     </label>
 
-                    {/* Gain — composite field (input + ComboBox). Click anywhere (except ComboBox) to focus input */}
                     <div
                         className={styles.inputWithDropdown}
                         role='group'
@@ -568,30 +558,30 @@ export default function TakeProfitsModal(props: PropIF) {
                             )
                                 return;
                             e.preventDefault();
-                            gainRef.current?.focus();
+                            lossRef.current?.focus();
                         }}
                     >
-                        <label htmlFor='gain'>Gain</label>
+                        <label htmlFor='loss'>Loss</label>
                         <input
-                            id='gain'
-                            ref={gainRef}
+                            id='loss'
+                            ref={lossRef}
                             type='number'
-                            value={formData.gain}
+                            value={formData.loss}
                             onChange={(e) =>
-                                handleInputChange('gain', e.target.value)
+                                handleInputChange('loss', e.target.value)
                             }
-                            onFocus={() => setGainFocused(true)}
+                            onFocus={() => setLossFocused(true)}
                             onBlur={() => {
-                                setGainFocused(false);
-                                setGainTouched(true);
+                                setLossFocused(false);
+                                setLossTouched(true);
                             }}
                         />
                         <ComboBox
-                            value={formData.gainCurrency}
+                            value={formData.lossCurrency}
                             options={currencyOptions}
                             onChange={(val) =>
                                 handleCurrencyChange(
-                                    'gainCurrency',
+                                    'lossCurrency',
                                     val as '$' | '%',
                                 )
                             }
@@ -621,13 +611,11 @@ export default function TakeProfitsModal(props: PropIF) {
                 </div>
             </section>
 
+            {/* --- TOGGLE SECTION --- */}
             <section className={styles.toggleContainer}>
                 <ToggleSwitch
                     isOn={configureAmount}
-                    onToggle={(v) => {
-                        const next = v ?? !configureAmount;
-                        setConfigureAmount(next);
-                    }}
+                    onToggle={(v) => setConfigureAmount(v ?? !configureAmount)}
                     label='Configure Amount'
                     reverse
                 />
@@ -663,7 +651,6 @@ export default function TakeProfitsModal(props: PropIF) {
 
                 {formData.limitPrice && (
                     <div className={styles.formRow}>
-                        {/* TP Limit Price — use text + inputMode to avoid spinners; label wraps for click-to-focus */}
                         <label
                             className={styles.inputWithoutDropdown}
                             htmlFor='tpLimitPrice'
@@ -676,11 +663,9 @@ export default function TakeProfitsModal(props: PropIF) {
                                 value={tpLimitStr}
                                 onChange={(e) => setTpLimitStr(e.target.value)}
                                 onBlur={onTpLimitBlur}
-                                aria-label='tp limit price'
                             />
                         </label>
 
-                        {/* SL Limit Price */}
                         <label
                             className={styles.inputWithoutDropdown}
                             htmlFor='slLimitPrice'
@@ -693,29 +678,29 @@ export default function TakeProfitsModal(props: PropIF) {
                                 value={slLimitStr}
                                 onChange={(e) => setSlLimitStr(e.target.value)}
                                 onBlur={onSlLimitBlur}
-                                aria-label='sl limit price'
                             />
                         </label>
                     </div>
                 )}
             </section>
+
+            {/* --- WARNINGS --- */}
             <div className={styles.warningContainer}>
                 {!tpInvalid && tpOutlier && showTpValidation && (
                     <span className={styles.warningText}>
-                        {' '}
                         TP is {(pctAway(tpTarget as number) * 100).toFixed(1)}%
                         from entry — double-check your input
                     </span>
                 )}
                 {!slInvalid && slOutlier && showSlValidation && (
                     <span className={styles.warningText}>
-                        {' '}
                         SL is {(pctAway(slTarget as number) * 100).toFixed(1)}%
                         from entry — double-check your input
                     </span>
                 )}
             </div>
 
+            {/* --- CONFIRM BUTTON --- */}
             <button
                 className={`${styles.confirmButton} ${!isFormValid() ? styles.disabled : ''}`}
                 onClick={handleConfirm}
@@ -724,13 +709,13 @@ export default function TakeProfitsModal(props: PropIF) {
                 Confirm
             </button>
 
+            {/* --- FOOTER INFO --- */}
             <section className={styles.textInfo}>
                 <p>
                     By default take-profit and stop-loss orders apply to the
-                    entire position. Take-profit and stop-loss automatically
-                    cancel after closing the position. A market order is
-                    triggered when the stop loss or take profit price is
-                    reached.
+                    entire position. These orders automatically cancel after
+                    closing the position. A market order is triggered when the
+                    stop loss or take profit price is reached.
                 </p>
                 <p>
                     If the order size is configured above, the TP/SL order will
