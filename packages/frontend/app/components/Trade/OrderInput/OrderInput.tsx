@@ -160,7 +160,7 @@ function OrderInput({
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
-    const [marketOrderType, setMarketOrderType] = useState<string>('market');
+    const [marketOrderType, setMarketOrderType] = useState<string>('limit');
     const [tradeDirection, setTradeDirection] = useState<OrderSide>('buy');
 
     const [shouldUpdateAfterTrade, setShouldUpdateAfterTrade] = useState(false);
