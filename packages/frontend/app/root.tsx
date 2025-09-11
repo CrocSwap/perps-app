@@ -27,6 +27,8 @@ import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
 import {
     MARKET_WS_ENDPOINT,
     RPC_ENDPOINT,
+    SHOULD_LOG_ANALYTICS,
+    SPLIT_TEST_VERSION,
     USER_WS_ENDPOINT,
 } from './utils/Constants';
 import { MarketDataProvider } from './contexts/MarketDataContext';
@@ -154,8 +156,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    const isProduction = import.meta.env.VITE_CONTEXT === 'production';
-
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
 
@@ -229,7 +229,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
-                {isProduction && (
+                {SHOULD_LOG_ANALYTICS && (
                     <script
                         defer
                         event-version={packageJson.version}
@@ -243,6 +243,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                                 ? getResolutionSegment(innerWidth)
                                 : undefined
                         }
+                        event-splitTestVersion={SPLIT_TEST_VERSION}
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>

@@ -220,3 +220,10 @@ export const TIMEOUT_MARKET_DATA_POLLING =
     import.meta.env.VITE_TIMEOUT_MARKET_DATA_POLLING || 2 * SECONDS;
 export const TIMEOUT_CANDLE_POLLING =
     import.meta.env.VITE_TIMEOUT_CANDLE_POLLING || 2 * SECONDS;
+
+export const SPLIT_TEST_VERSION =
+    import.meta.env.VITE_SPLIT_TEST_VERSION || 'control';
+
+export const SHOULD_LOG_ANALYTICS =
+    import.meta.env.VITE_SHOULD_LOG_ANALYTICS &&
+    import.meta.env.VITE_SHOULD_LOG_ANALYTICS.toLowerCase() === 'true';

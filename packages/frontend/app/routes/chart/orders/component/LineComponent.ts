@@ -10,6 +10,7 @@ export type LineData = {
     yPrice: number;
     textValue: LineLabel;
     quantityTextValue?: number;
+    quantityText?: string;
     color: string;
     type: 'PNL' | 'LIMIT' | 'LIQ';
     labelLocations?: LabelLocation[];

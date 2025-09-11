@@ -1,4 +1,4 @@
-import { FaDiscord } from 'react-icons/fa';
+import { FaDiscord, FaCommentAlt } from 'react-icons/fa';
 import { RiTwitterXFill } from 'react-icons/ri';
 // import { IoIosInformationCircle } from 'react-icons/io';
 // import { useTutorial } from '~/hooks/useTutorial';
@@ -7,66 +7,73 @@ import packageJson from '../../../../package.json';
 import styles from './DropdownMenu.module.css';
 import { externalURLs } from '~/utils/Constants';
 
-const menuItems = [
-    // { name: 'Docs', icon: <FaFileAlt /> },
-    {
-        name: '𝕏 / Twitter',
-        icon: <RiTwitterXFill />,
-        url: externalURLs.twitter,
-    },
-    {
-        name: 'Discord',
-        icon: <FaDiscord />,
-        url: externalURLs.discord,
-    },
-    // { name: 'Medium', icon: <FaMediumM /> },
-    // { name: 'Privacy', icon: <FaUserSecret /> },
-    // { name: 'Terms of Service', icon: <FaFileAlt /> },
-    // { name: 'FAQ', icon: <LuCircleHelp /> },
-];
-
 interface DropdownMenuProps {
-    setIsDropdownMenuOpen: (open: boolean) => void;
+    setIsDropdownMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    onFeedbackClick: () => void;
 }
 
-const DropdownMenu = ({ setIsDropdownMenuOpen }: DropdownMenuProps) => {
+const DropdownMenu = ({
+    setIsDropdownMenuOpen,
+    onFeedbackClick,
+}: DropdownMenuProps) => {
     const sessionState = useSession();
-    // const { handleRestartTutorial } = useTutorial();
 
-    // const handleTutorialClick = () => {
-    //     console.log(
-    //         'Tutorial button clicked in DropdownMenu, restarting tutorial...',
-    //     );
-    //     handleRestartTutorial();
-    // };
+    const handleFeedbackClick = () => {
+        onFeedbackClick();
+        setIsDropdownMenuOpen(false);
+    };
+
+    const menuItems = [
+        // { name: 'Docs', icon: <FaFileAlt /> },
+        {
+            name: '𝕏 / Twitter',
+            icon: <RiTwitterXFill />,
+            url: externalURLs.twitter,
+        },
+        {
+            name: 'Discord',
+            icon: <FaDiscord />,
+            url: externalURLs.discord,
+        },
+        {
+            name: 'Send Feedback',
+            icon: <FaCommentAlt />,
+            onClick: handleFeedbackClick,
+        },
+        // { name: 'Medium', icon: <FaMediumM /> },
+        // { name: 'Privacy', icon: <FaUserSecret /> },
+        // { name: 'Terms of Service', icon: <FaFileAlt /> },
+        // { name: 'FAQ', icon: <LuCircleHelp /> },
+    ];
 
     return (
         <div className={styles.container}>
-            {menuItems.map((item) => (
+            {menuItems.map((item, index) => (
                 <div
-                    key={JSON.stringify(item)}
+                    key={`${item.name}-${index}`}
                     className={styles.menuItem}
                     onClick={() => {
-                        window.open(item.url, '_blank');
-                        if (typeof plausible === 'function') {
-                            plausible('External Link Clicked', {
-                                props: {
-                                    linkType: item.name,
-                                },
-                            });
+                        if (item.url) {
+                            window.open(item.url, '_blank');
+                            if (typeof plausible === 'function') {
+                                plausible('External Link Clicked', {
+                                    props: {
+                                        location: 'dropdown-menu',
+                                        name: item.name,
+                                        url: item.url,
+                                    },
+                                });
+                            }
+                        } else if (item.onClick) {
+                            item.onClick();
                         }
+                        setIsDropdownMenuOpen(false);
                     }}
                 >
                     <span>{item.name}</span>
                     <span>{item.icon}</span>
                 </div>
             ))}
-            {/* <button
-                className={styles.tutorialButton}
-                onClick={handleTutorialClick}
-            >
-                Tutorial <IoIosInformationCircle size={22} />
-            </button> */}
             <div className={styles.version}>
                 Version: {packageJson.version.split('-')[0]}
             </div>

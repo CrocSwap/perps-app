@@ -1,5 +1,6 @@
 /* container in which to populate notifications */
 .notifications {
+    --notification-layer-width: 380px;
     /* remove the element from the normal layout flow */
     position: absolute;
     /* render element slightly up and left from bottom-right corner */
@@ -11,9 +12,7 @@
     /* slight vertical gap between elements */
     gap: 15px;
     /* added to show notifications above other elements on trade page */
-    z-index: 100;
-
-    --notification-layer-width: 380px;
+    z-index: var(--z-index-notification, 1000) !important;
 
     max-width: var(--notification-layer-width);
 }

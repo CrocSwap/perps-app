@@ -5,8 +5,13 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import type { LineData } from './component/LineComponent';
-import { type LineLabel } from './customOrderLineUtils';
+import {
+    formatLiquidationPrice,
+    quantityTextFormatWithComma,
+    type LineLabel,
+} from './customOrderLineUtils';
 import { LIQ_PRICE_LINE_COLOR } from './orderLineUtils';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 export const usePositionOrderLines = (): LineData[] => {
     const { chart } = useTradingView();
@@ -15,6 +20,7 @@ export const usePositionOrderLines = (): LineData[] => {
 
     const sessionState = useSession();
     const isSessionEstablished = isEstablished(sessionState);
+    const { formatNum } = useNumFormatter();
 
     const [lines, setLines] = useState<LineData[]>([]);
 
@@ -46,6 +52,7 @@ export const usePositionOrderLines = (): LineData[] => {
                     yPrice: order.price,
                     textValue: { type: 'PNL', pnl } as LineLabel,
                     quantityTextValue: order.szi,
+                    quantityText: quantityTextFormatWithComma(order.szi),
                     color: pnl > 0 ? getBsColor().buy : getBsColor().sell,
                     type: 'PNL',
                     lineStyle: 3,
@@ -61,7 +68,11 @@ export const usePositionOrderLines = (): LineData[] => {
                         type: 'Liq',
                         text: ' Liq. Price',
                     } as LineLabel,
-                    quantityTextValue: undefined,
+                    quantityTextValue: order.liqPrice,
+                    quantityText: formatLiquidationPrice(
+                        order.liqPrice,
+                        formatNum,
+                    ),
                     color: LIQ_PRICE_LINE_COLOR,
                     type: 'LIQ',
                     lineStyle: 3,

@@ -350,3 +350,12 @@ body {
     height: 100%;
     max-height: 195px;
 }
+
+.table {
+    overflow: auto;
+    scrollbar-width: none; /* Firefox */
+}
+
+.table::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}

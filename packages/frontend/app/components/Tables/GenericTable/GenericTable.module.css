@@ -44,14 +44,11 @@
 }
 
 .tableBody.scrollVisible {
-    scrollbar-width: thin !important;
+    /* scrollbar-width: thin !important;
     scrollbar-color: rgba(255, 255, 255, 0.2) var(--bg-dark4);
-    padding-right: var(--padding-s);
+    padding-right: var(--padding-s); */
 }
 
-.tableBody::-webkit-scrollbar {
-    display: none !important;
-}
 .pageMode.tableBody {
     position: relative;
 }
