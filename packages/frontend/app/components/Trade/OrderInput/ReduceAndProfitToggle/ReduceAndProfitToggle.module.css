@@ -5,15 +5,16 @@
     gap: var(--gap-s);
 }
 .reduceToggleContent {
-    display: flex;
+    display: inline-flex;
     flex-direction: row;
     align-items: center;
     gap: var(--gap-m);
     font-size: var(--font-size-s, 12px);
     color: var(--text1);
     user-select: none;
-    cursor: pointer;
+    width: fit-content; /* <-- Only take up as much space as the content */
 }
+
 .toggleLabel {
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
