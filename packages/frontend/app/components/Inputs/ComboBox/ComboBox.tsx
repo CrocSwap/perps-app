@@ -1,19 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import styles from './ComboBox.module.css';
-import { FaChevronDown } from 'react-icons/fa';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import { GoChevronDown } from 'react-icons/go';
+
+type Option = string | number | object;
+type CssPositioning = 'fixed' | 'absolute' | 'relative' | 'static' | 'sticky';
 
 interface ComboBoxProps {
-    value: any;
-    options: any[];
+    value: string | number | undefined;
+    options: Option[];
     fieldName?: string;
-    onChange: (value: any) => void;
-    modifyOptions?: (value: any) => string;
-    modifyValue?: (value: any) => string;
-    cssPositioning?: string;
+    onChange: (value: string | number) => void;
+    modifyOptions?: (value: string | number) => ReactNode;
+    modifyValue?: (value: string | number | undefined) => ReactNode;
+    cssPositioning?: CssPositioning;
     type?: 'big-val';
 }
-
 const ComboBox: React.FC<ComboBoxProps> = ({
     value,
     options,
@@ -31,8 +33,36 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     const comboBoxValueRef = useRef<HTMLDivElement>(null);
     const comboBoxOptionsRef = useRef<HTMLDivElement>(null);
 
-    const optionOnClick = (option: any) => {
-        onChange(fieldName ? option[fieldName] : option);
+    const isRecord = (o: unknown): o is object =>
+        typeof o === 'object' && o !== null;
+
+    const getOptionValue = (
+        option: Option,
+        fieldName?: string,
+    ): string | number => {
+        if (fieldName && isRecord(option)) {
+            // es-lint disable-next-line
+            const v = (option as any)[fieldName];
+            return typeof v === 'string' || typeof v === 'number' ? v : '';
+        }
+        return option as string | number;
+    };
+
+    const optionKey = (option: Option, fieldName?: string) => {
+        const k = getOptionValue(option, fieldName);
+        return typeof k === 'string' || typeof k === 'number'
+            ? k
+            : JSON.stringify(option);
+    };
+
+    const isSelected = (
+        option: Option,
+        value: string | number | undefined,
+        fieldName?: string,
+    ) => value !== undefined && getOptionValue(option, fieldName) === value;
+
+    const optionOnClick = (option: Option) => {
+        onChange(getOptionValue(option, fieldName));
         setIsOpen(false);
     };
 
@@ -73,16 +103,19 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                     className={styles.comboBoxValueContainer}
                     onClick={(e) => {
                         e.stopPropagation();
-                        e.nativeEvent.stopImmediatePropagation();
-                        setIsOpen(!isOpen);
+
+                        e.nativeEvent?.stopImmediatePropagation?.();
+                        setIsOpen((o) => !o);
                     }}
                 >
                     <div className={styles.comboBoxValue}>
                         {modifyValue ? modifyValue(value) : value}{' '}
                     </div>
-                    <FaChevronDown
+                    <div
                         className={`${styles.comboBoxIcon} ${isOpen ? styles.comboBoxIconOpen : ''}`}
-                    />
+                    >
+                        <GoChevronDown size={30} />
+                    </div>
                 </div>
 
                 {isOpen && (
@@ -90,29 +123,29 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                         ref={comboBoxOptionsRef}
                         className={styles.comboBoxOptionsWrapper}
                     >
-                        {options.map((option) => (
-                            <div
-                                key={fieldName ? option[fieldName] : option}
-                                className={
-                                    fieldName
-                                        ? option[fieldName] === value
-                                            ? styles.comboBoxOptionSelected
-                                            : ''
-                                        : option === value
-                                          ? styles.comboBoxOptionSelected
-                                          : ''
-                                }
-                                onClick={() => optionOnClick(option)}
-                            >
-                                {fieldName
-                                    ? modifyOptions
-                                        ? modifyOptions(option[fieldName])
-                                        : option[fieldName]
-                                    : modifyOptions
-                                      ? modifyOptions(option)
-                                      : option}
-                            </div>
-                        ))}
+                        {(options ?? [])
+                            .filter((o): o is Option => o != null)
+                            .map((option) => {
+                                const optVal = getOptionValue(
+                                    option,
+                                    fieldName,
+                                );
+                                return (
+                                    <div
+                                        key={optionKey(option, fieldName)}
+                                        className={
+                                            isSelected(option, value, fieldName)
+                                                ? styles.comboBoxOptionSelected
+                                                : ''
+                                        }
+                                        onClick={() => optionOnClick(option)}
+                                    >
+                                        {modifyOptions
+                                            ? modifyOptions(optVal)
+                                            : optVal}
+                                    </div>
+                                );
+                            })}
                     </div>
                 )}
             </div>

@@ -99,13 +99,22 @@ export default function ComboBoxContainer() {
                             value={wsEnvironment}
                             options={wsEnvironments}
                             fieldName='value'
-                            onChange={(value) => setWsEnvironment(value)}
+                            onChange={(value) =>
+                                setWsEnvironment(
+                                    value as
+                                        | 'mock'
+                                        | 'hl'
+                                        | 'local'
+                                        | 'mainnet'
+                                        | 'testnet',
+                                )
+                            }
                         />
                     ) : (
                         <ComboBox
                             value={wsUrl}
                             options={wsUrls}
-                            onChange={(value) => setWsUrl(value)}
+                            onChange={(value) => setWsUrl(String(value))}
                         />
                     )}
                 </div>
@@ -138,7 +147,7 @@ export default function ComboBoxContainer() {
                     <ComboBox
                         value={selectedCurrency}
                         options={currencies}
-                        onChange={(value) => setSelectedCurrency(value)}
+                        onChange={(value) => setSelectedCurrency(String(value))}
                     />
                 </div>
                 <div className={styles.divider} />
@@ -212,12 +221,13 @@ export default function ComboBoxContainer() {
                                 fieldName='label'
                                 onChange={(value) =>
                                     setDebugWallet({
-                                        label: value,
+                                        label: String(value),
                                         address:
                                             debugWallets.find(
                                                 (wallet) =>
-                                                    wallet.label === value,
-                                            )?.address || '',
+                                                    wallet.label ===
+                                                    String(value),
+                                            )?.address ?? '',
                                     })
                                 }
                                 cssPositioning='fixed'

@@ -32,6 +32,17 @@
 .comboBoxIcon {
     transition: var(--ease-in-out-fast);
     transform: rotate(0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.comboBoxIcon svg {
+    width: 15px !important;
+    height: 15px !important;
 }
 
 .comboBoxIconOpen {
