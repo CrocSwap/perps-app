@@ -63,11 +63,11 @@
     background: var(--bg-dark4);
 }
 
-.inputWithoutDropdown p,
-.inputWithDropdown p {
+.formRow label {
     margin: 0;
     white-space: nowrap;
     color: var(--text2);
+    /* font-size: var(--font-size-m); */
 }
 
 .inputWithoutDropdown input,

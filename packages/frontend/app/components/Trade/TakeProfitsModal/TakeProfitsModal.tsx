@@ -5,6 +5,7 @@ import type { PositionIF } from '~/utils/UserDataIFs';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 import { useEffect } from 'react';
+import { useRef } from 'react';
 
 interface TPSLFormData {
     tpPrice: string;
@@ -35,8 +36,50 @@ export default function TakeProfitsModal(props: PropIF) {
     const [configureAmount, setConfigureAmount] = useState<boolean>(false);
     const [applyPct, setApplyPct] = useState<number>(100);
 
+    // Refs for each input
+    const tpPriceRef = useRef<HTMLInputElement>(null);
+    const gainRef = useRef<HTMLInputElement>(null);
+    const slPriceRef = useRef<HTMLInputElement>(null);
+    const lossRef = useRef<HTMLInputElement>(null);
+    const tpLimitRef = useRef<HTMLInputElement>(null);
+    const slLimitRef = useRef<HTMLInputElement>(null);
+
+    // Reusable props: clicking the container focuses the input (but don't steal clicks
+    // from nested interactive elements like the combobox button/listbox)
+    const focusContainer = (ref: React.RefObject<HTMLInputElement>) => ({
+        onMouseDown: (e: React.MouseEvent) => {
+            const t = e.target as HTMLElement;
+            if (t.closest('input,button,[role="button"],[role="listbox"]'))
+                return;
+            e.preventDefault();
+            ref.current?.focus();
+        },
+        onClick: (e: React.MouseEvent) => {
+            const t = e.target as HTMLElement;
+            if (t.closest('input,button,[role="button"],[role="listbox"]'))
+                return;
+            ref.current?.focus();
+        },
+    });
+
     const roundToStep = (x: number, step: number) =>
         Math.floor((x + Number.EPSILON) / step) * step;
+    const pxStep = useMemo(() => {
+        const ref = markPrice || position.entryPx;
+        if (ref >= 100000) return 10;
+        if (ref >= 10000) return 1;
+        if (ref >= 1000) return 0.5;
+        if (ref >= 100) return 0.1;
+        if (ref >= 10) return 0.01;
+        if (ref >= 1) return 0.001;
+        return 0.0001;
+    }, [markPrice, position.entryPx]);
+
+    const parsePx = (s: string) => {
+        if (!s) return NaN;
+        const n = Number(String(s).replace(/,/g, ''));
+        return Number.isFinite(n) ? n : NaN;
+    };
 
     useEffect(() => {
         if (!configureAmount) setApplyPct(100);
@@ -46,6 +89,31 @@ export default function TakeProfitsModal(props: PropIF) {
         const raw = (applyPct / 100) * totalBase;
         return roundToStep(raw, baseStep);
     }, [applyPct, totalBase, baseStep]);
+    // LIMIT PRICE DATA------------------
+    const [tpLimitStr, setTpLimitStr] = useState<string>('');
+    const [slLimitStr, setSlLimitStr] = useState<string>('');
+
+    const tpLimitPx = useMemo(() => {
+        const n = parsePx(tpLimitStr);
+        return Number.isFinite(n) ? roundToStep(n, pxStep) : NaN;
+    }, [tpLimitStr, pxStep]);
+
+    const slLimitPx = useMemo(() => {
+        const n = parsePx(slLimitStr);
+        return Number.isFinite(n) ? roundToStep(n, pxStep) : NaN;
+    }, [slLimitStr, pxStep]);
+
+    const onTpLimitBlur = () => {
+        const n = parsePx(tpLimitStr);
+        if (Number.isFinite(n)) setTpLimitStr(String(roundToStep(n, pxStep)));
+    };
+
+    const onSlLimitBlur = () => {
+        const n = parsePx(slLimitStr);
+        if (Number.isFinite(n)) setSlLimitStr(String(roundToStep(n, pxStep)));
+    };
+
+    // ----------------------------------
 
     const [formData, setFormData] = useState<TPSLFormData>({
         tpPrice: position.tp ? position.tp.toString() : '',
@@ -377,11 +445,14 @@ export default function TakeProfitsModal(props: PropIF) {
 
             <section className={styles.formContainer}>
                 <div className={styles.formRow}>
-                    <div
+                    {/* TP Price — wrap the whole field in a <label> so any click focuses the input */}
+                    <label
                         className={`${styles.inputWithoutDropdown} ${showTpValidation && tpInvalid ? styles.fieldError : ''} ${showTpValidation && tpOutlier && !tpInvalid ? styles.fieldWarning : ''}`}
+                        htmlFor='tpPrice'
                     >
-                        <p>TP Price</p>
+                        <span>TP Price</span>
                         <input
+                            id='tpPrice'
                             type='number'
                             value={formData.tpPrice}
                             onChange={(e) =>
@@ -394,11 +465,28 @@ export default function TakeProfitsModal(props: PropIF) {
                             }}
                             aria-invalid={tpInvalid || undefined}
                         />
-                    </div>
+                    </label>
 
-                    <div className={styles.inputWithDropdown}>
-                        <p>Gain</p>
+                    {/* Gain — composite field (input + ComboBox). Click anywhere (except ComboBox) to focus input */}
+                    <div
+                        className={styles.inputWithDropdown}
+                        role='group'
+                        onMouseDown={(e) => {
+                            const t = e.target as HTMLElement;
+                            if (
+                                t.closest(
+                                    'input,button,[role="button"],[role="listbox"]',
+                                )
+                            )
+                                return;
+                            e.preventDefault();
+                            gainRef.current?.focus();
+                        }}
+                    >
+                        <label htmlFor='gain'>Gain</label>
                         <input
+                            id='gain'
+                            ref={gainRef}
                             type='number'
                             value={formData.gain}
                             onChange={(e) =>
@@ -410,7 +498,6 @@ export default function TakeProfitsModal(props: PropIF) {
                                 setGainTouched(true);
                             }}
                         />
-
                         <ComboBox
                             value={formData.gainCurrency}
                             options={currencyOptions}
@@ -424,6 +511,7 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
+
                 <div className={styles.expectedProfitContainer}>
                     {(formData.tpPrice || formData.gain) && (
                         <span className={styles.expectedProfitText}>
@@ -445,46 +533,65 @@ export default function TakeProfitsModal(props: PropIF) {
                 </div>
 
                 <div className={styles.formRow}>
-                    <div
-                        className={`${styles.inputWithoutDropdown} ${showSlValidation && slInvalid ? styles.fieldError : ''} ${showSlValidation && slOutlier && !slInvalid ? styles.fieldWarning : ''}`}
+                    {/* TP Price — wrap the whole field in a <label> so any click focuses the input */}
+                    <label
+                        className={`${styles.inputWithoutDropdown} ${showTpValidation && tpInvalid ? styles.fieldError : ''} ${showTpValidation && tpOutlier && !tpInvalid ? styles.fieldWarning : ''}`}
+                        htmlFor='tpPrice'
                     >
-                        <p>SL Price</p>
+                        <span>TP Price</span>
                         <input
+                            id='tpPrice'
                             type='number'
-                            value={formData.slPrice}
+                            value={formData.tpPrice}
                             onChange={(e) =>
-                                handleInputChange('slPrice', e.target.value)
+                                handleInputChange('tpPrice', e.target.value)
                             }
-                            onFocus={() => setSlPriceFocused(true)}
+                            onFocus={() => setTpPriceFocused(true)}
                             onBlur={() => {
-                                setSlPriceFocused(false);
-                                setSlPriceTouched(true);
+                                setTpPriceFocused(false);
+                                setTpPriceTouched(true);
                             }}
-                            aria-invalid={slInvalid || undefined}
+                            aria-invalid={tpInvalid || undefined}
                         />
-                    </div>
+                    </label>
 
-                    <div className={styles.inputWithDropdown}>
-                        <p>Loss</p>
+                    {/* Gain — composite field (input + ComboBox). Click anywhere (except ComboBox) to focus input */}
+                    <div
+                        className={styles.inputWithDropdown}
+                        role='group'
+                        onMouseDown={(e) => {
+                            const t = e.target as HTMLElement;
+                            if (
+                                t.closest(
+                                    'input,button,[role="button"],[role="listbox"]',
+                                )
+                            )
+                                return;
+                            e.preventDefault();
+                            gainRef.current?.focus();
+                        }}
+                    >
+                        <label htmlFor='gain'>Gain</label>
                         <input
+                            id='gain'
+                            ref={gainRef}
                             type='number'
-                            value={formData.loss}
+                            value={formData.gain}
                             onChange={(e) =>
-                                handleInputChange('loss', e.target.value)
+                                handleInputChange('gain', e.target.value)
                             }
-                            onFocus={() => setLossFocused(true)}
+                            onFocus={() => setGainFocused(true)}
                             onBlur={() => {
-                                setLossFocused(false);
-                                setLossTouched(true);
+                                setGainFocused(false);
+                                setGainTouched(true);
                             }}
                         />
-
                         <ComboBox
-                            value={formData.lossCurrency}
+                            value={formData.gainCurrency}
                             options={currencyOptions}
                             onChange={(val) =>
                                 handleCurrencyChange(
-                                    'lossCurrency',
+                                    'gainCurrency',
                                     val as '$' | '%',
                                 )
                             }
@@ -492,6 +599,7 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
+
                 <div className={styles.expectedProfitContainer}>
                     {(formData.slPrice || formData.loss) && (
                         <span className={styles.expectedProfitText}>
@@ -552,6 +660,44 @@ export default function TakeProfitsModal(props: PropIF) {
                     label='Limit Price'
                     reverse
                 />
+
+                {formData.limitPrice && (
+                    <div className={styles.formRow}>
+                        {/* TP Limit Price — use text + inputMode to avoid spinners; label wraps for click-to-focus */}
+                        <label
+                            className={styles.inputWithoutDropdown}
+                            htmlFor='tpLimitPrice'
+                        >
+                            <span>TP Limit Price</span>
+                            <input
+                                id='tpLimitPrice'
+                                type='text'
+                                inputMode='decimal'
+                                value={tpLimitStr}
+                                onChange={(e) => setTpLimitStr(e.target.value)}
+                                onBlur={onTpLimitBlur}
+                                aria-label='tp limit price'
+                            />
+                        </label>
+
+                        {/* SL Limit Price */}
+                        <label
+                            className={styles.inputWithoutDropdown}
+                            htmlFor='slLimitPrice'
+                        >
+                            <span>SL Limit Price</span>
+                            <input
+                                id='slLimitPrice'
+                                type='text'
+                                inputMode='decimal'
+                                value={slLimitStr}
+                                onChange={(e) => setSlLimitStr(e.target.value)}
+                                onBlur={onSlLimitBlur}
+                                aria-label='sl limit price'
+                            />
+                        </label>
+                    </div>
+                )}
             </section>
             <div className={styles.warningContainer}>
                 {!tpInvalid && tpOutlier && showTpValidation && (
