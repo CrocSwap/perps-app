@@ -1,19 +1,21 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import styles from './TakeProfitsModal.module.css';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 
-interface TPSLFormData {
-    tpPrice: string;
-    slPrice: string;
-    gain: string;
-    loss: string;
-    gainCurrency: '$' | '%';
-    lossCurrency: '$' | '%';
-    configureAmount: boolean;
-    limitPrice: boolean;
+type Currency = '$' | '%';
+
+interface TakeProfitStopLossFormData {
+    takeProfitPrice: string;
+    stopLossPrice: string;
+    takeProfitGain: string;
+    stopLossAmount: string;
+    takeProfitGainType: Currency;
+    stopLossAmountType: Currency;
+    isCustomAllocationEnabled: boolean;
+    isLimitOrderEnabled: boolean;
 }
 
 interface PropIF {
@@ -25,23 +27,19 @@ interface PropIF {
 }
 
 export default function TakeProfitsModal(props: PropIF) {
-    const { closeTPModal, position, markPrice, baseSymbol, qtyStep } = props;
+    const { closeTPModal, position, markPrice, qtyStep } = props;
 
-    const totalBase = Math.abs(position.szi ?? 0);
-    const baseStep = qtyStep ?? 1e-8;
-    const labelSym = baseSymbol ?? position.coin;
+    const totalBaseQuantity = Math.abs(position.szi ?? 0);
 
-    const [configureAmount, setConfigureAmount] = useState<boolean>(false);
-    const [applyPct, setApplyPct] = useState<number>(100);
+    // --- minimum lot size increment for quantity calculations ---
+    const quantityStep = qtyStep ?? 1e-8;
 
-    // Refs for each input
-    const gainRef = useRef<HTMLInputElement>(null);
-    const lossRef = useRef<HTMLInputElement>(null);
+    // --- snap any number to a given increment (used across prices/size) ---
+    const roundToNearestIncrement = (value: number, increment: number) =>
+        Math.round((value + Number.EPSILON) / increment) * increment;
 
-    const roundToStep = (x: number, step: number) =>
-        Math.round((x + Number.EPSILON) / step) * step;
-
-    const pxStep = useMemo(() => {
+    // --- price tick size heuristic based on current/entry price ---
+    const priceTickSize = useMemo(() => {
         const ref = markPrice || position.entryPx;
         if (ref >= 100000) return 10;
         if (ref >= 10000) return 1;
@@ -52,361 +50,533 @@ export default function TakeProfitsModal(props: PropIF) {
         return 0.0001;
     }, [markPrice, position.entryPx]);
 
-    const parsePx = (s: string) => {
+    // --- parse entered price string (removes commas, returns NaN if bad) ---
+    const parsePrice = (s: string) => {
         if (!s) return NaN;
         const n = Number(String(s).replace(/,/g, ''));
         return Number.isFinite(n) ? n : NaN;
     };
 
-    useEffect(() => {
-        if (!configureAmount) setApplyPct(100);
-    }, [configureAmount]);
+    // --- price snapper that returns a string ready for inputs ---
+    const snapPriceForInput = (v: number) =>
+        String(roundToNearestIncrement(v, priceTickSize));
 
-    const applyBase = useMemo(() => {
-        const raw = (applyPct / 100) * totalBase;
-        return roundToStep(raw, baseStep);
-    }, [applyPct, totalBase, baseStep]);
-    // LIMIT PRICE DATA------------------
-    const [tpLimitStr, setTpLimitStr] = useState<string>('');
-    const [slLimitStr, setSlLimitStr] = useState<string>('');
-
-    const tpLimitPx = useMemo(() => {
-        const n = parsePx(tpLimitStr);
-        return Number.isFinite(n) ? roundToStep(n, pxStep) : NaN;
-    }, [tpLimitStr, pxStep]);
-
-    const slLimitPx = useMemo(() => {
-        const n = parsePx(slLimitStr);
-        return Number.isFinite(n) ? roundToStep(n, pxStep) : NaN;
-    }, [slLimitStr, pxStep]);
-
-    const onTpLimitBlur = () => {
-        const n = parsePx(tpLimitStr);
-        if (Number.isFinite(n)) setTpLimitStr(String(roundToStep(n, pxStep)));
+    // how many decimals does a step like 1e-8 or 0.001 imply?
+    const decimalsFromStep = (step: number) => {
+        if (!Number.isFinite(step) || step <= 0) return 8;
+        const s = String(step);
+        if (s.includes('e-')) return parseInt(s.split('e-')[1], 10);
+        const dot = s.indexOf('.');
+        return dot === -1 ? 0 : s.length - dot - 1;
     };
 
-    const onSlLimitBlur = () => {
-        const n = parsePx(slLimitStr);
-        if (Number.isFinite(n)) setSlLimitStr(String(roundToStep(n, pxStep)));
-    };
+    const formatCrypto = (value: number) =>
+        value.toFixed(8).replace(/\.?0+$/, '');
 
-    // ----------------------------------
+    // --- threshold for “this looks really far from entry” warnings ---
+    const OUTLIER_RATIO = 0.5; // 50%
 
-    const [formData, setFormData] = useState<TPSLFormData>({
-        tpPrice: position.tp ? position.tp.toString() : '',
-        slPrice: position.sl ? position.sl.toString() : '',
-        gain: '',
-        loss: '',
-        gainCurrency: '$',
-        lossCurrency: '$',
-        configureAmount: false,
-        limitPrice: false,
+    // --- refs to focus the right input when wrapper is clicked ---
+    const takeProfitGainInputRef = useRef<HTMLInputElement>(null);
+    const stopLossAmountInputRef = useRef<HTMLInputElement>(null);
+
+    // --- all editable fields for TP/SL form ---
+    const [form, setForm] = useState<TakeProfitStopLossFormData>({
+        takeProfitPrice: position.tp ? position.tp.toString() : '',
+        stopLossPrice: position.sl ? position.sl.toString() : '',
+        takeProfitGain: '',
+        stopLossAmount: '',
+        takeProfitGainType: '$',
+        stopLossAmountType: '$',
+        isCustomAllocationEnabled: false,
+        isLimitOrderEnabled: false,
     });
-    const [tpSource, setTpSource] = useState<'price' | 'gain' | null>(null);
-    const [slSource, setSlSource] = useState<'price' | 'loss' | null>(null);
 
-    // THIS IS JUST FOR WARNING VALIDATIONS-------------------------------------------
-    const [tpPriceFocused, setTpPriceFocused] = useState(false);
-    const [tpPriceTouched, setTpPriceTouched] = useState(false);
-    const [gainFocused, setGainFocused] = useState(false);
-    const [gainTouched, setGainTouched] = useState(false);
+    // --- mostly for ui interactions ---
+    const [ui, setUi] = useState({
+        takeProfitInputMode: null as 'price' | 'gain' | null,
+        stopLossInputMode: null as 'price' | 'loss' | null,
 
-    const [slPriceFocused, setSlPriceFocused] = useState(false);
-    const [slPriceTouched, setSlPriceTouched] = useState(false);
-    const [lossFocused, setLossFocused] = useState(false);
-    const [lossTouched, setLossTouched] = useState(false);
+        isTakeProfitPriceFocused: false,
+        hasTakeProfitPriceBeenTouched: false,
+        isTakeProfitGainFocused: false,
+        hasTakeProfitGainBeenTouched: false,
 
-    // Show validation when the field driving the target has been blurred at least once
-    const showTpValidation = useMemo(() => {
-        if (tpSource === 'price') {
-            return !!formData.tpPrice && tpPriceTouched && !tpPriceFocused;
-        }
-        if (tpSource === 'gain') {
-            return !!formData.gain && gainTouched && !gainFocused;
-        }
-        // If no explicit source yet, only show after either candidate is blurred with a value
-        return (
-            (!!formData.tpPrice && tpPriceTouched && !tpPriceFocused) ||
-            (!!formData.gain && gainTouched && !gainFocused)
-        );
-    }, [
-        tpSource,
-        formData.tpPrice,
-        formData.gain,
-        tpPriceTouched,
-        tpPriceFocused,
-        gainTouched,
-        gainFocused,
-    ]);
+        isStopLossPriceFocused: false,
+        hasStopLossPriceBeenTouched: false,
+        isStopLossAmountFocused: false,
+        hasStopLossAmountBeenTouched: false,
 
-    const showSlValidation = useMemo(() => {
-        if (slSource === 'price') {
-            return !!formData.slPrice && slPriceTouched && !slPriceFocused;
-        }
-        if (slSource === 'loss') {
-            return !!formData.loss && lossTouched && !lossFocused;
-        }
-        return (
-            (!!formData.slPrice && slPriceTouched && !slPriceFocused) ||
-            (!!formData.loss && lossTouched && !lossFocused)
-        );
-    }, [
-        slSource,
-        formData.slPrice,
-        formData.loss,
-        slPriceTouched,
-        slPriceFocused,
-        lossTouched,
-        lossFocused,
-    ]);
+        allocationPercentage: 100,
+        takeProfitLimitInput: '',
+        stopLossLimitInput: '',
+    });
 
-    // END OF VALIDATION---------------------------------------------------------------
-    const currencyOptions: Array<'$' | '%'> = ['$', '%'];
+    // --- entry price used for P&L math  ---
+    const entryPrice = position.entryPx;
 
-    const baseForPnL = position.entryPx;
-    const displayPrice = markPrice || position.entryPx;
+    // --- price shown as “current / mark” in the header  ---
+    const markOrEntryPrice = markPrice || position.entryPx;
 
-    const qty = Math.abs(position.szi);
+    // --- absolute position size and direction flags ---
+    const positionQuantity = Math.abs(position.szi);
     const isLong = position.szi > 0;
 
-    const tpFromGain = useMemo(() => {
-        if (!formData.gain) return undefined;
-        const gain = parseFloat(formData.gain);
-        if (!Number.isFinite(gain) || !qty) return undefined;
-        if (formData.gainCurrency === '$') {
-            const priceChange = gain / qty;
-            return isLong ? baseForPnL + priceChange : baseForPnL - priceChange;
+    // --- computed base amount when “Configure Amount” is enabled (allocationPercentage of position) ---
+    const allocatedQuantity = useMemo(() => {
+        const raw = (ui.allocationPercentage / 100) * totalBaseQuantity;
+        return roundToNearestIncrement(raw, quantityStep);
+    }, [ui.allocationPercentage, totalBaseQuantity, quantityStep]);
+
+    // --- derive TP price from desired gain (absolute $ or %) ---
+    const takeProfitFromGain = useMemo(() => {
+        if (!form.takeProfitGain) return undefined;
+        const gain = parseFloat(form.takeProfitGain);
+        if (!Number.isFinite(gain) || !positionQuantity) return undefined;
+        if (form.takeProfitGainType === '$') {
+            const priceChange = gain / positionQuantity;
+            return isLong ? entryPrice + priceChange : entryPrice - priceChange;
         } else {
             const pct = gain / 100;
-            return baseForPnL * (isLong ? 1 + pct : 1 - pct);
+            return entryPrice * (isLong ? 1 + pct : 1 - pct);
         }
-    }, [formData.gain, formData.gainCurrency, qty, isLong, baseForPnL]);
+    }, [
+        form.takeProfitGain,
+        form.takeProfitGainType,
+        positionQuantity,
+        isLong,
+        entryPrice,
+    ]);
 
-    const slFromLoss = useMemo(() => {
-        if (!formData.loss) return undefined;
-        const loss = parseFloat(formData.loss);
-        if (!Number.isFinite(loss) || !qty) return undefined;
-        if (formData.lossCurrency === '$') {
-            const priceChange = loss / qty;
-            return isLong ? baseForPnL - priceChange : baseForPnL + priceChange;
+    // --- derive SL price from tolerated loss (absolute $ or %) ---
+    const stopLossFromLoss = useMemo(() => {
+        if (!form.stopLossAmount) return undefined;
+        const loss = parseFloat(form.stopLossAmount);
+        if (!Number.isFinite(loss) || !positionQuantity) return undefined;
+        if (form.stopLossAmountType === '$') {
+            const priceChange = loss / positionQuantity;
+            return isLong ? entryPrice - priceChange : entryPrice + priceChange;
         } else {
             const pct = loss / 100;
-            return baseForPnL * (isLong ? 1 - pct : 1 + pct);
+            return entryPrice * (isLong ? 1 - pct : 1 + pct);
         }
-    }, [formData.loss, formData.lossCurrency, qty, isLong, baseForPnL]);
+    }, [
+        form.stopLossAmount,
+        form.stopLossAmountType,
+        positionQuantity,
+        isLong,
+        entryPrice,
+    ]);
 
-    const tpTarget = useMemo(() => {
-        const priceVal = formData.tpPrice
-            ? parseFloat(formData.tpPrice)
+    // --- keeps track of which field the user last typed in — TP Price or Gain — so we know which value to use and ignore the other.
+    const takeProfitTarget = useMemo(() => {
+        const priceVal = form.takeProfitPrice
+            ? parseFloat(form.takeProfitPrice)
             : undefined;
-        if (tpSource === 'gain') return tpFromGain;
-        if (tpSource === 'price') return priceVal;
-        // fallback: prefer gain if present
-        return tpFromGain ?? priceVal;
-    }, [tpSource, formData.tpPrice, tpFromGain]);
+        if (ui.takeProfitInputMode === 'gain') return takeProfitFromGain;
+        if (ui.takeProfitInputMode === 'price') return priceVal;
+        return takeProfitFromGain ?? priceVal;
+    }, [ui.takeProfitInputMode, form.takeProfitPrice, takeProfitFromGain]);
 
-    const slTarget = useMemo(() => {
-        const priceVal = formData.slPrice
-            ? parseFloat(formData.slPrice)
+    const stopLossTarget = useMemo(() => {
+        const priceVal = form.stopLossPrice
+            ? parseFloat(form.stopLossPrice)
             : undefined;
-        if (slSource === 'loss') return slFromLoss;
-        if (slSource === 'price') return priceVal;
-        // fallback: prefer loss if present
-        return slFromLoss ?? priceVal;
-    }, [slSource, formData.slPrice, slFromLoss]);
+        if (ui.stopLossInputMode === 'loss') return stopLossFromLoss;
+        if (ui.stopLossInputMode === 'price') return priceVal;
+        return stopLossFromLoss ?? priceVal;
+    }, [ui.stopLossInputMode, form.stopLossPrice, stopLossFromLoss]);
 
-    const pnlAt = (target: number) => {
-        const diff = isLong ? target - baseForPnL : baseForPnL - target;
-        return diff * qty;
-    };
-
-    const expectedProfit = useMemo(() => {
-        return Number.isFinite(tpTarget as number)
-            ? pnlAt(tpTarget as number)
-            : null;
-    }, [tpTarget, baseForPnL, qty, isLong]);
-
-    const expectedLoss = useMemo(() => {
-        if (!Number.isFinite(slTarget as number)) return null;
-        const raw = pnlAt(slTarget as number);
-        return Math.abs(raw);
-    }, [slTarget, baseForPnL, qty, isLong]);
-
-    const tpInvalid =
-        Number.isFinite(tpTarget as number) &&
-        ((isLong && (tpTarget as number) <= baseForPnL) ||
-            (!isLong && (tpTarget as number) >= baseForPnL));
-
-    const slInvalid =
-        Number.isFinite(slTarget as number) &&
-        ((isLong && (slTarget as number) >= baseForPnL) ||
-            (!isLong && (slTarget as number) <= baseForPnL));
-    const pctAway = (target?: number) =>
-        target ? Math.abs((target - baseForPnL) / baseForPnL) : 0;
-
-    const OUTLIER_PCT = 0.5; // 30% away from entry price triggers warning
-    const tpOutlier =
-        Number.isFinite(tpTarget as number) &&
-        pctAway(tpTarget as number) >= OUTLIER_PCT;
-    const slOutlier =
-        Number.isFinite(slTarget as number) &&
-        pctAway(slTarget as number) >= OUTLIER_PCT;
-    const snap = (v: number) => String(roundToStep(v, pxStep));
-
-    const updateTPPriceFromGain = (gainValue: string, currency?: '$' | '%') => {
-        if (!gainValue || !qty) return;
-        const gain = parseFloat(gainValue);
-        const cur = currency ?? formData.gainCurrency;
-        let newPrice: number;
-        if (cur === '$') {
-            const priceChange = gain / qty;
-            newPrice = isLong
-                ? baseForPnL + priceChange
-                : baseForPnL - priceChange;
-        } else {
-            const pct = gain / 100;
-            newPrice = baseForPnL * (isLong ? 1 + pct : 1 - pct);
-        }
-        setFormData((p) => ({ ...p, tpPrice: snap(newPrice) }));
-    };
-
-    const updateSLPriceFromLoss = (lossValue: string, currency?: '$' | '%') => {
-        if (!lossValue || !qty) return;
-        const loss = parseFloat(lossValue);
-        const cur = currency ?? formData.lossCurrency;
-        let newPrice: number;
-        if (cur === '$') {
-            const priceChange = loss / qty;
-            newPrice = isLong
-                ? baseForPnL - priceChange
-                : baseForPnL + priceChange;
-        } else {
-            const pct = loss / 100;
-            newPrice = baseForPnL * (isLong ? 1 - pct : 1 + pct);
-        }
-        setFormData((p) => ({ ...p, slPrice: snap(newPrice) }));
-    };
-
-    const placeTakeProfitOrder = async (): Promise<void> => {
-        console.log('Place Take Profit order:', {
-            coin: position.coin,
-            price: formData.tpPrice,
-            quantity: Math.abs(position.szi),
-            side: position.szi > 0 ? 'sell' : 'buy',
-            configureAmount: formData.configureAmount,
-            limitPrice: formData.limitPrice,
-        });
-    };
-
-    const placeStopLossOrder = async (): Promise<void> => {
-        console.log('Place Stop Loss order:', {
-            coin: position.coin,
-            price: formData.slPrice,
-            quantity: Math.abs(position.szi),
-            side: position.szi > 0 ? 'sell' : 'buy',
-            configureAmount: formData.configureAmount,
-            limitPrice: formData.limitPrice,
-        });
-    };
-
-    const infoData = [
-        { label: 'Market', value: position.coin },
-        {
-            label: 'Position',
-            value: `${Math.abs(position.szi)} ${position.coin}`,
+    // -calculates P&L (in $) at a given price target ---
+    const computePnlAtPrice = useCallback(
+        (target: number) => {
+            const diff = isLong ? target - entryPrice : entryPrice - target;
+            return diff * positionQuantity;
         },
-        { label: 'Entry Price', value: baseForPnL.toLocaleString() },
-        { label: 'Mark Price', value: displayPrice.toLocaleString() },
-    ];
+        [isLong, entryPrice, positionQuantity],
+    );
 
-    const handleInputChange = (
-        field: keyof TPSLFormData,
-        value: string | boolean,
-    ) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
+    // --- preview of expected profit if TP hits ---
+    const expectedProfit = useMemo(
+        () =>
+            Number.isFinite(takeProfitTarget as number)
+                ? computePnlAtPrice(takeProfitTarget as number)
+                : null,
+        [takeProfitTarget, computePnlAtPrice],
+    );
 
-        if (field === 'tpPrice' && typeof value === 'string') {
-            setTpSource('price');
-        } else if (field === 'gain' && typeof value === 'string') {
-            setTpSource('gain');
-            updateTPPriceFromGain(value);
-        } else if (field === 'slPrice' && typeof value === 'string') {
-            setSlSource('price');
-        } else if (field === 'loss' && typeof value === 'string') {
-            setSlSource('loss');
-            updateSLPriceFromLoss(value);
+    // --- preview of expected loss if SL hits ---
+    const expectedLoss = useMemo(() => {
+        if (!Number.isFinite(stopLossTarget as number)) return null;
+        const raw = computePnlAtPrice(stopLossTarget as number);
+        return Math.abs(raw);
+    }, [stopLossTarget, computePnlAtPrice]);
+
+    //-----------VALIDATIONS----------------------------
+
+    // --- validity: TP must be in the profit direction relative to entry ---
+    const isTakeProfitInvalid =
+        Number.isFinite(takeProfitTarget as number) &&
+        ((isLong && (takeProfitTarget as number) <= entryPrice) ||
+            (!isLong && (takeProfitTarget as number) >= entryPrice));
+
+    // --- validity: SL must be in the loss direction relative to entry ---
+    const isStopLossInvalid =
+        Number.isFinite(stopLossTarget as number) &&
+        ((isLong && (stopLossTarget as number) >= entryPrice) ||
+            (!isLong && (stopLossTarget as number) <= entryPrice));
+
+    // --- normalized distance from entry (for outlier warnings) ---
+    const distanceFromEntryRatio = (target?: number) =>
+        target ? Math.abs((target - entryPrice) / entryPrice) : 0;
+
+    // --- flag extreme TP/SL distances (to nudge users to double-check) ---
+    const isTakeProfitOutlier =
+        Number.isFinite(takeProfitTarget as number) &&
+        distanceFromEntryRatio(takeProfitTarget as number) >= OUTLIER_RATIO;
+
+    const isStopLossOutlier =
+        Number.isFinite(stopLossTarget as number) &&
+        distanceFromEntryRatio(stopLossTarget as number) >= OUTLIER_RATIO;
+
+    // --- show TP validation after user has interacted with TP fields ---
+    const showTakeProfitValidation = useMemo(() => {
+        if (ui.takeProfitInputMode === 'price')
+            return (
+                !!form.takeProfitPrice &&
+                ui.hasTakeProfitPriceBeenTouched &&
+                !ui.isTakeProfitPriceFocused
+            );
+        if (ui.takeProfitInputMode === 'gain')
+            return (
+                !!form.takeProfitGain &&
+                ui.hasTakeProfitGainBeenTouched &&
+                !ui.isTakeProfitGainFocused
+            );
+        return (
+            (!!form.takeProfitPrice &&
+                ui.hasTakeProfitPriceBeenTouched &&
+                !ui.isTakeProfitPriceFocused) ||
+            (!!form.takeProfitGain &&
+                ui.hasTakeProfitGainBeenTouched &&
+                !ui.isTakeProfitGainFocused)
+        );
+    }, [
+        ui.takeProfitInputMode,
+        form.takeProfitPrice,
+        form.takeProfitGain,
+        ui.hasTakeProfitPriceBeenTouched,
+        ui.isTakeProfitPriceFocused,
+        ui.hasTakeProfitGainBeenTouched,
+        ui.isTakeProfitGainFocused,
+    ]);
+
+    // --- show SL validation after user has interacted with SL fields ---
+    const showStopLossValidation = useMemo(() => {
+        if (ui.stopLossInputMode === 'price')
+            return (
+                !!form.stopLossPrice &&
+                ui.hasStopLossPriceBeenTouched &&
+                !ui.isStopLossPriceFocused
+            );
+        if (ui.stopLossInputMode === 'loss')
+            return (
+                !!form.stopLossAmount &&
+                ui.hasStopLossAmountBeenTouched &&
+                !ui.isStopLossAmountFocused
+            );
+        return (
+            (!!form.stopLossPrice &&
+                ui.hasStopLossPriceBeenTouched &&
+                !ui.isStopLossPriceFocused) ||
+            (!!form.stopLossAmount &&
+                ui.hasStopLossAmountBeenTouched &&
+                !ui.isStopLossAmountFocused)
+        );
+    }, [
+        ui.stopLossInputMode,
+        form.stopLossPrice,
+        form.stopLossAmount,
+        ui.hasStopLossPriceBeenTouched,
+        ui.isStopLossPriceFocused,
+        ui.hasStopLossAmountBeenTouched,
+        ui.isStopLossAmountFocused,
+    ]);
+    //-----------END VALIDATIONS----------------------------
+
+    // --- reset configured size to 100% when “Configure Amount” turns off ---
+    useEffect(() => {
+        if (!form.isCustomAllocationEnabled)
+            setUi((u) => ({ ...u, allocationPercentage: 100 }));
+    }, [form.isCustomAllocationEnabled]);
+
+    // --- TP price changed directly by user (tells us to use the typed price) ---
+    const onTakeProfitPriceChange = (v: string) => {
+        setForm((p) => ({ ...p, takeProfitPrice: v }));
+        setUi((u) => ({ ...u, takeProfitInputMode: 'price' }));
+    };
+
+    // --- SL price changed directly by user (marks source as “price”) ---
+    const onStopLossPriceChange = (v: string) => {
+        setForm((p) => ({ ...p, stopLossPrice: v }));
+        setUi((u) => ({ ...u, stopLossInputMode: 'price' }));
+    };
+
+    // --- user edits desired profit; derive/snap the corresponding TP price ---
+    const onTakeProfitGainChange = (v: string) => {
+        setForm((p) => ({ ...p, takeProfitGain: v }));
+        setUi((u) => ({ ...u, takeProfitInputMode: 'gain' }));
+        const gain = parseFloat(v);
+        if (Number.isFinite(gain) && positionQuantity) {
+            const cur = form.takeProfitGainType;
+            let next: number;
+            if (cur === '$')
+                next = isLong
+                    ? entryPrice + gain / positionQuantity
+                    : entryPrice - gain / positionQuantity;
+            else {
+                const pct = gain / 100;
+                next = entryPrice * (isLong ? 1 + pct : 1 - pct);
+            }
+            setForm((p) => ({
+                ...p,
+                takeProfitPrice: snapPriceForInput(next),
+            }));
         }
     };
 
-    const handleCurrencyChange = (
-        field: 'gainCurrency' | 'lossCurrency',
-        newCurrency: '$' | '%',
-    ) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: newCurrency,
-        }));
-
-        if (field === 'gainCurrency' && formData.gain) {
-            setTpSource('gain');
-            updateTPPriceFromGain(formData.gain, newCurrency);
-        } else if (field === 'lossCurrency' && formData.loss) {
-            setSlSource('loss');
-            updateSLPriceFromLoss(formData.loss, newCurrency);
+    // --- user edits tolerated loss; derive/snap the corresponding SL price ---
+    const onStopLossAmountChange = (v: string) => {
+        setForm((p) => ({ ...p, stopLossAmount: v }));
+        setUi((u) => ({ ...u, stopLossInputMode: 'loss' }));
+        const loss = parseFloat(v);
+        if (Number.isFinite(loss) && positionQuantity) {
+            const cur = form.stopLossAmountType;
+            let next: number;
+            if (cur === '$')
+                next = isLong
+                    ? entryPrice - loss / positionQuantity
+                    : entryPrice + loss / positionQuantity;
+            else {
+                const pct = loss / 100;
+                next = entryPrice * (isLong ? 1 - pct : 1 + pct);
+            }
+            setForm((p) => ({ ...p, stopLossPrice: snapPriceForInput(next) }));
         }
     };
 
-    const handleConfirm = async () => {
-        if (!isFormValid()) {
+    // --- when switching gain currency, recompute TP if a gain value exists ---
+    const onTakeProfitGainTypeChange = (val: Currency | string) => {
+        const c = val as Currency;
+        setForm((p) => ({ ...p, takeProfitGainType: c }));
+        if (form.takeProfitGain) onTakeProfitGainChange(form.takeProfitGain);
+    };
+
+    // --- when switching loss currency, recompute SL if a loss value exists ---
+    const onStopLossAmountTypeChange = (val: Currency | string) => {
+        const c = val as Currency;
+        setForm((p) => ({ ...p, stopLossAmountType: c }));
+        if (form.stopLossAmount) onStopLossAmountChange(form.stopLossAmount);
+    };
+
+    // --- blur handler: snap TP input to the nearest tick and mark it “touched” ---
+    const onTakeProfitBlur = (raw: string) => {
+        setUi((u) => ({
+            ...u,
+            isTakeProfitPriceFocused: false,
+            hasTakeProfitPriceBeenTouched: true,
+        }));
+        const n = parsePrice(raw);
+        if (Number.isFinite(n))
+            setForm((p) => ({ ...p, takeProfitPrice: snapPriceForInput(n) }));
+    };
+
+    // --- blur handler: snap SL input to the nearest tick and mark it “touched” ---
+    const onStopLossBlur = (raw: string) => {
+        setUi((u) => ({
+            ...u,
+            isStopLossPriceFocused: false,
+            hasStopLossPriceBeenTouched: true,
+        }));
+        const n = parsePrice(raw);
+        if (Number.isFinite(n))
+            setForm((p) => ({ ...p, stopLossPrice: snapPriceForInput(n) }));
+    };
+
+    // --- blur handlers for optional limit prices (text inputs) ---
+    const onTakeProfitLimitBlur = () => {
+        const n = parsePrice(ui.takeProfitLimitInput);
+        if (Number.isFinite(n))
+            setUi((u) => ({
+                ...u,
+                takeProfitLimitInput: String(
+                    roundToNearestIncrement(n, priceTickSize),
+                ),
+            }));
+    };
+    const onStopLossLimitBlur = () => {
+        const n = parsePrice(ui.stopLossLimitInput);
+        if (Number.isFinite(n))
+            setUi((u) => ({
+                ...u,
+                stopLossLimitInput: String(
+                    roundToNearestIncrement(n, priceTickSize),
+                ),
+            }));
+    };
+
+    // --- overall form validity: at least one of TP/SL set and each (if set) is directionally valid ---
+    const isFormValid = useMemo(() => {
+        const hasTp =
+            form.takeProfitPrice.trim() !== '' ||
+            form.takeProfitGain.trim() !== '';
+        const hasSl =
+            form.stopLossPrice.trim() !== '' ||
+            form.stopLossAmount.trim() !== '';
+        const somethingSet = hasTp || hasSl;
+        const validWhenSet =
+            (!hasTp || !isTakeProfitInvalid) && (!hasSl || !isStopLossInvalid);
+        return somethingSet && validWhenSet && positionQuantity > 0;
+    }, [
+        form.takeProfitPrice,
+        form.takeProfitGain,
+        form.stopLossPrice,
+        form.stopLossAmount,
+        isTakeProfitInvalid,
+        isStopLossInvalid,
+        positionQuantity,
+    ]);
+
+    // --- Confirm: compute final size/prices (rounded), include optional limits, and "place" orders ---
+    const handleConfirm = useCallback(async () => {
+        if (!isFormValid) return;
+
+        // Determine the order size (configured allocation or full position), rounded to lot step
+        const rawOrderSize = form.isCustomAllocationEnabled
+            ? allocatedQuantity
+            : totalBaseQuantity;
+        const finalOrderSize = roundToNearestIncrement(
+            rawOrderSize,
+            quantityStep,
+        );
+
+        if (finalOrderSize <= 0) {
+            console.warn('Order size too small to place.');
             return;
         }
 
-        console.log('Form submitted:', formData);
+        // Prepare trigger prices (TP and SL), rounded to tick size
+        const takeProfitTriggerPrice =
+            form.takeProfitPrice !== ''
+                ? roundToNearestIncrement(
+                      Number(form.takeProfitPrice),
+                      priceTickSize,
+                  )
+                : undefined;
 
-        try {
-            if (formData.tpPrice) {
-                await placeTakeProfitOrder();
-            }
+        const stopLossTriggerPrice =
+            form.stopLossPrice !== ''
+                ? roundToNearestIncrement(
+                      Number(form.stopLossPrice),
+                      priceTickSize,
+                  )
+                : undefined;
 
-            if (formData.slPrice) {
-                await placeStopLossOrder();
-            }
+        // Optional limit prices if limit orders are enabled
+        const takeProfitLimitPrice =
+            form.isLimitOrderEnabled && ui.takeProfitLimitInput
+                ? roundToNearestIncrement(
+                      Number(ui.takeProfitLimitInput),
+                      priceTickSize,
+                  )
+                : undefined;
 
-            closeTPModal();
-        } catch (error) {
-            console.error('Error placing TP/SL orders:', error);
+        const stopLossLimitPrice =
+            form.isLimitOrderEnabled && ui.stopLossLimitInput
+                ? roundToNearestIncrement(
+                      Number(ui.stopLossLimitInput),
+                      priceTickSize,
+                  )
+                : undefined;
+
+        // Validate numbers
+        if (
+            takeProfitTriggerPrice !== undefined &&
+            !Number.isFinite(takeProfitTriggerPrice)
+        )
+            return;
+        if (
+            stopLossTriggerPrice !== undefined &&
+            !Number.isFinite(stopLossTriggerPrice)
+        )
+            return;
+
+        const orderSide = position.szi > 0 ? 'sell' : 'buy';
+        const orderType = form.isLimitOrderEnabled
+            ? 'STOP_LIMIT'
+            : 'STOP_MARKET';
+
+        if (takeProfitTriggerPrice !== undefined) {
+            console.log('Placing Take Profit Order:', {
+                symbol: position.coin,
+                triggerPrice: takeProfitTriggerPrice,
+                limitPrice: takeProfitLimitPrice,
+                size: finalOrderSize,
+                side: orderSide,
+                reduceOnly: true,
+                type: orderType,
+                ocoGroupId: 'tp-sl-group',
+            });
         }
-    };
 
-    const isFormValid = () => {
-        const hasTp =
-            formData.tpPrice.trim() !== '' || formData.gain.trim() !== '';
-        const hasSl =
-            formData.slPrice.trim() !== '' || formData.loss.trim() !== '';
-        const somethingSet = hasTp || hasSl;
+        if (stopLossTriggerPrice !== undefined) {
+            console.log('Placing Stop Loss Order:', {
+                symbol: position.coin,
+                triggerPrice: stopLossTriggerPrice,
+                limitPrice: stopLossLimitPrice,
+                size: finalOrderSize,
+                side: orderSide,
+                reduceOnly: true,
+                type: orderType,
+                ocoGroupId: 'tp-sl-group',
+            });
+        }
 
-        const tpOk = !tpInvalid;
-        const slOk = !slInvalid;
+        closeTPModal();
+    }, [
+        isFormValid,
+        form.isCustomAllocationEnabled,
+        form.isLimitOrderEnabled,
+        form.takeProfitPrice,
+        form.stopLossPrice,
+        ui.takeProfitLimitInput,
+        ui.stopLossLimitInput,
+        allocatedQuantity,
+        totalBaseQuantity,
+        quantityStep,
+        priceTickSize,
+        position.coin,
+        position.szi,
+        closeTPModal,
+    ]);
 
-        // If TP is set, it must be valid; same for SL. If not set, ignore validity.
-        const tpIsSet =
-            formData.tpPrice.trim() !== '' || formData.gain.trim() !== '';
-        const slIsSet =
-            formData.slPrice.trim() !== '' || formData.loss.trim() !== '';
+    const headerInfo = [
+        { label: 'Market', value: position.coin },
+        {
+            label: 'Position',
+            value: `${formatCrypto(Math.abs(position.szi))} ${position.coin}`,
+        },
+        { label: 'Entry Price', value: formatCrypto(entryPrice) },
+        { label: 'Mark Price', value: formatCrypto(markOrEntryPrice) },
+    ];
 
-        const validWhenSet = (!tpIsSet || tpOk) && (!slIsSet || slOk);
-
-        return somethingSet && validWhenSet;
-    };
+    const currencyOptions: Currency[] = ['$', '%'];
 
     return (
         <div className={styles.container}>
             {/* --- INFO HEADER --- */}
             <section className={styles.infoContainer}>
-                {infoData.map((item) => (
+                {headerInfo.map((item) => (
                     <div key={item.label} className={styles.infoItem}>
                         <p>{item.label}</p>
                         <p>{item.value}</p>
@@ -414,38 +584,33 @@ export default function TakeProfitsModal(props: PropIF) {
                 ))}
             </section>
 
-            {/* --- FORM CONTAINER --- */}
+            {/* --- FORM --- */}
             <section className={styles.formContainer}>
-                {/* TP Row */}
+                {/* Take Profit Row */}
                 <div className={styles.formRow}>
                     <label
-                        className={`${styles.inputWithoutDropdown} ${showTpValidation && tpInvalid ? styles.fieldError : ''} ${showTpValidation && tpOutlier && !tpInvalid ? styles.fieldWarning : ''}`}
-                        htmlFor='tpPrice'
+                        className={`${styles.inputWithoutDropdown} ${showTakeProfitValidation && isTakeProfitInvalid ? styles.fieldError : ''} ${showTakeProfitValidation && isTakeProfitOutlier && !isTakeProfitInvalid ? styles.fieldWarning : ''}`}
+                        htmlFor='takeProfitPrice'
                     >
                         <span>TP Price</span>
                         <input
-                            id='tpPrice'
+                            id='takeProfitPrice'
                             type='number'
-                            value={formData.tpPrice}
+                            step={priceTickSize}
+                            value={form.takeProfitPrice}
                             onChange={(e) =>
-                                handleInputChange('tpPrice', e.target.value)
+                                onTakeProfitPriceChange(e.target.value)
                             }
-                            onFocus={() => setTpPriceFocused(true)}
-                            onBlur={(e) => {
-                                setTpPriceFocused(false);
-                                setTpPriceTouched(true);
-                                const n = parsePx(e.currentTarget.value);
-                                if (Number.isFinite(n)) {
-                                    const snapped = String(
-                                        roundToStep(n, pxStep),
-                                    );
-                                    if (snapped !== e.currentTarget.value) {
-                                        e.currentTarget.value = snapped;
-                                        handleInputChange('tpPrice', snapped);
-                                    }
-                                }
-                            }}
-                            aria-invalid={tpInvalid || undefined}
+                            onFocus={() =>
+                                setUi((u) => ({
+                                    ...u,
+                                    isTakeProfitPriceFocused: true,
+                                }))
+                            }
+                            onBlur={(e) =>
+                                onTakeProfitBlur(e.currentTarget.value)
+                            }
+                            aria-invalid={isTakeProfitInvalid || undefined}
                         />
                     </label>
 
@@ -461,88 +626,86 @@ export default function TakeProfitsModal(props: PropIF) {
                             )
                                 return;
                             e.preventDefault();
-                            gainRef.current?.focus();
+                            takeProfitGainInputRef.current?.focus();
                         }}
                     >
-                        <label htmlFor='gain'>Gain</label>
+                        <label htmlFor='takeProfitGain'>Gain</label>
                         <input
-                            id='gain'
-                            ref={gainRef}
+                            id='takeProfitGain'
+                            ref={takeProfitGainInputRef}
                             type='number'
-                            value={formData.gain}
+                            min={0}
+                            value={form.takeProfitGain}
                             onChange={(e) =>
-                                handleInputChange('gain', e.target.value)
+                                onTakeProfitGainChange(e.target.value)
                             }
-                            onFocus={() => setGainFocused(true)}
-                            onBlur={() => {
-                                setGainFocused(false);
-                                setGainTouched(true);
-                            }}
+                            onFocus={() =>
+                                setUi((u) => ({
+                                    ...u,
+                                    isTakeProfitGainFocused: true,
+                                }))
+                            }
+                            onBlur={() =>
+                                setUi((u) => ({
+                                    ...u,
+                                    isTakeProfitGainFocused: false,
+                                    hasTakeProfitGainBeenTouched: true,
+                                }))
+                            }
                         />
                         <ComboBox
-                            value={formData.gainCurrency}
+                            value={form.takeProfitGainType}
                             options={currencyOptions}
-                            onChange={(val) =>
-                                handleCurrencyChange(
-                                    'gainCurrency',
-                                    val as '$' | '%',
-                                )
-                            }
+                            onChange={(val) => onTakeProfitGainTypeChange(val)}
                             cssPositioning='fixed'
                         />
                     </div>
                 </div>
 
                 <div className={styles.expectedProfitContainer}>
-                    {(formData.tpPrice || formData.gain) && (
+                    {(form.takeProfitPrice || form.takeProfitGain) && (
                         <span className={styles.expectedProfitText}>
                             Expected Profit:{' '}
                             {expectedProfit == null
                                 ? '—'
                                 : `$${expectedProfit.toFixed(2)}`}
-                            {tpInvalid && showTpValidation && (
-                                <span className={styles.validationError}>
-                                    {' '}
-                                    • TP must be {isLong
-                                        ? 'above'
-                                        : 'below'}{' '}
-                                    entry
-                                </span>
-                            )}
+                            {isTakeProfitInvalid &&
+                                showTakeProfitValidation && (
+                                    <span className={styles.validationError}>
+                                        {' '}
+                                        • TP must be{' '}
+                                        {isLong ? 'above' : 'below'} entry
+                                    </span>
+                                )}
                         </span>
                     )}
                 </div>
 
-                {/* SL Row */}
+                {/* Stop Loss Row */}
                 <div className={styles.formRow}>
                     <label
-                        className={`${styles.inputWithoutDropdown} ${showSlValidation && slInvalid ? styles.fieldError : ''} ${showSlValidation && slOutlier && !slInvalid ? styles.fieldWarning : ''}`}
-                        htmlFor='slPrice'
+                        className={`${styles.inputWithoutDropdown} ${showStopLossValidation && isStopLossInvalid ? styles.fieldError : ''} ${showStopLossValidation && isStopLossOutlier && !isStopLossInvalid ? styles.fieldWarning : ''}`}
+                        htmlFor='stopLossPrice'
                     >
                         <span>SL Price</span>
                         <input
-                            id='slPrice'
+                            id='stopLossPrice'
                             type='number'
-                            value={formData.slPrice}
+                            step={priceTickSize}
+                            value={form.stopLossPrice}
                             onChange={(e) =>
-                                handleInputChange('slPrice', e.target.value)
+                                onStopLossPriceChange(e.target.value)
                             }
-                            onFocus={() => setSlPriceFocused(true)}
-                            onBlur={(e) => {
-                                setSlPriceFocused(false);
-                                setSlPriceTouched(true);
-                                const n = parsePx(e.currentTarget.value);
-                                if (Number.isFinite(n)) {
-                                    const snapped = String(
-                                        roundToStep(n, pxStep),
-                                    );
-                                    if (snapped !== e.currentTarget.value) {
-                                        e.currentTarget.value = snapped;
-                                        handleInputChange('slPrice', snapped);
-                                    }
-                                }
-                            }}
-                            aria-invalid={slInvalid || undefined}
+                            onFocus={() =>
+                                setUi((u) => ({
+                                    ...u,
+                                    isStopLossPriceFocused: true,
+                                }))
+                            }
+                            onBlur={(e) =>
+                                onStopLossBlur(e.currentTarget.value)
+                            }
+                            aria-invalid={isStopLossInvalid || undefined}
                         />
                     </label>
 
@@ -558,46 +721,50 @@ export default function TakeProfitsModal(props: PropIF) {
                             )
                                 return;
                             e.preventDefault();
-                            lossRef.current?.focus();
+                            stopLossAmountInputRef.current?.focus();
                         }}
                     >
-                        <label htmlFor='loss'>Loss</label>
+                        <label htmlFor='stopLossAmount'>Loss</label>
                         <input
-                            id='loss'
-                            ref={lossRef}
+                            id='stopLossAmount'
+                            ref={stopLossAmountInputRef}
                             type='number'
-                            value={formData.loss}
+                            min={0}
+                            value={form.stopLossAmount}
                             onChange={(e) =>
-                                handleInputChange('loss', e.target.value)
+                                onStopLossAmountChange(e.target.value)
                             }
-                            onFocus={() => setLossFocused(true)}
-                            onBlur={() => {
-                                setLossFocused(false);
-                                setLossTouched(true);
-                            }}
+                            onFocus={() =>
+                                setUi((u) => ({
+                                    ...u,
+                                    isStopLossAmountFocused: true,
+                                }))
+                            }
+                            onBlur={() =>
+                                setUi((u) => ({
+                                    ...u,
+                                    isStopLossAmountFocused: false,
+                                    hasStopLossAmountBeenTouched: true,
+                                }))
+                            }
                         />
                         <ComboBox
-                            value={formData.lossCurrency}
+                            value={form.stopLossAmountType}
                             options={currencyOptions}
-                            onChange={(val) =>
-                                handleCurrencyChange(
-                                    'lossCurrency',
-                                    val as '$' | '%',
-                                )
-                            }
+                            onChange={(val) => onStopLossAmountTypeChange(val)}
                             cssPositioning='fixed'
                         />
                     </div>
                 </div>
 
                 <div className={styles.expectedProfitContainer}>
-                    {(formData.slPrice || formData.loss) && (
+                    {(form.stopLossPrice || form.stopLossAmount) && (
                         <span className={styles.expectedProfitText}>
                             Expected Loss:{' '}
                             {expectedLoss == null
                                 ? '—'
                                 : `-$${expectedLoss.toFixed(2)}`}
-                            {slInvalid && showSlValidation && (
+                            {isStopLossInvalid && showStopLossValidation && (
                                 <span className={styles.validationError}>
                                     {' '}
                                     • SL must be {isLong
@@ -611,105 +778,139 @@ export default function TakeProfitsModal(props: PropIF) {
                 </div>
             </section>
 
-            {/* --- TOGGLE SECTION --- */}
+            {/* Toggles */}
             <section className={styles.toggleContainer}>
                 <ToggleSwitch
-                    isOn={configureAmount}
-                    onToggle={(v) => setConfigureAmount(v ?? !configureAmount)}
+                    isOn={form.isCustomAllocationEnabled}
+                    onToggle={(v) =>
+                        setForm((p) => ({
+                            ...p,
+                            isCustomAllocationEnabled:
+                                v ?? !p.isCustomAllocationEnabled,
+                        }))
+                    }
                     label='Configure Amount'
                     reverse
                 />
 
-                {configureAmount && (
+                {form.isCustomAllocationEnabled && (
                     <>
                         <PositionSize
-                            value={applyPct}
-                            onChange={setApplyPct}
+                            value={ui.allocationPercentage}
+                            onChange={(v) =>
+                                setUi((u) => ({
+                                    ...u,
+                                    allocationPercentage: v,
+                                }))
+                            }
                             isModal
                             className={styles.positionSizeRow}
                         />
                         <div className={styles.amountReadout}>
-                            {applyBase} {labelSym}{' '}
-                            <span className={styles.subtext}>
-                                ({applyPct}% of {totalBase} {labelSym})
-                            </span>
+                            {formatCrypto(allocatedQuantity)} BTC (
+                            {ui.allocationPercentage}% of{' '}
+                            {formatCrypto(totalBaseQuantity)} BTC)
                         </div>
                     </>
                 )}
 
                 <ToggleSwitch
-                    isOn={formData.limitPrice}
-                    onToggle={(newState) =>
-                        handleInputChange(
-                            'limitPrice',
-                            newState ?? !formData.limitPrice,
-                        )
+                    isOn={form.isLimitOrderEnabled}
+                    onToggle={(v) =>
+                        setForm((p) => ({
+                            ...p,
+                            isLimitOrderEnabled: v ?? !p.isLimitOrderEnabled,
+                        }))
                     }
                     label='Limit Price'
                     reverse
                 />
 
-                {formData.limitPrice && (
+                {form.isLimitOrderEnabled && (
                     <div className={styles.formRow}>
                         <label
                             className={styles.inputWithoutDropdown}
-                            htmlFor='tpLimitPrice'
+                            htmlFor='takeProfitLimitPrice'
                         >
                             <span>TP Limit Price</span>
                             <input
-                                id='tpLimitPrice'
+                                id='takeProfitLimitPrice'
                                 type='text'
                                 inputMode='decimal'
-                                value={tpLimitStr}
-                                onChange={(e) => setTpLimitStr(e.target.value)}
-                                onBlur={onTpLimitBlur}
+                                value={ui.takeProfitLimitInput}
+                                onChange={(e) =>
+                                    setUi((u) => ({
+                                        ...u,
+                                        takeProfitLimitInput: e.target.value,
+                                    }))
+                                }
+                                onBlur={onTakeProfitLimitBlur}
                             />
                         </label>
 
                         <label
                             className={styles.inputWithoutDropdown}
-                            htmlFor='slLimitPrice'
+                            htmlFor='stopLossLimitPrice'
                         >
                             <span>SL Limit Price</span>
                             <input
-                                id='slLimitPrice'
+                                id='stopLossLimitPrice'
                                 type='text'
                                 inputMode='decimal'
-                                value={slLimitStr}
-                                onChange={(e) => setSlLimitStr(e.target.value)}
-                                onBlur={onSlLimitBlur}
+                                value={ui.stopLossLimitInput}
+                                onChange={(e) =>
+                                    setUi((u) => ({
+                                        ...u,
+                                        stopLossLimitInput: e.target.value,
+                                    }))
+                                }
+                                onBlur={onStopLossLimitBlur}
                             />
                         </label>
                     </div>
                 )}
             </section>
 
-            {/* --- WARNINGS --- */}
+            {/* Warnings */}
             <div className={styles.warningContainer}>
-                {!tpInvalid && tpOutlier && showTpValidation && (
-                    <span className={styles.warningText}>
-                        TP is {(pctAway(tpTarget as number) * 100).toFixed(1)}%
-                        from entry — double-check your input
-                    </span>
-                )}
-                {!slInvalid && slOutlier && showSlValidation && (
-                    <span className={styles.warningText}>
-                        SL is {(pctAway(slTarget as number) * 100).toFixed(1)}%
-                        from entry — double-check your input
-                    </span>
-                )}
+                {!isTakeProfitInvalid &&
+                    isTakeProfitOutlier &&
+                    showTakeProfitValidation && (
+                        <span className={styles.warningText}>
+                            TP is{' '}
+                            {(
+                                distanceFromEntryRatio(
+                                    takeProfitTarget as number,
+                                ) * 100
+                            ).toFixed(1)}
+                            % from entry — double-check your input
+                        </span>
+                    )}
+                {!isStopLossInvalid &&
+                    isStopLossOutlier &&
+                    showStopLossValidation && (
+                        <span className={styles.warningText}>
+                            SL is{' '}
+                            {(
+                                distanceFromEntryRatio(
+                                    stopLossTarget as number,
+                                ) * 100
+                            ).toFixed(1)}
+                            % from entry — double-check your input
+                        </span>
+                    )}
             </div>
 
-            {/* --- CONFIRM BUTTON --- */}
+            {/* Confirm */}
             <button
-                className={`${styles.confirmButton} ${!isFormValid() ? styles.disabled : ''}`}
+                className={`${styles.confirmButton} ${!isFormValid ? styles.disabled : ''}`}
                 onClick={handleConfirm}
-                disabled={!isFormValid()}
+                disabled={!isFormValid}
             >
                 Confirm
             </button>
 
-            {/* --- FOOTER INFO --- */}
+            {/* Footer */}
             <section className={styles.textInfo}>
                 <p>
                     By default take-profit and stop-loss orders apply to the
