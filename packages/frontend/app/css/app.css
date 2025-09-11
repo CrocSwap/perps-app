@@ -74,3 +74,108 @@
         padding-right: var(--padding-s, 8px);
     }
 }
+
+._sessionPanelPopover_1ifo2_256._sessionPanelPopover_1ifo2_256
+    ._sessionPanel_1ifo2_256 {
+    background: var(--bg-dark3);
+    border: none;
+    border-radius: 0.25rem;
+    box-shadow: var(--dropdown-box-shadow);
+    width: 25rem;
+    height: 30rem;
+    outline: none;
+    color: var(--text1) !important;
+    display: grid;
+}
+._sessionPanelPopover_1ifo2_256 *,
+._sessionPanelPopover_1ifo2_256 ::before,
+._sessionPanelPopover_1ifo2_256 ::after {
+    color: var(--text1);
+}
+
+._sessionPanelPopover_1ifo2_256._sessionPanelPopover_1ifo2_256
+    ._sessionPanel_1ifo2_256
+    ._tokenList_1ifo2_1257
+    ._token_1ifo2_795,
+._sessionPanelPopover_1ifo2_256._sessionPanelPopover_1ifo2_256
+    ._sessionPanel_1ifo2_256
+    ._tokenList_1ifo2_1257
+    ._tokenButton_1ifo2_1266 {
+    display: grid;
+    grid-template-columns: max-content 1fr max-content;
+    gap: 0.75rem;
+    background: var(--bg-dark2);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    align-items: center;
+    color: #0f172a;
+    border: none;
+    text-align: left;
+}
+
+/* tab border color */
+._sessionPanelPopover_1ifo2_256._sessionPanelPopover_1ifo2_256
+    ._sessionPanel_1ifo2_256
+    ._tabs_1ifo2_571
+    ._tabList_1ifo2_576
+    ._tab_1ifo2_571[data-selected] {
+    border-color: var(--accent1);
+    cursor: unset;
+}
+/* tab main border bottom */
+._sessionPanelPopover_1ifo2_256._sessionPanelPopover_1ifo2_256
+    ._sessionPanel_1ifo2_256
+    ._tabPanel_1ifo2_610 {
+    border-top: 1px solid var(--bg-dark2);
+    /* border-bottom: 1px solrgb(36, 84, 144)--bg-dark2); */
+}
+/* icon background */
+._sessionPanelPopover_1ifo2_256._sessionPanelPopover_1ifo2_256
+    ._sessionPanel_1ifo2_256
+    ._walletPage_1ifo2_1202
+    ._topButtons_1ifo2_1210
+    ._topButton_1ifo2_1210
+    ._icon_1ifo2_517 {
+    background: var(--accent1);
+    border-radius: 9999px;
+    padding: 0.375rem;
+    font-size: 3rem;
+    color: #f8fafc;
+}
+/* icons label */
+._sessionPanelPopover_1ifo2_256._sessionPanelPopover_1ifo2_256
+    ._sessionPanel_1ifo2_256
+    ._walletPage_1ifo2_1202
+    ._topButtons_1ifo2_1210
+    ._topButton_1ifo2_1210
+    ._text_1ifo2_1249 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0;
+    font-style: normal;
+    text-align: center;
+    color: var(--aceent1);
+}
+/* logout */
+._sessionPanelPopover_1ifo2_256._sessionPanelPopover_1ifo2_256
+    ._sessionPanel_1ifo2_256
+    ._footer_1ifo2_1535
+    ._logoutButton_1ifo2_1550 {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0.25rem 1rem;
+    position: relative;
+    margin-right: -1rem;
+    color: var(--text1);
+}
+
+/* footer with log out button */
+._sessionPanelPopover_1ifo2_256._sessionPanelPopover_1ifo2_256
+    ._sessionPanel_1ifo2_256
+    ._tabPanel_1ifo2_610 {
+    border-top: none;
+    border-bottom: 1px solid var(--bg-dark2);
+
+    overflow: hidden;
+}
