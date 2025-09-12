@@ -155,29 +155,35 @@ export default function GenericTable<
     const [rowLimit, setRowLimit] = useState(slicedLimit);
 
     const isHttpInfoCallsDisabled = true;
-    const isShowAllEnabled = true;
+    const isSessionEstablished = useMemo(() => {
+        if (manualAddressEnabled) {
+            return manualAddress && manualAddress.length > 0;
+        }
+        if (isDebugWalletActive) {
+            return true;
+        }
+        return isEstablished(sessionState);
+    }, [
+        sessionState,
+        manualAddressEnabled,
+        manualAddress,
+        isDebugWalletActive,
+    ]);
+    const isShowAllEnabled = isSessionEstablished && data.length > slicedLimit;
 
     const checkShadow = useCallback(() => {
-        const tableBody = document.getElementById(
-            `${id}-tableBody`,
-        ) as HTMLElement;
-        const actionsContainer = document.getElementById(
-            `${id}-actionsContainer`,
-        ) as HTMLElement;
+        const tableBody = document.getElementById(`${id}-tableBody`);
+        if (!tableBody) return;
 
-        if (!tableBody || !actionsContainer) {
-            return;
-        }
-
-        const bottomNotShadowed =
-            tableBody.scrollTop + tableBody.clientHeight + 2 >=
+        const hasOverflow = tableBody.scrollHeight > tableBody.clientHeight + 1;
+        const atBottom =
+            tableBody.scrollTop + tableBody.clientHeight + 1 >=
             tableBody.scrollHeight;
-        if (bottomNotShadowed) {
-            actionsContainer?.classList.add(styles.notShadowed);
-        } else {
-            actionsContainer?.classList.remove(styles.notShadowed);
-        }
-    }, []);
+
+        // Toggle classes directly on tableBody
+        tableBody.classList.toggle(styles.hasOverflow, hasOverflow);
+        tableBody.classList.toggle(styles.atBottom, atBottom);
+    }, [id]);
 
     const calculateRowCount = () => {
         const rowHeight = 25;
@@ -395,21 +401,6 @@ export default function GenericTable<
         };
     }, [tableState, checkShadow, id]);
 
-    const isSessionEstablished = useMemo(() => {
-        if (manualAddressEnabled) {
-            return manualAddress && manualAddress.length > 0;
-        }
-        if (isDebugWalletActive) {
-            return true;
-        }
-        return isEstablished(sessionState);
-    }, [
-        sessionState,
-        manualAddressEnabled,
-        manualAddress,
-        isDebugWalletActive,
-    ]);
-
     useEffect(() => {
         const button = sessionButtonRef.current;
         if (button) {
@@ -438,6 +429,9 @@ export default function GenericTable<
                 className={`${styles.tableBody} ${
                     pageMode ? styles.pageMode : styles.notPage
                 } ${isShowAllEnabled ? styles.scrollVisible : ''}`}
+                style={{
+                    overflowY: isSessionEstablished ? 'auto' : 'hidden',
+                }}
             >
                 <span
                     id={`${id}-headerContainer`}
