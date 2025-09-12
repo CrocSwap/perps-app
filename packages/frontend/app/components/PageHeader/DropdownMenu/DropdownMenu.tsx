@@ -6,6 +6,7 @@ import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import packageJson from '../../../../package.json';
 import styles from './DropdownMenu.module.css';
 import { externalURLs } from '~/utils/Constants';
+import { t } from 'i18next';
 
 interface DropdownMenuProps {
     setIsDropdownMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -36,7 +37,7 @@ const DropdownMenu = ({
             url: externalURLs.discord,
         },
         {
-            name: 'Send Feedback',
+            name: t('feedback.menuLabel'),
             icon: <FaCommentAlt />,
             onClick: handleFeedbackClick,
         },

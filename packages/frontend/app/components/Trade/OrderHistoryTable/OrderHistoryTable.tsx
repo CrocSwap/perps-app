@@ -9,9 +9,7 @@ import type {
     OrderDataSortBy,
 } from '~/utils/orderbook/OrderBookIFs';
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
-import OrderHistoryTableHeader, {
-    OrderHistoryTableModel,
-} from './OrderHistoryTableHeader';
+import { OrderHistoryTableHeader } from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
 
 interface OrderHistoryTableProps {
@@ -21,7 +19,7 @@ interface OrderHistoryTableProps {
     isFetched: boolean;
 }
 
-export default function OrderHistoryTable(props: OrderHistoryTableProps) {
+export function OrderHistoryTable(props: OrderHistoryTableProps) {
     const { selectedFilter, pageMode, data, isFetched } = props;
 
     const { symbol, filterOrderHistory } = useTradeDataStore();
@@ -71,7 +69,6 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                 skeletonColRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
                 defaultSortBy={'timestamp'}
                 defaultSortDirection={'desc'}
-                tableModel={OrderHistoryTableModel}
                 noDataMessage='No order history'
                 csvDataFetcher={fetchOrderHistory}
                 csvDataFetcherArgs={[userAddress]}
@@ -79,3 +76,5 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
         </>
     );
 }
+
+export default OrderHistoryTable;

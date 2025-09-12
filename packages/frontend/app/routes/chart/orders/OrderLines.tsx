@@ -30,7 +30,7 @@ export default function OrderLines({
     scaleData,
     overlayCanvasMousePositionRef,
 }: OrderLinesProps) {
-    const { chart } = useTradingView();
+    const { chart, isChartReady } = useTradingView();
 
     const openLines = useOpenOrderLines();
     const positionLines = usePositionOrderLines();
@@ -185,12 +185,14 @@ export default function OrderLines({
 
     return (
         <>
-            <LineComponent
-                key='lines'
-                lines={visibleLines}
-                localChartReady={localChartReady}
-                setLocalChartReady={setLocalChartReady}
-            />
+            {isChartReady && (
+                <LineComponent
+                    key='lines'
+                    lines={visibleLines}
+                    localChartReady={localChartReady}
+                    setLocalChartReady={setLocalChartReady}
+                />
+            )}
             {localChartReady && (
                 <LabelComponent
                     key='labels'

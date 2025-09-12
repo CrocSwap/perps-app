@@ -21,6 +21,7 @@ import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
 import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
+import { t } from 'i18next';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -433,7 +434,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 modalCtrl.open();
                             }}
                         >
-                            Market
+                            {t('transactions.market')}
                         </button>
                         <button
                             className={styles.actionButton}
@@ -442,7 +443,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 modalCtrl.open();
                             }}
                         >
-                            Limit
+                            {t('transactions.limit')}
                         </button>
                     </div>
                 </div>

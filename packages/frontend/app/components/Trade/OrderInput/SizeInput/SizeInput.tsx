@@ -3,6 +3,7 @@ import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './SizeInput.module.css';
+import { t } from 'i18next';
 
 interface PropsIF {
     inputId?: string;
@@ -94,7 +95,11 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
             className={`${styles.sizeInputContainer} ${isModal && styles.modalContainer}`}
             onClick={handleContainerClick}
         >
-            <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
+            <span>
+                {useTotalSize
+                    ? t('transactions.totalSize')
+                    : t('transactions.size')}
+            </span>
             <NumFormattedInput
                 id={inputId || 'trade-module-size-input'}
                 value={value}
@@ -103,7 +108,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 onKeyDown={onKeyDown}
                 className={className}
                 aria-label={ariaLabel}
-                placeholder='Enter Size'
+                placeholder={t('transactions.enterSize')}
                 onFocus={onFocus}
                 autoFocus={props.autoFocus}
             />

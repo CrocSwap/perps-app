@@ -32,6 +32,7 @@ import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 // import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 import type { TabType } from '~/routes/trade';
 import { useSdk } from '~/hooks/useSdk';
+import { t } from 'i18next';
 
 interface OrderBookProps {
     orderCount: number;
@@ -247,7 +248,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const midHeader = useCallback(
         (id: string) => (
             <div id={id} className={styles.orderBookBlockMid}>
-                <div>Spread</div>
+                <div>{t('orderBook.spread')}</div>
                 <div>{selectedResolution?.val}</div>
                 <div>
                     {symbolInfo?.markPx &&
@@ -381,15 +382,15 @@ const OrderBook: React.FC<OrderBookProps> = ({
             </div>
 
             <div id={'orderBookHeader2'} className={styles.orderBookHeader}>
-                <div>Price</div>
+                <div>{t('transactions.price')}</div>
                 <div>
-                    Size{' '}
+                    {t('transactions.size')}
                     {selectedMode === 'symbol'
                         ? `(${symbol.toUpperCase()})`
                         : '(USD)'}
                 </div>
                 <div>
-                    Total{' '}
+                    {t('transactions.total')}
                     {selectedMode === 'symbol'
                         ? `(${symbol.toUpperCase()})`
                         : '(USD)'}

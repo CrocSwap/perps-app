@@ -5,6 +5,7 @@ import Tabs from '~/components/Tabs/Tabs';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { accountIF } from '~/stores/AccountsStore';
 import styles from './StrategyTable.module.css';
+import { t } from 'i18next';
 
 // interface for table column header metadata
 export interface headerItemIF {
@@ -16,53 +17,53 @@ export interface headerItemIF {
 // data to label column headers
 const tableHeaders: headerItemIF[] = [
     {
-        name: 'Time',
-        key: 'time',
+        name: t('tradeTable.time'),
+        key: t('tradeTable.time'),
         sortable: true,
     },
     {
-        name: 'Type',
-        key: 'type',
+        name: t('tradeTable.type'),
+        key: t('tradeTable.type'),
         sortable: true,
     },
     {
-        name: 'Coin',
-        key: 'coin',
+        name: t('tradeTable.coin'),
+        key: t('tradeTable.coin'),
         sortable: true,
     },
     {
-        name: 'Direction',
-        key: 'direction',
+        name: t('tradeTable.direction'),
+        key: t('tradeTable.direction'),
         sortable: true,
     },
     {
-        name: 'Size',
-        key: 'size',
+        name: t('tradeTable.size'),
+        key: t('tradeTable.size'),
         sortable: true,
     },
     {
-        name: 'Filled Size',
-        key: 'filledSize',
+        name: t('tradeTable.filledSize'),
+        key: t('tradeTable.filledSize'),
         sortable: true,
     },
     {
-        name: 'Order Value',
-        key: 'orderValue',
+        name: t('tradeTable.orderValue'),
+        key: t('tradeTable.orderValue'),
         sortable: true,
     },
     {
-        name: 'Price',
-        key: 'price',
+        name: t('tradeTable.price'),
+        key: t('tradeTable.price'),
         sortable: true,
     },
     {
-        name: 'Reduce Only',
-        key: 'reduceOnly',
+        name: t('tradeTable.reduceOnly'),
+        key: t('tradeTable.reduceOnly'),
         sortable: true,
     },
     {
-        name: 'Trigger Conditions',
-        key: 'Trigger Conditions',
+        name: t('tradeTable.triggerConditions'),
+        key: t('tradeTable.triggerConditions'),
         sortable: true,
     },
     {
@@ -71,13 +72,13 @@ const tableHeaders: headerItemIF[] = [
         sortable: true,
     },
     {
-        name: 'Status',
-        key: 'status',
+        name: t('tradeTable.status'),
+        key: t('tradeTable.status'),
         sortable: true,
     },
     {
-        name: 'Order',
-        key: 'order',
+        name: t('tradeTable.order'),
+        key: t('tradeTable.order'),
         sortable: true,
     },
 ];

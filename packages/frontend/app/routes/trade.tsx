@@ -8,6 +8,7 @@ import {
     useLayoutEffect,
 } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { t } from 'i18next';
 import { Resizable } from 're-resizable';
 import type { NumberSize } from 're-resizable';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
@@ -314,13 +315,13 @@ export default function Trade() {
     const tabList = useMemo(
         () =>
             [
-                { key: 'order', label: 'Order' },
-                { key: 'chart', label: 'Chart' },
-                { key: 'book', label: 'Book' },
-                { key: 'recent', label: 'Recent' },
-                { key: 'positions', label: 'Positions' },
+                { key: 'order', label: t('navigation.trade') },
+                { key: 'chart', label: t('navigation.chart') },
+                { key: 'book', label: t('navigation.book') },
+                { key: 'recent', label: t('navigation.recent') },
+                { key: 'positions', label: t('navigation.positions') },
             ] as const,
-        [],
+        [t],
     );
 
     const handleTabClick = useCallback(

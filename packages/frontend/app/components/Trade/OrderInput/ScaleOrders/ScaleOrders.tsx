@@ -13,6 +13,7 @@ import evenRatioSvg from '../../../../assets/icons/EvenRatio.svg';
 import decreasingRatioSvg from '../../../../assets/icons/DecreasingRatio.svg';
 import increasingRatioSvg from '../../../../assets/icons/IncreasingRatio.svg';
 import DistributionDropdown from './DistributionDropdown';
+import { t } from 'i18next';
 
 interface ScaleOrdersProps {
     minPrice: number;
@@ -36,19 +37,19 @@ const priceDistributionOptions: Array<{
 }> = [
     {
         type: PRICE_DISTRIBUTION_TYPES.FLAT,
-        label: 'Flat',
+        label: t('transactions.flatPriceDistribution'),
         icon: flatPriceSvg,
         iconClassName: styles.flatIcon,
     },
     {
         type: PRICE_DISTRIBUTION_TYPES.INCREASING,
-        label: 'Increasing',
+        label: t('transactions.increasing'),
         icon: increasingPriceSvg,
         iconClassName: styles.increasingIcon,
     },
     {
         type: PRICE_DISTRIBUTION_TYPES.DECREASING,
-        label: 'Decreasing',
+        label: t('transactions.decreasing'),
         icon: decreasingPriceSvg,
         iconClassName: styles.decreasingIcon,
     },
@@ -56,19 +57,19 @@ const priceDistributionOptions: Array<{
 const ratioDistributionOptions = [
     {
         type: RATIO_DISTRIBUTION_TYPES.EVENLY_SPLIT,
-        label: 'Evenly Split',
+        label: t('transactions.evenlySplit'),
         icon: evenRatioSvg,
         iconClassName: styles.flatIcon,
     },
     {
         type: RATIO_DISTRIBUTION_TYPES.INCREASING,
-        label: 'Increasing',
+        label: t('transactions.increasing'),
         icon: increasingRatioSvg,
         iconClassName: styles.increasingIcon,
     },
     {
         type: RATIO_DISTRIBUTION_TYPES.DECREASING,
-        label: 'Decreasing',
+        label: t('transactions.decreasing'),
         icon: decreasingRatioSvg,
         iconClassName: styles.decreasingIcon,
     },
@@ -160,7 +161,7 @@ export default function ScaleOrders({
                         value={totalOrderInputValue}
                         onChange={handleTotalOrderInputChange}
                         onBlur={handleTotalOrderInputBlur}
-                        placeholder='Total Orders'
+                        placeholder={t('transactions.totalOrders')}
                         className={styles.totalOrdersInput}
                     />
                     <div className={styles.quantityButtons}>
@@ -180,7 +181,7 @@ export default function ScaleOrders({
 
                 <div className={styles.tableHeader}>
                     <DistributionDropdown
-                        label='Price'
+                        label={t('transactions.price')}
                         tooltipContent='price tooltip'
                         options={priceDistributionOptions}
                         currentValue={priceDistribution}
@@ -191,7 +192,7 @@ export default function ScaleOrders({
                     />
 
                     <DistributionDropdown
-                        label='Ratio'
+                        label={t('transactions.ratio')}
                         tooltipContent='ratio'
                         options={ratioDistributionOptions}
                         currentValue={ratioDistribution}
@@ -201,7 +202,9 @@ export default function ScaleOrders({
                         headerClassName={styles.ratioHeader}
                     />
 
-                    <div className={styles.quantityHeader}>Quantity</div>
+                    <div className={styles.quantityHeader}>
+                        {t('common.quantity')}
+                    </div>
                 </div>
 
                 <div className={styles.orderList}>
@@ -242,7 +245,7 @@ export default function ScaleOrders({
 
                 {!isValidRatio && (
                     <div className={styles.errorMessage}>
-                        Sum of order ratios must be 100%
+                        {t('transactions.orderRatioSumMustBe100')}
                     </div>
                 )}
             </div>
@@ -250,14 +253,14 @@ export default function ScaleOrders({
             {isModal && (
                 <div className={styles.actions}>
                     <button className={styles.cancelButton} onClick={onClose}>
-                        Cancel
+                        {t('common.cancel')}
                     </button>
                     <button
                         className={styles.confirmButton}
                         disabled={!isValidRatio}
                         onClick={handleConfirm}
                     >
-                        Confirm
+                        {t('common.confirm')}
                     </button>
                 </div>
             )}

@@ -10,6 +10,7 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
+import { t } from 'i18next';
 
 export interface OpenOrderData {
     time: string;
@@ -222,7 +223,9 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     onClick={handleCancel}
                     disabled={isCancelling}
                 >
-                    {isCancelling ? 'Cancelling...' : 'Cancel'}
+                    {isCancelling
+                        ? t('transactions.cancelling')
+                        : t('common.cancel')}
                 </button>
             </div>
         </div>
