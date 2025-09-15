@@ -77,6 +77,12 @@ export default function TakeProfitsModal(props: PropIF) {
     const toInput = (n: number) =>
         Number.isFinite(n) ? String(+n.toFixed(8)).replace(/\.?0+$/, '') : '';
 
+    const isTpDirectionValid = (tp: number) =>
+        (isLong && tp > entryPrice) || (!isLong && tp < entryPrice);
+
+    const isSlDirectionValid = (sl: number) =>
+        (isLong && sl < entryPrice) || (!isLong && sl > entryPrice);
+
     const gainFromTpPrice = (tpPrice: number) => {
         const dollars = computePnlAtPrice(tpPrice); // same PnL math
         const pct =
@@ -85,6 +91,17 @@ export default function TakeProfitsModal(props: PropIF) {
             100;
         return { dollars, pct };
     };
+
+    // canonical $ ↔ % conversions
+    const pctFromDollars = (dollars: number) =>
+        Number.isFinite(dollars) && entryPrice > 0 && positionQuantity > 0
+            ? (dollars / (entryPrice * positionQuantity)) * 100
+            : NaN;
+
+    const dollarsFromPct = (pct: number) =>
+        Number.isFinite(pct) && entryPrice > 0 && positionQuantity > 0
+            ? (pct / 100) * entryPrice * positionQuantity
+            : NaN;
 
     const lossFromSlPrice = (slPrice: number) => {
         const dollars = Math.abs(computePnlAtPrice(slPrice));
@@ -118,6 +135,8 @@ export default function TakeProfitsModal(props: PropIF) {
     const [ui, setUi] = useState({
         takeProfitInputMode: null as 'price' | 'gain' | null,
         stopLossInputMode: null as 'price' | 'loss' | null,
+        tpGainUSD: null as number | null,
+        slLossUSD: null as number | null,
 
         isTakeProfitPriceFocused: false,
         hasTakeProfitPriceBeenTouched: false,
@@ -339,12 +358,16 @@ export default function TakeProfitsModal(props: PropIF) {
         setForm((p) => {
             const next = { ...p, takeProfitPrice: v };
             const n = parsePrice(v);
-            if (Number.isFinite(n)) {
-                const { dollars, pct } = gainFromTpPrice(n);
+            if (Number.isFinite(n) && isTpDirectionValid(n)) {
+                const dollars = computePnlAtPrice(n);
+                setUi((u) => ({ ...u, tpGainUSD: dollars }));
                 next.takeProfitGain =
                     p.takeProfitGainType === '$'
                         ? toInput(dollars)
-                        : toInput(pct);
+                        : toInput(pctFromDollars(dollars));
+            } else {
+                setUi((u) => ({ ...u, tpGainUSD: null }));
+                next.takeProfitGain = '';
             }
             return next;
         });
@@ -356,12 +379,16 @@ export default function TakeProfitsModal(props: PropIF) {
         setForm((p) => {
             const next = { ...p, stopLossPrice: v };
             const n = parsePrice(v);
-            if (Number.isFinite(n)) {
-                const { dollars, pct } = lossFromSlPrice(n);
+            if (Number.isFinite(n) && isSlDirectionValid(n)) {
+                const dollars = Math.abs(computePnlAtPrice(n));
+                setUi((u) => ({ ...u, slLossUSD: dollars }));
                 next.stopLossAmount =
                     p.stopLossAmountType === '$'
                         ? toInput(dollars)
-                        : toInput(pct);
+                        : toInput(pctFromDollars(dollars));
+            } else {
+                setUi((u) => ({ ...u, slLossUSD: null }));
+                next.stopLossAmount = '';
             }
             return next;
         });
@@ -372,16 +399,18 @@ export default function TakeProfitsModal(props: PropIF) {
         setUi((u) => ({ ...u, takeProfitInputMode: 'gain' }));
         const gain = parseFloat(v);
         if (Number.isFinite(gain) && positionQuantity) {
-            const cur = form.takeProfitGainType;
-            let next: number;
-            if (cur === '$')
-                next = isLong
-                    ? entryPrice + gain / positionQuantity
-                    : entryPrice - gain / positionQuantity;
-            else {
-                const pct = gain / 100;
-                next = entryPrice * (isLong ? 1 + pct : 1 - pct);
+            // 1) update canonical dollars
+            const dollars =
+                form.takeProfitGainType === '$' ? gain : dollarsFromPct(gain);
+            if (Number.isFinite(dollars)) {
+                setUi((u) => ({
+                    ...u,
+                    tpGainUSD: Math.max(0, dollars as number),
+                }));
             }
+            // 2) compute target price *from dollars*
+            const perUnit = (dollars as number) / positionQuantity;
+            const next = isLong ? entryPrice + perUnit : entryPrice - perUnit;
             setForm((p) => ({
                 ...p,
                 takeProfitPrice: snapPriceForInput(next),
@@ -395,16 +424,18 @@ export default function TakeProfitsModal(props: PropIF) {
         setUi((u) => ({ ...u, stopLossInputMode: 'loss' }));
         const loss = parseFloat(v);
         if (Number.isFinite(loss) && positionQuantity) {
-            const cur = form.stopLossAmountType;
-            let next: number;
-            if (cur === '$')
-                next = isLong
-                    ? entryPrice - loss / positionQuantity
-                    : entryPrice + loss / positionQuantity;
-            else {
-                const pct = loss / 100;
-                next = entryPrice * (isLong ? 1 - pct : 1 + pct);
+            // 1) update canonical dollars (always positive for a loss)
+            const dollars =
+                form.stopLossAmountType === '$' ? loss : dollarsFromPct(loss);
+            if (Number.isFinite(dollars)) {
+                setUi((u) => ({
+                    ...u,
+                    slLossUSD: Math.max(0, dollars as number),
+                }));
             }
+            // 2) compute target price from dollars
+            const perUnit = (dollars as number) / positionQuantity;
+            const next = isLong ? entryPrice - perUnit : entryPrice + perUnit;
             setForm((p) => ({ ...p, stopLossPrice: snapPriceForInput(next) }));
         }
     };
@@ -412,52 +443,36 @@ export default function TakeProfitsModal(props: PropIF) {
     // --- when switching gain currency, recompute TP if a gain value exists ---
     const onTakeProfitGainTypeChange = (val: Currency | string) => {
         const c = val as Currency;
-        setForm((p) => ({ ...p, takeProfitGainType: c }));
+        if (c !== '$' && c !== '%') return;
+        if (c === form.takeProfitGainType) return;
+
         setForm((p) => {
-            // If user last edited price (or we have a price), derive gain from price
-            if (
-                (ui.takeProfitInputMode === 'price' || p.takeProfitPrice) &&
-                p.takeProfitPrice
-            ) {
-                const n = parsePrice(p.takeProfitPrice);
-                if (Number.isFinite(n)) {
-                    const { dollars, pct } = gainFromTpPrice(n);
-                    return {
-                        ...p,
-                        takeProfitGain:
-                            c === '$' ? toInput(dollars) : toInput(pct),
-                    };
-                }
-            } else if (p.takeProfitGain) {
-                // fall back to your existing direction (gain -> price)
-                onTakeProfitGainChange(p.takeProfitGain);
+            const next = { ...p, takeProfitGainType: c };
+            if (ui.tpGainUSD != null) {
+                next.takeProfitGain =
+                    c === '$'
+                        ? toInput(ui.tpGainUSD)
+                        : toInput(pctFromDollars(ui.tpGainUSD));
             }
-            return p;
+            return next;
         });
     };
 
     // --- when switching loss currency, recompute SL if a loss value exists ---
     const onStopLossAmountTypeChange = (val: Currency | string) => {
         const c = val as Currency;
-        setForm((p) => ({ ...p, stopLossAmountType: c }));
+        if (c !== '$' && c !== '%') return;
+        if (c === form.stopLossAmountType) return;
+
         setForm((p) => {
-            if (
-                (ui.stopLossInputMode === 'price' || p.stopLossPrice) &&
-                p.stopLossPrice
-            ) {
-                const n = parsePrice(p.stopLossPrice);
-                if (Number.isFinite(n)) {
-                    const { dollars, pct } = lossFromSlPrice(n);
-                    return {
-                        ...p,
-                        stopLossAmount:
-                            c === '$' ? toInput(dollars) : toInput(pct),
-                    };
-                }
-            } else if (p.stopLossAmount) {
-                onStopLossAmountChange(p.stopLossAmount);
+            const next = { ...p, stopLossAmountType: c };
+            if (ui.slLossUSD != null) {
+                next.stopLossAmount =
+                    c === '$'
+                        ? toInput(ui.slLossUSD)
+                        : toInput(pctFromDollars(ui.slLossUSD));
             }
-            return p;
+            return next;
         });
     };
 
@@ -471,17 +486,16 @@ export default function TakeProfitsModal(props: PropIF) {
         const n = parsePrice(raw);
         if (Number.isFinite(n)) {
             const snapped = roundToNearestIncrement(n, priceTickSize);
-            setForm((p) => {
-                const { dollars, pct } = gainFromTpPrice(snapped);
-                return {
-                    ...p,
-                    takeProfitPrice: snapPriceForInput(snapped),
-                    takeProfitGain:
-                        p.takeProfitGainType === '$'
-                            ? toInput(dollars)
-                            : toInput(pct),
-                };
-            });
+            const dollars = computePnlAtPrice(snapped);
+            setUi((u) => ({ ...u, tpGainUSD: Math.max(0, dollars) }));
+            setForm((p) => ({
+                ...p,
+                takeProfitPrice: snapPriceForInput(snapped),
+                takeProfitGain:
+                    p.takeProfitGainType === '$'
+                        ? toInput(Math.max(0, dollars))
+                        : toInput(pctFromDollars(Math.max(0, dollars))),
+            }));
         }
     };
 
@@ -495,17 +509,16 @@ export default function TakeProfitsModal(props: PropIF) {
         const n = parsePrice(raw);
         if (Number.isFinite(n)) {
             const snapped = roundToNearestIncrement(n, priceTickSize);
-            setForm((p) => {
-                const { dollars, pct } = lossFromSlPrice(snapped);
-                return {
-                    ...p,
-                    stopLossPrice: snapPriceForInput(snapped),
-                    stopLossAmount:
-                        p.stopLossAmountType === '$'
-                            ? toInput(dollars)
-                            : toInput(pct),
-                };
-            });
+            const dollars = Math.abs(computePnlAtPrice(snapped));
+            setUi((u) => ({ ...u, slLossUSD: dollars }));
+            setForm((p) => ({
+                ...p,
+                stopLossPrice: snapPriceForInput(snapped),
+                stopLossAmount:
+                    p.stopLossAmountType === '$'
+                        ? toInput(dollars)
+                        : toInput(pctFromDollars(dollars)),
+            }));
         }
     };
 
@@ -678,6 +691,28 @@ export default function TakeProfitsModal(props: PropIF) {
 
     const currencyOptions: Currency[] = ['$', '%'];
 
+    useEffect(() => {
+        // initialize canonical $ from prefilled prices
+        if (form.takeProfitPrice) {
+            const n = parsePrice(form.takeProfitPrice);
+            if (Number.isFinite(n))
+                setUi((u) => ({
+                    ...u,
+                    tpGainUSD: Math.max(0, computePnlAtPrice(n)),
+                }));
+        }
+        if (form.stopLossPrice) {
+            const n = parsePrice(form.stopLossPrice);
+            if (Number.isFinite(n))
+                setUi((u) => ({
+                    ...u,
+                    slLossUSD: Math.abs(computePnlAtPrice(n)),
+                }));
+        }
+        // run once on mount or when initial form changes
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <div className={styles.container}>
             {/* --- INFO HEADER --- */}
@@ -727,10 +762,11 @@ export default function TakeProfitsModal(props: PropIF) {
                             const t = e.target as HTMLElement;
                             if (
                                 t.closest(
-                                    'input,button,[role="button"],[role="listbox"]',
+                                    'input,button,[role="button"],[role="listbox"],[data-combobox-root]',
                                 )
-                            )
+                            ) {
                                 return;
+                            }
                             e.preventDefault();
                             takeProfitGainInputRef.current?.focus();
                         }}
@@ -822,10 +858,11 @@ export default function TakeProfitsModal(props: PropIF) {
                             const t = e.target as HTMLElement;
                             if (
                                 t.closest(
-                                    'input,button,[role="button"],[role="listbox"]',
+                                    'input,button,[role="button"],[role="listbox"],[data-combobox-root]',
                                 )
-                            )
+                            ) {
                                 return;
+                            }
                             e.preventDefault();
                             stopLossAmountInputRef.current?.focus();
                         }}

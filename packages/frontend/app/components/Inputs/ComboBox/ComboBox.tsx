@@ -97,6 +97,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
             <div
                 className={`${styles.comboBoxContainer} ${getClassName()}`}
                 ref={comboBoxRef}
+                data-combobox-root
             >
                 <div
                     ref={comboBoxValueRef}
