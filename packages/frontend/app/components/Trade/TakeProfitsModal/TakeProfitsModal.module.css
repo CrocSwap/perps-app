@@ -164,7 +164,7 @@
     -moz-appearance: textfield;
 }
 .validationError {
-    color: var(--sell);
+    color: var(--red);
     margin-left: 6px;
     font-size: var(--font-size-s);
 }

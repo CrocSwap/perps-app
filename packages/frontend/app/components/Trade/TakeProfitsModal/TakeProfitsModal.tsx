@@ -73,6 +73,28 @@ export default function TakeProfitsModal(props: PropIF) {
     const formatCrypto = (value: number) =>
         value.toFixed(8).replace(/\.?0+$/, '');
 
+    // --- helpers: derive $ / % from a typed TP/SL price (NEW) ---
+    const toInput = (n: number) =>
+        Number.isFinite(n) ? String(+n.toFixed(8)).replace(/\.?0+$/, '') : '';
+
+    const gainFromTpPrice = (tpPrice: number) => {
+        const dollars = computePnlAtPrice(tpPrice); // same PnL math
+        const pct =
+            ((isLong ? tpPrice - entryPrice : entryPrice - tpPrice) /
+                entryPrice) *
+            100;
+        return { dollars, pct };
+    };
+
+    const lossFromSlPrice = (slPrice: number) => {
+        const dollars = Math.abs(computePnlAtPrice(slPrice));
+        const pct =
+            (Math.abs(isLong ? slPrice - entryPrice : entryPrice - slPrice) /
+                entryPrice) *
+            100;
+        return { dollars, pct };
+    };
+
     // --- threshold for “this looks really far from entry” warnings ---
     const OUTLIER_RATIO = 0.5; // 50%
 
@@ -311,17 +333,39 @@ export default function TakeProfitsModal(props: PropIF) {
     }, [form.isCustomAllocationEnabled]);
 
     // --- TP price changed directly by user (tells us to use the typed price) ---
+
     const onTakeProfitPriceChange = (v: string) => {
-        setForm((p) => ({ ...p, takeProfitPrice: v }));
         setUi((u) => ({ ...u, takeProfitInputMode: 'price' }));
+        setForm((p) => {
+            const next = { ...p, takeProfitPrice: v };
+            const n = parsePrice(v);
+            if (Number.isFinite(n)) {
+                const { dollars, pct } = gainFromTpPrice(n);
+                next.takeProfitGain =
+                    p.takeProfitGainType === '$'
+                        ? toInput(dollars)
+                        : toInput(pct);
+            }
+            return next;
+        });
     };
 
     // --- SL price changed directly by user (marks source as “price”) ---
     const onStopLossPriceChange = (v: string) => {
-        setForm((p) => ({ ...p, stopLossPrice: v }));
         setUi((u) => ({ ...u, stopLossInputMode: 'price' }));
+        setForm((p) => {
+            const next = { ...p, stopLossPrice: v };
+            const n = parsePrice(v);
+            if (Number.isFinite(n)) {
+                const { dollars, pct } = lossFromSlPrice(n);
+                next.stopLossAmount =
+                    p.stopLossAmountType === '$'
+                        ? toInput(dollars)
+                        : toInput(pct);
+            }
+            return next;
+        });
     };
-
     // --- user edits desired profit; derive/snap the corresponding TP price ---
     const onTakeProfitGainChange = (v: string) => {
         setForm((p) => ({ ...p, takeProfitGain: v }));
@@ -369,14 +413,52 @@ export default function TakeProfitsModal(props: PropIF) {
     const onTakeProfitGainTypeChange = (val: Currency | string) => {
         const c = val as Currency;
         setForm((p) => ({ ...p, takeProfitGainType: c }));
-        if (form.takeProfitGain) onTakeProfitGainChange(form.takeProfitGain);
+        setForm((p) => {
+            // If user last edited price (or we have a price), derive gain from price
+            if (
+                (ui.takeProfitInputMode === 'price' || p.takeProfitPrice) &&
+                p.takeProfitPrice
+            ) {
+                const n = parsePrice(p.takeProfitPrice);
+                if (Number.isFinite(n)) {
+                    const { dollars, pct } = gainFromTpPrice(n);
+                    return {
+                        ...p,
+                        takeProfitGain:
+                            c === '$' ? toInput(dollars) : toInput(pct),
+                    };
+                }
+            } else if (p.takeProfitGain) {
+                // fall back to your existing direction (gain -> price)
+                onTakeProfitGainChange(p.takeProfitGain);
+            }
+            return p;
+        });
     };
 
     // --- when switching loss currency, recompute SL if a loss value exists ---
     const onStopLossAmountTypeChange = (val: Currency | string) => {
         const c = val as Currency;
         setForm((p) => ({ ...p, stopLossAmountType: c }));
-        if (form.stopLossAmount) onStopLossAmountChange(form.stopLossAmount);
+        setForm((p) => {
+            if (
+                (ui.stopLossInputMode === 'price' || p.stopLossPrice) &&
+                p.stopLossPrice
+            ) {
+                const n = parsePrice(p.stopLossPrice);
+                if (Number.isFinite(n)) {
+                    const { dollars, pct } = lossFromSlPrice(n);
+                    return {
+                        ...p,
+                        stopLossAmount:
+                            c === '$' ? toInput(dollars) : toInput(pct),
+                    };
+                }
+            } else if (p.stopLossAmount) {
+                onStopLossAmountChange(p.stopLossAmount);
+            }
+            return p;
+        });
     };
 
     // --- blur handler: snap TP input to the nearest tick and mark it “touched” ---
@@ -387,8 +469,20 @@ export default function TakeProfitsModal(props: PropIF) {
             hasTakeProfitPriceBeenTouched: true,
         }));
         const n = parsePrice(raw);
-        if (Number.isFinite(n))
-            setForm((p) => ({ ...p, takeProfitPrice: snapPriceForInput(n) }));
+        if (Number.isFinite(n)) {
+            const snapped = roundToNearestIncrement(n, priceTickSize);
+            setForm((p) => {
+                const { dollars, pct } = gainFromTpPrice(snapped);
+                return {
+                    ...p,
+                    takeProfitPrice: snapPriceForInput(snapped),
+                    takeProfitGain:
+                        p.takeProfitGainType === '$'
+                            ? toInput(dollars)
+                            : toInput(pct),
+                };
+            });
+        }
     };
 
     // --- blur handler: snap SL input to the nearest tick and mark it “touched” ---
@@ -399,8 +493,20 @@ export default function TakeProfitsModal(props: PropIF) {
             hasStopLossPriceBeenTouched: true,
         }));
         const n = parsePrice(raw);
-        if (Number.isFinite(n))
-            setForm((p) => ({ ...p, stopLossPrice: snapPriceForInput(n) }));
+        if (Number.isFinite(n)) {
+            const snapped = roundToNearestIncrement(n, priceTickSize);
+            setForm((p) => {
+                const { dollars, pct } = lossFromSlPrice(snapped);
+                return {
+                    ...p,
+                    stopLossPrice: snapPriceForInput(snapped),
+                    stopLossAmount:
+                        p.stopLossAmountType === '$'
+                            ? toInput(dollars)
+                            : toInput(pct),
+                };
+            });
+        }
     };
 
     // --- blur handlers for optional limit prices (text inputs) ---
@@ -870,36 +976,6 @@ export default function TakeProfitsModal(props: PropIF) {
                     </div>
                 )}
             </section>
-
-            {/* Warnings */}
-            <div className={styles.warningContainer}>
-                {!isTakeProfitInvalid &&
-                    isTakeProfitOutlier &&
-                    showTakeProfitValidation && (
-                        <span className={styles.warningText}>
-                            TP is{' '}
-                            {(
-                                distanceFromEntryRatio(
-                                    takeProfitTarget as number,
-                                ) * 100
-                            ).toFixed(1)}
-                            % from entry — double-check your input
-                        </span>
-                    )}
-                {!isStopLossInvalid &&
-                    isStopLossOutlier &&
-                    showStopLossValidation && (
-                        <span className={styles.warningText}>
-                            SL is{' '}
-                            {(
-                                distanceFromEntryRatio(
-                                    stopLossTarget as number,
-                                ) * 100
-                            ).toFixed(1)}
-                            % from entry — double-check your input
-                        </span>
-                    )}
-            </div>
 
             {/* Confirm */}
             <button
