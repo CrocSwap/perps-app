@@ -69,12 +69,14 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             canvasRef.current = newCanvas;
         }
 
+        const dpr = window.devicePixelRatio || 1;
         const canvas = canvasRef.current;
 
         const handleMouseMove = (e: MouseEvent) => {
             const rect = canvas.getBoundingClientRect();
-            const offsetX = e.clientX - rect.left;
-            const offsetY = e.clientY - rect.top;
+            const offsetX = (e.clientX - rect.left) * dpr;
+            const offsetY = (e.clientY - rect.top) * dpr;
+
             mousePositionRef.current = { x: offsetX, y: offsetY };
         };
 

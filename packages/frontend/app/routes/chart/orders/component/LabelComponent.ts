@@ -223,12 +223,14 @@ const LabelComponent = ({
                 overlayOffsetX,
                 overlayOffsetY,
                 drawnLabelsRef.current,
-                isLiqPriceLineDraggable,
             );
 
             if (
                 isLabel &&
                 isLabel.matchType === 'onLabel' &&
+                (isLabel.parentLine.type === 'LIMIT' ||
+                    (isLabel.parentLine.type === 'LIQ' &&
+                        isLiqPriceLineDraggable)) &&
                 isLabel.label.type !== 'Cancel'
             ) {
                 if (overlayCanvasRef.current)
@@ -275,7 +277,6 @@ const LabelComponent = ({
                                     overlayOffsetX,
                                     overlayOffsetY,
                                     drawnLabelsRef.current,
-                                    isLiqPriceLineDraggable,
                                 );
                                 overlayCanvasMousePositionRef.current = {
                                     x: overlayOffsetX,
@@ -296,6 +297,19 @@ const LabelComponent = ({
                                                     (
                                                         pane as HTMLElement
                                                     ).style.cursor = 'pointer';
+                                                }
+                                            } else if (
+                                                isLabel.parentLine.type ===
+                                                    'PNL' ||
+                                                (isLabel.parentLine.type ===
+                                                    'LIQ' &&
+                                                    !isLiqPriceLineDraggable)
+                                            ) {
+                                                if (pane) {
+                                                    (
+                                                        pane as HTMLElement
+                                                    ).style.cursor =
+                                                        'crosshair';
                                                 }
                                             } else {
                                                 overlayCanvasRef.current.style.pointerEvents =
@@ -410,7 +424,7 @@ const LabelComponent = ({
                     message: String(result.error || 'Failed to cancel order'),
                     icon: 'error',
                     txLink: result.signature
-                        ? blockExplorer + result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
             }
@@ -473,7 +487,6 @@ const LabelComponent = ({
                             offsetX,
                             offsetY,
                             drawnLabelsRef.current,
-                            isLiqPriceLineDraggable,
                         );
 
                         if (
@@ -527,13 +540,15 @@ const LabelComponent = ({
                 offsetX,
                 offsetY,
                 drawnLabelsRef.current,
-                isLiqPriceLineDraggable,
             );
 
             if (
                 isLabel &&
                 isLabel.matchType === 'onLabel' &&
-                isLabel.label.type !== 'Cancel'
+                isLabel.label.type !== 'Cancel' &&
+                (isLabel.parentLine.type === 'LIMIT' ||
+                    (isLabel.parentLine.type === 'LIQ' &&
+                        isLiqPriceLineDraggable))
             ) {
                 canvas.style.cursor = 'grabbing';
                 tempSelectedLine = isLabel;
@@ -746,8 +761,6 @@ const LabelComponent = ({
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.cursor = 'pointer';
-
-                    overlayCanvasRef.current.style.pointerEvents = 'none';
                 }
             }, 300);
         };
