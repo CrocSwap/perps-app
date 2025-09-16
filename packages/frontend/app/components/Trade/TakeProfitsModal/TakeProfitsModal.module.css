@@ -169,17 +169,17 @@
     font-size: var(--font-size-s);
 }
 
-.fieldError {
+/* .fieldError {
     outline: 1px solid var(--sell);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--sell) 20%, transparent);
     border-radius: var(--radius-s);
-}
+} */
 
-.fieldWarning {
+/* .fieldWarning {
     outline: 1px solid var(--red);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 20%, transparent);
     border-radius: var(--radius-s);
-}
+} */
 
 .warningText {
     color: var(--red,);
