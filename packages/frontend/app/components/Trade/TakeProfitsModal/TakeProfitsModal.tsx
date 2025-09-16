@@ -160,7 +160,7 @@ export default function TakeProfitsModal(props: PropIF) {
     const markOrEntryPrice = markPrice || position.entryPx;
 
     // --- absolute position size and direction flags ---
-    const positionQuantity = Math.abs(position.szi);
+    const positionQuantity = Math.abs(position.szi ?? 0);
     const isLong = position.szi > 0;
 
     // --- computed base amount when “Configure Amount” is enabled (allocationPercentage of position) ---
