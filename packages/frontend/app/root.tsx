@@ -24,7 +24,9 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
 
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+import PageViewTracker from './components/PageViewTracker/PageViewTracker';
 import {
+    FUUL_API_KEY,
     MARKET_WS_ENDPOINT,
     RPC_ENDPOINT,
     SHOULD_LOG_ANALYTICS,
@@ -35,6 +37,8 @@ import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import packageJson from '../package.json';
 import { getResolutionSegment } from './utils/functions/getSegment';
+import { Fuul } from '@fuul/sdk';
+
 import MobileFooter from './components/MobileFooter/MobileFooter';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
@@ -166,6 +170,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
+    useEffect(() => {
+        if (FUUL_API_KEY) {
+            Fuul.init({
+                apiKey: FUUL_API_KEY,
+            });
+        }
+    }, [FUUL_API_KEY]);
+
     return (
         <html lang='en'>
             <head>
@@ -294,6 +306,9 @@ export default function App() {
                                         <WsConnectionChecker />
                                         <WebSocketDebug />
                                         <div className='root-container'>
+                                            {/* Track page views */}
+                                            <PageViewTracker />
+
                                             {/* Added error boundary for header */}
                                             <ComponentErrorBoundary>
                                                 <PageHeader />
