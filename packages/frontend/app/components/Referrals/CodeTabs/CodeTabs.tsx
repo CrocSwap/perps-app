@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { Fuul } from '@fuul/sdk';
 import { useUserDataStore } from '~/stores/UserDataStore';
+import truncString from '~/utils/functions/truncString';
 
 // Add Buffer type definition for TypeScript
 declare const Buffer: {
@@ -70,7 +71,8 @@ export default function CodeTabs(props: Props) {
                 <section className={styles.sectionWithButton}>
                     <div className={styles.enterCodeContent}>
                         <p>
-                            You are using <span>{referralCode}</span> as a
+                            You are using{' '}
+                            <span>{truncString(referralCode, 6, 6)}</span> as a
                             referral code. Click 'Edit' to change it. You can
                             only use one referral code at a time.{' '}
                         </p>
