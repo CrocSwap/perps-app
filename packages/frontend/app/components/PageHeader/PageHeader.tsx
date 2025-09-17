@@ -33,6 +33,7 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
+import { Fuul, UserIdentifierType } from '@fuul/sdk';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -45,20 +46,16 @@ export default function PageHeader() {
     const [searchParams] = useSearchParams();
     const userDataStore = useUserDataStore();
     useEffect(() => {
-        const REFERRAL_CODE_URL_PARAM = 'referral';
-        const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
-        const referralCode =
-            searchParams.get(REFERRAL_CODE_URL_PARAM) ||
-            searchParams.get(ALTERNATE_REFERRAL_CODE_URL_PARAM);
+        const REFERRAL_CODE_URL_PARAM = 'af';
+        const referralCode = searchParams.get(REFERRAL_CODE_URL_PARAM);
         if (referralCode) {
             userDataStore.setReferralCode(referralCode);
-            const newSearchParams = new URLSearchParams(
-                searchParams.toString(),
-            );
-            newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
-            newSearchParams.delete(ALTERNATE_REFERRAL_CODE_URL_PARAM);
-            const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
-            window.history.replaceState({}, '', newUrl); // remove referral code from URL
+            // const newSearchParams = new URLSearchParams(
+            //     searchParams.toString(),
+            // );
+            // newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
+            // const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
+            // window.history.replaceState({}, '', newUrl); // remove referral code from URL
         }
     }, [searchParams]);
 
@@ -109,7 +106,7 @@ export default function PageHeader() {
         { name: 'Trade', path: `/v2/trade/${symbol}` },
         // { name: 'Vaults', path: '/v2/vaults' },
         // { name: 'Portfolio', path: '/v2/portfolio' },
-        // { name: 'Referrals', path: '/v2/referrals' },
+        { name: 'Referrals', path: '/v2/referrals' },
         // { name: 'Points', path: '/points' },
         // { name: 'Leaderboard', path: '/v2/leaderboard' },
         // { name: 'Strategies', path: '/strategies' },
@@ -188,6 +185,71 @@ export default function PageHeader() {
                             : 'login button clicked',
                     },
                 });
+                const userWalletKey =
+                    sessionState.walletPublicKey ||
+                    sessionState.sessionPublicKey;
+
+                (async () => {
+                    try {
+                        // Create a dynamic message with current date
+                        const currentDate = new Date()
+                            .toISOString()
+                            .split('T')[0];
+                        const message = `Accept affiliate code ${userDataStore.referralCode} on ${currentDate}`;
+
+                        // Convert message to Uint8Array
+                        const messageBytes = new TextEncoder().encode(message);
+
+                        // Get the signature from the session
+                        const signatureBytes =
+                            await sessionState.signMessage(messageBytes);
+
+                        // Convert the signature to base64
+                        const signatureArray = Array.from(
+                            new Uint8Array(signatureBytes),
+                        );
+                        const binaryString = String.fromCharCode.apply(
+                            null,
+                            signatureArray,
+                        );
+                        const signature = btoa(binaryString);
+
+                        // Call the Fuul SDK to identify the user
+
+                        try {
+                            const response = await Fuul.identifyUser({
+                                identifier: userWalletKey.toString(),
+                                identifierType:
+                                    UserIdentifierType.SolanaAddress,
+                                signature,
+                                signaturePublicKey: userWalletKey.toString(),
+                                message,
+                            });
+                            console.log(
+                                'Fuul.identifyUser successful:',
+                                response,
+                            );
+                        } catch (error: any) {
+                            console.error('Detailed error in identifyUser:', {
+                                message: error.message,
+                                status: error.response?.status,
+                                statusText: error.response?.statusText,
+                                data: error.response?.data,
+                                config: {
+                                    url: error.config?.url,
+                                    method: error.config?.method,
+                                    headers: error.config?.headers,
+                                },
+                            });
+                            throw error; // Re-throw to be caught by the outer catch
+                        }
+                    } catch (error) {
+                        console.error('Error in identifyUser:', error);
+                        // Optionally show a user-friendly error message
+                        // You might want to implement this based on your UI framework
+                        // showErrorToast('Failed to identify user. Please try again.');
+                    }
+                })();
             }
             localStorage.removeItem('loginButtonClickTime');
         } else if (
@@ -199,7 +261,7 @@ export default function PageHeader() {
             }
         }
         prevIsUserConnected.current = isUserConnected;
-    }, [isUserConnected]);
+    }, [isUserConnected, userDataStore.referralCode]);
 
     return (
         <>
