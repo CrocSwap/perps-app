@@ -75,6 +75,7 @@
     color: var(--base-text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     margin: 0;
+    line-height: 1.5;
 }
 
 .enterCodeContent > p > span {
