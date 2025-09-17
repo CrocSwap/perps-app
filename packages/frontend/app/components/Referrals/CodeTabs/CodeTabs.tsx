@@ -69,8 +69,11 @@ export default function CodeTabs(props: Props) {
             !isEditing ? (
                 <section className={styles.sectionWithButton}>
                     <div className={styles.enterCodeContent}>
-                        <h6>Current Affiliate Code</h6>
-                        <p>{referralCode}</p>
+                        <p>
+                            You are using <span>{referralCode}</span> as a
+                            referral code. Click 'Edit' to change it. You can
+                            only use one referral code at a time.{' '}
+                        </p>
                     </div>
                     <SimpleButton
                         bg='accent1'

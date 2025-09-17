@@ -65,14 +65,20 @@
 .enterCodeContent {
     display: flex;
     flex-direction: column;
+    height: 100%;
     gap: var(--gap-s, 10px);
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
 }
 
-.enterCodeContent h6 {
+.enterCodeContent > p {
     color: var(--base-text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     margin: 0;
+}
+
+.enterCodeContent > p > span {
+    color: var(--accent3);
 }
 
 .enterCodeContent input {
