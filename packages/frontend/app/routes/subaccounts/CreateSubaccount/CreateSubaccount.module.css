@@ -5,7 +5,7 @@
     flex-direction: column;
     padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
     gap: 24px;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     background-color: var(--bg-dark3);
     border-radius: var(--radius-m);
     user-select: none;
@@ -19,8 +19,8 @@
     border: none;
     border-radius: var(--radius-s);
     outline: none;
-    color: var(--text1);
-    caret-color: var(--text1);
+    color: var(--text1, #f0f0f8);
+    caret-color: var(--text1, #f0f0f8);
 }
 
 .modal_buttons {

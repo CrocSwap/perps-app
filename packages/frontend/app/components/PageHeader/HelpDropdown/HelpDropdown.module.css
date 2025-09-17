@@ -41,7 +41,7 @@
     height: 30px;
 }
 .content header svg:hover {
-    fill: var(--text1) !important;
+    fill: var(--text1, #f0f0f8) !important;
     cursor: pointer;
 }
 

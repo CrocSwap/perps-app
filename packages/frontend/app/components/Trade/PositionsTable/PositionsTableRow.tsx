@@ -412,7 +412,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     <div className={`${styles.cell} ${styles.tpslCell}`}>
                         {getTpSl()}
                         <button onClick={openTpSlModal}>
-                            <LuPen color='var(--text1)' size={10} />
+                            <LuPen color='var(--text1, #f0f0f8)' size={10} />
                         </button>
                     </div>
                 )}

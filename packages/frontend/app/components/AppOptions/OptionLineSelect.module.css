@@ -10,7 +10,7 @@
     /* not in a CSS variable bc it is only consumed here */
     height: 32px;
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 /* container for the active selection and the dropdown below it */

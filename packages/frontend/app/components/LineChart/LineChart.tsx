@@ -181,7 +181,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const svgXAxis = d3.select('#xAxis');
         const svgYAxis = d3.select('#yAxis');
 
-        const fillStyle = 'var(--text1)';
+        const fillStyle = 'var(--text1, #f0f0f8)';
         const font = 'var(--font-family-main)';
         const fontSize = 'var(--font-size-s)';
 

@@ -11,7 +11,7 @@
     justify-content: center;
     min-height: 100%;
     padding: var(--padding-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     background-color: var(--bg-dark2);
     text-align: center;
 }
@@ -45,7 +45,7 @@
     font-size: var(--font-size-xl);
     font-weight: var(--notFound-font-weight-bold);
     margin-bottom: var(--font-size-m);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .message {

@@ -43,7 +43,7 @@
     font-size: var(--font-size-xl);
     /* font-weight is from Figma not centralized */
     font-weight: 300;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .create_strategy > div {

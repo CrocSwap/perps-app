@@ -39,6 +39,14 @@ function Modal(props: ModalProps) {
     const bottomSheetRef = useRef<HTMLDivElement>(null);
     const handleRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
+    // ADD: SSR-safe portal element
+    const [portalEl, setPortalEl] = useState<HTMLElement | null>(null);
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            setPortalEl(document.getElementById('modal-root') ?? document.body);
+        }
+    }, []);
+
     const contentRef = useRef<HTMLDivElement>(null);
 
     // State to track drag
@@ -256,7 +264,7 @@ function Modal(props: ModalProps) {
         () => (
             <header>
                 <span />
-                <h3 id='modal-title' style={{ color: 'var(--text1' }}>
+                <h3 id='modal-title' style={{ color: 'var(--text1, #f0f0f8)' }}>
                     {title}
                 </h3>
                 {!shouldUseBottomSheet ? (
@@ -278,6 +286,11 @@ function Modal(props: ModalProps) {
         ),
         [children],
     );
+    // If no close handler, keep your early return
+    if (!close) return children;
+
+    // Guard for SSR/first paint
+    if (!portalEl) return null;
 
     return createPortal(
         <div
@@ -333,9 +346,7 @@ function Modal(props: ModalProps) {
             {actualPosition === 'bottomSheet' ? (
                 <div
                     ref={bottomSheetRef}
-                    className={`${styles.bottomSheet} ${animation} ${
-                        isKeyboardVisible ? styles.keyboardActive : ''
-                    }`}
+                    className={`${styles.bottomSheet} ${animation} ${isKeyboardVisible ? styles.keyboardActive : ''}`}
                 >
                     <div
                         ref={handleRef}
@@ -357,7 +368,7 @@ function Modal(props: ModalProps) {
                 </div>
             )}
         </div>,
-        document.body,
+        portalEl,
     );
 }
 

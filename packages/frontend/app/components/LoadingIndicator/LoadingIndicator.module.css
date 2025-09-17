@@ -288,7 +288,7 @@
 }
 
 .loadingText {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-l); /* Increased from font-size-m */
     font-family: var(--font-family-main);
     font-weight: 500;

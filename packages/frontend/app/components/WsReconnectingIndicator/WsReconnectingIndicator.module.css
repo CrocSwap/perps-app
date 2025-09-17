@@ -8,7 +8,7 @@
     left: 0;
     padding-bottom: var(--margin-s);
     z-index: 1000;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     background: linear-gradient(
         0deg,
         color-mix(in srgb, var(--accent1) 20%, transparent) 0%,

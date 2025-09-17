@@ -212,7 +212,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 <div className={`${styles.cell} ${styles.tpslCell}`}>
                     {order.isTrigger ? formatNum(order.triggerPx || 0) : '--'}
                     <button>
-                        <LuPen color='var(--text1)' size={10} />
+                        <LuPen color='var(--text1, #f0f0f8)' size={10} />
                     </button>
                 </div>
             )}

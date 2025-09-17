@@ -40,7 +40,7 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
         if (type === 'negative') {
             return getBsColor().sell;
         }
-        return 'var(--text1)';
+        return 'var(--text1, #f0f0f8)';
     };
 
     const handleFieldClick = () => {
@@ -68,9 +68,9 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
                                 ? getBsColor().buy
                                 : lastWsChange < 0
                                   ? getBsColor().sell
-                                  : 'var(--text1)',
+                                  : 'var(--text1, #f0f0f8)',
                     }}
-                    animate={{ color: 'var(--text1)' }}
+                    animate={{ color: 'var(--text1, #f0f0f8)' }}
                     transition={{ duration: 1, ease: 'easeInOut' }}
                 >
                     {value}

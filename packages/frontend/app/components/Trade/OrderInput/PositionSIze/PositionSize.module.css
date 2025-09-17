@@ -129,7 +129,7 @@
 }
 
 .valueLabel:hover {
-    color: var(--text1) !important;
+    color: var(--text1, #f0f0f8) !important;
 }
 
 .valueDisplay {
@@ -151,7 +151,7 @@
     height: 32px;
     background-color: transparent;
     border: none;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     text-align: center;
     outline: none;

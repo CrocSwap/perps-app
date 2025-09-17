@@ -67,7 +67,7 @@
 }
 
 .timeCell svg:hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .priceCell,

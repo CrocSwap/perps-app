@@ -223,7 +223,10 @@ export default function PageHeader() {
                         onClick={() => setIsMenuOpen(false)}
                         className={styles.mobileNavCloseButton}
                     >
-                        <MdOutlineClose size={20} color='var(--text1)' />
+                        <MdOutlineClose
+                            size={20}
+                            color='var(--text1, #f0f0f8)'
+                        />
                     </button>
                     {navLinks.map((link) => (
                         <Link

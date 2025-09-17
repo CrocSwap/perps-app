@@ -6,7 +6,7 @@
     margin: 0 auto;
     padding: var(--padding-l);
     background: var(--bg-dark1);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-family: var(--font-family-main, sans-serif);
 }
 
@@ -52,7 +52,7 @@
 
 .sectionHeader h2 {
     font-size: var(--font-size-xl);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     margin: 0;
 }
 
@@ -65,7 +65,7 @@
 .toggleCode {
     padding: var(--padding-m) var(--padding-l);
     background: var(--bg-dark4);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     border: 1px solid var(--bg-dark5);
     border-radius: var(--radius-s);
     cursor: pointer;
@@ -165,7 +165,7 @@
     background: var(--bg-dark3);
     padding: var(--padding-m);
     font-weight: 600;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .propsRow {

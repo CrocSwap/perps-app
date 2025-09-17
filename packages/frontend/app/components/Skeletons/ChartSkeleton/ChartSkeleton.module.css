@@ -6,7 +6,7 @@
     height: calc(var(--size) * 0.75);
     padding: calc(var(--size) * 0.0625);
     width: var(--size);
-    --color: color-mix(in srgb, var(--text1) 10%, transparent);
+    --color: color-mix(in srgb, var(--text1, #f0f0f8) 10%, transparent);
     border-left: 1px solid var(--color);
     border-bottom: 1px solid var(--color);
     box-sizing: border-box;

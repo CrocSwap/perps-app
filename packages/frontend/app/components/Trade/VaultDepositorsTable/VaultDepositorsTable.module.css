@@ -42,7 +42,7 @@
 }
 
 .headerCell.active {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .sortable {

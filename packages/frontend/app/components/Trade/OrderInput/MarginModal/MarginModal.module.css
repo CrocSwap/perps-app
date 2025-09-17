@@ -42,7 +42,7 @@
 /* headline text inside each margin mode button */
 .margin_buttons > button > h3 {
     font-size: var(--font-size-m, 18px);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 /* main CTA to accept current selection and close the modal */

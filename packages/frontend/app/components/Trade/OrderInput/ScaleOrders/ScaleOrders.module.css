@@ -41,7 +41,7 @@
     justify-content: space-between;
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark4, #27272c);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     outline: none;
     border: none;
@@ -77,7 +77,7 @@
 .quantityButton.active,
 .quantityButton:hover {
     border: 1px solid var(--text2);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .tableHeader {
@@ -123,7 +123,7 @@
     fill: var(--text2);
 }
 .dropdownToggle:hover .dropdownIcon svg {
-    fill: var(--text1);
+    fill: var(--text1, #f0f0f8);
 }
 
 .totalRatio {
@@ -223,7 +223,7 @@
     justify-content: space-between;
     align-items: center;
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     outline: none;
     border: 1px solid transparent;
 }
@@ -254,7 +254,7 @@
 }
 .percentSign {
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .invalidInput {

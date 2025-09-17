@@ -61,7 +61,7 @@
 }
 
 .tab:hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 .tab.activeTab,
 .tab.activeTab:hover {
@@ -111,7 +111,7 @@
 }
 
 .scrollArrow:hover svg {
-    fill: var(--text1);
+    fill: var(--text1, #f0f0f8);
 }
 
 .scrollArrowLeft {

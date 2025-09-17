@@ -240,7 +240,7 @@
     height: 32px;
     background-color: transparent;
     border: none;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     text-align: center;
     outline: none;
@@ -264,7 +264,7 @@
     height: 33px;
     border: none;
     border-radius: var(--radius-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s);
     text-align: center;
     outline: none;
@@ -284,6 +284,6 @@
     outline: none;
     border: none;
     background: var(--accent1);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     padding: var(--padding-xs);
 }

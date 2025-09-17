@@ -130,7 +130,9 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
     const filterTabs = (
         <section className={styles.filterTabsContainer}>
             {/* color to simulate active tab */}
-            <button style={{ color: 'var(--text1)' }}>All Coins</button>
+            <button style={{ color: 'var(--text1, #f0f0f8)' }}>
+                All Coins
+            </button>
             <button className={styles.filterNewButton}>
                 New <BsStars color='var(--accent1)' size={14} />
             </button>

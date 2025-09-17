@@ -1,7 +1,7 @@
 .container {
     min-height: 100vh;
     background: var(--bg-dark1);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-family: var(--font-family-main);
     padding: var(--padding-xl) var(--padding-l);
 }
@@ -88,7 +88,7 @@
     font-size: var(--font-size-l);
     font-weight: 600;
     margin: 0 0 var(--margin-s) 0;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .cardDescription {

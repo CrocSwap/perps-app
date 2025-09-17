@@ -47,7 +47,7 @@
     align-items: center;
     justify-content: space-between;
     text-align: center;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 .metricRow span {
     color: var(--text2, #bcbcc4);

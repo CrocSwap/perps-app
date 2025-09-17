@@ -63,7 +63,7 @@
 }
 
 .detail_value {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .scroll_button {
@@ -86,7 +86,7 @@
 }
 
 .scroll_button:hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     background: var(--bg-dark2, #0f0f14);
 }
 

@@ -19,7 +19,7 @@
     box-shadow: var(--dropdown-box-shadow);
     font-family: var(--font-family-main);
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     display: flex;
     align-items: flex-start;
     gap: var(--gap-s);
@@ -86,7 +86,7 @@
 
 .update {
     background: var(--bg-dark3);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     border-color: var(--accent1);
 }
 
@@ -97,7 +97,7 @@
         var(--bg-dark3) 0%,
         var(--var(--bg-dark3)) 100%
     );
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     border-color: var(--accent1);
     box-shadow: var(--dropdown-box-shadow);
 }
@@ -142,7 +142,7 @@
 }
 
 .update .closeButton {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .bottomFull .closeButton {
@@ -158,5 +158,5 @@
 
 .bottomFull .closeButton:hover {
     opacity: 1;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }

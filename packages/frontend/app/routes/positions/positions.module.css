@@ -41,7 +41,7 @@
     fill: var(--text2);
 }
 .expandIcon:hover {
-    fill: var(--text1);
+    fill: var(--text1, #f0f0f8);
 }
 .chvrDown {
     display: none;

@@ -6,7 +6,7 @@
 .tooltip {
     position: fixed;
     background-color: var(--bg-dark3);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     padding: var(--padding-s) var(--padding-m);
     text-align: center;
     border-radius: 0.375rem;
@@ -54,7 +54,7 @@
 .tooltip {
     position: fixed;
     background-color: var(--bg-dark3);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     padding: var(--padding-s) var(--padding-m);
     text-align: center;
     border-radius: 0.375rem;

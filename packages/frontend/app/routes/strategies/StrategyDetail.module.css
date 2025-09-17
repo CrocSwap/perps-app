@@ -66,7 +66,7 @@
 .back_and_title > h2 {
     font-weight: 300;
     font-size: var(--font-size-xl);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .address_clickable {
@@ -104,7 +104,7 @@
     /* magic number is from Figma */
     /* large width prevents layout shift when text changes*/
     width: 160px;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 /* styles to apply to each individual `<button>` elem */

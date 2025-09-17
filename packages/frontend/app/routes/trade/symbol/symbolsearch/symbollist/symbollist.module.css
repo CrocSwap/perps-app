@@ -52,7 +52,7 @@
     width: 100%;
     outline: none;
     border: none;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     display: flex;
     align-items: center;
     font-size: var(--font-size-s);
@@ -60,7 +60,7 @@
 
 .symbolListItem {
     cursor: pointer;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 .filterTabsContainer {
     width: 100%;
@@ -128,7 +128,7 @@
 }
 
 .headerCell.active {
-    color: var(--text1) !important;
+    color: var(--text1, #f0f0f8) !important;
 }
 
 .headerCell.sortable {
@@ -146,7 +146,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     background: var(--accent1) !important;
     padding: var(--padding-xs);
     border-radius: var(--radius-xs) !important;
@@ -167,7 +167,7 @@
 }
 
 .symbolListSearchClose:hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .favIcon {
@@ -181,7 +181,7 @@
 }
 
 .favIcon:not(.favIconActive):hover {
-    color: var(--text1) !important;
+    color: var(--text1, #f0f0f8) !important;
 }
 
 .favIconActive:hover {

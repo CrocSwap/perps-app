@@ -38,7 +38,7 @@ export function Tab(props: TabProps) {
         <button
             className={`${styles.tab} ${wide ? styles.wideTab : ''} ${flex ? styles.flexTab : ''} ${isActive ? styles.activeTab : ''}`}
             style={{
-                color: notInteractive ? 'var(--text1)' : '',
+                color: notInteractive ? 'var(--text1, #f0f0f8)' : '',
                 cursor: notInteractive ? 'auto' : 'cursor',
             }}
             onClick={() => notInteractive || onClick()}

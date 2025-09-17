@@ -52,7 +52,7 @@
 }
 
 .dropdownToggle:hover:not(.disabled) svg {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .dropdownMenu {
@@ -101,7 +101,7 @@
 }
 
 .dropdownItem:hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .noOptions {

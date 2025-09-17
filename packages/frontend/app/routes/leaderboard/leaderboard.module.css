@@ -47,7 +47,7 @@
     font-size: var(--font-size-s, 12px);
 }
 .searchContainer svg:hover {
-    fill: var(--text1);
+    fill: var(--text1, #f0f0f8);
 }
 
 .searchInput {
@@ -77,7 +77,7 @@
 }
 
 .periodSelector:hover svg {
-    fill: var(--text1);
+    fill: var(--text1, #f0f0f8);
 }
 
 .periodText {
@@ -195,7 +195,7 @@
     fill: var(--text2);
 }
 .expandIcon:hover {
-    fill: var(--text1);
+    fill: var(--text1, #f0f0f8);
 }
 .chvrDown {
     display: none;

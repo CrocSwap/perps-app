@@ -9,7 +9,7 @@
 
 .contentText {
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     margin-bottom: var(--margin-m);
     margin-top: var(--margin-s);
 }

@@ -119,7 +119,7 @@
     min-width: var(--fee-modal-width);
     padding: var(--padding-s) var(--padding-m) var(--padding-m);
     border-radius: var(--radius-m);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     gap: var(--gap-m);
     background-color: var(--bg-dark3);
     user-select: none;

@@ -270,7 +270,7 @@ function DepositDropdown(props: propsIF) {
                                                     : bsColor.sell,
                                         }}
                                         animate={{
-                                            color: 'var(--text1)',
+                                            color: 'var(--text1, #f0f0f8)',
                                         }}
                                         transition={{
                                             duration: 0.3,

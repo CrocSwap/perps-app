@@ -251,6 +251,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </head>
             <body>
                 {children}
+
                 <ScrollRestoration />
                 <Scripts />
                 {/* Removed inline script - now loading dynamically in useEffect */}
@@ -294,6 +295,8 @@ export default function App() {
                                         <WsConnectionChecker />
                                         <WebSocketDebug />
                                         <div className='root-container'>
+                                            <div id='modal-root' />
+
                                             {/* Added error boundary for header */}
                                             <ComponentErrorBoundary>
                                                 <PageHeader />

@@ -23,7 +23,7 @@
     color: var(--text2);
 }
 .dropdown button:hover .icon {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .menu {
@@ -51,5 +51,5 @@
 }
 
 .menuItem:hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }

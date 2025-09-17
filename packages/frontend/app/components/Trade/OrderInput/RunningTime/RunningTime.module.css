@@ -32,13 +32,13 @@
     outline: none;
     border: none;
     text-align: left;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     cursor: pointer;
     font-size: var(--font-size-s, 12px);
     padding: 0 var(--padding-s);
     height: 32px;
 }
 .runningPriceMinutes span {
-    color: var(--text1) !important;
+    color: var(--text1, #f0f0f8) !important;
     font-size: var(--font-size-s, 12px);
 }

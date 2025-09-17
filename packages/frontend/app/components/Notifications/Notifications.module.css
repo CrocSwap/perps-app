@@ -29,7 +29,7 @@
     box-shadow: var(--dropdown-box-shadow);
     font-family: var(--font-family-main);
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     background-color: var(--bg-dark3);
     gap: var(--gap-m);
     animation: slideIn 0.3s ease-out;
@@ -113,7 +113,7 @@
 
 .news > ul > li > h5 {
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 @media (max-width: 768px) {

@@ -272,7 +272,7 @@ export default function SliderTrack({
                                     ? 'rgba(128, 128, 128, 0.6)'
                                     : isActive || isHovered
                                       ? tickColor
-                                      : 'var(--text1)',
+                                      : 'var(--text1, #f0f0f8)',
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {

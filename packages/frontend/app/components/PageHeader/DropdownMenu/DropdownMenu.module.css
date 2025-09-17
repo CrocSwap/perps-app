@@ -76,7 +76,7 @@
     outline: none;
     border: none;
     background-color: transparent;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     display: flex;
     flex-direction: row;
     align-items: center;

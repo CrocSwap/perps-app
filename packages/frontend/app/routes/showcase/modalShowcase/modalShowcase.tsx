@@ -681,7 +681,7 @@ function MyModalComponent() {
                                     borderRadius: '8px',
                                     border: '1px solid var(--bg-dark4)',
                                     background: 'var(--bg-dark3)',
-                                    color: 'var(--text1)',
+                                    color: 'var(--text1, #f0f0f8)',
                                     fontSize: '16px',
                                 }}
                             />
@@ -693,7 +693,7 @@ function MyModalComponent() {
                                     borderRadius: '8px',
                                     border: '1px solid var(--bg-dark4)',
                                     background: 'var(--bg-dark3)',
-                                    color: 'var(--text1)',
+                                    color: 'var(--text1, #f0f0f8)',
                                     fontSize: '16px',
                                     resize: 'vertical',
                                 }}

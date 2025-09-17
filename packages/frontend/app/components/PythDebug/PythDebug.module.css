@@ -25,7 +25,7 @@
 .header h4 {
     margin: 0;
     font-size: 14px;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .status {
@@ -62,12 +62,12 @@
 
 .symbol {
     font-weight: 600;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .price {
     text-align: right;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-family: 'Roboto Mono', monospace;
 }
 

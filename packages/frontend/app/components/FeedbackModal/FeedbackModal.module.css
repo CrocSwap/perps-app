@@ -59,7 +59,7 @@
 }
 
 .closeIcon:hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 @keyframes slideUp {
@@ -94,7 +94,7 @@
     margin: 0 0 8px 0;
     font-size: var(--font-size-m, 18px);
     font-weight: 500;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     line-height: 1.3;
     font-family: var(--font-family-main);
 }
@@ -162,7 +162,7 @@
 
 .feedbackButton span {
     font-weight: 400;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: 14px;
     font-family: var(--font-family-main);
 }
@@ -178,7 +178,7 @@
     border: 1px solid var(--bg-dark4);
     border-radius: 8px;
     background: var(--bg-dark4);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-family: var(--font-family-main);
     font-size: var(--font-size-s, 12px);
     line-height: 1.5;
@@ -231,7 +231,7 @@
 .cancelButton {
     background: transparent;
     border: 1px solid var(--bg-dark4);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .cancelButton:hover {
@@ -240,7 +240,7 @@
 
 .submitButton {
     background: var(--accent1);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     border: none;
     font-weight: 500;
 }
@@ -272,7 +272,7 @@
     height: 48px;
     border-radius: 50%;
     background-color: var(--positive);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -285,7 +285,7 @@
 .successTitle {
     font-size: var(--font-size-l, 20px);
     font-weight: 500;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     margin: 0 0 24px;
     font-family: var(--font-family-main);
 }
@@ -314,7 +314,7 @@
 
 .closeButton {
     background: var(--accent1);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     border: none;
     padding: 8px 16px;
     border-radius: 4px;

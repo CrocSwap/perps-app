@@ -240,7 +240,7 @@ body {
 
     .mobileTabBtn.active {
         background: var(--accent1, #7371fc);
-        color: var(--text1);
+        color: var(--text1, #f0f0f8);
     }
 
     /* KEY FIX: respect the fixed footer space */

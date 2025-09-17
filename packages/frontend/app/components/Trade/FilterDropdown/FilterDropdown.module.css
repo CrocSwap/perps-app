@@ -10,7 +10,7 @@
     background: transparent;
     outline: none;
     border: none;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     gap: var(--gap-s);
     padding: var(--padding-dropdown);
@@ -27,7 +27,7 @@
 
 .active svg,
 .filterButton:hover .chevron {
-    fill: var(--text1) !important;
+    fill: var(--text1, #f0f0f8) !important;
 }
 
 .chevron {
@@ -64,11 +64,11 @@
 }
 
 .optionRow:hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .selected {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 @media (max-width: 768px) {

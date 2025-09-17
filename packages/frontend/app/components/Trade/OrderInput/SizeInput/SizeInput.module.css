@@ -22,14 +22,14 @@
     outline: none;
     border: none;
     text-align: right;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     cursor: text;
 }
 .tokenButton {
     background-color: transparent;
     outline: none;
     border: none;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     display: flex;
     justify-content: flex-end;
     flex-direction: row;

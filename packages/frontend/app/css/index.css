@@ -16,7 +16,7 @@
     --text3: #88888f;
 
     --accent1: #7371fc;
-    --accent1-dark: #5f5df0;
+    --accent1-dark: #4f4dc8;
 
     --accent2: #e480ff;
     --accent3: #5ffff2;
@@ -282,7 +282,7 @@ button {
 button {
     position: relative;
     overflow: hidden;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     z-index: 1;
     background: inherit;
     border: none;

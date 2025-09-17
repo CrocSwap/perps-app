@@ -26,7 +26,7 @@
     white-space: nowrap;
     min-width: 2rem;
     text-align: center;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .comboBoxIcon {
@@ -60,11 +60,11 @@
 }
 
 .comboBoxOptionsWrapper > div:hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .comboBoxOptionSelected {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .bigVal .comboBoxValue {
@@ -171,7 +171,7 @@
 .manualAddressInput {
     background-color: var(--bg-dark4);
     border: none;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s);
     padding: var(--padding-xs);
     border-radius: var(--radius-xs);

@@ -36,7 +36,7 @@ const POSITION_SIZE_UI_CONFIG = {
     // Color values
     ACTIVE_LABEL_COLOR: '#FFFFFF',
     INACTIVE_LABEL_COLOR: '#808080',
-    TEXT_COLOR: 'var(--text1)',
+    TEXT_COLOR: 'var(--text1, #f0f0f8)',
     ACCENT_COLOR: 'var(--accent1)',
 
     // Default show labels state

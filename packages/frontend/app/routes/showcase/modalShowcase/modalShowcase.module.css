@@ -22,7 +22,7 @@
     margin: 0 auto;
     padding: var(--padding-l);
     background: var(--bg-dark1);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-family: var(--font-family-main, sans-serif);
     min-height: 100vh;
 }
@@ -85,7 +85,7 @@
 
 .sectionHeader h2 {
     font-size: var(--header-h2);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     margin: 0 0 var(--margin-xs) 0;
 }
 
@@ -98,7 +98,7 @@
 .toggleCode {
     padding: var(--padding-s) var(--padding-m);
     background: var(--bg-dark4);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     border: 1px solid var(--bg-dark5);
     border-radius: var(--radius-s);
     cursor: pointer;
@@ -167,7 +167,7 @@
 .copyBtn {
     padding: var(--padding-xs) var(--padding-s);
     background: var(--accent1);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     border: none;
     border-radius: var(--radius-xs);
     cursor: pointer;
@@ -209,7 +209,7 @@
     background: var(--bg-dark3);
     padding: var(--padding-m);
     font-weight: var(--font-weight-bold);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--label-font);
 }
 
@@ -249,7 +249,7 @@
 
 .exampleGroup h3 {
     margin: 0 0 var(--margin-m) 0;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--header-h3);
     font-weight: var(--font-weight-bold);
 }
@@ -295,7 +295,7 @@
 
 .guidelineCard h3 {
     margin: 0 0 var(--margin-m) 0;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--paragraph);
     font-weight: var(--font-weight-bold);
 }
@@ -320,7 +320,7 @@
 
 .tipCard h4 {
     margin: 0 0 var(--margin-s) 0;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--paragraph-sm);
     font-weight: var(--font-weight-bold);
 }

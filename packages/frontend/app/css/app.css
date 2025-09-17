@@ -3,6 +3,9 @@
 :root {
     --footer-h: 56px;
 }
+#modal-root {
+    display: contents;
+}
 
 /* --- Root grid: header + content --- */
 .root-container {

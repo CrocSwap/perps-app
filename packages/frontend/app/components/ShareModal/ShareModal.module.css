@@ -72,7 +72,7 @@
 
 .price > div:last-child {
     font-size: var(--text-size-m);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .info {
@@ -101,7 +101,7 @@
 }
 
 .custom_text > label {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .custom_text > textarea {
@@ -136,7 +136,7 @@
     flex-shrink: 0;
     border-radius: var(--radius-s, 8px);
     background: var(--accent1,);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-m, 18px);
     padding: 1px var(--padding-s);
 }

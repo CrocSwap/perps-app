@@ -69,7 +69,7 @@
     gap: var(--gap-xs);
 }
 .inputDetailValue {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .margin_type_btn {
@@ -227,7 +227,7 @@
 
 .name_and_icon > h4 {
     font-size: var(--font-size-m);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 .launchpad_clickables > li p {

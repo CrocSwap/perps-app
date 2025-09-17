@@ -19,7 +19,7 @@
     gap: inherit;
     border-radius: var(--radius-s);
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 /**

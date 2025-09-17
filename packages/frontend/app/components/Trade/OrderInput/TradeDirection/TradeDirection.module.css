@@ -56,5 +56,5 @@
 }
 
 .toggle_button:not(.active):hover {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }

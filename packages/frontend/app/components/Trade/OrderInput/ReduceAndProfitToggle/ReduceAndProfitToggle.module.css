@@ -10,7 +10,7 @@
     align-items: center;
     gap: var(--gap-m);
     font-size: var(--font-size-s, 12px);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     user-select: none;
 }
 .toggleLabel {
@@ -41,7 +41,7 @@
     gap: var(--gap-xs);
 }
 .inputDetailValue {
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 
 /* form container */
@@ -80,7 +80,7 @@
     background: var(--bg-dark4);
 
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     outline: none;
     border: none;
 }
@@ -97,7 +97,7 @@
     background-color: transparent;
     outline: none;
     border: none;
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 .toggleContainer {
     display: flex;

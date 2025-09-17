@@ -62,7 +62,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = memo(
                     ? getBsColor().buy
                     : change < 0
                       ? getBsColor().sell
-                      : 'var(--text1)',
+                      : 'var(--text1, #f0f0f8)',
             [change, getBsColor],
         );
 

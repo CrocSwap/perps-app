@@ -43,7 +43,7 @@
 
 .vaultCardContent {
     font-size: var(--font-size-xl);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     display: inline-block;
 }
 

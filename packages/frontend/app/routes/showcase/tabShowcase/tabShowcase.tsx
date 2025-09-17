@@ -60,7 +60,7 @@ export default function TabsShowcase() {
             onChange={(e) => onChange(e.target.value)}
             style={{
                 background: 'var(--bg-dark4)',
-                color: 'var(--text1)',
+                color: 'var(--text1, #f0f0f8)',
                 border: '1px solid var(--bg-dark5)',
                 borderRadius: 'var(--radius-s)',
                 padding: 'var(--padding-xs) var(--padding-s)',

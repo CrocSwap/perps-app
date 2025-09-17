@@ -27,7 +27,7 @@
 .cell {
     width: 100%;
     font-size: var(--font-size-s);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

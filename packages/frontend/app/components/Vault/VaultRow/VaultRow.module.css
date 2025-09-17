@@ -9,7 +9,7 @@
 }
 .cell {
     font-size: var(--font-size-m, 18px);
-    color: var(--text1);
+    color: var(--text1, #f0f0f8);
 }
 .headerCell {
     color: var(--text2, #6a6a6d);
