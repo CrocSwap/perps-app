@@ -8,6 +8,8 @@ import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
 import type { TabType } from '~/routes/trade';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useAppStateStore } from '~/stores/AppStateStore';
 
 interface propsIF {
     mobileView?: boolean;
@@ -21,24 +23,37 @@ const ORDER_ROW_GAP = 4;
 
 export default function OrderBookSection(props: propsIF) {
     const { mobileView, mobileContent, switchTab, chartTopHeight } = props;
-    const [orderCount, setOrderCount] = useState(9);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
 
     const { orderBookMode, setOrderBookMode } = useAppSettings();
+    const { orderCount, setOrderCount } = useOrderBookStore();
     const orderBookModeRef = useRef(orderBookMode);
+
+    const { liquidationsActive } = useAppStateStore();
 
     // Sync ref with state
     useEffect(() => {
         orderBookModeRef.current = orderBookMode;
     }, [orderBookMode]);
 
+    useEffect(() => {
+        if (orderBookModeRef.current === 'stacked' && liquidationsActive) {
+            setOrderBookMode('tab');
+            orderBookModeRef.current = 'tab';
+        }
+    }, [liquidationsActive]);
+
     const menuItems = useMemo(
         () => [
             { label: 'Tab', listener: () => setOrderBookMode('tab') },
-            { label: 'Stacked', listener: () => setOrderBookMode('stacked') },
+            {
+                label: 'Stacked',
+                listener: () => setOrderBookMode('stacked'),
+                exclude: liquidationsActive,
+            },
             { label: 'Large', listener: () => setOrderBookMode('large') },
         ],
-        [setOrderBookMode],
+        [setOrderBookMode, liquidationsActive],
     );
 
     const orderBookComponent = useMemo(

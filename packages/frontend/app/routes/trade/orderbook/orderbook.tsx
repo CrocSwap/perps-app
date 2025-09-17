@@ -71,22 +71,33 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, []);
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
-    const [selectedResolution, setSelectedResolution] =
-        useState<OrderRowResolutionIF | null>(null);
-
-    const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
 
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
     const { formatNum } = useNumFormatter();
     const lockOrderBook = useRef<boolean>(false);
     const { getBsColor } = useAppSettings();
-    const { buys, sells, setOrderBook } = useOrderBookStore();
+    const {
+        buys,
+        sells,
+        selectedResolution,
+        selectedMode,
+        orderBookState,
+        setOrderBook,
+        setSelectedResolution,
+        setSelectedMode,
+        setOrderBookState,
+    } = useOrderBookStore();
     const rowLockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // No useMemo for simple arithmetic
     const buyPlaceHolderCount = Math.max(orderCount - buys?.length || 0, 0);
     const sellPlaceHolderCount = Math.max(orderCount - sells?.length || 0, 0);
+
+    // useEffect(() => {
+    //     console.log('buys', buys);
+    //     console.log('sells', sells);
+    //     console.log('orderBook');
+    // }, [buys, sells]);
 
     const {
         userOrders,
@@ -192,7 +203,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
             setOrderBookState(TableState.FILLED);
             filledResolution.current = selectedResolution;
         },
-        [selectedResolution, setOrderBook],
+        [selectedResolution, setOrderBook, setOrderBookState],
     );
 
     const postOrderBookRaw = useWorker<OrderBookOutput>(
@@ -204,9 +215,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
         if (symbol === symbolInfo?.coin) {
             const resolutionList = getResolutionListForSymbol(symbolInfo);
             setResolutions(resolutionList);
-            setSelectedResolution(resolutionList[0]);
+            if (!selectedResolution) {
+                setSelectedResolution(resolutionList[0]);
+            }
         }
-    }, [symbol, symbolInfo?.coin]);
+    }, [symbol, symbolInfo?.coin, selectedResolution, setSelectedResolution]);
 
     const subKey = useMemo(() => {
         if (!selectedResolution) return undefined;
@@ -509,7 +522,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     background: `linear-gradient(to top,  ${getBsColor().buy} 0%, var(--bg-dark2) 100%)`,
                                 }}
                             ></div>
-                            <div className={styles.orderBookBlock}>
+                            <div
+                                id={'orderbook-sell-block'}
+                                className={styles.orderBookBlock}
+                            >
                                 {sellPlaceHolderCount === 1 ? (
                                     <div className={styles.orderRowWrapper}>
                                         <div
@@ -596,7 +612,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
                             {midHeader('orderBookMidHeader')}
 
-                            <div className={styles.orderBookBlock}>
+                            <div
+                                id={'orderbook-buy-block'}
+                                className={styles.orderBookBlock}
+                            >
                                 {buys
                                     .slice(0, orderCount)
                                     .map((order, index) => (
