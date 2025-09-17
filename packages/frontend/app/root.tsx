@@ -233,17 +233,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <script
                         defer
                         event-version={packageJson.version}
-                        event-windowHeight={
+                        event-windowheight={
                             innerHeight
                                 ? getResolutionSegment(innerHeight)
                                 : undefined
                         }
-                        event-windowWidth={
+                        event-windowwidth={
                             innerWidth
                                 ? getResolutionSegment(innerWidth)
                                 : undefined
                         }
-                        event-splitTestVersion={SPLIT_TEST_VERSION}
+                        event-splittestversion={SPLIT_TEST_VERSION}
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>

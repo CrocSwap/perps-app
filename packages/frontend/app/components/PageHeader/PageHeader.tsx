@@ -37,35 +37,9 @@ import FeedbackModal from '../FeedbackModal/FeedbackModal';
 export default function PageHeader() {
     // Feedback modal state
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
-    const [feedbackType, setFeedbackType] = useState<
-        'positive' | 'negative' | null
-    >(null);
-    const [feedbackText, setFeedbackText] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isSubmitted, setIsSubmitted] = useState(false);
-
-    const handleFeedbackSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!feedbackType || !feedbackText.trim()) return;
-
-        setIsSubmitting(true);
-        try {
-            // TODO: Replace with actual feedback submission
-            console.log('Submitting feedback:', { feedbackType, feedbackText });
-            await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-            setIsSubmitted(true);
-        } catch (error) {
-            console.error('Error submitting feedback:', error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
 
     const handleFeedbackClose = () => {
         setIsFeedbackOpen(false);
-        setFeedbackType(null);
-        setFeedbackText('');
-        setIsSubmitted(false);
     };
     // logic to read a URL referral code and set in state + local storage
     const [searchParams] = useSearchParams();
