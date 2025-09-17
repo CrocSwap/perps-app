@@ -1,20 +1,23 @@
+:root {
+    --z-top: 2147483647;
+}
+
 .outside_modal {
     position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100vw;
+    inset: 0;
     height: 100vh;
-    height: 100dvh; /* Dynamic viewport height that adjusts to browser UI */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    z-index: var(--z-top);
+    isolation: isolate;
     backdrop-filter: blur(10px);
-    z-index: 100000;
-    /* Prevent scrolling of background content */
+
     overflow: hidden;
-    /* Prevent swipe-up navigation gestures on iOS */
     overscroll-behavior: none;
+    pointer-events: auto;
 }
 
 /* Special styling when keyboard is visible */
@@ -40,7 +43,7 @@
     cursor: pointer;
 }
 .outside_modal header svg:hover {
-    fill: var(--text1);
+    fill: var(--text1, #f0f0f8);
 }
 
 /* Bottom sheet specific container style */

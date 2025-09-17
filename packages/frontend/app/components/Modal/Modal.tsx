@@ -9,6 +9,7 @@ import React, {
 import { MdClose } from 'react-icons/md';
 import { useMobile } from '~/hooks/useMediaQuery';
 import styles from './Modal.module.css';
+import { createPortal } from 'react-dom';
 
 type positions = 'center' | 'bottomRight' | 'bottomSheet';
 
@@ -255,7 +256,9 @@ function Modal(props: ModalProps) {
         () => (
             <header>
                 <span />
-                <h3 id='modal-title'>{title}</h3>
+                <h3 id='modal-title' style={{ color: 'var(--text1' }}>
+                    {title}
+                </h3>
                 {!shouldUseBottomSheet ? (
                     <MdClose onClick={handleClose} color='var(--text2)' />
                 ) : (
@@ -276,7 +279,7 @@ function Modal(props: ModalProps) {
         [children],
     );
 
-    return (
+    return createPortal(
         <div
             ref={modalRef}
             id={OUTSIDE_MODAL_DOM_ID}
@@ -290,7 +293,6 @@ function Modal(props: ModalProps) {
             role='dialog'
             aria-modal='true'
             aria-labelledby='modal-title'
-            // NEW pointer-aware outside close
             onMouseDown={(e) => {
                 pointerDownOnBackdrop.current = e.target === e.currentTarget;
                 pointerDownPos.current = { x: e.clientX, y: e.clientY };
@@ -354,7 +356,8 @@ function Modal(props: ModalProps) {
                     {modalContent}
                 </div>
             )}
-        </div>
+        </div>,
+        document.body,
     );
 }
 

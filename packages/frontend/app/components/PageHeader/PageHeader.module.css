@@ -85,6 +85,7 @@
     align-items: center;
     gap: var(--gap-s);
     flex-shrink: 0;
+    z-index: 0;
 }
 
 .menuButtonMobile {
