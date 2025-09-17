@@ -133,6 +133,11 @@
     color: var(--accent2, #75f0d3);
 }
 
+.create_code_buttons {
+    display: flex;
+    gap: var(--gap-m, 16px);
+}
+
 .claimContent {
     height: 100%;
     display: flex;

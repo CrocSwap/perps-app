@@ -97,27 +97,29 @@ export default function CodeTabs(props: Props) {
                             }
                         />
                     </div>
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => {
-                            setIsEditing(false);
-                            setTemporaryReferralCode('');
-                            if (temporaryReferralCode) {
-                                setReferralCode(temporaryReferralCode);
-                            }
-                        }}
-                    >
-                        Update
-                    </SimpleButton>
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => {
-                            setIsEditing(false);
-                            setTemporaryReferralCode('');
-                        }}
-                    >
-                        Cancel
-                    </SimpleButton>
+                    <div className={styles.create_code_buttons}>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => {
+                                setIsEditing(false);
+                                setTemporaryReferralCode('');
+                                if (temporaryReferralCode) {
+                                    setReferralCode(temporaryReferralCode);
+                                }
+                            }}
+                        >
+                            Update
+                        </SimpleButton>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => {
+                                setIsEditing(false);
+                                setTemporaryReferralCode('');
+                            }}
+                        >
+                            Cancel
+                        </SimpleButton>
+                    </div>
                 </section>
             )
         ) : (
