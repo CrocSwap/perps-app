@@ -157,7 +157,8 @@ export const MIN_POSITION_USD_SIZE = 0.01;
 export const MARKET_API_URL =
     import.meta.env.VITE_PROXY_URL ||
     import.meta.env.VITE_MARKET_API_URL ||
-    'https://hyper-proxy-1080663129748.europe-west1.run.app';
+    'https://embindexer.net/ember/hyper-proxy';
+// 'https://hyper-proxy-1080663129748.europe-west1.run.app';
 // 'https://api.hyperliquid.xyz';
 // import.meta.env.VITE_MARKET_API_URL || 'http://localhost:8080';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
