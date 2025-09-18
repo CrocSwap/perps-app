@@ -146,6 +146,7 @@ export default function App() {
     const isHomePage = location.pathname === '/' || location.pathname === '';
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
         // Set window dimensions
@@ -162,7 +163,13 @@ export default function App() {
             };
             document.body.appendChild(script);
 
+            // Mark as mounted after a small delay to ensure styles are loaded
+            const timer = setTimeout(() => {
+                setIsMounted(true);
+            }, 100);
+
             return () => {
+                clearTimeout(timer);
                 if (script.parentNode) {
                     script.parentNode.removeChild(script);
                 }
@@ -250,7 +257,10 @@ export default function App() {
                     ></script>
                 )}
             </head>
-            <body>
+            <body
+                className={!isMounted ? 'invisible' : ''}
+                style={!isMounted ? { visibility: 'hidden' } : {}}
+            >
                 <FogoSessionProvider
                     endpoint={RPC_ENDPOINT}
                     domain='https://perps.ambient.finance'
