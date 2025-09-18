@@ -63,7 +63,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
     switchTab,
 }) => {
     // TODO: Can be uncommented if we want to use the rest poller
-    const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
     // const { info } = useSdk();
 
     const orderClickDisabled = false;
