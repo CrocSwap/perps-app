@@ -138,31 +138,35 @@ class ComponentErrorBoundary extends React.Component<
     }
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
-    useEffect(() => {
-        const script = document.createElement('script');
-        script.src = '../tv/datafeeds/udf/dist/bundle.js';
-        script.async = true;
-        script.onerror = (error) => {
-            console.error('Failed to load TradingView script:', error);
-        };
-        document.head.appendChild(script);
+// Layout component has been merged into App component to fix hydration issues
 
-        return () => {
-            // Cleanup script when component unmounts
-            if (document.head.contains(script)) {
-                document.head.removeChild(script);
-            }
-        };
-    }, []);
-
+export default function App() {
+    const { wsEnvironment } = useDebugStore();
+    const location = useLocation();
+    const isHomePage = location.pathname === '/' || location.pathname === '';
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
 
     useEffect(() => {
+        // Set window dimensions
         if (typeof window !== 'undefined') {
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
+
+            // Load TradingView script
+            const script = document.createElement('script');
+            script.src = '../tv/datafeeds/udf/dist/bundle.js';
+            script.async = true;
+            script.onerror = (error) => {
+                console.error('Failed to load TradingView script:', error);
+            };
+            document.body.appendChild(script);
+
+            return () => {
+                if (script.parentNode) {
+                    script.parentNode.removeChild(script);
+                }
+            };
         }
     }, []);
 
@@ -187,7 +191,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 />
                 <link rel='manifest' href='/manifest.webmanifest' />
                 <Meta />
-                {/* Preconnect to Google Fonts domains */}
                 <link
                     rel='preconnect'
                     href='https://fonts.googleapis.com'
@@ -198,8 +201,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     href='https://fonts.gstatic.com'
                     crossOrigin='anonymous'
                 />
-
-                {/* Single consolidated font request with all needed weights and families */}
                 <link
                     rel='preload'
                     as='style'
@@ -250,33 +251,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 )}
             </head>
             <body>
-                {children}
-                <ScrollRestoration />
-                <Scripts />
-                {/* Removed inline script - now loading dynamically in useEffect */}
-            </body>
-        </html>
-    );
-}
-
-export default function App() {
-    // Use memoized value to prevent unnecessary re-renders
-    const { wsEnvironment } = useDebugStore();
-    const location = useLocation();
-    const isHomePage = location.pathname === '/' || location.pathname === '';
-
-    return (
-        <>
-            <Layout>
                 <FogoSessionProvider
                     endpoint={RPC_ENDPOINT}
                     domain='https://perps.ambient.finance'
-                    tokens={[
-                        // NATIVE_MINT.toBase58(),
-                        'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
-                    ]}
+                    tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}
                     defaultRequestedLimits={{
-                        // [NATIVE_MINT.toBase58()]: 1_500_000_000n,
                         fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry:
                             1_000_000_000n,
                     }}
@@ -294,14 +273,12 @@ export default function App() {
                                         <WsConnectionChecker />
                                         <WebSocketDebug />
                                         <div className='root-container'>
-                                            {/* Added error boundary for header */}
                                             <ComponentErrorBoundary>
                                                 <PageHeader />
                                             </ComponentErrorBoundary>
                                             <main
                                                 className={`content ${isHomePage ? 'home-page' : ''}`}
                                             >
-                                                {/*  Added Suspense for async content loading */}
                                                 <Suspense
                                                     fallback={
                                                         <LoadingIndicator />
@@ -317,8 +294,6 @@ export default function App() {
                                                     <MobileFooter />
                                                 </footer>
                                             </ComponentErrorBoundary>
-
-                                            {/* Added error boundary for notifications */}
                                             <ComponentErrorBoundary>
                                                 <Notifications />
                                             </ComponentErrorBoundary>
@@ -330,8 +305,10 @@ export default function App() {
                         </UnifiedMarginDataProvider>
                     </AppProvider>
                 </FogoSessionProvider>
-            </Layout>
-        </>
+                <ScrollRestoration />
+                <Scripts />
+            </body>
+        </html>
     );
 }
 
