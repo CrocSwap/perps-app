@@ -163,10 +163,12 @@ export default function App() {
             };
             document.body.appendChild(script);
 
-            // Mark as mounted after a small delay to ensure styles are loaded
+            // Mark as mounted after the next tick to ensure styles are loaded
             const timer = setTimeout(() => {
+                document.documentElement.classList.add('mounted');
+                document.body.classList.add('mounted');
                 setIsMounted(true);
-            }, 100);
+            }, 0);
 
             return () => {
                 clearTimeout(timer);
@@ -177,8 +179,29 @@ export default function App() {
         }
     }, []);
 
+    // Add global styles to prevent FOUC
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            body:not(.mounted) {
+                visibility: hidden;
+                opacity: 0;
+            }
+            body.mounted {
+                visibility: visible;
+                opacity: 1;
+                transition: opacity 0.2s ease-in;
+            }
+        `;
+        document.head.appendChild(style);
+
+        return () => {
+            document.head.removeChild(style);
+        };
+    }, []);
+
     return (
-        <html lang='en'>
+        <html lang='en' className={isMounted ? 'mounted' : ''}>
             <head>
                 <meta charSet='utf-8' />
                 <meta
@@ -257,10 +280,7 @@ export default function App() {
                     ></script>
                 )}
             </head>
-            <body
-                className={!isMounted ? 'invisible' : ''}
-                style={!isMounted ? { visibility: 'hidden' } : {}}
-            >
+            <body className={isMounted ? 'mounted' : ''}>
                 <FogoSessionProvider
                     endpoint={RPC_ENDPOINT}
                     domain='https://perps.ambient.finance'
