@@ -32,6 +32,8 @@ import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 // import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 import type { TabType } from '~/routes/trade';
 import { useSdk } from '~/hooks/useSdk';
+import type { L2BookData } from '@perps-app/sdk/src/utils/types';
+import { processOrderBookMessage } from '~/processors/processOrderBook';
 
 interface OrderBookProps {
     orderCount: number;
@@ -82,7 +84,13 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const lockOrderBook = useRef<boolean>(false);
     const { getBsColor } = useAppSettings();
     const { buys, sells, setOrderBook } = useOrderBookStore();
+
+    const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
+    const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
+
     const rowLockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
     // No useMemo for simple arithmetic
     const buyPlaceHolderCount = Math.max(orderCount - buys?.length || 0, 0);
@@ -97,6 +105,49 @@ const OrderBook: React.FC<OrderBookProps> = ({
         symbol,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
+
+    const needExtraPolling = useMemo(() => {
+        if (!selectedResolution) return false;
+        if (selectedResolution.mantissa) return true;
+        if (
+            symbol === 'BTC' &&
+            selectedResolution.nsigfigs &&
+            selectedResolution.nsigfigs <= 5
+        )
+            return true;
+        if (
+            symbol !== 'BTC' &&
+            selectedResolution.nsigfigs &&
+            selectedResolution.nsigfigs <= 4
+        )
+            return true;
+        return false;
+    }, [selectedResolution, symbol]);
+
+    useEffect(() => {
+        const subKey = {
+            type: 'l2Book' as const,
+            coin: symbol,
+        };
+
+        if (needExtraPolling) {
+            subscribeToPoller(
+                'info',
+                subKey,
+                (l2BookData: L2BookData) => {
+                    const { buys, sells } = processOrderBookMessage(l2BookData);
+                    setLwBuys(buys);
+                    setLwSells(sells);
+                },
+                3000,
+                true,
+            );
+        }
+
+        return () => {
+            unsubscribeFromPoller('info', subKey);
+        };
+    }, [needExtraPolling]);
 
     // Use custom hook for stable slot arrays
     const buySlots = useOrderSlots(buys);
@@ -246,28 +297,44 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     const midHeader = useCallback(
         (id: string) => {
+            const buyArr =
+                needExtraPolling && lwBuys.length > 0 ? lwBuys : buys;
+            const sellArr =
+                needExtraPolling && lwSells.length > 0 ? lwSells : sells;
             let diff = 0;
             if (
-                buys.length > 0 &&
-                sells.length > 0 &&
+                buyArr.length > 0 &&
+                sellArr.length > 0 &&
                 orderBookState === TableState.FILLED
             ) {
-                diff = sells[0].px - buys[0].px;
+                diff = sellArr[0].px - buyArr[0].px;
             }
             return (
                 <div id={id} className={styles.orderBookBlockMid}>
                     <div>Spread</div>
-                    <div>{diff > 0 ? diff : ''}</div>
+                    <div>
+                        {diff > 0 ? new Number(diff.toFixed(6)).toString() : ''}
+                    </div>
                     <div>
                         {symbolInfo?.markPx &&
                             diff > 0 &&
-                            ((diff / symbolInfo?.markPx) * 100).toFixed(3)}
+                            new Number(
+                                ((diff / symbolInfo?.markPx) * 100).toFixed(3),
+                            ).toString()}
                         %
                     </div>
                 </div>
             );
         },
-        [buys, sells, symbolInfo, orderBookState],
+        [
+            buys,
+            sells,
+            symbolInfo,
+            orderBookState,
+            lwBuys,
+            lwSells,
+            needExtraPolling,
+        ],
     );
 
     const rowClickHandler = useCallback(
