@@ -102,27 +102,19 @@ export default function GenericTable<
     const sortByKey = `GenericTable:${storageKey}:sortBy`;
     const sortDirKey = `GenericTable:${storageKey}:sortDir`;
 
-    const [sortBy, setSortBy] = useState<S>(() => {
-        const stored = localStorage.getItem(sortByKey);
-        return safeParse<S>(stored, props.defaultSortBy as S);
-    });
+    const [sortBy, setSortBy] = useState<S>(props.defaultSortBy as S);
 
     const { manualAddressEnabled, manualAddress, isDebugWalletActive } =
         useDebugStore();
 
     const [sortDirection, setSortDirection] = useState<TableSortDirection>(
-        () => {
-            const stored = localStorage.getItem(sortDirKey);
-            return safeParse<TableSortDirection>(
-                stored,
-                props.defaultSortDirection as TableSortDirection,
-            );
-        },
+        props.defaultSortDirection as TableSortDirection,
     );
 
     useEffect(() => {
-        const storedSortBy = localStorage.getItem(sortByKey);
-        const storedSortDir = localStorage.getItem(sortDirKey);
+        if (typeof window === 'undefined') return;
+        const storedSortBy = window.localStorage.getItem(sortByKey);
+        const storedSortDir = window.localStorage.getItem(sortDirKey);
 
         if (storedSortBy) {
             setSortBy(safeParse<S>(storedSortBy, props.defaultSortBy as S));
@@ -138,11 +130,15 @@ export default function GenericTable<
     }, [sortDirKey, sortByKey]);
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
         if (sortBy !== undefined) {
-            localStorage.setItem(sortByKey, JSON.stringify(sortBy));
+            window.localStorage.setItem(sortByKey, JSON.stringify(sortBy));
         }
         if (sortDirection !== undefined) {
-            localStorage.setItem(sortDirKey, JSON.stringify(sortDirection));
+            window.localStorage.setItem(
+                sortDirKey,
+                JSON.stringify(sortDirection),
+            );
         }
     }, [sortBy, sortDirection, sortByKey, sortDirKey]);
 
@@ -266,7 +262,7 @@ export default function GenericTable<
                 (page + 1) * rowsPerPage,
             );
         }
-        checkShadow();
+        // Do not mutate the DOM during render; effects will handle shadows
         return sortedData.slice(0, rowLimit);
     }, [sortedData, pageMode, page, rowsPerPage, rowLimit]);
 

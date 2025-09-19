@@ -85,6 +85,22 @@
     align-items: center;
     gap: var(--gap-s);
     flex-shrink: 0;
+    white-space: nowrap; /* prevent wrapping-induced height changes */
+}
+
+/* Reserve space for the Deposit button to avoid layout shift when it mounts */
+.depositSlot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--deposit-button-width);
+    height: var(--deposit-button-height);
+    flex: 0 0 var(--deposit-button-width);
+}
+
+.depositButtonPlaceholder {
+    width: var(--deposit-button-width);
+    height: var(--deposit-button-height);
 }
 
 .menuButtonMobile {

@@ -77,8 +77,9 @@ const GenericTablePagination: React.FC<GenericTablePaginationProps> = ({
                             }
                         }}
                         disabled={page === 0}
+                        aria-label='Previous page'
                     >
-                        <FaChevronLeft size={20} />
+                        <FaChevronLeft size={20} aria-hidden='true' />
                     </button>
 
                     <button
@@ -94,8 +95,9 @@ const GenericTablePagination: React.FC<GenericTablePaginationProps> = ({
                         disabled={
                             page >= Math.ceil(totalCount / rowsPerPageState) - 1
                         }
+                        aria-label='Next page'
                     >
-                        <FaChevronRight size={20} />
+                        <FaChevronRight size={20} aria-hidden='true' />
                     </button>
                 </div>
             </div>

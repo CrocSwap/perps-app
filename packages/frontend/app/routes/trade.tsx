@@ -46,7 +46,9 @@ export default function Trade() {
     symbolRef.current = symbol;
     // add refs near the other refs
     const lastColHeightRef = useRef<number | null>(null);
-    const lastWinInnerHeightRef = useRef<number>(window.innerHeight);
+    const lastWinInnerHeightRef = useRef<number>(
+        typeof window !== 'undefined' ? window.innerHeight : 0,
+    );
 
     const {
         orderBookMode,

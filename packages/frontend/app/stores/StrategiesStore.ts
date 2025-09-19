@@ -97,6 +97,15 @@ export interface useStrategiesStoreIF {
     reset: () => void;
 }
 
+const ssrSafeStorage = () =>
+    (typeof window !== 'undefined'
+        ? window.localStorage
+        : {
+              getItem: () => null,
+              setItem: () => {},
+              removeItem: () => {},
+          }) as Storage;
+
 export const useStrategiesStore = create<useStrategiesStoreIF>()(
     // persist data in local storage (only values, not reducers)
     persist(
@@ -150,13 +159,15 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
                     ),
                 });
             },
-            reset: (): void => set({ data: MOCK_STRATEGIES }),
+            reset: (): void => {
+                set({ data: MOCK_STRATEGIES });
+            },
         }),
         {
             // key for local storage
             name: LS_KEY,
             // format and destination of data
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(ssrSafeStorage),
             partialize: (state) => ({ data: state.data }),
         },
     ),

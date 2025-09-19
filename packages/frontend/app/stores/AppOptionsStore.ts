@@ -33,6 +33,14 @@ export interface useAppOptionsIF extends Record<appOptions, boolean> {
 const LS_KEY = 'APP_OPTIONS';
 
 // hook to manage global state and local storage
+const ssrSafeStorage = () =>
+    (typeof window !== 'undefined'
+        ? window.localStorage
+        : {
+              getItem: () => null,
+              setItem: () => {},
+              removeItem: () => {},
+          }) as Storage;
 export const useAppOptions = create<useAppOptionsIF>()(
     // persist data in local storage (only values, not reducers)
     persist(
@@ -41,18 +49,26 @@ export const useAppOptions = create<useAppOptionsIF>()(
             // ... local storage will re-hydrate if present
             ...DEFAULTS,
             // set a given option to `true`
-            enable: (o: appOptions): void => set({ [o]: true }),
+            enable: (o: appOptions): void => {
+                set({ [o]: true });
+            },
             // set a given option to `false`
-            disable: (o: appOptions): void => set({ [o]: false }),
+            disable: (o: appOptions): void => {
+                set({ [o]: false });
+            },
             // toggle a value `true` ⟷ `false`
-            toggle: (o: appOptions): void => set({ [o]: !get()[o] }),
-            applyDefaults: (): void => set(DEFAULTS),
+            toggle: (o: appOptions): void => {
+                set({ [o]: !get()[o] });
+            },
+            applyDefaults: (): void => {
+                set(DEFAULTS);
+            },
         }),
         {
             // key for local storage
             name: LS_KEY,
             // format and destination of data
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(ssrSafeStorage),
         },
     ),
 );

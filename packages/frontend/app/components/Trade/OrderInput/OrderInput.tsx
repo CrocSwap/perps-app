@@ -18,7 +18,6 @@ import React, {
 } from 'react';
 import { GoZap } from 'react-icons/go';
 import { LuCircleHelp } from 'react-icons/lu';
-import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
@@ -74,6 +73,7 @@ import type {
     OrderSide,
     OrderTypeOption,
 } from '~/utils/CommonIFs';
+import { MdKeyboardArrowLeft } from 'react-icons/md';
 
 const useOnlyMarket = false;
 
@@ -153,6 +153,7 @@ function OrderInput({
     // Track if the OrderInput component is focused
     const [isFocused, setIsFocused] = useState(false);
     const orderInputRef = useRef<HTMLDivElement>(null);
+    const submitButtonRef = useRef<HTMLElement | null>(null);
     const { getBsColor } = useAppSettings();
 
     const sessionState = useSession();
@@ -826,7 +827,7 @@ function OrderInput({
         if (event.key === 'Enter') {
             if (!isUserLoggedIn || isDisabled) return;
             if (activeOptions.skipOpenOrderConfirm) {
-                (submitButton as HTMLElement)?.focus();
+                submitButtonRef.current?.focus();
                 event.preventDefault();
             } else {
                 handleSubmitOrder();
@@ -855,7 +856,7 @@ function OrderInput({
         if (event.key === 'Enter') {
             if (!isUserLoggedIn || isDisabled) return;
             if (activeOptions.skipOpenOrderConfirm) {
-                (submitButton as HTMLElement)?.focus();
+                submitButtonRef.current?.focus();
                 event.preventDefault();
             } else {
                 handleSubmitOrder();
@@ -879,7 +880,7 @@ function OrderInput({
         if (event.key === 'Enter') {
             if (!isUserLoggedIn || isDisabled) return;
             if (activeOptions.skipOpenOrderConfirm) {
-                (submitButton as HTMLElement)?.focus();
+                submitButtonRef.current?.focus();
                 event.preventDefault();
             } else {
                 handleSubmitOrder();
@@ -981,13 +982,27 @@ function OrderInput({
                         </Tooltip>
                     </div>
                     <div className={styles.actionButtonsContainer}>
-                        <button onClick={() => confirmOrderModal.open('scale')}>
-                            <img src={flatSvg} alt='flat price distribution' />
-                            Flat
+                        <button
+                            className={styles.toggleSwitch}
+                            role='switch'
+                            aria-checked='false'
+                            aria-label='Flat price distribution'
+                            tabIndex={0}
+                            onClick={() => confirmOrderModal.open('scale')}
+                        >
+                            <img src={flatSvg} alt='' aria-hidden='true' />
+                            <span>Flat</span>
                         </button>
-                        <button onClick={() => confirmOrderModal.open('scale')}>
-                            <img src={evenSvg} alt='even price distribution' />
-                            Evenly Split
+                        <button
+                            className={styles.toggleSwitch}
+                            role='switch'
+                            aria-checked='false'
+                            aria-label='Evenly split price distribution'
+                            tabIndex={0}
+                            onClick={() => confirmOrderModal.open('scale')}
+                        >
+                            <img src={evenSvg} alt='' aria-hidden='true' />
+                            <span>Evenly Split</span>
                         </button>
                     </div>
                 </div>
@@ -1100,7 +1115,6 @@ function OrderInput({
             selectedDenom,
             setSelectedDenom,
             useTotalSize,
-            autoFocus: window.innerWidth > 768, // do not autofocus on mobile
         }),
         [
             handleSizeChange,
@@ -1113,6 +1127,22 @@ function OrderInput({
             setSelectedDenom,
         ],
     );
+
+    // After mount on client, focus the size input on desktop widths
+    useEffect(() => {
+        if (typeof window === 'undefined' || typeof document === 'undefined')
+            return;
+        if (window.innerWidth <= 768) return; // do not autofocus on mobile
+        const el = document.getElementById(
+            'trade-module-size-input',
+        ) as HTMLInputElement | null;
+
+        setTimeout(() => {
+            if (!notionalQtyNum) {
+                el?.focus();
+            }
+        }, 850);
+    }, [tradeDirection, marketOrderType]);
 
     const sizeSliderPercentageValueProps = useMemo(
         () => ({
@@ -1962,8 +1992,9 @@ function OrderInput({
             // 3. No modals are open
             // 4. Skip confirmation is not enabled
 
-            const isSubmitButtonFocused =
-                document.activeElement === submitButton;
+            const isSubmitButtonFocused = submitButtonRef.current
+                ? document.activeElement === submitButtonRef.current
+                : false;
             // Submit if either:
             // 1. The submit button is focused, or
             // 2. Skip confirmation is not enabled
@@ -1979,10 +2010,10 @@ function OrderInput({
             } else if (
                 activeOptions.skipOpenOrderConfirm &&
                 isFocused &&
-                submitButton
+                submitButtonRef.current
             ) {
                 // focus the submit button
-                (submitButton as HTMLElement).focus();
+                submitButtonRef.current.focus();
             }
         };
 
@@ -2105,9 +2136,13 @@ function OrderInput({
     //     </div>
     // );
 
-    const submitButton = document.querySelector(
-        '[data-testid="submit-order-button"]',
-    );
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            submitButtonRef.current = document.querySelector(
+                '[data-testid="submit-order-button"]',
+            ) as HTMLElement | null;
+        }
+    }, []);
 
     const submitButtonText = userExceededOI
         ? 'Max Open Interest Reached'
@@ -2182,14 +2217,15 @@ function OrderInput({
                                 className={styles.exit_launchpad}
                                 onClick={() => setShowLaunchpad(false)}
                             >
-                                <MdKeyboardArrowLeft />
+                                <MdKeyboardArrowLeft aria-label='Close Order Types' />
                             </div>
                             <h3>Order Types</h3>
                             <button
                                 className={styles.trade_type_toggle}
+                                aria-label='Trade type'
                                 onClick={() => setShowLaunchpad(false)}
                             >
-                                <PiSquaresFour />
+                                <PiSquaresFour aria-label='Close Order Types' />
                             </button>
                         </header>
                         <ul className={styles.launchpad_clickables}>
@@ -2243,6 +2279,7 @@ function OrderInput({
                                 </SimpleButton>
                                 <button
                                     className={styles.trade_type_toggle}
+                                    aria-label='Trade type'
                                     onClick={() => setShowLaunchpad(true)}
                                 >
                                     <PiSquaresFour />

@@ -1,0 +1,51 @@
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 160px;
+}
+
+.logoMask {
+    /* Size of the logo */
+    width: 80px;
+    height: 80px;
+
+    /* Use the favicon svg as a mask so the gradient shows through the logo shape */
+    -webkit-mask-image: url('/images/favicon.svg');
+    mask-image: url('/images/favicon.svg');
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+
+    /* Animated gradient background that shines through the mask */
+    background: linear-gradient(
+        135deg,
+        #4ade80 0%,
+        #22d3ee 25%,
+        #818cf8 50%,
+        #f472b6 75%,
+        #fb923c 100%
+    );
+    background-size: 300% 300%;
+    animation: gradientShift 2.5s ease-in-out infinite;
+
+    /* Slight glow */
+    filter: drop-shadow(0 6px 18px rgba(129, 140, 248, 0.45));
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}

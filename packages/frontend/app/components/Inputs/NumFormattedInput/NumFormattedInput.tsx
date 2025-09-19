@@ -87,6 +87,8 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
                 aria-label={ariaLabel}
                 inputMode='numeric'
                 placeholder={placeholder}
+                autoComplete='off'
+                spellCheck={false}
                 autoFocus={autoFocus}
             />
         </>

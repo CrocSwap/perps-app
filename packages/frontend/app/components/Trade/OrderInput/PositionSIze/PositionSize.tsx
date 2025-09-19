@@ -401,6 +401,8 @@ export default function PositionSize({
                             style={{
                                 color: POSITION_SIZE_UI_CONFIG.TEXT_COLOR,
                             }}
+                            autoComplete='off'
+                            spellCheck={false}
                         />
                         <span
                             className={styles.valueSuffix}

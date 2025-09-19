@@ -167,6 +167,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     }
                     label='Configure Amount'
                     reverse
+                    aria-label='Configure Amount toggle'
                 />
                 <ToggleSwitch
                     isOn={formData.limitPrice}
@@ -178,6 +179,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     }
                     label='Limit Price'
                     reverse
+                    aria-label='Limit Price toggle'
                 />
             </section>
             <button

@@ -134,15 +134,23 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                     type='button'
                                     className={`${styles.feedbackButton} ${feedbackType === 'positive' ? styles.selected : ''}`}
                                     onClick={() => setFeedbackType('positive')}
+                                    aria-label='Thumbs up'
                                 >
-                                    <FaThumbsUp className={styles.icon} />
+                                    <FaThumbsUp
+                                        className={styles.icon}
+                                        aria-hidden='true'
+                                    />
                                 </button>
                                 <button
                                     type='button'
                                     className={`${styles.feedbackButton} ${feedbackType === 'negative' ? styles.selected : ''}`}
                                     onClick={() => setFeedbackType('negative')}
+                                    aria-label='Thumbs down'
                                 >
-                                    <FaThumbsDown className={styles.icon} />
+                                    <FaThumbsDown
+                                        className={styles.icon}
+                                        aria-hidden='true'
+                                    />
                                 </button>
                             </div>
 

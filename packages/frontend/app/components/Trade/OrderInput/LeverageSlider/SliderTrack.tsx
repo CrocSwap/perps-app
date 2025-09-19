@@ -89,15 +89,44 @@ export default function SliderTrack({
                 aria-label='Leverage amount'
                 aria-valuemin={minimumInputValue}
                 aria-valuemax={maximumInputValue}
-                aria-valuenow={Math.round(currentValue * 10) / 10}
+                aria-valuenow={
+                    isNaN(currentValue) ||
+                    currentValue === null ||
+                    currentValue === undefined
+                        ? minimumInputValue
+                        : Math.max(
+                              minimumInputValue,
+                              Math.min(
+                                  maximumInputValue,
+                                  Math.round(currentValue * 10) / 10,
+                              ),
+                          )
+                }
                 aria-orientation='horizontal'
                 onKeyDown={onKeyDown}
                 onMouseDown={onTrackMouseDown}
                 onTouchStart={onTrackTouchStart}
                 onMouseMove={onTrackMouseMove}
                 onMouseLeave={onTrackMouseLeave}
+                aria-valuetext={`${
+                    isNaN(currentValue) ||
+                    currentValue === null ||
+                    currentValue === undefined
+                        ? minimumInputValue
+                        : Math.max(
+                              minimumInputValue,
+                              Math.min(
+                                  maximumInputValue,
+                                  Math.round(currentValue * 10) / 10,
+                              ),
+                          )
+                }x leverage`}
             >
-                <div className={styles.sliderBackground}></div>
+                <div
+                    className={styles.sliderBackground}
+                    role='none'
+                    aria-hidden='true'
+                ></div>
 
                 {/* Greyed out minimum section */}
                 {shouldShowMinimumConstraints && (

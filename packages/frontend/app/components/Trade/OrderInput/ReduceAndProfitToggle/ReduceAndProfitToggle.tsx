@@ -169,6 +169,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isChasingIntervalEnabled}
                         onToggle={handleToggleIsChasingInterval}
                         label=''
+                        aria-label='Chasing interval toggle'
                     />
 
                     <h3 className={styles.toggleLabel}>Max Chase Distance</h3>
@@ -199,6 +200,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isRandomizeEnabled}
                         onToggle={handleToggleRandomize}
                         label=''
+                        aria-label='Randomize toggle'
                     />
                     <h3 className={styles.toggleLabel}>Randomize</h3>
                 </div>
@@ -212,6 +214,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isReduceOnlyEnabled}
                         onToggle={handleToggleReduceOnly}
                         label=''
+                        aria-label='Reduce Only toggle'
                     />
                     <h3 className={styles.toggleLabel}>Reduce Only</h3>
                 </div>
@@ -225,6 +228,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isTakeProfitEnabled}
                         onToggle={handleToggleProfitOnly}
                         label=''
+                        aria-label='Take Profit / Stop Loss toggle'
                     />
                     <h3 className={styles.toggleLabel}>
                         Take Profit / Stop Loss
