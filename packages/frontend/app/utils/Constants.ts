@@ -155,12 +155,25 @@ export const MIN_VISIBLE_ORDER_LABEL_RATIO = 0.8;
 export const MIN_POSITION_USD_SIZE = 0.01;
 
 export const MARKET_API_URL =
-    import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_PROXY_URL ||
+    import.meta.env.VITE_MARKET_API_URL ||
+    'https://embindexer.net/ember/hyper-proxy';
+// 'https://hyper-proxy-1080663129748.europe-west1.run.app';
+// 'https://api.hyperliquid.xyz';
+// import.meta.env.VITE_MARKET_API_URL || 'http://localhost:8080';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const POLLING_API_URL =
-    import.meta.env.VITE_POLLING_API_URL || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_PROXY_URL ||
+    import.meta.env.VITE_POLLING_API_URL ||
+    'https://embindexer.net/ember/hyper-proxy';
+// 'https://hyper-proxy-1080663129748.europe-west1.run.app';
+// 'https://api.hyperliquid.xyz';
+// import.meta.env.VITE_POLLING_API_URL || 'http://localhost:8080';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
+
+export const ALTERNATE_POLLING_API_URL =
+    import.meta.env.VITE_ALTERNATE_PROXY_URL || 'https://api.hyperliquid.xyz';
 
 export const POLLING_API_INFO_ENDPOINT =
     import.meta.env.POLLING_API_INFO_ENDPOINT || `${POLLING_API_URL}/info`;
@@ -228,3 +241,24 @@ export const SPLIT_TEST_VERSION =
 export const SHOULD_LOG_ANALYTICS =
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS &&
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS.toLowerCase() === 'true';
+
+export const WHITELISTED_COINS_FOR_MAIN_PROXY = new Set<string>(
+    ['BTC'].map((coin) => coin.toUpperCase()),
+);
+
+export const getPollingApiUrl = (payload: any) => {
+    if (payload.coin) {
+        if (WHITELISTED_COINS_FOR_MAIN_PROXY.has(payload.coin.toUpperCase())) {
+            return POLLING_API_URL;
+        }
+        return ALTERNATE_POLLING_API_URL;
+    } else if (payload.req && payload.req.coin) {
+        if (
+            WHITELISTED_COINS_FOR_MAIN_PROXY.has(payload.req.coin.toUpperCase())
+        ) {
+            return POLLING_API_URL;
+        }
+        return ALTERNATE_POLLING_API_URL;
+    }
+    return POLLING_API_URL;
+};

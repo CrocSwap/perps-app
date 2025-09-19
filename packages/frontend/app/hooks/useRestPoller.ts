@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useCallback, useEffect } from 'react';
-import { POLLING_API_URL } from '~/utils/Constants';
+import {
+    ALTERNATE_POLLING_API_URL,
+    getPollingApiUrl,
+    POLLING_API_URL,
+} from '~/utils/Constants';
 
-export interface UsePollerIF {
-    url?: string;
-}
+export interface UsePollerIF {}
 
 export function useRestPoller(props: UsePollerIF = {}) {
-    const { url = POLLING_API_URL } = props;
-
     const intervalMap = new Map<string, NodeJS.Timeout>();
 
     useEffect(() => {}, []);
@@ -26,6 +26,9 @@ export function useRestPoller(props: UsePollerIF = {}) {
         callInit: boolean = false,
     ) => {
         const key = toKey(endpoint, payload);
+
+        const url = getPollingApiUrl(payload);
+
         const interval = setInterval(() => {
             fetch(`${url}/${endpoint}`, {
                 method: 'POST',

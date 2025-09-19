@@ -2,7 +2,11 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getLS, processSymbolUrlParam } from '~/utils/AppUtils';
-import { POLLING_API_INFO_ENDPOINT, WsChannels } from '~/utils/Constants';
+import {
+    getPollingApiUrl,
+    POLLING_API_INFO_ENDPOINT,
+    WsChannels,
+} from '~/utils/Constants';
 
 export default function TradeRouteHandler() {
     const { marketId } = useParams<{ marketId: string }>(); // Get marketId from URL
@@ -27,13 +31,17 @@ export default function TradeRouteHandler() {
         } else {
             urlSymbol = processSymbolUrlParam(urlSymbol);
 
-            const response = await fetch(POLLING_API_INFO_ENDPOINT, {
+            const reqPayload = {
+                type: WsChannels.ORDERBOOK,
+                coin: urlSymbol,
+            };
+
+            const targetServer = getPollingApiUrl(reqPayload);
+
+            const response = await fetch(`${targetServer}/info`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: WsChannels.ORDERBOOK,
-                    coin: urlSymbol,
-                }),
+                body: JSON.stringify(reqPayload),
             });
 
             const data = await response.json();
