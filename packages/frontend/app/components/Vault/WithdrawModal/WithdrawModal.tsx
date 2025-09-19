@@ -4,6 +4,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './WithdrawModal.module.css';
+import { t } from 'i18next';
 
 interface WithdrawModalProps {
     vault: {
@@ -94,7 +95,7 @@ export default function WithdrawModal({
                     type='text'
                     value={amount}
                     onChange={handleInputChange}
-                    aria-label='withdraw input'
+                    aria-label={t('aria.withdrawInput')}
                     inputMode='numeric'
                     pattern='[0-9]*'
                     placeholder='Enter amount'

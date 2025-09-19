@@ -1,3 +1,5 @@
+import { t } from 'i18next';
+
 export interface NotificationOptions {
     type: 'success' | 'error' | 'info' | 'warning';
     title: string;
@@ -81,8 +83,11 @@ export class NotificationService {
 
         this.addNotification(id, {
             type: 'success',
-            title: 'Deposit Successful',
-            message: `Successfully deposited ${amount} ${token}${options.signature ? ` (${options.signature.slice(0, 8)}...)` : ''}`,
+            title: t('transactions.depositSuccessful'),
+            message: t('transactions.successfullyDeposited', {
+                amount: amount,
+                unit: token,
+            }),
             duration: 7000,
         });
     }
@@ -98,7 +103,7 @@ export class NotificationService {
 
         this.addNotification(id, {
             type: 'error',
-            title: 'Deposit Failed',
+            title: t('transactions.depositFailed'),
             message: error,
             duration: 10000,
         });

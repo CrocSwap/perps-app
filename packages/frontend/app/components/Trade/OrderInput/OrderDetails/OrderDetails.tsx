@@ -6,6 +6,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './OrderDetails.module.css';
+import { useTranslation } from 'react-i18next';
 
 interface MarketInfoItem {
     label: string;
@@ -26,6 +27,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     marginRequired,
     liquidationPrice,
 }) => {
+    const { i18n, t } = useTranslation();
     const { formatNum } = useNumFormatter();
     const { isTradeInfoExpanded, setIsTradeInfoExpanded } = useTradeDataStore();
 
@@ -40,8 +42,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     const marketInfoData: MarketInfoItem[] = useMemo(() => {
         const arr: (MarketInfoItem | false)[] = [
             showLiquidationPrice && {
-                label: 'Liquidation Price',
-                tooltipLabel: 'liquidation price',
+                label: t('transactions.liquidationPrice'),
+                tooltipLabel: t('transactions.liquidationPrice'),
                 value: (() => {
                     if (
                         liquidationPrice === null ||
@@ -69,20 +71,20 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 })(),
             },
             orderMarketPrice === 'scale' && {
-                label: 'Avg. Entry Price',
-                tooltipLabel: 'average entry price',
+                label: t('transactions.avgEntryPrice'),
+                tooltipLabel: t('transactions.avgEntryPrice'),
                 value: '-',
             },
             {
-                label: 'Order Value',
-                tooltipLabel: 'order value',
+                label: t('transactions.orderValue'),
+                tooltipLabel: t('transactions.orderValue'),
                 value: usdOrderValue
                     ? formatNum(usdOrderValue, null, true, true)
                     : '-',
             },
             {
-                label: 'Margin Required',
-                tooltipLabel: 'margin required',
+                label: t('transactions.marginRequired'),
+                tooltipLabel: t('transactions.marginRequired'),
                 value: marginRequired
                     ? formatNum(marginRequired, null, true, true)
                     : '-',
@@ -96,43 +98,44 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
         marginRequired,
         formatNum,
         liquidationPrice,
+        i18n.language,
     ]);
 
     const twapInfoData: MarketInfoItem[] = useMemo(
         () => [
             {
-                label: 'Frequency',
-                tooltipLabel: 'frequency',
-                value: '30 seconds',
+                label: t('transactions.frequency'),
+                tooltipLabel: t('transactions.frequency'),
+                value: `30 ${t('time.seconds')}`,
             },
             {
-                label: 'Run Time',
-                tooltipLabel: 'run time',
-                value: '30 minutes',
+                label: t('transactions.runTime'),
+                tooltipLabel: t('transactions.runTime'),
+                value: `30 ${t('time.minutes')}`,
             },
             {
-                label: 'Number of Orders',
-                tooltipLabel: 'number of orders',
+                label: t('transactions.numberOfOrders'),
+                tooltipLabel: t('transactions.numberOfOrders'),
                 value: '61',
             },
         ],
-        [],
+        [i18n.language],
     );
 
     const limitInfoData: MarketInfoItem[] = useMemo(
         () => [
             {
-                label: 'Chasing Interval',
-                tooltipLabel: 'chasing interval',
-                value: 'Per 1s',
+                label: t('transactions.chasingInterval'),
+                tooltipLabel: t('transactions.chasingInterval'),
+                value: `Per 1 ${t('time.second')}`,
             },
             {
-                label: 'Size per suborder',
-                tooltipLabel: 'size per suborder',
+                label: t('transactions.sizePerSuborder'),
+                tooltipLabel: t('transactions.sizePerSuborder'),
                 value: '0.000 ETH',
             },
         ],
-        [],
+        [i18n.language],
     );
 
     const infoDataMap: Record<string, MarketInfoItem[]> = useMemo(
@@ -208,8 +211,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                     onClick={() => setIsTradeInfoExpanded(!isTradeInfoExpanded)}
                     aria-label={
                         isTradeInfoExpanded
-                            ? 'Collapse details'
-                            : 'Expand details'
+                            ? t('transactions.collapseDetails')
+                            : t('transactions.expandDetails')
                     }
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}

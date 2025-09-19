@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { DebugWallet } from '~/stores/DebugStore';
 
 export * from './externalResources';
@@ -12,10 +13,6 @@ export enum FormatTypes {
 export type NumFormat = {
     label: string;
     value: FormatTypes;
-};
-
-export type LangType = {
-    label: string;
 };
 
 export const NumFormatTypes: NumFormat[] = [
@@ -34,21 +31,6 @@ export const NumFormatTypes: NumFormat[] = [
     {
         label: '1 234,56',
         value: FormatTypes.SV,
-    },
-];
-
-export const Langs: LangType[] = [
-    {
-        label: 'English',
-    },
-    {
-        label: 'Français',
-    },
-    {
-        label: '한국어',
-    },
-    {
-        label: '简体中文',
     },
 ];
 
@@ -228,3 +210,13 @@ export const SPLIT_TEST_VERSION =
 export const SHOULD_LOG_ANALYTICS =
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS &&
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS.toLowerCase() === 'true';
+
+export const languageOptions = {
+    en: 'English 🇬🇧',
+    es: 'Español 🇪🇸',
+    fr: 'Français 🇫🇷',
+    tr: 'Türkçe 🇹🇷',
+    ja: '日本語 🇯🇵',
+    ko: '한국어 🇰🇷',
+    zh: '中文 (简体) 🇨🇳',
+};

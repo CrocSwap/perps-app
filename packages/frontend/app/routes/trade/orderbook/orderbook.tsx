@@ -32,6 +32,7 @@ import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 // import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 import type { TabType } from '~/routes/trade';
 import { useSdk } from '~/hooks/useSdk';
+import { t } from 'i18next';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
 
@@ -316,7 +317,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
             }
             return (
                 <div id={id} className={styles.orderBookBlockMid}>
-                    <div>Spread</div>
+                    <div>{t('orderBook.spread')}</div>
                     <div>
                         {diff > 0 ? new Number(diff.toFixed(6)).toString() : ''}
                     </div>
@@ -468,15 +469,15 @@ const OrderBook: React.FC<OrderBookProps> = ({
             </div>
 
             <div id={'orderBookHeader2'} className={styles.orderBookHeader}>
-                <div>Price</div>
+                <div>{t('transactions.price')}</div>
                 <div>
-                    Size{' '}
+                    {t('transactions.size')}
                     {selectedMode === 'symbol'
                         ? `(${symbol.toUpperCase()})`
                         : '(USD)'}
                 </div>
                 <div>
-                    Total{' '}
+                    {t('transactions.total')}
                     {selectedMode === 'symbol'
                         ? `(${symbol.toUpperCase()})`
                         : '(USD)'}

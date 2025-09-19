@@ -10,7 +10,7 @@ import daiImage from '../../assets/tokens/dai.svg';
 import ethImage from '../../assets/tokens/eth.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 import Hero from '~/components/Home/Hero/Hero';
-import TradeButton from '~/components/Home/TradeButton/TradeButton';
+import { t } from 'i18next';
 
 interface FloatingTokenProps {
     src: string;
@@ -123,8 +123,38 @@ export function meta() {
 }
 
 export default function Home(): JSX.Element {
+    // const [hasVisited, setHasVisited] = useState(false);
+
+    // useEffect(() => {
+    //     try {
+    //         const visited = sessionStorage.getItem('hasVisitedHome') === 'true';
+    //         setHasVisited(visited);
+
+    //         if (!visited) {
+    //             sessionStorage.setItem('hasVisitedHome', 'true');
+    //         }
+    //     } catch (e) {
+    //         console.error('Session storage error:', e);
+    //     }
+    // }, []);
+
+    const navigation = useNavigation();
+
     const { symbol } = useTradeDataStore();
 
+    function TradeButton({ symbol }: { symbol: string }) {
+        const isNavigating = navigation.state !== 'idle';
+
+        return (
+            <Link
+                to={`/v2/trade/${symbol}`}
+                className={styles.primary}
+                viewTransition
+            >
+                {isNavigating ? t('common.loading') : t('home.startTrading')}
+            </Link>
+        );
+    }
     const showOnlyHero = true;
 
     if (showOnlyHero) return <Hero />;
@@ -153,11 +183,13 @@ export default function Home(): JSX.Element {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: 'easeOut' }}
             >
-                <h1>Trade Perps With Ambient</h1>
-                <p>Fast execution. Zero taker fees. Up to 100x leverage.</p>
+                <h1>{t('home.title')}</h1>
+                <p>{t('home.subtitle')}</p>
                 <div className={styles.buttons}>
-                    <TradeButton />
-                    <button className={styles.secondary}>Learn More</button>
+                    <TradeButton symbol={symbol} />
+                    <button className={styles.secondary}>
+                        {t('home.learnMore')}
+                    </button>
                 </div>
             </motion.div>
 

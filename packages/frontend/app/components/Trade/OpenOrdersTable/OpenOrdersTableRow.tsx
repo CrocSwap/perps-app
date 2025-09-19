@@ -10,6 +10,7 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
+import { t } from 'i18next';
 
 export interface OpenOrderData {
     time: string;
@@ -46,8 +47,8 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
     const handleCancel = async () => {
         if (!order.oid) {
             notifications.add({
-                title: 'Cancel Failed',
-                message: 'Order ID not found',
+                title: t('transactions.cancelFailed.title'),
+                message: t('transactions.cancelFailed.message'),
                 icon: 'error',
             });
             return;
@@ -65,8 +66,12 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             );
             // Show pending notification
             notifications.add({
-                title: 'Cancel Order Pending',
-                message: `Cancelling order for ${usdValueOfOrderStr} of ${order.coin}`,
+                title: t('transactions.cancelOrderPending.title'),
+                message: t('transactions.cancelOrderPending.message', {
+                    side: order.side,
+                    usdValueOfOrderStr,
+                    symbol: order.coin,
+                }),
                 icon: 'spinner',
                 slug,
                 removeAfter: 60000,
@@ -101,8 +106,11 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 }
                 // Show success notification
                 notifications.add({
-                    title: 'Order Cancelled',
-                    message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
+                    title: t('transactions.cancelOrderConfirmed.title'),
+                    message: t('transactions.cancelOrderConfirmed.message', {
+                        usdValueOfOrderStr,
+                        symbol: order.coin,
+                    }),
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -137,8 +145,10 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 }
                 // Show error notification
                 notifications.add({
-                    title: 'Cancel Failed',
-                    message: String(result.error || 'Failed to cancel order'),
+                    title: t('transactions.cancelFailed.title'),
+                    message: String(
+                        result.error || t('transactions.cancelFailed.message2'),
+                    ),
                     icon: 'error',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -150,11 +160,11 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             console.error('❌ Error cancelling order:', error);
             notifications.remove(slug);
             notifications.add({
-                title: 'Cancel Failed',
+                title: t('transactions.cancelFailed.title'),
                 message:
                     error instanceof Error
                         ? error.message
-                        : 'Unknown error occurred',
+                        : t('transactions.unknownErrorOccurred'),
                 icon: 'error',
             });
         } finally {
@@ -170,7 +180,11 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 {formatTimestamp(order.timestamp)}
             </div>
             <div className={`${styles.cell} ${styles.typeCell}`}>
-                {order.orderType}
+                {order.orderType.toLowerCase() === 'market'
+                    ? t('transactions.market')
+                    : order.orderType.toLowerCase() === 'limit'
+                      ? t('transactions.limit')
+                      : order.orderType}
             </div>
             <div className={`${styles.cell} ${styles.coinCell}`}>
                 {order.coin}
@@ -184,7 +198,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                             : getBsColor().sell,
                 }}
             >
-                {order.side === 'buy' ? 'Long' : 'Short'}
+                {order.side === 'buy' ? t('common.long') : t('common.short')}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
                 {order.sz ? formatNum(order.sz) : '--'}
@@ -194,16 +208,18 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             </div>
             <div className={`${styles.cell} ${styles.orderValueCell}`}>
                 {order.limitPx === 0
-                    ? 'Market'
+                    ? t('transactions.market')
                     : order.orderValue
                       ? `${formatNum(order.orderValue, 2, true, true)}`
                       : '--'}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
-                {order.limitPx === 0 ? 'Market' : formatNum(order.limitPx)}
+                {order.limitPx === 0
+                    ? t('transactions.market')
+                    : formatNum(order.limitPx)}
             </div>
             <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>
-                {order.reduceOnly ? 'Yes' : 'No'}
+                {order.reduceOnly ? t('common.yes') : t('common.no')}
             </div>
             <div className={`${styles.cell} ${styles.triggerConditionsCell}`}>
                 {order.triggerCondition}
@@ -222,7 +238,9 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     onClick={handleCancel}
                     disabled={isCancelling}
                 >
-                    {isCancelling ? 'Cancelling...' : 'Cancel'}
+                    {isCancelling
+                        ? t('transactions.cancelling')
+                        : t('common.cancel')}
                 </button>
             </div>
         </div>

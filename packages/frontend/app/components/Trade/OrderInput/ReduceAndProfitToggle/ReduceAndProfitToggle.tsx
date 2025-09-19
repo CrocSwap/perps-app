@@ -5,6 +5,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import ChaseDistance from '../ChaseDistance/ChaseDistance';
 import styles from './ReduceAndProfitToggle.module.css';
+import { t } from 'i18next';
 
 interface PropsIF {
     isReduceOnlyEnabled: boolean;
@@ -216,7 +217,9 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         label=''
                         aria-label='Reduce Only toggle'
                     />
-                    <h3 className={styles.toggleLabel}>Reduce Only</h3>
+                    <h3 className={styles.toggleLabel}>
+                        {t('tradeTable.reduceOnly')}
+                    </h3>
                 </div>
             )}
             {showTakeProfitToggle && (

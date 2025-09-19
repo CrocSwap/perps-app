@@ -1,0 +1,529 @@
+{
+    "common": {
+        "yes": "예",
+        "no": "아니요",
+        "cancel": "취소",
+        "save": "저장",
+        "delete": "삭제",
+        "edit": "편집",
+        "close": "닫기",
+        "loading": "로딩 중...",
+        "confirming": "확인 중...",
+        "processing": "처리 중...",
+        "error": "오류",
+        "success": "성공",
+        "applyDefaults": "기본값 적용",
+        "learnMore": "자세히 알아보기",
+        "deposit": "입금",
+        "transfer": "이체",
+        "withdraw": "출금",
+        "submit": "제출",
+        "quantity": "수량",
+        "confirm": "확인",
+        "amount": "금액",
+        "max": "최대",
+        "min": "최소",
+        "positions": "포지션",
+        "balances": "잔고",
+        "openOrders": "미체결 주문",
+        "tradeHistory": "거래내역",
+        "fundingHistory": "펀딩내역",
+        "orderHistory": "주문내역",
+        "depositsAndWithdrawals": "입출금",
+        "twap": "TWAP",
+        "all": "전체",
+        "active": "활성",
+        "long": "롱",
+        "short": "숏",
+        "create": "생성",
+        "update": "업데이트",
+        "reset": "초기화",
+        "announcements": "공지사항",
+        "leverage": "레버리지",
+        "comingSoon": "곧 출시"
+    },
+    "transactions": {
+        "orderTypes": "주문 유형",
+        "marginMode": "마진 모드",
+        "scaleOptions": "스케일 옵션",
+        "confirmBuyOrder": "매수 주문 확인",
+        "confirmSellOrder": "매도 주문 확인",
+        "confirmLimitBuyOrder": "지정가 매수 주문 확인",
+        "confirmLimitSellOrder": "지정가 매도 주문 확인",
+        "availableToTrade": "거래 가능 금액",
+        "availableToTradeTooltip": "예치된 {{symbol}}",
+        "currentPosition": "현재 포지션",
+        "currentPositionTooltip": "현재 {{symbol}} 포지션 수량",
+        "maxOpenInterestReached": "최대 미결제 약정 도달",
+        "depositToTrade": "거래를 위해 입금하기",
+        "switchDirectionToReduce": "감소를 위해 방향 전환",
+        "maxLongDepositToTrade": "Max Long - 거래 위해 입금",
+        "maxShortDepositToTrade": "Max Short - 거래 위해 입금",
+        "minimumOr100Percent": "최소 또는 100%",
+        "minimum": "최소",
+        "invalidPrice": "유효하지 않은 가격",
+        "orderSizeBelowMinimum": "주문 수량이 최소 미만",
+        "orderSizeExceedsPositionLimits": "주문 수량이 포지션 한도 초과",
+        "insufficientCollateral": "담보금 부족",
+        "reduceOnlyExceedsPositionSize": "Reduce Only 수량이 포지션 크기 초과",
+        "processingOrder": "주문 처리 중...",
+        "positionLimitReached": "포지션 한도 도달",
+        "limitOrderFailed": "지정가 주문 실패",
+        "unknownErrorOccurred": "알 수 없는 오류 발생",
+        "failedToPlaceLimitOrder": "지정가 주문 제출 실패",
+        "sellShortLimitOrderPlaced": "매도 / Short 지정가 주문 제출됨",
+        "sellShortLimitOrderPending": "매도 / Short 지정가 주문 대기중",
+        "successfullyPlacedSellOrderFor": "{{usdValueOfOrderStr}} {{symbol}} (가격: {{limitPrice}}) 매도 주문 제출됨",
+        "placingSellShortLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} (가격: {{limitPrice}}) 지정가 매도 주문 제출 중",
+        "enterValidLimitPrice": "유효한 지정가 입력",
+        "enterValidOrderSize": "유효한 주문 수량 입력",
+        "buyLongLimitOrderPlaced": "매수 / Long 지정가 주문 제출됨",
+        "successfullyPlacedBuyOrderFor": "{{usdValueOfOrderStr}} {{symbol}} (가격: {{limitPrice}}) 매수 주문 제출됨",
+        "buyLongLimitOrderPending": "매수 / Long 지정가 주문 대기중",
+        "placingBuyLongLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} (가격: {{limitPrice}}) 지정가 매수 주문 제출 중",
+        "priceDistribution": "가격 분포",
+        "flat": "플랫",
+        "flatPriceDistribution": "평가 가격 분포",
+        "evenlySplit": "균등 분할",
+        "evenPriceDistribution": "균등 가격 분포",
+        "market": "시장가",
+        "limit": "지정가",
+        "price": "가격",
+        "size": "수량",
+        "time": "시간",
+        "total": "총액",
+        "action": "작업",
+        "ratio": "비율",
+        "buyLong": "매수 / Long",
+        "sellShort": "매도 / Short",
+        "confirmingTransaction": "거래 확인 중...",
+        "processing": "처리 중...",
+        "dontShowThisAgain": "다시 표시하지 않기",
+        "estLiquidationPrice": "예상 청산 가격",
+        "estimatedPriceAtWhichPosWillBeLiquidated": "예상 청산 가격",
+        "orderValue": "주문 금액",
+        "hideSmallBalances": "소액 잔고 숨기기",
+        "increasing": "증가",
+        "decreasing": "감소",
+        "totalOrders": "총 주문 건수",
+        "orderRatioSumMustBe100": "주문 비율 총합은 100%여야 함",
+        "collapseDetails": "세부 정보 접기",
+        "expandDetails": "세부 정보 확장",
+        "frequency": "빈도",
+        "runTime": "실행 시간",
+        "numberOfOrders": "주문 수",
+        "chasingInterval": "추적 간격",
+        "sizePerSuborder": "서브 주문별 수량",
+        "avgEntryPrice": "평균 진입 가격",
+        "averageEntryPrice": "평균 진입 가격",
+        "marginRequired": "필요 마진",
+        "maxPosSizeLimitedByOiCap": "최대 포지션 크기 미결제 약정 한도에 의해 제한",
+        "openPositionIsXSwitchToY": "현재 포지션: {{x}}. {{y}}로 전환합니다.",
+        "buySellAtCurrentPrice": "현재가에 매수/매도",
+        "buySellAtSpecificPrice": "지정가에 매수/매도",
+        "maxTradeSizeLimitedTo": "최대 거래 수량 제한",
+        "yourPositionIsLimitedByOpenInterest": "귀하의 {{coin}} 포지션은 {{limitedBy}} 한도로 제한됨",
+        "currentMaxTradeSizeForMarket": "현 시장 최대 거래 수량: {{limit}}",
+        "placingLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} (가격: {{limitPrice}}) 지정가 주문 제출 중",
+        "sellOrderPending": "매도 주문 대기중",
+        "orderSubmittedFor": "{{usdValueOfOrderStr}} {{symbol}} 주문 제출됨",
+        "buyOrderPending": "매수 주문 대기중",
+        "buyOrderSuccessful": "매수 주문 성공",
+        "successfullyBought": "{{usdValueOfOrderStr}} {{symbol}} 매수 성공",
+        "sellOrderSuccessful": "매도 주문 성공",
+        "successfullySold": "{{usdValueOfOrderStr}} {{symbol}} 매도 성공",
+        "sellOrderFailed": "매도 주문 실패",
+        "transactionFailed": "거래 실패",
+        "buyOrderFailed": "매수 주문 실패",
+        "closeFailed": "포지션 종료 실패",
+        "closeFailedTitle": "종료 실패",
+        "liquidationPrice": "청산 가격",
+        "enterPrice": "가격 입력",
+        "enterSize": "수량 입력",
+        "totalSize": "총 수량",
+        "cancelling": "취소 중...",
+        "midButton": "MID",
+        "positionClosed": "포지션 종료됨",
+        "successfullyClosedPosition": "{{usdValueOfOrderStr}} {{symbol}} 포지션 종료 성공",
+        "failedToClosePosition": "포지션 종료 실패",
+        "transactionTimedOut": "거래가 {{timeInSeconds}}초 후 시간 초과됨",
+        "txFailedOrNotConfirmed": "거래 실패 또는 미확인",
+        "walletBalance": "지갑 잔고",
+        "walletBalanceTooltip": "현재 지갑 잔고",
+        "depositSuccessful": "입금 성공",
+        "successfullyDeposited": "{{amount}} {{unit}} 입금 성공",
+        "despositFailed": "입금 실패",
+        "withdrawalSuccessful": "출금 성공",
+        "successfullyWithdrawn": "{{amount}} {{unit}} 출금 성공",
+        "withdrawFailed": "출금 실패",
+        "availableToDeposit": "입금 가능 금액",
+        "availableToDepositTooltip": "볼트 용량 및 지갑 잔고 기준 입금 가능 금액",
+        "availableToWithdraw": "출금 가능 금액",
+        "availableToWithdrawTooltip": "포트폴리오 출금 가능 총액",
+        "invalidAmount": "유효하지 않은 금액",
+        "depositToVault": "{{vaultName}}에 {{unitValue}} 입금",
+        "depositToVaultMsg": "{{vaultName}}에서 수익 얻으려면 {{unitValue}}를 입금하세요. 다음 에포크 이후 출금 가능합니다.",
+        "txFailedTryAgain": "거래 실패, 다시 시도하세요.",
+        "minDepositAmountIs": "최소 입금 금액은 ${{amount}}입니다",
+        "enterAmountMin10": "금액 입력 (최소 $10)",
+        "cancellingAllOrders": {
+            "title": "전체 주문 취소 중",
+            "message": "{{count}}개의 {{noun}} 취소 시도 중..."
+        },
+        "cancelOrderPending": {
+            "title": "주문 취소 대기중",
+            "message": "{{usdValueOfOrderStr}}의 {{symbol}} 주문 취소 중"
+        },
+        "cancelOrderConfirmed": {
+            "title": "주문 취소됨",
+            "message": "{{usdValueOfOrderStr}}의 {{symbol}} 주문 취소 성공"
+        },
+        "cancelFailed": {
+            "title": "취소 실패",
+            "message": "주문 ID를 찾을 수 없음",
+            "message2": "주문 취소 실패"
+        },
+        "cancelLimitPending": {
+            "title": "지정가 주문 취소 대기중",
+            "message": "{{usdValueOfOrderStr}}의 {{symbol}} {{side}} 지정가 주문 취소 중"
+        },
+        "cancelLimitConfirmed": {
+            "title": "주문 취소됨",
+            "message": "{{usdValueOfOrderStr}}의 {{symbol}} {{side}} 지정가 주문 취소 성공"
+        },
+        "failedToUpdatedOrder": {
+            "title": "주문 업데이트 실패"
+        },
+        "orderUpdated": {
+            "title": "주문 업데이트됨",
+            "message": "{{usdValueOfOrderStr}}의 {{symbol}} 주문을 {{limitPrice}}로 성공적으로 업데이트함"
+        },
+        "orderFilled": {
+            "title": "{{side}} 주문 체결됨",
+            "message": "{{usdValueOfFillStr}}의 {{symbol}} {{side}} 주문이 {{fillPrice}}에 성공적으로 체결됨"
+        },
+        "errorUpdatingOrder": {
+            "title": "주문 업데이트 오류"
+        },
+        "cancelAllFailed": {
+            "title": "전체 취소 실패",
+            "message": "어떤 주문도 취소되지 않았습니다."
+        },
+        "cancelAllConfirmed": {
+            "title": "모든 주문 취소됨",
+            "message": "모든 {{count}}개 주문이 성공적으로 취소됨"
+        },
+        "cancelAllPartialSuccess": {
+            "title": "부분 성공",
+            "message": "{{successCount}}개 취소, {{failedCount}}개 실패"
+        },
+        "noOpenOrders": "미체결 주문 없음",
+        "transactionError": "거래 오류",
+        "invalidLimitPrice": {
+            "title": "유효하지 않은 가격",
+            "message": "유효한 지정가를 입력하세요"
+        },
+        "invalidOrderSize": {
+            "title": "유효하지 않은 수량",
+            "message": "유효한 주문 수량 입력하세요"
+        },
+        "leverageUpdated": {
+            "title": "레버리지 업데이트됨",
+            "message": "레버리지가 {{leverage}}배로 성공적으로 업데이트되었습니다"
+        },
+        "leverageUpdateFailed": {
+            "title": "거래 실패",
+            "message": "레버리지 업데이트 실패"
+        },
+        "viewOnExplorer": "익스플로러에서 보기",
+        "limitOrderUpdatePending": {
+            "title": "지정가 주문 업데이트 대기중",
+            "message": "{{coin}}에서 {{value}}의 {{side}} 주문을 {{limitPrice}}로 업데이트 중"
+        },
+        "filled": "체결",
+        "open": "미체결",
+        "partiallyFilled": "부분 체결",
+        "canceled": "취소됨",
+        "pending": "대기중"
+    },
+    "subaccounts": {
+        "createSubAccount": "서브계정 생성",
+        "createSubAccountPH": "예: 내 서브계정1",
+        "created": {
+            "title": "서브계정 생성됨",
+            "message": "새 전략 서브계정 {{name}} 생성 완료",
+            "message2": "새 재량 서브계정 {{name}} 생성 완료"
+        }
+    },
+    "strategies": {
+        "newStrategy": "새 전략",
+        "editStrategy": "전략 편집"
+    },
+    "margin": {
+        "cross": {
+            "title": "크로스",
+            "heading": "크로스 마진",
+            "blurb": "모든 크로스 포지션은 동일한 마진(담보)을 공유합니다. 청산 시 크로스 마진 잔액 및 해당 포지션이 모두 손실됩니다."
+        },
+        "isolated": {
+            "title": "격리",
+            "heading": "격리 모드",
+            "blurb": "개별 포지션별로 마진을 제한하여 리스크를 관리합니다. 격리 포지션의 마진 비율이 100%가 되면 포지션은 청산됩니다. 개별 포지션마다 마진을 추가/삭제할 수 있습니다."
+        }
+    },
+    "tradeTable": {
+        "selectATabToViewData": "데이터를 보려면 탭을 선택하세요",
+        "time": "시간",
+        "type": "유형",
+        "coin": "코인",
+        "direction": "방향",
+        "size": "수량",
+        "filledSize": "체결 수량",
+        "orderValue": "주문 가치",
+        "price": "가격",
+        "tradeValue": "거래 금액",
+        "fee": "수수료",
+        "closedPnl": "실현 PnL",
+        "reduceOnly": "감소 전용",
+        "triggerConditions": "트리거 조건",
+        "tpsl": "TP/SL",
+        "status": "상태",
+        "order": "주문",
+        "long": "Long",
+        "short": "Short",
+        "noOpenPositions": "오픈 포지션 없음",
+        "markPrice": "마크 가격",
+        "orderId": "주문 ID",
+        "totalBalance": "총 잔고",
+        "availableBalance": "사용 가능 잔고",
+        "currencyValue": "{{currency}} 가치",
+        "buyingPower": "매수력",
+        "contract": "계약",
+        "positionValue": "포지션 가치",
+        "entryPrice": "진입 가격",
+        "pnl": "PnL (ROE%)",
+        "liqPrice": "청산 가격",
+        "margin": "마진",
+        "funding": "펀딩/자금",
+        "close": "포지션 닫기",
+        "originalSize": "원래 수량",
+        "cancelAll": "전체 취소",
+        "noTradeHistory": "거래 내역 없음",
+        "noOrderHistory": "주문 내역 없음",
+        "noFundingHistory": "펀딩 내역 없음",
+        "fundingHistory": "전체: {{allTime}} 변경 후: {{sinceChange}}",
+        "openLong": "Long 오픈",
+        "openShort": "Short 오픈",
+        "closeLong": "Long 청산",
+        "closeShort": "Short 청산"
+    },
+    "time": {
+        "second": "초",
+        "seconds": "초",
+        "minute": "분",
+        "minutes": "분",
+        "hour": "시간",
+        "hours": "시간",
+        "day": "일",
+        "days": "일",
+        "week": "주",
+        "weeks": "주",
+        "month": "월",
+        "months": "월",
+        "year": "년",
+        "years": "년"
+    },
+    "navigation": {
+        "home": "홈",
+        "about": "소개",
+        "contact": "문의",
+        "settings": "설정",
+        "profile": "프로필",
+        "logout": "로그아웃",
+        "trade": "거래",
+        "chart": "차트",
+        "book": "주문장",
+        "recent": "최근",
+        "positions": "포지션"
+    },
+    "auth": {
+        "login": "로그인",
+        "register": "회원가입",
+        "email": "이메일",
+        "password": "비밀번호",
+        "forgotPassword": "비밀번호 찾기",
+        "loginSuccess": "로그인 성공",
+        "loginError": "유효하지 않은 자격증명"
+    },
+    "forms": {
+        "name": "이름",
+        "firstName": "이름",
+        "lastName": "성",
+        "phone": "전화번호",
+        "address": "주소",
+        "submit": "제출",
+        "required": "필수 입력 항목"
+    },
+    "messages": {
+        "welcome": "환영합니다",
+        "hello": "{{name}}님, 안녕하세요!",
+        "goodbye": "안녕히 가세요",
+        "thankYou": "감사합니다",
+        "pleaseWait": "잠시만 기다려주세요...",
+        "connectWalletForTrading": "가스 수수료 없이 거래하려면 지갑을 연결하세요."
+    },
+    "home": {
+        "title": "Ambient로 퍼페츄얼 거래",
+        "subtitle": "빠른 체결. 테이커 수수료 없음. 최대 100배 레버리지.",
+        "startTrading": "거래 시작",
+        "learnMore": "자세히 알아보기",
+        "hero": {
+            "heading1": "제로에서",
+            "one": "일",
+            "heading2": "탈중앙화 거래 프로토콜",
+            "description": "Ambient는 독특한 DeFi 상품과 CEX와 유사한 사용자 경험을 결합한 완전히 새로운 탈중앙화 퍼페츄얼 DEX입니다.",
+            "stats": {
+                "totalVolume": "총 거래량",
+                "activeUsers": "실시간 사용자"
+            }
+        }
+    },
+    "referrals": {
+        "title": "추천",
+        "description": "사용자를 추천하고 보상을 받으세요. 제휴자는 더 많은 보상 획득!",
+        "tradersReferred": "추천 받은 트레이더",
+        "rewardsEarned": "획득한 보상"
+    },
+    "deposit": {
+        "prompt": "Fogo에서 {{token}} 입금",
+        "input_prompt": "금액 입력 (최소 ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "입금 가능"
+    },
+    "withdraw": {
+        "prompt": "Fogo로 {{token}} 출금",
+        "explanation": "{{token}}이(가) 귀하의 주소로 전송됩니다.",
+        "availableToWithdraw": "출금 가능",
+        "input_prompt": "금액 입력 (최소 ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "orderBook": {
+        "tab": "탭",
+        "stacked": "스택",
+        "large": "대형",
+        "book": "장부",
+        "trades": "거래",
+        "spread": "스프레드"
+    },
+    "appSettings": {
+        "title": "설정",
+        "skipOpenOrderConfirm": "미체결 주문 확인 생략",
+        "enableTxNotifications": "거래 알림 활성화",
+        "enableBackgroundFillNotif": "백그라운드 체결 알림 활성화",
+        "numberFormat": "숫자 형식",
+        "color": "색상",
+        "language": "언어"
+    },
+    "symbolInfo": {
+        "mark": "마크",
+        "markTooltip": "불공평한 청산 방지용 추정 공정 가치",
+        "oracle": "오라클",
+        "oracleTooltip": "Pyth Network 오라클의 실시간 가격",
+        "oracleTooltipPythStale": "Pyth Network 오라클 (가격이 오래될 수 있음)",
+        "oracleTooltipNoPyth": "여러 주요 거래소에서 집계한 외부 시장 가격",
+        "24hChange": "24시간 변화",
+        "24hChangeTooltip": "최근 24시간 가격 변화",
+        "24hVolume": "24시간 거래량",
+        "24hVolumeTooltip": "최근 24시간 총 거래량",
+        "openInterest": "미결제약정",
+        "openInterestTooltip": "시장 미결제약정 합계",
+        "fundingRate": "펀딩 비율",
+        "fundingRateTooltip": "롱이 숏에(또는 반대) 지급하는 시간당 비율. 추가 수수료 없음, 현물 시장과 연동된 P2P 펀딩.",
+        "fundingCountdown": "펀딩 카운트다운",
+        "fundingCountdownTooltip": "다음 펀딩까지 남은 시간"
+    },
+    "feedback": {
+        "menuLabel": "피드백",
+        "title": "피드백 보내기",
+        "ratingPrompt": "경험을 어떻게 평가하시나요?",
+        "sendFeedback": "피드백 제출",
+        "positivePrompt": "가장 좋았던 점?",
+        "negativePrompt": "개선이 필요한 점?",
+        "placeholder": "익명 피드백은 개선에 도움됩니다.",
+        "warningText": "피드백이 너무 길어 잘릴 수 있음",
+        "submitButtonText": "피드백 제출",
+        "submittingButtonText": "제출 중...",
+        "appreciateText": "피드백 주셔서 감사합니다.",
+        "thanksText": "감사합니다!"
+    },
+    "accountOverview": {
+        "heading": "계정 개요",
+        "balance": "잔고",
+        "balanceTooltip": "총 계정 자산",
+        "unrealizedPnl": "미실현 PnL",
+        "unrealizedPnlTooltip": "미실현 손익"
+    },
+    "marketLimitClose": {
+        "marketHeading": "시장가 종료",
+        "marketDescription": "현재 시장가로 포지션을 종료하는 주문을 제출합니다.",
+        "minimumOr100Percent": "{{min}} 최소 또는 100%",
+        "noZeroSize": "크기가 0일 수 없음",
+        "sizeExceedsPosition": "크기가 포지션을 초과할 수 없음",
+        "invalidOrderSizeTitle": "잘못된 주문 크기",
+        "invalidSize": "유효한 주문 크기를 입력하세요",
+        "limitHeading": "지정가 종료",
+        "limitDescription": "지정한 가격에서 포지션을 종료하는 주문을 제출합니다.",
+        "estimatedClosedPnl": "예상 실현 PnL(수수료 제외): {{estimatedPNL}}",
+        "positionClosed": "포지션 종료됨",
+        "percentOfPositionClosed": "포지션의 {{sizePercentageValue}}% 종료"
+    },
+    "newVersion": {
+        "title": "새 버전 이용 가능",
+        "message": {
+            "withVersionNumber": "{{version}} 버전이 새 기능과 개선 사항으로 준비되었습니다.",
+            "noVersionNumber": "새 버전이 새 기능과 개선 사항으로 준비되었습니다."
+        },
+        "updateButton": "지금 업데이트",
+        "version": "버전"
+    },
+    "leverage": {
+        "title": "레버리지를 조정",
+        "closePositionPrompt": "최소 레버리지를 위해 포지션을 종료하세요"
+    },
+    "share": {
+        "prompt": "텍스트를 사용자 지정하세요",
+        "xCTA": "𝕏에서 공유",
+        "copyLinkCTA": "링크 복사",
+        "textPlaceholder": "지금 {{fogo}} 테스트넷에서 {{twitter}}로 {{coin}} 퍼프 거래를 하세요"
+    },
+    "colors": {
+        "default": "기본값",
+        "opposite": "반대",
+        "deuteranopia": "적록색맹",
+        "tritanopia": "청황색맹",
+        "protanopia": "적색맹"
+    },
+    "aria": {
+        "closeAnnouncement": "공지 닫기",
+        "closeFeedbackForm": "피드백 폼 닫기",
+        "depositInput": "입금 입력란",
+        "addressInput": "주소 입력란",
+        "amountInput": "금액 입력란",
+        "withdrawInput": "출금 입력란",
+        "scrollTabsLeft": "탭 왼쪽으로 스크롤",
+        "scrollTabsRight": "탭 오른쪽으로 스크롤",
+        "leverageValue": "레버리지 값",
+        "leverageAmount": "레버리지 금액",
+        "setLeverageTo": "레버리지를 {{value}}배로 설정",
+        "positionSizePercentage": "포지션 크기 비율",
+        "positionSizeValue": "포지션 크기 값",
+        "totalOrders": "총 주문 수",
+        "runningPriceInput": {
+            "minutes": "시장가(분) 입력란",
+            "hours": "시장가(시) 입력란"
+        },
+        "yourDepositAmount": "내 입금 금액"
+    },
+
+    "chart": {
+        "liqPrice": "청산 가격"
+    }
+}

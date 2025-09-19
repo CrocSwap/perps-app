@@ -9,7 +9,7 @@ import {
     type UserTradeDataStore,
 } from './UserTradeDataStore';
 
-export type marginModesT = 'cross' | 'isolated';
+export type marginModesT = 'margin.cross.title' | 'margin.isolated.title';
 
 type TradeDataStore = UserTradeDataStore & {
     marginMode: marginModesT;
@@ -50,7 +50,7 @@ const useTradeDataStore = create<TradeDataStore>()(
     persist(
         (set, get) => ({
             ...createUserTradesSlice(set, get),
-            marginMode: 'cross',
+            marginMode: 'margin.cross.title',
             setMarginMode: (m: marginModesT) => set({ marginMode: m }),
             symbol: 'BTC',
             setSymbol: (symbol: string) => {
@@ -116,7 +116,7 @@ const useTradeDataStore = create<TradeDataStore>()(
             selectedCurrency: 'USD',
             setSelectedCurrency: (currency: string) =>
                 set({ selectedCurrency: currency }),
-            selectedTradeTab: 'Positions',
+            selectedTradeTab: 'common.positions',
             setSelectedTradeTab: (tab: string) => {
                 set({ selectedTradeTab: tab });
             },
@@ -148,7 +148,7 @@ const useTradeDataStore = create<TradeDataStore>()(
         }),
         {
             name: 'TRADE_DATA',
-            version: 1, // Bump version for migration!
+            version: 3, // Bump version for migration!
             migrate: (persistedState: unknown, version: number) => {
                 if (version < 1) {
                     const currentFavKeys =
@@ -166,6 +166,13 @@ const useTradeDataStore = create<TradeDataStore>()(
                         favKeys: currentFavKeys,
                     };
                 }
+                if (version < 3) {
+                    return {
+                        ...(persistedState as TradeDataStore),
+                        selectedTradeTab: 'common.positions',
+                        marginMode: 'margin.cross.title',
+                    };
+                }
                 return persistedState ?? {};
             },
             partialize: (state) => ({
@@ -173,8 +180,8 @@ const useTradeDataStore = create<TradeDataStore>()(
                 favKeys: state.favKeys,
                 symbol: state.symbol,
                 selectedTradeTab:
-                    state.selectedTradeTab === 'Balances'
-                        ? 'Positions'
+                    state.selectedTradeTab === 'common.balances'
+                        ? 'common.positions'
                         : state.selectedTradeTab,
                 userNonFundingLedgerUpdates: state.userNonFundingLedgerUpdates,
                 isTradeInfoExpanded: state.isTradeInfoExpanded,

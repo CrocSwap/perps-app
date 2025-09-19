@@ -1,0 +1,529 @@
+{
+    "common": {
+        "yes": "はい",
+        "no": "いいえ",
+        "cancel": "キャンセル",
+        "save": "保存",
+        "delete": "削除",
+        "edit": "編集",
+        "close": "閉じる",
+        "loading": "読み込み中...",
+        "confirming": "確認中...",
+        "processing": "処理中...",
+        "error": "エラー",
+        "success": "成功",
+        "applyDefaults": "デフォルトを適用",
+        "learnMore": "詳細はこちら",
+        "deposit": "入金",
+        "transfer": "送金",
+        "withdraw": "出金",
+        "submit": "送信",
+        "quantity": "数量",
+        "confirm": "確認",
+        "amount": "金額",
+        "max": "最大",
+        "min": "最小",
+        "positions": "ポジション",
+        "balances": "残高",
+        "openOrders": "未約定注文",
+        "tradeHistory": "取引履歴",
+        "fundingHistory": "ファンディング履歴",
+        "orderHistory": "注文履歴",
+        "depositsAndWithdrawals": "入出金",
+        "twap": "TWAP",
+        "all": "すべて",
+        "active": "アクティブ",
+        "long": "ロング",
+        "short": "ショート",
+        "create": "作成",
+        "update": "更新",
+        "reset": "リセット",
+        "announcements": "お知らせ",
+        "leverage": "レバレッジ",
+        "comingSoon": "近日公開"
+    },
+    "transactions": {
+        "orderTypes": "注文タイプ",
+        "marginMode": "証拠金モード",
+        "scaleOptions": "スケールオプション",
+        "confirmBuyOrder": "買い注文を確認",
+        "confirmSellOrder": "売り注文を確認",
+        "confirmLimitBuyOrder": "指値買い注文を確認",
+        "confirmLimitSellOrder": "指値売り注文を確認",
+        "availableToTrade": "取引可能残高",
+        "availableToTradeTooltip": "{{symbol}}が入金済み",
+        "currentPosition": "現在のポジション",
+        "currentPositionTooltip": "現在の{{symbol}}ポジションサイズ",
+        "maxOpenInterestReached": "最大建玉数に達しました",
+        "depositToTrade": "取引用に入金",
+        "switchDirectionToReduce": "減少のため方向切り替え",
+        "maxLongDepositToTrade": "Max Long - 取引用に入金",
+        "maxShortDepositToTrade": "Max Short - 取引用に入金",
+        "minimumOr100Percent": "最小または100％",
+        "minimum": "最小",
+        "invalidPrice": "無効な価格",
+        "orderSizeBelowMinimum": "注文サイズが最小値未満です",
+        "orderSizeExceedsPositionLimits": "注文サイズがポジション限度を超えています",
+        "insufficientCollateral": "証拠金不足",
+        "reduceOnlyExceedsPositionSize": "Reduce Only量がポジションサイズを超えています",
+        "processingOrder": "注文処理中...",
+        "positionLimitReached": "ポジション限度に達しました",
+        "limitOrderFailed": "指値注文失敗",
+        "unknownErrorOccurred": "不明なエラーが発生しました",
+        "failedToPlaceLimitOrder": "指値注文を出せませんでした",
+        "sellShortLimitOrderPlaced": "売り / Short 指値注文発注済み",
+        "sellShortLimitOrderPending": "売り / Short 指値注文保留中",
+        "successfullyPlacedSellOrderFor": "{{usdValueOfOrderStr}} {{symbol}} の売り注文（価格：{{limitPrice}}）を発注しました",
+        "placingSellShortLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} の指値売り注文（価格：{{limitPrice}}）を発注しています",
+        "enterValidLimitPrice": "有効な指値価格を入力してください",
+        "enterValidOrderSize": "有効な注文サイズを入力してください",
+        "buyLongLimitOrderPlaced": "買い / Long 指値注文発注済み",
+        "successfullyPlacedBuyOrderFor": "{{usdValueOfOrderStr}} {{symbol}} の買い注文（価格：{{limitPrice}}）を発注しました",
+        "buyLongLimitOrderPending": "買い / Long 指値注文保留中",
+        "placingBuyLongLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} の指値買い注文（価格：{{limitPrice}}）を発注しています",
+        "priceDistribution": "価格分布",
+        "flat": "フラット",
+        "flatPriceDistribution": "フラットな価格分布",
+        "evenlySplit": "均等分割",
+        "evenPriceDistribution": "均等価格分布",
+        "market": "成行",
+        "limit": "指値",
+        "price": "価格",
+        "size": "サイズ",
+        "time": "時間",
+        "total": "合計",
+        "action": "アクション",
+        "ratio": "比率",
+        "buyLong": "買い / Long",
+        "sellShort": "売り / Short",
+        "confirmingTransaction": "取引を確認中...",
+        "processing": "処理中...",
+        "dontShowThisAgain": "これを再表示しない",
+        "estLiquidationPrice": "推定清算価格",
+        "estimatedPriceAtWhichPosWillBeLiquidated": "ポジションの推定清算価格",
+        "orderValue": "注文金額",
+        "hideSmallBalances": "少額残高を非表示",
+        "increasing": "増加中",
+        "decreasing": "減少中",
+        "totalOrders": "注文総数",
+        "orderRatioSumMustBe100": "注文比率合計は100％でなければなりません",
+        "collapseDetails": "詳細を折りたたむ",
+        "expandDetails": "詳細を展開",
+        "frequency": "頻度",
+        "runTime": "稼働時間",
+        "numberOfOrders": "注文数",
+        "chasingInterval": "追従間隔",
+        "sizePerSuborder": "サブ注文ごとのサイズ",
+        "avgEntryPrice": "平均エントリー価格",
+        "averageEntryPrice": "平均エントリー価格",
+        "marginRequired": "必要証拠金",
+        "maxPosSizeLimitedByOiCap": "最大ポジションサイズは建玉上限で制限されます",
+        "openPositionIsXSwitchToY": "オープンポジション: {{x}}。{{y}}に切替。",
+        "buySellAtCurrentPrice": "現行価格で買い/売り",
+        "buySellAtSpecificPrice": "指定価格で買い/売り",
+        "maxTradeSizeLimitedTo": "最大取引サイズに制限あり",
+        "yourPositionIsLimitedByOpenInterest": "あなたの{{coin}}ポジションは{{limitedBy}}上限で制限されています",
+        "currentMaxTradeSizeForMarket": "この市場の最大取引サイズ: {{limit}}",
+        "placingLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}}の指値注文（価格：{{limitPrice}}）発注中",
+        "sellOrderPending": "売り注文保留中",
+        "orderSubmittedFor": "{{usdValueOfOrderStr}} {{symbol}}の注文が送信されました",
+        "buyOrderPending": "買い注文保留中",
+        "buyOrderSuccessful": "買い注文成功",
+        "successfullyBought": "{{usdValueOfOrderStr}} {{symbol}}購入完了",
+        "sellOrderSuccessful": "売り注文成功",
+        "successfullySold": "{{usdValueOfOrderStr}} {{symbol}}売却完了",
+        "sellOrderFailed": "売り注文失敗",
+        "transactionFailed": "取引失敗",
+        "buyOrderFailed": "買い注文失敗",
+        "closeFailed": "ポジション終了失敗",
+        "closeFailedTitle": "終了失敗",
+        "liquidationPrice": "清算価格",
+        "enterPrice": "価格を入力",
+        "enterSize": "サイズを入力",
+        "totalSize": "合計サイズ",
+        "cancelling": "キャンセル中...",
+        "midButton": "MID",
+        "positionClosed": "ポジション終了",
+        "successfullyClosedPosition": "{{usdValueOfOrderStr}} {{symbol}}ポジションの終了完了",
+        "failedToClosePosition": "ポジション終了失敗",
+        "transactionTimedOut": "取引が{{timeInSeconds}}秒後タイムアウト",
+        "txFailedOrNotConfirmed": "取引失敗または未確認",
+        "walletBalance": "ウォレット残高",
+        "walletBalanceTooltip": "現在のウォレット残高",
+        "depositSuccessful": "入金成功",
+        "successfullyDeposited": "{{amount}} {{unit}}入金完了",
+        "despositFailed": "入金失敗",
+        "withdrawalSuccessful": "出金成功",
+        "successfullyWithdrawn": "{{amount}} {{unit}}出金完了",
+        "withdrawFailed": "出金失敗",
+        "availableToDeposit": "入金可能額",
+        "availableToDepositTooltip": "ボールト容量・ウォレット残高に基づく入金可能額",
+        "availableToWithdraw": "出金可能額",
+        "availableToWithdrawTooltip": "ポートフォリオから出金可能な総額",
+        "invalidAmount": "無効な金額",
+        "depositToVault": "{{vaultName}}に{{unitValue}}を入金",
+        "depositToVaultMsg": "{{vaultName}}で運用するため{{unitValue}}を入金します。入金は次回エポック後に出金可能となります。",
+        "txFailedTryAgain": "取引失敗。再度お試しください。",
+        "minDepositAmountIs": "最低入金額は${{amount}}です",
+        "enterAmountMin10": "金額を入力（最低$10）",
+        "cancellingAllOrders": {
+            "title": "全注文キャンセル中",
+            "message": "{{count}}件の{{noun}}をキャンセルしています..."
+        },
+        "cancelOrderPending": {
+            "title": "注文キャンセル保留中",
+            "message": "{{usdValueOfOrderStr}}の{{symbol}}注文キャンセル中"
+        },
+        "cancelOrderConfirmed": {
+            "title": "注文キャンセル完了",
+            "message": "{{usdValueOfOrderStr}}の{{symbol}}注文を正常にキャンセルしました"
+        },
+        "cancelFailed": {
+            "title": "キャンセル失敗",
+            "message": "注文IDが見つかりません",
+            "message2": "注文のキャンセル失敗"
+        },
+        "cancelLimitPending": {
+            "title": "指値注文キャンセル保留中",
+            "message": "{{usdValueOfOrderStr}}の{{symbol}} {{side}}指値注文キャンセル中"
+        },
+        "cancelLimitConfirmed": {
+            "title": "注文キャンセル完了",
+            "message": "{{usdValueOfOrderStr}}の{{symbol}} {{side}}指値注文を正常にキャンセルしました"
+        },
+        "failedToUpdatedOrder": {
+            "title": "注文更新失敗"
+        },
+        "orderUpdated": {
+            "title": "注文更新完了",
+            "message": "{{usdValueOfOrderStr}}の{{symbol}}注文を{{limitPrice}}で正常に更新しました"
+        },
+        "orderFilled": {
+            "title": "{{side}}注文約定",
+            "message": "{{usdValueOfFillStr}}の{{symbol}} {{side}}注文が{{fillPrice}}で約定完了"
+        },
+        "errorUpdatingOrder": {
+            "title": "注文更新エラー"
+        },
+        "cancelAllFailed": {
+            "title": "全注文キャンセル失敗",
+            "message": "注文をキャンセルできませんでした。"
+        },
+        "cancelAllConfirmed": {
+            "title": "全注文キャンセル完了",
+            "message": "すべての{{count}}件の注文を正常にキャンセルしました"
+        },
+        "cancelAllPartialSuccess": {
+            "title": "部分成功",
+            "message": "{{successCount}}件キャンセル、{{failedCount}}件失敗"
+        },
+        "noOpenOrders": "未約定注文なし",
+        "transactionError": "取引エラー",
+        "invalidLimitPrice": {
+            "title": "無効な価格",
+            "message": "正しい指値価格を入力してください"
+        },
+        "invalidOrderSize": {
+            "title": "無効な注文サイズ",
+            "message": "正しい注文サイズを入力してください"
+        },
+        "leverageUpdated": {
+            "title": "レバレッジ更新完了",
+            "message": "レバレッジ{{leverage}}倍に正常に更新されました"
+        },
+        "leverageUpdateFailed": {
+            "title": "取引失敗",
+            "message": "レバレッジ更新失敗"
+        },
+        "viewOnExplorer": "エクスプローラーで表示",
+        "limitOrderUpdatePending": {
+            "title": "指値注文更新保留中",
+            "message": "{{coin}}の{{value}} {{side}}注文を{{limitPrice}}で更新中"
+        },
+        "filled": "約定済み",
+        "open": "有効",
+        "partiallyFilled": "一部約定",
+        "canceled": "取消済み",
+        "pending": "保留中"
+    },
+    "subaccounts": {
+        "createSubAccount": "サブアカウント作成",
+        "createSubAccountPH": "例: サブアカウント1",
+        "created": {
+            "title": "サブアカウント作成完了",
+            "message": "新しい戦略用サブアカウント {{name}} が作成されました",
+            "message2": "新しい裁量サブアカウント {{name}} を作成しました"
+        }
+    },
+    "strategies": {
+        "newStrategy": "新しい戦略",
+        "editStrategy": "戦略を編集"
+    },
+    "margin": {
+        "cross": {
+            "title": "クロス",
+            "heading": "クロスマージン",
+            "blurb": "すべてのクロスポジションは同じ証拠金を担保として共有します。清算されると、証拠金残高および残っているオープンポジションは失われます。"
+        },
+        "isolated": {
+            "title": "アイソレート",
+            "heading": "アイソレートモード",
+            "blurb": "個別ポジションごとに証拠金の割り当てを制限してリスクを管理します。アイソレートポジションの証拠金比率が100％に達すると清算されます。個別に証拠金を増減できます。"
+        }
+    },
+    "tradeTable": {
+        "selectATabToViewData": "データ表示するタブを選択してください",
+        "time": "時間",
+        "type": "タイプ",
+        "coin": "通貨",
+        "direction": "方向",
+        "size": "数量",
+        "filledSize": "約定数量",
+        "orderValue": "注文金額",
+        "price": "価格",
+        "tradeValue": "取引金額",
+        "fee": "手数料",
+        "closedPnl": "確定損益",
+        "reduceOnly": "Reduce Only",
+        "triggerConditions": "発動条件",
+        "tpsl": "TP/SL",
+        "status": "ステータス",
+        "order": "注文",
+        "long": "Long",
+        "short": "Short",
+        "noOpenPositions": "未決済ポジションなし",
+        "markPrice": "参考価格",
+        "orderId": "注文ID",
+        "totalBalance": "合計残高",
+        "availableBalance": "利用可能残高",
+        "currencyValue": "{{currency}}の価値",
+        "buyingPower": "購入可能額",
+        "contract": "契約",
+        "positionValue": "ポジション価値",
+        "entryPrice": "約定価格",
+        "pnl": "損益（ROE%）",
+        "liqPrice": "清算価格",
+        "margin": "証拠金",
+        "funding": "資金調達",
+        "close": "ポジションを決済",
+        "originalSize": "元のサイズ",
+        "cancelAll": "すべてキャンセル",
+        "noTradeHistory": "取引履歴なし",
+        "noOrderHistory": "注文履歴なし",
+        "noFundingHistory": "資金調達履歴なし",
+        "fundingHistory": "通算: {{allTime}} 変更後: {{sinceChange}}",
+        "openLong": "Long新規",
+        "openShort": "Short新規",
+        "closeLong": "Long決済",
+        "closeShort": "Short決済"
+    },
+    "time": {
+        "second": "秒",
+        "seconds": "秒",
+        "minute": "分",
+        "minutes": "分",
+        "hour": "時間",
+        "hours": "時間",
+        "day": "日",
+        "days": "日",
+        "week": "週",
+        "weeks": "週",
+        "month": "月",
+        "months": "月",
+        "year": "年",
+        "years": "年"
+    },
+    "navigation": {
+        "home": "ホーム",
+        "about": "概要",
+        "contact": "お問い合わせ",
+        "settings": "設定",
+        "profile": "プロフィール",
+        "logout": "ログアウト",
+        "trade": "取引",
+        "chart": "チャート",
+        "book": "注文板",
+        "recent": "最新",
+        "positions": "ポジション"
+    },
+    "auth": {
+        "login": "ログイン",
+        "register": "登録",
+        "email": "メール",
+        "password": "パスワード",
+        "forgotPassword": "パスワードを忘れた場合",
+        "loginSuccess": "ログイン成功",
+        "loginError": "無効な認証情報"
+    },
+    "forms": {
+        "name": "氏名",
+        "firstName": "名",
+        "lastName": "姓",
+        "phone": "電話",
+        "address": "住所",
+        "submit": "送信",
+        "required": "この項目は必須です"
+    },
+    "messages": {
+        "welcome": "ようこそ",
+        "hello": "{{name}}さん、こんにちは！",
+        "goodbye": "さようなら",
+        "thankYou": "ありがとうございます",
+        "pleaseWait": "お待ちください…",
+        "connectWalletForTrading": "ガス手数料ゼロで取引するためにウォレットを接続してください。"
+    },
+    "home": {
+        "title": "Ambientでパーペチュアル取引",
+        "subtitle": "高速執行。テイカー手数料ゼロ。最大100倍レバレッジ。",
+        "startTrading": "取引を開始",
+        "learnMore": "詳細はこちら",
+        "hero": {
+            "heading1": "ゼロから",
+            "one": "1",
+            "heading2": "分散型取引プロトコル",
+            "description": "Ambientは、ユニークなDeFi商品とCEX並みのユーザー体験を組み合わせた全く新しい分散型パーペチュアルDEXです",
+            "stats": {
+                "totalVolume": "総取引量",
+                "activeUsers": "アクティブユーザー"
+            }
+        }
+    },
+    "referrals": {
+        "title": "紹介",
+        "description": "ユーザーを紹介して報酬を獲得。アフィリエイトはより多く報酬を得られます。",
+        "tradersReferred": "紹介されたトレーダー",
+        "rewardsEarned": "獲得報酬"
+    },
+    "deposit": {
+        "prompt": "Fogoから{{token}}を入金",
+        "input_prompt": "金額を入力（最小${{MIN_DEPOSIT_AMOUNT}}）",
+        "availableToDeposit": "入金可能"
+    },
+    "withdraw": {
+        "prompt": "Fogoに{{token}}を出金",
+        "explanation": "{{token}}はあなたのアドレスに送信されます。",
+        "availableToWithdraw": "出金可能",
+        "input_prompt": "金額を入力（最小${{MIN_WITHDRAW_AMOUNT}}）"
+    },
+    "orderBook": {
+        "tab": "タブ",
+        "stacked": "積み上げ",
+        "large": "大",
+        "book": "注文板",
+        "trades": "取引",
+        "spread": "スプレッド"
+    },
+    "appSettings": {
+        "title": "設定",
+        "skipOpenOrderConfirm": "注文確認をスキップ",
+        "enableTxNotifications": "取引通知を有効",
+        "enableBackgroundFillNotif": "バックグラウンド約定通知を有効",
+        "numberFormat": "数字形式",
+        "color": "色",
+        "language": "言語"
+    },
+    "symbolInfo": {
+        "mark": "マーク",
+        "markTooltip": "不公平な清算を防ぐために計算された推定公正価格",
+        "oracle": "オラクル",
+        "oracleTooltip": "Pyth Networkオラクルによるリアルタイム価格",
+        "oracleTooltipPythStale": "Pyth Networkオラクル（価格が古い可能性あり）",
+        "oracleTooltipNoPyth": "複数の著名な取引所から集計された外部市場価格",
+        "24hChange": "24時間変動",
+        "24hChangeTooltip": "直近24時間の価格変動",
+        "24hVolume": "24時間取引量",
+        "24hVolumeTooltip": "直近24時間の総取引量",
+        "openInterest": "建玉残高",
+        "openInterestTooltip": "市場の総建玉残高",
+        "fundingRate": "資金調達率",
+        "fundingRateTooltip": "ロング側がショート側に（または逆）支払う時間率。追加手数料なしでスポット市場と価格を揃えるためのP2P資金調達です。",
+        "fundingCountdown": "資金調達カウントダウン",
+        "fundingCountdownTooltip": "次の資金調達までの残り時間"
+    },
+    "feedback": {
+        "menuLabel": "フィードバック",
+        "title": "フィードバックを送信する",
+        "ratingPrompt": "体験をどのように評価しますか？",
+        "sendFeedback": "フィードバックを送信",
+        "positivePrompt": "最も良かった点は？",
+        "negativePrompt": "改善できる点は？",
+        "placeholder": "匿名のフィードバックは改善に役立ちます。",
+        "warningText": "フィードバックが長すぎるため切り捨てられます。",
+        "submitButtonText": "フィードバック送信",
+        "submittingButtonText": "送信中...",
+        "appreciateText": "フィードバックありがとうございました。",
+        "thanksText": "ありがとうございます！"
+    },
+    "accountOverview": {
+        "heading": "アカウント概要",
+        "balance": "残高",
+        "balanceTooltip": "総アカウント資産",
+        "unrealizedPnl": "未実現PnL",
+        "unrealizedPnlTooltip": "未実現損益"
+    },
+    "marketLimitClose": {
+        "marketHeading": "マーケットクローズ",
+        "marketDescription": "現在価格でポジションを閉じる注文を発注します。",
+        "minimumOr100Percent": "{{min}}最小または100％",
+        "noZeroSize": "サイズがゼロにできません",
+        "sizeExceedsPosition": "サイズはポジションを超えられません",
+        "invalidOrderSizeTitle": "無効な注文サイズ",
+        "invalidSize": "有効な注文サイズを入力してください",
+        "limitHeading": "指値クローズ",
+        "limitDescription": "指値価格でポジションを閉じる注文を発注します。",
+        "estimatedClosedPnl": "推定確定PnL（手数料なし）：{{estimatedPNL}}",
+        "positionClosed": "ポジションが閉鎖されました",
+        "percentOfPositionClosed": "ポジションの{{sizePercentageValue}}％を閉鎖"
+    },
+    "newVersion": {
+        "title": "新バージョン利用可能",
+        "message": {
+            "withVersionNumber": "バージョン{{version}}が新機能および改善点で利用可能です。",
+            "noVersionNumber": "新バージョンが新機能および改善点で利用可能です。"
+        },
+        "updateButton": "今すぐアップデート",
+        "version": "バージョン"
+    },
+    "leverage": {
+        "title": "レバレッジを調整",
+        "closePositionPrompt": "レバレッジを下げるにはポジション終了"
+    },
+    "share": {
+        "prompt": "テキストをカスタマイズ",
+        "xCTA": "𝕏で共有",
+        "copyLinkCTA": "リンクをコピー",
+        "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう"
+    },
+    "colors": {
+        "default": "デフォルト",
+        "opposite": "反転",
+        "deuteranopia": "色覚異常（緑）",
+        "tritanopia": "色覚異常（青）",
+        "protanopia": "色覚異常（赤）"
+    },
+    "aria": {
+        "closeAnnouncement": "お知らせを閉じる",
+        "closeFeedbackForm": "フィードバックフォームを閉じる",
+        "depositInput": "入金入力欄",
+        "addressInput": "住所入力欄",
+        "amountInput": "金額入力欄",
+        "withdrawInput": "出金入力欄",
+        "scrollTabsLeft": "タブを左へスクロール",
+        "scrollTabsRight": "タブを右へスクロール",
+        "leverageValue": "レバレッジ値",
+        "leverageAmount": "レバレッジ金額",
+        "setLeverageTo": "レバレッジを{{value}}倍に設定",
+        "positionSizePercentage": "ポジションサイズの割合",
+        "positionSizeValue": "ポジションサイズ値",
+        "totalOrders": "注文総数",
+        "runningPriceInput": {
+            "minutes": "稼働価格（分）入力欄",
+            "hours": "稼働価格（時間）入力欄"
+        },
+        "yourDepositAmount": "あなたの入金金額"
+    },
+
+    "chart": {
+        "liqPrice": "清算価格"
+    }
+}

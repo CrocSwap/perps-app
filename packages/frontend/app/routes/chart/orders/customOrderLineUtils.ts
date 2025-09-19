@@ -1,5 +1,6 @@
 import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
 import { getMainSeriesPaneIndex } from '../overlayCanvas/overlayCanvasUtils';
+import { t } from 'i18next';
 
 export type LineLabelType =
     | 'PNL'
@@ -23,7 +24,7 @@ export type LineLabel =
           triggerCondition: string;
           orderType: string;
       }
-    | { type: 'Liq'; text: ' Liq. Price' };
+    | { type: 'Liq'; text: string };
 
 export const addCustomOrderLine = async (
     chart: IChartingLibraryWidget,
@@ -323,10 +324,10 @@ export function formatLineLabel(label: LineLabel): string {
     switch (label.type) {
         case 'PNL': {
             const pnl = quantityTextFormatWithComma(Math.abs(label.pnl));
-            return ' PNL ' + (label.pnl > 0 ? `$${pnl}  ` : `-$${pnl} `);
+            return ' PnL ' + (label.pnl > 0 ? `$${pnl}  ` : `-$${pnl} `);
         }
         case 'Limit':
-            return ` Limit ${label.price}  ${label.triggerCondition} `;
+            return ` ${t('transactions.limit')} ${label.price}  ${label.triggerCondition} `;
         case 'Take Profit Market':
             return getTriggerConditionText(
                 label.triggerCondition,

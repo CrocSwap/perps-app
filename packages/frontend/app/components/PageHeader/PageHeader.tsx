@@ -32,7 +32,9 @@ import RpcDropdown from './RpcDropdown/RpcDropdown';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
+import { t } from 'i18next';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
+import { useTranslation } from 'react-i18next';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -106,7 +108,7 @@ export default function PageHeader() {
 
     // data to generate nav links in page header
     const navLinks = [
-        { name: 'Trade', path: `/v2/trade/${symbol}` },
+        { name: t('navigation.trade'), path: `/v2/trade/${symbol}` },
         // { name: 'Vaults', path: '/v2/vaults' },
         // { name: 'Portfolio', path: '/v2/portfolio' },
         // { name: 'Referrals', path: '/v2/referrals' },
@@ -298,7 +300,9 @@ export default function PageHeader() {
                                         }
                                     }}
                                 >
-                                    {isShortScreen ? 'Transfer' : 'Deposit'}
+                                    {isShortScreen
+                                        ? t('common.transfer')
+                                        : t('common.deposit')}
                                 </button>
                                 {isDepositDropdownOpen && (
                                     <DepositDropdown
@@ -447,7 +451,7 @@ export default function PageHeader() {
                 <Modal
                     close={() => appSettingsModal.close()}
                     position={'center'}
-                    title='Options'
+                    title={t('appSettings.title')}
                 >
                     <AppOptions />
                 </Modal>

@@ -1,6 +1,7 @@
 import React, { useState, type HTMLAttributes, type ReactNode } from 'react';
 import styles from './Announcement.module.css';
 import { GrClose } from 'react-icons/gr';
+import { t } from 'i18next';
 
 export type AnnouncementPosition =
     | 'bottom-right'
@@ -94,7 +95,7 @@ const Announcement: React.FC<AnnouncementProps> = ({
             <button
                 onClick={handleClose}
                 className={styles.closeButton}
-                aria-label='Close announcement'
+                aria-label={t('aria.closeAnnouncement')}
                 type='button'
             >
                 <GrClose size={20} />

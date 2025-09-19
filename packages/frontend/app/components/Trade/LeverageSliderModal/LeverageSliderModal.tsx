@@ -11,6 +11,7 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer, BTC_MAX_LEVERAGE } from '~/utils/Constants';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
+import { t } from 'i18next';
 
 interface LeverageSliderModalProps {
     currentLeverage: number;
@@ -112,8 +113,10 @@ export default function LeverageSliderModal({
 
                 // Show success notification
                 notificationStore.add({
-                    title: 'Leverage Updated',
-                    message: `Successfully set leverage to ${value.toFixed(1)}x`,
+                    title: t('transactions.leverageUpdated.title'),
+                    message: t('transactions.leverageUpdated.message', {
+                        leverage: value.toFixed(1),
+                    }),
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -127,8 +130,10 @@ export default function LeverageSliderModal({
 
                 // Show error notification and close modal
                 notificationStore.add({
-                    title: 'Transaction Failed',
-                    message: result.error || 'Failed to update leverage',
+                    title: t('transactions.leverageUpdateFailed.title'),
+                    message:
+                        result.error ||
+                        t('transactions.leverageUpdateFailed.message'),
                     icon: 'error',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -141,11 +146,11 @@ export default function LeverageSliderModal({
             const errorMessage =
                 error instanceof Error
                     ? error.message
-                    : 'Failed to update leverage';
+                    : t('transactions.leverageUpdateFailed.message');
 
             // Show error notification
             notificationStore.add({
-                title: 'Transaction Error',
+                title: t('transactions.leverageUpdateFailed.title'),
                 message: errorMessage,
                 icon: 'error',
             });
@@ -165,7 +170,7 @@ export default function LeverageSliderModal({
         useState<boolean>(false);
 
     return (
-        <Modal title='Adjust Leverage' close={onClose}>
+        <Modal title={t('leverage.title')} close={onClose}>
             <div className={styles.leverageSliderContainer}>
                 {/* Use the enhanced LeverageSlider component in modal mode */}
                 <div className={styles.sliderSection}>
@@ -206,7 +211,7 @@ export default function LeverageSliderModal({
                         bg='dark4'
                         disabled={isProcessing}
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </SimpleButton>
                     <SimpleButton
                         onClick={handleConfirm}
@@ -214,12 +219,12 @@ export default function LeverageSliderModal({
                         disabled={isProcessing || isLoading}
                     >
                         {transactionStatus === 'pending'
-                            ? 'Confirming...'
+                            ? t('common.confirming')
                             : isProcessing
-                              ? 'Processing...'
+                              ? t('common.processing')
                               : isLoading
-                                ? 'Loading...'
-                                : 'Confirm'}
+                                ? t('common.loading')
+                                : t('common.confirm')}
                     </SimpleButton>
                 </div>
             </div>
