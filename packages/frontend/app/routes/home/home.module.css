@@ -11,6 +11,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    display: none;
     /* font-size: 3rem;
 
   color: var(--text1); */

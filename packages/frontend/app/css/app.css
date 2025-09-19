@@ -74,3 +74,12 @@
         padding-right: var(--padding-s, 8px);
     }
 }
+
+html.modal-open,
+html.modal-open body {
+    overflow: hidden !important;
+}
+/* Prevent backdrop-filter from being clipped by ancestor overflow/transform */
+html.modal-open .root-container {
+    overflow: visible !important;
+}

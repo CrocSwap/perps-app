@@ -15,6 +15,7 @@
     overflow: hidden;
     /* Prevent swipe-up navigation gestures on iOS */
     overscroll-behavior: none;
+    color: var(--text1);
 }
 
 /* Special styling when keyboard is visible */
