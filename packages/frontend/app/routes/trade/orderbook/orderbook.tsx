@@ -67,9 +67,12 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     const orderClickDisabled = false;
 
-    const orderRowHeight = useMemo(() => {
+    const [orderRowHeight, setOrderRowHeight] = useState<number>(16);
+    useEffect(() => {
+        if (typeof document === 'undefined') return;
         const dummyOrderRow = document.getElementById('dummyOrderRow');
-        return dummyOrderRow?.getBoundingClientRect()?.height || 16;
+        const h = dummyOrderRow?.getBoundingClientRect()?.height;
+        if (h && Number.isFinite(h)) setOrderRowHeight(h);
     }, []);
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
@@ -88,7 +91,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
 
-    const rowLockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const rowLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
 
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
@@ -393,20 +398,28 @@ const OrderBook: React.FC<OrderBookProps> = ({
         ],
     );
 
+    // Deterministic pseudo-random generator based on index to avoid SSR hydration mismatches
+    const seededRandom = useCallback((n: number) => {
+        // Mulberry-like simple PRNG using only the index for determinism across server and client
+        let t = (n + 0x6d2b79f5) | 0;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296; // in [0,1)
+    }, []);
+
     const getRandWidth = useCallback(
         (index: number, inverse: boolean = false) => {
+            const jitter = seededRandom(index) * 20; // 0..20
             let rand;
             if (inverse) {
-                rand =
-                    100 / orderCount +
-                    index * (100 / orderCount) +
-                    Math.random() * 20;
+                rand = 100 / orderCount + index * (100 / orderCount) + jitter;
             } else {
-                rand = 100 - index * (100 / orderCount) + Math.random() * 20;
+                rand = 100 - index * (100 / orderCount) + jitter;
             }
-            return rand < 100 ? rand + '%' : '100%';
+            const clamped = Math.min(rand, 100);
+            return clamped + '%';
         },
-        [orderCount],
+        [orderCount, seededRandom],
     );
 
     return (

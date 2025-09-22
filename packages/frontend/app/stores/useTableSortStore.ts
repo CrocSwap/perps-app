@@ -17,6 +17,18 @@ interface TableSortStore<S> {
     ) => void;
 }
 
+const ssrSafeStorage = () =>
+    (typeof window !== 'undefined'
+        ? window.localStorage
+        : {
+              getItem: (_key: string) => null,
+              setItem: (_key: string, _value: string) => {},
+              removeItem: (_key: string) => {},
+              clear: () => {},
+              key: (_index: number) => null,
+              length: 0,
+          }) as Storage;
+
 export const useTableSortStore = create<TableSortStore<any>>()(
     persist(
         (set) => ({
@@ -31,7 +43,7 @@ export const useTableSortStore = create<TableSortStore<any>>()(
         }),
         {
             name: 'table-sort-store',
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(ssrSafeStorage),
         },
     ),
 );

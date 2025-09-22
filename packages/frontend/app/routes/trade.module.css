@@ -13,6 +13,7 @@ body {
     display: grid;
     grid-template-rows: 1fr var(--trade-tables-height-desktop);
     gap: var(--gap-s);
+    width: 600px;
 }
 
 .containerNew {

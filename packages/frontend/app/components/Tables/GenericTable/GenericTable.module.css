@@ -47,9 +47,10 @@
     box-sizing: border-box;
     overflow: hidden;
 }
+
 .tableBody::after {
-    content: '';
-    position: absolute;
+    content: '\00a0';
+    position: sticky;
     left: 0;
     right: 0;
     bottom: 0;

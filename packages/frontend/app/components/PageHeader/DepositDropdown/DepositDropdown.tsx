@@ -25,7 +25,7 @@ interface propsIF {
     isDropdown?: boolean;
     openDepositModal: () => void;
     openWithdrawModal: () => void;
-    PortfolioModalsRenderer: React.ReactNode;
+    // PortfolioModalsRenderer: React.ReactNode;
 }
 
 const tooltipSvg = (
@@ -58,7 +58,7 @@ function DepositDropdown(props: propsIF) {
         marginBucket,
         openDepositModal,
         openWithdrawModal,
-        PortfolioModalsRenderer,
+        // PortfolioModalsRenderer,
     } = props;
 
     const [balanceNum, setBalanceNum] = useState<number>(0);
@@ -292,7 +292,7 @@ function DepositDropdown(props: propsIF) {
                     </div>
                 )}
             </div>
-            {PortfolioModalsRenderer}
+            {/* {PortfolioModalsRenderer} */}
         </>
     );
 }

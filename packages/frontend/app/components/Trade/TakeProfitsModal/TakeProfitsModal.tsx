@@ -993,6 +993,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     }
                     label='Configure Amount'
                     reverse
+                    aria-label='Configure Amount toggle'
                 />
 
                 {form.isCustomAllocationEnabled && (
@@ -1026,6 +1027,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     }
                     label='Limit Price'
                     reverse
+                    aria-label='Limit Price toggle'
                 />
 
                 {form.isLimitOrderEnabled && (

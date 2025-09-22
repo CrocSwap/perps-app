@@ -80,8 +80,9 @@ const Pagination: React.FC<PaginationProps> = ({
                             }
                         }}
                         disabled={page === 0}
+                        aria-label='Previous page'
                     >
-                        <FaChevronLeft size={20} />
+                        <FaChevronLeft size={20} aria-hidden='true' />
                     </button>
 
                     <button
@@ -96,8 +97,9 @@ const Pagination: React.FC<PaginationProps> = ({
                         disabled={
                             page === Math.floor(totalCount / rowsPerPageState)
                         }
+                        aria-label='Next page'
                     >
-                        <FaChevronRight size={20} />
+                        <FaChevronRight size={20} aria-hidden='true' />
                     </button>
                 </div>
             </div>

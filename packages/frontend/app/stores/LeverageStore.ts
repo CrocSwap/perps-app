@@ -65,6 +65,15 @@ const DEFAULT_LEVERAGE = 1;
 const DEFAULT_MIN_LEVERAGE = 1;
 const DEFAULT_MAX_LEVERAGE_FALLBACK = 20;
 
+const ssrSafeStorage = () =>
+    (typeof window !== 'undefined'
+        ? window.localStorage
+        : {
+              getItem: () => null,
+              setItem: () => {},
+              removeItem: () => {},
+          }) as Storage;
+
 export const useLeverageStore = create<LeverageStore>()(
     persist(
         (set, get) => ({
@@ -227,7 +236,7 @@ export const useLeverageStore = create<LeverageStore>()(
         }),
         {
             name: 'leverage-store',
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(ssrSafeStorage),
         },
     ),
 );

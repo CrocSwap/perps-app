@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 const AnimatedPath = ({
     color1 = '#1E1E24', // First color
     color2 = '#7371FC', // Second color
@@ -8,8 +10,10 @@ const AnimatedPath = ({
     strokeWidth = '1', // Default stroke width
     className = '', // Allow custom className
 }) => {
-    const gradientId1 = `gradient1-${Math.random().toString(36).substr(2, 9)}`;
-    const gradientId2 = `gradient2-${Math.random().toString(36).substr(2, 9)}`;
+    // Use deterministic IDs to avoid SSR hydration mismatches
+    const uid = useId();
+    const gradientId1 = `gradient1-${uid}`;
+    const gradientId2 = `gradient2-${uid}`;
 
     // Constructing the colors array using color1, color2, and color3
     const colors = [color1, color2, color3, color1];

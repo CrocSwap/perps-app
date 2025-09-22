@@ -84,6 +84,14 @@ export type accountLevelsT = keyof typeof MOCK_ACCOUNTS;
 const LS_KEY = 'subaccounts';
 
 // hook to manage global state and local storage
+const ssrSafeStorage = () =>
+    (typeof window !== 'undefined'
+        ? window.localStorage
+        : {
+              getItem: () => null,
+              setItem: () => {},
+              removeItem: () => {},
+          }) as Storage;
 export const useAccounts = create<useAccountsIF>()(
     // persist data in local storage (only values, not reducers)
     persist(
@@ -92,7 +100,7 @@ export const useAccounts = create<useAccountsIF>()(
             // ... data from local storage will re-hydrate if present
             ...MOCK_ACCOUNTS,
             // add a new sub-account
-            create: (name: string, g: subaccountGroupT): void =>
+            create: (name: string, g: subaccountGroupT): void => {
                 set({
                     sub: get().sub.concat(
                         new Account(
@@ -102,15 +110,18 @@ export const useAccounts = create<useAccountsIF>()(
                             g,
                         ),
                     ),
-                }),
+                });
+            },
             // reset to only the default mock data
-            reset: (): void => set(MOCK_ACCOUNTS),
+            reset: (): void => {
+                set(MOCK_ACCOUNTS);
+            },
         }),
         {
             // key for local storage
             name: LS_KEY,
             // format and destination of data
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(ssrSafeStorage),
         },
     ),
 );

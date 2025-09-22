@@ -137,7 +137,7 @@ export class WebSocketInstance {
             errorCallback?: ErrCallback;
         }
     > = {};
-    private pingInterval: number | null = null;
+    private pingInterval: ReturnType<typeof setInterval> | null = null;
     private stopped: boolean = false;
     private isDebug: boolean;
     private baseUrl: string;
@@ -146,13 +146,13 @@ export class WebSocketInstance {
     private numWorkers: number;
     private jsonParserWorkerBlobUrl: string | null = null;
     private pongReceived: boolean = false;
-    private pongTimeout: NodeJS.Timeout | null = null;
+    private pongTimeout: ReturnType<typeof setTimeout> | null = null;
     private sleepMode: boolean = false;
     private pongCheckLock: boolean = false;
     private pingIntervalMs: number;
     private firstMessageLogged: boolean = false;
     private isConnecting: boolean = false;
-    private reconnectTimeout: NodeJS.Timeout | null = null;
+    private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
     private reconnectAttempts: number = 0;
     private readonly maxReconnectAttempts = 20; // Maximum number of reconnection attempts before giving up
     private readonly initialReconnectDelay = 1000; // Start with 1 second

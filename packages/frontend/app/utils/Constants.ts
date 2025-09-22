@@ -168,13 +168,14 @@ export const POLLING_API_INFO_ENDPOINT =
 export const MARKET_INFO_ENDPOINT =
     import.meta.env.VITE_MARKET_INFO_ENDPOINT || MARKET_API_URL + '/info';
 
+// Use secure WebSocket endpoints by default
 export const MARKET_WS_ENDPOINT =
-    import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_MARKET_WS_ENDPOINT || 'wss://api.hyperliquid.xyz';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const USER_WS_ENDPOINT =
     import.meta.env.VITE_USER_WS_ENDPOINT ||
-    'https://embindexer.net/ember/tradesocket';
+    'wss://embindexer.net/ember/tradesocket';
 
 export const blockExplorer =
     import.meta.env.VITE_BLOCK_EXPLORER || 'https://fogoscan.com';
@@ -196,7 +197,7 @@ console.log('Market WS Endpoint:', MARKET_WS_ENDPOINT);
 console.log('User WS Endpoint:', USER_WS_ENDPOINT);
 
 export const wsUrls = [
-    MARKET_WS_ENDPOINT + '/ws',
+    MARKET_WS_ENDPOINT,
     'wss://pulse-api-mock.liquidity.tools/ws',
     'wss://api-ui.hyperliquid.xyz/ws',
 ];
