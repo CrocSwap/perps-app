@@ -18,6 +18,7 @@ import MobileFooter from './components/MobileFooter/MobileFooter';
 import WebSocketDebug from './components/WebSocketDebug/WebSocketDebug';
 import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import { Fuul } from '@fuul/sdk';
 
 // Providers
 import { AppProvider } from './contexts/AppContext';
@@ -29,6 +30,7 @@ import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
 
 // Config
 import {
+    FUUL_API_KEY,
     MARKET_WS_ENDPOINT,
     RPC_ENDPOINT,
     USER_WS_ENDPOINT,
@@ -44,6 +46,7 @@ import './css/index.css';
 import { getResolutionSegment } from './utils/functions/getSegment';
 import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndicator';
 import { GlobalModalHost } from './components/Modal/GlobalModalHost';
+import PageViewTracker from './components/PageViewTracker/PageViewTracker';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -287,6 +290,8 @@ export default function App() {
                                             <WsConnectionChecker />
                                             <WebSocketDebug />
                                             <div className='root-container'>
+                                                {/* Track page views */}
+                                                <PageViewTracker />
                                                 <PageHeader />
                                                 <main
                                                     className={`content ${isHomePage ? 'home-page' : ''}`}
