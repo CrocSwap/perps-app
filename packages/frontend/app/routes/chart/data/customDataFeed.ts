@@ -19,18 +19,24 @@ import {
     updateCandleCache,
     updateMarkDataWithSubscription,
 } from './candleDataCache';
-import { processWSCandleMessage } from './processChartData';
+import {
+    processLastCandleWithPx,
+    processWSCandleMessage,
+} from './processChartData';
 import {
     convertResolutionToIntervalParam,
     mapResolutionToInterval,
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
+    getCurrentCandleTime,
 } from './utils/utils';
+import type { Bar } from '~/tv/charting_library';
 
 const subscriptions = new Map<string, { unsubscribe: () => void }>();
 
 export type CustomDataFeedType = IDatafeedChartApi & {
     updateUserAddress: (address: string) => void;
+    updateLastPrice: (symbol: string, price: number) => void;
 } & { onReady(callback: OnReadyCallback): void };
 
 export const createDataFeed = (
@@ -41,8 +47,14 @@ export const createDataFeed = (
     const updateUserAddress = (newAddress: string) => {
         currentUserAddress = newAddress;
     };
+    let lastBarMap: Map<string, Bar | null> = new Map();
+    let lastPriceMap: Map<string, number> = new Map();
+    const updateLastPrice = (symbol: string, price: number) => {
+        lastPriceMap.set(symbol, price);
+    };
     const datafeed: IDatafeedChartApi & {
         updateUserAddress: (address: string) => void;
+        updateLastPrice: (symbol: string, price: number) => void;
     } = {
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
             onResult([]);
@@ -95,6 +107,8 @@ export const createDataFeed = (
             const { from, to } = periodParams;
             const symbol = symbolInfo.ticker;
 
+            const currentCandleTime = getCurrentCandleTime(resolution);
+
             if (symbol) {
                 try {
                     const bars = await getHistoricalData(
@@ -103,6 +117,26 @@ export const createDataFeed = (
                         from,
                         to,
                     );
+
+                    if (bars && bars.length > 0) {
+                        const last = bars.reduce((latest, current) => {
+                            return current.time > latest.time
+                                ? current
+                                : latest;
+                        });
+                        const lastBar = lastBarMap.get(
+                            `${symbol}-${resolution}`,
+                        );
+                        if (lastBar) {
+                            if (last.time > lastBar.time) {
+                                lastPriceMap.set(symbol, last.close);
+                                lastBarMap.set(`${symbol}-${resolution}`, last);
+                            }
+                        } else {
+                            // lastBar = last;
+                            lastBarMap.set(`${symbol}-${resolution}`, last);
+                        }
+                    }
 
                     bars && onResult(bars, { noData: bars.length === 0 });
                 } catch (error) {
@@ -225,51 +259,52 @@ export const createDataFeed = (
         },
 
         subscribeBars: (symbolInfo, resolution, onTick, listenerGuid) => {
-            console.log(
-                '>>> subscribeBars',
-                symbolInfo,
-                resolution,
-                onTick,
-                listenerGuid,
-            );
-            if (!info) return console.log('SDK is not ready');
-
-            const intervalParam = convertResolutionToIntervalParam(resolution);
-
             const poller = setInterval(() => {
-                const currentTime = new Date().getTime();
-                fetch(`${POLLING_API_URL}/info`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        type: 'candleSnapshot',
-                        req: {
-                            coin: symbolInfo.ticker,
-                            interval: intervalParam,
-                            endTime: currentTime,
-                            startTime: currentTime - 1000 * 10,
-                        },
-                    }),
-                }).then((res) => {
-                    res.json().then((data) => {
-                        const candleData = data[0];
-                        if (
-                            symbolInfo.ticker &&
-                            candleData.s === symbolInfo.ticker
-                        ) {
-                            const tick = processWSCandleMessage(candleData);
-                            onTick(tick);
-                            updateCandleCache(
-                                symbolInfo.ticker,
-                                resolution,
-                                tick,
-                            );
-                        }
-                    });
-                });
-            }, TIMEOUT_CANDLE_POLLING);
+                const lastBar = lastBarMap.get(
+                    `${symbolInfo.ticker as string}-${resolution}`,
+                );
+                const lastPrice =
+                    lastPriceMap.get(symbolInfo.ticker as string) || 0;
+                if (!lastBar) return;
+                if (lastPrice === 0) return;
+
+                const currentCandleTime = getCurrentCandleTime(resolution);
+                let updatedBar;
+                if (lastBar.time < currentCandleTime) {
+                    onTick(lastBar);
+
+                    updatedBar = processLastCandleWithPx(
+                        lastBar as Bar,
+                        lastPrice,
+                        resolution,
+                        true,
+                    );
+                    lastBarMap.set(
+                        `${symbolInfo.ticker as string}-${resolution}`,
+                        updatedBar,
+                    );
+                    // lastBar = updatedBar;
+                } else {
+                    updatedBar = processLastCandleWithPx(
+                        lastBar as Bar,
+                        lastPrice,
+                        resolution,
+                    );
+                    // console.log(
+                    //     '>>> update bar as with last candle',
+                    //     updatedBar,
+                    // );
+                }
+
+                if (updatedBar) {
+                    onTick(updatedBar);
+                    updateCandleCache(
+                        symbolInfo.ticker as string,
+                        resolution,
+                        updatedBar,
+                    );
+                }
+            }, 200);
             const unsubscribe = () => clearInterval(poller);
             subscriptions.set(listenerGuid, { unsubscribe });
         },
@@ -295,6 +330,7 @@ export const createDataFeed = (
         },
 
         updateUserAddress,
+        updateLastPrice,
     } as CustomDataFeedType;
 
     return datafeed as CustomDataFeedType;

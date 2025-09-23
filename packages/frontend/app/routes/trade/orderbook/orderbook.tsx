@@ -32,6 +32,7 @@ import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 // import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 import type { TabType } from '~/routes/trade';
 import { useSdk } from '~/hooks/useSdk';
+import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
 
@@ -62,8 +63,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     switchTab,
 }) => {
     // TODO: Can be uncommented if we want to use the rest poller
-    // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
-    const { info } = useSdk();
+    // const { info } = useSdk();
 
     const orderClickDisabled = false;
 
@@ -279,26 +279,21 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [selectedResolution, symbol]);
 
     useEffect(() => {
-        console.log('>>> orderbook subKey', subKey);
-        if (!subKey || !info) return;
+        // if (!subKey || !info) return;
+        if (!subKey) return;
         setOrderBookState(TableState.LOADING);
         if (subKey) {
-            // subscribeToPoller(
-            //     'info',
-            //     subKey,
-            //     postOrderBookRaw,
-            //     TIMEOUT_OB_POLLING,
-            //     true,
-            // );
+            subscribeToPoller('info', subKey, postOrderBookRaw, 600, true);
 
-            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+            // const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
             return () => {
-                // unsubscribeFromPoller('info', subKey);
-                unsubscribe();
+                unsubscribeFromPoller('info', subKey);
+                // unsubscribe();
             };
         }
-    }, [subKey, info]);
+        // }, [subKey, info]);
+    }, [subKey]);
 
     const midHeader = useCallback(
         (id: string) => {

@@ -80,7 +80,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
-    const { symbol, addToFetchedChannels } = useTradeDataStore();
+    const { symbol, addToFetchedChannels, symbolInfo } = useTradeDataStore();
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
@@ -487,6 +487,15 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             chart.chart().refreshMarks();
         }
     }, [userAddress, chart, symbol]);
+
+    useEffect(() => {
+        if (symbolInfo) {
+            dataFeedRef.current?.updateLastPrice(
+                symbolInfo.coin,
+                symbolInfo.markPx,
+            );
+        }
+    }, [symbolInfo]);
 
     useEffect(() => {
         if (!chart) return;

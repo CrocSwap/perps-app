@@ -1,4 +1,4 @@
-import { POLLING_API_INFO_ENDPOINT } from '~/utils/Constants';
+import { getPollingApiUrl, POLLING_API_INFO_ENDPOINT } from '~/utils/Constants';
 
 export const fetchCandles = async (
     coin: string,
@@ -19,7 +19,8 @@ export const fetchCandles = async (
     };
 
     try {
-        const response = await fetch(POLLING_API_INFO_ENDPOINT, {
+        const url = getPollingApiUrl(requestBody);
+        const response = await fetch(`${url}/info`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody),
