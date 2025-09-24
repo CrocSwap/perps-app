@@ -207,8 +207,9 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             {/* Take Profit Row */}
             <div className={styles.formRow}>
                 <div className={styles.inputWithoutDropdown}>
-                    <p>SL Price</p>
+                    <label htmlFor='takeProfitPriceInput'>SL Price</label>
                     <input
+                        id='takeProfitPriceInput'
                         type='number'
                         value={takeProfitPrice}
                         onChange={(e) => {
@@ -218,8 +219,9 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     />
                 </div>
                 <div className={styles.inputWithDropdown}>
-                    <p>Gain</p>
+                    <label htmlFor='takeProfitGainInput'>Gain</label>
                     <input
+                        id='takeProfitGainInput'
                         type='number'
                         value={takeProfitGain}
                         onChange={(e) => {
@@ -254,8 +256,9 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             {/* Stop Loss Row */}
             <div className={styles.formRow}>
                 <div className={styles.inputWithoutDropdown}>
-                    <p>SL Price</p>
+                    <label htmlFor='stopLossPriceInput'>SL Price</label>
                     <input
+                        id='stopLossPriceInput'
                         type='number'
                         value={stopLossPrice}
                         onChange={(e) => {
@@ -265,8 +268,9 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     />
                 </div>
                 <div className={styles.inputWithDropdown}>
-                    <p>Loss</p>
+                    <label htmlFor='stopLossLossInput'>Loss</label>
                     <input
+                        id='stopLossLossInput'
                         type='number'
                         value={stopLossLoss}
                         onChange={(e) => {

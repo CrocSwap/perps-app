@@ -92,7 +92,9 @@
 }
 
 .inputWithoutDropdown p,
-.inputWithDropdown p {
+.inputWithDropdown p,
+.inputWithoutDropdown label,
+.inputWithDropdown label {
     margin: 0;
     white-space: nowrap;
     color: var(--text2);
