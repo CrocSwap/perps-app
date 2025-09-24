@@ -34,6 +34,7 @@ import type { TabType } from '~/routes/trade';
 import { useSdk } from '~/hooks/useSdk';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
+import { useInfoApi } from '~/hooks/useInfoApi';
 
 interface OrderBookProps {
     orderCount: number;
@@ -80,6 +81,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
         useState<OrderRowResolutionIF | null>(null);
 
     const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
+    const [canSubscribe, setCanSubscribe] = useState(false);
+
+    const canSubscribeRef = useRef(false);
+    canSubscribeRef.current = canSubscribe;
 
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
@@ -90,6 +95,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
+
+    const { fetchObSnapshot } = useInfoApi();
 
     const rowLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
@@ -174,6 +181,14 @@ const OrderBook: React.FC<OrderBookProps> = ({
         },
         [],
     );
+
+    const fetchOb = useCallback(async () => {
+        const { buys, sells } = await fetchObSnapshot(symbol);
+        setOrderBook(buys, sells);
+        setOrderBookState(TableState.FILLED);
+        setCanSubscribe(true);
+        canSubscribeRef.current = true;
+    }, [fetchObSnapshot, symbol, setOrderBook]);
 
     useEffect(() => {
         if (userOrdersRef.current.length === 0) {
@@ -279,26 +294,23 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [selectedResolution, symbol]);
 
     useEffect(() => {
-        console.log('>>> orderbook subKey', subKey);
-        if (!subKey || !info) return;
+        console.log('>>>> useEffect fetchob', symbol);
+        setCanSubscribe(false);
+        canSubscribeRef.current = false;
         setOrderBookState(TableState.LOADING);
-        if (subKey) {
-            // subscribeToPoller(
-            //     'info',
-            //     subKey,
-            //     postOrderBookRaw,
-            //     TIMEOUT_OB_POLLING,
-            //     true,
-            // );
+        fetchOb();
+    }, [symbol]);
 
-            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+    useEffect(() => {
+        if (!subKey || !info || !canSubscribeRef.current) return;
 
-            return () => {
-                // unsubscribeFromPoller('info', subKey);
-                unsubscribe();
-            };
-        }
-    }, [subKey, info]);
+        console.log('>>>> subscribe', subKey, canSubscribeRef.current);
+        const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+
+        return () => {
+            unsubscribe();
+        };
+    }, [canSubscribe, subKey, info]);
 
     const midHeader = useCallback(
         (id: string) => {

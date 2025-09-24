@@ -2,7 +2,10 @@ import type {
     OpenOrderRawData,
     OrderHistory,
 } from '@perps-app/sdk/src/utils/types';
-import { processUserOrder } from '~/processors/processOrderBook';
+import {
+    processOrderBookMessage,
+    processUserOrder,
+} from '~/processors/processOrderBook';
 import {
     processUserFills,
     processUserFundings,
@@ -10,7 +13,10 @@ import {
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
 import { processVaultDetails } from '~/processors/processVault';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import type {
+    OrderBookRowIF,
+    OrderDataIF,
+} from '~/utils/orderbook/OrderBookIFs';
 import type {
     SpotMetaIF,
     TokenDetailsIF,
@@ -348,6 +354,26 @@ export function useInfoApi() {
         return ret;
     };
 
+    const fetchObSnapshot = async (
+        symbol: string,
+    ): Promise<{
+        buys: OrderBookRowIF[];
+        sells: OrderBookRowIF[];
+    }> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: 'l2Book',
+                coin: symbol,
+            }),
+        });
+
+        const data = await response.json();
+        const { buys, sells } = processOrderBookMessage(data);
+        return { buys, sells };
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -362,5 +388,6 @@ export function useInfoApi() {
         fetchUserNonFundingLedgerUpdates,
         fetchTokenId,
         fetchTokenDetails,
+        fetchObSnapshot,
     };
 }
