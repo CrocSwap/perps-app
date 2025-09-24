@@ -228,3 +228,7 @@ export const SPLIT_TEST_VERSION =
 export const SHOULD_LOG_ANALYTICS =
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS &&
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS.toLowerCase() === 'true';
+
+export const IS_RESTRICTED_SITE =
+    import.meta.env.VITE_IS_RESTRICTED_SITE &&
+    import.meta.env.VITE_IS_RESTRICTED_SITE.toLowerCase() === 'true';

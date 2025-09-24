@@ -14,7 +14,7 @@ import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation, useSearchParams } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
-import { useShortScreen } from '~/hooks/useMediaQuery';
+import useMediaQuery, { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
@@ -158,7 +158,9 @@ export default function PageHeader() {
         [],
     );
 
-    const isShortScreen: boolean = useShortScreen();
+    const shortA = useShortScreen();
+    const shortB = useMediaQuery('(max-width: 600px)');
+    const isShortScreen: boolean = shortA || shortB;
 
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();

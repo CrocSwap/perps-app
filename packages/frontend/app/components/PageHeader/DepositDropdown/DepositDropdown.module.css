@@ -138,3 +138,9 @@
     text-align: center;
     font-size: var(--font-size-s, 12px);
 }
+
+@media (max-width: 600px) {
+    .dropdownContainer {
+        left: 0;
+    }
+}
