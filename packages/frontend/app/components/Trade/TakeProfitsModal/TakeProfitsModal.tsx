@@ -857,7 +857,9 @@ export default function TakeProfitsModal(props: PropIF) {
                         <ComboBox
                             value={form.takeProfitGainType}
                             options={currencyOptions}
-                            onChange={(val) => onTakeProfitGainTypeChange(val)}
+                            onChange={(val) =>
+                                onTakeProfitGainTypeChange(val as Currency)
+                            }
                             cssPositioning='fixed'
                         />
                     </div>
@@ -953,7 +955,9 @@ export default function TakeProfitsModal(props: PropIF) {
                         <ComboBox
                             value={form.stopLossAmountType}
                             options={currencyOptions}
-                            onChange={(val) => onStopLossAmountTypeChange(val)}
+                            onChange={(val) =>
+                                onStopLossAmountTypeChange(val as Currency)
+                            }
                             cssPositioning='fixed'
                         />
                     </div>
