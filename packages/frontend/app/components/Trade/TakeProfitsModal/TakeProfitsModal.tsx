@@ -261,22 +261,22 @@ export default function TakeProfitsModal(props: PropIF) {
     const expectedLoss = useMemo(() => {
         if (!Number.isFinite(stopLossTarget as number)) return null;
         const raw = computePnlAtPrice(stopLossTarget as number);
-        return Math.abs(raw);
+        return raw; // Keep the sign - negative means profit, positive means loss
     }, [stopLossTarget, computePnlAtPrice]);
 
     //-----------VALIDATIONS----------------------------
 
     // --- validity: TP must be in the profit direction relative to entry ---
-    const isTakeProfitInvalid =
-        Number.isFinite(takeProfitTarget as number) &&
-        ((isLong && (takeProfitTarget as number) <= entryPrice) ||
-            (!isLong && (takeProfitTarget as number) >= entryPrice));
+    const isTakeProfitInvalid = !Number.isFinite(takeProfitTarget as number);
+    // &&
+    // ((isLong && (takeProfitTarget as number) <= entryPrice) ||
+    //     (!isLong && (takeProfitTarget as number) >= entryPrice));
 
     // --- validity: SL must be in the loss direction relative to entry ---
-    const isStopLossInvalid =
-        Number.isFinite(stopLossTarget as number) &&
-        ((isLong && (stopLossTarget as number) >= entryPrice) ||
-            (!isLong && (stopLossTarget as number) <= entryPrice));
+    const isStopLossInvalid = !Number.isFinite(stopLossTarget as number);
+    // &&
+    // ((isLong && (stopLossTarget as number) >= entryPrice) ||
+    //     (!isLong && (stopLossTarget as number) <= entryPrice));
 
     // --- normalized distance from entry (for outlier warnings) ---
     const distanceFromEntryRatio = (target?: number) =>
@@ -369,16 +369,23 @@ export default function TakeProfitsModal(props: PropIF) {
         setForm((p) => {
             const next = { ...p, takeProfitPrice: v };
             const n = parsePrice(v);
-            if (Number.isFinite(n) && isTpDirectionValid(n)) {
+            if (Number.isFinite(n)) {
                 const dollars = computePnlAtPrice(n);
-                setUi((u) => ({ ...u, tpGainUSD: dollars }));
-                next.takeProfitGain =
+                const gainValue =
                     p.takeProfitGainType === '$'
-                        ? toInput(dollars)
-                        : toInput(pctFromDollars(dollars));
+                        ? Number(dollars.toFixed(2))
+                        : Number(pctFromDollars(dollars).toFixed(3));
+
+                // Update both UI state and form state for gain field
+                setUi((u) => ({
+                    ...u,
+                    tpGainUSD: dollars,
+                }));
+
+                // Update form state to reflect the calculated gain value
+                next.takeProfitGain = toInput(gainValue);
             } else {
                 setUi((u) => ({ ...u, tpGainUSD: null }));
-                next.takeProfitGain = '';
             }
             return next;
         });
@@ -390,68 +397,102 @@ export default function TakeProfitsModal(props: PropIF) {
         setForm((p) => {
             const next = { ...p, stopLossPrice: v };
             const n = parsePrice(v);
-            if (Number.isFinite(n) && isSlDirectionValid(n)) {
-                const dollars = Math.abs(computePnlAtPrice(n));
-                setUi((u) => ({ ...u, slLossUSD: dollars }));
-                next.stopLossAmount =
+            if (Number.isFinite(n)) {
+                const dollars = -1 * computePnlAtPrice(n);
+                const lossValue =
                     p.stopLossAmountType === '$'
-                        ? toInput(dollars)
-                        : toInput(pctFromDollars(dollars));
+                        ? Number(dollars.toFixed(2))
+                        : Number(pctFromDollars(dollars).toFixed(3));
+
+                // Update both UI state and form state for loss field
+                setUi((u) => ({
+                    ...u,
+                    slLossUSD: dollars,
+                }));
+
+                // Update form state to reflect the calculated loss value
+                next.stopLossAmount = toInput(lossValue);
             } else {
                 setUi((u) => ({ ...u, slLossUSD: null }));
-                next.stopLossAmount = '';
             }
             return next;
         });
     };
-    // --- user edits desired profit; derive/snap the corresponding TP price ---
+    // --- user edits desired profit; update gain value only ---
     const onTakeProfitGainChange = (v: string) => {
         setForm((p) => ({ ...p, takeProfitGain: v }));
         setUi((u) => ({ ...u, takeProfitInputMode: 'gain' }));
+
         const gain = parseFloat(v);
         if (Number.isFinite(gain) && effectiveQty > 0) {
-            // 1) update canonical dollars
             const dollars =
                 form.takeProfitGainType === '$' ? gain : dollarsFromPct(gain);
+
             if (Number.isFinite(dollars)) {
                 setUi((u) => ({
                     ...u,
                     tpGainUSD: Math.max(0, dollars as number),
                 }));
-            }
-            // 2) compute target price *from dollars*
-            // const perUnit = (dollars as number) / positionQuantity;
-            const perUnit = (dollars as number) / effectiveQty;
 
-            const next = isLong ? entryPrice + perUnit : entryPrice - perUnit;
-            setForm((p) => ({
-                ...p,
-                takeProfitPrice: snapPriceForInput(next),
-            }));
+                // Calculate and update the price based on gain/loss
+                const targetPrice =
+                    form.takeProfitGainType === '$'
+                        ? isLong
+                            ? entryPrice + gain / effectiveQty
+                            : entryPrice - gain / effectiveQty
+                        : entryPrice *
+                          (isLong ? 1 + gain / 100 : 1 - gain / 100);
+
+                if (targetPrice > 0) {
+                    const snappedPrice = roundToNearestIncrement(
+                        targetPrice,
+                        priceTickSize,
+                    );
+                    setForm((p) => ({
+                        ...p,
+                        takeProfitPrice: snapPriceForInput(snappedPrice),
+                    }));
+                }
+            }
         }
     };
 
-    // --- user edits tolerated loss; derive/snap the corresponding SL price ---
+    // --- user edits tolerated loss; update loss value only ---
     const onStopLossAmountChange = (v: string) => {
         setForm((p) => ({ ...p, stopLossAmount: v }));
         setUi((u) => ({ ...u, stopLossInputMode: 'loss' }));
+
         const loss = parseFloat(v);
         if (Number.isFinite(loss) && effectiveQty > 0) {
-            // 1) update canonical dollars (always positive for a loss)
             const dollars =
                 form.stopLossAmountType === '$' ? loss : dollarsFromPct(loss);
+
             if (Number.isFinite(dollars)) {
                 setUi((u) => ({
                     ...u,
                     slLossUSD: Math.max(0, dollars as number),
                 }));
-            }
-            // 2) compute target price from dollars
-            // const perUnit = (dollars as number) / positionQuantity;
-            const perUnit = (dollars as number) / effectiveQty;
 
-            const next = isLong ? entryPrice - perUnit : entryPrice + perUnit;
-            setForm((p) => ({ ...p, stopLossPrice: snapPriceForInput(next) }));
+                // Calculate and update the price based on gain/loss
+                const targetPrice =
+                    form.stopLossAmountType === '$'
+                        ? isLong
+                            ? entryPrice - loss / effectiveQty
+                            : entryPrice + loss / effectiveQty
+                        : entryPrice *
+                          (isLong ? 1 - loss / 100 : 1 + loss / 100);
+
+                if (targetPrice > 0) {
+                    const snappedPrice = roundToNearestIncrement(
+                        targetPrice,
+                        priceTickSize,
+                    );
+                    setForm((p) => ({
+                        ...p,
+                        stopLossPrice: snapPriceForInput(snappedPrice),
+                    }));
+                }
+            }
         }
     };
 
@@ -464,10 +505,11 @@ export default function TakeProfitsModal(props: PropIF) {
         setForm((p) => {
             const next = { ...p, takeProfitGainType: c };
             if (ui.tpGainUSD != null) {
-                next.takeProfitGain =
+                const formattedValue =
                     c === '$'
-                        ? toInput(ui.tpGainUSD)
-                        : toInput(pctFromDollars(ui.tpGainUSD));
+                        ? Number(ui.tpGainUSD.toFixed(2))
+                        : Number(pctFromDollars(ui.tpGainUSD).toFixed(3));
+                next.takeProfitGain = toInput(formattedValue);
             }
             return next;
         });
@@ -482,10 +524,11 @@ export default function TakeProfitsModal(props: PropIF) {
         setForm((p) => {
             const next = { ...p, stopLossAmountType: c };
             if (ui.slLossUSD != null) {
-                next.stopLossAmount =
+                const formattedValue =
                     c === '$'
-                        ? toInput(ui.slLossUSD)
-                        : toInput(pctFromDollars(ui.slLossUSD));
+                        ? Number(ui.slLossUSD.toFixed(2))
+                        : Number(pctFromDollars(ui.slLossUSD).toFixed(3));
+                next.stopLossAmount = toInput(formattedValue);
             }
             return next;
         });
@@ -502,14 +545,16 @@ export default function TakeProfitsModal(props: PropIF) {
         if (Number.isFinite(n)) {
             const snapped = roundToNearestIncrement(n, priceTickSize);
             const dollars = computePnlAtPrice(snapped);
+            const gainValue =
+                form.takeProfitGainType === '$'
+                    ? Number(dollars.toFixed(2))
+                    : Number(pctFromDollars(dollars).toFixed(3));
+
             setUi((u) => ({ ...u, tpGainUSD: Math.max(0, dollars) }));
             setForm((p) => ({
                 ...p,
                 takeProfitPrice: snapPriceForInput(snapped),
-                takeProfitGain:
-                    p.takeProfitGainType === '$'
-                        ? toInput(Math.max(0, dollars))
-                        : toInput(pctFromDollars(Math.max(0, dollars))),
+                takeProfitGain: toInput(gainValue),
             }));
         }
     };
@@ -525,14 +570,16 @@ export default function TakeProfitsModal(props: PropIF) {
         if (Number.isFinite(n)) {
             const snapped = roundToNearestIncrement(n, priceTickSize);
             const dollars = Math.abs(computePnlAtPrice(snapped));
+            const lossValue =
+                form.stopLossAmountType === '$'
+                    ? Number(dollars.toFixed(2))
+                    : Number(pctFromDollars(dollars).toFixed(3));
+
             setUi((u) => ({ ...u, slLossUSD: dollars }));
             setForm((p) => ({
                 ...p,
                 stopLossPrice: snapPriceForInput(snapped),
-                stopLossAmount:
-                    p.stopLossAmountType === '$'
-                        ? toInput(dollars)
-                        : toInput(pctFromDollars(dollars)),
+                stopLossAmount: toInput(lossValue),
             }));
         }
     };
@@ -731,13 +778,17 @@ export default function TakeProfitsModal(props: PropIF) {
     // POSITION SLIDER UPDATES
 
     useEffect(() => {
-        // TP -> update $ gain only
+        // TP -> update $ gain only if user hasn't manually entered a gain value
         const tpN = parsePrice(form.takeProfitPrice);
         if (Number.isFinite(tpN)) {
             const diff = isLong ? tpN - entryPrice : entryPrice - tpN;
             const gainUSD = Math.max(0, diff * effectiveQty);
             setUi((u) => ({ ...u, tpGainUSD: gainUSD }));
-            if (form.takeProfitGainType === '$') {
+            if (
+                form.takeProfitGainType === '$' &&
+                !ui.hasTakeProfitGainBeenTouched &&
+                form.takeProfitGain === ''
+            ) {
                 const next = toInput(gainUSD);
                 setForm((p) =>
                     p.takeProfitGain === next
@@ -747,13 +798,17 @@ export default function TakeProfitsModal(props: PropIF) {
             }
         }
 
-        // SL -> update $ loss only
+        // SL -> update $ loss only if user hasn't manually entered a loss value
         const slN = parsePrice(form.stopLossPrice);
         if (Number.isFinite(slN)) {
             const diff = isLong ? entryPrice - slN : slN - entryPrice;
-            const lossUSD = Math.max(0, diff * effectiveQty);
+            const lossUSD = diff * effectiveQty; // Keep the sign - negative means profit
             setUi((u) => ({ ...u, slLossUSD: lossUSD }));
-            if (form.stopLossAmountType === '$') {
+            if (
+                form.stopLossAmountType === '$' &&
+                !ui.hasStopLossAmountBeenTouched &&
+                form.stopLossAmount === ''
+            ) {
                 const next = toInput(lossUSD);
                 setForm((p) =>
                     p.stopLossAmount === next
@@ -770,6 +825,8 @@ export default function TakeProfitsModal(props: PropIF) {
         form.stopLossAmountType,
         entryPrice,
         isLong,
+        ui.hasTakeProfitGainBeenTouched,
+        ui.hasStopLossAmountBeenTouched,
     ]);
 
     return (
@@ -868,10 +925,15 @@ export default function TakeProfitsModal(props: PropIF) {
                 <div className={styles.expectedProfitContainer}>
                     {(form.takeProfitPrice || form.takeProfitGain) && (
                         <span className={styles.expectedProfitText}>
-                            Expected Profit:{' '}
+                            {expectedProfit && expectedProfit < 0
+                                ? 'Expected Loss'
+                                : 'Expected Profit'}
+                            :{' '}
                             {expectedProfit == null
                                 ? '—'
-                                : `$${expectedProfit.toFixed(2)}`}
+                                : form.takeProfitGainType === '$'
+                                  ? `${pctFromDollars(Math.abs(expectedProfit)).toFixed(3)}%`
+                                  : `$${Math.abs(expectedProfit).toFixed(2)}`}
                             {isTakeProfitInvalid &&
                                 showTakeProfitValidation && (
                                     <span className={styles.validationError}>
@@ -965,11 +1027,13 @@ export default function TakeProfitsModal(props: PropIF) {
 
                 <div className={styles.expectedProfitContainer}>
                     {(form.stopLossPrice || form.stopLossAmount) && (
-                        <span className={styles.expectedProfitText}>
-                            Expected Loss:{' '}
+                        <span className={styles.expectedLossText}>
+                            {`${expectedLoss && expectedLoss > 0 ? 'Expected Profit' : 'Expected Loss'}: `}
                             {expectedLoss == null
                                 ? '—'
-                                : `-$${expectedLoss.toFixed(2)}`}
+                                : form.stopLossAmountType === '%'
+                                  ? `$${Math.abs(expectedLoss).toFixed(2)}`
+                                  : `${pctFromDollars(Math.abs(expectedLoss)).toFixed(3)}%`}
                             {isStopLossInvalid && showStopLossValidation && (
                                 <span className={styles.validationError}>
                                     {' '}

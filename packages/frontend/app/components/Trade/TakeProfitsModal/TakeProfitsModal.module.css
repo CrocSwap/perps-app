@@ -151,7 +151,7 @@
     width: 100%;
     display: flex;
     justify-content: flex-end;
-    color: var(--green);
+    color: var(--text2);
     font-size: var(--font-size-s);
 }
 .formContainer input[type='number']::-webkit-outer-spin-button,
@@ -191,7 +191,7 @@
     width: 100%;
     display: flex;
     justify-content: flex-end;
-    color: var(--sell);
+    color: var(--text2);
     font-size: var(--font-size-s);
 }
 .warningContainer {
