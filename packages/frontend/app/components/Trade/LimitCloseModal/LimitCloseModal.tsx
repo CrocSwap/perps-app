@@ -17,6 +17,7 @@ import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 import PriceInput from '../OrderInput/PriceInput/PriceInput';
 import SizeInput from '../OrderInput/SizeInput/SizeInput';
 import styles from './LimitCloseModal.module.css';
+import { t } from 'i18next';
 
 interface PropsIF {
     close: () => void;
@@ -237,10 +238,11 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     };
 
     const getWarningMessage = () => {
-        if (Math.abs(notionalSymbolQtyNum) < 1e-8) return 'Size cannot be zero';
+        if (Math.abs(notionalSymbolQtyNum) < 1e-8)
+            return t('marketLimitClose.noZeroSize');
         if (notionalSymbolQtyNum > originalSize)
-            return 'Size cannot exceed your position';
-        if (notionalSymbolQtyNum < 0) return 'Please enter a valid size';
+            return t('marketLimitClose.sizeExceedsPosition');
+        if (notionalSymbolQtyNum < 0) return t('marketLimitClose.invalidSize');
         return '';
     };
 
@@ -270,8 +272,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
             notifications.add({
-                title: 'Invalid Order Size',
-                message: 'Please enter a valid order size',
+                title: t('transactions.invalidOrderSize.title'),
+                message: t('transactions.invalidOrderSize.message'),
                 icon: 'error',
             });
             close();
@@ -281,8 +283,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         // Validate price
         if (!limitPrice || limitPrice <= 0) {
             notifications.add({
-                title: 'Invalid Price',
-                message: 'Please enter a valid limit price',
+                title: t('transactions.invalidLimitPrice.title'),
+                message: t('transactions.invalidLimitPrice.message'),
                 icon: 'error',
             });
             close();
@@ -324,8 +326,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     });
                 }
                 notifications.add({
-                    title: `${side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Limit Order Placed`,
-                    message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
+                    title: `${side === 'buy' ? t('transactions.buyLongLimitOrderPlaced') : t('transactions.sellShortLimitOrderPlaced')}`,
+                    message: `${side === 'buy' ? t('transactions.successfullyPlacedBuyOrderFor', { usdValueOfOrderStr, symbol: symbolInfo?.coin, limitPrice }) : t('transactions.successfullyPlacedSellOrderFor', { usdValueOfOrderStr, symbol: symbolInfo?.coin, limitPrice })}`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -350,8 +352,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     });
                 }
                 notifications.add({
-                    title: 'Limit Order Failed',
-                    message: result.error || 'Failed to place limit order',
+                    title: t('transactions.limitOrderFailed'),
+                    message: result.error || t('transactions.limitOrderFailed'),
                     icon: 'error',
                     removeAfter: 10000,
                     txLink: result.signature
@@ -376,11 +378,11 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 });
             }
             notifications.add({
-                title: 'Limit Order Failed',
+                title: t('transactions.limitOrderFailed'),
                 message:
                     error instanceof Error
                         ? error.message
-                        : 'Unknown error occurred',
+                        : t('transactions.unknownErrorOccurred'),
                 icon: 'error',
                 removeAfter: 10000,
             });
@@ -455,11 +457,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     }, [positionSize, isProcessingOrder, isOverLimit, close]);
 
     return (
-        <Modal title='Limit Close' close={close}>
+        <Modal title={t('marketLimitClose.limitHeading')} close={close}>
             <div className={styles.container}>
                 <p className={styles.description}>
-                    This will send an order to close your position at the limit
-                    price.
+                    {t('marketLimitClose.limitDescription')}
                 </p>
                 <div className={styles.content}>
                     <PriceInput
@@ -518,10 +519,14 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                                     : styles.estimatedPnlNegative
                             }
                         >
-                            Estimated closed PNL (without fees):{' '}
-                            <span>
-                                {formatNum(estimatedPNL, 2, true, true)}
-                            </span>
+                            {t('marketLimitClose.estimatedClosedPnl', {
+                                estimatedPNL: formatNum(
+                                    estimatedPNL,
+                                    2,
+                                    true,
+                                    true,
+                                ),
+                            })}
                         </p>
                     )}
 
@@ -535,10 +540,17 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         }
                     >
                         {isLessThanMinValue
-                            ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum`
+                            ? t('marketLimitClose.minimumOr100Percent', {
+                                  min: formatNum(
+                                      MIN_ORDER_VALUE,
+                                      2,
+                                      true,
+                                      true,
+                                  ),
+                              })
                             : isProcessingOrder
-                              ? 'Processing...'
-                              : 'Confirm'}
+                              ? t('transactions.processing')
+                              : t('common.confirm')}
                     </SimpleButton>
                 </div>
             </div>

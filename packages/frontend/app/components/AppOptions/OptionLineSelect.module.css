@@ -24,7 +24,20 @@
     width: 170px;
     height: 100%;
     gap: var(--gap-xs);
-    overflow-y: visible;
+    overflow: visible;
+}
+.caret {
+    transition: transform 160ms ease;
+}
+.caret_open {
+    transform: rotate(180deg);
+}
+/* If opening upward, invert baseline so open state looks correct */
+.caret_up {
+    transform: rotate(180deg);
+}
+.caret_up.caret_open {
+    transform: rotate(0deg);
 }
 
 /* elem showing the active selection, opens or closes dropdown on click */
@@ -70,4 +83,20 @@
 .options_dropdown > *:hover {
     cursor: pointer;
     background-color: var(--bg-dark4);
+}
+
+.options_dropdown {
+    position: absolute;
+    min-width: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.drop_down {
+    top: calc(100% + var(--gap-xs));
+    left: 0;
+}
+
+.drop_up {
+    bottom: calc(100% + var(--gap-xs));
+    left: 0;
 }

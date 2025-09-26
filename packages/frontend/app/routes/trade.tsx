@@ -31,6 +31,7 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
 import { getSizePercentageSegment } from '~/utils/functions/getSegment';
+import { useTranslation } from 'react-i18next';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -42,6 +43,7 @@ export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 export default function Trade() {
     const { symbol } = useTradeDataStore();
     const { marginBucket } = useUnifiedMarginData();
+    const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     // add refs near the other refs
@@ -320,13 +322,13 @@ export default function Trade() {
     const tabList = useMemo(
         () =>
             [
-                { key: 'order', label: 'Order' },
-                { key: 'chart', label: 'Chart' },
-                { key: 'book', label: 'Book' },
-                { key: 'recent', label: 'Recent' },
-                { key: 'positions', label: 'Positions' },
+                { key: 'order', label: t('navigation.trade') },
+                { key: 'chart', label: t('navigation.chart') },
+                { key: 'book', label: t('navigation.book') },
+                { key: 'recent', label: t('navigation.recent') },
+                { key: 'positions', label: t('navigation.positions') },
             ] as const,
-        [],
+        [t],
     );
 
     const handleTabClick = useCallback(

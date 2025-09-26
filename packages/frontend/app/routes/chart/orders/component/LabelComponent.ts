@@ -20,6 +20,7 @@ import {
 import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
+import { t } from 'i18next';
 
 interface LabelProps {
     lines: LineData[];
@@ -336,8 +337,8 @@ const LabelComponent = ({
     const handleCancel = async (order: LineData) => {
         if (!order.oid) {
             notifications.add({
-                title: 'Cancel Failed',
-                message: 'Order ID not found',
+                title: t('transactions.cancelFailed.title'),
+                message: t('transactions.cancelFailed.message'),
                 icon: 'error',
             });
             return;
@@ -354,8 +355,12 @@ const LabelComponent = ({
         try {
             // Show pending notification
             notifications.add({
-                title: 'Cancel Order Pending',
-                message: `Cancelling ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
+                title: t('transactions.cancelLimitPending.title'),
+                message: t('transactions.cancelLimitPending.message', {
+                    side: order.side,
+                    usdValueOfOrderStr,
+                    symbol: symbolInfo?.coin,
+                }),
                 icon: 'spinner',
                 slug,
                 removeAfter: 60000,
@@ -390,8 +395,12 @@ const LabelComponent = ({
                 }
                 // Show success notification
                 notifications.add({
-                    title: 'Order Cancelled',
-                    message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
+                    title: t('transactions.cancelLimitConfirmed.title'),
+                    message: t('transactions.cancelLimitConfirmed.message', {
+                        side: order.side,
+                        usdValueOfOrderStr,
+                        symbol: symbolInfo?.coin,
+                    }),
                     icon: 'check',
                     txLink: result.signature
                         ? blockExplorer + result.signature
@@ -420,8 +429,8 @@ const LabelComponent = ({
                 }
                 // Show error notification
                 notifications.add({
-                    title: 'Cancel Failed',
-                    message: String(result.error || 'Failed to cancel order'),
+                    title: t('transactions.cancelFailed.title'),
+                    message: t('transactions.cancelFailed.message2'),
                     icon: 'error',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -432,11 +441,11 @@ const LabelComponent = ({
             console.error('❌ Error cancelling order:', error);
             notifications.remove(slug);
             notifications.add({
-                title: 'Cancel Failed',
+                title: t('transactions.cancelFailed.title'),
                 message:
                     error instanceof Error
                         ? error.message
-                        : 'Unknown error occurred',
+                        : t('transactions.unknownErrorOccurred'),
                 icon: 'error',
             });
             if (typeof plausible === 'function') {
@@ -613,8 +622,18 @@ const LabelComponent = ({
                 );
                 // Show pending notification
                 notifications.add({
-                    title: 'Limit Order Update Pending',
-                    message: `Updating ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
+                    title: t('transactions.limitOrderUpdatePending.title'),
+                    message: t('transactions.limitOrderUpdatePending.message', {
+                        side,
+                        value: usdValueOfOrderStr,
+                        coin: symbolInfo?.coin,
+                        limitPrice: formatNum(
+                            roundDownToTenth(newPrice),
+                            newPrice > 10_000 ? 0 : 2,
+                            true,
+                            true,
+                        ),
+                    }),
                     icon: 'spinner',
                     slug,
                     removeAfter: 60000,
@@ -666,9 +685,10 @@ const LabelComponent = ({
                         });
                     }
                     notifications.add({
-                        title: 'Failed to update order',
+                        title: t('transactions.failedToUpdatedOrder.title'),
                         message:
-                            limitOrderResult.error || 'Unknown error occurred',
+                            limitOrderResult.error ||
+                            t('transactions.unknownErrorOccurred'),
                         icon: 'error',
                         removeAfter: 10000,
                         txLink: limitOrderResult.signature
@@ -698,8 +718,17 @@ const LabelComponent = ({
                         });
                     }
                     notifications.add({
-                        title: 'Order updated',
-                        message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
+                        title: t('transactions.orderUpdated.title'),
+                        message: t('transactions.orderUpdated.message', {
+                            usdValueOfOrderStr,
+                            symbol: symbolInfo?.coin,
+                            limitPrice: formatNum(
+                                roundDownToTenth(newPrice),
+                                newPrice > 10_000 ? 0 : 2,
+                                true,
+                                true,
+                            ),
+                        }),
                         icon: 'check',
                         removeAfter: 10000,
                         txLink: limitOrderResult.signature
@@ -712,11 +741,11 @@ const LabelComponent = ({
                 console.error('Error updating order:', error);
                 notifications.remove(slug);
                 notifications.add({
-                    title: 'Error updating order',
+                    title: t('transactions.errorUpdatingOrder.title'),
                     message:
                         error instanceof Error
                             ? error.message
-                            : 'Unknown error occurred',
+                            : t('transactions.unknownErrorOccurred'),
                     icon: 'error',
                 });
                 if (typeof plausible === 'function') {

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
+import { t } from 'i18next';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { useMarketOrderLog } from '~/hooks/useMarketOrderLog';
@@ -600,8 +601,20 @@ export default function WebDataConsumer() {
                             notifiedOrdersRef.current.add(fill.oid);
 
                             notificationStore.add({
-                                title: `${fill.side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Order Filled`,
-                                message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px, fill.px > 10_000 ? 0 : 2, true, true)}`,
+                                title: t('transactions.orderFilled.title', {
+                                    side: fill.side,
+                                }),
+                                message: t('transactions.orderFilled.message', {
+                                    side: fill.side,
+                                    usdValueOfFillStr,
+                                    symbol: fill.coin,
+                                    fillPrice: formatNum(
+                                        fill.px,
+                                        fill.px > 10_000 ? 0 : 2,
+                                        true,
+                                        true,
+                                    ),
+                                }),
                                 icon: 'check',
                                 removeAfter: 5000,
                             });

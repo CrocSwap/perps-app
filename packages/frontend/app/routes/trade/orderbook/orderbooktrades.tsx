@@ -12,6 +12,7 @@ import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './orderbooktrades.module.css';
 import OrderTradeRow from './ordertraderow/ordertraderow';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { t } from 'i18next';
 
 interface OrderBookTradesProps {
     maxHeight?: number;
@@ -114,9 +115,9 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ maxHeight }) => {
     return (
         <div className={styles.orderTradesContainer}>
             <div id='orderTradesHeader' className={styles.orderTradesHeader}>
-                <div>Price</div>
-                <div>Size {'(' + symbol + ')'}</div>
-                <div>Time</div>
+                <div>{t('transactions.price')}</div>
+                <div>{t('transactions.size') + ' (' + symbol + ')'}</div>
+                <div>{t('transactions.time')}</div>
             </div>
 
             <BasicDivider />

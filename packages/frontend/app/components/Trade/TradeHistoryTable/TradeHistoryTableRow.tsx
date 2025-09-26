@@ -3,6 +3,8 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import type { UserFillIF } from '~/utils/UserDataIFs';
 import styles from './TradeHistoryTable.module.css';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface TradeHistoryTableRowProps {
     trade: UserFillIF;
@@ -16,11 +18,28 @@ export default function TradeHistoryTableRow(props: TradeHistoryTableRowProps) {
 
     const { getBsColor } = useAppSettings();
 
+    const { t, i18n } = useTranslation();
+
     // const handleViewOrderDetails = () => {
     //     // if (onViewOrderDetails && trade.hasOrderDetails) {
     //     //     onViewOrderDetails(trade.time, trade.coin);
     //     // }
     // };
+
+    const directionDisplayText = useMemo(() => {
+        switch (trade.dir.toLowerCase()) {
+            case 'open long':
+                return t('tradeTable.openLong');
+            case 'open short':
+                return t('tradeTable.openShort');
+            case 'close long':
+                return t('tradeTable.closeLong');
+            case 'close short':
+                return t('tradeTable.closeShort');
+            default:
+                return trade.dir;
+        }
+    }, [trade.dir, i18n.language]);
 
     return (
         <div className={styles.rowContainer}>
@@ -46,7 +65,7 @@ export default function TradeHistoryTableRow(props: TradeHistoryTableRowProps) {
                             : getBsColor().sell,
                 }}
             >
-                {trade.dir}
+                {directionDisplayText}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
                 {formatNum(trade.px)}

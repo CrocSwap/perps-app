@@ -7,6 +7,7 @@ import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './watchlistnode.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import { t } from 'i18next';
 
 interface WatchListNodeProps {
     coin: string;
@@ -67,7 +68,10 @@ const WatchListNode: React.FC<WatchListNodeProps> = memo(
         );
 
         return (
-            <Tooltip position='top' content={disabled ? 'Coming Soon' : ''}>
+            <Tooltip
+                position='top'
+                content={disabled ? t('common.comingSoon') : ''}
+            >
                 <div
                     className={`${styles.watchListNodeContainer} ${disabled ? styles.disabled : ''}`}
                 >

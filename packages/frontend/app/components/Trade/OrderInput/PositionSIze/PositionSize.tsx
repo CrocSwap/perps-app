@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './PositionSize.module.css';
+import { t } from 'i18next';
 
 interface SizeOption {
     value: number;
@@ -298,7 +299,7 @@ export default function PositionSize({
                         className={styles.sliderTrack}
                         role='slider'
                         tabIndex={0}
-                        aria-label='Position size percentage'
+                        aria-label={t('aria.positionSizePercentage')}
                         aria-valuemin={POSITION_SIZE_CONFIG.MIN_VALUE}
                         aria-valuemax={POSITION_SIZE_CONFIG.MAX_VALUE}
                         aria-valuenow={currentValue}
@@ -397,7 +398,7 @@ export default function PositionSize({
                             onBlur={handleInputBlur}
                             onKeyDown={handleInputKeyDown}
                             className={styles.valueInput}
-                            aria-label='Position size value'
+                            aria-label={t('aria.positionSizeValue')}
                             style={{
                                 color: POSITION_SIZE_UI_CONFIG.TEXT_COLOR,
                             }}

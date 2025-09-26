@@ -3,18 +3,20 @@ import styles from './TradeHistoryTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { HeaderCell, TableSortDirection } from '~/utils/CommonIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
+import { t } from 'i18next';
 
-interface TradeHistoryTableHeaderProps {
+export interface TradeHistoryTableHeaderProps {
     sortBy?: UserFillSortBy;
     sortDirection: TableSortDirection;
     sortClickHandler: (key: UserFillSortBy) => void;
 }
 
-export const TradeHistoryTableModel:
-    | HeaderCell<number>[]
-    | HeaderCell<string>[] = [
+// This is the model that can be imported by other components
+export const getTradeHistoryTableModel = (): Array<
+    HeaderCell<number> | HeaderCell<string>
+> => [
     {
-        name: 'Time',
+        name: t('tradeTable.time'),
         key: 'time',
         sortable: true,
         className: 'timeCell',
@@ -24,21 +26,21 @@ export const TradeHistoryTableModel:
         },
     } as HeaderCell<number>,
     {
-        name: 'Coin',
+        name: t('tradeTable.coin'),
         key: 'coin',
         sortable: true,
         className: 'coinCell',
         exportable: true,
     },
     {
-        name: 'Direction',
+        name: t('tradeTable.direction'),
         key: 'dir',
         sortable: true,
         className: 'directionCell',
         exportable: true,
     },
     {
-        name: 'Price',
+        name: t('tradeTable.price'),
         key: 'px',
         sortable: true,
         className: 'priceCell',
@@ -48,7 +50,7 @@ export const TradeHistoryTableModel:
         },
     },
     {
-        name: 'Size',
+        name: t('tradeTable.size'),
         key: 'sz',
         sortable: true,
         className: 'sizeCell',
@@ -59,7 +61,7 @@ export const TradeHistoryTableModel:
         },
     },
     {
-        name: 'Trade Value',
+        name: t('tradeTable.tradeValue'),
         key: 'value',
         sortable: true,
         className: 'tradeValueCell',
@@ -67,7 +69,7 @@ export const TradeHistoryTableModel:
         exportAction: (v: number) => `="${v.toFixed(2)}"`,
     },
     {
-        name: 'Fee',
+        name: t('tradeTable.fee'),
         key: 'fee',
         sortable: true,
         className: 'feeCell',
@@ -77,7 +79,7 @@ export const TradeHistoryTableModel:
         },
     },
     {
-        name: 'Closed PNL',
+        name: t('tradeTable.closedPnl'),
         key: 'closedPnl',
         sortable: true,
         className: 'closedPnlCell',
@@ -93,6 +95,8 @@ export default function TradeHistoryTableHeader({
     sortDirection,
     sortClickHandler,
 }: TradeHistoryTableHeaderProps) {
+    // Get the model inside the component to ensure it updates with language changes
+    const TradeHistoryTableModel = getTradeHistoryTableModel();
     return (
         <div className={styles.headerContainer}>
             {TradeHistoryTableModel.map((header) => (

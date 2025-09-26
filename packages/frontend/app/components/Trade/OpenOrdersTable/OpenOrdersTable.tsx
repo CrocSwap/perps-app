@@ -14,6 +14,7 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
+import { t } from 'i18next';
 interface OpenOrdersTableProps {
     data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
@@ -49,8 +50,13 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         try {
             // Show initial notification
             notifications.add({
-                title: 'Cancelling All Orders',
-                message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
+                // title: 'Cancelling All Orders',
+                title: t('transactions.cancellingAllOrders.title'),
+                // message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
+                message: t('transactions.cancellingAllOrders.message', {
+                    count: filteredOrders.length,
+                    noun: filteredOrders.length === 1 ? 'order' : 'orders',
+                }),
                 icon: 'spinner',
                 slug,
                 removeAfter: 60000,
@@ -161,8 +167,17 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 });
                             }
                             notifications.add({
-                                title: 'Order Cancelled',
-                                message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${order.coin}`,
+                                title: t(
+                                    'transactions.cancelLimitConfirmed.title',
+                                ),
+                                message: t(
+                                    'transactions.cancelLimitConfirmed.message',
+                                    {
+                                        side: order.side,
+                                        usdValueOfOrderStr,
+                                        symbol: order.coin,
+                                    },
+                                ),
                                 icon: 'check',
                                 removeAfter: 5000,
                                 txLink: successOrderSignature
@@ -187,8 +202,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         });
                     }
                     notifications.add({
-                        title: 'All Orders Cancelled',
-                        message: `Successfully cancelled all ${successCount} orders`,
+                        title: t('transactions.cancelAllConfirmed.title'),
+                        message: t('transactions.cancelAllConfirmed.message', {
+                            count: successCount,
+                        }),
                         icon: 'check',
                         removeAfter: 5000,
                         txLink: successOrderSignature
@@ -223,8 +240,14 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         });
                     }
                     notifications.add({
-                        title: 'Partial Success',
-                        message: `Cancelled ${successCount} orders, ${failureCount} failed`,
+                        title: t('transactions.cancelAllPartialSuccess.title'),
+                        message: t(
+                            'transactions.cancelAllPartialSuccess.message',
+                            {
+                                successCount,
+                                failureCount,
+                            },
+                        ),
                         icon: 'error',
                         removeAfter: 8000,
                         txLink: failedOrderSignature
@@ -247,8 +270,8 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         });
                     }
                     notifications.add({
-                        title: 'Cancel All Failed',
-                        message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
+                        title: t('transactions.cancelAllFailed.title'),
+                        message: `${t('transactions.cancelAllFailed.message')} ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
                         icon: 'error',
                         removeAfter: 8000,
                         txLink: failedOrderSignature
@@ -261,11 +284,11 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
             console.error('❌ Error during cancel all operation:', error);
             notifications.remove(slug);
             notifications.add({
-                title: 'Cancel All Failed',
+                title: t('transactions.cancelAllFailed.title'),
                 message:
                     error instanceof Error
                         ? error.message
-                        : 'Unknown error occurred',
+                        : t('transactions.unknownErrorOccurred'),
                 icon: 'error',
                 removeAfter: 5000,
             });
@@ -307,7 +330,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     return (
         <>
             <GenericTable
-                noDataMessage='No open orders'
+                noDataMessage={t('transactions.noOpenOrders')}
                 storageKey={`OpenOrdersTable_${currentUserRef.current}`}
                 data={filteredOrders}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (

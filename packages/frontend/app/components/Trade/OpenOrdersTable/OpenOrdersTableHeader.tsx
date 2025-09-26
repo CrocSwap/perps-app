@@ -2,6 +2,7 @@ import type { OrderDataSortBy } from '~/utils/orderbook/OrderBookIFs';
 import styles from './OpenOrdersTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { TableSortDirection } from '~/utils/CommonIFs';
+import { t } from 'i18next';
 
 export interface HeaderCell {
     name: string;
@@ -29,61 +30,61 @@ export default function OpenOrdersTableHeader({
 
     const tableHeaders: HeaderCell[] = [
         {
-            name: 'Time',
+            name: t('tradeTable.time'),
             key: 'timestamp',
             sortable: true,
             className: styles.timeCell,
         },
         {
-            name: 'Type',
+            name: t('tradeTable.type'),
             key: 'orderType',
             sortable: true,
             className: styles.typeCell,
         },
         {
-            name: 'Coin',
+            name: t('tradeTable.coin'),
             key: 'coin',
             sortable: true,
             className: styles.coinCell,
         },
         {
-            name: 'Direction',
+            name: t('tradeTable.direction'),
             key: 'side',
             sortable: true,
             className: styles.directionCell,
         },
         {
-            name: 'Size',
+            name: t('tradeTable.size'),
             key: 'sz',
             sortable: true,
             className: styles.sizeCell,
         },
         {
-            name: 'Original Size',
+            name: t('tradeTable.originalSize'),
             key: 'origSz',
             sortable: true,
             className: styles.originalSizeCell,
         },
         {
-            name: 'Order Value',
+            name: t('tradeTable.orderValue'),
             key: 'orderValue',
             sortable: true,
             className: styles.orderValueCell,
         },
         {
-            name: 'Price',
+            name: t('tradeTable.price'),
             key: 'price',
             sortable: true,
             className: styles.priceCell,
         },
         {
-            name: 'Reduce Only',
+            name: t('tradeTable.reduceOnly'),
             key: 'reduceOnly',
             sortable: false,
             className: styles.reduceOnlyCell,
         },
         {
-            name: 'Trigger Conditions',
+            name: t('tradeTable.triggerConditions'),
             key: 'triggerConditions',
             sortable: false,
             className: styles.triggerConditionsCell,
@@ -91,7 +92,7 @@ export default function OpenOrdersTableHeader({
         ...(showTpSl
             ? [
                   {
-                      name: 'TP/SL',
+                      name: t('tradeTable.tpsl'),
                       key: 'tpsl' as OrderDataSortBy,
                       sortable: false,
                       className: styles.tpslCell,
@@ -99,7 +100,7 @@ export default function OpenOrdersTableHeader({
               ]
             : []),
         {
-            name: 'Cancel All',
+            name: t('tradeTable.cancelAll'),
             key: 'cancel',
             sortable: false,
             className: styles.cancelCell,
@@ -131,7 +132,7 @@ export default function OpenOrdersTableHeader({
                             disabled={!hasActiveOrders}
                             type='button'
                         >
-                            Cancel All
+                            {t('tradeTable.cancelAll')}
                         </button>
                     ) : (
                         <>

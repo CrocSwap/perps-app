@@ -73,15 +73,14 @@ const LineComponent = ({
                         const element = chartRef.getShapeById(lineId);
                         if (element) chartRef.removeEntity(lineId);
                     }
-
-                    orderLineItemsRef.current = [];
-                    setOrderLineItems([]);
                 }
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error: unknown) {
             // console.warn('Cleanup failed:', error);
         } finally {
+            orderLineItemsRef.current = [];
+            setOrderLineItems([]);
             cleanupInProgressRef.current = false;
         }
     };

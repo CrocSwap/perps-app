@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './LeverageSlider.module.css';
+import { t } from 'i18next';
 
 interface SliderTrackProps {
     sliderRef: React.RefObject<HTMLDivElement | null>;
@@ -86,7 +87,7 @@ export default function SliderTrack({
                 className={styles.sliderTrack}
                 role='slider'
                 tabIndex={0}
-                aria-label='Leverage amount'
+                aria-label={t('aria.leverageAmount')}
                 aria-valuemin={minimumInputValue}
                 aria-valuemax={maximumInputValue}
                 aria-valuenow={
@@ -177,7 +178,7 @@ export default function SliderTrack({
                                     setSliderBelowMinimumLeverage?.(false)
                                 }
                             >
-                                Min:{' '}
+                                {t('common.min')}:{' '}
                                 {minimumValue < 3
                                     ? `${minimumValue.toFixed(1)}x`
                                     : `${Math.trunc(minimumValue)}x`}{' '}
@@ -218,7 +219,9 @@ export default function SliderTrack({
                             key={index}
                             role='button'
                             tabIndex={0}
-                            aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
+                            aria-label={t('aria.setLeverageTo', {
+                                value: formatLabelValue(tickValue),
+                            })}
                             className={`${styles.sliderMarker} ${
                                 isActive ? styles.active : ''
                             } ${isCurrent ? styles.sliderMarkerCurrent : ''} ${
@@ -291,7 +294,9 @@ export default function SliderTrack({
                             key={index}
                             role='button'
                             tabIndex={0}
-                            aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
+                            aria-label={t('aria.setLeverageTo', {
+                                value: formatLabelValue(tickValue),
+                            })}
                             className={`${styles.valueLabel} ${
                                 isHovered ? styles.valueLabelHovered : ''
                             }`}

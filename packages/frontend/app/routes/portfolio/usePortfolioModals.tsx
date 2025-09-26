@@ -5,6 +5,7 @@ import PortfolioSend from '~/components/Portfolio/PortfolioSend/PortfolioSend';
 import PortfolioWithdraw from '~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw';
 import { useModal } from '~/hooks/useModal';
 import { usePortfolioManager } from './usePortfolioManager';
+import { t } from 'i18next';
 
 export type PortfolioModalType = 'deposit' | 'withdraw' | 'send';
 
@@ -158,11 +159,11 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
                 position='center'
                 title={
                     activePortfolioModalType === 'deposit'
-                        ? 'Deposit'
+                        ? t('common.deposit')
                         : activePortfolioModalType === 'withdraw'
-                          ? 'Withdraw'
+                          ? t('common.withdraw')
                           : activePortfolioModalType === 'send'
-                            ? 'Send'
+                            ? t('common.transfer')
                             : ''
                 }
             >
