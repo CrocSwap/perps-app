@@ -211,6 +211,17 @@ function OrderInput({
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
+    // Take Profit / Stop Loss state
+    const [takeProfitPrice, setTakeProfitPrice] = useState('');
+    const [stopLossPrice, setStopLossPrice] = useState('');
+    const [takeProfitGain, setTakeProfitGain] = useState('');
+    const [stopLossLoss, setStopLossLoss] = useState('');
+    const [tpGainCurrency, setTpGainCurrency] = useState<'$' | '%'>('$');
+    const [slLossCurrency, setSlLossCurrency] = useState<'$' | '%'>('$');
+
+    const minNotionalUsdOrderSize = 0.99;
+    const [maxNotionalUsdOrderSize, setMaxNotionalUsdOrderSize] =
+        useState<number>(100_000);
     const [maxRemainingOI, setMaxRemainingOI] = useState<number>(100_000);
 
     const OI_BUFFER = 0.9995;
@@ -1023,6 +1034,22 @@ function OrderInput({
             handleToggleRandomize,
             isChasingIntervalEnabled,
             handleToggleIsChasingInterval: handleToggleChasingInterval,
+            takeProfitPrice,
+            setTakeProfitPrice,
+            stopLossPrice,
+            setStopLossPrice,
+            takeProfitGain,
+            setTakeProfitGain,
+            stopLossLoss,
+            setStopLossLoss,
+            tpGainCurrency,
+            setTpGainCurrency,
+            slLossCurrency,
+            setSlLossCurrency,
+            markPx: markPx || 0,
+            symbol: symbol || '',
+            notionalSymbolQtyNum: notionalQtyNum,
+            tradeDirection,
         }),
         [
             isReduceOnlyEnabled,
@@ -1034,6 +1061,16 @@ function OrderInput({
             handleToggleRandomize,
             isChasingIntervalEnabled,
             handleToggleChasingInterval,
+            takeProfitPrice,
+            stopLossPrice,
+            takeProfitGain,
+            stopLossLoss,
+            tpGainCurrency,
+            slLossCurrency,
+            markPx,
+            symbol,
+            notionalQtyNum,
+            tradeDirection,
         ],
     );
 
