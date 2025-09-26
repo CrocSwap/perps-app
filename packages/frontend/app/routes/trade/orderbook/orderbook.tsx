@@ -11,8 +11,8 @@ import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useRestPoller } from '~/hooks/useRestPoller';
-import { useWorker } from '~/hooks/useWorker';
-import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
+// import { useWorker } from '~/hooks/useWorker';
+// import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -31,9 +31,10 @@ import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 // import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 import type { TabType } from '~/routes/trade';
-import { useSdk } from '~/hooks/useSdk';
+// import { useSdk } from '~/hooks/useSdk';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
+import { useWsObserver, WsChannels } from '~/contexts/WsObserverContext';
 
 interface OrderBookProps {
     orderCount: number;
@@ -63,7 +64,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
 }) => {
     // TODO: Can be uncommented if we want to use the rest poller
     // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
-    const { info } = useSdk();
+
+    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
 
     const orderClickDisabled = false;
 
@@ -242,19 +244,21 @@ const OrderBook: React.FC<OrderBookProps> = ({
         return slots;
     }, [userSymbolOrders, sellSlots, findClosestSlot, formatNum]);
 
-    const handleOrderBookWorkerResult = useCallback(
-        ({ data }: { data: OrderBookOutput }) => {
-            setOrderBook(data.buys, data.sells);
-            setOrderBookState(TableState.FILLED);
-            filledResolution.current = selectedResolution;
-        },
-        [selectedResolution, setOrderBook],
-    );
+    // code blocks were being used in sdk approach
 
-    const postOrderBookRaw = useWorker<OrderBookOutput>(
-        'orderbook',
-        handleOrderBookWorkerResult,
-    );
+    // const handleOrderBookWorkerResult = useCallback(
+    //     ({ data }: { data: OrderBookOutput }) => {
+    //         setOrderBook(data.buys, data.sells);
+    //         setOrderBookState(TableState.FILLED);
+    //         filledResolution.current = selectedResolution;
+    //     },
+    //     [selectedResolution, setOrderBook],
+    // );
+
+    // const postOrderBookRaw = useWorker<OrderBookOutput>(
+    //     'orderbook',
+    //     handleOrderBookWorkerResult,
+    // );
 
     useEffect(() => {
         if (symbol === symbolInfo?.coin) {
@@ -278,9 +282,19 @@ const OrderBook: React.FC<OrderBookProps> = ({
         };
     }, [selectedResolution, symbol]);
 
+    const handleOrderBookResult = useCallback(
+        (payload: any) => {
+            const { buys, sells } = processOrderBookMessage(payload);
+            setOrderBook(buys, sells);
+            setOrderBookState(TableState.FILLED);
+            filledResolution.current = selectedResolution;
+        },
+        [selectedResolution, setOrderBook, setOrderBookState],
+    );
+
     useEffect(() => {
         console.log('>>> orderbook subKey', subKey);
-        if (!subKey || !info) return;
+        if (!subKey) return;
         setOrderBookState(TableState.LOADING);
         if (subKey) {
             // subscribeToPoller(
@@ -291,14 +305,20 @@ const OrderBook: React.FC<OrderBookProps> = ({
             //     true,
             // );
 
-            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+            // const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+
+            subscribe(WsChannels.ORDERBOOK, {
+                payload: subKey,
+                handler: handleOrderBookResult,
+                single: true,
+            });
 
             return () => {
                 // unsubscribeFromPoller('info', subKey);
-                unsubscribe();
+                // unsubscribe();
             };
         }
-    }, [subKey, info]);
+    }, [subKey]);
 
     const midHeader = useCallback(
         (id: string) => {
