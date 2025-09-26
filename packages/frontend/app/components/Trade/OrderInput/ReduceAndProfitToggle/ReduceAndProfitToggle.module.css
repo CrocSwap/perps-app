@@ -181,6 +181,6 @@
     width: 100%;
     display: flex;
     justify-content: flex-end;
-    color: var(--green);
+    color: var(--text2);
     font-size: var(--font-size-s);
 }

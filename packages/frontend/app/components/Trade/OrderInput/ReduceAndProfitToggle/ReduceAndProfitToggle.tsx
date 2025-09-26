@@ -5,6 +5,7 @@ import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import ChaseDistance from '../ChaseDistance/ChaseDistance';
 import styles from './ReduceAndProfitToggle.module.css';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import { pctFromDollars } from '~/utils/functions/profitLossConversions';
 
 interface PropsIF {
     isReduceOnlyEnabled: boolean;
@@ -68,9 +69,55 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         notionalSymbolQtyNum,
         tradeDirection,
     } = props;
+    const [hasTakeProfitGainBeenTouched, setHasTakeProfitGainBeenTouched] =
+        useState(false);
+    const [hasStopLossLossBeenTouched, setHasStopLossLossBeenTouched] =
+        useState(false);
     const [chaseDistance, setChaseDistance] = useState('');
     const [chaseMode, setChaseMode] = useState<'usd' | 'symbol'>('usd');
     const currencyOptions: Array<'$' | '%'> = ['$', '%'];
+
+    const updatePriceFromGain = (gainValue: string) => {
+        if (!markPx || !gainValue || !notionalSymbolQtyNum) return;
+
+        const gain = parseFloat(gainValue);
+        let newPrice: number;
+
+        if (tpGainCurrency === '$') {
+            newPrice =
+                tradeDirection === 'buy'
+                    ? markPx + gain / notionalSymbolQtyNum
+                    : markPx - gain / notionalSymbolQtyNum;
+        } else {
+            const multiplier =
+                tradeDirection === 'buy' ? 1 + gain / 100 : 1 - gain / 100;
+            newPrice = markPx * multiplier;
+        }
+
+        setTakeProfitPrice?.(newPrice.toFixed(6));
+    };
+
+    const updatePriceFromLoss = (lossValue: string) => {
+        if (!markPx || !lossValue || !notionalSymbolQtyNum) return;
+
+        const loss = parseFloat(lossValue);
+        let newPrice: number;
+
+        if (slLossCurrency === '$') {
+            // Dollar amount loss per unit
+            newPrice =
+                tradeDirection === 'buy'
+                    ? markPx - loss / notionalSymbolQtyNum
+                    : markPx + loss / notionalSymbolQtyNum;
+        } else {
+            // Percentage loss
+            const multiplier =
+                tradeDirection === 'buy' ? 1 - loss / 100 : 1 + loss / 100;
+            newPrice = markPx * multiplier;
+        }
+
+        setStopLossPrice?.(newPrice.toFixed(6));
+    };
 
     const calculateExpectedProfit = (): number | null => {
         if (!takeProfitPrice && !takeProfitGain) return null;
@@ -139,46 +186,64 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         return priceDiff * notionalSymbolQtyNum;
     };
 
-    const updatePriceFromGain = (gainValue: string) => {
-        if (!markPx || !gainValue || !notionalSymbolQtyNum) return;
-
-        const gain = parseFloat(gainValue);
-        let newPrice: number;
-
-        if (tpGainCurrency === '$') {
-            newPrice =
-                tradeDirection === 'buy'
-                    ? markPx + gain / notionalSymbolQtyNum
-                    : markPx - gain / notionalSymbolQtyNum;
-        } else {
-            const multiplier =
-                tradeDirection === 'buy' ? 1 + gain / 100 : 1 - gain / 100;
-            newPrice = markPx * multiplier;
+    const updateGainFromPrice = (priceValue: string) => {
+        if (!priceValue || !markPx || !notionalSymbolQtyNum) {
+            console.log('updateGainFromPrice: missing required values', {
+                priceValue,
+                markPx,
+                notionalSymbolQtyNum,
+            });
+            return;
         }
 
-        setTakeProfitPrice?.(newPrice.toFixed(6));
+        const price = parseFloat(priceValue);
+        if (!Number.isFinite(price)) {
+            console.log('updateGainFromPrice: invalid price', priceValue);
+            return;
+        }
+
+        const priceDiff =
+            tradeDirection === 'buy' ? price - markPx : markPx - price;
+
+        const gainUSD = priceDiff * notionalSymbolQtyNum;
+        const gainValue =
+            tpGainCurrency === '$'
+                ? Math.abs(gainUSD)
+                : Math.abs((gainUSD / (markPx * notionalSymbolQtyNum)) * 100);
+
+        // Only update if user hasn't manually entered a gain value
+        if (!hasTakeProfitGainBeenTouched) {
+            const result = setTakeProfitGain?.(gainValue.toString());
+            console.log(
+                'updateGainFromPrice: setTakeProfitGain result',
+                result,
+            );
+        } else {
+            console.log(
+                'updateGainFromPrice: not updating gain because hasTakeProfitGainBeenTouched is true',
+            );
+        }
     };
 
-    const updatePriceFromLoss = (lossValue: string) => {
-        if (!markPx || !lossValue || !notionalSymbolQtyNum) return;
+    const updateLossFromPrice = (priceValue: string) => {
+        if (!priceValue || !markPx || !notionalSymbolQtyNum) return;
 
-        const loss = parseFloat(lossValue);
-        let newPrice: number;
+        const price = parseFloat(priceValue);
+        if (!Number.isFinite(price)) return;
 
-        if (slLossCurrency === '$') {
-            // Dollar amount loss per unit
-            newPrice =
-                tradeDirection === 'buy'
-                    ? markPx - loss / notionalSymbolQtyNum
-                    : markPx + loss / notionalSymbolQtyNum;
-        } else {
-            // Percentage loss
-            const multiplier =
-                tradeDirection === 'buy' ? 1 - loss / 100 : 1 + loss / 100;
-            newPrice = markPx * multiplier;
+        const priceDiff =
+            tradeDirection === 'buy' ? markPx - price : price - markPx;
+
+        const lossUSD = priceDiff * notionalSymbolQtyNum;
+        const lossValue =
+            slLossCurrency === '$'
+                ? Math.abs(lossUSD)
+                : Math.abs((lossUSD / (markPx * notionalSymbolQtyNum)) * 100);
+
+        // Only update if user hasn't manually entered a loss value
+        if (!hasStopLossLossBeenTouched) {
+            setStopLossLoss?.(lossValue.toString());
         }
-
-        setStopLossPrice?.(newPrice.toFixed(6));
     };
 
     const expectedProfit = useMemo(() => {
@@ -207,14 +272,15 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             {/* Take Profit Row */}
             <div className={styles.formRow}>
                 <div className={styles.inputWithoutDropdown}>
-                    <label htmlFor='takeProfitPriceInput'>SL Price</label>
+                    <label htmlFor='takeProfitPriceInput'>TP Price</label>
                     <input
                         id='takeProfitPriceInput'
                         type='number'
                         value={takeProfitPrice}
                         onChange={(e) => {
-                            console.log('TP price changed:', e.target.value);
                             setTakeProfitPrice?.(e.target.value);
+                            setHasTakeProfitGainBeenTouched(false); // Reset touch state so gain can update from price
+                            updateGainFromPrice(e.target.value);
                         }}
                     />
                 </div>
@@ -225,8 +291,8 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         type='number'
                         value={takeProfitGain}
                         onChange={(e) => {
-                            console.log('TP gain changed:', e.target.value);
                             setTakeProfitGain?.(e.target.value);
+                            setHasTakeProfitGainBeenTouched(true);
                             updatePriceFromGain(e.target.value);
                         }}
                     />
@@ -235,10 +301,41 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         options={currencyOptions}
                         onChange={(val) => {
                             const currency = val as '$' | '%';
-                            setTpGainCurrency?.(currency);
-                            if (takeProfitGain) {
-                                updatePriceFromGain(takeProfitGain);
+                            if (currency === tpGainCurrency) return;
+
+                            // Convert current gain value to USD first, then to new currency
+                            if (
+                                takeProfitGain &&
+                                markPx &&
+                                notionalSymbolQtyNum
+                            ) {
+                                const currentGain = parseFloat(takeProfitGain);
+                                if (Number.isFinite(currentGain)) {
+                                    // Convert current gain to USD
+                                    const currentGainUSD =
+                                        tpGainCurrency === '$'
+                                            ? currentGain
+                                            : (currentGain *
+                                                  (markPx *
+                                                      notionalSymbolQtyNum)) /
+                                              100;
+
+                                    // Convert USD to new currency
+                                    const newGainValue =
+                                        currency === '$'
+                                            ? currentGainUSD
+                                            : (currentGainUSD /
+                                                  (markPx *
+                                                      notionalSymbolQtyNum)) *
+                                              100;
+
+                                    setTakeProfitGain?.(
+                                        newGainValue.toString(),
+                                    );
+                                }
                             }
+
+                            setTpGainCurrency?.(currency);
                         }}
                         cssPositioning='fixed'
                     />
@@ -246,10 +343,15 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             </div>
             {takeProfitGain && (
                 <span className={styles.expectedProfitText}>
-                    Expected Profit:{' '}
-                    {expectedProfit
-                        ? `$${expectedProfit.toFixed(2)}`
-                        : 'Calculating...'}
+                    {expectedProfit && expectedProfit < 0
+                        ? 'Expected Loss'
+                        : 'Expected Profit'}
+                    :{' '}
+                    {expectedProfit == null || !markPx || !notionalSymbolQtyNum
+                        ? 'Calculating...'
+                        : tpGainCurrency === '%'
+                          ? `$${Math.abs(expectedProfit).toFixed(2)}`
+                          : `${pctFromDollars(Math.abs(expectedProfit), markPx, notionalSymbolQtyNum).toFixed(3)}%`}
                 </span>
             )}
 
@@ -262,8 +364,9 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         type='number'
                         value={stopLossPrice}
                         onChange={(e) => {
-                            console.log('SL price changed:', e.target.value);
                             setStopLossPrice?.(e.target.value);
+                            setHasStopLossLossBeenTouched(false); // Reset touch state so loss can update from price
+                            updateLossFromPrice(e.target.value);
                         }}
                     />
                 </div>
@@ -274,8 +377,8 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         type='number'
                         value={stopLossLoss}
                         onChange={(e) => {
-                            console.log('SL loss changed:', e.target.value);
                             setStopLossLoss?.(e.target.value);
+                            setHasStopLossLossBeenTouched(true);
                             updatePriceFromLoss(e.target.value);
                         }}
                     />
@@ -284,10 +387,39 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         options={currencyOptions}
                         onChange={(val) => {
                             const currency = val as '$' | '%';
-                            setSlLossCurrency?.(currency);
-                            if (stopLossLoss) {
-                                updatePriceFromLoss(stopLossLoss);
+                            if (currency === slLossCurrency) return;
+
+                            // Convert current loss value to USD first, then to new currency
+                            if (
+                                stopLossLoss &&
+                                markPx &&
+                                notionalSymbolQtyNum
+                            ) {
+                                const currentLoss = parseFloat(stopLossLoss);
+                                if (Number.isFinite(currentLoss)) {
+                                    // Convert current loss to USD
+                                    const currentLossUSD =
+                                        slLossCurrency === '$'
+                                            ? currentLoss
+                                            : (currentLoss *
+                                                  (markPx *
+                                                      notionalSymbolQtyNum)) /
+                                              100;
+
+                                    // Convert USD to new currency
+                                    const newLossValue =
+                                        currency === '$'
+                                            ? currentLossUSD
+                                            : (currentLossUSD /
+                                                  (markPx *
+                                                      notionalSymbolQtyNum)) *
+                                              100;
+
+                                    setStopLossLoss?.(newLossValue.toString());
+                                }
                             }
+
+                            setSlLossCurrency?.(currency);
                         }}
                         cssPositioning='fixed'
                     />
@@ -295,10 +427,12 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             </div>
             {stopLossLoss && (
                 <span className={styles.expectedProfitText}>
-                    Expected Loss:{' '}
-                    {expectedLoss
-                        ? `$${expectedLoss.toFixed(2)}`
-                        : 'Calculating...'}
+                    {`${expectedLoss && expectedLoss < 0 ? 'Expected Profit' : 'Expected Loss'}: `}
+                    {expectedLoss == null
+                        ? 'Calculating...'
+                        : slLossCurrency === '%'
+                          ? `$${Math.abs(expectedLoss).toFixed(2)}`
+                          : `${((Math.abs(expectedLoss) / (markPx * notionalSymbolQtyNum)) * 100).toFixed(3)}%`}
                 </span>
             )}
         </section>

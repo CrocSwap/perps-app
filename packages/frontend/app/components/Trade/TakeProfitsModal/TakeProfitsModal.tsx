@@ -4,6 +4,10 @@ import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
+import {
+    pctFromDollars,
+    dollarsFromPct,
+} from '~/utils/functions/profitLossConversions';
 
 type Currency = '$' | '%';
 
@@ -61,56 +65,12 @@ export default function TakeProfitsModal(props: PropIF) {
     const snapPriceForInput = (v: number) =>
         String(roundToNearestIncrement(v, priceTickSize));
 
-    // how many decimals does a step like 1e-8 or 0.001 imply?
-    const decimalsFromStep = (step: number) => {
-        if (!Number.isFinite(step) || step <= 0) return 8;
-        const s = String(step);
-        if (s.includes('e-')) return parseInt(s.split('e-')[1], 10);
-        const dot = s.indexOf('.');
-        return dot === -1 ? 0 : s.length - dot - 1;
-    };
-
     const formatCrypto = (value: number) =>
         value.toFixed(8).replace(/\.?0+$/, '');
 
     // --- helpers: derive $ / % from a typed TP/SL price (NEW) ---
     const toInput = (n: number) =>
         Number.isFinite(n) ? String(+n.toFixed(8)).replace(/\.?0+$/, '') : '';
-
-    const isTpDirectionValid = (tp: number) =>
-        (isLong && tp > entryPrice) || (!isLong && tp < entryPrice);
-
-    const isSlDirectionValid = (sl: number) =>
-        (isLong && sl < entryPrice) || (!isLong && sl > entryPrice);
-
-    const gainFromTpPrice = (tpPrice: number) => {
-        const dollars = computePnlAtPrice(tpPrice); // same PnL math
-        const pct =
-            ((isLong ? tpPrice - entryPrice : entryPrice - tpPrice) /
-                entryPrice) *
-            100;
-        return { dollars, pct };
-    };
-
-    // canonical $ ↔ % conversions
-    const pctFromDollars = (dollars: number) =>
-        Number.isFinite(dollars) && entryPrice > 0 && effectiveQty > 0
-            ? (dollars / (entryPrice * effectiveQty)) * 100
-            : NaN;
-
-    const dollarsFromPct = (pct: number) =>
-        Number.isFinite(pct) && entryPrice > 0 && effectiveQty > 0
-            ? (pct / 100) * entryPrice * effectiveQty
-            : NaN;
-
-    const lossFromSlPrice = (slPrice: number) => {
-        const dollars = Math.abs(computePnlAtPrice(slPrice));
-        const pct =
-            (Math.abs(isLong ? slPrice - entryPrice : entryPrice - slPrice) /
-                entryPrice) *
-            100;
-        return { dollars, pct };
-    };
 
     // --- threshold for “this looks really far from entry” warnings ---
     const OUTLIER_RATIO = 0.5; // 50%
@@ -374,7 +334,13 @@ export default function TakeProfitsModal(props: PropIF) {
                 const gainValue =
                     p.takeProfitGainType === '$'
                         ? Number(dollars.toFixed(2))
-                        : Number(pctFromDollars(dollars).toFixed(3));
+                        : Number(
+                              pctFromDollars(
+                                  dollars,
+                                  entryPrice,
+                                  effectiveQty,
+                              ).toFixed(3),
+                          );
 
                 // Update both UI state and form state for gain field
                 setUi((u) => ({
@@ -402,7 +368,13 @@ export default function TakeProfitsModal(props: PropIF) {
                 const lossValue =
                     p.stopLossAmountType === '$'
                         ? Number(dollars.toFixed(2))
-                        : Number(pctFromDollars(dollars).toFixed(3));
+                        : Number(
+                              pctFromDollars(
+                                  dollars,
+                                  entryPrice,
+                                  effectiveQty,
+                              ).toFixed(3),
+                          );
 
                 // Update both UI state and form state for loss field
                 setUi((u) => ({
@@ -426,7 +398,9 @@ export default function TakeProfitsModal(props: PropIF) {
         const gain = parseFloat(v);
         if (Number.isFinite(gain) && effectiveQty > 0) {
             const dollars =
-                form.takeProfitGainType === '$' ? gain : dollarsFromPct(gain);
+                form.takeProfitGainType === '$'
+                    ? gain
+                    : dollarsFromPct(gain, entryPrice, effectiveQty);
 
             if (Number.isFinite(dollars)) {
                 setUi((u) => ({
@@ -465,7 +439,9 @@ export default function TakeProfitsModal(props: PropIF) {
         const loss = parseFloat(v);
         if (Number.isFinite(loss) && effectiveQty > 0) {
             const dollars =
-                form.stopLossAmountType === '$' ? loss : dollarsFromPct(loss);
+                form.stopLossAmountType === '$'
+                    ? loss
+                    : dollarsFromPct(loss, entryPrice, effectiveQty);
 
             if (Number.isFinite(dollars)) {
                 setUi((u) => ({
@@ -508,7 +484,13 @@ export default function TakeProfitsModal(props: PropIF) {
                 const formattedValue =
                     c === '$'
                         ? Number(ui.tpGainUSD.toFixed(2))
-                        : Number(pctFromDollars(ui.tpGainUSD).toFixed(3));
+                        : Number(
+                              pctFromDollars(
+                                  ui.tpGainUSD,
+                                  entryPrice,
+                                  effectiveQty,
+                              ).toFixed(3),
+                          );
                 next.takeProfitGain = toInput(formattedValue);
             }
             return next;
@@ -527,7 +509,13 @@ export default function TakeProfitsModal(props: PropIF) {
                 const formattedValue =
                     c === '$'
                         ? Number(ui.slLossUSD.toFixed(2))
-                        : Number(pctFromDollars(ui.slLossUSD).toFixed(3));
+                        : Number(
+                              pctFromDollars(
+                                  ui.slLossUSD,
+                                  entryPrice,
+                                  effectiveQty,
+                              ).toFixed(3),
+                          );
                 next.stopLossAmount = toInput(formattedValue);
             }
             return next;
@@ -548,7 +536,13 @@ export default function TakeProfitsModal(props: PropIF) {
             const gainValue =
                 form.takeProfitGainType === '$'
                     ? Number(dollars.toFixed(2))
-                    : Number(pctFromDollars(dollars).toFixed(3));
+                    : Number(
+                          pctFromDollars(
+                              dollars,
+                              entryPrice,
+                              effectiveQty,
+                          ).toFixed(3),
+                      );
 
             setUi((u) => ({ ...u, tpGainUSD: Math.max(0, dollars) }));
             setForm((p) => ({
@@ -573,7 +567,13 @@ export default function TakeProfitsModal(props: PropIF) {
             const lossValue =
                 form.stopLossAmountType === '$'
                     ? Number(dollars.toFixed(2))
-                    : Number(pctFromDollars(dollars).toFixed(3));
+                    : Number(
+                          pctFromDollars(
+                              dollars,
+                              entryPrice,
+                              effectiveQty,
+                          ).toFixed(3),
+                      );
 
             setUi((u) => ({ ...u, slLossUSD: dollars }));
             setForm((p) => ({
@@ -932,7 +932,7 @@ export default function TakeProfitsModal(props: PropIF) {
                             {expectedProfit == null
                                 ? '—'
                                 : form.takeProfitGainType === '$'
-                                  ? `${pctFromDollars(Math.abs(expectedProfit)).toFixed(3)}%`
+                                  ? `${pctFromDollars(Math.abs(expectedProfit), entryPrice, effectiveQty).toFixed(3)}%`
                                   : `$${Math.abs(expectedProfit).toFixed(2)}`}
                             {isTakeProfitInvalid &&
                                 showTakeProfitValidation && (
@@ -1033,7 +1033,7 @@ export default function TakeProfitsModal(props: PropIF) {
                                 ? '—'
                                 : form.stopLossAmountType === '%'
                                   ? `$${Math.abs(expectedLoss).toFixed(2)}`
-                                  : `${pctFromDollars(Math.abs(expectedLoss)).toFixed(3)}%`}
+                                  : `${pctFromDollars(Math.abs(expectedLoss), entryPrice, effectiveQty).toFixed(3)}%`}
                             {isStopLossInvalid && showStopLossValidation && (
                                 <span className={styles.validationError}>
                                     {' '}
