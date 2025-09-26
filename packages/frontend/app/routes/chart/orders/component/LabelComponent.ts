@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
@@ -15,15 +15,19 @@ import {
     getMainSeriesPaneIndex,
     getPaneCanvasAndIFrameDoc,
     getXandYLocationForChartDrag,
+    updateOverlayCanvasSize,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
 import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
+import orderLinesLabelTooltip from '../../overlayCanvas/OrderLinesOverlayTooltip';
+import { useLazyD3 } from '../../hooks/useLazyD3';
 
 interface LabelProps {
     lines: LineData[];
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
+    canvasWrapperRef: React.MutableRefObject<HTMLDivElement | null>;
     zoomChanged: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     canvasSize: any;
@@ -45,6 +49,7 @@ interface LabelProps {
 const LabelComponent = ({
     lines,
     overlayCanvasRef,
+    canvasWrapperRef,
     zoomChanged,
     canvasSize,
     drawnLabelsRef,
@@ -65,9 +70,105 @@ const LabelComponent = ({
     const { executeLimitOrder } = useLimitOrderService();
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [horizontalLine, setHorizontalLine] = useState<any>();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [horizontalLineLogScale, setHorizontalLineLogScale] = useState<any>();
+
     const [isDrag, setIsDrag] = useState(false);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dragLabelTooltipRef = useRef<any>(null);
+    const showLabelTooltip = useRef<boolean>(true);
+
     const isLiqPriceLineDraggable = false;
+    const { d3, d3fc } = useLazyD3() ?? {};
+
+    useEffect(() => {
+        const dpr = Math.round(window.devicePixelRatio) || 1;
+
+        if (
+            scaleData !== undefined &&
+            canvasSize &&
+            isChartReady &&
+            d3 &&
+            d3fc
+        ) {
+            const dummyXScale = d3
+                .scaleLinear()
+                .domain([0, 1])
+                .range([0, canvasSize.width]);
+
+            const horizontalLine = d3fc
+                .annotationCanvasLine()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .value((d: any) => d.yPrice)
+                .yScale(scaleData?.yScale)
+                .xScale(dummyXScale)
+                .orient('horizontal')
+                .label('');
+            horizontalLine.decorate(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (context: CanvasRenderingContext2D, d: any) => {
+                    context.strokeStyle = d.color;
+                    context.fillStyle = d.color;
+                    context.lineWidth = d.lineWidth * dpr;
+                    if (d.dash) {
+                        const scaledDash = d.dash.map(
+                            (val: number) => val * dpr,
+                        );
+                        context.setLineDash(scaledDash);
+                    }
+                },
+            );
+
+            const horizontalLineLogScale = d3fc
+                .annotationCanvasLine()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .value((d: any) => d.yPrice)
+                .yScale(scaleData?.scaleSymlog)
+                .xScale(dummyXScale)
+                .orient('horizontal')
+                .label('');
+
+            horizontalLineLogScale.decorate(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (context: CanvasRenderingContext2D, d: any) => {
+                    context.strokeStyle = d.color;
+                    context.fillStyle = d.color;
+                    context.lineWidth = d.lineWidth * dpr;
+                    if (d.dash) {
+                        const scaledDash = d.dash.map(
+                            (val: number) => val * dpr,
+                        );
+                        context.setLineDash(scaledDash);
+                    }
+                },
+            );
+
+            setHorizontalLine(() => {
+                return horizontalLine;
+            });
+
+            setHorizontalLineLogScale(() => {
+                return horizontalLineLogScale;
+            });
+        }
+    }, [scaleData, canvasSize === undefined, isChartReady]);
+
+    useEffect(() => {
+        if (!overlayCanvasRef.current || !canvasWrapperRef.current) return;
+
+        if (dragLabelTooltipRef.current) return;
+
+        const labelTooltip = orderLinesLabelTooltip({
+            overlayCanvasRef,
+            canvasWrapperRef,
+        });
+
+        dragLabelTooltipRef.current = labelTooltip;
+    }, [overlayCanvasRef, canvasWrapperRef]);
 
     useEffect(() => {
         if (!chart || !isChartReady || !ctx || !canvasSize) return;
@@ -75,39 +176,37 @@ const LabelComponent = ({
         let animationFrameId: number | null = null;
 
         const draw = () => {
-            let heightAttr = canvasSize?.height;
-            let widthAttr = canvasSize?.width;
+            const heightAttr = canvasSize?.height;
+            const widthAttr = canvasSize?.width;
 
             if (overlayCanvasRef.current) {
-                const { iframeDoc, paneCanvas } =
-                    getPaneCanvasAndIFrameDoc(chart);
-
-                if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
-
-                const width = overlayCanvasRef.current.style.width;
-                const height = overlayCanvasRef.current.style?.height;
-
-                heightAttr = paneCanvas?.height;
-                widthAttr = paneCanvas.width;
-
-                if (
-                    width !== canvasSize?.styleWidth ||
-                    height !== canvasSize?.styleWidth
-                ) {
-                    overlayCanvasRef.current.style.width = `${canvasSize?.styleWidth}px`;
-                    overlayCanvasRef.current.style.height = `${canvasSize?.styleHeight}px`;
-                    overlayCanvasRef.current.width = paneCanvas.width;
-                    overlayCanvasRef.current.height = paneCanvas.height;
-                }
+                updateOverlayCanvasSize(overlayCanvasRef.current, canvasSize);
             }
-
             drawnLabelsRef.current.map((i) => {
                 const data = i.labelLocations;
                 data?.forEach((item) => {
-                    ctx.clearRect(item.x, item.y, item.width, item.height);
+                    ctx.clearRect(0, item.y, canvasSize.width, item.height);
                 });
             });
 
+            const paneIndex = getMainSeriesPaneIndex(chart);
+            if (paneIndex === null)
+                return { pixel: 0, chartHeight: 0, textHeight: 0 };
+            const priceScalePane = chart.activeChart().getPanes()[
+                paneIndex
+            ] as IPaneApi;
+            const priceScale = priceScalePane.getMainSourcePriceScale();
+            if (priceScale) {
+                const isLogarithmic = priceScale.getMode() === 1;
+
+                if (horizontalLineLogScale && isLogarithmic) {
+                    horizontalLineLogScale.context(ctx);
+                    horizontalLineLogScale(lines);
+                } else if (horizontalLine) {
+                    horizontalLine.context(ctx);
+                    horizontalLine(lines);
+                }
+            }
             const linesWithLabels = lines.map((line) => {
                 const yPricePixel = getPricetoPixel(
                     chart,
@@ -212,6 +311,9 @@ const LabelComponent = ({
         zoomChanged,
         canvasSize,
         selectedLine,
+        horizontalLine,
+        horizontalLineLogScale,
+        scaleData?.yScale.domain(),
     ]);
 
     useLayoutEffect(() => {
@@ -233,8 +335,24 @@ const LabelComponent = ({
                         isLiqPriceLineDraggable)) &&
                 isLabel.label.type !== 'Cancel'
             ) {
-                if (overlayCanvasRef.current)
+                if (overlayCanvasRef.current) {
+                    if (
+                        dragLabelTooltipRef.current &&
+                        showLabelTooltip.current
+                    ) {
+                        dragLabelTooltipRef.current
+                            .style('visibility', 'visible')
+                            .style('top', isLabel.label.y - 30 + 'px')
+                            .style(
+                                'left',
+                                isLabel.label.x +
+                                    isLabel.label.width / 2 +
+                                    'px',
+                            );
+                    }
+
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
+                }
             } else {
                 if (overlayCanvasRef.current)
                     overlayCanvasRef.current.style.pointerEvents = 'none';
@@ -324,6 +442,13 @@ const LabelComponent = ({
                                                 ).style.cursor = 'crosshair';
                                             }
                                         }
+                                    }
+                                } else {
+                                    if (dragLabelTooltipRef.current) {
+                                        dragLabelTooltipRef.current.style(
+                                            'visibility',
+                                            'hidden',
+                                        );
                                     }
                                 }
                             }
@@ -524,7 +649,7 @@ const LabelComponent = ({
     }
 
     useEffect(() => {
-        if (!overlayCanvasRef.current) return;
+        if (!overlayCanvasRef.current || !d3 || !d3fc) return;
         let tempSelectedLine: LabelLocationData | undefined = undefined;
         const canvas = overlayCanvasRef.current;
         let originalPrice: number | undefined = undefined;
@@ -532,6 +657,11 @@ const LabelComponent = ({
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
+            if (dragLabelTooltipRef.current) {
+                showLabelTooltip.current = false;
+                dragLabelTooltipRef.current.style('visibility', 'hidden');
+            }
+
             const rect = canvas.getBoundingClientRect();
             const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
             const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
@@ -561,7 +691,7 @@ const LabelComponent = ({
         const handleDragging = (event: any) => {
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
-                canvas.getBoundingClientRect(),
+                dpr,
             );
 
             let advancedValue = scaleData?.yScale.invert(clientY);
@@ -761,6 +891,10 @@ const LabelComponent = ({
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.cursor = 'pointer';
+
+                    overlayCanvasRef.current.style.pointerEvents = 'none';
+
+                    showLabelTooltip.current = true;
                 }
             }, 300);
         };
