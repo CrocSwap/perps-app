@@ -57,6 +57,7 @@ export const usePositionOrderLines = (): LineData[] => {
                     type: 'PNL',
                     lineStyle: 3,
                     lineWidth: 1,
+                    dash: [6, 6],
                 });
             }
 
@@ -77,6 +78,7 @@ export const usePositionOrderLines = (): LineData[] => {
                     type: 'LIQ',
                     lineStyle: 3,
                     lineWidth: 2,
+                    dash: [12, 12],
                 });
             }
 
