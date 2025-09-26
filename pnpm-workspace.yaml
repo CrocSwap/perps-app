@@ -3,6 +3,7 @@ packages:
 
 onlyBuiltDependencies:
     - blake-hash
+    - esbuild
     - protobufjs
     - tiny-secp256k1
     - usb
