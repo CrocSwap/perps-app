@@ -155,6 +155,10 @@ export const MARKET_WS_ENDPOINT =
     import.meta.env.VITE_MARKET_WS_ENDPOINT || 'wss://api.hyperliquid.xyz';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
+export const FUUL_API_KEY =
+    import.meta.env.VITE_FUUL_API_KEY ||
+    'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+
 export const USER_WS_ENDPOINT =
     import.meta.env.VITE_USER_WS_ENDPOINT ||
     'wss://embindexer.net/ember/tradesocket';
