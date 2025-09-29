@@ -299,6 +299,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     <ComboBox
                         value={tpGainCurrency}
                         options={currencyOptions}
+                        noMinWidth
                         onChange={(val) => {
                             const currency = val as '$' | '%';
                             if (currency === tpGainCurrency) return;
@@ -385,6 +386,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     <ComboBox
                         value={slLossCurrency}
                         options={currencyOptions}
+                        noMinWidth
                         onChange={(val) => {
                             const currency = val as '$' | '%';
                             if (currency === slLossCurrency) return;

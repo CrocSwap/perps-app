@@ -15,6 +15,7 @@ interface ComboBoxProps {
     modifyValue?: (value: string | number | undefined) => ReactNode;
     cssPositioning?: CssPositioning;
     type?: 'big-val';
+    noMinWidth?: boolean;
 }
 const ComboBox: React.FC<ComboBoxProps> = ({
     value,
@@ -25,6 +26,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     modifyValue,
     type,
     cssPositioning,
+    noMinWidth,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const comboBoxRef = useOutsideClick<HTMLDivElement>(() => {
@@ -109,7 +111,10 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                         setIsOpen((o) => !o);
                     }}
                 >
-                    <div className={styles.comboBoxValue}>
+                    <div
+                        className={styles.comboBoxValue}
+                        style={{ minWidth: noMinWidth ? '0' : '2rem' }}
+                    >
                         {modifyValue ? modifyValue(value) : value}{' '}
                     </div>
                     <div
