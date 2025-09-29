@@ -3,6 +3,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import type { UserBalanceSortBy } from '~/utils/UserDataIFs';
 import styles from './BalancesTable.module.css';
+import { t } from 'i18next';
 
 export interface HeaderCell {
     name: string;
@@ -28,37 +29,37 @@ export default function BalancesTableHeader({
 
     const tableHeaders: HeaderCell[] = [
         {
-            name: 'Coin',
+            name: t('tradeTable.coin'),
             key: 'sortName',
             sortable: true,
             className: styles.coinCell,
         },
         {
-            name: 'Total Balance',
+            name: t('tradeTable.totalBalance'),
             key: 'total',
             sortable: true,
             className: styles.totalBalanceCell,
         },
         {
-            name: 'Available Balance',
+            name: t('tradeTable.availableBalance'),
             key: 'available',
             sortable: true,
             className: styles.availableBalanceCell,
         },
         {
-            name: `${selectedCurrency} Value`,
+            name: t('tradeTable.currencyValue', { currency: selectedCurrency }),
             key: 'usdcValue',
             sortable: true,
             className: styles.usdcValueCell,
         },
         {
-            name: 'Buying Power',
+            name: t('tradeTable.buyingPower'),
             key: 'buyingPower',
             sortable: true,
             className: styles.buyingPowerCell,
         },
         {
-            name: 'Contract',
+            name: t('tradeTable.contract'),
             key: 'contract',
             sortable: false,
             className: styles.contractCell,

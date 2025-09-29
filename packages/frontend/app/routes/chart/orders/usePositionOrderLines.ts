@@ -12,6 +12,7 @@ import {
 } from './customOrderLineUtils';
 import { LIQ_PRICE_LINE_COLOR } from './orderLineUtils';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { t } from 'i18next';
 
 export const usePositionOrderLines = (): LineData[] => {
     const { chart } = useTradingView();
@@ -66,7 +67,7 @@ export const usePositionOrderLines = (): LineData[] => {
                     yPrice: order.liqPrice,
                     textValue: {
                         type: 'Liq',
-                        text: ' Liq. Price',
+                        text: `${t('chart.liqPrice')}`,
                     } as LineLabel,
                     quantityTextValue: order.liqPrice,
                     quantityText: formatLiquidationPrice(

@@ -6,10 +6,9 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import type { UserFillIF, UserFillSortBy } from '~/utils/UserDataIFs';
-import TradeHistoryTableHeader, {
-    TradeHistoryTableModel,
-} from './TradeHistoryTableHeader';
+import TradeHistoryTableHeader from './TradeHistoryTableHeader';
 import TradeHistoryTableRow from './TradeHistoryTableRow';
+import { t } from 'i18next';
 interface TradeHistoryTableProps {
     data: UserFillIF[];
     isFetched: boolean;
@@ -91,8 +90,7 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
                 skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
                 defaultSortBy={'time'}
                 defaultSortDirection={'desc'}
-                tableModel={TradeHistoryTableModel}
-                noDataMessage='No trade history'
+                noDataMessage={t('tradeTable.noTradeHistory')}
                 csvDataFetcher={fetchUserFills}
                 csvDataFetcherArgs={[userAddress, true]}
             />

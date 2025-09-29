@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import styles from './VaultCard.module.css';
+import { t } from 'i18next';
 
 interface VaultCardProps {
     name: string;
@@ -83,7 +84,7 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
                 <input
                     type='text'
                     value={formatCurrency(yourDeposit, unit)}
-                    aria-label='Your deposit amount'
+                    aria-label={t('aria.yourDepositAmount')}
                     readOnly
                 />
             </div>

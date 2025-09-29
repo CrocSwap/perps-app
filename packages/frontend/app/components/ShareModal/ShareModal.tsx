@@ -13,6 +13,7 @@ import Modal from '../Modal/Modal';
 import perpsLogo from './perpsLogo.png';
 import shareCardBackground from './shareCardBackground.png';
 import styles from './ShareModal.module.css';
+import { t } from 'i18next';
 
 interface propsIF {
     close: () => void;
@@ -92,7 +93,9 @@ export default function ShareModal(props: propsIF) {
                                     backgroundColor: `var(--${memPosition.szi > 0 ? 'green' : 'red'}-dark)`,
                                 }}
                             >
-                                {(memPosition.szi > 0 ? 'Long' : 'Short') +
+                                {(memPosition.szi > 0
+                                    ? t('tradeTable.long')
+                                    : t('tradeTable.short')) +
                                     ' ' +
                                     Math.floor(memPosition.leverage.value)}
                                 x
@@ -110,11 +113,11 @@ export default function ShareModal(props: propsIF) {
                     </div>
                     <div className={styles.prices}>
                         <div className={styles.price}>
-                            <div>Entry Price</div>
+                            <div>{t('tradeTable.entryPrice')}</div>
                             <div>{formatNum(memPosition.entryPx)}</div>
                         </div>
                         <div className={styles.price}>
-                            <div>Mark Price</div>
+                            <div>{t('tradeTable.markPrice')}</div>
                             <div>
                                 {formatNum(
                                     coinPriceMap.get(memPosition.coin) ?? 0,
@@ -134,14 +137,18 @@ export default function ShareModal(props: propsIF) {
                     </div> */}
                     <div className={styles.custom_text}>
                         <label htmlFor={TEXTAREA_ID_FOR_DOM}>
-                            Customize your text
+                            {t('share.prompt')}
                         </label>
                         <textarea
                             id={TEXTAREA_ID_FOR_DOM}
                             ref={inputRef}
                             maxLength={TWITTER_CHARACTER_LIMIT}
                             autoComplete='false'
-                            defaultValue={`Trade $${memPosition.coin} perps at ${PERPS_TWITTER} on ${FOGO_TWITTER} Testnet now`}
+                            defaultValue={t('share.textPlaceholder', {
+                                coin: memPosition.coin,
+                                twitter: PERPS_TWITTER,
+                                fogo: FOGO_TWITTER,
+                            })}
                         />
                     </div>
                     <div className={styles.button_bank}>
@@ -174,7 +181,7 @@ export default function ShareModal(props: propsIF) {
                                     );
                             }}
                         >
-                            Share on 𝕏 <RiTwitterFill />
+                            {t('share.xCTA')} <RiTwitterFill />
                         </button>
                     </div>
                 </div>

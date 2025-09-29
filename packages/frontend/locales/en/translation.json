@@ -1,0 +1,551 @@
+{
+    "common": {
+        "yes": "Yes",
+        "no": "No",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "close": "Close",
+        "loading": "Loading...",
+        "confirming": "Confirming...",
+        "processing": "Processing...",
+        "error": "Error",
+        "success": "Success",
+        "applyDefaults": "Apply Defaults",
+        "learnMore": "Learn More",
+        "deposit": "Deposit",
+        "transfer": "Transfer",
+        "withdraw": "Withdraw",
+        "submit": "Submit",
+        "quantity": "Quantity",
+        "confirm": "Confirm",
+        "amount": "Amount",
+        "max": "Max",
+        "min": "Min",
+        "positions": "Positions",
+        "balances": "Balances",
+        "openOrders": "Open Orders",
+        "tradeHistory": "Trade History",
+        "fundingHistory": "Funding History",
+        "orderHistory": "Order History",
+        "depositsAndWithdrawals": "Deposits & Withdrawals",
+        "twap": "TWAP",
+        "all": "All",
+        "active": "Active",
+        "long": "Long",
+        "short": "Short",
+        "create": "Create",
+        "update": "Update",
+        "reset": "Reset",
+        "announcements": "Announcements",
+        "leverage": "Leverage",
+        "comingSoon": "Coming Soon"
+    },
+    "transactions": {
+        "orderTypes": "Order Types",
+        "marginMode": "Margin Mode",
+        "scaleOptions": "Scale Options",
+        "confirmBuyOrder": "Confirm Buy Order",
+        "confirmSellOrder": "Confirm Sell Order",
+        "confirmLimitBuyOrder": "Confirm Limit Buy Order",
+        "confirmLimitSellOrder": "Confirm Limit Sell Order",
+        "availableToTrade": "Available to Trade",
+        "availableToTradeTooltip": "Deposited {{symbol}}",
+        "currentPosition": "Current Position",
+        "currentPositionTooltip": "Current {{symbol}} position size",
+        "maxOpenInterestReached": "Maximum Open Interest Reached",
+        "depositToTrade": "Deposit to Trade",
+        "switchDirectionToReduce": "Switch Direction to Reduce",
+        "maxLongDepositToTrade": "Max Long - Deposit to Trade",
+        "maxShortDepositToTrade": "Max Short - Deposit to Trade",
+        "minimumOr100Percent": "Minimum or 100%",
+        "minimum": "Minimum",
+        "invalidPrice": "Invalid Price",
+        "orderSizeBelowMinimum": "Order size is below the minimum",
+        "orderSizeExceedsPositionLimits": "Order size exceeds position limits",
+        "insufficientCollateral": "Insufficient Collateral",
+        "reduceOnlyExceedsPositionSize": "Reduce Only amount exceeds position size",
+        "processingOrder": "Processing order...",
+        "positionLimitReached": "Position limit reached",
+        "limitOrderFailed": "Limit Order Failed",
+        "unknownErrorOccurred": "An unknown error occurred",
+        "failedToPlaceLimitOrder": "Unable to place limit order",
+        "sellShortLimitOrderPlaced": "Sell/Short Limit Order Placed",
+        "sellShortLimitOrderPending": "Sell/Short Limit Order Pending",
+        "successfullyPlacedSellOrderFor": "Sell order placed for {{usdValueOfOrderStr}} {{symbol}} at {{limitPrice}}",
+        "placingSellShortLimitOrderFor": "Placing limit sell order for {{usdValueOfOrderStr}} {{symbol}} at {{limitPrice}}",
+        "enterValidLimitPrice": "Enter a valid limit price",
+        "enterValidOrderSize": "Enter a valid order size",
+        "buyLongLimitOrderPlaced": "Buy/Long Limit Order Placed",
+        "successfullyPlacedBuyOrderFor": "Buy order placed for {{usdValueOfOrderStr}} {{symbol}} at {{limitPrice}}",
+        "buyLongLimitOrderPending": "Buy/Long Limit Order Pending",
+        "placingBuyLongLimitOrderFor": "Placing limit buy order for {{usdValueOfOrderStr}} {{symbol}} at {{limitPrice}}",
+        "priceDistribution": "Price Distribution",
+        "flat": "Flat",
+        "flatPriceDistribution": "Flat Price Distribution",
+        "evenlySplit": "Evenly Split",
+        "evenPriceDistribution": "Even Price Distribution",
+        "market": "Market",
+        "limit": "Limit",
+        "price": "Price",
+        "size": "Size",
+        "time": "Time",
+        "total": "Total",
+        "action": "Action",
+        "ratio": "Ratio",
+        "buyLong": "Buy / Long",
+        "sellShort": "Sell / Short",
+        "confirmingTransaction": "Confirming transaction...",
+        "processing": "Processing...",
+        "dontShowThisAgain": "Don't show this again",
+        "estLiquidationPrice": "Estimated Liquidation Price",
+        "estimatedPriceAtWhichPosWillBeLiquidated": "Estimated liquidation price for your position",
+        "orderValue": "Order Value",
+        "hideSmallBalances": "Hide Small Balances",
+        "increasing": "Increasing",
+        "decreasing": "Decreasing",
+        "totalOrders": "Total Orders",
+        "orderRatioSumMustBe100": "Sum of order ratios must be 100%",
+        "collapseDetails": "Collapse Details",
+        "expandDetails": "Expand Details",
+        "frequency": "Frequency",
+        "runTime": "Run Time",
+        "numberOfOrders": "Number of Orders",
+        "chasingInterval": "Chasing Interval",
+        "sizePerSuborder": "Size per Suborder",
+        "avgEntryPrice": "Avg. Entry Price",
+        "averageEntryPrice": "Average Entry Price",
+        "marginRequired": "Margin Required",
+        "maxPosSizeLimitedByOiCap": "Max position size limited by open interest cap",
+        "openPositionIsXSwitchToY": "Open position: {{x}}. Switch to {{y}}.",
+        "buySellAtCurrentPrice": "Buy/Sell at Current Price",
+        "buySellAtSpecificPrice": "Buy/Sell at Specific Price",
+        "maxTradeSizeLimitedTo": "Maximum trade size limited",
+        "yourPositionIsLimitedByOpenInterest": "Your {{coin}} position is limited by the {{limitedBy}} cap",
+        "currentMaxTradeSizeForMarket": "Current max trade size for this market: {{limit}}",
+        "placingLimitOrderFor": "Placing limit order for {{usdValueOfOrderStr}} {{symbol}} at {{limitPrice}}",
+        "sellOrderPending": "Sell Order Pending",
+        "orderSubmittedFor": "Order submitted for {{usdValueOfOrderStr}} {{symbol}}",
+        "buyOrderPending": "Buy Order Pending",
+        "buyOrderSuccessful": "Buy Order Successful",
+        "successfullyBought": "Successfully bought {{usdValueOfOrderStr}} {{symbol}}",
+        "sellOrderSuccessful": "Sell Order Successful",
+        "successfullySold": "Successfully sold {{usdValueOfOrderStr}} {{symbol}}",
+        "sellOrderFailed": "Sell Order Failed",
+        "transactionFailed": "Transaction Failed",
+        "buyOrderFailed": "Buy Order Failed",
+        "closeFailed": "Failed to close position",
+        "closeFailedTitle": "Close Failed",
+        "liquidationPrice": "Liquidation Price",
+        "enterPrice": "Enter Price",
+        "enterSize": "Enter Size",
+        "totalSize": "Total Size",
+        "cancelling": "Cancelling...",
+        "midButton": "MID",
+        "positionClosed": "Position Closed",
+        "successfullyClosedPosition": "Successfully closed {{usdValueOfOrderStr}} of {{symbol}} position",
+        "failedToClosePosition": "Failed to close position",
+        "transactionTimedOut": "Transaction timed out after {{timeInSeconds}} seconds",
+        "txFailedOrNotConfirmed": "Transaction failed or was not confirmed",
+        "walletBalance": "Wallet balance",
+        "walletBalanceTooltip": "Your current wallet balance",
+        "depositSuccessful": "Deposit Successful",
+        "successfullyDeposited": "Successfully deposited {{amount}} {{unit}}",
+        "depositFailed": "Deposit Failed",
+        "withdrawalSuccessful": "Withdrawal Successful",
+        "successfullyWithdrawn": "Successfully withdrew {{amount}} {{unit}}",
+        "withdrawFailed": "Withdrawal Failed",
+        "availableToDeposit": "Available to Deposit",
+        "availableToDepositTooltip": "Available to deposit based on vault capacity and wallet balance",
+        "availableToWithdraw": "Available to Withdraw",
+        "availableToWithdrawTooltip": "The total amount you have available to withdraw from your portfolio",
+        "invalidAmount": "Invalid Amount",
+        "depositToVault": "Deposit {{unitValue}} to {{vaultName}}",
+        "depositToVaultMsg": "Deposit {{unitValue}} to earn yield from the {{vaultName}}. Deposits will be available for withdrawal after the next epoch.",
+        "txFailedTryAgain": "Transaction failed. Please try again.",
+        "minDepositAmountIs": "Minimum deposit amount is ${{amount}}",
+        "enterAmountMin10": "Enter amount (min $10)",
+        "cancellingAllOrders": {
+            "title": "Cancelling All Orders",
+            "message": "Attempting to cancel {{count}} {{noun}}..."
+        },
+        "cancelOrderPending": {
+            "title": "Cancel Order Pending",
+            "message": "Canceling order for {{usdValueOfOrderStr}} of {{symbol}}"
+        },
+        "cancelOrderConfirmed": {
+            "title": "Order Canceled",
+            "message": "Successfully canceled order for {{usdValueOfOrderStr}} of {{symbol}}"
+        },
+        "cancelFailed": {
+            "title": "Cancel Failed",
+            "message": "Order ID not found",
+            "message2": "Failed to cancel order"
+        },
+        "cancelLimitPending": {
+            "title": "Cancel Limit Pending",
+            "message": "Canceling {{side}} limit order for {{usdValueOfOrderStr}} of {{symbol}}"
+        },
+        "cancelLimitConfirmed": {
+            "title": "Order Canceled",
+            "message": "Successfully canceled {{side}} limit order for {{usdValueOfOrderStr}} of {{symbol}}"
+        },
+        "failedToUpdatedOrder": {
+            "title": "Failed to update order"
+        },
+        "orderUpdated": {
+            "title": "Order updated",
+            "message": "Successfully updated order for {{usdValueOfOrderStr}} of {{symbol}} at {{limitPrice}}"
+        },
+        "orderFilled": {
+            "title": "{{side}} Order Filled",
+            "message": "Successfully filled {{side}} order for {{usdValueOfFillStr}} of {{symbol}} at {{fillPrice}}"
+        },
+        "errorUpdatingOrder": {
+            "title": "Error updating order"
+        },
+        "cancelAllFailed": {
+            "title": "Cancel All Failed",
+            "message": "Failed to cancel any orders."
+        },
+        "cancelAllConfirmed": {
+            "title": "All Orders Canceled",
+            "message": "Successfully canceled all {{count}} orders"
+        },
+        "cancelAllPartialSuccess": {
+            "title": "Partial Success",
+            "message": "Canceled {{successCount}} orders, {{failedCount}} failed"
+        },
+        "noOpenOrders": "No open orders",
+        "transactionError": "Transaction Error",
+        "invalidLimitPrice": {
+            "title": "Invalid Price",
+            "message": "Please enter a valid limit price"
+        },
+        "invalidOrderSize": {
+            "title": "Invalid Order Size",
+            "message": "Please enter a valid order size"
+        },
+        "leverageUpdated": {
+            "title": "Leverage Updated",
+            "message": "Successfully updated leverage to {{leverage}}x"
+        },
+        "leverageUpdateFailed": {
+            "title": "Transaction Failed",
+            "message": "Failed to update leverage"
+        },
+        "viewOnExplorer": "View on explorer",
+        "limitOrderUpdatePending": {
+            "title": "Limit Order Update Pending",
+            "message": "Updating {{side}} order for {{value}} of {{coin}} at {{limitPrice}}"
+        },
+        "filled": "Filled",
+        "open": "Open",
+        "partiallyFilled": "Partially Filled",
+        "canceled": "Canceled",
+        "pending": "Pending",
+        "tpslToggleLabel": "Take Profit / Stop Loss"
+    },
+    "subaccounts": {
+        "createSubAccount": "Create Sub-Account",
+        "createSubAccountPH": "eg: My Sub-Account 1",
+        "created": {
+            "title": "Sub Account Created",
+            "message": "Made new strategy Sub-Account {{name}}",
+            "message2": "Made new discretionary sub-account {{name}}"
+        }
+    },
+    "strategies": {
+        "newStrategy": "New Strategy",
+        "editStrategy": "Edit Strategy"
+    },
+    "margin": {
+        "cross": {
+            "title": "Cross",
+            "heading": "Cross Margin",
+            "blurb": "All cross positions share the same cross margin as collateral. If liquidated, your cross margin balance and any remaining open positions under this mode may be forfeited."
+        },
+        "isolated": {
+            "title": "Isolated",
+            "heading": "Isolated Mode",
+            "blurb": "Manage risk on individual positions by limiting the margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. You can add or remove margin for individual positions in this mode."
+        }
+    },
+    "tradeTable": {
+        "selectATabToViewData": "Select a tab to view data",
+        "time": "Time",
+        "type": "Type",
+        "coin": "Coin",
+        "direction": "Direction",
+        "size": "Size",
+        "filledSize": "Filled Size",
+        "orderValue": "Order Value",
+        "price": "Price",
+        "tradeValue": "Trade Value",
+        "fee": "Fee",
+        "closedPnl": "Closed PnL",
+        "reduceOnly": "Reduce Only",
+        "triggerConditions": "Trigger Conditions",
+        "tpsl": "TP/SL",
+        "status": "Status",
+        "order": "Order",
+        "long": "Long",
+        "short": "Short",
+        "noOpenPositions": "No open positions",
+        "markPrice": "Mark Price",
+        "orderId": "Order ID",
+        "totalBalance": "Total Balance",
+        "availableBalance": "Available Balance",
+        "currencyValue": "{{currency}} Value",
+        "buyingPower": "Buying Power",
+        "contract": "Contract",
+        "positionValue": "Position Value",
+        "entryPrice": "Entry Price",
+        "pnl": "PnL (ROE%)",
+        "liqPrice": "Liquidation Price",
+        "margin": "Margin",
+        "funding": "Funding",
+        "close": "Close Position",
+        "originalSize": "Original Size",
+        "cancelAll": "Cancel All",
+        "noTradeHistory": "No trade history",
+        "noOrderHistory": "No order history",
+        "noFundingHistory": "No funding history",
+        "fundingHistory": "All-time: {{allTime}} Since change: {{sinceChange}}",
+        "openLong": "Open Long",
+        "openShort": "Open Short",
+        "closeLong": "Close Long",
+        "closeShort": "Close Short"
+    },
+    "time": {
+        "second": "second",
+        "seconds": "seconds",
+        "minute": "minute",
+        "minutes": "minutes",
+        "hour": "hour",
+        "hours": "hours",
+        "day": "day",
+        "days": "days",
+        "week": "week",
+        "weeks": "weeks",
+        "month": "month",
+        "months": "months",
+        "year": "year",
+        "years": "years"
+    },
+    "navigation": {
+        "home": "Home",
+        "about": "About",
+        "contact": "Contact",
+        "settings": "Settings",
+        "profile": "Profile",
+        "logout": "Log Out",
+        "trade": "Trade",
+        "chart": "Chart",
+        "book": "Order Book",
+        "recent": "Recent",
+        "positions": "Positions"
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Register",
+        "email": "Email",
+        "password": "Password",
+        "forgotPassword": "Forgot Password?",
+        "loginSuccess": "Login Successful",
+        "loginError": "Invalid credentials"
+    },
+    "forms": {
+        "name": "Name",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone",
+        "address": "Address",
+        "submit": "Submit",
+        "required": "This field is required"
+    },
+    "messages": {
+        "welcome": "Welcome",
+        "hello": "Hello, {{name}}!",
+        "goodbye": "Goodbye",
+        "thankYou": "Thank you",
+        "pleaseWait": "Please wait...",
+        "connectWalletForTrading": "Connect your wallet to start trading with zero gas fees."
+    },
+    "home": {
+        "title": "Trade Perps With Ambient",
+        "subtitle": "Fast execution. Zero taker fees. Up to 100x leverage.",
+        "startTrading": "Start Trading",
+        "learnMore": "Learn More",
+        "hero": {
+            "heading1": "Zero-to-",
+            "one": "One",
+            "heading2": "Decentralized Trading Protocol",
+            "description": "Ambient is an entirely new kind of decentralized perp DEX combining unique DeFi native products with a user experience rivaling CEXes",
+            "stats": {
+                "totalVolume": "Total Volume",
+                "activeUsers": "Active Users"
+            }
+        }
+    },
+    "referrals": {
+        "title": "Referrals",
+        "description": "Refer users to earn rewards. Affiliates earn higher rewards.",
+        "tradersReferred": "Traders Referred",
+        "rewardsEarned": "Rewards Earned"
+    },
+    "deposit": {
+        "prompt": "Deposit {{token}} from Fogo",
+        "input_prompt": "Enter amount (min ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "Available to Deposit"
+    },
+    "withdraw": {
+        "prompt": "Withdraw {{token}} to Fogo",
+        "explanation": "{{token}} will be sent to your address.",
+        "availableToWithdraw": "Available for Withdrawal",
+        "input_prompt": "Enter amount (min ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "orderBook": {
+        "tab": "Tab",
+        "stacked": "Stacked",
+        "large": "Large",
+        "book": "Book",
+        "trades": "Trades",
+        "spread": "Spread"
+    },
+    "appSettings": {
+        "title": "Settings",
+        "skipOpenOrderConfirm": "Skip Open Order Confirmation",
+        "enableTxNotifications": "Enable Transaction Notifications",
+        "enableBackgroundFillNotif": "Enable Background Fill Notifications",
+        "numberFormat": "Number Format",
+        "color": "Color",
+        "language": "Language"
+    },
+    "symbolInfo": {
+        "mark": "Mark",
+        "markTooltip": "Estimated fair value, calculated to prevent unfair liquidations",
+        "oracle": "Oracle",
+        "oracleTooltip": "Real-time price from the Pyth Network oracle",
+        "oracleTooltipPythStale": "Pyth Network oracle (price may be stale)",
+        "oracleTooltipNoPyth": "An external, aggregated market value sourced from multiple reputable exchanges",
+        "24hChange": "24h Change",
+        "24hChangeTooltip": "Change in price over the last 24 hours",
+        "24hVolume": "24h Volume",
+        "24hVolumeTooltip": "Total market volume in the last 24 hours",
+        "openInterest": "Open Interest",
+        "openInterestTooltip": "Total open interest in the market",
+        "fundingRate": "Funding Rate",
+        "fundingRateTooltip": "Hourly rate at which longs pay shorts (or vice versa if negative). No additional fees; funding is a peer-to-peer payment to keep prices aligned with spot markets.",
+        "fundingCountdown": "Funding Countdown",
+        "fundingCountdownTooltip": "Time remaining until next funding"
+    },
+    "feedback": {
+        "menuLabel": "Feedback",
+        "title": "Share Your Feedback",
+        "ratingPrompt": "How would you rate your experience?",
+        "sendFeedback": "Send Feedback",
+        "positivePrompt": "What do you like most?",
+        "negativePrompt": "What can we improve?",
+        "placeholder": "Your anonymous feedback helps us improve.",
+        "warningText": "Your feedback is too long and will be truncated.",
+        "submitButtonText": "Send Feedback",
+        "submittingButtonText": "Submitting...",
+        "appreciateText": "Thank you for your feedback.",
+        "thanksText": "Thank you!"
+    },
+    "accountOverview": {
+        "heading": "Account Overview",
+        "balance": "Balance",
+        "balanceTooltip": "Total account equity",
+        "unrealizedPnl": "Unrealized PnL",
+        "unrealizedPnlTooltip": "Unrealized profits and losses"
+    },
+    "marketLimitClose": {
+        "marketHeading": "Market Close",
+        "marketDescription": "This will send an order to close your position at the current market price.",
+        "minimumOr100Percent": "{{min}} Minimum or 100%",
+        "noZeroSize": "Size cannot be zero",
+        "sizeExceedsPosition": "Size cannot exceed your position",
+        "invalidOrderSizeTitle": "Invalid Order Size",
+        "invalidSize": "Enter a valid order size",
+        "limitHeading": "Limit Close",
+        "limitDescription": "This will send an order to close your position at the limit price.",
+        "estimatedClosedPnl": "Estimated closed PnL (without fees): {{estimatedPNL}}",
+        "positionClosed": "Position Closed",
+        "percentOfPositionClosed": "{{sizePercentageValue}}% of Position Closed"
+    },
+    "newVersion": {
+        "title": "New Version Available",
+        "message": {
+            "withVersionNumber": "Version {{version}} is ready to install with new features and improvements.",
+            "noVersionNumber": "A new version is ready to install with new features and improvements."
+        },
+        "updateButton": "Update Now",
+        "version": "Version"
+    },
+    "leverage": {
+        "title": "Adjust Leverage",
+        "closePositionPrompt": "Close position to reduce minimum leverage"
+    },
+    "share": {
+        "prompt": "Customize your text",
+        "xCTA": "Share on 𝕏",
+        "copyLinkCTA": "Copy Link",
+        "textPlaceholder": "Trade {{coin}} perps at {{twitter}} on {{fogo}} Testnet now"
+    },
+    "colors": {
+        "default": "Default",
+        "opposite": "Opposite",
+        "deuteranopia": "Deuteranopia",
+        "tritanopia": "Tritanopia",
+        "protanopia": "Protanopia"
+    },
+    "aria": {
+        "closeAnnouncement": "Close announcement",
+        "closeFeedbackForm": "Close feedback form",
+        "depositInput": "Deposit input",
+        "addressInput": "Address input",
+        "amountInput": "Amount input",
+        "withdrawInput": "Withdraw input",
+        "scrollTabsLeft": "Scroll tabs left",
+        "scrollTabsRight": "Scroll tabs right",
+        "leverageValue": "Leverage value",
+        "leverageAmount": "Leverage amount",
+        "setLeverageTo": "Set leverage to {{value}}x",
+        "positionSizePercentage": "Position size percentage",
+        "positionSizeValue": "Position size value",
+        "totalOrders": "Total orders",
+        "runningPriceInput": {
+            "minutes": "running price hours minutes field",
+            "hours": "running price hours minutes field"
+        },
+        "yourDepositAmount": "Your deposit amount",
+        "flatPriceDistribution": "Flat price distribution",
+        "evenPriceDistribution": "Evenly split price distribution",
+        "thumbsUp": "Thumbs up",
+        "thumbsDown": "Thumbs down",
+        "closeNav": "Close navigation menu",
+        "openSettings": "Open settings",
+        "openMoreOptionsMenu": "Open more options menu",
+        "previousPage": "Previous page",
+        "nextPage": "Next page",
+        "tradeType": "Trade type",
+        "closeTradeTypeMenu": "Close Trade Type Menu",
+        "toggleChasingInterval": "Toggle Chasing Interval",
+        "toggleRandomize": "Toggle Randomize",
+        "toggleReduceOnly": "Toggle Reduce Only",
+        "toggleTPSL": "Toggle Take Profit / Stop Loss",
+        "editTPSL": "Edit Take Profit / Stop Loss",
+        "toggleConfigureAmount": "Toggle Configure Amount",
+        "toggleLimitPrice": "Toggle Limit Price"
+    },
+    "chart": {
+        "liqPrice": "Liq. Price"
+    },
+    "meta": {
+        "title": "Home | Ambient",
+        "content": "Trade Perps With Ambient"
+    }
+}

@@ -33,6 +33,7 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
+import { useTranslation } from 'react-i18next';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -44,6 +45,7 @@ export default function PageHeader() {
     // logic to read a URL referral code and set in state + local storage
     const [searchParams] = useSearchParams();
     const userDataStore = useUserDataStore();
+    const { t } = useTranslation();
     useEffect(() => {
         const REFERRAL_CODE_URL_PARAM = 'referral';
         const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
@@ -106,7 +108,7 @@ export default function PageHeader() {
 
     // data to generate nav links in page header
     const navLinks = [
-        { name: 'Trade', path: `/v2/trade/${symbol}` },
+        { name: t('navigation.trade'), path: `/v2/trade/${symbol}` },
         // { name: 'Vaults', path: '/v2/vaults' },
         // { name: 'Portfolio', path: '/v2/portfolio' },
         // { name: 'Referrals', path: '/v2/referrals' },
@@ -224,7 +226,7 @@ export default function PageHeader() {
                     <button
                         onClick={() => setIsMenuOpen(false)}
                         className={styles.mobileNavCloseButton}
-                        aria-label='Close navigation menu'
+                        aria-label={t('aria.closeNav')}
                     >
                         <MdOutlineClose size={20} color='var(--text1)' />
                     </button>
@@ -300,7 +302,9 @@ export default function PageHeader() {
                                         }
                                     }}
                                 >
-                                    {isShortScreen ? 'Transfer' : 'Deposit'}
+                                    {isShortScreen
+                                        ? t('common.transfer')
+                                        : t('common.deposit')}
                                 </button>
                                 {isDepositDropdownOpen && (
                                     <DepositDropdown
@@ -415,7 +419,7 @@ export default function PageHeader() {
                     <button
                         className={styles.internationalButton}
                         onClick={() => appSettingsModal.open()}
-                        aria-label='Open settings'
+                        aria-label={t('aria.openSettings')}
                     >
                         <LuSettings size={20} />
                     </button>
@@ -428,7 +432,7 @@ export default function PageHeader() {
                             onClick={() =>
                                 setIsDropdownMenuOpen(!isDropdownMenuOpen)
                             }
-                            aria-label='Open more options menu'
+                            aria-label={t('aria.openMoreOptionsMenu')}
                         >
                             <MdOutlineMoreHoriz size={20} />
                         </button>
@@ -446,7 +450,7 @@ export default function PageHeader() {
                 <Modal
                     close={() => appSettingsModal.close()}
                     position={'center'}
-                    title='Options'
+                    title={t('appSettings.title')}
                 >
                     <AppOptions />
                 </Modal>

@@ -11,6 +11,7 @@ import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import styles from './symbolinfo.module.css';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import SymbolSearch from './symbolsearch/symbolsearch';
+import { t } from 'i18next';
 
 const SymbolInfo: React.FC = React.memo(() => {
     const { symbol, symbolInfo } = useTradeDataStore();
@@ -99,8 +100,8 @@ const SymbolInfo: React.FC = React.memo(() => {
                                 id='tutorial-pool-info'
                             >
                                 <SymbolInfoField
-                                    tooltipContent='Estimated fair value, calculated to prevent unfair liquidations'
-                                    label='Mark'
+                                    tooltipContent={t('symbolInfo.markTooltip')}
+                                    label={t('symbolInfo.mark')}
                                     valueClass={'w4'}
                                     value={formatNum(symbolInfo?.markPx)}
                                     lastWsChange={symbolInfo?.lastPriceChange}
@@ -111,11 +112,15 @@ const SymbolInfo: React.FC = React.memo(() => {
                                         pythPrice &&
                                         isPythConnected
                                             ? isPythStale
-                                                ? 'Pyth Network oracle (price may be stale)'
-                                                : 'Real-time price from Pyth Network oracle'
-                                            : 'An external, aggregated market value sourced from multiple reputable exchanges'
+                                                ? t(
+                                                      'symbolInfo.oracleTooltipPythStale',
+                                                  )
+                                                : t('symbolInfo.oracleTooltip')
+                                            : t(
+                                                  'symbolInfo.oracleTooltipNoPyth',
+                                              )
                                     }
-                                    label={`Oracle${usePythOracle && isPythStale ? ' ⚠' : ''}`}
+                                    label={`${t('symbolInfo.oracle')}${usePythOracle && isPythStale ? ' ⚠' : ''}`}
                                     valueClass={'w4'}
                                     value={formatNum(
                                         usePythOracle &&
@@ -126,8 +131,10 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     )}
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='Change in price over the last 24 hours'
-                                    label='24h Change'
+                                    tooltipContent={t(
+                                        'symbolInfo.24hChangeTooltip',
+                                    )}
+                                    label={t('symbolInfo.24hChange')}
                                     valueClass={'w7'}
                                     value={changeData.str}
                                     type={
@@ -139,8 +146,10 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     }
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='Total volume of the market over the last 24 hours'
-                                    label='24h Volume'
+                                    tooltipContent={t(
+                                        'symbolInfo.24hVolumeTooltip',
+                                    )}
+                                    label={t('symbolInfo.24hVolume')}
                                     valueClass={'w7'}
                                     value={
                                         '$' +
@@ -148,8 +157,10 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     }
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='Total open interest of the market'
-                                    label='Open Interest'
+                                    tooltipContent={t(
+                                        'symbolInfo.openInterestTooltip',
+                                    )}
+                                    label={t('symbolInfo.openInterest')}
                                     valueClass={'w7'}
                                     value={
                                         '$' +
@@ -167,16 +178,10 @@ const SymbolInfo: React.FC = React.memo(() => {
                                                 styles.fundingTooltipContent
                                             }
                                         >
-                                            The hourly rate at which longs pay
-                                            shorts (if negative, shorts pay
-                                            longs). There are no fees associated
-                                            with funding, which is a
-                                            peer-to-peer transfer between users
-                                            to push prices towards the spot
-                                            price.
+                                            {t('symbolInfo.fundingRateTooltip')}
                                         </div>
                                     }
-                                    label='Funding Rate'
+                                    label={t('symbolInfo.fundingRate')}
                                     valueClass={'w7'}
                                     value={
                                         (symbolInfo?.funding * 100)
@@ -186,8 +191,10 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     type={'positive'}
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='Time until the next funding'
-                                    label='Funding Countdown'
+                                    tooltipContent={t(
+                                        'symbolInfo.fundingCountdownTooltip',
+                                    )}
+                                    label={t('symbolInfo.fundingCountdown')}
                                     valueClass={'w7'}
                                     value={fundingCountdown}
                                 />
@@ -205,20 +212,20 @@ const SymbolInfo: React.FC = React.memo(() => {
                                 className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}
                             >
                                 {[
-                                    'Mark',
-                                    'Oracle',
-                                    '24h Change',
-                                    '24h Volume',
-                                    'Open Interest',
-                                    'Funding Rate',
-                                    'Funding Countdown',
+                                    t('symbolInfo.mark'),
+                                    t('symbolInfo.oracle'),
+                                    t('symbolInfo.24hChange'),
+                                    t('symbolInfo.24hVolume'),
+                                    t('symbolInfo.openInterest'),
+                                    t('symbolInfo.fundingRate'),
+                                    t('symbolInfo.fundingCountdown'),
                                 ].map((label) => (
                                     <SymbolInfoField
                                         key={label}
                                         label={label}
                                         valueClass={
-                                            label === 'Mark' ||
-                                            label === 'Oracle'
+                                            label === t('symbolInfo.mark') ||
+                                            label === t('symbolInfo.oracle')
                                                 ? 'w4'
                                                 : 'w7'
                                         }

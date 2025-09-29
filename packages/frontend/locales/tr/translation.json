@@ -1,0 +1,551 @@
+{
+    "common": {
+        "yes": "Evet",
+        "no": "Hayır",
+        "cancel": "İptal",
+        "save": "Kaydet",
+        "delete": "Sil",
+        "edit": "Düzenle",
+        "close": "Kapat",
+        "loading": "Yükleniyor...",
+        "confirming": "Onaylanıyor...",
+        "processing": "İşleniyor...",
+        "error": "Hata",
+        "success": "Başarılı",
+        "applyDefaults": "Varsayılanları uygula",
+        "learnMore": "Daha fazla bilgi",
+        "deposit": "Yatır",
+        "transfer": "Transfer",
+        "withdraw": "Çek",
+        "submit": "Gönder",
+        "quantity": "Miktar",
+        "confirm": "Onayla",
+        "amount": "Tutar",
+        "max": "Maks",
+        "min": "Min",
+        "positions": "Pozisyonlar",
+        "balances": "Bakiyeler",
+        "openOrders": "Açık Emirler",
+        "tradeHistory": "İşlem Geçmişi",
+        "fundingHistory": "Finansman Geçmişi",
+        "orderHistory": "Emir Geçmişi",
+        "depositsAndWithdrawals": "Yatırma ve Çekme",
+        "twap": "TWAP",
+        "all": "Hepsi",
+        "active": "Aktif",
+        "long": "Long",
+        "short": "Short",
+        "create": "Oluştur",
+        "update": "Güncelle",
+        "reset": "Sıfırla",
+        "announcements": "Duyurular",
+        "leverage": "Kaldıraç",
+        "comingSoon": "Yakında"
+    },
+    "transactions": {
+        "orderTypes": "Emir Türleri",
+        "marginMode": "Marjin Modu",
+        "scaleOptions": "Ölçek Seçenekleri",
+        "confirmBuyOrder": "Alım Emrini Onayla",
+        "confirmSellOrder": "Satış Emrini Onayla",
+        "confirmLimitBuyOrder": "Limitli Alım Emrini Onayla",
+        "confirmLimitSellOrder": "Limitli Satış Emrini Onayla",
+        "availableToTrade": "İşlem Yapılabilir Tutar",
+        "availableToTradeTooltip": "Yatırılan {{symbol}}",
+        "currentPosition": "Mevcut Pozisyon",
+        "currentPositionTooltip": "Mevcut {{symbol}} pozisyon büyüklüğü",
+        "maxOpenInterestReached": "Maksimum Açık Pozisyon Limiti Ulaşıldı",
+        "depositToTrade": "İşlem Yapmak İçin Yatır",
+        "switchDirectionToReduce": "Azaltmak için Yönü Değiştir",
+        "maxLongDepositToTrade": "Max Long - İşlem için yatır",
+        "maxShortDepositToTrade": "Max Short - İşlem için yatır",
+        "minimumOr100Percent": "Minimum veya %100",
+        "minimum": "Minimum",
+        "invalidPrice": "Geçersiz Fiyat",
+        "orderSizeBelowMinimum": "Emir büyüklüğü minimumun altında",
+        "orderSizeExceedsPositionLimits": "Emir büyüklüğü pozisyon limitlerini aşıyor",
+        "insufficientCollateral": "Yetersiz Teminat",
+        "reduceOnlyExceedsPositionSize": "Sadece Azalt miktarı pozisyon büyüklüğünü aşıyor",
+        "processingOrder": "Emir işleniyor...",
+        "positionLimitReached": "Pozisyon limiti aşıldı",
+        "limitOrderFailed": "Limitli Emir Başarısız",
+        "unknownErrorOccurred": "Bilinmeyen bir hata oluştu",
+        "failedToPlaceLimitOrder": "Limit emri verilemedi",
+        "sellShortLimitOrderPlaced": "Sat / Short limit emri verildi",
+        "sellShortLimitOrderPending": "Sat / Short limit emri beklemede",
+        "successfullyPlacedSellOrderFor": "{{usdValueOfOrderStr}} {{symbol}} için satış emri verildi ({{limitPrice}})",
+        "placingSellShortLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} limitli satış emri veriliyor ({{limitPrice}})",
+        "enterValidLimitPrice": "Geçerli bir limit fiyatı girin",
+        "enterValidOrderSize": "Geçerli bir emir boyutu girin",
+        "buyLongLimitOrderPlaced": "Al / Long limit emri verildi",
+        "successfullyPlacedBuyOrderFor": "{{usdValueOfOrderStr}} {{symbol}} için alış emri verildi ({{limitPrice}})",
+        "buyLongLimitOrderPending": "Al / Long limit emri beklemede",
+        "placingBuyLongLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} limitli alış emri veriliyor ({{limitPrice}})",
+        "priceDistribution": "Fiyat Dağılımı",
+        "flat": "Düz",
+        "flatPriceDistribution": "Düz Fiyat Dağılımı",
+        "evenlySplit": "Eşit Böl",
+        "evenPriceDistribution": "Eşit Fiyat Dağılımı",
+        "market": "Piyasa",
+        "limit": "Limit",
+        "price": "Fiyat",
+        "size": "Büyüklük",
+        "time": "Zaman",
+        "total": "Toplam",
+        "action": "Aksiyon",
+        "ratio": "Oran",
+        "buyLong": "Al / Long",
+        "sellShort": "Sat / Short",
+        "confirmingTransaction": "İşlem onaylanıyor...",
+        "processing": "İşleniyor...",
+        "dontShowThisAgain": "Bunu tekrar gösterme",
+        "estLiquidationPrice": "Tahmini Likidasyon Fiyatı",
+        "estimatedPriceAtWhichPosWillBeLiquidated": "Pozisyonunuz için tahmini likidasyon fiyatı",
+        "orderValue": "Emir Değeri",
+        "hideSmallBalances": "Küçük Bakiyeleri Gizle",
+        "increasing": "Artıyor",
+        "decreasing": "Azalıyor",
+        "totalOrders": "Toplam Emir",
+        "orderRatioSumMustBe100": "Emir oranlarının toplamı %100 olmalıdır",
+        "collapseDetails": "Detayları Gizle",
+        "expandDetails": "Detayları Göster",
+        "frequency": "Frekans",
+        "runTime": "Çalışma Süresi",
+        "numberOfOrders": "Emir Adedi",
+        "chasingInterval": "Takip Aralığı",
+        "sizePerSuborder": "Alt Emir Büyüklüğü",
+        "avgEntryPrice": "Ortalama Giriş Fiyatı",
+        "averageEntryPrice": "Ortalama Giriş Fiyatı",
+        "marginRequired": "Gerekli Marjin",
+        "maxPosSizeLimitedByOiCap": "Maksimum pozisyon büyüklüğü açık pozisyon limiti ile sınırlı",
+        "openPositionIsXSwitchToY": "Açık pozisyon: {{x}}. {{y}}'ye geçin.",
+        "buySellAtCurrentPrice": "Mevcut Fiyattan Al/Sat",
+        "buySellAtSpecificPrice": "Belirli Fiyattan Al/Sat",
+        "maxTradeSizeLimitedTo": "Maksimum işlem büyüklüğü sınırlandı",
+        "yourPositionIsLimitedByOpenInterest": "Pozisyonunuz {{limitedBy}} sınırıyla limitli {{coin}}",
+        "currentMaxTradeSizeForMarket": "Mevcut piyasa için maksimum işlem büyüklüğü: {{limit}}",
+        "placingLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} için limitli emir {{limitPrice}} fiyatında yerleştiriliyor",
+        "sellOrderPending": "Satış Emri Bekliyor",
+        "orderSubmittedFor": "{{usdValueOfOrderStr}} {{symbol}} için emir gönderildi",
+        "buyOrderPending": "Alım Emri Bekliyor",
+        "buyOrderSuccessful": "Alım Emri Başarılı",
+        "successfullyBought": "{{usdValueOfOrderStr}} {{symbol}} başarılı şekilde alındı",
+        "sellOrderSuccessful": "Satış Emri Başarılı",
+        "successfullySold": "{{usdValueOfOrderStr}} {{symbol}} başarılı şekilde satıldı",
+        "sellOrderFailed": "Satış Emri Başarısız",
+        "transactionFailed": "İşlem Başarısız",
+        "buyOrderFailed": "Alım Emri Başarısız",
+        "closeFailed": "Pozisyon kapatılamadı",
+        "closeFailedTitle": "Kapatma Başarısız",
+        "liquidationPrice": "Likidasyon Fiyatı",
+        "enterPrice": "Fiyat Girin",
+        "enterSize": "Büyüklük Girin",
+        "totalSize": "Toplam Büyüklük",
+        "cancelling": "İptal ediliyor...",
+        "midButton": "MID",
+        "positionClosed": "Pozisyon Kapandı",
+        "successfullyClosedPosition": "{{usdValueOfOrderStr}} {{symbol}} pozisyonu başarılı şekilde kapandı",
+        "failedToClosePosition": "Pozisyon kapatma başarısız",
+        "transactionTimedOut": "İşlem {{timeInSeconds}} saniye sonra zaman aşımına uğradı",
+        "txFailedOrNotConfirmed": "İşlem başarısız oldu veya onaylanmadı",
+        "walletBalance": "Cüzdan Bakiyesi",
+        "walletBalanceTooltip": "Geçerli cüzdan bakiyeniz",
+        "depositSuccessful": "Yatırma Başarılı",
+        "successfullyDeposited": "{{amount}} {{unit}} başarılı şekilde yatırıldı",
+        "depositFailed": "Yatırma Başarısız",
+        "withdrawalSuccessful": "Çekim Başarılı",
+        "successfullyWithdrawn": "{{amount}} {{unit}} başarılı şekilde çekildi",
+        "withdrawFailed": "Çekim Başarısız",
+        "availableToDeposit": "Yatırılabilir Tutar",
+        "availableToDepositTooltip": "Kasadaki kapasite ve cüzdan bakiyesine göre yatırılabilir tutar",
+        "availableToWithdraw": "Çekilebilir Tutar",
+        "availableToWithdrawTooltip": "Portföyünüzden çekebileceğiniz toplam tutar",
+        "invalidAmount": "Geçersiz Tutar",
+        "depositToVault": "{{vaultName}}'a {{unitValue}} yatır",
+        "depositToVaultMsg": "{{vaultName}} üzerinden getiri elde etmek için {{unitValue}} yatırın. Yatırımlar bir sonraki dönemin ardından çekilebilir olacak.",
+        "txFailedTryAgain": "İşlem başarısız oldu. Lütfen tekrar deneyin.",
+        "minDepositAmountIs": "Minimum yatırma tutarı ${{amount}}",
+        "enterAmountMin10": "Tutar girin (min $10)",
+        "cancellingAllOrders": {
+            "title": "Tüm Emirler İptal Ediliyor",
+            "message": "{{count}} {{noun}} iptal edilmeye çalışılıyor..."
+        },
+        "cancelOrderPending": {
+            "title": "Emir İptali Bekleniyor",
+            "message": "{{usdValueOfOrderStr}} {{symbol}} için emir iptal ediliyor"
+        },
+        "cancelOrderConfirmed": {
+            "title": "Emir İptal Edildi",
+            "message": "{{usdValueOfOrderStr}} {{symbol}} için emir başarıyla iptal edildi"
+        },
+        "cancelFailed": {
+            "title": "İptal Başarısız",
+            "message": "Emir ID'si bulunamadı",
+            "message2": "Emir iptali başarısız"
+        },
+        "cancelLimitPending": {
+            "title": "Limitli Emir İptali Bekleniyor",
+            "message": "{{usdValueOfOrderStr}} {{symbol}} için {{side}} limitli emir iptal ediliyor"
+        },
+        "cancelLimitConfirmed": {
+            "title": "Emir İptal Edildi",
+            "message": "{{usdValueOfOrderStr}} {{symbol}} için {{side}} limitli emir başarıyla iptal edildi"
+        },
+        "failedToUpdatedOrder": {
+            "title": "Emir Güncellenemedi"
+        },
+        "orderUpdated": {
+            "title": "Emir Güncellendi",
+            "message": "{{usdValueOfOrderStr}} {{symbol}} için emir {{limitPrice}} ile başarıyla güncellendi"
+        },
+        "orderFilled": {
+            "title": "{{side}} Emir Gerçekleşti",
+            "message": "{{usdValueOfFillStr}} {{symbol}} için {{side}} emir {{fillPrice}} fiyatında başarıyla gerçekleşti"
+        },
+        "errorUpdatingOrder": {
+            "title": "Emir Güncelleme Hatası"
+        },
+        "cancelAllFailed": {
+            "title": "Tüm Emirler İptal Edilemedi",
+            "message": "Hiçbir emir iptal edilemedi."
+        },
+        "cancelAllConfirmed": {
+            "title": "Tüm Emirler İptal Edildi",
+            "message": "{{count}} emir başarıyla iptal edildi"
+        },
+        "cancelAllPartialSuccess": {
+            "title": "Kısmi Başarı",
+            "message": "{{successCount}} emir iptal edildi, {{failedCount}} başarısız"
+        },
+        "noOpenOrders": "Açık emir yok",
+        "transactionError": "İşlem Hatası",
+        "invalidLimitPrice": {
+            "title": "Geçersiz Fiyat",
+            "message": "Geçerli bir limit fiyatı giriniz"
+        },
+        "invalidOrderSize": {
+            "title": "Geçersiz Emir Büyüklüğü",
+            "message": "Geçerli bir emir büyüklüğü giriniz"
+        },
+        "leverageUpdated": {
+            "title": "Kaldıraç Güncellendi",
+            "message": "Kaldıraç başarıyla {{leverage}}x olarak güncellendi"
+        },
+        "leverageUpdateFailed": {
+            "title": "İşlem Başarısız",
+            "message": "Kaldıraç güncellenemedi"
+        },
+        "viewOnExplorer": "Tarayıcıda görüntüle",
+        "limitOrderUpdatePending": {
+            "title": "Limitli Emir Güncellemesi Bekleniyor",
+            "message": "{{coin}} için {{value}}'de {{side}} limitli emir {{limitPrice}} ile güncelleniyor"
+        },
+        "filled": "Gerçekleşti",
+        "open": "Açık",
+        "partiallyFilled": "Kısmen gerçekleşti",
+        "canceled": "İptal edildi",
+        "pending": "Beklemede",
+        "tpslToggleLabel": "TP/SL (Kâr Al / Zarar Durdur)"
+    },
+    "subaccounts": {
+        "createSubAccount": "Alt Hesap Oluştur",
+        "createSubAccountPH": "ör: Alt Hesabım 1",
+        "created": {
+            "title": "Alt Hesap Oluşturuldu",
+            "message": "{{name}} strateji alt hesabı oluşturuldu",
+            "message2": "{{name}} kendi karar alt hesabı oluşturuldu"
+        }
+    },
+    "strategies": {
+        "newStrategy": "Yeni Strateji",
+        "editStrategy": "Stratejiyi Düzenle"
+    },
+    "margin": {
+        "cross": {
+            "title": "Çapraz",
+            "heading": "Çapraz Marjin",
+            "blurb": "Çaprazdaki tüm pozisyonlar aynı teminatı paylaşır. Tasfiye durumunda, tüm teminat ve açık pozisyonlar kaybedilebilir."
+        },
+        "isolated": {
+            "title": "Yalıtılmış",
+            "heading": "Yalıtılmış Mod",
+            "blurb": "Her pozisyona ayrılmış marjin miktarını sınırlayarak riski yönetin. İzole marjin oranı %100 olursa pozisyon tasfiye edilir. Bu modda pozisyonunuza ayrı marjin ekleyip çıkarabilirsiniz."
+        }
+    },
+    "tradeTable": {
+        "selectATabToViewData": "Verileri görmek için bir sekme seçin",
+        "time": "Zaman",
+        "type": "Tür",
+        "coin": "Coin",
+        "direction": "Yön",
+        "size": "Büyüklük",
+        "filledSize": "Gerçekleşen Büyüklük",
+        "orderValue": "Emir Değeri",
+        "price": "Fiyat",
+        "tradeValue": "İşlem Değeri",
+        "fee": "Komisyon",
+        "closedPnl": "Kapanan PnL",
+        "reduceOnly": "Sadece Kapat",
+        "triggerConditions": "Tetikleme Koşulları",
+        "tpsl": "TP/SL",
+        "status": "Durum",
+        "order": "Emir",
+        "long": "Long",
+        "short": "Short",
+        "noOpenPositions": "Açık pozisyon yok",
+        "markPrice": "İşaret Fiyatı",
+        "orderId": "Emir ID",
+        "totalBalance": "Toplam Bakiye",
+        "availableBalance": "Kullanılabilir Bakiye",
+        "currencyValue": "{{currency}} Değeri",
+        "buyingPower": "Alım Gücü",
+        "contract": "Kontrat",
+        "positionValue": "Pozisyon Değeri",
+        "entryPrice": "Giriş Fiyatı",
+        "pnl": "PnL (ROE%)",
+        "liqPrice": "Likidasyon Fiyatı",
+        "margin": "Marjin",
+        "funding": "Fonlama",
+        "close": "Pozisyonu Kapat",
+        "originalSize": "Orijinal Büyüklük",
+        "cancelAll": "Hepsini İptal Et",
+        "noTradeHistory": "İşlem geçmişiniz yok",
+        "noOrderHistory": "Emir geçmişiniz yok",
+        "noFundingHistory": "Fonlama geçmişiniz yok",
+        "fundingHistory": "Tüm zamanlar: {{allTime}} Değişim sonrası: {{sinceChange}}",
+        "openLong": "Long Aç",
+        "openShort": "Short Aç",
+        "closeLong": "Long Kapat",
+        "closeShort": "Short Kapat"
+    },
+    "time": {
+        "second": "saniye",
+        "seconds": "saniye",
+        "minute": "dakika",
+        "minutes": "dakika",
+        "hour": "saat",
+        "hours": "saat",
+        "day": "gün",
+        "days": "gün",
+        "week": "hafta",
+        "weeks": "hafta",
+        "month": "ay",
+        "months": "ay",
+        "year": "yıl",
+        "years": "yıl"
+    },
+    "navigation": {
+        "home": "Ana Sayfa",
+        "about": "Hakkında",
+        "contact": "İletişim",
+        "settings": "Ayarlar",
+        "profile": "Profil",
+        "logout": "Çıkış",
+        "trade": "Alım Satım",
+        "chart": "Grafik",
+        "book": "Emir Defteri",
+        "recent": "Son",
+        "positions": "Pozisyonlar"
+    },
+    "auth": {
+        "login": "Giriş",
+        "register": "Kayıt Ol",
+        "email": "E-posta",
+        "password": "Şifre",
+        "forgotPassword": "Şifremi Unuttum?",
+        "loginSuccess": "Giriş başarılı",
+        "loginError": "Geçersiz Kimlik"
+    },
+    "forms": {
+        "name": "Ad",
+        "firstName": "Ad",
+        "lastName": "Soyad",
+        "phone": "Telefon",
+        "address": "Adres",
+        "submit": "Gönder",
+        "required": "Bu alan gereklidir"
+    },
+    "messages": {
+        "welcome": "Hoş geldiniz",
+        "hello": "Merhaba, {{name}}!",
+        "goodbye": "Güle güle",
+        "thankYou": "Teşekkürler",
+        "pleaseWait": "Lütfen bekleyin...",
+        "connectWalletForTrading": "Gas ücreti olmadan işlem yapmak için cüzdanınızı bağlayın."
+    },
+    "home": {
+        "title": "Ambient ile Perpetual Ticaret",
+        "subtitle": "Hızlı işlem. Taker ücreti yok. 100x kaldıraç imkanı.",
+        "startTrading": "Ticarete Başla",
+        "learnMore": "Daha fazla bilgi",
+        "hero": {
+            "heading1": "Sıfırdan-",
+            "one": "Bire",
+            "heading2": "Merkeziyetsiz Ticaret Protokolü",
+            "description": "Ambient, benzersiz DeFi ürünleriyle CEX düzeyinde bir kullanıcı deneyimini birleştiren tamamen yeni bir merkeziyetsiz perpetual DEX'tir",
+            "stats": {
+                "totalVolume": "Toplam Hacim",
+                "activeUsers": "Aktif Kullanıcı"
+            }
+        }
+    },
+    "referrals": {
+        "title": "Referanslar",
+        "description": "Kullanıcıları davet et, ödül kazanın. İş Ortakları daha fazla kazanır.",
+        "tradersReferred": "Referans Edilen Traderlar",
+        "rewardsEarned": "Kazanılan Ödüller"
+    },
+    "deposit": {
+        "prompt": "Fogo'dan {{token}} yatır",
+        "input_prompt": "Miktarı girin (min ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "Yatırmak için müsait"
+    },
+    "withdraw": {
+        "prompt": "Fogo'ya {{token}} çek",
+        "explanation": "{{token}} adresinize gönderilecek.",
+        "availableToWithdraw": "Çekim için müsait",
+        "input_prompt": "Miktarı girin (min ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "orderBook": {
+        "tab": "Sekme",
+        "stacked": "Gruplanmış",
+        "large": "Büyük",
+        "book": "Defter",
+        "trades": "İşlemler",
+        "spread": "Spread"
+    },
+    "appSettings": {
+        "title": "Ayarlar",
+        "skipOpenOrderConfirm": "Açık Emir Onayını Atla",
+        "enableTxNotifications": "İşlem Bildirimlerini Aç",
+        "enableBackgroundFillNotif": "Arkaplan Dolum Bildirimini Aç",
+        "numberFormat": "Sayı Formatı",
+        "color": "Renk",
+        "language": "Dil"
+    },
+    "symbolInfo": {
+        "mark": "Gösterge",
+        "markTooltip": "Adil likiditeyi korumak için hesaplanan tahmini değer",
+        "oracle": "Oracle",
+        "oracleTooltip": "Gerçek zamanlı fiyat: Pyth Network oracle",
+        "oracleTooltipPythStale": "Pyth Network oracle (fiyat eski olabilir)",
+        "oracleTooltipNoPyth": "Birden çok borsadan alınan harici, toplanmış piyasa değeri",
+        "24hChange": "24s Değişim",
+        "24hChangeTooltip": "Son 24 saatteki fiyat değişimi",
+        "24hVolume": "24s Hacim",
+        "24hVolumeTooltip": "Son 24 saatteki toplam piyasa hacmi",
+        "openInterest": "Açık Pozisyon Limiti",
+        "openInterestTooltip": "Piyasadaki toplam açık pozisyon",
+        "fundingRate": "Finansman Oranı",
+        "fundingRateTooltip": "Saatlik oran, long'lar short'lara (veya tersi) ödeme yapar. Ekstra ücret yok; fiyat koruması için yapılan ödemedir.",
+        "fundingCountdown": "Finansman Geri Sayımı",
+        "fundingCountdownTooltip": "Sonraki finansmana kalan süre"
+    },
+    "feedback": {
+        "menuLabel": "Geri Bildirim",
+        "title": "Geri Bildiriminizi Paylaşın",
+        "ratingPrompt": "Deneyiminizi nasıl değerlendirirsiniz?",
+        "sendFeedback": "Geri bildirim gönder",
+        "positivePrompt": "En çok neyi beğendiniz?",
+        "negativePrompt": "Ne geliştirilmelidir?",
+        "placeholder": "Anonim geri bildiriminiz gelişmemiz için yardımcı olur.",
+        "warningText": "Geri bildiriminiz çok uzun, kısaltılacak.",
+        "submitButtonText": "Geri bildirim gönder",
+        "submittingButtonText": "Gönderiliyor...",
+        "appreciateText": "Geri bildiriminiz için teşekkürler.",
+        "thanksText": "Teşekkürler!"
+    },
+    "accountOverview": {
+        "heading": "Hesap Özeti",
+        "balance": "Bakiye",
+        "balanceTooltip": "Toplam hesap varlığı",
+        "unrealizedPnl": "Gerçekleşmemiş PnL",
+        "unrealizedPnlTooltip": "Gerçekleşmemiş kar/zarar"
+    },
+    "marketLimitClose": {
+        "marketHeading": "Piyasa Kapat",
+        "marketDescription": "Mevcut piyasa fiyatında pozisyonunuzu kapatacak bir emir gönderir.",
+        "minimumOr100Percent": "{{min}} Minimum veya %100",
+        "noZeroSize": "Boyut sıfır olamaz",
+        "sizeExceedsPosition": "Boyut pozisyonu geçemez",
+        "invalidOrderSizeTitle": "Geçersiz emir boyutu",
+        "invalidSize": "Geçerli emir boyutu girin",
+        "limitHeading": "Limitli Kapatma",
+        "limitDescription": "Belirlediğiniz limitte pozisyonunuzu kapatacak emir gönderir.",
+        "estimatedClosedPnl": "Tahmini kapalı PnL (komisyonsuz): {{estimatedPNL}}",
+        "positionClosed": "Pozisyon kapatıldı",
+        "percentOfPositionClosed": "Pozisyonun %{{sizePercentageValue}} kapatıldı"
+    },
+    "newVersion": {
+        "title": "Yeni Sürüm Mevcut",
+        "message": {
+            "withVersionNumber": "{{version}} sürümü yeni özellikler ve iyileştirmeleriyle kurulmaya hazır.",
+            "noVersionNumber": "Yeni özellikler ve iyileştirmelerle yeni sürüm kurulmaya hazır."
+        },
+        "updateButton": "Şimdi güncelle",
+        "version": "Sürüm"
+    },
+    "leverage": {
+        "title": "Kaldıraç ayarla",
+        "closePositionPrompt": "Minimum kaldıraç için pozisyonu kapat"
+    },
+    "share": {
+        "prompt": "Metninizi özelleştirin",
+        "xCTA": "𝕏'te paylaş",
+        "copyLinkCTA": "Bağlantıyı kopyala",
+        "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap"
+    },
+    "colors": {
+        "default": "Varsayılan",
+        "opposite": "Zıt",
+        "deuteranopia": "Deuteranopi",
+        "tritanopia": "Tritanopi",
+        "protanopia": "Protanopi"
+    },
+    "aria": {
+        "closeAnnouncement": "Duyuruyu kapat",
+        "closeFeedbackForm": "Geri bildirim formunu kapat",
+        "depositInput": "Yatırma girişi",
+        "addressInput": "Adres girişi",
+        "amountInput": "Tutar girişi",
+        "withdrawInput": "Çekim girişi",
+        "scrollTabsLeft": "Sekmeleri sola kaydır",
+        "scrollTabsRight": "Sekmeleri sağa kaydır",
+        "leverageValue": "Kaldıraç değeri",
+        "leverageAmount": "Kaldıraç tutarı",
+        "setLeverageTo": "{{value}}x kaldıraç ayarla",
+        "positionSizePercentage": "Pozisyon boyut yüzdesi",
+        "positionSizeValue": "Pozisyon boyut değeri",
+        "totalOrders": "Toplam emir",
+        "runningPriceInput": {
+            "minutes": "Çalışan fiyat dakika alanı",
+            "hours": "Çalışan fiyat saat alanı"
+        },
+        "yourDepositAmount": "Yatırdığınız tutar",
+        "flatPriceDistribution": "Düz fiyat dağılımı",
+        "evenPriceDistribution": "Eşit fiyat dağılımı",
+        "thumbsUp": "Beğen",
+        "thumbsDown": "Beğenme",
+        "closeNav": "Navigasyon menüsünü kapat",
+        "openSettings": "Ayarları aç",
+        "openMoreOptionsMenu": "Daha fazla seçenek menüsünü aç",
+        "previousPage": "Önceki sayfa",
+        "nextPage": "Sonraki sayfa",
+        "tradeType": "İşlem türü",
+        "closeTradeTypeMenu": "İşlem türü menüsünü kapat",
+        "toggleChasingInterval": "Takip aralığını değiştir",
+        "toggleRandomize": "Rastgeleleştir",
+        "toggleReduceOnly": "Sadece emir kapatmayı değiştir",
+        "toggleTPSL": "Kâr Al / Zarar Durdur'u değiştir",
+        "editTPSL": "Kâr Al / Zarar Durdur'u düzenle",
+        "toggleConfigureAmount": "Tutarı yapılandırmayı değiştir",
+        "toggleLimitPrice": "Limit fiyatı değiştir"
+    },
+    "chart": {
+        "liqPrice": "Lik. fiyatı"
+    },
+    "meta": {
+        "title": "Ana Sayfa | Ambient",
+        "content": "Ambient ile vadeli işlemleri alıp satın"
+    }
+}

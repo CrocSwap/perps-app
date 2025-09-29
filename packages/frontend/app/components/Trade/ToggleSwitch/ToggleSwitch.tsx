@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import styles from './ToggleSwitch.module.css';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -13,7 +14,7 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
     const {
         isOn,
         onToggle,
-        label = 'Hide Small Balances',
+        label = t('transactions.hideSmallBalances'),
         hideLabel = false,
         reverse,
     } = props;

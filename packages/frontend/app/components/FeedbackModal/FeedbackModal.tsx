@@ -1,6 +1,7 @@
 import { FaThumbsUp, FaThumbsDown, FaTimes } from 'react-icons/fa';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import styles from './FeedbackModal.module.css';
+import { t } from 'i18next';
 
 type FeedbackType = 'positive' | 'negative' | null;
 
@@ -112,7 +113,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 <button
                     className={styles.closeIcon}
                     onClick={handleClose}
-                    aria-label='Close feedback form'
+                    aria-label={t('aria.closeFeedbackForm')}
                 >
                     <FaTimes />
                 </button>
@@ -121,20 +122,20 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                     <form onSubmit={handleSubmit} className={styles.form}>
                         <div className={styles.header}>
                             <h2 className={styles.title}>
-                                Share Your Feedback
+                                {t('feedback.title')}
                             </h2>
                         </div>
 
                         <div>
                             <label className={styles.label}>
-                                How would you rate your experience?
+                                {t('feedback.ratingPrompt')}
                             </label>
                             <div className={styles.feedbackButtons}>
                                 <button
                                     type='button'
                                     className={`${styles.feedbackButton} ${feedbackType === 'positive' ? styles.selected : ''}`}
                                     onClick={() => setFeedbackType('positive')}
-                                    aria-label='Thumbs up'
+                                    aria-label={t('aria.thumbsUp')}
                                 >
                                     <FaThumbsUp
                                         className={styles.icon}
@@ -145,7 +146,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                     type='button'
                                     className={`${styles.feedbackButton} ${feedbackType === 'negative' ? styles.selected : ''}`}
                                     onClick={() => setFeedbackType('negative')}
-                                    aria-label='Thumbs down'
+                                    aria-label={t('aria.thumbsDown')}
                                 >
                                     <FaThumbsDown
                                         className={styles.icon}
@@ -160,8 +161,8 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                     className={styles.label}
                                 >
                                     {feedbackType === 'positive'
-                                        ? 'What do you like most?'
-                                        : 'What can we improve?'}
+                                        ? t('feedback.positivePrompt')
+                                        : t('feedback.negativePrompt')}
                                 </label>
                                 <textarea
                                     ref={textareaRef}
@@ -182,13 +183,12 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                             );
                                         }, 100);
                                     }}
-                                    placeholder='Your anonymous feedback helps us improve...'
+                                    placeholder={t('feedback.placeholder')}
                                     rows={5}
                                 />
                                 {!truncatedMatchesOriginal && (
                                     <div className={styles.warningText}>
-                                        Your feedback exceeds the maximum length
-                                        and will be truncated.
+                                        {t('feedback.warningText')}
                                     </div>
                                 )}
                             </div>
@@ -201,7 +201,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                 onClick={handleClose}
                                 disabled={isSubmitting}
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </button>
                             <button
                                 type='submit'
@@ -211,22 +211,26 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                     isSubmitting
                                 }
                             >
-                                {isSubmitting ? 'Sending...' : 'Send Feedback'}
+                                {isSubmitting
+                                    ? t('feedback.submittingButtonText')
+                                    : t('feedback.submitButtonText')}
                             </button>
                         </div>
                     </form>
                 ) : (
                     <div className={styles.successMessage}>
                         <div className={styles.successIcon}>✓</div>
-                        <h2 className={styles.successTitle}>Thank You!</h2>
+                        <h2 className={styles.successTitle}>
+                            {t('feedback.thanksText')}
+                        </h2>
                         <p className={styles.successText}>
-                            We appreciate your feedback.
+                            {t('feedback.appreciateText')}
                         </p>
                         <button
                             className={styles.closeButton}
                             onClick={handleClose}
                         >
-                            Close
+                            {t('common.close')}
                         </button>
                     </div>
                 )}

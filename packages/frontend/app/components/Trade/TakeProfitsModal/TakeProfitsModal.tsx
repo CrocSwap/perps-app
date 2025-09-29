@@ -8,6 +8,7 @@ import {
     pctFromDollars,
     dollarsFromPct,
 } from '~/utils/functions/profitLossConversions';
+import { t } from 'i18next';
 
 type Currency = '$' | '%';
 
@@ -1061,7 +1062,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     }
                     label='Configure Amount'
                     reverse
-                    aria-label='Configure Amount toggle'
+                    aria-label={t('toggleConfigureAmount')}
                 />
 
                 {form.isCustomAllocationEnabled && (
@@ -1095,7 +1096,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     }
                     label='Limit Price'
                     reverse
-                    aria-label='Limit Price toggle'
+                    aria-label={t('toggleLimitPrice')}
                 />
 
                 {form.isLimitOrderEnabled && (

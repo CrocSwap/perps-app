@@ -8,6 +8,7 @@ import {
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import type { notificationIF } from '~/stores/NotificationStore';
 import styles from './Notification.module.css';
+import { t } from 'i18next';
 
 interface propsIF {
     data: notificationIF;
@@ -219,7 +220,7 @@ export default function Notification(props: propsIF) {
                         }
                     }}
                 >
-                    View on explorer
+                    {t('transactions.viewOnExplorer')}
                 </a>
             )}
         </section>

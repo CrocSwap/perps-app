@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FaChevronLeft, FaChevronRight, FaChevronUp } from 'react-icons/fa';
 import styles from './Pagination.module.css';
+import { t } from 'i18next';
 
 interface PaginationProps {
     totalCount: number;
@@ -80,7 +81,7 @@ const Pagination: React.FC<PaginationProps> = ({
                             }
                         }}
                         disabled={page === 0}
-                        aria-label='Previous page'
+                        aria-label={t('aria.previousPage')}
                     >
                         <FaChevronLeft size={20} aria-hidden='true' />
                     </button>
@@ -97,7 +98,7 @@ const Pagination: React.FC<PaginationProps> = ({
                         disabled={
                             page === Math.floor(totalCount / rowsPerPageState)
                         }
-                        aria-label='Next page'
+                        aria-label={t('aria.nextPage')}
                     >
                         <FaChevronRight size={20} aria-hidden='true' />
                     </button>

@@ -6,6 +6,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import styles from './DepositModal.module.css';
+import { useTranslation } from 'react-i18next';
 
 interface DepositModalProps {
     vault: {
@@ -24,6 +25,7 @@ export default function DepositModal({
     onDeposit,
     onClose,
 }: DepositModalProps) {
+    const { t, i18n } = useTranslation();
     const notificationStore = useNotificationStore();
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
@@ -108,7 +110,11 @@ export default function DepositModal({
                 setTimeout(
                     () =>
                         reject(
-                            new Error('Transaction timed out after 15 seconds'),
+                            new Error(
+                                t('transactions.transactionTimedOut', {
+                                    timeInSeconds: 15,
+                                }),
+                            ),
                         ),
                     15000,
                 );
@@ -129,8 +135,11 @@ export default function DepositModal({
 
                 // Show success notification
                 notificationStore.add({
-                    title: 'Deposit Successful',
-                    message: `Successfully deposited ${formatNum(depositAmount, 2, true, false)} fUSD`,
+                    title: t('transactions.depositSuccessful'),
+                    message: t('transactions.successfullyDeposited', {
+                        amount: formatNum(depositAmount, 2, true, false),
+                        unit: unitValue,
+                    }),
                     icon: 'check',
                 });
 
@@ -139,7 +148,7 @@ export default function DepositModal({
             } else {
                 setTransactionStatus('failed');
                 setError(
-                    result.error || 'Transaction failed or was not confirmed',
+                    result.error || t('transactions.txFailedOrNotConfirmed'),
                 );
             }
         } catch (error) {
@@ -155,19 +164,19 @@ export default function DepositModal({
         validateVaultAmount,
         executeDeposit,
         onDeposit,
+        i18n.language,
     ]);
 
     const infoItems = [
         {
-            label: 'Available to deposit',
+            label: t('transactions.availableToDeposit'),
             value: formatCurrency(maxAvailableAmount, unitValue),
-            tooltip:
-                'The maximum amount you can deposit based on vault capacity and wallet balance',
+            tooltip: t('transactions.availableToDepositTooltip'),
         },
         {
-            label: 'Wallet balance',
+            label: t('transactions.walletBalance'),
             value: formatCurrency(walletBalance?.decimalized || 0, unitValue),
-            tooltip: 'Your current wallet balance',
+            tooltip: t('transactions.walletBalanceTooltip'),
         },
     ];
 
@@ -211,9 +220,10 @@ export default function DepositModal({
 
     // Enhanced button text logic
     const buttonText = useMemo(() => {
-        if (transactionStatus === 'pending') return 'Confirming Transaction...';
-        if (isProcessing) return 'Processing...';
-        if (isDepositLoading) return 'Loading...';
+        if (transactionStatus === 'pending')
+            return t('transactions.confirmingTransaction');
+        if (isProcessing) return t('common.processing');
+        if (isDepositLoading) return t('common.loading');
 
         if (amount) {
             const depositAmount = parseFloat(amount);
@@ -229,12 +239,15 @@ export default function DepositModal({
                 console.log('Validation result:', depositValidation);
 
                 if (!depositValidation.isValid) {
-                    return depositValidation.message || 'Invalid Amount';
+                    return (
+                        depositValidation.message ||
+                        t('transactions.invalidAmount')
+                    );
                 }
             }
         }
 
-        return 'Deposit';
+        return t('common.deposit');
     }, [
         amount,
         isProcessing,
@@ -252,12 +265,16 @@ export default function DepositModal({
             </header> */}
             <div className={styles.textContent}>
                 <h4>
-                    Deposit {unitValue} to {vault.name}
+                    {t('transactions.depositToVault', {
+                        unitValue,
+                        vaultName: vault.name,
+                    })}
                 </h4>
                 <p>
-                    Deposit {unitValue} to earn yield from the {vault.name}.
-                    Deposits will be available for withdrawal after the next
-                    epoch.
+                    {t('transactions.depositToVaultMsg', {
+                        unitValue,
+                        vaultName: vault.name,
+                    })}
                 </p>
             </div>
 
@@ -268,7 +285,7 @@ export default function DepositModal({
 
             <div className={styles.inputContainer}>
                 <h6>
-                    Amount{' '}
+                    {t('common.amount') + ' '}
                     {isBelowMinimum && (
                         <span className={styles.minWarning}>(Min: $10)</span>
                     )}
@@ -277,10 +294,10 @@ export default function DepositModal({
                     type='text'
                     value={amount}
                     onChange={handleInputChange}
-                    aria-label='deposit input'
+                    aria-label={t('aria.depositInput')}
                     inputMode='numeric'
                     pattern='[0-9]*'
-                    placeholder='Enter amount (min $10)'
+                    placeholder={t('transactions.enterAmountMin10')}
                     min='0'
                     step='any'
                     className={isBelowMinimum ? styles.inputBelowMin : ''}
@@ -291,7 +308,7 @@ export default function DepositModal({
                 {error && <div className={styles.error}>{error}</div>}
                 {transactionStatus === 'failed' && !error && (
                     <div className={styles.error}>
-                        Transaction failed. Please try again.
+                        {t('transactions.txFailedTryAgain')}
                     </div>
                 )}
             </div>
@@ -319,7 +336,11 @@ export default function DepositModal({
                 onClick={(e) => {
                     if (isBelowMinimum) {
                         e.preventDefault();
-                        setError('Minimum deposit amount is $5.00');
+                        setError(
+                            t('transactions.minDepositAmountIs', {
+                                amount: '$5.00',
+                            }),
+                        );
                         // Clear error after 3 seconds
                         setTimeout(() => setError(null), 3000);
                         return;
