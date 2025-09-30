@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
@@ -77,6 +77,35 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
     const [chaseDistance, setChaseDistance] = useState('');
     const [chaseMode, setChaseMode] = useState<'usd' | 'symbol'>('usd');
     const currencyOptions: Array<'$' | '%'> = ['$', '%'];
+
+    // Re-run calculations when position size changes
+    useEffect(() => {
+        // If we have a take profit price set, recalculate the gain
+        if (takeProfitPrice && !hasTakeProfitGainBeenTouched) {
+            updateGainFromPrice(takeProfitPrice);
+        }
+        // If we have a take profit gain set, recalculate the price
+        if (takeProfitGain && hasTakeProfitGainBeenTouched) {
+            updatePriceFromGain(takeProfitGain);
+        }
+        // If we have a stop loss price set, recalculate the loss
+        if (stopLossPrice && !hasStopLossLossBeenTouched) {
+            updateLossFromPrice(stopLossPrice);
+        }
+        // If we have a stop loss loss set, recalculate the price
+        if (stopLossLoss && hasStopLossLossBeenTouched) {
+            updatePriceFromLoss(stopLossLoss);
+        }
+    }, [
+        notionalSymbolQtyNum,
+        markPx,
+        takeProfitPrice,
+        takeProfitGain,
+        stopLossPrice,
+        stopLossLoss,
+        hasTakeProfitGainBeenTouched,
+        hasStopLossLossBeenTouched,
+    ]);
 
     const updatePriceFromGain = (gainValue: string) => {
         if (!markPx || !gainValue || !notionalSymbolQtyNum) return;
@@ -216,15 +245,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
 
         // Only update if user hasn't manually entered a gain value
         if (!hasTakeProfitGainBeenTouched) {
-            const result = setTakeProfitGain?.(gainValue.toString());
-            console.log(
-                'updateGainFromPrice: setTakeProfitGain result',
-                result,
-            );
-        } else {
-            console.log(
-                'updateGainFromPrice: not updating gain because hasTakeProfitGainBeenTouched is true',
-            );
+            setTakeProfitGain?.(gainValue.toString());
         }
     };
 
