@@ -10,6 +10,7 @@ import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
+import { t } from 'i18next';
 
 interface propsIF {
     portfolio: {
@@ -212,8 +213,9 @@ function PortfolioWithdraw({
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
                 notificationStore.add({
-                    title: 'Withdrawal Failed',
-                    message: result.error || 'Transaction failed',
+                    title: t('transactions.withdrawFailed'),
+                    message:
+                        result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
                     txLink: result.signature
@@ -243,8 +245,11 @@ function PortfolioWithdraw({
                 }
                 // Show success notification
                 notificationStore.add({
-                    title: 'Withdrawal Successful',
-                    message: `Successfully withdrew ${formatNum(withdrawInputNum, 2, true, false)} fUSD`,
+                    title: t('transactions.withdrawalSuccessful'),
+                    message: t('transactions.successfullyWithdrawn', {
+                        amount: formatNum(withdrawInputNum, 2, true, false),
+                        unit: 'fUSD',
+                    }),
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -289,12 +294,11 @@ function PortfolioWithdraw({
     const infoItems = useMemo(
         () => [
             {
-                label: 'Available to withdraw',
+                label: t('transactions.availableToWithdraw'),
                 value: !isNaN(portfolio.availableBalance)
                     ? formatNum(portfolio.availableBalance, 2, true, true)
                     : '-',
-                tooltip:
-                    'The total amount you have available to withdraw from your portfolio',
+                tooltip: t('transactions.availableToWithdrawTooltip'),
             },
         ],
         [portfolio.availableBalance, formatNum],
@@ -305,14 +309,14 @@ function PortfolioWithdraw({
             <div className={styles.textContent}>
                 <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
                 {/* <h4>Withdraw {unitValue} to Fogo</h4> */}
-                <h4>Withdraw fUSD to Fogo</h4>
+                <h4>{t('withdraw.prompt', { token: 'fUSD' })}</h4>
                 <div>
-                    <p>fUSD will be sent to your address.</p>
+                    <p>{t('withdraw.explanation', { token: 'fUSD' })}</p>
                 </div>
             </div>
 
             <div className={styles.input_container}>
-                <h6>Amount</h6>
+                <h6>{t('common.amount')}</h6>
                 {showInvalidSizeWarning ? (
                     userBalanceLessThanMinimum ? (
                         <span>
@@ -325,7 +329,9 @@ function PortfolioWithdraw({
                     )
                 ) : null}
                 <NumFormattedInput
-                    placeholder='Enter amount (min $1)'
+                    placeholder={t('withdraw.input_prompt', {
+                        MIN_WITHDRAW_AMOUNT,
+                    })}
                     value={rawInputString}
                     onChange={(
                         event: string | React.ChangeEvent<HTMLInputElement>,
@@ -339,7 +345,7 @@ function PortfolioWithdraw({
                         }
                     }}
                     autoFocus
-                    aria-label='withdraw input'
+                    aria-label={t('aria.withdrawInput')}
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                         if (e.key === 'Enter' && !isButtonDisabled) {
                             handleWithdraw();
@@ -354,12 +360,12 @@ function PortfolioWithdraw({
                     disabled={isProcessing}
                     className={maxModeActive ? styles.active : ''}
                 >
-                    Max
+                    {t('common.max')}
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
                 {transactionStatus === 'failed' && !error && (
                     <div className={styles.error}>
-                        Transaction failed. Please try again.
+                        {t('transactions.txFailedTryAgain')}
                     </div>
                 )}
             </div>
@@ -389,10 +395,10 @@ function PortfolioWithdraw({
                 disabled={isButtonDisabled}
             >
                 {transactionStatus === 'pending'
-                    ? 'Confirming Transaction...'
+                    ? t('transactions.confirmingTransaction')
                     : isProcessing
-                      ? 'Processing...'
-                      : 'Withdraw'}
+                      ? t('transactions.processing')
+                      : t('common.withdraw')}
             </SimpleButton>
         </div>
     );

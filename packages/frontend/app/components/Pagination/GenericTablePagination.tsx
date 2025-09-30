@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FaChevronLeft, FaChevronRight, FaChevronUp } from 'react-icons/fa';
 import styles from './Pagination.module.css';
+import { t } from 'i18next';
 
 interface GenericTablePaginationProps {
     page: number;
@@ -77,7 +78,7 @@ const GenericTablePagination: React.FC<GenericTablePaginationProps> = ({
                             }
                         }}
                         disabled={page === 0}
-                        aria-label='Previous page'
+                        aria-label={t('aria.previousPage')}
                     >
                         <FaChevronLeft size={20} aria-hidden='true' />
                     </button>
@@ -95,7 +96,7 @@ const GenericTablePagination: React.FC<GenericTablePaginationProps> = ({
                         disabled={
                             page >= Math.ceil(totalCount / rowsPerPageState) - 1
                         }
-                        aria-label='Next page'
+                        aria-label={t('aria.nextPage')}
                     >
                         <FaChevronRight size={20} aria-hidden='true' />
                     </button>

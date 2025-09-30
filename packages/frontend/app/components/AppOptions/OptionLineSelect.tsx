@@ -11,10 +11,11 @@ interface propsIF {
     text: string;
     active: string | JSX.Element;
     options: dropdownOptionsIF[];
+    dropDirection?: 'down' | 'up';
 }
 
 export default function OptionLineSelect(props: propsIF) {
-    const { text, active, options } = props;
+    const { text, active, options, dropDirection = 'down' } = props;
 
     // boolean to track whether the options dropdown is open
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -50,19 +51,37 @@ export default function OptionLineSelect(props: propsIF) {
         <li className={styles.option_line}>
             {text}
 
-            <div
-                ref={dropdownRef}
-                onClick={() => setIsOpen(!isOpen)}
-                className={styles.dropdown_container}
-            >
-                <div className={styles.active_option}>
+            <div className={styles.dropdown_container} ref={dropdownRef}>
+                <div
+                    className={styles.active_option}
+                    onClick={() => setIsOpen((o) => !o)}
+                >
                     {active}
-                    <SlArrowDown />
+                    <SlArrowDown
+                        className={`${styles.caret} ${isOpen ? styles.caret_open : ''} ${
+                            dropDirection === 'up' ? styles.caret_up : ''
+                        }`}
+                    />
                 </div>
+
                 {isOpen && (
-                    <div className={styles.options_dropdown}>
-                        {options.map((o: dropdownOptionsIF) => (
-                            <div onClick={() => o.set()}>{o.readable}</div>
+                    <div
+                        className={`${styles.options_dropdown} ${
+                            dropDirection === 'up'
+                                ? styles.drop_up
+                                : styles.drop_down
+                        }`}
+                    >
+                        {options.map((o: dropdownOptionsIF, i) => (
+                            <div
+                                key={i}
+                                onClick={() => {
+                                    o.set();
+                                    setIsOpen(false);
+                                }}
+                            >
+                                {o.readable}
+                            </div>
                         ))}
                     </div>
                 )}

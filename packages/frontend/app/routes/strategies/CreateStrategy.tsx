@@ -13,6 +13,7 @@ import {
 } from '~/stores/NotificationStore';
 import { useState } from 'react';
 import { FaChevronLeft } from 'react-icons/fa';
+import { t } from 'i18next';
 
 export interface textInputIF {
     label: string;
@@ -120,8 +121,8 @@ export default function CreateStrategy(props: propsT) {
                     >
                         <FaChevronLeft />
                     </div>
-                    {page === 'new' && <h2>New Strategy</h2>}
-                    {page === 'edit' && <h2>Edit Strategy: {strategy.name}</h2>}
+                    {page === 'new' && <h2>{t('strategies.newStrategy')}</h2>}
+                    {page === 'edit' && <h2>{t('strategies.editStrategy')}</h2>}
                 </header>
                 <div>
                     <section className={styles.create_strategy_inputs}>
@@ -177,7 +178,7 @@ export default function CreateStrategy(props: propsT) {
                                 setOrderSize(strategy.orderSize);
                             }}
                         >
-                            Reset
+                            {t('common.reset')}
                         </Button>
                         <div className={styles.buttons_right}>
                             <Button
@@ -190,7 +191,7 @@ export default function CreateStrategy(props: propsT) {
                                     )
                                 }
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                             <Button
                                 onClick={() => {
@@ -217,8 +218,13 @@ export default function CreateStrategy(props: propsT) {
                                         );
                                         subAccounts.create(name, 'strategy');
                                         notifications.add({
-                                            title: 'Sub Account Created',
-                                            message: `Made new strategy Sub-Account ${name}`,
+                                            title: t(
+                                                'subaccounts.created.title',
+                                            ),
+                                            message: t(
+                                                'subaccounts.created.message',
+                                                { name },
+                                            ),
                                             icon: 'check',
                                         });
                                     }
@@ -227,8 +233,8 @@ export default function CreateStrategy(props: propsT) {
                                 size={100}
                                 selected
                             >
-                                {page === 'new' && 'Create'}
-                                {page === 'edit' && 'Update'}
+                                {page === 'new' && t('common.create')}
+                                {page === 'edit' && t('common.update')}
                             </Button>
                         </div>
                     </section>

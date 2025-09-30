@@ -8,6 +8,7 @@ import TokenDropdown, {
 } from '~/components/TokenDropdown/TokenDropdown';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { LuCircleHelp } from 'react-icons/lu';
+import { t } from 'i18next';
 
 interface PortfolioSendProps {
     availableAmount: number;
@@ -174,7 +175,7 @@ function PortfolioSend({
                     type='text'
                     value={address}
                     onChange={handleAddressChange}
-                    aria-label='address input'
+                    aria-label={t('aria.addressInput')}
                     placeholder='Enter address...'
                     disabled={isProcessing}
                 />
@@ -202,7 +203,7 @@ function PortfolioSend({
                     type='text'
                     value={amount}
                     onChange={handleInputChange}
-                    aria-label='amount input'
+                    aria-label={t('aria.amountInput')}
                     inputMode='numeric'
                     pattern='[0-9]*'
                     placeholder='Enter amount'

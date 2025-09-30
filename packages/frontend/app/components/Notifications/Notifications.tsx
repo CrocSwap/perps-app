@@ -17,6 +17,7 @@ import { WsChannels } from '~/utils/Constants';
 import SimpleButton from '../SimpleButton/SimpleButton';
 import Notification from './Notification';
 import styles from './Notifications.module.css';
+import { t } from 'i18next';
 
 interface NewsItemIF {
     headline: string;
@@ -287,11 +288,13 @@ export default function Notifications() {
                         />
                     </header>
                     <div className={styles.text_content}>
-                        <h3>New Version Available</h3>
+                        <h3>{t('newVersion.title')}</h3>
                         <p>
                             {version
-                                ? `Version ${version} is ready to install with new features and improvements.`
-                                : 'A new version is ready with exciting updates and bug fixes.'}
+                                ? t('newVersion.message.withVersionNumber', {
+                                      version,
+                                  })
+                                : t('newVersion.message.noVersionNumber')}
                         </p>
                     </div>
                     <SimpleButton
@@ -300,14 +303,14 @@ export default function Notifications() {
                             setShowReload(false);
                         }}
                     >
-                        Update Now
+                        {t('newVersion.updateButton')}
                     </SimpleButton>
                 </div>
             )}
             {unseen.messages.length > 0 && !userClosedNews && (
                 <div className={styles.news}>
                     <header>
-                        <h4>Announcements</h4>
+                        <h4>{t('common.announcements')}</h4>
                         <MdClose
                             color='var(--text2)'
                             size={16}

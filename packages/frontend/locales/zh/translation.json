@@ -1,0 +1,551 @@
+{
+    "common": {
+        "yes": "是",
+        "no": "否",
+        "cancel": "取消",
+        "save": "保存",
+        "delete": "删除",
+        "edit": "编辑",
+        "close": "关闭",
+        "loading": "加载中...",
+        "confirming": "确认中...",
+        "processing": "处理中...",
+        "error": "错误",
+        "success": "成功",
+        "applyDefaults": "应用默认值",
+        "learnMore": "了解更多",
+        "deposit": "充值",
+        "transfer": "转账",
+        "withdraw": "提现",
+        "submit": "提交",
+        "quantity": "数量",
+        "confirm": "确认",
+        "amount": "金额",
+        "max": "最大",
+        "min": "最小",
+        "positions": "持仓",
+        "balances": "余额",
+        "openOrders": "未成交订单",
+        "tradeHistory": "交易记录",
+        "fundingHistory": "资金记录",
+        "orderHistory": "订单历史",
+        "depositsAndWithdrawals": "充值与提现",
+        "twap": "TWAP",
+        "all": "全部",
+        "active": "活跃",
+        "long": "多头",
+        "short": "空头",
+        "create": "创建",
+        "update": "更新",
+        "reset": "重置",
+        "announcements": "公告",
+        "leverage": "杠杆",
+        "comingSoon": "即将上线"
+    },
+    "transactions": {
+        "orderTypes": "订单类型",
+        "marginMode": "保证金模式",
+        "scaleOptions": "比例选项",
+        "confirmBuyOrder": "确认买入订单",
+        "confirmSellOrder": "确认卖出订单",
+        "confirmLimitBuyOrder": "确认限价买入订单",
+        "confirmLimitSellOrder": "确认限价卖出订单",
+        "availableToTrade": "可用交易额",
+        "availableToTradeTooltip": "已存入{{symbol}}",
+        "currentPosition": "当前持仓",
+        "currentPositionTooltip": "当前{{symbol}}持仓数量",
+        "maxOpenInterestReached": "已达最大未平仓量",
+        "depositToTrade": "存入资金进行交易",
+        "switchDirectionToReduce": "切换方向减少持仓",
+        "maxLongDepositToTrade": "Max Long - 存入资金进行交易",
+        "maxShortDepositToTrade": "Max Short - 存入资金进行交易",
+        "minimumOr100Percent": "最低或100%",
+        "minimum": "最低数量",
+        "invalidPrice": "价格无效",
+        "orderSizeBelowMinimum": "订单数量低于最低限额",
+        "orderSizeExceedsPositionLimits": "订单数量超出持仓限制",
+        "insufficientCollateral": "保证金不足",
+        "reduceOnlyExceedsPositionSize": "只减仓数量超出当前持仓",
+        "processingOrder": "订单处理中...",
+        "positionLimitReached": "达到持仓上限",
+        "limitOrderFailed": "限价订单失败",
+        "unknownErrorOccurred": "发生未知错误",
+        "failedToPlaceLimitOrder": "无法提交限价订单",
+        "sellShortLimitOrderPlaced": "卖 / Short 限价订单已提交",
+        "sellShortLimitOrderPending": "卖 / Short 限价订单等待中",
+        "successfullyPlacedSellOrderFor": "卖出订单已提交：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
+        "placingSellShortLimitOrderFor": "正在提交卖 / Short 限价订单：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
+        "enterValidLimitPrice": "请输入有效的限价",
+        "enterValidOrderSize": "请输入有效的订单数量",
+        "buyLongLimitOrderPlaced": "买 / Long 限价订单已提交",
+        "successfullyPlacedBuyOrderFor": "买入订单已提交：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
+        "buyLongLimitOrderPending": "买 / Long 限价订单等待中",
+        "placingBuyLongLimitOrderFor": "正在提交买 / Long 限价订单：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
+        "priceDistribution": "价格分布",
+        "flat": "平盘",
+        "flatPriceDistribution": "平盘价格分布",
+        "evenlySplit": "平均分配",
+        "evenPriceDistribution": "平均价格分布",
+        "market": "市价",
+        "limit": "限价",
+        "price": "价格",
+        "size": "数量",
+        "time": "时间",
+        "total": "总计",
+        "action": "操作",
+        "ratio": "比例",
+        "buyLong": "买 / Long",
+        "sellShort": "卖 / Short",
+        "confirmingTransaction": "交易确认中...",
+        "processing": "处理中...",
+        "dontShowThisAgain": "不再显示",
+        "estLiquidationPrice": "预计强平价格",
+        "estimatedPriceAtWhichPosWillBeLiquidated": "预计您的持仓将被强平的价格",
+        "orderValue": "订单价值",
+        "hideSmallBalances": "隐藏小额余额",
+        "increasing": "递增",
+        "decreasing": "递减",
+        "totalOrders": "订单总数",
+        "orderRatioSumMustBe100": "订单占比总和必须为100%",
+        "collapseDetails": "收起详情",
+        "expandDetails": "展开详情",
+        "frequency": "频率",
+        "runTime": "运行时长",
+        "numberOfOrders": "订单数量",
+        "chasingInterval": "跟单间隔",
+        "sizePerSuborder": "每笔子订单数量",
+        "avgEntryPrice": "平均入场价",
+        "averageEntryPrice": "平均入场价",
+        "marginRequired": "所需保证金",
+        "maxPosSizeLimitedByOiCap": "最大持仓受未平仓量上限限制",
+        "openPositionIsXSwitchToY": "当前持仓：{{x}}。切换为{{y}}。",
+        "buySellAtCurrentPrice": "以当前价格买/卖",
+        "buySellAtSpecificPrice": "以指定价格买/卖",
+        "maxTradeSizeLimitedTo": "最大交易数量有限制",
+        "yourPositionIsLimitedByOpenInterest": "您的{{coin}}持仓受{{limitedBy}}上限影响",
+        "currentMaxTradeSizeForMarket": "当前市场最大交易数量：{{limit}}",
+        "placingLimitOrderFor": "正在提交{{usdValueOfOrderStr}}{{symbol}}的限价订单，价格{{limitPrice}}",
+        "sellOrderPending": "卖出订单待处理",
+        "orderSubmittedFor": "已提交{{usdValueOfOrderStr}}{{symbol}}订单",
+        "buyOrderPending": "买入订单待处理",
+        "buyOrderSuccessful": "买入订单成功",
+        "successfullyBought": "成功买入{{usdValueOfOrderStr}}{{symbol}}",
+        "sellOrderSuccessful": "卖出订单成功",
+        "successfullySold": "成功卖出{{usdValueOfOrderStr}}{{symbol}}",
+        "sellOrderFailed": "卖出订单失败",
+        "transactionFailed": "交易失败",
+        "buyOrderFailed": "买入订单失败",
+        "closeFailed": "平仓失败",
+        "closeFailedTitle": "平仓失败",
+        "liquidationPrice": "强平价格",
+        "enterPrice": "输入价格",
+        "enterSize": "输入数量",
+        "totalSize": "总数量",
+        "cancelling": "正在取消...",
+        "midButton": "MID",
+        "positionClosed": "持仓已平仓",
+        "successfullyClosedPosition": "成功平仓{{usdValueOfOrderStr}} {{symbol}}持仓",
+        "failedToClosePosition": "平仓失败",
+        "transactionTimedOut": "交易{{timeInSeconds}}秒后超时",
+        "txFailedOrNotConfirmed": "交易失败或未确认",
+        "walletBalance": "钱包余额",
+        "walletBalanceTooltip": "当前钱包余额",
+        "depositSuccessful": "充值成功",
+        "successfullyDeposited": "成功充值{{amount}} {{unit}}",
+        "depositFailed": "充值失败",
+        "withdrawalSuccessful": "提现成功",
+        "successfullyWithdrawn": "成功提现{{amount}} {{unit}}",
+        "withdrawFailed": "提现失败",
+        "availableToDeposit": "可充值金额",
+        "availableToDepositTooltip": "基于保险库容量和钱包余额的可充值金额",
+        "availableToWithdraw": "可提现金额",
+        "availableToWithdrawTooltip": "您的资产组合可提现总金额",
+        "invalidAmount": "金额无效",
+        "depositToVault": "存入{{unitValue}}到{{vaultName}}",
+        "depositToVaultMsg": "存入{{unitValue}}可获得{{vaultName}}的收益。存款将在下个周期后可提现。",
+        "txFailedTryAgain": "交易失败，请重试。",
+        "minDepositAmountIs": "最低充值金额为${{amount}}",
+        "enterAmountMin10": "请输入金额（最低$10）",
+        "cancellingAllOrders": {
+            "title": "正在取消所有订单",
+            "message": "正在尝试取消{{count}}个{{noun}}..."
+        },
+        "cancelOrderPending": {
+            "title": "订单取消待处理",
+            "message": "正在取消{{usdValueOfOrderStr}}的{{symbol}}订单"
+        },
+        "cancelOrderConfirmed": {
+            "title": "订单已取消",
+            "message": "成功取消{{usdValueOfOrderStr}}的{{symbol}}订单"
+        },
+        "cancelFailed": {
+            "title": "取消失败",
+            "message": "订单ID未找到",
+            "message2": "订单取消失败"
+        },
+        "cancelLimitPending": {
+            "title": "限价订单取消待处理",
+            "message": "正在取消{{usdValueOfOrderStr}}的{{symbol}}{{side}}限价订单"
+        },
+        "cancelLimitConfirmed": {
+            "title": "订单已取消",
+            "message": "成功取消{{usdValueOfOrderStr}}的{{symbol}}{{side}}限价订单"
+        },
+        "failedToUpdatedOrder": {
+            "title": "订单更新失败"
+        },
+        "orderUpdated": {
+            "title": "订单已更新",
+            "message": "成功将{{usdValueOfOrderStr}}的{{symbol}}订单更新为{{limitPrice}}"
+        },
+        "orderFilled": {
+            "title": "{{side}}订单已成交",
+            "message": "成功成交{{usdValueOfFillStr}}的{{symbol}}{{side}}订单，价格{{fillPrice}}"
+        },
+        "errorUpdatingOrder": {
+            "title": "订单更新错误"
+        },
+        "cancelAllFailed": {
+            "title": "全部取消失败",
+            "message": "未能取消任何订单。"
+        },
+        "cancelAllConfirmed": {
+            "title": "所有订单已取消",
+            "message": "成功取消所有{{count}}个订单"
+        },
+        "cancelAllPartialSuccess": {
+            "title": "部分成功",
+            "message": "已取消{{successCount}}个订单，{{failedCount}}个失败"
+        },
+        "noOpenOrders": "暂无未成交订单",
+        "transactionError": "交易错误",
+        "invalidLimitPrice": {
+            "title": "价格无效",
+            "message": "请输入有效限价"
+        },
+        "invalidOrderSize": {
+            "title": "订单数量无效",
+            "message": "请输入有效的订单数量"
+        },
+        "leverageUpdated": {
+            "title": "杠杆已更新",
+            "message": "已成功更新杠杆至{{leverage}}倍"
+        },
+        "leverageUpdateFailed": {
+            "title": "交易失败",
+            "message": "杠杆更新失败"
+        },
+        "viewOnExplorer": "在区块浏览器中查看",
+        "limitOrderUpdatePending": {
+            "title": "限价订单更新待处理",
+            "message": "正在以{{limitPrice}}更新{{coin}}的{{value}}{{side}}订单"
+        },
+        "filled": "已成交",
+        "open": "未成交",
+        "partiallyFilled": "部分成交",
+        "canceled": "已取消",
+        "pending": "待处理",
+        "tpslToggleLabel": "TP/SL (止盈/止损)"
+    },
+    "subaccounts": {
+        "createSubAccount": "创建子账户",
+        "createSubAccountPH": "例如：我的子账户1",
+        "created": {
+            "title": "子账户已创建",
+            "message": "已创建新策略子账户{{name}}",
+            "message2": "已创建新自主管理子账户{{name}}"
+        }
+    },
+    "strategies": {
+        "newStrategy": "新策略",
+        "editStrategy": "编辑策略"
+    },
+    "margin": {
+        "cross": {
+            "title": "全仓",
+            "heading": "全仓保证金",
+            "blurb": "所有全仓仓位共用同一保证金作为担保。若被强平，可能丧失保证金余额及该模式下的全部持仓。"
+        },
+        "isolated": {
+            "title": "逐仓",
+            "heading": "逐仓模式",
+            "blurb": "可为每个仓位分别分配保证金，独立管理风险。逐仓仓位保证金比例达100%时将被强平。可分别增减仓位保证金。"
+        }
+    },
+    "tradeTable": {
+        "selectATabToViewData": "请选择一个标签以查看数据",
+        "time": "时间",
+        "type": "类型",
+        "coin": "币种",
+        "direction": "方向",
+        "size": "数量",
+        "filledSize": "成交数量",
+        "orderValue": "订单价值",
+        "price": "价格",
+        "tradeValue": "交易价值",
+        "fee": "手续费",
+        "closedPnl": "已实现盈亏",
+        "reduceOnly": "只减仓",
+        "triggerConditions": "触发条件",
+        "tpsl": "止盈/止损",
+        "status": "状态",
+        "order": "订单",
+        "long": "Long",
+        "short": "Short",
+        "noOpenPositions": "无持仓",
+        "markPrice": "标记价格",
+        "orderId": "订单编号",
+        "totalBalance": "总余额",
+        "availableBalance": "可用余额",
+        "currencyValue": "{{currency}}价值",
+        "buyingPower": "购买力",
+        "contract": "合约",
+        "positionValue": "持仓价值",
+        "entryPrice": "开仓价格",
+        "pnl": "盈亏 (ROE%)",
+        "liqPrice": "强平价格",
+        "margin": "保证金",
+        "funding": "资金费率",
+        "close": "平仓",
+        "originalSize": "原始数量",
+        "cancelAll": "全部取消",
+        "noTradeHistory": "无交易历史",
+        "noOrderHistory": "无订单历史",
+        "noFundingHistory": "无资金费率历史",
+        "fundingHistory": "总计: {{allTime}} 变化后: {{sinceChange}}",
+        "openLong": "开 Long",
+        "openShort": "开 Short",
+        "closeLong": "平 Long",
+        "closeShort": "平 Short"
+    },
+    "time": {
+        "second": "秒",
+        "seconds": "秒",
+        "minute": "分钟",
+        "minutes": "分钟",
+        "hour": "小时",
+        "hours": "小时",
+        "day": "天",
+        "days": "天",
+        "week": "周",
+        "weeks": "周",
+        "month": "月",
+        "months": "月",
+        "year": "年",
+        "years": "年"
+    },
+    "navigation": {
+        "home": "首页",
+        "about": "关于",
+        "contact": "联系",
+        "settings": "设置",
+        "profile": "个人资料",
+        "logout": "退出登录",
+        "trade": "交易",
+        "chart": "图表",
+        "book": "订单簿",
+        "recent": "最近",
+        "positions": "持仓"
+    },
+    "auth": {
+        "login": "登录",
+        "register": "注册",
+        "email": "邮箱",
+        "password": "密码",
+        "forgotPassword": "忘记密码？",
+        "loginSuccess": "登录成功",
+        "loginError": "无效凭证"
+    },
+    "forms": {
+        "name": "姓名",
+        "firstName": "名字",
+        "lastName": "姓氏",
+        "phone": "电话",
+        "address": "地址",
+        "submit": "提交",
+        "required": "此字段为必填项"
+    },
+    "messages": {
+        "welcome": "欢迎",
+        "hello": "{{name}}，你好！",
+        "goodbye": "再见",
+        "thankYou": "谢谢",
+        "pleaseWait": "请稍候...",
+        "connectWalletForTrading": "连接钱包即可零Gas费交易。"
+    },
+    "home": {
+        "title": "Ambient合约交易",
+        "subtitle": "极速成交。零Taker费。最高100倍杠杆。",
+        "startTrading": "开始交易",
+        "learnMore": "了解更多",
+        "hero": {
+            "heading1": "从零",
+            "one": "到一",
+            "heading2": "去中心化交易协议",
+            "description": "Ambient是集DeFi原生产品与CEX级体验于一体的全新去中心化合约DEX平台",
+            "stats": {
+                "totalVolume": "总交易量",
+                "activeUsers": "活跃用户"
+            }
+        }
+    },
+    "referrals": {
+        "title": "邀请",
+        "description": "邀请用户赚奖励。合作伙伴获得更多奖励。",
+        "tradersReferred": "已邀请交易者",
+        "rewardsEarned": "已赚取奖励"
+    },
+    "deposit": {
+        "prompt": "从Fogo充值{{token}}",
+        "input_prompt": "输入金额（最低${{MIN_DEPOSIT_AMOUNT}}）",
+        "availableToDeposit": "可充值"
+    },
+    "withdraw": {
+        "prompt": "提取{{token}}到Fogo",
+        "explanation": "{{token}}将发送到您的地址。",
+        "availableToWithdraw": "可提现",
+        "input_prompt": "输入金额（最低${{MIN_WITHDRAW_AMOUNT}}）"
+    },
+    "orderBook": {
+        "tab": "标签",
+        "stacked": "合并视图",
+        "large": "大额",
+        "book": "订单簿",
+        "trades": "交易",
+        "spread": "价差"
+    },
+    "appSettings": {
+        "title": "设置",
+        "skipOpenOrderConfirm": "跳过未成交订单确认",
+        "enableTxNotifications": "启用交易通知",
+        "enableBackgroundFillNotif": "启用后台成交通知",
+        "numberFormat": "数字格式",
+        "color": "颜色",
+        "language": "语言"
+    },
+    "symbolInfo": {
+        "mark": "标记",
+        "markTooltip": "按照公平原则计算的估价，防止不公平强平",
+        "oracle": "预言机",
+        "oracleTooltip": "Pyth Network预言机实时价格",
+        "oracleTooltipPythStale": "Pyth Network预言机（价格可能滞后）",
+        "oracleTooltipNoPyth": "来自多个知名交易所的外部市场数据",
+        "24hChange": "24小时变动",
+        "24hChangeTooltip": "过去24小时价格变化",
+        "24hVolume": "24小时成交量",
+        "24hVolumeTooltip": "过去24小时总成交量",
+        "openInterest": "未平仓合约量",
+        "openInterestTooltip": "市场总未平仓合约量",
+        "fundingRate": "资金费率",
+        "fundingRateTooltip": "多头支付空头（或反之），每小时费率。无额外费用；资金费率用于锚定现货市场价格。",
+        "fundingCountdown": "资金倒计时",
+        "fundingCountdownTooltip": "距离下次资金发放剩余时间"
+    },
+    "feedback": {
+        "menuLabel": "反馈",
+        "title": "提交反馈",
+        "ratingPrompt": "您如何评价本次体验？",
+        "sendFeedback": "提交反馈",
+        "positivePrompt": "您最喜欢什么？",
+        "negativePrompt": "有哪些可以改进的？",
+        "placeholder": "您的匿名反馈将有助于我们改进。",
+        "warningText": "反馈内容过长，将被截断。",
+        "submitButtonText": "提交反馈",
+        "submittingButtonText": "正在提交...",
+        "appreciateText": "感谢您的反馈。",
+        "thanksText": "谢谢！"
+    },
+    "accountOverview": {
+        "heading": "账户总览",
+        "balance": "余额",
+        "balanceTooltip": "账户总资产",
+        "unrealizedPnl": "未实现PnL",
+        "unrealizedPnlTooltip": "未实现盈亏"
+    },
+    "marketLimitClose": {
+        "marketHeading": "市价平仓",
+        "marketDescription": "将以当前市价提交平仓订单。",
+        "minimumOr100Percent": "{{min}}最小或100%",
+        "noZeroSize": "数量不能为0",
+        "sizeExceedsPosition": "数量不能超过持仓量",
+        "invalidOrderSizeTitle": "无效订单数量",
+        "invalidSize": "请输入有效订单数量",
+        "limitHeading": "限价平仓",
+        "limitDescription": "将以限价提交平仓订单。",
+        "estimatedClosedPnl": "预计已实现PnL（不含手续费）：{{estimatedPNL}}",
+        "positionClosed": "持仓已平仓",
+        "percentOfPositionClosed": "已平仓{{sizePercentageValue}}%持仓"
+    },
+    "newVersion": {
+        "title": "新版本可用",
+        "message": {
+            "withVersionNumber": "版本{{version}}已准备好，新增功能与优化。",
+            "noVersionNumber": "新版本已准备好，新增功能与优化。"
+        },
+        "updateButton": "立即更新",
+        "version": "版本"
+    },
+    "leverage": {
+        "title": "调整杠杆",
+        "closePositionPrompt": "关闭持仓以降低最低杠杆"
+    },
+    "share": {
+        "prompt": "自定义您的文本",
+        "xCTA": "在𝕏分享",
+        "copyLinkCTA": "复制链接",
+        "textPlaceholder": "立即在{{fogo}} Testnet通过{{twitter}}交易{{coin}}合约"
+    },
+    "colors": {
+        "default": "默认",
+        "opposite": "相反",
+        "deuteranopia": "红绿色盲",
+        "tritanopia": "蓝黄色盲",
+        "protanopia": "红色盲"
+    },
+    "aria": {
+        "closeAnnouncement": "关闭公告",
+        "closeFeedbackForm": "关闭反馈表单",
+        "depositInput": "充值输入框",
+        "addressInput": "地址输入框",
+        "amountInput": "金额输入框",
+        "withdrawInput": "提现输入框",
+        "scrollTabsLeft": "标签左移",
+        "scrollTabsRight": "标签右移",
+        "leverageValue": "杠杆数值",
+        "leverageAmount": "杠杆金额",
+        "setLeverageTo": "设置杠杆为{{value}}倍",
+        "positionSizePercentage": "持仓比例",
+        "positionSizeValue": "持仓数值",
+        "totalOrders": "订单总数",
+        "runningPriceInput": {
+            "minutes": "运行价格分钟输入框",
+            "hours": "运行价格小时输入框"
+        },
+        "yourDepositAmount": "您的充值金额",
+        "flatPriceDistribution": "平价分布",
+        "evenPriceDistribution": "均分价格分布",
+        "thumbsUp": "点赞",
+        "thumbsDown": "点踩",
+        "closeNav": "关闭导航菜单",
+        "openSettings": "打开设置",
+        "openMoreOptionsMenu": "打开更多选项菜单",
+        "previousPage": "上一页",
+        "nextPage": "下一页",
+        "tradeType": "交易类型",
+        "closeTradeTypeMenu": "关闭交易类型菜单",
+        "toggleChasingInterval": "切换跟单间隔",
+        "toggleRandomize": "切换随机",
+        "toggleReduceOnly": "切换只减仓",
+        "toggleTPSL": "切换止盈止损",
+        "editTPSL": "编辑止盈止损",
+        "toggleConfigureAmount": "切换金额设置",
+        "toggleLimitPrice": "切换限价"
+    },
+    "chart": {
+        "liqPrice": "清算价格"
+    },
+    "meta": {
+        "title": "首页 | Ambient",
+        "content": "在Ambient进行永续合约交易"
+    }
+}

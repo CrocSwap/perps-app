@@ -21,6 +21,7 @@ import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
 import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
+import { useTranslation } from 'react-i18next';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -31,6 +32,8 @@ interface PositionsTableRowProps {
 const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
     (props) => {
         const navigate = useNavigate();
+
+        const { t, i18n } = useTranslation();
 
         const { position } = props;
         const { coinPriceMap, symbol, symbolInfo } = useTradeDataStore();
@@ -240,8 +243,17 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         });
                     }
                     notifications.add({
-                        title: 'Position Closed',
-                        message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
+                        title: t('transactions.positionClosed'),
+                        message: t('transactions.successfullyClosedPosition', {
+                            usdValueOfOrderStr: formatNum(
+                                position.szi,
+                                2,
+                                true,
+                                true,
+                                true,
+                            ),
+                            symbol: position.coin,
+                        }),
                         icon: 'check',
                         txLink: result.signature
                             ? blockExplorer + result.signature
@@ -271,9 +283,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         });
                     }
                     notifications.add({
-                        title: 'Close Failed',
+                        title: t('transactions.closeFailedTitle'),
                         message: String(
-                            result.error || 'Failed to close position',
+                            result.error ||
+                                t('transactions.failedToClosePosition'),
                         ),
                         txLink: result.signature
                             ? blockExplorer + result.signature
@@ -284,11 +297,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             } catch (error) {
                 console.error('❌ Error closing position:', error);
                 notifications.add({
-                    title: 'Close Failed',
+                    title: t('transactions.closeFailed'),
                     message: String(
                         error instanceof Error
                             ? error.message
-                            : 'Unknown error occurred',
+                            : t('transactions.unknownErrorOccurred'),
                     ),
                     icon: 'error',
                 });
@@ -311,11 +324,27 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         );
         const fundingTooltipMsg = useMemo(
             () =>
-                `All-time: ${formatNum(position.cumFunding.allTime * -1, 2, true, true, true)} Since change: ${formatNum(position.cumFunding.sinceChange * -1, 2, true, true, true)}`,
+                t('tradeTable.fundingHistory', {
+                    allTime: formatNum(
+                        position.cumFunding.allTime * -1,
+                        2,
+                        true,
+                        true,
+                        true,
+                    ),
+                    sinceChange: formatNum(
+                        position.cumFunding.sinceChange * -1,
+                        2,
+                        true,
+                        true,
+                        true,
+                    ),
+                }),
             [
                 position.cumFunding.allTime,
                 position.cumFunding.sinceChange,
                 formatNum,
+                i18n.language,
             ],
         );
 
@@ -427,7 +456,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 {showTpSl && (
                     <div className={`${styles.cell} ${styles.tpslCell}`}>
                         {getTpSl()}
-                        <button onClick={openTpSlModal} aria-label='Edit TP/SL'>
+                        <button
+                            onClick={openTpSlModal}
+                            aria-label={t('editTPSL')}
+                        >
                             <LuPen
                                 color='var(--text1)'
                                 size={10}
@@ -453,7 +485,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 modalCtrl.open();
                             }}
                         >
-                            Market
+                            {t('transactions.market')}
                         </button>
                         <button
                             className={styles.actionButton}
@@ -462,7 +494,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 modalCtrl.open();
                             }}
                         >
-                            Limit
+                            {t('transactions.limit')}
                         </button>
                     </div>
                 </div>

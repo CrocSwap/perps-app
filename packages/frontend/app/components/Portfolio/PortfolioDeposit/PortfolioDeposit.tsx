@@ -15,6 +15,7 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
+import { t } from 'i18next';
 
 interface propsIF {
     portfolio: {
@@ -151,8 +152,9 @@ function PortfolioDeposit(props: propsIF) {
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
                 notificationStore.add({
-                    title: 'Deposit Failed',
-                    message: result.error || 'Transaction failed',
+                    title: t('transactions.depositFailed'),
+                    message:
+                        result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
                     txLink: result.signature
@@ -182,8 +184,11 @@ function PortfolioDeposit(props: propsIF) {
                 }
                 // Show success notification
                 notificationStore.add({
-                    title: 'Deposit Successful',
-                    message: `Successfully deposited ${formatNum(depositInputNum, 2, true, false)} fUSD`,
+                    title: t('transactions.depositSuccessful'),
+                    message: t('transactions.successfullyDeposited', {
+                        amount: formatNum(depositInputNum, 2, true, false),
+                        unit: 'fUSD',
+                    }),
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -230,7 +235,7 @@ function PortfolioDeposit(props: propsIF) {
 
         return [
             {
-                label: 'Available to deposit',
+                label: t('deposit.availableToDeposit'),
                 value: !isNaN(availableBalance)
                     ? formatNum(
                           availableBalance,
@@ -271,7 +276,7 @@ function PortfolioDeposit(props: propsIF) {
         <div className={styles.container}>
             <div className={styles.textContent}>
                 <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
-                <h4>Deposit {selectedToken.symbol} from Fogo</h4>
+                <h4>{t('deposit.prompt', { token: selectedToken.symbol })}</h4>
             </div>
 
             <TokenDropdown
@@ -282,15 +287,17 @@ function PortfolioDeposit(props: propsIF) {
             />
 
             <div className={styles.input_container}>
-                <h6>Amount</h6>
+                <h6>{t('common.amount')}</h6>
                 {showInvalidSizeWarning && (
                     <span>{`Min: ${formatNum(MIN_DEPOSIT_AMOUNT, 2, true, true)}`}</span>
                 )}
                 <NumFormattedInput
-                    placeholder={`Enter amount (min $${MIN_DEPOSIT_AMOUNT})`}
+                    placeholder={t('deposit.input_prompt', {
+                        MIN_DEPOSIT_AMOUNT,
+                    })}
                     value={rawInputString}
                     onChange={handleDepositChange}
-                    aria-label='deposit input'
+                    aria-label={t('aria.depositInput')}
                     autoFocus
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                         if (
@@ -306,7 +313,7 @@ function PortfolioDeposit(props: propsIF) {
                     )}
                 />
                 <button onClick={handleMaxClick} disabled={isProcessing}>
-                    Max
+                    {t('common.max')}
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
                 {transactionStatus === 'failed' && !error && (
@@ -341,10 +348,10 @@ function PortfolioDeposit(props: propsIF) {
                 disabled={isButtonDisabled || isSizeInvalid}
             >
                 {transactionStatus === 'pending'
-                    ? 'Confirming Transaction...'
+                    ? t('transactions.confirmingTransaction')
                     : isProcessing
-                      ? 'Processing...'
-                      : 'Deposit'}
+                      ? t('transactions.processing')
+                      : t('common.deposit')}
             </SimpleButton>
         </div>
     );

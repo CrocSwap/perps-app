@@ -12,6 +12,7 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import styles from './Tabs.module.css';
+import { t } from 'i18next';
 
 interface TabProps {
     label: string;
@@ -126,39 +127,39 @@ export default function Tabs(props: TabsProps) {
     const getTabLabel = (
         tab: string | { id: string; label: string },
     ): string => {
-        let label = typeof tab === 'string' ? tab : tab.label;
-        if (label === 'Balances' && webDataFetched && balancesCount > 0) {
-            label = `Balances (${balancesCount})`;
+        let label = typeof tab === 'string' ? t(tab) : t(tab.label);
+        if (tab === 'common.balances' && webDataFetched && balancesCount > 0) {
+            label = `${t(tab)} (${balancesCount})`;
         } else if (
-            label === 'Positions' &&
+            tab === 'common.positions' &&
             webDataFetched &&
             positionsCount > 0
         ) {
-            label = `Positions (${positionsCount})`;
+            label = `${t(tab)} (${positionsCount})`;
         } else if (
-            label === 'Open Orders' &&
+            tab === 'common.openOrders' &&
             webDataFetched &&
             openOrdersCount > 0
         ) {
-            label = `Open Orders (${openOrdersCount})`;
+            label = `${t(tab)} (${openOrdersCount})`;
         } else if (
-            label === 'Trade History' &&
+            tab === 'common.tradeHistory' &&
             webDataFetched &&
             userFills.length > 0
         ) {
-            label = `Trade History (${userFills.length})`;
+            label = `${t(tab)} (${userFills.length})`;
         } else if (
-            label === 'Funding' &&
+            tab === 'common.fundingHistory' &&
             webDataFetched &&
             userFundings.length > 0
         ) {
-            label = `Funding (${userFundings.length})`;
+            label = `${t(tab)} (${userFundings.length})`;
         } else if (
-            label === 'Order History' &&
+            tab === 'common.orderHistory' &&
             webDataFetched &&
             orderHistory.length > 0
         ) {
-            label = `Order History (${orderHistory.length})`;
+            label = `${t(tab)} (${orderHistory.length})`;
         }
         return label;
     };
@@ -302,7 +303,7 @@ export default function Tabs(props: TabsProps) {
                     <button
                         className={`${styles.scrollArrow} ${styles.scrollArrowLeft}`}
                         onClick={scrollLeft}
-                        aria-label='Scroll tabs left'
+                        aria-label={t('aria.scrollTabsLeft')}
                     >
                         <svg viewBox='0 0 24 24' fill='currentColor'>
                             <path d='M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z' />
@@ -339,7 +340,7 @@ export default function Tabs(props: TabsProps) {
                     <button
                         className={`${styles.scrollArrow} ${styles.scrollArrowRight}`}
                         onClick={scrollRight}
-                        aria-label='Scroll tabs right'
+                        aria-label={t('aria.scrollTabsRight')}
                     >
                         <svg viewBox='0 0 24 24' fill='currentColor'>
                             <path d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z' />

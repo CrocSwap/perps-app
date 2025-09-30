@@ -1,6 +1,7 @@
 import TradeButton from '../TradeButton/TradeButton';
 import AnimatedPath from './AnimatedPath';
 import styles from './Hero.module.css';
+import { t } from 'i18next';
 
 export default function Hero() {
     return (
@@ -46,16 +47,13 @@ export default function Hero() {
 
             <div className={styles.hero_heading}>
                 <h2>
-                    Zero-to-<span>One</span>{' '}
+                    {t('home.hero.heading1')}
+                    <span>{t('home.hero.one')}</span>
                 </h2>
-                <h2>Decentralized Trading Protocol</h2>
+                <h2>{t('home.hero.heading2')}</h2>
             </div>
 
-            <p>
-                Ambient is an entirely new kind of decentralized perp DEX
-                combining unique DeFi native products with a user experience
-                rivaling CEXes
-            </p>
+            <p>{t('home.hero.description')}</p>
 
             <div className={styles.desktop_trade_button}>
                 <TradeButton />
@@ -65,11 +63,11 @@ export default function Hero() {
             {/* <div className={styles.hero_stats_container}>
                 <div className={styles.hero_stats}>
                     <h2>$2.4B</h2>
-                    <p>Total Volume</p>
+                    <p>{t('home.hero.stats.totalVolume')}</p>
                 </div>
                 <div className={styles.hero_stats}>
                     <h2>50K+</h2>
-                    <p>Active Users</p>
+                    <p>{t('home.hero.stats.activeUsers')}</p>
                 </div>
             </div> */}
 
@@ -91,16 +89,13 @@ export default function Hero() {
                     {/* Mobile Hero Content */}
                     <div className={styles.mobile_hero_heading}>
                         <h2>
-                            Zero-to-<span>One</span>{' '}
+                            {t('home.hero.heading1')}
+                            <span>{t('home.hero.one')}</span>
                         </h2>
-                        <h2>Decentralized Trading Protocol</h2>
+                        <h2>{t('home.hero.heading2')}</h2>
                     </div>
 
-                    <p>
-                        Ambient is an entirely new kind of decentralized perp
-                        DEX combining unique DeFi native products with a user
-                        experience rivaling CEXes
-                    </p>
+                    <p>{t('home.hero.description')}</p>
                 </div>
 
                 {/* Bottom section */}

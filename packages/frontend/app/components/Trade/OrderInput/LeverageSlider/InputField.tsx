@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './LeverageSlider.module.css';
+import { t } from 'i18next';
 
 interface InputFieldProps {
     value: string;
@@ -39,7 +40,7 @@ export default function InputField({
                 className={
                     modalMode ? styles.modalValueInput : styles.valueInput
                 }
-                aria-label='Leverage value'
+                aria-label={t('aria.leverageValue')}
                 style={{
                     color: isDragging ? knobColor : 'inherit',
                 }}

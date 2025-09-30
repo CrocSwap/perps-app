@@ -1,0 +1,550 @@
+{
+    "common": {
+        "yes": "Có",
+        "no": "Không",
+        "cancel": "Hủy",
+        "save": "Lưu",
+        "delete": "Xóa",
+        "edit": "Chỉnh sửa",
+        "close": "Đóng",
+        "loading": "Đang tải...",
+        "confirming": "Đang xác nhận...",
+        "processing": "Đang xử lý...",
+        "error": "Lỗi",
+        "success": "Thành công",
+        "applyDefaults": "Áp dụng mặc định",
+        "learnMore": "Tìm hiểu thêm",
+        "deposit": "Nạp tiền",
+        "transfer": "Chuyển tiền",
+        "withdraw": "Rút tiền",
+        "submit": "Gửi",
+        "quantity": "Số lượng",
+        "confirm": "Xác nhận",
+        "amount": "Số tiền",
+        "max": "Tối đa",
+        "min": "Tối thiểu",
+        "positions": "Vị thế",
+        "balances": "Số dư",
+        "openOrders": "Lệnh mở",
+        "tradeHistory": "Lịch sử giao dịch",
+        "fundingHistory": "Lịch sử cấp vốn",
+        "orderHistory": "Lịch sử lệnh",
+        "depositsAndWithdrawals": "Nạp và rút tiền",
+        "twap": "TWAP",
+        "all": "Tất cả",
+        "active": "Hoạt động",
+        "long": "Mua (Long)",
+        "short": "Bán (Short)",
+        "create": "Tạo",
+        "update": "Cập nhật",
+        "reset": "Đặt lại",
+        "announcements": "Thông báo",
+        "leverage": "Đòn bẩy",
+        "comingSoon": "Sắp ra mắt"
+    },
+    "transactions": {
+        "orderTypes": "Loại lệnh",
+        "marginMode": "Chế độ ký quỹ",
+        "scaleOptions": "Tùy chọn tỷ lệ",
+        "confirmBuyOrder": "Xác nhận lệnh mua",
+        "confirmSellOrder": "Xác nhận lệnh bán",
+        "confirmLimitBuyOrder": "Xác nhận lệnh mua giới hạn",
+        "confirmLimitSellOrder": "Xác nhận lệnh bán giới hạn",
+        "availableToTrade": "Số dư khả dụng để giao dịch",
+        "availableToTradeTooltip": "{{symbol}} đã nạp",
+        "currentPosition": "Vị thế hiện tại",
+        "currentPositionTooltip": "Kích thước vị thế {{symbol}} hiện tại",
+        "maxOpenInterestReached": "Đã đạt giới hạn vị thế mở tối đa",
+        "depositToTrade": "Nạp tiền để giao dịch",
+        "switchDirectionToReduce": "Đổi hướng để giảm vị thế",
+        "maxLongDepositToTrade": "Long tối đa - Nạp để giao dịch",
+        "maxShortDepositToTrade": "Short tối đa - Nạp để giao dịch",
+        "minimumOr100Percent": "Tối thiểu hoặc 100%",
+        "minimum": "Tối thiểu",
+        "invalidPrice": "Giá không hợp lệ",
+        "orderSizeBelowMinimum": "Kích thước lệnh thấp hơn tối thiểu",
+        "orderSizeExceedsPositionLimits": "Kích thước lệnh vượt quá giới hạn vị thế",
+        "insufficientCollateral": "Ký quỹ không đủ",
+        "reduceOnlyExceedsPositionSize": "Số lượng chỉ giảm vượt quá kích thước vị thế",
+        "processingOrder": "Đang xử lý lệnh...",
+        "positionLimitReached": "Đã đạt giới hạn vị thế",
+        "limitOrderFailed": "Lệnh giới hạn thất bại",
+        "unknownErrorOccurred": "Đã xảy ra lỗi không xác định",
+        "failedToPlaceLimitOrder": "Không thể đặt lệnh giới hạn",
+        "sellShortLimitOrderPlaced": "Lệnh bán/Short giới hạn đã đặt",
+        "sellShortLimitOrderPending": "Lệnh bán/Short giới hạn đang chờ",
+        "successfullyPlacedSellOrderFor": "Đã đặt lệnh bán {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
+        "placingSellShortLimitOrderFor": "Đang đặt lệnh bán giới hạn {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
+        "enterValidLimitPrice": "Vui lòng nhập giá giới hạn hợp lệ",
+        "enterValidOrderSize": "Vui lòng nhập kích thước lệnh hợp lệ",
+        "buyLongLimitOrderPlaced": "Lệnh mua/Long giới hạn đã đặt",
+        "successfullyPlacedBuyOrderFor": "Đã đặt lệnh mua {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
+        "buyLongLimitOrderPending": "Lệnh mua/Long giới hạn đang chờ",
+        "placingBuyLongLimitOrderFor": "Đang đặt lệnh mua giới hạn {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
+        "priceDistribution": "Phân phối giá",
+        "flat": "Phẳng",
+        "flatPriceDistribution": "Phân phối giá phẳng",
+        "evenlySplit": "Chia đều",
+        "evenPriceDistribution": "Phân phối giá đều",
+        "market": "Thị trường",
+        "limit": "Giới hạn",
+        "price": "Giá",
+        "size": "Kích thước",
+        "time": "Thời gian",
+        "total": "Tổng cộng",
+        "action": "Thao tác",
+        "ratio": "Tỷ lệ",
+        "buyLong": "Mua/Long",
+        "sellShort": "Bán/Short",
+        "confirmingTransaction": "Đang xác nhận giao dịch...",
+        "processing": "Đang xử lý...",
+        "dontShowThisAgain": "Không hiển thị lại",
+        "estLiquidationPrice": "Giá thanh lý ước tính",
+        "estimatedPriceAtWhichPosWillBeLiquidated": "Giá thanh lý ước tính cho vị thế của bạn",
+        "orderValue": "Giá trị lệnh",
+        "hideSmallBalances": "Ẩn số dư nhỏ",
+        "increasing": "Tăng",
+        "decreasing": "Giảm",
+        "totalOrders": "Tổng số lệnh",
+        "orderRatioSumMustBe100": "Tổng tỷ lệ lệnh phải là 100%",
+        "collapseDetails": "Thu gọn chi tiết",
+        "expandDetails": "Mở rộng chi tiết",
+        "frequency": "Tần suất",
+        "runTime": "Thời gian chạy",
+        "numberOfOrders": "Số lượng lệnh",
+        "chasingInterval": "Khoảng thời gian truy đuổi",
+        "sizePerSuborder": "Kích thước mỗi lệnh con",
+        "avgEntryPrice": "Giá vào trung bình",
+        "averageEntryPrice": "Giá vào trung bình",
+        "marginRequired": "Ký quỹ yêu cầu",
+        "maxPosSizeLimitedByOiCap": "Kích thước vị thế tối đa bị giới hạn bởi vị thế mở",
+        "openPositionIsXSwitchToY": "Vị thế mở: {{x}}. Chuyển sang {{y}}.",
+        "buySellAtCurrentPrice": "Mua/bán theo giá hiện tại",
+        "buySellAtSpecificPrice": "Mua/bán theo giá chỉ định",
+        "maxTradeSizeLimitedTo": "Giới hạn kích thước giao dịch tối đa",
+        "yourPositionIsLimitedByOpenInterest": "Vị thế {{coin}} của bạn bị giới hạn bởi {{limitedBy}}",
+        "currentMaxTradeSizeForMarket": "Kích thước giao dịch lớn nhất hiện tại cho thị trường này: {{limit}}",
+        "placingLimitOrderFor": "Đang đặt lệnh giới hạn cho {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
+        "sellOrderPending": "Lệnh bán đang chờ xử lý",
+        "orderSubmittedFor": "Đã gửi lệnh cho {{usdValueOfOrderStr}} {{symbol}}",
+        "buyOrderPending": "Lệnh mua đang chờ xử lý",
+        "buyOrderSuccessful": "Lệnh mua thành công",
+        "successfullyBought": "Mua thành công {{usdValueOfOrderStr}} {{symbol}}",
+        "sellOrderSuccessful": "Lệnh bán thành công",
+        "successfullySold": "Bán thành công {{usdValueOfOrderStr}} {{symbol}}",
+        "sellOrderFailed": "Lệnh bán thất bại",
+        "transactionFailed": "Giao dịch thất bại",
+        "buyOrderFailed": "Lệnh mua thất bại",
+        "closeFailed": "Đóng vị thế thất bại",
+        "closeFailedTitle": "Đóng thất bại",
+        "liquidationPrice": "Giá thanh lý",
+        "enterPrice": "Nhập giá",
+        "enterSize": "Nhập kích thước",
+        "totalSize": "Tổng kích thước",
+        "cancelling": "Đang hủy...",
+        "midButton": "MID",
+        "positionClosed": "Vị thế đã đóng",
+        "successfullyClosedPosition": "Đã đóng thành công {{usdValueOfOrderStr}} vị thế {{symbol}}",
+        "failedToClosePosition": "Đóng vị thế thất bại",
+        "transactionTimedOut": "Giao dịch bị hết thời gian sau {{timeInSeconds}} giây",
+        "txFailedOrNotConfirmed": "Giao dịch thất bại hoặc chưa xác nhận",
+        "walletBalance": "Số dư ví",
+        "walletBalanceTooltip": "Số dư ví hiện tại của bạn",
+        "depositSuccessful": "Nạp tiền thành công",
+        "successfullyDeposited": "Đã nạp thành công {{amount}} {{unit}}",
+        "depositFailed": "Nạp tiền thất bại",
+        "withdrawalSuccessful": "Rút tiền thành công",
+        "successfullyWithdrawn": "Đã rút thành công {{amount}} {{unit}}",
+        "withdrawFailed": "Rút tiền thất bại",
+        "availableToDeposit": "Có thể nạp",
+        "availableToDepositTooltip": "Khả dụng để nạp dựa trên dung lượng vault và số dư ví",
+        "availableToWithdraw": "Có thể rút",
+        "availableToWithdrawTooltip": "Tổng số tiền bạn có thể rút từ danh mục",
+        "invalidAmount": "Số tiền không hợp lệ",
+        "depositToVault": "Nạp {{unitValue}} vào {{vaultName}}",
+        "depositToVaultMsg": "Nạp {{unitValue}} để nhận lãi suất từ {{vaultName}}. Có thể rút sau epoch tiếp theo.",
+        "txFailedTryAgain": "Giao dịch thất bại. Vui lòng thử lại.",
+        "minDepositAmountIs": "Số tiền nạp tối thiểu là ${{amount}}",
+        "enterAmountMin10": "Nhập số tiền (tối thiểu $10)",
+        "cancellingAllOrders": {
+            "title": "Đang hủy tất cả lệnh",
+            "message": "Đang cố gắng hủy {{count}} {{noun}}..."
+        },
+        "cancelOrderPending": {
+            "title": "Đang chờ hủy lệnh",
+            "message": "Đang hủy lệnh {{usdValueOfOrderStr}} cho {{symbol}}"
+        },
+        "cancelOrderConfirmed": {
+            "title": "Lệnh đã hủy",
+            "message": "Đã hủy thành công lệnh {{usdValueOfOrderStr}} cho {{symbol}}"
+        },
+        "cancelFailed": {
+            "title": "Hủy thất bại",
+            "message": "Không tìm thấy ID lệnh",
+            "message2": "Hủy lệnh thất bại"
+        },
+        "cancelLimitPending": {
+            "title": "Đang chờ hủy lệnh giới hạn",
+            "message": "Đang hủy lệnh giới hạn {{side}} {{usdValueOfOrderStr}} cho {{symbol}}"
+        },
+        "cancelLimitConfirmed": {
+            "title": "Lệnh đã hủy",
+            "message": "Đã hủy thành công lệnh giới hạn {{side}} {{usdValueOfOrderStr}} cho {{symbol}}"
+        },
+        "failedToUpdatedOrder": {
+            "title": "Cập nhật lệnh thất bại"
+        },
+        "orderUpdated": {
+            "title": "Đã cập nhật lệnh",
+            "message": "Đã cập nhật thành công lệnh {{usdValueOfOrderStr}} cho {{symbol}} tại {{limitPrice}}"
+        },
+        "orderFilled": {
+            "title": "{{side}} Lệnh đã khớp",
+            "message": "Đã khớp thành công lệnh {{side}} {{usdValueOfFillStr}} cho {{symbol}} tại {{fillPrice}}"
+        },
+        "errorUpdatingOrder": {
+            "title": "Lỗi khi cập nhật lệnh"
+        },
+        "cancelAllFailed": {
+            "title": "Hủy tất cả thất bại",
+            "message": "Không thể hủy bất kỳ lệnh nào."
+        },
+        "cancelAllConfirmed": {
+            "title": "Tất cả lệnh đã hủy",
+            "message": "Đã hủy thành công toàn bộ {{count}} lệnh"
+        },
+        "cancelAllPartialSuccess": {
+            "title": "Thành công một phần",
+            "message": "Đã hủy {{successCount}} lệnh, {{failedCount}} lệnh thất bại"
+        },
+        "noOpenOrders": "Không có lệnh mở",
+        "transactionError": "Lỗi giao dịch",
+        "invalidLimitPrice": {
+            "title": "Giá không hợp lệ",
+            "message": "Vui lòng nhập giá giới hạn hợp lệ"
+        },
+        "invalidOrderSize": {
+            "title": "Kích thước lệnh không hợp lệ",
+            "message": "Vui lòng nhập kích thước lệnh hợp lệ"
+        },
+        "leverageUpdated": {
+            "title": "Cập nhật đòn bẩy",
+            "message": "Đã cập nhật thành công đòn bẩy thành {{leverage}}x"
+        },
+        "leverageUpdateFailed": {
+            "title": "Giao dịch thất bại",
+            "message": "Cập nhật đòn bẩy thất bại"
+        },
+        "viewOnExplorer": "Xem trên explorer",
+        "limitOrderUpdatePending": {
+            "title": "Đang chờ cập nhật lệnh giới hạn",
+            "message": "Đang cập nhật lệnh {{side}} {{value}} cho {{coin}} tại {{limitPrice}}"
+        },
+        "filled": "Đã khớp",
+        "open": "Mở",
+        "partiallyFilled": "Khớp một phần",
+        "canceled": "Đã hủy",
+        "pending": "Đang chờ"
+    },
+    "subaccounts": {
+        "createSubAccount": "Tạo tài khoản phụ",
+        "createSubAccountPH": "vd: Tài khoản phụ của tôi 1",
+        "created": {
+            "title": "Tài khoản phụ đã tạo",
+            "message": "Đã tạo tài khoản phụ chiến lược mới {{name}}",
+            "message2": "Đã tạo tài khoản phụ tự quản mới {{name}}"
+        }
+    },
+    "strategies": {
+        "newStrategy": "Chiến lược mới",
+        "editStrategy": "Chỉnh sửa chiến lược"
+    },
+    "margin": {
+        "cross": {
+            "title": "Ký quỹ chéo",
+            "heading": "Ký quỹ chéo",
+            "blurb": "Tất cả các vị thế ký quỹ chéo dùng chung một khoản ký quỹ chéo làm tài sản thế chấp. Nếu bị thanh lý, số dư ký quỹ chéo và toàn bộ các vị thế mở trong chế độ này có thể bị mất."
+        },
+        "isolated": {
+            "title": "Ký quỹ riêng biệt",
+            "heading": "Chế độ ký quỹ riêng biệt",
+            "blurb": "Quản lý rủi ro cho từng vị thế bằng cách giới hạn số tiền ký quỹ được phân bổ. Nếu tỷ lệ ký quỹ của vị thế riêng biệt đạt 100%, vị thế đó sẽ bị thanh lý. Bạn có thể thêm hoặc bớt ký quỹ cho từng vị thế trong chế độ này."
+        }
+    },
+    "tradeTable": {
+        "selectATabToViewData": "Chọn một tab để xem dữ liệu",
+        "time": "Thời gian",
+        "type": "Loại",
+        "coin": "Coin",
+        "direction": "Hướng",
+        "size": "Khối lượng",
+        "filledSize": "Khối lượng đã khớp",
+        "orderValue": "Giá trị lệnh",
+        "price": "Giá",
+        "tradeValue": "Giá trị giao dịch",
+        "fee": "Phí",
+        "closedPnl": "Lãi/lỗ đã chốt",
+        "reduceOnly": "Chỉ giảm",
+        "triggerConditions": "Điều kiện kích hoạt",
+        "tpsl": "TP/SL",
+        "status": "Trạng thái",
+        "order": "Lệnh",
+        "long": "Long",
+        "short": "Short",
+        "noOpenPositions": "Không có vị thế mở",
+        "markPrice": "Giá đánh dấu",
+        "orderId": "ID lệnh",
+        "totalBalance": "Tổng số dư",
+        "availableBalance": "Số dư khả dụng",
+        "currencyValue": "Giá trị {{currency}}",
+        "buyingPower": "Sức mua",
+        "contract": "Hợp đồng",
+        "positionValue": "Giá trị vị thế",
+        "entryPrice": "Giá vào lệnh",
+        "pnl": "PnL (ROE%)",
+        "liqPrice": "Giá thanh lý",
+        "margin": "Ký quỹ",
+        "funding": "Phí cấp vốn",
+        "close": "Đóng vị thế",
+        "originalSize": "Khối lượng gốc",
+        "cancelAll": "Hủy tất cả",
+        "noTradeHistory": "Không có lịch sử giao dịch",
+        "noOrderHistory": "Không có lịch sử lệnh",
+        "noFundingHistory": "Không có lịch sử phí cấp vốn",
+        "fundingHistory": "Tất cả: {{allTime}} Kể từ khi thay đổi: {{sinceChange}}",
+        "openLong": "Mở Long",
+        "openShort": "Mở Short",
+        "closeLong": "Đóng Long",
+        "closeShort": "Đóng Short"
+    },
+    "time": {
+        "second": "giây",
+        "seconds": "giây",
+        "minute": "phút",
+        "minutes": "phút",
+        "hour": "giờ",
+        "hours": "giờ",
+        "day": "ngày",
+        "days": "ngày",
+        "week": "tuần",
+        "weeks": "tuần",
+        "month": "tháng",
+        "months": "tháng",
+        "year": "năm",
+        "years": "năm"
+    },
+    "navigation": {
+        "home": "Trang chủ",
+        "about": "Giới thiệu",
+        "contact": "Liên hệ",
+        "settings": "Cài đặt",
+        "profile": "Hồ sơ",
+        "logout": "Đăng xuất",
+        "trade": "Giao dịch",
+        "chart": "Biểu đồ",
+        "book": "Sổ lệnh",
+        "recent": "Gần đây",
+        "positions": "Vị thế"
+    },
+    "auth": {
+        "login": "Đăng nhập",
+        "register": "Đăng ký",
+        "email": "Email",
+        "password": "Mật khẩu",
+        "forgotPassword": "Quên mật khẩu?",
+        "loginSuccess": "Đăng nhập thành công",
+        "loginError": "Thông tin không hợp lệ"
+    },
+    "forms": {
+        "name": "Tên",
+        "firstName": "Tên",
+        "lastName": "Họ",
+        "phone": "Điện thoại",
+        "address": "Địa chỉ",
+        "submit": "Gửi",
+        "required": "Trường này là bắt buộc"
+    },
+    "messages": {
+        "welcome": "Chào mừng",
+        "hello": "Xin chào, {{name}}!",
+        "goodbye": "Tạm biệt",
+        "thankYou": "Cảm ơn bạn",
+        "pleaseWait": "Vui lòng chờ...",
+        "connectWalletForTrading": "Kết nối ví để giao dịch miễn phí phí gas."
+    },
+    "home": {
+        "title": "Giao dịch Perps cùng Ambient",
+        "subtitle": "Khớp lệnh nhanh. Không phí taker. Đòn bẩy lên đến 100x.",
+        "startTrading": "Bắt đầu giao dịch",
+        "learnMore": "Tìm hiểu thêm",
+        "hero": {
+            "heading1": "Từ số 0 đến",
+            "one": "Một",
+            "heading2": "Giao thức giao dịch phi tập trung",
+            "description": "Ambient là DEX hợp đồng vĩnh viễn đột phá, kết hợp sản phẩm DeFi độc đáo cùng trải nghiệm người dùng sánh ngang với CEX",
+            "stats": {
+                "totalVolume": "Tổng khối lượng",
+                "activeUsers": "Người dùng hoạt động"
+            }
+        }
+    },
+    "referrals": {
+        "title": "Giới thiệu",
+        "description": "Giới thiệu người dùng để nhận thưởng. Đối tác nhận thưởng cao hơn.",
+        "tradersReferred": "Nhà giao dịch đã giới thiệu",
+        "rewardsEarned": "Phần thưởng nhận được"
+    },
+    "deposit": {
+        "prompt": "Nạp {{token}} từ Fogo",
+        "input_prompt": "Nhập số tiền (tối thiểu ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "Sẵn sàng để nạp"
+    },
+    "withdraw": {
+        "prompt": "Rút {{token}} về Fogo",
+        "explanation": "{{token}} sẽ được gửi tới địa chỉ của bạn.",
+        "availableToWithdraw": "Sẵn sàng để rút",
+        "input_prompt": "Nhập số tiền (tối thiểu ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "orderBook": {
+        "tab": "Tab",
+        "stacked": "Gộp",
+        "large": "Lớn",
+        "book": "Sổ lệnh",
+        "trades": "Giao dịch",
+        "spread": "Chênh lệch giá"
+    },
+    "appSettings": {
+        "title": "Cài đặt",
+        "skipOpenOrderConfirm": "Bỏ qua xác nhận lệnh mở",
+        "enableTxNotifications": "Bật thông báo giao dịch",
+        "enableBackgroundFillNotif": "Bật thông báo khớp lệnh nền",
+        "numberFormat": "Định dạng số",
+        "color": "Màu sắc",
+        "language": "Ngôn ngữ"
+    },
+    "symbolInfo": {
+        "mark": "Giá đánh dấu",
+        "markTooltip": "Giá trị ước tính công bằng, tính toán để ngăn thanh lý không hợp lý",
+        "oracle": "Oracle",
+        "oracleTooltip": "Giá theo thời gian thực từ oracle Pyth Network",
+        "oracleTooltipPythStale": "Oracle Pyth Network (giá có thể bị trễ)",
+        "oracleTooltipNoPyth": "Giá thị trường tổng hợp, lấy từ nhiều sàn uy tín",
+        "24hChange": "Biến động 24h",
+        "24hChangeTooltip": "Biến động giá trong 24 giờ qua",
+        "24hVolume": "Khối lượng 24h",
+        "24hVolumeTooltip": "Tổng khối lượng thị trường trong 24 giờ qua",
+        "openInterest": "Vị thế mở",
+        "openInterestTooltip": "Tổng vị thế mở trên thị trường",
+        "fundingRate": "Tỷ lệ funding",
+        "fundingRateTooltip": "Tỷ lệ mỗi giờ mà Long trả cho Short (hoặc ngược lại nếu âm). Không phí bổ sung; funding là khoản thanh toán P2P để giữ giá sát thị trường giao ngay.",
+        "fundingCountdown": "Đếm ngược funding",
+        "fundingCountdownTooltip": "Thời gian còn lại đến funding tiếp theo"
+    },
+    "feedback": {
+        "menuLabel": "Góp ý",
+        "title": "Gửi góp ý của bạn",
+        "ratingPrompt": "Bạn đánh giá trải nghiệm như thế nào?",
+        "sendFeedback": "Gửi góp ý",
+        "positivePrompt": "Bạn thích điều gì nhất?",
+        "negativePrompt": "Có thể cải thiện điều gì?",
+        "placeholder": "Góp ý ẩn danh của bạn giúp chúng tôi phát triển.",
+        "warningText": "Góp ý quá dài sẽ bị cắt ngắn.",
+        "submitButtonText": "Gửi góp ý",
+        "submittingButtonText": "Đang gửi...",
+        "appreciateText": "Cảm ơn bạn đã góp ý.",
+        "thanksText": "Cảm ơn bạn!"
+    },
+    "accountOverview": {
+        "heading": "Tổng quan tài khoản",
+        "balance": "Số dư",
+        "balanceTooltip": "Tổng tài sản tài khoản",
+        "unrealizedPnl": "PnL chưa chốt",
+        "unrealizedPnlTooltip": "Lợi nhuận và thua lỗ chưa chốt"
+    },
+    "marketLimitClose": {
+        "marketHeading": "Đóng vị thế theo giá thị trường",
+        "marketDescription": "Thao tác này sẽ gửi lệnh đóng vị thế ở giá thị trường hiện tại.",
+        "minimumOr100Percent": "{{min}} Tối thiểu hoặc 100%",
+        "noZeroSize": "Khối lượng không được bằng 0",
+        "sizeExceedsPosition": "Khối lượng không vượt quá vị thế của bạn",
+        "invalidOrderSizeTitle": "Khối lượng lệnh không hợp lệ",
+        "invalidSize": "Vui lòng nhập khối lượng lệnh hợp lệ",
+        "limitHeading": "Đóng vị thế theo giá giới hạn",
+        "limitDescription": "Thao tác này sẽ gửi lệnh đóng vị thế ở giá giới hạn đã đặt.",
+        "estimatedClosedPnl": "Ước tính lãi/lỗ (không phí): {{estimatedPNL}}",
+        "positionClosed": "Vị thế đã đóng",
+        "percentOfPositionClosed": "{{sizePercentageValue}}% vị thế đã đóng"
+    },
+    "newVersion": {
+        "title": "Có phiên bản mới",
+        "message": {
+            "withVersionNumber": "Phiên bản {{version}} đã sẵn sàng cài đặt với các tính năng và cải tiến mới.",
+            "noVersionNumber": "Có phiên bản mới đã sẵn sàng cài đặt với các tính năng và cải tiến."
+        },
+        "updateButton": "Cập nhật ngay",
+        "version": "Phiên bản"
+    },
+    "leverage": {
+        "title": "Điều chỉnh đòn bẩy",
+        "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu"
+    },
+    "share": {
+        "prompt": "Tùy chỉnh văn bản của bạn",
+        "xCTA": "Chia sẻ lên 𝕏",
+        "copyLinkCTA": "Sao chép liên kết",
+        "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay"
+    },
+    "colors": {
+        "default": "Mặc định",
+        "opposite": "Đối lập",
+        "deuteranopia": "Deuteranopia",
+        "tritanopia": "Tritanopia",
+        "protanopia": "Protanopia"
+    },
+    "aria": {
+        "closeAnnouncement": "Đóng thông báo",
+        "closeFeedbackForm": "Đóng biểu mẫu góp ý",
+        "depositInput": "Trường nhập số tiền nạp",
+        "addressInput": "Trường nhập địa chỉ",
+        "amountInput": "Trường nhập số tiền",
+        "withdrawInput": "Trường nhập số tiền rút",
+        "scrollTabsLeft": "Cuộn tab sang trái",
+        "scrollTabsRight": "Cuộn tab sang phải",
+        "leverageValue": "Giá trị đòn bẩy",
+        "leverageAmount": "Số lượng đòn bẩy",
+        "setLeverageTo": "Đặt đòn bẩy thành {{value}}x",
+        "positionSizePercentage": "Tỷ lệ khối lượng vị thế",
+        "positionSizeValue": "Giá trị khối lượng vị thế",
+        "totalOrders": "Tổng số lệnh",
+        "runningPriceInput": {
+            "minutes": "Trường giá theo phút",
+            "hours": "Trường giá theo giờ"
+        },
+        "yourDepositAmount": "Số tiền bạn đã nạp",
+        "flatPriceDistribution": "Phân phối giá phẳng",
+        "evenPriceDistribution": "Phân phối giá đều",
+        "thumbsUp": "Thích",
+        "thumbsDown": "Không thích",
+        "closeNav": "Đóng menu điều hướng",
+        "openSettings": "Mở cài đặt",
+        "openMoreOptionsMenu": "Mở menu tùy chọn",
+        "previousPage": "Trang trước",
+        "nextPage": "Trang tiếp",
+        "tradeType": "Loại giao dịch",
+        "closeTradeTypeMenu": "Đóng menu lựa chọn loại giao dịch",
+        "toggleChasingInterval": "Chuyển khoảng truy đuổi giá",
+        "toggleRandomize": "Chuyển ngẫu nhiên",
+        "toggleReduceOnly": "Chuyển chỉ giảm vị thế",
+        "toggleTPSL": "Chuyển Chốt lời/Dừng lỗ",
+        "editTPSL": "Chỉnh sửa Chốt lời/Dừng lỗ",
+        "toggleConfigureAmount": "Chuyển nhập số tiền",
+        "toggleLimitPrice": "Chuyển nhập giá giới hạn"
+    },
+    "chart": {
+        "liqPrice": "Giá thanh lý"
+    },
+    "meta": {
+        "title": "Trang chủ | Ambient",
+        "content": "Giao dịch Perps với Ambient"
+    }
+}

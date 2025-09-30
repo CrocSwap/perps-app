@@ -1,0 +1,551 @@
+{
+    "common": {
+        "yes": "Oui",
+        "no": "Non",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "close": "Fermer",
+        "loading": "Chargement...",
+        "confirming": "Confirmation...",
+        "processing": "Traitement...",
+        "error": "Erreur",
+        "success": "Succès",
+        "applyDefaults": "Appliquer les paramètres par défaut",
+        "learnMore": "En savoir plus",
+        "deposit": "Déposer",
+        "transfer": "Transférer",
+        "withdraw": "Retirer",
+        "submit": "Soumettre",
+        "quantity": "Quantité",
+        "confirm": "Confirmer",
+        "amount": "Montant",
+        "max": "Max",
+        "min": "Min",
+        "positions": "Positions",
+        "balances": "Soldes",
+        "openOrders": "Ordres ouverts",
+        "tradeHistory": "Historique de trading",
+        "fundingHistory": "Historique de financement",
+        "orderHistory": "Historique des ordres",
+        "depositsAndWithdrawals": "Dépôts et retraits",
+        "twap": "TWAP",
+        "all": "Tous",
+        "active": "Actif",
+        "long": "Long",
+        "short": "Short",
+        "create": "Créer",
+        "update": "Mettre à jour",
+        "reset": "Réinitialiser",
+        "announcements": "Annonces",
+        "leverage": "Effet de levier",
+        "comingSoon": "Bientôt disponible"
+    },
+    "transactions": {
+        "orderTypes": "Types d'ordre",
+        "marginMode": "Mode de marge",
+        "scaleOptions": "Options d'échelle",
+        "confirmBuyOrder": "Confirmer l'ordre d'achat",
+        "confirmSellOrder": "Confirmer l'ordre de vente",
+        "confirmLimitBuyOrder": "Confirmer l'ordre limite d'achat",
+        "confirmLimitSellOrder": "Confirmer l'ordre limite de vente",
+        "availableToTrade": "Disponible pour le trading",
+        "availableToTradeTooltip": "{{symbol}} déposé",
+        "currentPosition": "Position actuelle",
+        "currentPositionTooltip": "Taille de la position actuelle en {{symbol}}",
+        "maxOpenInterestReached": "Intérêt ouvert maximal atteint",
+        "depositToTrade": "Déposer pour trader",
+        "switchDirectionToReduce": "Changer de direction pour réduire",
+        "maxLongDepositToTrade": "Max Long - Déposer pour trader",
+        "maxShortDepositToTrade": "Max Short - Déposer pour trader",
+        "minimumOr100Percent": "Minimum ou 100 %",
+        "minimum": "Minimum",
+        "invalidPrice": "Prix invalide",
+        "orderSizeBelowMinimum": "Taille de l'ordre en dessous du minimum",
+        "orderSizeExceedsPositionLimits": "Taille de l'ordre dépasse les limites de position",
+        "insufficientCollateral": "Collatéral insuffisant",
+        "reduceOnlyExceedsPositionSize": "Montant 'réduire seulement' dépasse la taille de la position",
+        "processingOrder": "Ordre en cours de traitement...",
+        "positionLimitReached": "Limite de position atteinte",
+        "limitOrderFailed": "Échec de l'ordre limite",
+        "unknownErrorOccurred": "Une erreur inconnue est survenue",
+        "failedToPlaceLimitOrder": "Impossible de placer l'ordre limite",
+        "sellShortLimitOrderPlaced": "Vendre / Short ordre limite placé",
+        "sellShortLimitOrderPending": "Vendre / Short ordre limite en attente",
+        "successfullyPlacedSellOrderFor": "Ordre de vente placé pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
+        "placingSellShortLimitOrderFor": "Placement de l'ordre limite de vente pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
+        "enterValidLimitPrice": "Entrez un prix limite valide",
+        "enterValidOrderSize": "Entrez une taille d'ordre valide",
+        "buyLongLimitOrderPlaced": "Acheter / Long ordre limite placé",
+        "successfullyPlacedBuyOrderFor": "Ordre d'achat placé pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
+        "buyLongLimitOrderPending": "Acheter / Long ordre limite en attente",
+        "placingBuyLongLimitOrderFor": "Placement de l'ordre limite d'achat pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
+        "priceDistribution": "Répartition des prix",
+        "flat": "Stable",
+        "flatPriceDistribution": "Répartition des prix stable",
+        "evenlySplit": "Répartition égale",
+        "evenPriceDistribution": "Répartition des prix égale",
+        "market": "Marché",
+        "limit": "Limite",
+        "price": "Prix",
+        "size": "Taille ",
+        "time": "Heure",
+        "total": "Total",
+        "action": "Action",
+        "ratio": "Ratio",
+        "buyLong": "Acheter / Long",
+        "sellShort": "Vendre / Short",
+        "confirmingTransaction": "Transaction en cours de confirmation...",
+        "processing": "Traitement en cours...",
+        "dontShowThisAgain": "Ne plus afficher ceci",
+        "estLiquidationPrice": "Prix de liquidation estimé",
+        "estimatedPriceAtWhichPosWillBeLiquidated": "Prix de liquidation estimé pour votre position",
+        "orderValue": "Valeur de l'ordre",
+        "hideSmallBalances": "Masquer les petits soldes",
+        "increasing": "En augmentation",
+        "decreasing": "En diminution",
+        "totalOrders": "Nombre total d'ordres",
+        "orderRatioSumMustBe100": "La somme des ratios doit être de 100 %",
+        "collapseDetails": "Réduire les détails",
+        "expandDetails": "Développer les détails",
+        "frequency": "Fréquence",
+        "runTime": "Durée",
+        "numberOfOrders": "Nombre d'ordres",
+        "chasingInterval": "Intervalle de poursuite",
+        "sizePerSuborder": "Taille par sous-ordre",
+        "avgEntryPrice": "Prix moyen d'entrée",
+        "averageEntryPrice": "Prix moyen d'entrée",
+        "marginRequired": "Marge requise",
+        "maxPosSizeLimitedByOiCap": "Taille maximale de la position limitée par le plafond d'intérêt ouvert",
+        "openPositionIsXSwitchToY": "Position ouverte : {{x}}. Passez à {{y}}.",
+        "buySellAtCurrentPrice": "Acheter/vendre au prix actuel",
+        "buySellAtSpecificPrice": "Acheter/vendre à un prix spécifique",
+        "maxTradeSizeLimitedTo": "Taille maximale de trade limitée",
+        "yourPositionIsLimitedByOpenInterest": "Votre position {{coin}} est limitée par le plafond de {{limitedBy}}",
+        "currentMaxTradeSizeForMarket": "Taille maximale de trade actuelle pour ce marché : {{limit}}",
+        "placingLimitOrderFor": "Placement de l'ordre limite pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
+        "sellOrderPending": "Ordre de vente en attente",
+        "orderSubmittedFor": "Ordre soumis pour {{usdValueOfOrderStr}} {{symbol}}",
+        "buyOrderPending": "Ordre d'achat en attente",
+        "buyOrderSuccessful": "Ordre d'achat réussi",
+        "successfullyBought": "Achat réussi de {{usdValueOfOrderStr}} {{symbol}}",
+        "sellOrderSuccessful": "Ordre de vente réussi",
+        "successfullySold": "Vente réussie de {{usdValueOfOrderStr}} {{symbol}}",
+        "sellOrderFailed": "Échec de l'ordre de vente",
+        "transactionFailed": "Échec de la transaction",
+        "buyOrderFailed": "Échec de l'ordre d'achat",
+        "closeFailed": "Échec de la clôture de la position",
+        "closeFailedTitle": "Clôture échouée",
+        "liquidationPrice": "Prix de liquidation",
+        "enterPrice": "Entrer le prix",
+        "enterSize": "Entrer la taille",
+        "totalSize": "Taille totale",
+        "cancelling": "Annulation en cours...",
+        "midButton": "MID",
+        "positionClosed": "Position clôturée",
+        "successfullyClosedPosition": "Position {{symbol}} clôturée avec succès pour {{usdValueOfOrderStr}}",
+        "failedToClosePosition": "Échec de la clôture de la position",
+        "transactionTimedOut": "Transaction expirée après {{timeInSeconds}} secondes",
+        "txFailedOrNotConfirmed": "La transaction a échoué ou n'a pas été confirmée",
+        "walletBalance": "Solde du portefeuille",
+        "walletBalanceTooltip": "Votre solde actuel du portefeuille",
+        "depositSuccessful": "Dépôt réussi",
+        "successfullyDeposited": "Dépôt réussi de {{amount}} {{unit}}",
+        "depositFailed": "Échec du dépôt",
+        "withdrawalSuccessful": "Retrait réussi",
+        "successfullyWithdrawn": "Retrait réussi de {{amount}} {{unit}}",
+        "withdrawFailed": "Échec du retrait",
+        "availableToDeposit": "Disponible pour dépôt",
+        "availableToDepositTooltip": "Disponible pour dépôt selon la capacité de la vault et le solde du portefeuille",
+        "availableToWithdraw": "Disponible pour retrait",
+        "availableToWithdrawTooltip": "Montant total disponible à retirer de votre portefeuille",
+        "invalidAmount": "Montant invalide",
+        "depositToVault": "Déposer {{unitValue}} dans {{vaultName}}",
+        "depositToVaultMsg": "Déposez {{unitValue}} pour générer du rendement via {{vaultName}}. Les dépôts seront disponibles pour retrait après la prochaine échéance.",
+        "txFailedTryAgain": "La transaction a échoué. Veuillez réessayer.",
+        "minDepositAmountIs": "Montant minimal de dépôt : ${{amount}}",
+        "enterAmountMin10": "Entrez le montant (min $10)",
+        "cancellingAllOrders": {
+            "title": "Annulation de tous les ordres",
+            "message": "Tentative d'annulation de {{count}} {{noun}}..."
+        },
+        "cancelOrderPending": {
+            "title": "Annulation d'ordre en cours",
+            "message": "Annulation de l'ordre pour {{usdValueOfOrderStr}} de {{symbol}}"
+        },
+        "cancelOrderConfirmed": {
+            "title": "Ordre annulé",
+            "message": "Ordre annulé avec succès pour {{usdValueOfOrderStr}} de {{symbol}}"
+        },
+        "cancelFailed": {
+            "title": "Échec de l'annulation",
+            "message": "ID d'ordre introuvable",
+            "message2": "Échec de l'annulation de l'ordre"
+        },
+        "cancelLimitPending": {
+            "title": "Annulation de l'ordre limite en cours",
+            "message": "Annulation de l'ordre limite {{side}} pour {{usdValueOfOrderStr}} de {{symbol}}"
+        },
+        "cancelLimitConfirmed": {
+            "title": "Ordre annulé",
+            "message": "Ordre limite {{side}} annulé avec succès pour {{usdValueOfOrderStr}} de {{symbol}}"
+        },
+        "failedToUpdatedOrder": {
+            "title": "Échec de la mise à jour de l'ordre"
+        },
+        "orderUpdated": {
+            "title": "Ordre mis à jour",
+            "message": "Ordre mis à jour avec succès pour {{usdValueOfOrderStr}} de {{symbol}} à {{limitPrice}}"
+        },
+        "orderFilled": {
+            "title": "Ordre {{side}} exécuté",
+            "message": "Ordre {{side}} exécuté avec succès pour {{usdValueOfFillStr}} de {{symbol}} à {{fillPrice}}"
+        },
+        "errorUpdatingOrder": {
+            "title": "Erreur lors de la mise à jour de l'ordre"
+        },
+        "cancelAllFailed": {
+            "title": "Échec de l'annulation de tous les ordres",
+            "message": "Impossible d'annuler les ordres."
+        },
+        "cancelAllConfirmed": {
+            "title": "Tous les ordres annulés",
+            "message": "Tous les {{count}} ordres ont été annulés avec succès"
+        },
+        "cancelAllPartialSuccess": {
+            "title": "Succès partiel",
+            "message": "{{successCount}} ordres annulés, {{failedCount}} échecs"
+        },
+        "noOpenOrders": "Aucun ordre ouvert",
+        "transactionError": "Erreur de transaction",
+        "invalidLimitPrice": {
+            "title": "Prix invalide",
+            "message": "Veuillez entrer un prix limite valide"
+        },
+        "invalidOrderSize": {
+            "title": "Taille d'ordre invalide",
+            "message": "Veuillez entrer une taille d'ordre valide"
+        },
+        "leverageUpdated": {
+            "title": "Effet de levier mis à jour",
+            "message": "Effet de levier mis à jour avec succès à {{leverage}}x"
+        },
+        "leverageUpdateFailed": {
+            "title": "Échec de la transaction",
+            "message": "Échec de la mise à jour de l'effet de levier"
+        },
+        "viewOnExplorer": "Voir sur l'explorateur",
+        "limitOrderUpdatePending": {
+            "title": "Mise à jour de l'ordre limite en attente",
+            "message": "Mise à jour de l'ordre {{side}} pour {{value}} de {{coin}} à {{limitPrice}}"
+        },
+        "filled": "Exécutée",
+        "open": "Ouverte",
+        "partiallyFilled": "Partiellement exécutée",
+        "canceled": "Annulée",
+        "pending": "En attente",
+        "tpslToggleLabel": "Take Profit / Stop Loss"
+    },
+    "subaccounts": {
+        "createSubAccount": "Créer un sous-compte",
+        "createSubAccountPH": "ex : Mon sous-compte 1",
+        "created": {
+            "title": "Sous-compte créé",
+            "message": "Nouveau sous-compte stratégie créé : {{name}}",
+            "message2": "Nouveau sous-compte discrétionnaire créé : {{name}}"
+        }
+    },
+    "strategies": {
+        "newStrategy": "Nouvelle stratégie",
+        "editStrategy": "Modifier la stratégie"
+    },
+    "margin": {
+        "cross": {
+            "title": "Croisé",
+            "heading": "Marge croisée",
+            "blurb": "Toutes les positions croisées partagent la même marge en garantie. En cas de liquidation, le solde et les positions ouvertes dans ce mode peuvent être perdus."
+        },
+        "isolated": {
+            "title": "Isolé",
+            "heading": "Mode isolé",
+            "blurb": "Gérez le risque en limitant la marge attribuée à chaque position. Si la marge isolée atteint 100%, la position est liquidée. Vous pouvez ajouter ou retirer de la marge individuellement."
+        }
+    },
+    "tradeTable": {
+        "selectATabToViewData": "Sélectionner un onglet pour voir les données",
+        "time": "Heure",
+        "type": "Type",
+        "coin": "Monnaie",
+        "direction": "Direction",
+        "size": "Taille",
+        "filledSize": "Taille exécutée",
+        "orderValue": "Valeur de l'ordre",
+        "price": "Prix",
+        "tradeValue": "Valeur échangée",
+        "fee": "Frais",
+        "closedPnl": "PnL clôturé",
+        "reduceOnly": "Réduire seulement",
+        "triggerConditions": "Conditions déclenchantes",
+        "tpsl": "TP/SL",
+        "status": "Statut",
+        "order": "Ordre",
+        "long": "Long",
+        "short": "Short",
+        "noOpenPositions": "Aucune position ouverte",
+        "markPrice": "Prix indicatif",
+        "orderId": "ID d'ordre",
+        "totalBalance": "Solde total",
+        "availableBalance": "Solde disponible",
+        "currencyValue": "Valeur {{currency}}",
+        "buyingPower": "Pouvoir d'achat",
+        "contract": "Contrat",
+        "positionValue": "Valeur de position",
+        "entryPrice": "Prix d'entrée",
+        "pnl": "PnL (ROE%)",
+        "liqPrice": "Prix de liquidation",
+        "margin": "Marge",
+        "funding": "Financement",
+        "close": "Fermer la position",
+        "originalSize": "Taille d'origine",
+        "cancelAll": "Tout annuler",
+        "noTradeHistory": "Aucun historique de transactions",
+        "noOrderHistory": "Aucun historique des ordres",
+        "noFundingHistory": "Aucun historique de financement",
+        "fundingHistory": "Total : {{allTime}} Depuis le changement : {{sinceChange}}",
+        "openLong": "Ouvrir Long",
+        "openShort": "Ouvrir Short",
+        "closeLong": "Fermer Long",
+        "closeShort": "Fermer Short"
+    },
+    "time": {
+        "second": "seconde",
+        "seconds": "secondes",
+        "minute": "minute",
+        "minutes": "minutes",
+        "hour": "heure",
+        "hours": "heures",
+        "day": "jour",
+        "days": "jours",
+        "week": "semaine",
+        "weeks": "semaines",
+        "month": "mois",
+        "months": "mois",
+        "year": "an",
+        "years": "ans"
+    },
+    "navigation": {
+        "home": "Accueil",
+        "about": "À propos",
+        "contact": "Contact",
+        "settings": "Paramètres",
+        "profile": "Profil",
+        "logout": "Déconnexion",
+        "trade": "Trading",
+        "chart": "Graphique",
+        "book": "Carnet d'ordres",
+        "recent": "Récent",
+        "positions": "Positions"
+    },
+    "auth": {
+        "login": "Connexion",
+        "register": "Inscription",
+        "email": "E-mail",
+        "password": "Mot de passe",
+        "forgotPassword": "Mot de passe oublié ?",
+        "loginSuccess": "Connexion réussie",
+        "loginError": "Identifiants invalides"
+    },
+    "forms": {
+        "name": "Nom",
+        "firstName": "Prénom",
+        "lastName": "Nom de famille",
+        "phone": "Téléphone",
+        "address": "Adresse",
+        "submit": "Soumettre",
+        "required": "Champ requis"
+    },
+    "messages": {
+        "welcome": "Bienvenue",
+        "hello": "Bonjour, {{name}} !",
+        "goodbye": "Au revoir",
+        "thankYou": "Merci",
+        "pleaseWait": "Veuillez patienter...",
+        "connectWalletForTrading": "Connectez votre portefeuille pour trader sans frais de gaz."
+    },
+    "home": {
+        "title": "Trader des Perps avec Ambient",
+        "subtitle": "Exécution rapide. Aucun frais taker. Jusqu'à 100x de levier.",
+        "startTrading": "Commencer à trader",
+        "learnMore": "En savoir plus",
+        "hero": {
+            "heading1": "De zéro à",
+            "one": " Un",
+            "heading2": "Protocole de trading décentralisé",
+            "description": "Ambient est une plateforme DEX de perps entièrement nouvelle, combinant des produits DeFi uniques avec une expérience utilisateur comparable à celle des CEX.",
+            "stats": {
+                "totalVolume": "Volume total",
+                "activeUsers": "Utilisateurs actifs"
+            }
+        }
+    },
+    "referrals": {
+        "title": "Parrainages",
+        "description": "Parrainez des utilisateurs et gagnez des récompenses. Les affiliés gagnent plus.",
+        "tradersReferred": "Traders parrainés",
+        "rewardsEarned": "Récompenses gagnées"
+    },
+    "deposit": {
+        "prompt": "Déposer {{token}} depuis Fogo",
+        "input_prompt": "Entrer le montant (min ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "Disponible pour déposer"
+    },
+    "withdraw": {
+        "prompt": "Retirer {{token}} vers Fogo",
+        "explanation": "{{token}} sera envoyé à votre adresse.",
+        "availableToWithdraw": "Disponible pour retrait",
+        "input_prompt": "Entrer le montant (min ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "orderBook": {
+        "tab": "Onglet",
+        "stacked": "Empilé",
+        "large": "Large",
+        "book": "Carnet",
+        "trades": "Trades",
+        "spread": "Spread"
+    },
+    "appSettings": {
+        "title": "Paramètres",
+        "skipOpenOrderConfirm": "Omettre la confirmation de l'ordre ouvert",
+        "enableTxNotifications": "Activer les notifications de transaction",
+        "enableBackgroundFillNotif": "Activer les notifications d'exécution en arrière-plan",
+        "numberFormat": "Format de nombre",
+        "color": "Couleur",
+        "language": "Langue"
+    },
+    "symbolInfo": {
+        "mark": "Indicatif",
+        "markTooltip": "Valeur estimée pour éviter les liquidations injustes",
+        "oracle": "Oracle",
+        "oracleTooltip": "Prix en temps réel depuis l'oracle Pyth Network",
+        "oracleTooltipPythStale": "Oracle Pyth Network (prix potentiellement obsolète)",
+        "oracleTooltipNoPyth": "Valeur de marché externe agrégée de plusieurs bourses reconnues",
+        "24hChange": "Changement 24h",
+        "24hChangeTooltip": "Changement de prix sur 24h",
+        "24hVolume": "Volume 24h",
+        "24hVolumeTooltip": "Volume total du marché sur 24h",
+        "openInterest": "Intérêt ouvert",
+        "openInterestTooltip": "Intérêt ouvert total sur le marché",
+        "fundingRate": "Taux de financement",
+        "fundingRateTooltip": "Taux horaire où les longs paient les shorts (ou inversement si négatif). Pas de frais supplémentaires ; le financement ajuste les prix au marché spot.",
+        "fundingCountdown": "Compte à rebours financement",
+        "fundingCountdownTooltip": "Temps restant jusqu'au prochain financement"
+    },
+    "feedback": {
+        "menuLabel": "Commentaires",
+        "title": "Envoyez votre commentaire",
+        "ratingPrompt": "Comment évalueriez-vous votre expérience ?",
+        "sendFeedback": "Envoyer le commentaire",
+        "positivePrompt": "Qu'avez-vous le plus aimé ?",
+        "negativePrompt": "Qu'est-ce que nous pouvons améliorer ?",
+        "placeholder": "Votre commentaire anonyme nous aide à améliorer.",
+        "warningText": "Votre commentaire est trop long et sera tronqué.",
+        "submitButtonText": "Envoyer le commentaire",
+        "submittingButtonText": "Envoi en cours...",
+        "appreciateText": "Merci pour votre commentaire.",
+        "thanksText": "Merci !"
+    },
+    "accountOverview": {
+        "heading": "Aperçu du compte",
+        "balance": "Solde",
+        "balanceTooltip": "Équité totale du compte",
+        "unrealizedPnl": "PnL non réalisé",
+        "unrealizedPnlTooltip": "Gains et pertes non réalisés"
+    },
+    "marketLimitClose": {
+        "marketHeading": "Clôture marché",
+        "marketDescription": "Cela enverra un ordre pour fermer votre position au prix actuel du marché.",
+        "minimumOr100Percent": "{{min}} Minimum ou 100%",
+        "noZeroSize": "La taille ne peut pas être zéro",
+        "sizeExceedsPosition": "La taille ne peut pas dépasser votre position",
+        "invalidOrderSizeTitle": "Taille d'ordre invalide",
+        "invalidSize": "Entrez une taille d'ordre valide",
+        "limitHeading": "Clôture limite",
+        "limitDescription": "Cela enverra un ordre pour fermer votre position au prix limite.",
+        "estimatedClosedPnl": "PnL clôturé estimé (hors frais): {{estimatedPNL}}",
+        "positionClosed": "Position fermée",
+        "percentOfPositionClosed": "{{sizePercentageValue}}% de la position fermée"
+    },
+    "newVersion": {
+        "title": "Nouvelle version disponible",
+        "message": {
+            "withVersionNumber": "La version {{version}} est prête à installer avec de nouvelles fonctionnalités et améliorations.",
+            "noVersionNumber": "Une nouvelle version est prête à installer avec de nouvelles fonctionnalités et améliorations."
+        },
+        "updateButton": "Mettre à jour maintenant",
+        "version": "Version"
+    },
+    "leverage": {
+        "title": "Ajuster l'effet de levier",
+        "closePositionPrompt": "Clôturez la position pour réduire le levier"
+    },
+    "share": {
+        "prompt": "Personnalisez votre texte",
+        "xCTA": "Partager sur 𝕏",
+        "copyLinkCTA": "Copier le lien",
+        "textPlaceholder": "Tradez les perps {{coin}} sur {{twitter}} sur {{fogo}} Testnet dès maintenant"
+    },
+    "colors": {
+        "default": "Par défaut",
+        "opposite": "Opposé",
+        "deuteranopia": "Deutéranopie",
+        "tritanopia": "Tritanopie",
+        "protanopia": "Protanopie"
+    },
+    "aria": {
+        "closeAnnouncement": "Fermer l'annonce",
+        "closeFeedbackForm": "Fermer le formulaire d'avis",
+        "depositInput": "Champ de saisie du dépôt",
+        "addressInput": "Champ de saisie de l'adresse",
+        "amountInput": "Champ de saisie du montant",
+        "withdrawInput": "Champ de saisie du retrait",
+        "scrollTabsLeft": "Faire défiler les onglets vers la gauche",
+        "scrollTabsRight": "Faire défiler les onglets vers la droite",
+        "leverageValue": "Valeur de l'effet de levier",
+        "leverageAmount": "Montant de l'effet de levier",
+        "setLeverageTo": "Définir l'effet de levier à {{value}}x",
+        "positionSizePercentage": "Pourcentage de la taille de la position",
+        "positionSizeValue": "Valeur de la taille de la position",
+        "totalOrders": "Nombre total d'ordres",
+        "runningPriceInput": {
+            "minutes": "Champ du nombre de minutes pour le prix en cours",
+            "hours": "Champ du nombre d'heures pour le prix en cours"
+        },
+        "yourDepositAmount": "Montant de votre dépôt",
+        "flatPriceDistribution": "Répartition des prix égale",
+        "evenPriceDistribution": "Répartition équilibrée des prix",
+        "thumbsUp": "Pouce levé",
+        "thumbsDown": "Pouce baissé",
+        "closeNav": "Fermer le menu de navigation",
+        "openSettings": "Ouvrir les paramètres",
+        "openMoreOptionsMenu": "Ouvrir le menu des options supplémentaires",
+        "previousPage": "Page précédente",
+        "nextPage": "Page suivante",
+        "tradeType": "Type de transaction",
+        "closeTradeTypeMenu": "Fermer le menu du type de transaction",
+        "toggleChasingInterval": "Activer/désactiver l'intervalle de suivi",
+        "toggleRandomize": "Activer/désactiver la randomisation",
+        "toggleReduceOnly": "Activer/désactiver le mode réduction seule",
+        "toggleTPSL": "Activer/désactiver Take Profit / Stop Loss",
+        "editTPSL": "Modifier Take Profit / Stop Loss",
+        "toggleConfigureAmount": "Activer/désactiver la configuration du montant",
+        "toggleLimitPrice": "Activer/désactiver le prix limite"
+    },
+    "chart": {
+        "liqPrice": "Prix de liq."
+    },
+    "meta": {
+        "title": "Accueil | Ambient",
+        "content": "Trader des Perps avec Ambient"
+    }
+}

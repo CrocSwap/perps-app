@@ -1,7 +1,7 @@
+import { t } from 'i18next';
 import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
 import ReferralsTabs from '~/components/Referrals/ReferralsTabs/ReferralsTabs';
 import styles from './referrals.module.css';
-// import styles from './referrals.module.css'
 // export function meta({}: Route.MetaArgs) {
 export function meta() {
     return [
@@ -15,19 +15,19 @@ export default function Referrals() {
     return (
         <div className={styles.container}>
             <header>
-                Referrals
+                {t('referrals.title')}
                 <p>
-                    Refer users to earn rewards. Affiliates earn greater
-                    rewards. <a href='#'>Learn More</a>
+                    {t('referrals.description')}{' '}
+                    <a href='#'>{t('common.learnMore')}</a>
                 </p>
             </header>
             <div className={styles.detailsContainer}>
                 <div className={styles.detailsContent}>
-                    <h6>Traders Referred</h6>
+                    <h6>{t('referrals.tradersReferred')}</h6>
                     <h3>0</h3>
                 </div>
                 <div className={styles.detailsContent}>
-                    <h6>Rewards Earned</h6>
+                    <h6>{t('referrals.rewardsEarned')}</h6>
                     <h3>$0.00</h3>
                 </div>
             </div>

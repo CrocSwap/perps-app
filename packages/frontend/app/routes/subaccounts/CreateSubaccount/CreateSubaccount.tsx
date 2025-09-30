@@ -8,6 +8,7 @@ import {
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { t } from 'i18next';
 
 // interface for functional component props
 interface propsIF {
@@ -35,8 +36,8 @@ export default function CreateSubaccount(props: propsIF) {
             if (text.length) {
                 create(inputRef.current.value, 'discretionary');
                 notifications.add({
-                    title: 'Sub Account Created',
-                    message: `Made new discretionary sub-account ${inputRef.current.value}`,
+                    title: t('subaccounts.created.title'),
+                    message: t('subaccounts.created.message2', { name: text }),
                     icon: 'check',
                 });
             }
@@ -49,7 +50,10 @@ export default function CreateSubaccount(props: propsIF) {
 
     // JSX return
     return (
-        <Modal title='Create Sub-Account' close={modalControl.close}>
+        <Modal
+            title={t('subaccounts.createSubAccount')}
+            close={modalControl.close}
+        >
             <div className={styles.create_sub_account_modal}>
                 <div className={styles.text_entry}>
                     <label htmlFor={INPUT_ID_FOR_DOM}>Name</label>
@@ -57,16 +61,16 @@ export default function CreateSubaccount(props: propsIF) {
                         id={INPUT_ID_FOR_DOM}
                         type='text'
                         autoComplete='off'
-                        placeholder='eg: My Sub-Account 1'
+                        placeholder={t('subaccounts.createSubAccountPH')}
                         ref={inputRef}
                     />
                 </div>
                 <div className={styles.modal_buttons}>
                     <SimpleButton bg='dark4' onClick={modalControl.close}>
-                        Cancel
+                        {t('common.cancel')}
                     </SimpleButton>
                     <SimpleButton bg='accent1' onClick={createSubaccount}>
-                        Confirm
+                        {t('common.confirm')}
                     </SimpleButton>
                 </div>
             </div>

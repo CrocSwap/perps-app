@@ -2,6 +2,7 @@ import SortIcon from '~/components/Vault/SortIcon';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import type { PositionDataSortBy } from '~/utils/UserDataIFs';
 import styles from './PositionsTable.module.css';
+import { t } from 'i18next';
 
 export interface HeaderCell {
     name: string;
@@ -25,55 +26,55 @@ export default function PositionsTableHeader({
 
     const tableHeaders: HeaderCell[] = [
         {
-            name: 'Coin',
+            name: t('tradeTable.coin'),
             key: 'coin',
             sortable: true,
             className: styles.coinCell,
         },
         {
-            name: 'Size',
+            name: t('tradeTable.size'),
             key: 'size',
             sortable: true,
             className: styles.sizeCell,
         },
         {
-            name: 'Position Value',
+            name: t('tradeTable.positionValue'),
             key: 'positionValue',
             sortable: true,
             className: styles.positionValueCell,
         },
         {
-            name: 'Entry Price',
+            name: t('tradeTable.entryPrice'),
             key: 'entryPrice',
             sortable: true,
             className: styles.entryPriceCell,
         },
         {
-            name: 'Mark Price',
+            name: t('tradeTable.markPrice'),
             key: 'markPrice',
             sortable: true,
             className: styles.markPriceCell,
         },
         {
-            name: 'PNL (ROE%)',
+            name: t('tradeTable.pnl'),
             key: 'pnl',
             sortable: true,
             className: styles.pnlCell,
         },
         {
-            name: 'Liq. Price',
+            name: t('tradeTable.liqPrice'),
             key: 'liqPrice',
             sortable: true,
             className: styles.liqPriceCell,
         },
         {
-            name: 'Margin',
+            name: t('tradeTable.margin'),
             key: 'margin',
             sortable: true,
             className: styles.marginCell,
         },
         {
-            name: 'Funding',
+            name: t('tradeTable.funding'),
             key: 'funding',
             sortable: true,
             className: styles.fundingCell,
@@ -89,7 +90,7 @@ export default function PositionsTableHeader({
               ]
             : []),
         {
-            name: 'Close',
+            name: t('tradeTable.close'),
             key: 'close',
             sortable: false,
             className: styles.closeCell,

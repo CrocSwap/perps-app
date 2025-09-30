@@ -6,6 +6,7 @@ import ChaseDistance from '../ChaseDistance/ChaseDistance';
 import styles from './ReduceAndProfitToggle.module.css';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import { pctFromDollars } from '~/utils/functions/profitLossConversions';
+import { t } from 'i18next';
 
 interface PropsIF {
     isReduceOnlyEnabled: boolean;
@@ -464,7 +465,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isChasingIntervalEnabled}
                         onToggle={handleToggleIsChasingInterval}
                         label=''
-                        aria-label='Chasing interval toggle'
+                        aria-label={t('aria.toggleChasingInterval')}
                     />
                     <h3 className={styles.toggleLabel}>Max Chase Distance</h3>
                 </div>
@@ -494,7 +495,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isRandomizeEnabled}
                         onToggle={handleToggleRandomize}
                         label=''
-                        aria-label='Randomize toggle'
+                        aria-label={t('aria.toggleRandomize')}
                     />
                     <h3 className={styles.toggleLabel}>Randomize</h3>
                 </div>
@@ -507,8 +508,8 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     <ToggleSwitch
                         isOn={isReduceOnlyEnabled}
                         onToggle={handleToggleReduceOnly}
-                        label='Reduce Only'
-                        aria-label='Reduce Only toggle'
+                        label={t('tradeTable.reduceOnly')}
+                        aria-label={t('aria.toggleReduceOnly')}
                         reverse
                     />
                 </div>
@@ -518,8 +519,8 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     <ToggleSwitch
                         isOn={isTakeProfitEnabled}
                         onToggle={handleToggleProfitOnly}
-                        label='Take Profit / Stop Loss'
-                        aria-label='Take Profit / Stop Loss toggle'
+                        label={t('transactions.tpslToggleLabel')}
+                        aria-label={t('aria.toggleTPSL')}
                         reverse
                     />
                 </div>

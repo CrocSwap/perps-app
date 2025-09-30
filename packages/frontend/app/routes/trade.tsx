@@ -31,6 +31,7 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
 import { getSizePercentageSegment } from '~/utils/functions/getSegment';
+import { useTranslation } from 'react-i18next';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -42,6 +43,7 @@ export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 export default function Trade() {
     const { symbol } = useTradeDataStore();
     const { marginBucket } = useUnifiedMarginData();
+    const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     // add refs near the other refs
@@ -144,6 +146,8 @@ export default function Trade() {
     const TABLE_COLLAPSE_TRIGGER = 160; // when table gets smaller than this, snap down
 
     const leftColRef = useRef<HTMLDivElement | null>(null);
+    const tableSectionRef = useRef<HTMLElement | null>(null);
+    const HEADER_HIT_HEIGHT = 72; // bump to 80/96 if your header is taller
 
     // local state used while dragging for immediate feedback
     const [chartTopHeight, setChartTopHeightLocal] = useState<number>(
@@ -320,13 +324,13 @@ export default function Trade() {
     const tabList = useMemo(
         () =>
             [
-                { key: 'order', label: 'Order' },
-                { key: 'chart', label: 'Chart' },
-                { key: 'book', label: 'Book' },
-                { key: 'recent', label: 'Recent' },
-                { key: 'positions', label: 'Positions' },
+                { key: 'order', label: t('navigation.trade') },
+                { key: 'chart', label: t('navigation.chart') },
+                { key: 'book', label: t('navigation.book') },
+                { key: 'recent', label: t('navigation.recent') },
+                { key: 'positions', label: t('navigation.positions') },
             ] as const,
-        [],
+        [t],
     );
 
     const handleTabClick = useCallback(
@@ -390,6 +394,52 @@ export default function Trade() {
         PortfolioModalsRenderer,
         isAnyPortfolioModalOpen,
     } = usePortfolioModals();
+
+    const isTableCollapsed = () => {
+        const available = getAvailable();
+        if (!available || available <= 0) return false;
+        const currentTop = chartTopHeightRef.current ?? chartTopHeight;
+        const tableHeight = available - currentTop;
+        return tableHeight <= TABLE_COLLAPSED + 0.5;
+    };
+
+    const openTableToDefault = () => {
+        const available = getAvailable();
+        if (!available || available <= 0) return;
+        const desiredTable = Math.max(TABLE_MIN, TABLE_DEFAULT);
+        const targetTop = clamp(available - desiredTable);
+        hasUserOverrideRef.current = true;
+        userRatioRef.current = targetTop / available;
+        setHeightBoth(targetTop);
+        if (typeof plausible === 'function') {
+            plausible('Trade Table Resize', {
+                props: {
+                    tradeTablePercentOfWindowHeight: 'default',
+                },
+            });
+        }
+    };
+
+    const collapseTableToBar = () => {
+        const available = getAvailable();
+        if (!available || available <= 0) return;
+        const snapTo = clamp(available - TABLE_COLLAPSED);
+        hasUserOverrideRef.current = true;
+        userRatioRef.current = snapTo / available;
+        setHeightBoth(snapTo);
+        if (typeof plausible === 'function') {
+            plausible('Trade Table Resize', {
+                props: {
+                    tradeTablePercentOfWindowHeight: 'minimum',
+                },
+            });
+        }
+    };
+
+    const isInteractiveEl = (el: HTMLElement | null) =>
+        !!el?.closest(
+            'button, [role="tab"], [data-tab], [data-action], a, input, select, textarea, [contenteditable="true"], [data-ensure-open]',
+        );
 
     // Mobile view
     if (isMobile && symbol) {
@@ -581,6 +631,45 @@ export default function Trade() {
                         <section
                             className={styles.table}
                             id='tutorial-trade-table'
+                            ref={tableSectionRef}
+                            onClick={(e) => {
+                                const el = e.target as HTMLElement | null;
+                                if (!el) return;
+
+                                const isInteractive = isInteractiveEl(el);
+
+                                if (isInteractive && isTableCollapsed()) {
+                                    // defer opening until after the child click finishes
+                                    requestAnimationFrame(() => {
+                                        openTableToDefault();
+                                    });
+                                }
+                            }}
+                            onDoubleClick={(e) => {
+                                if (isMobile) return;
+
+                                const target = e.target as HTMLElement | null;
+                                if (!target) return;
+
+                                // Ignore interactive controls
+                                if (isInteractiveEl(target)) return;
+
+                                // Collapsed → open anywhere
+                                if (isTableCollapsed()) {
+                                    openTableToDefault();
+                                    return;
+                                }
+
+                                const section = tableSectionRef.current;
+                                if (!section) return;
+
+                                const rect = section.getBoundingClientRect();
+                                const yFromTop = e.clientY - rect.top;
+
+                                if (yFromTop <= HEADER_HIT_HEIGHT) {
+                                    collapseTableToBar();
+                                }
+                            }}
                         >
                             <MemoizedTradeTable />
                         </section>

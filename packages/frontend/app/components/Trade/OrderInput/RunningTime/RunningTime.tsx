@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import styles from './RunningTime.module.css';
 
 export default function RunningTime() {
@@ -9,7 +10,7 @@ export default function RunningTime() {
                     type='text'
                     // value={value}
                     onChange={(e) => console.log(e)}
-                    aria-label={'running price input hours'}
+                    aria-label={t('aria.runningPriceInput.hours')}
                     inputMode='numeric'
                     pattern='[0-9]*'
                     placeholder='Hour(s)'
@@ -19,7 +20,7 @@ export default function RunningTime() {
                         type='text'
                         // value={value}
                         onChange={(e) => console.log(e)}
-                        aria-label={'running price input minutes'}
+                        aria-label={t('aria.runningPriceInput.minutes')}
                         inputMode='numeric'
                         pattern='[0-9]*'
                         placeholder='Minute(s)'

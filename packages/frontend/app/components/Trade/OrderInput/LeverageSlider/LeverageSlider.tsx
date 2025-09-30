@@ -14,6 +14,7 @@ import InputField from './InputField';
 import styles from './LeverageSlider.module.css';
 import SliderTrack from './SliderTrack';
 import { BTC_MAX_LEVERAGE } from '~/utils/Constants';
+import { t } from 'i18next';
 
 interface LeverageSliderProps {
     value: number;
@@ -893,11 +894,13 @@ export default function LeverageSlider({
         <div className={containerClasses}>
             {!hideTitle && (
                 <div className={titleClasses}>
-                    <h3 className={styles.containerTitle}>Leverage</h3>
+                    <h3 className={styles.containerTitle}>
+                        {t('common.leverage')}
+                    </h3>
                     {!modalMode && showMinimumWarning && (
                         <div className={warningClasses}>
                             {minimumValue !== undefined && (
-                                <>Close position to reduce minimum leverage</>
+                                <>{t('leverage.closePositionPrompt')}</>
                             )}
                         </div>
                     )}
@@ -911,7 +914,7 @@ export default function LeverageSlider({
                     {modalMode && showMinimumWarning && (
                         <div className={warningClasses}>
                             {minimumValue !== undefined && (
-                                <>Close position to reduce minimum leverage</>
+                                <>{t('leverage.closePositionPrompt')}</>
                             )}
                         </div>
                     )}

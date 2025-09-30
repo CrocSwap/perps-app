@@ -33,6 +33,7 @@ import {
     defaultDrawingToolColors,
     getChartDefaultColors,
     getChartThemeColors,
+    mapI18nToTvLocale,
     priceFormatterFactory,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
@@ -45,10 +46,13 @@ import {
     widget,
     type IBasicDataFeed,
     type IChartingLibraryWidget,
+    type LanguageCode,
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
 import { processSymbolUrlParam } from '~/utils/AppUtils';
+
+import i18n from 'i18next';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -107,7 +111,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             setChartInterval(res.interval);
         }
         setChartState(res);
-    }, []);
+    }, [i18n.language]);
 
     const defaultProps: Omit<ChartContainerProps, 'container'> = {
         symbolName: 'BTC',
@@ -244,7 +248,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             favorites: {
                 intervals: ['5', '1h', 'D'] as ResolutionString[],
             },
-            locale: 'en',
+            locale: mapI18nToTvLocale(i18n.language) as LanguageCode,
             theme: 'dark',
             custom_themes: customThemes(),
             overrides: {
@@ -378,18 +382,26 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [chartState, info]);
 
     useEffect(() => {
+        setIsChartReady(false);
+        if (chart) {
+            setChart(null);
+        }
         initChart();
 
         return () => {
-            if (chart) {
-                drawingEventUnsubscribe(chart);
-                studyEventsUnsubscribe(chart);
-                intervalChangedUnsubscribe(chart);
-                visibleRangeChangedUnsubscribe(chart);
-                chart.remove();
+            try {
+                if (chart) {
+                    drawingEventUnsubscribe(chart);
+                    studyEventsUnsubscribe(chart);
+                    intervalChangedUnsubscribe(chart);
+                    visibleRangeChangedUnsubscribe(chart);
+                    chart.remove();
+                }
+            } catch (error) {
+                console.error(error);
             }
         };
-    }, [chartState, info, initChart]);
+    }, [chartState, info, i18n.language, initChart]);
 
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;

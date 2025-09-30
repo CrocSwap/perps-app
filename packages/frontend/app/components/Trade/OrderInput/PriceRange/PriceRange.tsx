@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import styles from './PriceRange.module.css';
 
 interface PropsIF {
@@ -72,7 +73,7 @@ export default function PriceRange(props: PropsIF) {
                 type='text'
                 value={totalOrders}
                 onChange={handleChangetotalOrders}
-                aria-label={'total orders'}
+                aria-label={t('aria.totalOrders')}
                 pattern='[0-9]*\.?[0-9]*'
                 placeholder='Total Orders'
                 className={styles.totalOrdersInput}

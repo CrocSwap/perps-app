@@ -3,7 +3,7 @@ import React from 'react';
 import { NavLink } from 'react-router';
 import styles from './MobileFooter.module.css';
 import { RiHome2Line } from 'react-icons/ri';
-import { MdOutlinePeopleAlt } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
 
 interface NavItem {
     name: string;
@@ -14,15 +14,16 @@ interface NavItem {
 }
 
 const MobileFooter: React.FC = () => {
+    const { t } = useTranslation();
     const navItems: NavItem[] = [
         {
-            name: 'Home',
+            name: t('navigation.home'),
             path: '/',
             icon: homeSvg,
             end: true,
         },
         {
-            name: 'Trade',
+            name: t('navigation.trade'),
             path: '/v2/trade',
             icon: tradeSvg,
         },

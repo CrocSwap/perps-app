@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import styles from './PriceInput.module.css';
+import { t } from 'i18next';
 
 interface PropsIF {
     value: string;
@@ -59,7 +60,7 @@ export default function PriceInput(props: PropsIF) {
               `}
             onClick={handleContainerClick}
         >
-            <span>Price</span>
+            <span>{t('transactions.price')}</span>
             <NumFormattedInput
                 id='trade-module-price-input'
                 value={value}
@@ -68,7 +69,7 @@ export default function PriceInput(props: PropsIF) {
                 onKeyDown={onKeyDown}
                 className={className}
                 aria-label={ariaLabel}
-                placeholder='Enter Price'
+                placeholder={t('transactions.enterPrice')}
             />
             {showMidButton && (
                 <button
@@ -84,7 +85,7 @@ export default function PriceInput(props: PropsIF) {
                         }
                     }}
                 >
-                    Mid
+                    {t('transactions.midButton')}
                 </button>
             )}
         </div>

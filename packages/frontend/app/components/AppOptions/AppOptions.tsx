@@ -10,10 +10,17 @@ import {
     type colorSetIF,
     type colorSetNames,
 } from '~/stores/AppSettingsStore';
-import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
+import {
+    languageOptions,
+    NumFormatTypes,
+    type NumFormat,
+} from '~/utils/Constants';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import OptionLineSelect from './OptionLineSelect';
+import { useTranslation } from 'react-i18next';
+import useMediaQuery from '~/hooks/useMediaQuery';
+import { getDefaultLanguage } from '~/utils/functions/getDefaultLanguage';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -22,8 +29,12 @@ export interface appOptionDataIF {
 
 export default function AppOptions() {
     const activeOptions: useAppOptionsIF = useAppOptions();
+
+    const isMobileVersion = useMediaQuery('(max-width: 768px)');
+
     const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
         useAppSettings();
+    const { i18n, t } = useTranslation();
 
     // !important:  this file instantiates children directly instead of using
     // !important:  ... .map() functions so we can easily mix different types
@@ -36,9 +47,21 @@ export default function AppOptions() {
         <section className={styles.app_options}>
             <ul>
                 <OptionLine
-                    text='Skip Open Order Confirmation'
+                    text={t('appSettings.skipOpenOrderConfirm')}
                     isChecked={activeOptions['skipOpenOrderConfirm']}
-                    toggle={() => activeOptions.toggle('skipOpenOrderConfirm')}
+                    toggle={() => {
+                        activeOptions.toggle('skipOpenOrderConfirm');
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting: 'skipOpenOrderConfirm',
+                                    value: !activeOptions[
+                                        'skipOpenOrderConfirm'
+                                    ],
+                                },
+                            });
+                        }
+                    }}
                 />
                 {/* <OptionLine
                     text='Skip Close Position Confirmations'
@@ -65,21 +88,43 @@ export default function AppOptions() {
             {/* <div className={styles.horizontal_divider} /> */}
             <ul>
                 {/* <OptionLine
-                    text='Display Verbose Errors'
+                    text={t('appSettings.displayVerboseErrors')}
                     isChecked={activeOptions['displayVerboseErrors']}
                     toggle={() => activeOptions.toggle('displayVerboseErrors')}
                 /> */}
                 <OptionLine
-                    text='Enable Transaction Notifications'
+                    text={t('appSettings.enableTxNotifications')}
                     isChecked={activeOptions['enableTxNotifications']}
-                    toggle={() => activeOptions.toggle('enableTxNotifications')}
+                    toggle={() => {
+                        activeOptions.toggle('enableTxNotifications');
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting: 'enableTxNotifications',
+                                    value: !activeOptions[
+                                        'enableTxNotifications'
+                                    ],
+                                },
+                            });
+                        }
+                    }}
                 />
                 <OptionLine
-                    text='Enable Background Fill Notifications'
+                    text={t('appSettings.enableBackgroundFillNotif')}
                     isChecked={activeOptions['enableBackgroundFillNotif']}
-                    toggle={() =>
-                        activeOptions.toggle('enableBackgroundFillNotif')
-                    }
+                    toggle={() => {
+                        activeOptions.toggle('enableBackgroundFillNotif');
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting: 'enableBackgroundFillNotif',
+                                    value: !activeOptions[
+                                        'enableBackgroundFillNotif'
+                                    ],
+                                },
+                            });
+                        }
+                    }}
                 />
                 {/* <OptionLine
                     text='Play Sound for Fills'
@@ -117,21 +162,28 @@ export default function AppOptions() {
             <div className={styles.horizontal_divider} />
             <ul>
                 <OptionLineSelect
-                    text='Number Format'
+                    text={t('appSettings.numberFormat')}
                     active={numFormat.label}
                     options={NumFormatTypes.map((n: NumFormat) => ({
                         readable: n.label,
-                        set: () => setNumFormat(n),
+                        set: () => {
+                            setNumFormat(n);
+                            if (typeof plausible === 'function') {
+                                plausible('Settings Change', {
+                                    props: {
+                                        setting: 'numberFormat',
+                                        value: n.label,
+                                    },
+                                });
+                            }
+                        },
                     }))}
                 />
                 <OptionLineSelect
-                    text='Color'
+                    text={t('appSettings.color')}
                     active={
                         <div style={{ gap: '10px' }}>
-                            <div>
-                                {(bsColor as string)[0].toUpperCase() +
-                                    (bsColor as string).slice(1)}
-                            </div>
+                            <div>{t(bsColor.toString())}</div>
                             <div style={{ gap: CIRCLE_GAP }}>
                                 <FaCircle color={getBsColor().buy} />
                                 <FaCircle color={getBsColor().sell} />
@@ -144,17 +196,56 @@ export default function AppOptions() {
                             return {
                                 readable: (
                                     <>
-                                        <div>
-                                            {text[0].toUpperCase() +
-                                                text.slice(1)}
-                                        </div>
+                                        <div>{t(text)}</div>
                                         <div style={{ gap: CIRCLE_GAP }}>
                                             <FaCircle color={colors.buy} />
                                             <FaCircle color={colors.sell} />
                                         </div>
                                     </>
                                 ),
-                                set: () => setBsColor(text as colorSetNames),
+                                set: () => {
+                                    setBsColor(text as colorSetNames);
+                                    if (typeof plausible === 'function') {
+                                        plausible('Settings Change', {
+                                            props: {
+                                                setting: 'colorScheme',
+                                                value: text,
+                                            },
+                                        });
+                                    }
+                                },
+                            };
+                        },
+                    )}
+                />
+                <OptionLineSelect
+                    text={t('appSettings.language')}
+                    dropDirection={isMobileVersion ? 'up' : 'down'}
+                    active={
+                        <div>
+                            {
+                                languageOptions[
+                                    (i18n?.language?.split('-')[0] ||
+                                        'en') as keyof typeof languageOptions
+                                ]
+                            }
+                        </div>
+                    }
+                    options={Object.entries(languageOptions).map(
+                        (lang: [string, string]) => {
+                            return {
+                                readable: <div>{lang[1]}</div>,
+                                set: () => {
+                                    i18n.changeLanguage(lang[0]);
+                                    if (typeof plausible === 'function') {
+                                        plausible('Settings Change', {
+                                            props: {
+                                                setting: 'language',
+                                                value: lang[1].split(' ')[0],
+                                            },
+                                        });
+                                    }
+                                },
                             };
                         },
                     )}
@@ -165,18 +256,24 @@ export default function AppOptions() {
                 onClick={() => {
                     activeOptions.applyDefaults();
                     setNumFormat(NumFormatTypes[0]);
-                    setBsColor('default');
+                    setBsColor('colors.default');
                     useAppSettings.getState().resetLayoutHeights();
+
+                    // reset language to browser default or English if unsupported
+                    const defaultLanguage = getDefaultLanguage();
+                    i18n.changeLanguage(defaultLanguage);
+
                     if (typeof plausible === 'function') {
-                        plausible('Trade Table Resize', {
+                        plausible('Settings Change', {
                             props: {
-                                tradeTablePercentOfWindowHeight: 'default',
+                                setting: 'applyDefaults',
+                                value: 'default',
                             },
                         });
                     }
                 }}
             >
-                Apply Defaults
+                {t('common.applyDefaults')}
             </div>
 
             {/* <div
