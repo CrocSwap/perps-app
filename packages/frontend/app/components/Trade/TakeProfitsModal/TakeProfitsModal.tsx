@@ -3,6 +3,7 @@ import styles from './TakeProfitsModal.module.css';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import PositionSize from '~/components/Trade/OrderInput/PositionSIze/PositionSize';
 import {
     pctFromDollars,
     dollarsFromPct,
@@ -23,7 +24,6 @@ export default function TakeProfitsModal(props: PropIF) {
     const { closeTPModal, position, markPrice, qtyStep } = props;
 
     const totalBaseQuantity = Math.abs(position.szi ?? 0);
-    const quantityStep = qtyStep ?? 1e-8;
     const entryPrice = position.entryPx;
     const markOrEntryPrice = markPrice || position.entryPx;
     const positionQuantity = Math.abs(position.szi ?? 0);
@@ -44,11 +44,23 @@ export default function TakeProfitsModal(props: PropIF) {
     const [tpGainCurrency, setTpGainCurrency] = useState<Currency>('$');
     const [slLossCurrency, setSlLossCurrency] = useState<Currency>('$');
 
+    // Form state for toggles
+    const [form, setForm] = useState({
+        isCustomAllocationEnabled: false,
+        isLimitOrderEnabled: false,
+    });
+
+    // UI state for toggles
+    const [ui, setUi] = useState({
+        allocationPercentage: 100,
+        takeProfitLimitInput: '',
+        stopLossLimitInput: '',
+    });
+
     const currencyOptions: Currency[] = ['$', '%'];
 
     const formatCrypto = (value: number) =>
         value.toFixed(8).replace(/\.?0+$/, '');
-
     const updatePriceFromGain = (gainValue: string) => {
         if (!markPrice || !gainValue || !positionQuantity) return;
 
@@ -228,10 +240,40 @@ export default function TakeProfitsModal(props: PropIF) {
         positionQuantity,
     ]);
 
+    // Calculate allocated quantity based on percentage
+    const allocatedQuantity = useMemo(() => {
+        return (totalBaseQuantity * ui.allocationPercentage) / 100;
+    }, [totalBaseQuantity, ui.allocationPercentage]);
+
+    // Limit price handlers
+    const onTakeProfitLimitBlur = () => {
+        if (ui.takeProfitLimitInput.trim() !== '') {
+            const limitPrice = parseFloat(ui.takeProfitLimitInput);
+            if (Number.isFinite(limitPrice)) {
+                setUi((u) => ({
+                    ...u,
+                    takeProfitLimitInput: limitPrice.toFixed(6),
+                }));
+            }
+        }
+    };
+
+    const onStopLossLimitBlur = () => {
+        if (ui.stopLossLimitInput.trim() !== '') {
+            const limitPrice = parseFloat(ui.stopLossLimitInput);
+            if (Number.isFinite(limitPrice)) {
+                setUi((u) => ({
+                    ...u,
+                    stopLossLimitInput: limitPrice.toFixed(6),
+                }));
+            }
+        }
+    };
+
     const handleConfirm = () => {
         if (!isFormValid) return;
 
-        const finalOrderSize = totalBaseQuantity;
+        const finalOrderSize = allocatedQuantity;
 
         const takeProfitTriggerPrice =
             takeProfitPrice !== '' ? parseFloat(takeProfitPrice) : undefined;
@@ -480,6 +522,101 @@ export default function TakeProfitsModal(props: PropIF) {
                               ? `$${Math.abs(expectedLoss).toFixed(2)}`
                               : `${((Math.abs(expectedLoss) / (markPrice * positionQuantity)) * 100).toFixed(3)}%`}
                     </span>
+                )}
+            </section>
+
+            {/* Toggles */}
+            <section className={styles.toggleContainer}>
+                <ToggleSwitch
+                    isOn={form.isCustomAllocationEnabled}
+                    onToggle={(v) =>
+                        setForm((p) => ({
+                            ...p,
+                            isCustomAllocationEnabled:
+                                v ?? !p.isCustomAllocationEnabled,
+                        }))
+                    }
+                    label='Configure Amount'
+                    reverse
+                    aria-label={t('aria.toggleConfigureAmount')}
+                />
+
+                {form.isCustomAllocationEnabled && (
+                    <>
+                        <PositionSize
+                            value={ui.allocationPercentage}
+                            onChange={(v) =>
+                                setUi((u) => ({
+                                    ...u,
+                                    allocationPercentage: v,
+                                }))
+                            }
+                            isModal
+                            className={styles.positionSizeRow}
+                        />
+                        <div className={styles.amountReadout}>
+                            {formatCrypto(allocatedQuantity)} BTC (
+                            {ui.allocationPercentage}% of{' '}
+                            {formatCrypto(totalBaseQuantity)} BTC)
+                        </div>
+                    </>
+                )}
+
+                <ToggleSwitch
+                    isOn={form.isLimitOrderEnabled}
+                    onToggle={(v) =>
+                        setForm((p) => ({
+                            ...p,
+                            isLimitOrderEnabled: v ?? !p.isLimitOrderEnabled,
+                        }))
+                    }
+                    label='Limit Price'
+                    reverse
+                    aria-label={t('aria.toggleLimitPrice')}
+                />
+
+                {form.isLimitOrderEnabled && (
+                    <div className={styles.formRow}>
+                        <label
+                            className={styles.inputWithoutDropdown}
+                            htmlFor='takeProfitLimitPrice'
+                        >
+                            <span>TP Limit Price</span>
+                            <input
+                                id='takeProfitLimitPrice'
+                                type='text'
+                                inputMode='decimal'
+                                value={ui.takeProfitLimitInput}
+                                onChange={(e) =>
+                                    setUi((u) => ({
+                                        ...u,
+                                        takeProfitLimitInput: e.target.value,
+                                    }))
+                                }
+                                onBlur={onTakeProfitLimitBlur}
+                            />
+                        </label>
+
+                        <label
+                            className={styles.inputWithoutDropdown}
+                            htmlFor='stopLossLimitPrice'
+                        >
+                            <span>SL Limit Price</span>
+                            <input
+                                id='stopLossLimitPrice'
+                                type='text'
+                                inputMode='decimal'
+                                value={ui.stopLossLimitInput}
+                                onChange={(e) =>
+                                    setUi((u) => ({
+                                        ...u,
+                                        stopLossLimitInput: e.target.value,
+                                    }))
+                                }
+                                onBlur={onStopLossLimitBlur}
+                            />
+                        </label>
+                    </div>
                 )}
             </section>
 
