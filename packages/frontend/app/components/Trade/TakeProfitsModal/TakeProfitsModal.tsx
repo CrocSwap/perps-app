@@ -76,7 +76,7 @@ export default function TakeProfitsModal(props: PropIF) {
             newPrice = markPrice * multiplier;
         }
 
-        setTakeProfitPrice(newPrice.toFixed(6));
+        setTakeProfitPrice(newPrice.toFixed(2));
     };
 
     const updatePriceFromLoss = (lossValue: string) => {
@@ -94,7 +94,7 @@ export default function TakeProfitsModal(props: PropIF) {
             newPrice = markPrice * multiplier;
         }
 
-        setStopLossPrice(newPrice.toFixed(6));
+        setStopLossPrice(newPrice.toFixed(2));
     };
 
     const calculateExpectedProfit = (): number | null => {

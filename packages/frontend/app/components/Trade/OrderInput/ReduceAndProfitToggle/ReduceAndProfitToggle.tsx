@@ -95,7 +95,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             newPrice = markPx * multiplier;
         }
 
-        setTakeProfitPrice?.(newPrice.toFixed(6));
+        setTakeProfitPrice?.(newPrice.toFixed(2));
     };
 
     const updatePriceFromLoss = (lossValue: string) => {
@@ -117,7 +117,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             newPrice = markPx * multiplier;
         }
 
-        setStopLossPrice?.(newPrice.toFixed(6));
+        setStopLossPrice?.(newPrice.toFixed(2));
     };
 
     const calculateExpectedProfit = (): number | null => {
