@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './TakeProfitsModal.module.css';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import type { PositionIF } from '~/utils/UserDataIFs';
@@ -61,16 +61,57 @@ export default function TakeProfitsModal(props: PropIF) {
 
     const formatCrypto = (value: number) =>
         value.toFixed(8).replace(/\.?0+$/, '');
+
+    // Calculate effective position quantity based on allocation percentage
+    const effectivePositionQuantity = useMemo(() => {
+        return form.isCustomAllocationEnabled
+            ? positionQuantity * (ui.allocationPercentage / 100)
+            : positionQuantity;
+    }, [
+        positionQuantity,
+        form.isCustomAllocationEnabled,
+        ui.allocationPercentage,
+    ]);
+
+    // Re-run calculations when position size or allocation changes
+    useEffect(() => {
+        // If we have a take profit price set, recalculate the gain
+        if (takeProfitPrice && !hasTakeProfitGainBeenTouched) {
+            updateGainFromPrice(takeProfitPrice);
+        }
+        // If we have a take profit gain set, recalculate the price
+        if (takeProfitGain && hasTakeProfitGainBeenTouched) {
+            updatePriceFromGain(takeProfitGain);
+        }
+        // If we have a stop loss price set, recalculate the loss
+        if (stopLossPrice && !hasStopLossLossBeenTouched) {
+            updateLossFromPrice(stopLossPrice);
+        }
+        // If we have a stop loss loss set, recalculate the price
+        if (stopLossLoss && hasStopLossLossBeenTouched) {
+            updatePriceFromLoss(stopLossLoss);
+        }
+    }, [
+        effectivePositionQuantity,
+        markPrice,
+        takeProfitPrice,
+        takeProfitGain,
+        stopLossPrice,
+        stopLossLoss,
+        hasTakeProfitGainBeenTouched,
+        hasStopLossLossBeenTouched,
+    ]);
+
     const updatePriceFromGain = (gainValue: string) => {
-        if (!markPrice || !gainValue || !positionQuantity) return;
+        if (!markPrice || !gainValue || !effectivePositionQuantity) return;
 
         const gain = parseFloat(gainValue);
         let newPrice: number;
 
         if (tpGainCurrency === '$') {
             newPrice = isLong
-                ? markPrice + gain / positionQuantity
-                : markPrice - gain / positionQuantity;
+                ? markPrice + gain / effectivePositionQuantity
+                : markPrice - gain / effectivePositionQuantity;
         } else {
             const multiplier = isLong ? 1 + gain / 100 : 1 - gain / 100;
             newPrice = markPrice * multiplier;
@@ -80,15 +121,15 @@ export default function TakeProfitsModal(props: PropIF) {
     };
 
     const updatePriceFromLoss = (lossValue: string) => {
-        if (!markPrice || !lossValue || !positionQuantity) return;
+        if (!markPrice || !lossValue || !effectivePositionQuantity) return;
 
         const loss = parseFloat(lossValue);
         let newPrice: number;
 
         if (slLossCurrency === '$') {
             newPrice = isLong
-                ? markPrice - loss / positionQuantity
-                : markPrice + loss / positionQuantity;
+                ? markPrice - loss / effectivePositionQuantity
+                : markPrice + loss / effectivePositionQuantity;
         } else {
             const multiplier = isLong ? 1 - loss / 100 : 1 + loss / 100;
             newPrice = markPrice * multiplier;
@@ -108,8 +149,8 @@ export default function TakeProfitsModal(props: PropIF) {
             const gain = parseFloat(takeProfitGain);
             if (tpGainCurrency === '$') {
                 targetPrice = isLong
-                    ? markPrice + gain / positionQuantity
-                    : markPrice - gain / positionQuantity;
+                    ? markPrice + gain / effectivePositionQuantity
+                    : markPrice - gain / effectivePositionQuantity;
             } else {
                 const multiplier = isLong ? 1 + gain / 100 : 1 - gain / 100;
                 targetPrice = markPrice * multiplier;
@@ -118,13 +159,13 @@ export default function TakeProfitsModal(props: PropIF) {
             return null;
         }
 
-        if (!markPrice || !positionQuantity) return null;
+        if (!markPrice || !effectivePositionQuantity) return null;
 
         const priceDiff = isLong
             ? targetPrice - markPrice
             : markPrice - targetPrice;
 
-        return priceDiff * positionQuantity;
+        return priceDiff * effectivePositionQuantity;
     };
 
     const calculateExpectedLoss = (): number | null => {
@@ -138,8 +179,8 @@ export default function TakeProfitsModal(props: PropIF) {
             const loss = parseFloat(stopLossLoss);
             if (slLossCurrency === '$') {
                 targetPrice = isLong
-                    ? markPrice - loss / positionQuantity
-                    : markPrice + loss / positionQuantity;
+                    ? markPrice - loss / effectivePositionQuantity
+                    : markPrice + loss / effectivePositionQuantity;
             } else {
                 const multiplier = isLong ? 1 - loss / 100 : 1 + loss / 100;
                 targetPrice = markPrice * multiplier;
@@ -148,17 +189,17 @@ export default function TakeProfitsModal(props: PropIF) {
             return null;
         }
 
-        if (!markPrice || !positionQuantity) return null;
+        if (!markPrice || !effectivePositionQuantity) return null;
 
         const priceDiff = isLong
             ? markPrice - targetPrice
             : targetPrice - markPrice;
 
-        return priceDiff * positionQuantity;
+        return priceDiff * effectivePositionQuantity;
     };
 
     const updateGainFromPrice = (priceValue: string) => {
-        if (!priceValue || !markPrice || !positionQuantity) {
+        if (!priceValue || !markPrice || !effectivePositionQuantity) {
             return;
         }
 
@@ -169,11 +210,14 @@ export default function TakeProfitsModal(props: PropIF) {
 
         const priceDiff = isLong ? price - markPrice : markPrice - price;
 
-        const gainUSD = priceDiff * positionQuantity;
+        const gainUSD = priceDiff * effectivePositionQuantity;
         const gainValue =
             tpGainCurrency === '$'
                 ? gainUSD.toFixed(2)
-                : ((gainUSD / (markPrice * positionQuantity)) * 100).toFixed(3);
+                : (
+                      (gainUSD / (markPrice * effectivePositionQuantity)) *
+                      100
+                  ).toFixed(3);
 
         // Only update if user hasn't manually entered a gain value
         if (!hasTakeProfitGainBeenTouched) {
@@ -182,18 +226,21 @@ export default function TakeProfitsModal(props: PropIF) {
     };
 
     const updateLossFromPrice = (priceValue: string) => {
-        if (!priceValue || !markPrice || !positionQuantity) return;
+        if (!priceValue || !markPrice || !effectivePositionQuantity) return;
 
         const price = parseFloat(priceValue);
         if (!Number.isFinite(price)) return;
 
         const priceDiff = isLong ? markPrice - price : price - markPrice;
 
-        const lossUSD = priceDiff * positionQuantity;
+        const lossUSD = priceDiff * effectivePositionQuantity;
         const lossValue =
             slLossCurrency === '$'
                 ? lossUSD.toFixed(2)
-                : ((lossUSD / (markPrice * positionQuantity)) * 100).toFixed(3);
+                : (
+                      (lossUSD / (markPrice * effectivePositionQuantity)) *
+                      100
+                  ).toFixed(3);
 
         // Only update if user hasn't manually entered a loss value
         if (!hasStopLossLossBeenTouched) {
@@ -208,7 +255,7 @@ export default function TakeProfitsModal(props: PropIF) {
         takeProfitGain,
         tpGainCurrency,
         markPrice,
-        positionQuantity,
+        effectivePositionQuantity,
         isLong,
     ]);
 
@@ -219,7 +266,7 @@ export default function TakeProfitsModal(props: PropIF) {
         stopLossLoss,
         slLossCurrency,
         markPrice,
-        positionQuantity,
+        effectivePositionQuantity,
         isLong,
     ]);
 
@@ -227,13 +274,13 @@ export default function TakeProfitsModal(props: PropIF) {
         const hasTp =
             takeProfitPrice.trim() !== '' || takeProfitGain.trim() !== '';
         const hasSl = stopLossPrice.trim() !== '' || stopLossLoss.trim() !== '';
-        return (hasTp || hasSl) && positionQuantity > 0;
+        return (hasTp || hasSl) && effectivePositionQuantity > 0;
     }, [
         takeProfitPrice,
         takeProfitGain,
         stopLossPrice,
         stopLossLoss,
-        positionQuantity,
+        effectivePositionQuantity,
     ]);
 
     // Calculate allocated quantity based on percentage
@@ -380,7 +427,7 @@ export default function TakeProfitsModal(props: PropIF) {
                                 if (
                                     takeProfitGain &&
                                     markPrice &&
-                                    positionQuantity
+                                    effectivePositionQuantity
                                 ) {
                                     const currentGain =
                                         parseFloat(takeProfitGain);
@@ -391,7 +438,7 @@ export default function TakeProfitsModal(props: PropIF) {
                                                 ? currentGain
                                                 : (currentGain *
                                                       (markPrice *
-                                                          positionQuantity)) /
+                                                          effectivePositionQuantity)) /
                                                   100;
 
                                         // Convert USD to new currency
@@ -401,7 +448,7 @@ export default function TakeProfitsModal(props: PropIF) {
                                                 : (
                                                       (currentGainUSD /
                                                           (markPrice *
-                                                              positionQuantity)) *
+                                                              effectivePositionQuantity)) *
                                                       100
                                                   ).toFixed(3);
 
@@ -425,11 +472,11 @@ export default function TakeProfitsModal(props: PropIF) {
                         :{' '}
                         {expectedProfit == null ||
                         !markPrice ||
-                        !positionQuantity
+                        !effectivePositionQuantity
                             ? 'Calculating...'
                             : tpGainCurrency === '%'
                               ? `$${Math.abs(expectedProfit).toFixed(2)}`
-                              : `${pctFromDollars(Math.abs(expectedProfit), markPrice, positionQuantity).toFixed(3)}%`}
+                              : `${pctFromDollars(Math.abs(expectedProfit), markPrice, effectivePositionQuantity).toFixed(3)}%`}
                     </span>
                 )}
 
@@ -472,7 +519,7 @@ export default function TakeProfitsModal(props: PropIF) {
                                 if (
                                     stopLossLoss &&
                                     markPrice &&
-                                    positionQuantity
+                                    effectivePositionQuantity
                                 ) {
                                     const currentLoss =
                                         parseFloat(stopLossLoss);
@@ -483,7 +530,7 @@ export default function TakeProfitsModal(props: PropIF) {
                                                 ? currentLoss
                                                 : (currentLoss *
                                                       (markPrice *
-                                                          positionQuantity)) /
+                                                          effectivePositionQuantity)) /
                                                   100;
 
                                         // Convert USD to new currency
@@ -493,7 +540,7 @@ export default function TakeProfitsModal(props: PropIF) {
                                                 : (
                                                       (currentLossUSD /
                                                           (markPrice *
-                                                              positionQuantity)) *
+                                                              effectivePositionQuantity)) *
                                                       100
                                                   ).toFixed(3);
 
@@ -512,11 +559,13 @@ export default function TakeProfitsModal(props: PropIF) {
                 {stopLossLoss && (
                     <span className={styles.expectedProfitText}>
                         {`${expectedLoss && expectedLoss < 0 ? 'Expected Profit' : 'Expected Loss'}: `}
-                        {expectedLoss == null || !markPrice || !positionQuantity
+                        {expectedLoss == null ||
+                        !markPrice ||
+                        !effectivePositionQuantity
                             ? 'Calculating...'
                             : slLossCurrency === '%'
                               ? `$${Math.abs(expectedLoss).toFixed(2)}`
-                              : `${((Math.abs(expectedLoss) / (markPrice * positionQuantity)) * 100).toFixed(3)}%`}
+                              : `${((Math.abs(expectedLoss) / (markPrice * effectivePositionQuantity)) * 100).toFixed(3)}%`}
                     </span>
                 )}
             </section>
