@@ -209,10 +209,10 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         const gainUSD = priceDiff * notionalSymbolQtyNum;
         const gainValue =
             tpGainCurrency === '$'
-                ? Math.abs(gainUSD).toFixed(2)
-                : Math.abs(
-                      (gainUSD / (markPx * notionalSymbolQtyNum)) * 100,
-                  ).toFixed(3);
+                ? gainUSD.toFixed(2)
+                : ((gainUSD / (markPx * notionalSymbolQtyNum)) * 100).toFixed(
+                      3,
+                  );
 
         // Only update if user hasn't manually entered a gain value
         if (!hasTakeProfitGainBeenTouched) {
@@ -240,10 +240,10 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         const lossUSD = priceDiff * notionalSymbolQtyNum;
         const lossValue =
             slLossCurrency === '$'
-                ? Math.abs(lossUSD).toFixed(2)
-                : Math.abs(
-                      (lossUSD / (markPx * notionalSymbolQtyNum)) * 100,
-                  ).toFixed(3);
+                ? lossUSD.toFixed(2)
+                : ((lossUSD / (markPx * notionalSymbolQtyNum)) * 100).toFixed(
+                      3,
+                  );
 
         // Only update if user hasn't manually entered a loss value
         if (!hasStopLossLossBeenTouched) {
