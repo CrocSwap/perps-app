@@ -217,7 +217,12 @@ export class WebSocketPool {
      * Reconnect all sockets
      */
     public reconnectAll() {
-        this.sockets.forEach((socket) => socket.reconnect());
+        this.sockets.forEach((socket) => {
+            if (socket.isAutoConnect()) {
+                console.log('>>> reconnecting socket', socket.getSocketName());
+                socket.reconnect();
+            }
+        });
     }
 
     /**
@@ -385,6 +390,7 @@ export class MultiSocketInfo {
     }
 
     public reconnect() {
+        console.log('>>> reconnect');
         this.pool.reconnectAll();
     }
 

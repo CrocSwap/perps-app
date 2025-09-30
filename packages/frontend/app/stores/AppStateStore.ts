@@ -9,10 +9,12 @@ type AppStateStore = {
     setTitleOverride: (titleOverride: string) => void;
     isWsStashed: boolean;
     setIsWsStashed: (isWsStashed: boolean) => void;
-    isTabActive: boolean;
-    setIsTabActive: (isTabActive: boolean) => void;
+    isTabActiveDelayed: boolean;
+    setIsTabActiveDelayed: (isTabActiveDelayed: boolean) => void;
     debugToolbarOpen: boolean;
     setDebugToolbarOpen: (debugToolbarOpen: boolean) => void;
+    isTabActive: boolean;
+    setIsTabActive: (isTabActive: boolean) => void;
 };
 
 export const useAppStateStore = create<AppStateStore>((set) => ({
@@ -25,9 +27,12 @@ export const useAppStateStore = create<AppStateStore>((set) => ({
     setTitleOverride: (titleOverride: string) => set({ titleOverride }),
     isWsStashed: false,
     setIsWsStashed: (isWsStashed: boolean) => set({ isWsStashed }),
-    isTabActive: true,
-    setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
+    isTabActiveDelayed: true,
+    setIsTabActiveDelayed: (isTabActiveDelayed: boolean) =>
+        set({ isTabActiveDelayed }),
     debugToolbarOpen: false,
     setDebugToolbarOpen: (debugToolbarOpen: boolean) =>
         set({ debugToolbarOpen }),
+    isTabActive: true,
+    setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
 }));
