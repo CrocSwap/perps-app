@@ -24,7 +24,7 @@
 
 .comboBoxValue {
     white-space: nowrap;
-    min-width: 2rem;
+    /* min-width: 2rem; */
     text-align: center;
     color: var(--text1);
 }
