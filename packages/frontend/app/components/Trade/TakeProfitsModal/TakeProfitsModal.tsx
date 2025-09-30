@@ -160,8 +160,10 @@ export default function TakeProfitsModal(props: PropIF) {
         const gainUSD = priceDiff * positionQuantity;
         const gainValue =
             tpGainCurrency === '$'
-                ? Math.abs(gainUSD)
-                : Math.abs((gainUSD / (markPrice * positionQuantity)) * 100);
+                ? Math.abs(gainUSD).toFixed(2)
+                : Math.abs(
+                      (gainUSD / (markPrice * positionQuantity)) * 100,
+                  ).toFixed(3);
 
         // Only update if user hasn't manually entered a gain value
         if (!hasTakeProfitGainBeenTouched) {
@@ -180,8 +182,10 @@ export default function TakeProfitsModal(props: PropIF) {
         const lossUSD = priceDiff * positionQuantity;
         const lossValue =
             slLossCurrency === '$'
-                ? Math.abs(lossUSD)
-                : Math.abs((lossUSD / (markPrice * positionQuantity)) * 100);
+                ? Math.abs(lossUSD).toFixed(2)
+                : Math.abs(
+                      (lossUSD / (markPrice * positionQuantity)) * 100,
+                  ).toFixed(3);
 
         // Only update if user hasn't manually entered a loss value
         if (!hasStopLossLossBeenTouched) {
@@ -355,11 +359,13 @@ export default function TakeProfitsModal(props: PropIF) {
                                         // Convert USD to new currency
                                         const newGainValue =
                                             currency === '$'
-                                                ? currentGainUSD
-                                                : (currentGainUSD /
-                                                      (markPrice *
-                                                          positionQuantity)) *
-                                                  100;
+                                                ? currentGainUSD.toFixed(2)
+                                                : (
+                                                      (currentGainUSD /
+                                                          (markPrice *
+                                                              positionQuantity)) *
+                                                      100
+                                                  ).toFixed(3);
 
                                         setTakeProfitGain(
                                             newGainValue.toString(),
@@ -445,11 +451,13 @@ export default function TakeProfitsModal(props: PropIF) {
                                         // Convert USD to new currency
                                         const newLossValue =
                                             currency === '$'
-                                                ? currentLossUSD
-                                                : (currentLossUSD /
-                                                      (markPrice *
-                                                          positionQuantity)) *
-                                                  100;
+                                                ? currentLossUSD.toFixed(2)
+                                                : (
+                                                      (currentLossUSD /
+                                                          (markPrice *
+                                                              positionQuantity)) *
+                                                      100
+                                                  ).toFixed(3);
 
                                         setStopLossLoss(
                                             newLossValue.toString(),

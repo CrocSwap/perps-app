@@ -209,8 +209,10 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         const gainUSD = priceDiff * notionalSymbolQtyNum;
         const gainValue =
             tpGainCurrency === '$'
-                ? Math.abs(gainUSD)
-                : Math.abs((gainUSD / (markPx * notionalSymbolQtyNum)) * 100);
+                ? Math.abs(gainUSD).toFixed(2)
+                : Math.abs(
+                      (gainUSD / (markPx * notionalSymbolQtyNum)) * 100,
+                  ).toFixed(3);
 
         // Only update if user hasn't manually entered a gain value
         if (!hasTakeProfitGainBeenTouched) {
@@ -238,8 +240,10 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         const lossUSD = priceDiff * notionalSymbolQtyNum;
         const lossValue =
             slLossCurrency === '$'
-                ? Math.abs(lossUSD)
-                : Math.abs((lossUSD / (markPx * notionalSymbolQtyNum)) * 100);
+                ? Math.abs(lossUSD).toFixed(2)
+                : Math.abs(
+                      (lossUSD / (markPx * notionalSymbolQtyNum)) * 100,
+                  ).toFixed(3);
 
         // Only update if user hasn't manually entered a loss value
         if (!hasStopLossLossBeenTouched) {
@@ -325,11 +329,13 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                                     // Convert USD to new currency
                                     const newGainValue =
                                         currency === '$'
-                                            ? currentGainUSD
-                                            : (currentGainUSD /
-                                                  (markPx *
-                                                      notionalSymbolQtyNum)) *
-                                              100;
+                                            ? currentGainUSD.toFixed(2)
+                                            : (
+                                                  (currentGainUSD /
+                                                      (markPx *
+                                                          notionalSymbolQtyNum)) *
+                                                  100
+                                              ).toFixed(3);
 
                                     setTakeProfitGain?.(
                                         newGainValue.toString(),
@@ -412,11 +418,13 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                                     // Convert USD to new currency
                                     const newLossValue =
                                         currency === '$'
-                                            ? currentLossUSD
-                                            : (currentLossUSD /
-                                                  (markPx *
-                                                      notionalSymbolQtyNum)) *
-                                              100;
+                                            ? currentLossUSD.toFixed(2)
+                                            : (
+                                                  (currentLossUSD /
+                                                      (markPx *
+                                                          notionalSymbolQtyNum)) *
+                                                  100
+                                              ).toFixed(3);
 
                                     setStopLossLoss?.(newLossValue.toString());
                                 }
