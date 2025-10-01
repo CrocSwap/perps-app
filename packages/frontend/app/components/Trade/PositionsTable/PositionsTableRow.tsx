@@ -455,11 +455,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 </div>
                 {showTpSl && (
                     <div className={`${styles.cell} ${styles.tpslCell}`}>
-                        {getTpSl()}
                         <button
                             onClick={openTpSlModal}
                             aria-label={t('aria.editTPSL')}
                         >
+                            {getTpSl()}
                             <LuPen
                                 color='var(--text1)'
                                 size={10}
