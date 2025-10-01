@@ -464,21 +464,25 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
-                {takeProfitGain && (
-                    <span className={styles.expectedProfitText}>
-                        {expectedProfit && expectedProfit < 0
-                            ? 'Expected Loss'
-                            : 'Expected Profit'}
-                        :{' '}
-                        {expectedProfit == null ||
-                        !markPrice ||
-                        !effectivePositionQuantity
-                            ? '...'
-                            : tpGainCurrency === '%'
-                              ? `$${Math.abs(expectedProfit).toFixed(2)}`
-                              : `${pctFromDollars(Math.abs(expectedProfit), markPrice, effectivePositionQuantity).toFixed(3)}%`}
-                    </span>
-                )}
+                <span className={styles.expectedProfitText}>
+                    {takeProfitGain ? (
+                        <>
+                            {expectedProfit && expectedProfit < 0
+                                ? 'Expected Loss'
+                                : 'Expected Profit'}
+                            :{' '}
+                            {expectedProfit == null ||
+                            !markPrice ||
+                            !effectivePositionQuantity
+                                ? '...'
+                                : tpGainCurrency === '%'
+                                  ? `$${Math.abs(expectedProfit).toFixed(2)}`
+                                  : `${pctFromDollars(Math.abs(expectedProfit), markPrice, effectivePositionQuantity).toFixed(3)}%`}
+                        </>
+                    ) : (
+                        ''
+                    )}
+                </span>
 
                 {/* Stop Loss Row */}
                 <div className={styles.formRow}>
@@ -556,18 +560,22 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
-                {stopLossLoss && (
-                    <span className={styles.expectedProfitText}>
-                        {`${expectedLoss && expectedLoss < 0 ? 'Expected Profit' : 'Expected Loss'}: `}
-                        {expectedLoss == null ||
-                        !markPrice ||
-                        !effectivePositionQuantity
-                            ? '...'
-                            : slLossCurrency === '%'
-                              ? `$${Math.abs(expectedLoss).toFixed(2)}`
-                              : `${((Math.abs(expectedLoss) / (markPrice * effectivePositionQuantity)) * 100).toFixed(3)}%`}
-                    </span>
-                )}
+                <span className={styles.expectedProfitText}>
+                    {stopLossLoss ? (
+                        <>
+                            {`${expectedLoss && expectedLoss < 0 ? 'Expected Profit' : 'Expected Loss'}: `}
+                            {expectedLoss == null ||
+                            !markPrice ||
+                            !effectivePositionQuantity
+                                ? '...'
+                                : slLossCurrency === '%'
+                                  ? `$${Math.abs(expectedLoss).toFixed(2)}`
+                                  : `${((Math.abs(expectedLoss) / (markPrice * effectivePositionQuantity)) * 100).toFixed(3)}%`}
+                        </>
+                    ) : (
+                        ''
+                    )}
+                </span>
             </section>
 
             {/* Toggles */}
