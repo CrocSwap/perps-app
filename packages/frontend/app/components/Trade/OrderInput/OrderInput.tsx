@@ -2351,7 +2351,7 @@ function OrderInput({
                                 >
                                     <div className={styles.name_and_icon}>
                                         {mo.icon}
-                                        <h4>{mo.label}</h4>
+                                        <h4>{mo.label} </h4>
                                     </div>
                                     <div>
                                         <p>{mo.blurb}</p>
