@@ -472,7 +472,7 @@
         "invalidSize": "有効な注文サイズを入力してください",
         "limitHeading": "指値クローズ",
         "limitDescription": "指値価格でポジションを閉じる注文を発注します。",
-        "estimatedClosedPnl": "推定確定PnL（手数料なし）：{{estimatedPNL}}",
+        "estimatedClosedPnl": "推定確定PnL：{{estimatedPNL}}",
         "positionClosed": "ポジションが閉鎖されました",
         "percentOfPositionClosed": "ポジションの{{sizePercentageValue}}％を閉鎖"
     },

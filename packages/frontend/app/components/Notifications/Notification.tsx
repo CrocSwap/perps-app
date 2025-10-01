@@ -213,8 +213,10 @@ export default function Notification(props: propsIF) {
                         if (typeof plausible === 'function') {
                             plausible('External Link Clicked', {
                                 props: {
+                                    location: 'notification',
                                     linkType:
                                         'block explorer link from notification',
+                                    url: data.txLink,
                                 },
                             });
                         }

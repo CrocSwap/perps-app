@@ -472,7 +472,7 @@
         "invalidSize": "Introduce un tamaño válido",
         "limitHeading": "Cierre límite",
         "limitDescription": "Esto enviará una orden para cerrar tu posición al precio límite.",
-        "estimatedClosedPnl": "PnL cerrado estimado (sin comisiones): {{estimatedPNL}}",
+        "estimatedClosedPnl": "PnL cerrado estimado: {{estimatedPNL}}",
         "positionClosed": "Posición cerrada",
         "percentOfPositionClosed": "{{sizePercentageValue}}% de la posición cerrada"
     },

@@ -472,7 +472,7 @@
         "invalidSize": "Gültige Ordergröße eingeben",
         "limitHeading": "Limit-Schließung",
         "limitDescription": "Dies sendet einen Auftrag, um Ihre Position zum Limitpreis zu schließen.",
-        "estimatedClosedPnl": "Geschätzter geschlossener PnL (ohne Gebühren): {{estimatedPNL}}",
+        "estimatedClosedPnl": "Geschätzter geschlossener PnL: {{estimatedPNL}}",
         "positionClosed": "Position geschlossen",
         "percentOfPositionClosed": "{{sizePercentageValue}}% der Position geschlossen"
     },

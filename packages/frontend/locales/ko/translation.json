@@ -472,7 +472,7 @@
         "invalidSize": "유효한 주문 수량을 입력하세요",
         "limitHeading": "지정가 종료",
         "limitDescription": "지정가로 포지션을 종료하는 주문을 제출합니다.",
-        "estimatedClosedPnl": "예상 실현 PnL (수수료 제외): {{estimatedPNL}}",
+        "estimatedClosedPnl": "예상 실현 PnL: {{estimatedPNL}}",
         "positionClosed": "포지션이 종료되었습니다",
         "percentOfPositionClosed": "포지션의 {{sizePercentageValue}}% 종료되었습니다"
     },

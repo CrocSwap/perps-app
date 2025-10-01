@@ -472,7 +472,7 @@
         "invalidSize": "Geçerli emir boyutu girin",
         "limitHeading": "Limitli Kapatma",
         "limitDescription": "Belirlediğiniz limitte pozisyonunuzu kapatacak emir gönderir.",
-        "estimatedClosedPnl": "Tahmini kapalı PnL (komisyonsuz): {{estimatedPNL}}",
+        "estimatedClosedPnl": "Tahmini kapalı PnL: {{estimatedPNL}}",
         "positionClosed": "Pozisyon kapatıldı",
         "percentOfPositionClosed": "Pozisyonun %{{sizePercentageValue}} kapatıldı"
     },

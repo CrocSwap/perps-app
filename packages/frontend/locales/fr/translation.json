@@ -472,7 +472,7 @@
         "invalidSize": "Entrez une taille d'ordre valide",
         "limitHeading": "Clôture limite",
         "limitDescription": "Cela enverra un ordre pour fermer votre position au prix limite.",
-        "estimatedClosedPnl": "PnL clôturé estimé (hors frais): {{estimatedPNL}}",
+        "estimatedClosedPnl": "PnL clôturé estimé: {{estimatedPNL}}",
         "positionClosed": "Position fermée",
         "percentOfPositionClosed": "{{sizePercentageValue}}% de la position fermée"
     },

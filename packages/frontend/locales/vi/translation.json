@@ -471,7 +471,7 @@
         "invalidSize": "Vui lòng nhập khối lượng lệnh hợp lệ",
         "limitHeading": "Đóng vị thế theo giá giới hạn",
         "limitDescription": "Thao tác này sẽ gửi lệnh đóng vị thế ở giá giới hạn đã đặt.",
-        "estimatedClosedPnl": "Ước tính lãi/lỗ (không phí): {{estimatedPNL}}",
+        "estimatedClosedPnl": "Ước tính lãi/lỗ: {{estimatedPNL}}",
         "positionClosed": "Vị thế đã đóng",
         "percentOfPositionClosed": "{{sizePercentageValue}}% vị thế đã đóng"
     },

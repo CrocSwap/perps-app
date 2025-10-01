@@ -168,7 +168,7 @@ export default function ShareModal(props: propsIF) {
                                 const top =
                                     window.screenY +
                                     (window.outerHeight - height) / 2;
-                                if (inputRef.current)
+                                if (inputRef.current) {
                                     window.open(
                                         'https://x.com/intent/tweet?text=' +
                                             encodeURIComponent(
@@ -179,6 +179,16 @@ export default function ShareModal(props: propsIF) {
                                         'tweetWindow',
                                         `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`,
                                     );
+                                    if (typeof plausible === 'function') {
+                                        plausible('External Link Clicked', {
+                                            props: {
+                                                location: 'share-modal',
+                                                linkType: 'Share on Twitter',
+                                                url: 'https://x.com/intent/tweet',
+                                            },
+                                        });
+                                    }
+                                }
                             }}
                         >
                             {t('share.xCTA')} <RiTwitterFill />
