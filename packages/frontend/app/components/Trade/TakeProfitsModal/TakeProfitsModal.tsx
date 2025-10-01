@@ -677,10 +677,15 @@ export default function TakeProfitsModal(props: PropIF) {
             {/* Footer */}
             <section className={styles.textInfo}>
                 <p>
-                    By default take-profit and stop-loss orders apply to the
-                    entire position. These orders automatically cancel after
-                    closing the position. A market order is triggered when the
-                    stop loss or take profit price is reached.
+                    By default, take-profit and stop-loss orders apply to the
+                    entire position. These orders are automatically canceled
+                    when the position is closed. When the stop-loss or
+                    take-profit price is reached, a market order is triggered.
+                </p>
+                <p>
+                    If an order size is set above, the take-profit or stop-loss
+                    order will remain fixed for that amount, regardless of any
+                    changes to the position in the future.
                 </p>
             </section>
         </div>
