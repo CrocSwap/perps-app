@@ -13,12 +13,9 @@ export default defineConfig({
         outDir: 'build',
         emptyOutDir: true,
         ssr: true,
-        rollupOptions: {
-            external: ['@noble/hashes/sha2'],
-        },
     },
     ssr: {
-        noExternal: ['@fogo/sessions-sdk-react', '@noble/hashes'],
+        noExternal: ['@fogo/sessions-sdk-react'],
         target: 'node',
     },
     resolve: {
