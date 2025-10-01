@@ -480,7 +480,7 @@
         "title": "새 버전 사용 가능",
         "message": {
             "withVersionNumber": "{{version}} 버전이 새로운 기능과 개선 사항으로 업데이트되었습니다.",
-            "noVersionNumber": "새 버전이 새로운 기능과 개선 사항으로 업데이트되었습니다."
+            "noVersionNumber": "최신 기능과 개선 사항을 받으려면 페이지를 새로 고침하세요."
         },
         "updateButton": "지금 업데이트",
         "version": "버전"

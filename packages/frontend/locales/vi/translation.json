@@ -479,7 +479,7 @@
         "title": "Có phiên bản mới",
         "message": {
             "withVersionNumber": "Phiên bản {{version}} đã sẵn sàng cài đặt với các tính năng và cải tiến mới.",
-            "noVersionNumber": "Có phiên bản mới đã sẵn sàng cài đặt với các tính năng và cải tiến."
+            "noVersionNumber": "Vui lòng tải lại trang để nhận các tính năng và cải tiến mới nhất."
         },
         "updateButton": "Cập nhật ngay",
         "version": "Phiên bản"

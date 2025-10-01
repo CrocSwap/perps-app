@@ -480,7 +480,7 @@
         "title": "新バージョン利用可能",
         "message": {
             "withVersionNumber": "バージョン{{version}}が新機能および改善点で利用可能です。",
-            "noVersionNumber": "新バージョンが新機能および改善点で利用可能です。"
+            "noVersionNumber": "最新の機能と改善を利用するためにページを再読み込みしてください。"
         },
         "updateButton": "今すぐアップデート",
         "version": "バージョン"

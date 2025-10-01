@@ -480,7 +480,7 @@
         "title": "Neue Version verfügbar",
         "message": {
             "withVersionNumber": "Version {{version}} ist bereit zur Installation mit neuen Funktionen und Verbesserungen.",
-            "noVersionNumber": "Eine neue Version ist mit neuen Funktionen und Verbesserungen zur Installation bereit."
+            "noVersionNumber": "Bitte laden Sie die Seite neu, um die neuesten Funktionen und Verbesserungen zu erhalten."
         },
         "updateButton": "Jetzt aktualisieren",
         "version": "Version"

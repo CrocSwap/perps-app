@@ -480,7 +480,7 @@
         "title": "Yeni Sürüm Mevcut",
         "message": {
             "withVersionNumber": "{{version}} sürümü yeni özellikler ve iyileştirmeleriyle kurulmaya hazır.",
-            "noVersionNumber": "Yeni özellikler ve iyileştirmelerle yeni sürüm kurulmaya hazır."
+            "noVersionNumber": "Lütfen en yeni özellikler ve iyileştirmeler için sayfayı yeniden yükleyin."
         },
         "updateButton": "Şimdi güncelle",
         "version": "Sürüm"
