@@ -397,9 +397,15 @@ export default function TakeProfitsModal(props: PropIF) {
                             type='number'
                             value={takeProfitPrice}
                             onChange={(e) => {
-                                setTakeProfitPrice(e.target.value);
+                                const value = e.target.value;
+                                setTakeProfitPrice(value);
                                 setHasTakeProfitGainBeenTouched(false); // Reset touch state so gain can update from price
-                                updateGainFromPrice(e.target.value);
+                                updateGainFromPrice(value);
+
+                                // Clear gain if price is cleared
+                                if (value === '') {
+                                    setTakeProfitGain('');
+                                }
                             }}
                         />
                     </div>
@@ -410,9 +416,15 @@ export default function TakeProfitsModal(props: PropIF) {
                             type='number'
                             value={takeProfitGain}
                             onChange={(e) => {
-                                setTakeProfitGain(e.target.value);
+                                const value = e.target.value;
+                                setTakeProfitGain(value);
                                 setHasTakeProfitGainBeenTouched(true);
-                                updatePriceFromGain(e.target.value);
+                                updatePriceFromGain(value);
+
+                                // Clear price if gain is cleared
+                                if (value === '') {
+                                    setTakeProfitPrice('');
+                                }
                             }}
                         />
                         <ComboBox
@@ -493,9 +505,15 @@ export default function TakeProfitsModal(props: PropIF) {
                             type='number'
                             value={stopLossPrice}
                             onChange={(e) => {
-                                setStopLossPrice(e.target.value);
+                                const value = e.target.value;
+                                setStopLossPrice(value);
                                 setHasStopLossLossBeenTouched(false); // Reset touch state so loss can update from price
-                                updateLossFromPrice(e.target.value);
+                                updateLossFromPrice(value);
+
+                                // Clear loss if price is cleared
+                                if (value === '') {
+                                    setStopLossLoss('');
+                                }
                             }}
                         />
                     </div>
@@ -506,9 +524,15 @@ export default function TakeProfitsModal(props: PropIF) {
                             type='number'
                             value={stopLossLoss}
                             onChange={(e) => {
-                                setStopLossLoss(e.target.value);
+                                const value = e.target.value;
+                                setStopLossLoss(value);
                                 setHasStopLossLossBeenTouched(true);
-                                updatePriceFromLoss(e.target.value);
+                                updatePriceFromLoss(value);
+
+                                // Clear price if loss is cleared
+                                if (value === '') {
+                                    setStopLossPrice('');
+                                }
                             }}
                         />
                         <ComboBox
