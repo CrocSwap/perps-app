@@ -25,7 +25,6 @@
         "@fogo/sessions-sdk-react": "^0.0.22",
         "@fuul/sdk": "^7.0.5",
         "@netlify/functions": "4.2.5",
-        "@noble/hashes": "^1.4.0",
         "@perps-app/sdk": "workspace:*",
         "@pythnetwork/hermes-client": "^2.0.0",
         "@react-router/node": "^7.9.1",

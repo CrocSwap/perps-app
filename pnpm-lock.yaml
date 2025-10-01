@@ -38,9 +38,6 @@ importers:
       '@netlify/functions':
         specifier: 4.2.5
         version: 4.2.5(rollup@2.79.2)
-      '@noble/hashes':
-        specifier: ^1.4.0
-        version: 1.8.0
       '@perps-app/sdk':
         specifier: workspace:*
         version: link:../sdk
