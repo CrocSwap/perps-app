@@ -473,7 +473,7 @@ export default function TakeProfitsModal(props: PropIF) {
                         {expectedProfit == null ||
                         !markPrice ||
                         !effectivePositionQuantity
-                            ? 'Calculating...'
+                            ? '...'
                             : tpGainCurrency === '%'
                               ? `$${Math.abs(expectedProfit).toFixed(2)}`
                               : `${pctFromDollars(Math.abs(expectedProfit), markPrice, effectivePositionQuantity).toFixed(3)}%`}
@@ -562,7 +562,7 @@ export default function TakeProfitsModal(props: PropIF) {
                         {expectedLoss == null ||
                         !markPrice ||
                         !effectivePositionQuantity
-                            ? 'Calculating...'
+                            ? '...'
                             : slLossCurrency === '%'
                               ? `$${Math.abs(expectedLoss).toFixed(2)}`
                               : `${((Math.abs(expectedLoss) / (markPrice * effectivePositionQuantity)) * 100).toFixed(3)}%`}

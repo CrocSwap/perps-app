@@ -377,7 +377,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         : 'Expected Profit'}
                     :{' '}
                     {expectedProfit == null || !markPx || !notionalSymbolQtyNum
-                        ? 'Calculating...'
+                        ? '...'
                         : tpGainCurrency === '%'
                           ? `$${Math.abs(expectedProfit).toFixed(2)}`
                           : `${pctFromDollars(Math.abs(expectedProfit), markPx, notionalSymbolQtyNum).toFixed(3)}%`}
