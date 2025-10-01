@@ -18,7 +18,7 @@ export default defineConfig({
         },
     },
     ssr: {
-        noExternal: ['@fogo/sessions-sdk-react'],
+        noExternal: ['@fogo/sessions-sdk-react', '@noble/hashes'],
         target: 'node',
     },
     resolve: {
