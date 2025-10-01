@@ -16,7 +16,7 @@ import React, {
     useState,
 } from 'react';
 import { GoZap } from 'react-icons/go';
-import { LuCircleHelp } from 'react-icons/lu';
+import { LuCircleHelp, LuOctagonX } from 'react-icons/lu';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
@@ -117,18 +117,18 @@ function OrderInput({
                   icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
               },
               // disabled code 21 Jul 25
-              //   {
-              //       value: 'stop_market',
-              //       label: 'Stop Market',
-              //       blurb: 'Triggers a market order at a set price',
-              //       icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-              //   },
-              //   {
-              //       value: 'stop_limit',
-              //       label: 'Stop Limit',
-              //       blurb: 'Triggers a limit order at a set price',
-              //       icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-              //   },
+              {
+                  value: 'stop_market',
+                  label: 'Stop Market',
+                  blurb: 'Triggers a market order at a set price',
+                  icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+              },
+              {
+                  value: 'stop_limit',
+                  label: 'Stop Limit',
+                  blurb: 'Triggers a limit order at a set price',
+                  icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+              },
               //   {
               //       value: 'twap',
               //       label: 'TWAP',
