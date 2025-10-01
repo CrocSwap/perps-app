@@ -9,6 +9,7 @@ import {
     dollarsFromPct,
 } from '~/utils/functions/profitLossConversions';
 import { t } from 'i18next';
+import getAbbreviatedPrice from '~/utils/functions/getAbbreviatedPrice';
 
 type Currency = '$' | '%';
 
@@ -117,7 +118,7 @@ export default function TakeProfitsModal(props: PropIF) {
             newPrice = markPrice * multiplier;
         }
 
-        setTakeProfitPrice(newPrice.toFixed(2));
+        setTakeProfitPrice(getAbbreviatedPrice(newPrice));
     };
 
     const updatePriceFromLoss = (lossValue: string) => {
@@ -135,7 +136,7 @@ export default function TakeProfitsModal(props: PropIF) {
             newPrice = markPrice * multiplier;
         }
 
-        setStopLossPrice(newPrice.toFixed(2));
+        setStopLossPrice(getAbbreviatedPrice(newPrice));
     };
 
     const calculateExpectedProfit = (): number | null => {

@@ -7,6 +7,7 @@ import styles from './ReduceAndProfitToggle.module.css';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import { pctFromDollars } from '~/utils/functions/profitLossConversions';
 import { t } from 'i18next';
+import getAbbreviatedPrice from '~/utils/functions/getAbbreviatedPrice';
 
 interface PropsIF {
     isReduceOnlyEnabled: boolean;
@@ -124,7 +125,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             newPrice = markPx * multiplier;
         }
 
-        setTakeProfitPrice?.(newPrice.toFixed(2));
+        setTakeProfitPrice?.(getAbbreviatedPrice(newPrice));
     };
 
     const updatePriceFromLoss = (lossValue: string) => {
@@ -146,7 +147,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             newPrice = markPx * multiplier;
         }
 
-        setStopLossPrice?.(newPrice.toFixed(2));
+        setStopLossPrice?.(getAbbreviatedPrice(newPrice));
     };
 
     const calculateExpectedProfit = (): number | null => {
