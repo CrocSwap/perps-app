@@ -370,19 +370,25 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     />
                 </div>
             </div>
-            {takeProfitGain && (
-                <span className={styles.expectedProfitText}>
-                    {expectedProfit && expectedProfit < 0
-                        ? 'Expected Loss'
-                        : 'Expected Profit'}
-                    :{' '}
-                    {expectedProfit == null || !markPx || !notionalSymbolQtyNum
-                        ? '...'
-                        : tpGainCurrency === '%'
-                          ? `$${Math.abs(expectedProfit).toFixed(2)}`
-                          : `${pctFromDollars(Math.abs(expectedProfit), markPx, notionalSymbolQtyNum).toFixed(3)}%`}
-                </span>
-            )}
+            <span className={styles.expectedProfitText}>
+                {takeProfitGain ? (
+                    <>
+                        {expectedProfit && expectedProfit < 0
+                            ? 'Expected Loss'
+                            : 'Expected Profit'}
+                        :{' '}
+                        {expectedProfit == null ||
+                        !markPx ||
+                        !notionalSymbolQtyNum
+                            ? '...'
+                            : tpGainCurrency === '%'
+                              ? `$${Math.abs(expectedProfit).toFixed(2)}`
+                              : `${pctFromDollars(Math.abs(expectedProfit), markPx, notionalSymbolQtyNum).toFixed(3)}%`}
+                    </>
+                ) : (
+                    ''
+                )}
+            </span>
 
             {/* Stop Loss Row */}
             <div className={styles.formRow}>
@@ -457,16 +463,20 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     />
                 </div>
             </div>
-            {stopLossLoss && (
-                <span className={styles.expectedProfitText}>
-                    {`${expectedLoss && expectedLoss < 0 ? 'Expected Profit' : 'Expected Loss'}: `}
-                    {expectedLoss == null
-                        ? 'Calculating...'
-                        : slLossCurrency === '%'
-                          ? `$${Math.abs(expectedLoss).toFixed(2)}`
-                          : `${((Math.abs(expectedLoss) / (markPx * notionalSymbolQtyNum)) * 100).toFixed(3)}%`}
-                </span>
-            )}
+            <span className={styles.expectedProfitText}>
+                {stopLossLoss ? (
+                    <>
+                        {`${expectedLoss && expectedLoss < 0 ? 'Expected Profit' : 'Expected Loss'}: `}
+                        {expectedLoss == null
+                            ? 'Calculating...'
+                            : slLossCurrency === '%'
+                              ? `$${Math.abs(expectedLoss).toFixed(2)}`
+                              : `${((Math.abs(expectedLoss) / (markPx * notionalSymbolQtyNum)) * 100).toFixed(3)}%`}
+                    </>
+                ) : (
+                    ''
+                )}
+            </span>
         </section>
     );
 

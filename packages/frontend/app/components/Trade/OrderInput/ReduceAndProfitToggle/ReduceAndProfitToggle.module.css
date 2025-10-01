@@ -183,4 +183,6 @@
     justify-content: flex-end;
     color: var(--text2);
     font-size: var(--font-size-s);
+    min-height: 16px;
+    align-items: center;
 }
