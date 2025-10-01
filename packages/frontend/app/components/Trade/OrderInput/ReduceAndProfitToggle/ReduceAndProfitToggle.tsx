@@ -493,7 +493,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     <>
                         {`${expectedLoss && expectedLoss < 0 ? 'Expected Profit' : 'Expected Loss'}: `}
                         {expectedLoss == null
-                            ? 'Calculating...'
+                            ? '...'
                             : slLossCurrency === '%'
                               ? `$${Math.abs(expectedLoss).toFixed(2)}`
                               : `${((Math.abs(expectedLoss) / (markPx * notionalSymbolQtyNum)) * 100).toFixed(3)}%`}
