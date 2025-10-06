@@ -245,7 +245,11 @@
         "partiallyFilled": "Kısmen gerçekleşti",
         "canceled": "İptal edildi",
         "pending": "Beklemede",
-        "tpslToggleLabel": "TP/SL (Kâr Al / Zarar Durdur)"
+        "tpslToggleLabel": "TP/SL (Kâr Al / Zarar Durdur)",
+        "limitTxFailedFallbackMessage": "Limit emir işlemi başarısız oldu",
+        "marketTxFailedFallbackMessage": "Piyasa emir işlemi başarısız oldu",
+        "depositTxFailedFallbackMessage": "Yatırım işlemi başarısız oldu",
+        "withdrawTxFailedFallbackMessage": "Çekim işlemi başarısız oldu"
     },
     "subaccounts": {
         "createSubAccount": "Alt Hesap Oluştur",

@@ -245,7 +245,11 @@
         "partiallyFilled": "Partiellement exécutée",
         "canceled": "Annulée",
         "pending": "En attente",
-        "tpslToggleLabel": "Take Profit / Stop Loss"
+        "tpslToggleLabel": "Take Profit / Stop Loss",
+        "limitTxFailedFallbackMessage": "La transaction d'ordre limité a échoué",
+        "marketTxFailedFallbackMessage": "La transaction d'ordre au marché a échoué",
+        "depositTxFailedFallbackMessage": "La transaction de dépôt a échoué",
+        "withdrawTxFailedFallbackMessage": "La transaction de retrait a échoué"
     },
     "subaccounts": {
         "createSubAccount": "Créer un sous-compte",

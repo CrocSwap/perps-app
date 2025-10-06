@@ -3,6 +3,7 @@ import {
     getUserTokenBalance,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey, Transaction } from '@solana/web3.js';
+import { t } from 'i18next';
 import { MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 // Removed notificationService - notifications handled by components
 
@@ -263,7 +264,7 @@ export class DepositService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : 'Order transaction failed';
+                        : t('transactions.depositTxFailedFallbackMessage');
                 console.error('❌ Deposit order failed:', errorMessage);
                 return {
                     success: false,

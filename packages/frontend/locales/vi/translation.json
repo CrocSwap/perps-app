@@ -244,7 +244,11 @@
         "open": "Mở",
         "partiallyFilled": "Khớp một phần",
         "canceled": "Đã hủy",
-        "pending": "Đang chờ"
+        "pending": "Đang chờ",
+        "limitTxFailedFallbackMessage": "Giao dịch lệnh giới hạn thất bại",
+        "marketTxFailedFallbackMessage": "Giao dịch lệnh thị trường thất bại",
+        "depositTxFailedFallbackMessage": "Giao dịch nạp tiền thất bại",
+        "withdrawTxFailedFallbackMessage": "Giao dịch rút tiền thất bại"
     },
     "subaccounts": {
         "createSubAccount": "Tạo tài khoản phụ",
