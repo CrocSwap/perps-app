@@ -78,4 +78,5 @@ export type OrderDataSortBy =
     | 'cancel'
     | 'limitPx'
     | 'triggerPx'
+    | 'filledSz'
     | undefined;

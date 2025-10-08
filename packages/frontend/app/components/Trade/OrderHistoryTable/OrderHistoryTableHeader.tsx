@@ -154,20 +154,28 @@ export const OrderHistoryTableHeader = ({
                     key={header.key}
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
                     onClick={() => {
-                        if (header.sortable) {
-                            sortClickHandler(header.key as OrderDataSortBy);
-                        }
+                        if (!header.sortable) return;
+
+                        sortClickHandler(String(header.key) as OrderDataSortBy);
                     }}
+                    title={
+                        typeof header.name === 'string'
+                            ? header.name
+                            : undefined
+                    }
                 >
-                    {header.name}
+                    <span className={styles.headerLabel}>{header.name}</span>
+
                     {header.sortable && (
-                        <SortIcon
-                            sortDirection={
-                                sortDirection && header.key === sortBy
-                                    ? sortDirection
-                                    : undefined
-                            }
-                        />
+                        <span className={styles.sortIconWrapper}>
+                            <SortIcon
+                                sortDirection={
+                                    sortDirection && header.key === sortBy
+                                        ? sortDirection
+                                        : undefined
+                                }
+                            />
+                        </span>
                     )}
                 </div>
             ))}

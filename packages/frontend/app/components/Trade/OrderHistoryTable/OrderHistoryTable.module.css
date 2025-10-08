@@ -48,6 +48,25 @@
     align-items: center;
     gap: var(--gap-xs);
     cursor: default;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.headerLabel {
+    flex: 1 1 0;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+.sortIconWrapper {
+    flex: 0 0 auto;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
 }
 
 .sortable {
