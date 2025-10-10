@@ -405,7 +405,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 console.error(error);
             }
         };
-    }, [chartState, info, i18n.language, initChart]);
+    }, [chartState, info, i18n.language, initChart, window === undefined]);
 
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;
