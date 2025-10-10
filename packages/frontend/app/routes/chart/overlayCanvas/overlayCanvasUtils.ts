@@ -109,7 +109,6 @@ export const getPixelToPrice = (
     const minPrice = priceRange.from;
     const isLogarithmic = priceScale.getMode() === 1;
 
-    // düzelt: TWCL'deki hesaplamada textHeight/2 offset uygulanmıştı, onu geri ekliyoruz
     const adjustedYPixel = chartHeightTemp - yPixel - textHeight / 2;
 
     if (isLogarithmic) {
