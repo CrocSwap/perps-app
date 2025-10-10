@@ -403,7 +403,7 @@ const LabelComponent = ({
                     }),
                     icon: 'check',
                     txLink: result.signature
-                        ? blockExplorer + result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
             } else {

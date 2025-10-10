@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}}注文約定",
-            "message": "{{usdValueOfFillStr}}の{{symbol}} {{side}}注文が{{fillPrice}}で約定完了"
+            "message": "{{usdValueOfFillStr}}の{{symbol}} {{side}}注文が{{fillPrice}}で約定完了",
+            "buySide": "買い",
+            "sellSide": "売り"
         },
         "errorUpdatingOrder": {
             "title": "注文更新エラー"
@@ -244,7 +246,11 @@
         "open": "有効",
         "partiallyFilled": "一部約定",
         "canceled": "取消済み",
-        "pending": "保留中"
+        "pending": "保留中",
+        "limitTxFailedFallbackMessage": "指値注文の取引は失敗しました",
+        "marketTxFailedFallbackMessage": "成行注文の取引は失敗しました",
+        "depositTxFailedFallbackMessage": "入金取引は失敗しました",
+        "withdrawTxFailedFallbackMessage": "出金取引は失敗しました"
     },
     "subaccounts": {
         "createSubAccount": "サブアカウント作成",
@@ -471,7 +477,7 @@
         "invalidSize": "有効な注文サイズを入力してください",
         "limitHeading": "指値クローズ",
         "limitDescription": "指値価格でポジションを閉じる注文を発注します。",
-        "estimatedClosedPnl": "推定確定PnL（手数料なし）：{{estimatedPNL}}",
+        "estimatedClosedPnl": "推定確定PnL：{{estimatedPNL}}",
         "positionClosed": "ポジションが閉鎖されました",
         "percentOfPositionClosed": "ポジションの{{sizePercentageValue}}％を閉鎖"
     },
@@ -479,7 +485,7 @@
         "title": "新バージョン利用可能",
         "message": {
             "withVersionNumber": "バージョン{{version}}が新機能および改善点で利用可能です。",
-            "noVersionNumber": "新バージョンが新機能および改善点で利用可能です。"
+            "noVersionNumber": "最新の機能と改善を利用するためにページを再読み込みしてください。"
         },
         "updateButton": "今すぐアップデート",
         "version": "バージョン"

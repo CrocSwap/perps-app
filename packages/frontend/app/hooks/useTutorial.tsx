@@ -6,6 +6,7 @@ import React, {
     type ReactNode,
 } from 'react';
 import { useNavigate } from 'react-router';
+import { SHOULD_LOG_ANALYTICS } from '~/utils/Constants';
 
 // Types
 interface TutorialContextType {
@@ -70,13 +71,6 @@ export const TutorialProvider: React.FC<{
         console.log('Restarting tutorial (internal handler)');
         setShowTutorial(true);
     };
-
-    // Debug logging
-    useEffect(() => {
-        console.log(
-            `Tutorial state changed - showTutorial: ${showTutorial}, hasCompleted: ${hasCompletedTutorial}`,
-        );
-    }, [showTutorial, hasCompletedTutorial]);
 
     const value: TutorialContextType = {
         showTutorial,

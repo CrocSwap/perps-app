@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}} Order Filled",
-            "message": "Successfully filled {{side}} order for {{usdValueOfFillStr}} of {{symbol}} at {{fillPrice}}"
+            "message": "Successfully filled {{side}} order for {{usdValueOfFillStr}} of {{symbol}} at {{fillPrice}}",
+            "buySide": "Buy",
+            "sellSide": "Sell"
         },
         "errorUpdatingOrder": {
             "title": "Error updating order"
@@ -244,7 +246,11 @@
         "open": "Open",
         "partiallyFilled": "Partially Filled",
         "canceled": "Canceled",
-        "pending": "Pending"
+        "pending": "Pending",
+        "limitTxFailedFallbackMessage": "Limit order transaction failed",
+        "marketTxFailedFallbackMessage": "Market order transaction failed",
+        "depositTxFailedFallbackMessage": "Deposit transaction failed",
+        "withdrawTxFailedFallbackMessage": "Withdraw transaction failed"
     },
     "subaccounts": {
         "createSubAccount": "Create Sub-Account",
@@ -392,7 +398,11 @@
         "title": "Referrals",
         "description": "Refer users to earn rewards. Affiliates earn higher rewards.",
         "tradersReferred": "Traders Referred",
-        "rewardsEarned": "Rewards Earned"
+        "rewardsEarned": "Rewards Earned",
+        "rewardHistory": "Reward History",
+        "enterCode": "Enter Code",
+        "claim": "Claim",
+        "createCode": "Create Code"
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",
@@ -471,7 +481,7 @@
         "invalidSize": "Enter a valid order size",
         "limitHeading": "Limit Close",
         "limitDescription": "This will send an order to close your position at the limit price.",
-        "estimatedClosedPnl": "Estimated closed PnL (without fees): {{estimatedPNL}}",
+        "estimatedClosedPnl": "Estimated closed PnL: {{estimatedPNL}}",
         "positionClosed": "Position Closed",
         "percentOfPositionClosed": "{{sizePercentageValue}}% of Position Closed"
     },
@@ -479,7 +489,7 @@
         "title": "New Version Available",
         "message": {
             "withVersionNumber": "Version {{version}} is ready to install with new features and improvements.",
-            "noVersionNumber": "A new version is ready to install with new features and improvements."
+            "noVersionNumber": "Please reload the page to get the latest features and improvements."
         },
         "updateButton": "Update Now",
         "version": "Version"

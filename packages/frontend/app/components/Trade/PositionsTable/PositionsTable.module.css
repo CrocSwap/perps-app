@@ -258,7 +258,11 @@
 
     .actionButton {
         font-size: var(--font-size-s);
-        margin-right: var(--margin-xs);
+        margin-right: 0;
+    }
+    .closeCell {
+        width: 100%;
+        justify-content: flex-end;
     }
 }
 

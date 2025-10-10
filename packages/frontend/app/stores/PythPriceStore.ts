@@ -111,16 +111,9 @@ export function initializePythPriceService(): void {
     // Subscribe to connection status changes
     service.onConnectionStatusChange((isConnected) => {
         store.setConnectionStatus(isConnected);
-
-        if (isConnected) {
-            console.log('✅ Pyth price service connected');
-        } else {
-            console.log('❌ Pyth price service disconnected');
-        }
     });
 
     serviceInitialized = true;
-    console.log('🚀 Pyth price service initialized');
 }
 
 // Selector hooks for common use cases

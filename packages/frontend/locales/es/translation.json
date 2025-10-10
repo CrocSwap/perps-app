@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "Orden {{side}} completada",
-            "message": "Orden {{side}} por {{usdValueOfFillStr}} de {{symbol}} completada exitosamente a {{fillPrice}}"
+            "message": "Orden {{side}} por {{usdValueOfFillStr}} de {{symbol}} completada exitosamente a {{fillPrice}}",
+            "buySide": "de compra",
+            "sellSide": "de venta"
         },
         "errorUpdatingOrder": {
             "title": "Error al actualizar la orden"
@@ -244,7 +246,11 @@
         "open": "Abierta",
         "partiallyFilled": "Parcialmente completada",
         "canceled": "Cancelada",
-        "pending": "Pendiente"
+        "pending": "Pendiente",
+        "limitTxFailedFallbackMessage": "La transacción de orden limitada falló",
+        "marketTxFailedFallbackMessage": "La transacción de orden de mercado falló",
+        "depositTxFailedFallbackMessage": "La transacción de depósito falló",
+        "withdrawTxFailedFallbackMessage": "La transacción de retiro falló"
     },
     "subaccounts": {
         "createSubAccount": "Crear subcuenta",
@@ -471,7 +477,7 @@
         "invalidSize": "Introduce un tamaño válido",
         "limitHeading": "Cierre límite",
         "limitDescription": "Esto enviará una orden para cerrar tu posición al precio límite.",
-        "estimatedClosedPnl": "PnL cerrado estimado (sin comisiones): {{estimatedPNL}}",
+        "estimatedClosedPnl": "PnL cerrado estimado: {{estimatedPNL}}",
         "positionClosed": "Posición cerrada",
         "percentOfPositionClosed": "{{sizePercentageValue}}% de la posición cerrada"
     },
@@ -479,7 +485,7 @@
         "title": "Nueva versión disponible",
         "message": {
             "withVersionNumber": "La versión {{version}} está lista para instalar con mejoras y nuevas funciones.",
-            "noVersionNumber": "Hay una nueva versión lista para instalar con mejoras y nuevas funciones."
+            "noVersionNumber": "Por favor, vuelve a cargar la página para obtener las últimas funciones y mejoras."
         },
         "updateButton": "Actualizar ahora",
         "version": "Versión"

@@ -2,10 +2,12 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import orderbookWorker from './workers/orderbook.worker.ts?worker';
 import webData2Worker from './workers/webdata2.worker.ts?worker';
+import jsonParserWorker from '~/processors/workers/jsonParser.worker.ts?worker';
 
 export const WORKERS = {
     webData2: webData2Worker,
     orderbook: orderbookWorker,
+    jsonParser: jsonParserWorker,
 } as const;
 
 export type WorkerKey = keyof typeof WORKERS;

@@ -244,7 +244,11 @@
         "open": "Offen",
         "partiallyFilled": "Teilweise ausgeführt",
         "canceled": "Abgebrochen",
-        "pending": "Ausstehend"
+        "pending": "Ausstehend",
+        "limitTxFailedFallbackMessage": "Limit-Order-Transaktion fehlgeschlagen",
+        "marketTxFailedFallbackMessage": "Markt-Order-Transaktion fehlgeschlagen",
+        "depositTxFailedFallbackMessage": "Einzahlungs-Transaktion fehlgeschlagen",
+        "withdrawTxFailedFallbackMessage": "Auszahlungs-Transaktion fehlgeschlagen"
     },
     "subaccounts": {
         "createSubAccount": "Unterkonto erstellen",
@@ -471,7 +475,7 @@
         "invalidSize": "Gültige Ordergröße eingeben",
         "limitHeading": "Limit-Schließung",
         "limitDescription": "Dies sendet einen Auftrag, um Ihre Position zum Limitpreis zu schließen.",
-        "estimatedClosedPnl": "Geschätzter geschlossener PnL (ohne Gebühren): {{estimatedPNL}}",
+        "estimatedClosedPnl": "Geschätzter geschlossener PnL: {{estimatedPNL}}",
         "positionClosed": "Position geschlossen",
         "percentOfPositionClosed": "{{sizePercentageValue}}% der Position geschlossen"
     },
@@ -479,7 +483,7 @@
         "title": "Neue Version verfügbar",
         "message": {
             "withVersionNumber": "Version {{version}} ist bereit zur Installation mit neuen Funktionen und Verbesserungen.",
-            "noVersionNumber": "Eine neue Version ist mit neuen Funktionen und Verbesserungen zur Installation bereit."
+            "noVersionNumber": "Bitte laden Sie die Seite neu, um die neuesten Funktionen und Verbesserungen zu erhalten."
         },
         "updateButton": "Jetzt aktualisieren",
         "version": "Version"

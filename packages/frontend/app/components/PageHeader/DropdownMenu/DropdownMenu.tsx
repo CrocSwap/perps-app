@@ -60,7 +60,7 @@ const DropdownMenu = ({
                                 plausible('External Link Clicked', {
                                     props: {
                                         location: 'dropdown-menu',
-                                        name: item.name,
+                                        linkType: item.name,
                                         url: item.url,
                                     },
                                 });

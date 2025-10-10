@@ -162,6 +162,12 @@
     .pnlCell {
         display: none;
     }
+
+    .contractCell {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
 }
 
 .cell.positive {

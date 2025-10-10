@@ -6,6 +6,7 @@ import {
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { marketOrderLogManager } from './MarketOrderLogManager';
+import { t } from 'i18next';
 
 export interface LimitOrderResult {
     success: boolean;
@@ -244,7 +245,7 @@ export class LimitOrderService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : 'Order transaction failed';
+                        : t('transactions.limitTxFailedFallbackMessage');
                 return {
                     success: false,
                     error: errorMessage,

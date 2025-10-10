@@ -149,6 +149,33 @@ body {
     padding: var(--gap-s);
 }
 
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    height: 100%;
+    min-height: 0;
+}
+
+.order_input {
+    flex: 1 1 auto;
+    min-height: 300px;
+}
+
+.wallet {
+    flex: 0 0 auto;
+    max-height: 195px;
+    height: 100%;
+}
+
+.table {
+    overflow: auto;
+    scrollbar-width: none;
+}
+.table::-webkit-scrollbar {
+    display: none;
+}
+
 /* Desktop styles (1920px and above) */
 @media only screen and (min-width: 1920px) {
     .containerTop {
@@ -215,6 +242,7 @@ body {
         justify-content: center;
         align-items: center;
         padding: 0 var(--padding-s);
+        overflow: visible; /* allow dropdown to escape */
     }
 
     .mobileTabBtns {
@@ -225,7 +253,14 @@ body {
     }
 
     .mobileTabBtn {
-        flex: 0 0 auto;
+        /* key: let each pill fill its grid cell and NOT grow from text */
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box; /* active ring/borders won't change width */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
         background: var(--bg-dark2, #111117);
         white-space: nowrap;
         border: none;
@@ -244,6 +279,71 @@ body {
         color: var(--text1);
     }
 
+    /* Positions dropdown */
+    .posTabWrap {
+        position: relative;
+        width: 100%;
+        overflow: visible;
+    }
+
+    .posTabBtn {
+        justify-content: space-between;
+        gap: 6px;
+    }
+
+    /* Truncate the dynamic label so it never pushes other tabs */
+    .posLabel {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    .posCaret {
+        opacity: 0.75;
+        flex: 0 0 auto;
+    }
+
+    /* Fixed-width dropdown, always left-aligned to the pill */
+    .posMenu {
+        background-color: red;
+        position: absolute;
+        top: calc(100% + 8px);
+        left: auto;
+        right: 0;
+        width: 280px;
+        max-width: 92vw;
+        z-index: 600;
+
+        background: var(--bg-dark2, #111117);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius-s);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+        overflow: hidden;
+    }
+
+    .posItem {
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: 0;
+        padding: 12px 14px;
+        color: var(--text2);
+        font-size: 13px;
+        white-space: nowrap; /* one-line menu items */
+    }
+
+    .posItem:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text1);
+    }
+    .activeItem {
+        background: rgba(115, 113, 252, 0.15);
+        color: var(--text1);
+    }
+
     /* KEY FIX: respect the fixed footer space */
     .mobileSection {
         position: fixed;
@@ -253,7 +353,7 @@ body {
         bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
         height: auto; /* top/bottom define the box */
         background: var(--bg-dark1);
-        overflow-y: auto !important;
+        overflow: hidden !important; /* page doesn't scroll */
         display: none;
         border-radius: 0;
         padding-bottom: 20px !important;
@@ -264,15 +364,15 @@ body {
         display: block;
     }
 
-    /* Order section styling */
+    /* Order section */
     .mobileOrder.active {
         display: block;
         background: var(--bg-dark1);
         padding: 0 var(--padding-s);
-        overflow-y: auto !important;
+        overflow-y: auto !important; /* only the content scrolls */
     }
 
-    /* Book and Recent trades sections */
+    /* Book & Recent */
     .mobileOnlyOrderBook,
     .mobileOnlyRecentTrades {
         height: 100%;
@@ -297,7 +397,6 @@ body {
         overflow-x: auto;
         scrollbar-width: none;
     }
-
     .mobileBookTabs::-webkit-scrollbar {
         display: none;
     }
@@ -310,11 +409,9 @@ body {
         font-size: 14px;
         position: relative;
     }
-
     .mobileBookTab.active {
         color: var(--primary);
     }
-
     .mobileBookTab.active::after {
         content: '';
         position: absolute;
@@ -325,38 +422,10 @@ body {
         background: var(--primary);
     }
 
-    /* Hide desktop elements */
+    /* Hide desktop-only elements */
     .containerTopLeft,
     .orderBook,
     .containerBottom {
         display: none;
     }
-}
-
-.rightCol {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-s);
-    height: 100%;
-    min-height: 0;
-}
-
-.order_input {
-    flex: 1;
-    min-height: 300px;
-}
-
-.wallet {
-    flex: 0 0 auto;
-    height: 100%;
-    max-height: 195px;
-}
-
-.table {
-    overflow: auto;
-    scrollbar-width: none; /* Firefox */
-}
-
-.table::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Edge */
 }

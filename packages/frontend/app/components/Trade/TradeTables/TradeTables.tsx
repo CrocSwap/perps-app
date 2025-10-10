@@ -43,6 +43,7 @@ interface TradeTableProps {
     vaultPage?: boolean;
     vaultFetched?: boolean;
     vaultDepositors?: VaultFollowerStateIF[];
+    mobileExternalSwitcher?: boolean;
 }
 
 export default function TradeTable(props: TradeTableProps) {
@@ -112,27 +113,26 @@ export default function TradeTable(props: TradeTableProps) {
             filteredTabs = availableTabs;
         }
 
-        if (isMobile) {
+        if (isMobile && !props.mobileExternalSwitcher) {
             return filteredTabs.filter(
                 (tab) =>
                     tab === 'common.positions' || tab === 'common.openOrders',
             );
         }
-
         return filteredTabs;
-    }, [page, vaultPage]);
+    }, [page, vaultPage, isMobile, props.mobileExternalSwitcher]);
 
     //  this useEffect is to handle tab switching when screen size changes
     useEffect(() => {
-        // If we're on mobile and current tab isn't allowed, switch to Positions
+        const lockToTwo = isMobile && !props.mobileExternalSwitcher;
         if (
-            isMobile &&
+            lockToTwo &&
             selectedTradeTab !== 'common.positions' &&
             selectedTradeTab !== 'common.openOrders'
         ) {
             handleTabChange('common.positions');
         }
-    }, [selectedTradeTab]);
+    }, [selectedTradeTab, isMobile, props.mobileExternalSwitcher]);
 
     // reset wallet on trade tables after switch back from vaults
     useEffect(() => {
@@ -256,20 +256,23 @@ export default function TradeTable(props: TradeTableProps) {
                 );
         }
     };
+    const showTabs = !(isMobile && props.mobileExternalSwitcher);
 
     return (
         <div className={styles.tradeTableWrapper}>
-            <Tabs
-                tabs={tabs}
-                defaultTab={selectedTradeTab}
-                onTabChange={handleTabChange}
-                rightContent={rightAlignedContent}
-                wrapperId='tradeTableTabs'
-                layoutIdPrefix='tradeTableTabsIndicator'
-                staticHeight={`var(--trade-tables-tabs-height)`}
-            />
+            {showTabs && (
+                <Tabs
+                    tabs={tabs}
+                    defaultTab={selectedTradeTab}
+                    onTabChange={handleTabChange}
+                    rightContent={rightAlignedContent}
+                    wrapperId='tradeTableTabs'
+                    layoutIdPrefix='tradeTableTabsIndicator'
+                    staticHeight={`var(--trade-tables-tabs-height)`}
+                />
+            )}
             <motion.div
-                className={`${styles.tableContent} ${
+                className={`${styles.tableContent} ${!showTabs ? styles.noTabs : ''} ${
                     portfolioPage ? styles.portfolioPage : ''
                 }`}
                 key={selectedTradeTab}

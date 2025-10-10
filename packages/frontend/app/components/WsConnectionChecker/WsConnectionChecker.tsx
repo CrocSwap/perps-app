@@ -22,7 +22,8 @@ export default function WsConnectionChecker() {
     const { fetchTokenId, fetchTokenDetails } = useInfoApi();
 
     const { symbol, updateSymbolInfo } = useTradeDataStore();
-    const { setTitleOverride, setIsTabActive } = useAppStateStore();
+    const { setTitleOverride, setIsTabActiveDelayed, setIsTabActive } =
+        useAppStateStore();
     const { formatNum } = useNumFormatter();
     const isTabPassive = useRef(false);
     const [hideReconnectIndicator, setHideReconnectIndicator] = useState(false);
@@ -49,6 +50,7 @@ export default function WsConnectionChecker() {
         const visibilityListener = () => {
             if (document.visibilityState === 'hidden') {
                 isTabPassive.current = true;
+                setIsTabActive(false);
                 if (sleepModeTimeout.current) {
                     clearTimeout(sleepModeTimeout.current);
                 }
@@ -56,17 +58,18 @@ export default function WsConnectionChecker() {
                     if (isTabPassive.current) {
                         console.log('>>> sleep mode', new Date().toISOString());
                         setIsWsSleepMode(true);
-                        setIsTabActive(false);
+                        setIsTabActiveDelayed(false);
                     }
                 }, WS_SLEEP_MODE);
             } else {
                 console.log('>>> resume mode', new Date().toISOString());
+                setIsTabActive(true);
                 isTabPassive.current = false;
                 if (sleepModeTimeout.current) {
                     clearTimeout(sleepModeTimeout.current);
                 }
                 setIsWsSleepMode(false);
-                setIsTabActive(true);
+                setIsTabActiveDelayed(true);
             }
         };
 

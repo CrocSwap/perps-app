@@ -17,3 +17,11 @@
 [data-name='legend-source-title'] {
     pointer-events: none !important;
 }
+
+div[data-role='hint'] > div[class*='container'] {
+    background-color: var(--accent1-dark, #5f5df0) !important;
+}
+
+div[class*='centerElement'] > div > div[class*='container'] {
+    background-color: var(--accent1-dark, #5f5df0) !important;
+}

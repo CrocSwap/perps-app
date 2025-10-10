@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "Ordre {{side}} exécuté",
-            "message": "Ordre {{side}} exécuté avec succès pour {{usdValueOfFillStr}} de {{symbol}} à {{fillPrice}}"
+            "message": "Ordre {{side}} exécuté avec succès pour {{usdValueOfFillStr}} de {{symbol}} à {{fillPrice}}",
+            "buySide": "acheter",
+            "sellSide": "vendre"
         },
         "errorUpdatingOrder": {
             "title": "Erreur lors de la mise à jour de l'ordre"
@@ -244,7 +246,11 @@
         "open": "Ouverte",
         "partiallyFilled": "Partiellement exécutée",
         "canceled": "Annulée",
-        "pending": "En attente"
+        "pending": "En attente",
+        "limitTxFailedFallbackMessage": "La transaction d'ordre limité a échoué",
+        "marketTxFailedFallbackMessage": "La transaction d'ordre au marché a échoué",
+        "depositTxFailedFallbackMessage": "La transaction de dépôt a échoué",
+        "withdrawTxFailedFallbackMessage": "La transaction de retrait a échoué"
     },
     "subaccounts": {
         "createSubAccount": "Créer un sous-compte",
@@ -471,7 +477,7 @@
         "invalidSize": "Entrez une taille d'ordre valide",
         "limitHeading": "Clôture limite",
         "limitDescription": "Cela enverra un ordre pour fermer votre position au prix limite.",
-        "estimatedClosedPnl": "PnL clôturé estimé (hors frais): {{estimatedPNL}}",
+        "estimatedClosedPnl": "PnL clôturé estimé: {{estimatedPNL}}",
         "positionClosed": "Position fermée",
         "percentOfPositionClosed": "{{sizePercentageValue}}% de la position fermée"
     },
@@ -479,7 +485,7 @@
         "title": "Nouvelle version disponible",
         "message": {
             "withVersionNumber": "La version {{version}} est prête à installer avec de nouvelles fonctionnalités et améliorations.",
-            "noVersionNumber": "Une nouvelle version est prête à installer avec de nouvelles fonctionnalités et améliorations."
+            "noVersionNumber": "Veuillez recharger la page pour profiter des dernières fonctionnalités et améliorations."
         },
         "updateButton": "Mettre à jour maintenant",
         "version": "Version"

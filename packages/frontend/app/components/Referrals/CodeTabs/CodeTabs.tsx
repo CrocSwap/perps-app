@@ -1,16 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-    useSession,
     isEstablished,
     SessionButton,
+    useSession,
 } from '@fogo/sessions-sdk-react';
 import { UserIdentifierType } from '@fuul/sdk';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import { Fuul } from '@fuul/sdk';
 import { useUserDataStore } from '~/stores/UserDataStore';
+import { Fuul } from '@fuul/sdk';
+import { URL_PARAMS, useUrlParams } from '~/hooks/useURLParams';
+import { useReferralStore } from '~/stores/ReferralStore';
 
 // Add Buffer type definition for TypeScript
 declare const Buffer: {
@@ -37,8 +39,6 @@ const availableTabs = ['Enter Code', 'Create Code', 'Claim'];
 export default function CodeTabs(props: Props) {
     const { initialTab = 'Enter Code' } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
-    const [referralCode, setReferralCode] = useState('');
-    const [temporaryReferralCode, setTemporaryReferralCode] = useState('');
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
     const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
         useState(true);
@@ -46,111 +46,146 @@ export default function CodeTabs(props: Props) {
     const [isEditing, setIsEditing] = useState(false);
     const sessionState = useSession();
     const userDataStore = useUserDataStore();
+    const referralStore = useReferralStore();
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
     };
 
-    const isSessionEstablished = useMemo(
+    const isSessionEstablished = useMemo<boolean>(
         () => isEstablished(sessionState),
         [sessionState],
     );
 
-    useEffect(() => {
-        if (userDataStore.referralCode) {
-            setReferralCode(userDataStore.referralCode);
+    const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
+
+    // fn to confirm a referral code and link to user's wallet address
+    function confirmRefCode(): void {
+        const isUserConnected = isEstablished(sessionState);
+        if (isUserConnected) {
+            referralStore.confirmCode(userDataStore.userAddress, {
+                value: referralStore.cached.value,
+                isConverted: false,
+            });
         }
-    }, [userDataStore.referralCode]);
+    }
+
+    // fn to update a referral code and trigger FUUL confirmation workflow
+    function handleUpdateReferralCode(r: string): void {
+        // update referral code param in the URL
+        handleReferralURLParam.set(r);
+        // toggle DOM to default view
+        setIsEditing(false);
+        // update referral code in store
+        userDataStore.userAddress
+            ? referralStore.confirmCode(userDataStore.userAddress, {
+                  value: r,
+                  isConverted: false,
+              })
+            : referralStore.cache(r);
+    }
 
     const affiliateAddress = userDataStore.userAddress;
 
-    const enterCodeContent = isSessionEstablished ? (
-        referralCode ? (
-            !isEditing ? (
-                <section className={styles.sectionWithButton}>
-                    <div className={styles.enterCodeContent}>
-                        <h6>Current Affiliate Code</h6>
-                        <p>{referralCode}</p>
-                    </div>
+    const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
+    const updateReferralCodeInputRef2 = useRef<HTMLInputElement>(null);
+
+    console.log({
+        isSessionEstablished,
+        referralStore,
+        isEditing,
+    });
+
+    const confirmOrEditCodeElem = (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>Current Affiliate Code</h6>
+                <p>
+                    {referralStore.getCode(affiliateAddress)?.value ||
+                        referralStore.cached.value}
+                </p>
+            </div>
+            {referralStore.isConverted || (
+                <div className={styles.refferal_code_buttons}>
+                    {referralStore.cached &&
+                        !referralStore.getCode(affiliateAddress) && (
+                            <SimpleButton bg='accent1' onClick={confirmRefCode}>
+                                Confirm
+                            </SimpleButton>
+                        )}
                     <SimpleButton
-                        bg='accent1'
-                        onClick={() => {
-                            console.log('Update');
-                            setIsEditing(true);
-                        }}
+                        bg='accent3'
+                        onClick={() => setIsEditing(true)}
                     >
                         Edit
                     </SimpleButton>
-                </section>
-            ) : (
-                <section className={styles.sectionWithButton}>
-                    <div className={styles.enterCodeContent}>
-                        <h6>Overwrite current referrer code: {referralCode}</h6>
-                        <input
-                            type='text'
-                            value={temporaryReferralCode}
-                            onChange={(e) =>
-                                setTemporaryReferralCode(e.target.value)
-                            }
-                        />
-                    </div>
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => {
-                            setIsEditing(false);
-                            setTemporaryReferralCode('');
-                            if (temporaryReferralCode) {
-                                setReferralCode(temporaryReferralCode);
-                            }
-                        }}
-                    >
-                        Update
-                    </SimpleButton>
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => {
-                            setIsEditing(false);
-                            setTemporaryReferralCode('');
-                        }}
-                    >
-                        Cancel
-                    </SimpleButton>
-                </section>
-            )
-        ) : (
-            <section className={styles.sectionWithButton}>
-                <div className={styles.enterCodeContent}>
-                    <h6>Enter a referral code</h6>
-                    <input
-                        type='text'
-                        value={temporaryReferralCode}
-                        onChange={(e) =>
-                            setTemporaryReferralCode(e.target.value)
-                        }
-                    />
                 </div>
+            )}
+        </section>
+    );
+
+    const overwriteCurrentReferralCodeElem = (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>
+                    Overwrite current referrer code:{' '}
+                    {referralStore.getCode(affiliateAddress)?.value ||
+                        referralStore.cached.value}
+                </h6>
+                <input
+                    ref={updateReferralCodeInputRef}
+                    type='text'
+                    defaultValue={
+                        referralStore.getCode(affiliateAddress)?.value ||
+                        referralStore.cached.value
+                    }
+                />
+            </div>
+            <div className={styles.refferal_code_buttons}>
                 <SimpleButton
                     bg='accent1'
-                    onClick={() => {
-                        setIsEditing(false);
-                        setTemporaryReferralCode('');
-                        setReferralCode(temporaryReferralCode);
-                    }}
+                    onClick={() =>
+                        handleUpdateReferralCode(
+                            updateReferralCodeInputRef.current?.value || '',
+                        )
+                    }
                 >
                     Update
                 </SimpleButton>
-                <SimpleButton
-                    bg='accent1'
-                    onClick={() => {
-                        setIsEditing(false);
-                        setTemporaryReferralCode('');
-                    }}
-                >
+                <SimpleButton bg='accent1' onClick={() => setIsEditing(false)}>
                     Cancel
                 </SimpleButton>
-            </section>
-        )
-    ) : (
+            </div>
+        </section>
+    );
+
+    const updateReferralCodeElem = (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>Enter a referral code</h6>
+                <input
+                    ref={updateReferralCodeInputRef2}
+                    type='text'
+                    defaultValue={referralStore.cached.value || ''}
+                />
+            </div>
+            <SimpleButton
+                bg='accent1'
+                onClick={() =>
+                    handleUpdateReferralCode(
+                        updateReferralCodeInputRef2.current?.value || '',
+                    )
+                }
+            >
+                Update
+            </SimpleButton>
+            <SimpleButton bg='accent1' onClick={() => setIsEditing(false)}>
+                Cancel
+            </SimpleButton>
+        </section>
+    );
+
+    const connectYourWalletElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Connect your wallet to enter a referral code</h6>
@@ -158,6 +193,26 @@ export default function CodeTabs(props: Props) {
             <SessionButton />
         </section>
     );
+
+    const enterCodeContent = isSessionEstablished
+        ? referralStore.cached
+            ? !isEditing
+                ? // this code block:
+                  //  - session is established
+                  //  - active referral code
+                  //  - user is not in 'edit' mode
+                  confirmOrEditCodeElem
+                : // this code block:
+                  //  - session is established
+                  //  - active referral code
+                  //  - user is in 'edit' mode
+                  overwriteCurrentReferralCodeElem
+            : // this code block:
+              //  - session is established
+              //  - no active referral code
+              updateReferralCodeElem
+        : // this code block: session is not established
+          connectYourWalletElem;
 
     useEffect(() => {
         (async () => {
@@ -333,7 +388,7 @@ export default function CodeTabs(props: Props) {
                             </a>
                         </div>
                     )}
-                    <p>
+                    <p className={styles.trackingLinkExplanation}>
                         You will receive <span>10%</span> of referred users fees
                         and they will receive a <span>4%</span> discount. See
                         the Docs for more.

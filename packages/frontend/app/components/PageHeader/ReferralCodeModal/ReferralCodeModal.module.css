@@ -1,0 +1,37 @@
+/* top-level element returned by JSX file */
+.referral_code_modal {
+    --container-width: 400px;
+    --base-z-idx-referral-code-modal: 1;
+    --divider-height: 1px;
+
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-s) var(--padding-m) var(--padding-m);
+    gap: var(--gap-l);
+    min-width: var(--container-width);
+    user-select: none;
+    background-color: var(--bg-dark3);
+    border-radius: var(--radius-m);
+
+    /*
+        This approach to z-index allows children of this element to
+        ... define a z-axis value relative to the value in this file.
+    */
+    z-index: var(--base-z-idx-referral-code-modal);
+}
+
+.referral_code_modal > p {
+    text-align: center;
+    font-size: var(--font-size-s);
+}
+
+.referral_code_inline {
+    color: var(--accent3);
+}
+
+.button_container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--gap-l);
+}

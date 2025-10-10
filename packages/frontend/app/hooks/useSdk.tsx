@@ -15,7 +15,10 @@ import React, {
 } from 'react';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { useDebugStore } from '~/stores/DebugStore';
-import { WS_SLEEP_MODE_STASH_CONNECTION } from '~/utils/Constants';
+import {
+    SHOULD_LOG_ANALYTICS,
+    WS_SLEEP_MODE_STASH_CONNECTION,
+} from '~/utils/Constants';
 import { useIsClient } from './useIsClient';
 
 type SdkContextType = {
@@ -49,7 +52,7 @@ export const SdkProvider: React.FC<{
         setWsReconnecting,
         isWsStashed,
         setIsWsStashed,
-        isTabActive,
+        isTabActiveDelayed,
     } = useAppStateStore();
     const { isWsSleepMode, isDebugWalletActive } = useDebugStore();
 
@@ -76,9 +79,6 @@ export const SdkProvider: React.FC<{
             // Debug: Log WebSocket connections to console
             if (typeof window !== 'undefined') {
                 (window as any).__perps_websockets__ = newInfo;
-                console.log(
-                    'WebSocket connections initialized. Type __perps_websockets__.multiSocketInfo.getPool().getConnectionStatus() in console to check status',
-                );
             }
         } else {
             info.setEnvironment(environment);
@@ -106,6 +106,7 @@ export const SdkProvider: React.FC<{
     }, [isDebugWalletActive]);
 
     useEffect(() => {
+        if (SHOULD_LOG_ANALYTICS) return;
         console.log('>>> useSdk | marketEndpoint', marketEndpoint);
         console.log('>>> useSdk | userEndpoint', userEndpoint);
     }, [marketEndpoint, userEndpoint]);
@@ -172,7 +173,7 @@ export const SdkProvider: React.FC<{
 
     useEffect(() => {
         if (!isClient) return;
-        if (!isTabActive) return;
+        if (!isTabActiveDelayed) return;
 
         if (internetConnected && shouldReconnect) {
             // Check if already connected before reconnecting
@@ -238,15 +239,15 @@ export const SdkProvider: React.FC<{
         isClient,
         info,
         shouldReconnect,
-        isTabActive,
+        isTabActiveDelayed,
         // isWsStashed,
-        // isTabActive,
+        // isTabActiveDelayed,
     ]);
 
     useEffect(() => {
         if (!isClient) return;
 
-        if (isWsStashed && isTabActive) {
+        if (isWsStashed && isTabActiveDelayed) {
             console.log('>>> will re init ws object', new Date().toISOString());
             reInitWs();
             setWsReconnecting(true);
@@ -278,7 +279,7 @@ export const SdkProvider: React.FC<{
         return () => {
             clearInterval(reconnectInterval);
         };
-    }, [isWsStashed, isTabActive, reInitWs, isClient, info]);
+    }, [isWsStashed, isTabActiveDelayed, reInitWs, isClient, info]);
 
     useEffect(() => {
         if (!isClient) return;
@@ -301,7 +302,7 @@ export const SdkProvider: React.FC<{
     }, [isWsSleepMode, info]);
 
     useEffect(() => {
-        if (!isTabActive) {
+        if (!isTabActiveDelayed) {
             console.log(
                 '>>> useSDK | tab is inactive',
                 new Date().toISOString(),
@@ -337,7 +338,7 @@ export const SdkProvider: React.FC<{
                 clearTimeout(stashTimeoutRef.current);
             }
         };
-    }, [isTabActive, info]);
+    }, [isTabActiveDelayed, info]);
 
     return (
         <SdkContext.Provider

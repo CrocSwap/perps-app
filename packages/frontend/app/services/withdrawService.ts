@@ -1,6 +1,7 @@
 import { buildWithdrawMarginTx } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { getUnifiedMarginData } from '~/utils/getUnifiedMarginData';
+import { t } from 'i18next';
 
 export interface WithdrawServiceResult {
     success: boolean;
@@ -257,7 +258,7 @@ export class WithdrawService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : 'Withdraw transaction failed';
+                        : t('transactions.withdrawTxFailedFallbackMessage');
                 console.error('❌ Withdraw order failed:', errorMessage);
                 return {
                     success: false,

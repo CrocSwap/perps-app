@@ -244,7 +244,11 @@
         "open": "Mở",
         "partiallyFilled": "Khớp một phần",
         "canceled": "Đã hủy",
-        "pending": "Đang chờ"
+        "pending": "Đang chờ",
+        "limitTxFailedFallbackMessage": "Giao dịch lệnh giới hạn thất bại",
+        "marketTxFailedFallbackMessage": "Giao dịch lệnh thị trường thất bại",
+        "depositTxFailedFallbackMessage": "Giao dịch nạp tiền thất bại",
+        "withdrawTxFailedFallbackMessage": "Giao dịch rút tiền thất bại"
     },
     "subaccounts": {
         "createSubAccount": "Tạo tài khoản phụ",
@@ -471,7 +475,7 @@
         "invalidSize": "Vui lòng nhập khối lượng lệnh hợp lệ",
         "limitHeading": "Đóng vị thế theo giá giới hạn",
         "limitDescription": "Thao tác này sẽ gửi lệnh đóng vị thế ở giá giới hạn đã đặt.",
-        "estimatedClosedPnl": "Ước tính lãi/lỗ (không phí): {{estimatedPNL}}",
+        "estimatedClosedPnl": "Ước tính lãi/lỗ: {{estimatedPNL}}",
         "positionClosed": "Vị thế đã đóng",
         "percentOfPositionClosed": "{{sizePercentageValue}}% vị thế đã đóng"
     },
@@ -479,7 +483,7 @@
         "title": "Có phiên bản mới",
         "message": {
             "withVersionNumber": "Phiên bản {{version}} đã sẵn sàng cài đặt với các tính năng và cải tiến mới.",
-            "noVersionNumber": "Có phiên bản mới đã sẵn sàng cài đặt với các tính năng và cải tiến."
+            "noVersionNumber": "Vui lòng tải lại trang để nhận các tính năng và cải tiến mới nhất."
         },
         "updateButton": "Cập nhật ngay",
         "version": "Phiên bản"

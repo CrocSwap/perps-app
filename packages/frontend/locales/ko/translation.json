@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}} 주문 체결됨",
-            "message": "{{usdValueOfFillStr}}의 {{symbol}} {{side}} 주문이 {{fillPrice}}에 성공적으로 체결됨"
+            "message": "{{usdValueOfFillStr}}의 {{symbol}} {{side}} 주문이 {{fillPrice}}에 성공적으로 체결됨",
+            "buySide": "매수",
+            "sellSide": "매도"
         },
         "errorUpdatingOrder": {
             "title": "주문 업데이트 오류"
@@ -244,7 +246,11 @@
         "open": "미체결",
         "partiallyFilled": "일부 체결됨",
         "canceled": "취소됨",
-        "pending": "대기중"
+        "pending": "대기중",
+        "limitTxFailedFallbackMessage": "지정가 주문 거래 실패",
+        "marketTxFailedFallbackMessage": "시장가 주문 거래 실패",
+        "depositTxFailedFallbackMessage": "입금 거래 실패",
+        "withdrawTxFailedFallbackMessage": "출금 거래 실패"
     },
     "subaccounts": {
         "createSubAccount": "서브계정 생성",
@@ -471,7 +477,7 @@
         "invalidSize": "유효한 주문 수량을 입력하세요",
         "limitHeading": "지정가 종료",
         "limitDescription": "지정가로 포지션을 종료하는 주문을 제출합니다.",
-        "estimatedClosedPnl": "예상 실현 PnL (수수료 제외): {{estimatedPNL}}",
+        "estimatedClosedPnl": "예상 실현 PnL: {{estimatedPNL}}",
         "positionClosed": "포지션이 종료되었습니다",
         "percentOfPositionClosed": "포지션의 {{sizePercentageValue}}% 종료되었습니다"
     },
@@ -479,7 +485,7 @@
         "title": "새 버전 사용 가능",
         "message": {
             "withVersionNumber": "{{version}} 버전이 새로운 기능과 개선 사항으로 업데이트되었습니다.",
-            "noVersionNumber": "새 버전이 새로운 기능과 개선 사항으로 업데이트되었습니다."
+            "noVersionNumber": "최신 기능과 개선 사항을 받으려면 페이지를 새로 고침하세요."
         },
         "updateButton": "지금 업데이트",
         "version": "버전"

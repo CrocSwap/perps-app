@@ -221,7 +221,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 ),
                                 txSignature: result.signature,
                                 explorerLink: result.signature
-                                    ? blockExplorer + '/tx/' + result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
                                     : undefined,
                             },
                         });
@@ -240,7 +240,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         }),
                         icon: 'check',
                         txLink: result.signature
-                            ? blockExplorer + result.signature
+                            ? `${blockExplorer}/tx/${result.signature}`
                             : undefined,
                     });
                 } else {
@@ -261,7 +261,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 ),
                                 txSignature: result.signature,
                                 explorerLink: result.signature
-                                    ? blockExplorer + '/tx/' + result.signature
+                                    ? `${blockExplorer}/tx/${result.signature}`
                                     : undefined,
                             },
                         });
@@ -273,7 +273,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 t('transactions.failedToClosePosition'),
                         ),
                         txLink: result.signature
-                            ? blockExplorer + result.signature
+                            ? `${blockExplorer}/tx/${result.signature}`
                             : undefined,
                         icon: 'error',
                     });

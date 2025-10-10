@@ -120,6 +120,11 @@ export function meta() {
     return [
         { title: t('meta.title') },
         { name: 'description', content: t('meta.content') },
+        {
+            name: 'og:image',
+            content:
+                'https://perps.ambient.finance/images/og/btc-on-ambient.png',
+        },
     ];
 }
 

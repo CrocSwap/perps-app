@@ -7,6 +7,7 @@ import {
 import { Connection, PublicKey } from '@solana/web3.js';
 import { MARKET_ORDER_PRICE_OFFSET_USD } from '~/utils/Constants';
 import { marketOrderLogManager } from './MarketOrderLogManager';
+import { t } from 'i18next';
 
 export interface MarketOrderResult {
     success: boolean;
@@ -276,7 +277,7 @@ export class MarketOrderService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : 'Order transaction failed';
+                        : t('transactions.marketTxFailedFallbackMessage');
                 return {
                     success: false,
                     error: errorMessage,

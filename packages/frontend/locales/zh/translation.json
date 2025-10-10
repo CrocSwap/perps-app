@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}}订单已成交",
-            "message": "成功成交{{usdValueOfFillStr}}的{{symbol}}{{side}}订单，价格{{fillPrice}}"
+            "message": "成功成交{{usdValueOfFillStr}}的{{symbol}}{{side}}订单，价格{{fillPrice}}",
+            "buySide": "买入",
+            "sellSide": "卖出"
         },
         "errorUpdatingOrder": {
             "title": "订单更新错误"
@@ -244,7 +246,11 @@
         "open": "未成交",
         "partiallyFilled": "部分成交",
         "canceled": "已取消",
-        "pending": "待处理"
+        "pending": "待处理",
+        "limitTxFailedFallbackMessage": "限价单交易失败",
+        "marketTxFailedFallbackMessage": "市价单交易失败",
+        "depositTxFailedFallbackMessage": "存款交易失败",
+        "withdrawTxFailedFallbackMessage": "取款交易失败"
     },
     "subaccounts": {
         "createSubAccount": "创建子账户",
@@ -471,7 +477,7 @@
         "invalidSize": "请输入有效订单数量",
         "limitHeading": "限价平仓",
         "limitDescription": "将以限价提交平仓订单。",
-        "estimatedClosedPnl": "预计已实现PnL（不含手续费）：{{estimatedPNL}}",
+        "estimatedClosedPnl": "预计已实现PnL：{{estimatedPNL}}",
         "positionClosed": "持仓已平仓",
         "percentOfPositionClosed": "已平仓{{sizePercentageValue}}%持仓"
     },
@@ -479,7 +485,7 @@
         "title": "新版本可用",
         "message": {
             "withVersionNumber": "版本{{version}}已准备好，新增功能与优化。",
-            "noVersionNumber": "新版本已准备好，新增功能与优化。"
+            "noVersionNumber": "请重新加载页面以获得最新功能和改进。"
         },
         "updateButton": "立即更新",
         "version": "版本"

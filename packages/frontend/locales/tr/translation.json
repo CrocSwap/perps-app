@@ -199,8 +199,10 @@
             "message": "{{usdValueOfOrderStr}} {{symbol}} için emir {{limitPrice}} ile başarıyla güncellendi"
         },
         "orderFilled": {
-            "title": "{{side}} Emir Gerçekleşti",
-            "message": "{{usdValueOfFillStr}} {{symbol}} için {{side}} emir {{fillPrice}} fiyatında başarıyla gerçekleşti"
+            "title": "{{side}} Emri Gerçekleşti",
+            "message": "{{usdValueOfFillStr}} {{symbol}} için {{side}} emri {{fillPrice}} fiyatında başarıyla gerçekleşti",
+            "buySide": "Al",
+            "sellSide": "Sat"
         },
         "errorUpdatingOrder": {
             "title": "Emir Güncelleme Hatası"
@@ -244,7 +246,11 @@
         "open": "Açık",
         "partiallyFilled": "Kısmen gerçekleşti",
         "canceled": "İptal edildi",
-        "pending": "Beklemede"
+        "pending": "Beklemede",
+        "limitTxFailedFallbackMessage": "Limit emir işlemi başarısız oldu",
+        "marketTxFailedFallbackMessage": "Piyasa emir işlemi başarısız oldu",
+        "depositTxFailedFallbackMessage": "Yatırım işlemi başarısız oldu",
+        "withdrawTxFailedFallbackMessage": "Çekim işlemi başarısız oldu"
     },
     "subaccounts": {
         "createSubAccount": "Alt Hesap Oluştur",
@@ -278,7 +284,7 @@
         "coin": "Coin",
         "direction": "Yön",
         "size": "Büyüklük",
-        "filledSize": "Gerçekleşen Büyüklük",
+        "filledSize": "Gerçekleşen Büy...",
         "orderValue": "Emir Değeri",
         "price": "Fiyat",
         "tradeValue": "İşlem Değeri",
@@ -471,7 +477,7 @@
         "invalidSize": "Geçerli emir boyutu girin",
         "limitHeading": "Limitli Kapatma",
         "limitDescription": "Belirlediğiniz limitte pozisyonunuzu kapatacak emir gönderir.",
-        "estimatedClosedPnl": "Tahmini kapalı PnL (komisyonsuz): {{estimatedPNL}}",
+        "estimatedClosedPnl": "Tahmini kapalı PnL: {{estimatedPNL}}",
         "positionClosed": "Pozisyon kapatıldı",
         "percentOfPositionClosed": "Pozisyonun %{{sizePercentageValue}} kapatıldı"
     },
@@ -479,7 +485,7 @@
         "title": "Yeni Sürüm Mevcut",
         "message": {
             "withVersionNumber": "{{version}} sürümü yeni özellikler ve iyileştirmeleriyle kurulmaya hazır.",
-            "noVersionNumber": "Yeni özellikler ve iyileştirmelerle yeni sürüm kurulmaya hazır."
+            "noVersionNumber": "Lütfen en yeni özellikler ve iyileştirmeler için sayfayı yeniden yükleyin."
         },
         "updateButton": "Şimdi güncelle",
         "version": "Sürüm"
