@@ -1,0 +1,71 @@
+.root {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    background: #0c0d11;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: none;
+    z-index: 2;
+    width: 30px;
+    height: 100%;
+    padding: 0;
+    border-radius: var(--bordius-m) 0 0 var(--bordius-m);
+    background: var(--bg-dark2);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.handle svg {
+    color: var(--text2);
+}
+.handle:hover svg {
+    color: var(--text1) !important;
+}
+
+.handle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.chev {
+    display: inline-block;
+    /* width: 10px;
+  height: 10px;
+  border-top: 2px solid rgba(255,255,255,0.85);
+  border-right: 2px solid rgba(255,255,255,0.85);
+  margin-left: var(--margin-s);
+  display: none; */
+}
+
+.left {
+    transform: rotate(-135deg);
+}
+.right {
+    transform: rotate(45deg);
+}
+
+.content {
+    height: 100%;
+}
+.container {
+    height: 100%;
+    padding-left: 0;
+}
+
+.root[aria-expanded='true'] .container {
+    padding-left: 30px;
+}
+
+@media (min-width: 768px) and (max-width: 1080px) {
+    #orderBookSection {
+        min-width: 30px;
+    }
+}

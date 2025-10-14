@@ -37,8 +37,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
-    min-height: 0;
     height: 100%;
+    min-height: 0;
+    overflow: hidden;
 }
 
 /* Top (chart + order book) */
@@ -155,17 +156,30 @@ body {
     gap: var(--gap-s);
     height: 100%;
     min-height: 0;
+    overflow: hidden;
 }
 
 .order_input {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .wallet {
-    flex: 0 0 auto;
-    max-height: 195px;
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 100px;
+    max-height: none;
+    height: auto;
+    grid-area: wallet;
+    width: 100%;
+    background: var(--bg-dark2);
+    border-radius: var(--radius-m);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    overflow: hidden;
 }
 
 .table {
@@ -435,4 +449,51 @@ body {
     #orderBookSection {
         min-width: 30px;
     }
+}
+
+/* In trade.module.css */
+
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    height: 100%;
+    min-height: 0;
+    overflow: hidden; /* Add this */
+}
+
+.order_input {
+    flex: 0 0 auto; /* Change from flex: 1 1 auto */
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Add this */
+}
+
+.wallet {
+    flex: 1 1 auto; /* Change from flex: 0 0 auto */
+    min-height: 100px; /* Add minimum height for wallet */
+    max-height: none; /* Remove the max-height: 195px constraint */
+    height: auto; /* Change from height: 100% */
+}
+
+.walletCollapsed {
+    cursor: pointer;
+    min-height: 40px !important;
+    max-height: 40px !important;
+}
+
+.walletCollapsedHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 13px;
+    color: var(--text2);
+    font-weight: 500;
+    user-select: none;
+}
+
+.walletCollapsedHeader:hover {
+    color: var(--text1);
 }
