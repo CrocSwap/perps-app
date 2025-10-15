@@ -10,6 +10,7 @@ import {
 } from '~/utils/functions/profitLossConversions';
 import { t } from 'i18next';
 import getAbbreviatedPrice from '~/utils/functions/getAbbreviatedPrice';
+import limitDecimalPlaces from '~/utils/functions/limitDecimalPlaces';
 
 type Currency = '$' | '%';
 
@@ -296,7 +297,7 @@ export default function TakeProfitsModal(props: PropIF) {
             if (Number.isFinite(limitPrice)) {
                 setUi((u) => ({
                     ...u,
-                    takeProfitLimitInput: limitPrice.toFixed(6),
+                    takeProfitLimitInput: limitPrice.toString(),
                 }));
             }
         }
@@ -308,7 +309,7 @@ export default function TakeProfitsModal(props: PropIF) {
             if (Number.isFinite(limitPrice)) {
                 setUi((u) => ({
                     ...u,
-                    stopLossLimitInput: limitPrice.toFixed(6),
+                    stopLossLimitInput: limitPrice.toString(),
                 }));
             }
         }
@@ -665,12 +666,16 @@ export default function TakeProfitsModal(props: PropIF) {
                                 type='text'
                                 inputMode='decimal'
                                 value={ui.takeProfitLimitInput}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                    const limitedValue = limitDecimalPlaces(
+                                        e.target.value,
+                                        8,
+                                    );
                                     setUi((u) => ({
                                         ...u,
-                                        takeProfitLimitInput: e.target.value,
-                                    }))
-                                }
+                                        takeProfitLimitInput: limitedValue,
+                                    }));
+                                }}
                                 onBlur={onTakeProfitLimitBlur}
                             />
                         </label>
@@ -685,12 +690,16 @@ export default function TakeProfitsModal(props: PropIF) {
                                 type='text'
                                 inputMode='decimal'
                                 value={ui.stopLossLimitInput}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                    const limitedValue = limitDecimalPlaces(
+                                        e.target.value,
+                                        8,
+                                    );
                                     setUi((u) => ({
                                         ...u,
-                                        stopLossLimitInput: e.target.value,
-                                    }))
-                                }
+                                        stopLossLimitInput: limitedValue,
+                                    }));
+                                }}
                                 onBlur={onStopLossLimitBlur}
                             />
                         </label>
