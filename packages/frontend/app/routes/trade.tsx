@@ -95,17 +95,14 @@ export default function Trade() {
     const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
-    // add refs near the other refs
-    const lastColHeightRef = useRef<number | null>(null);
-    const lastWinInnerHeightRef = useRef<number>(
-        typeof window !== 'undefined' ? window.innerHeight : 0,
-    );
 
     const {
         orderBookMode,
         chartTopHeight: storedHeight,
         setChartTopHeight,
         resetLayoutHeights,
+        isWalletCollapsed,
+        setIsWalletCollapsed,
     } = useAppSettings();
     const sessionState = useSession();
     const isUserConnected = isEstablished(sessionState);
@@ -196,14 +193,12 @@ export default function Trade() {
 
     const leftColRef = useRef<HTMLDivElement | null>(null);
     const tableSectionRef = useRef<HTMLElement | null>(null);
-    const HEADER_HIT_HEIGHT = 10;
 
     // local state used while dragging for immediate feedback
     const [chartTopHeight, setChartTopHeightLocal] = useState<number>(
         storedHeight ?? 570,
     );
-    // Add after your existing chartTopHeight state
-    // Add after your existing chartTopHeight state
+
     const [orderInputHeight, setOrderInputHeight] = useState<number | null>(
         null,
     );
@@ -212,19 +207,18 @@ export default function Trade() {
     const rightColRef = useRef<HTMLDivElement | null>(null);
 
     // Constants for order input resize
-    // Constants for order input resize
     const ORDER_INPUT_DEFAULT = 450;
     const ORDER_INPUT_MIN = 300;
     const WALLET_MIN = 30;
     const WALLET_DEFAULT = 195;
     const WALLET_COLLAPSED = 40; // Just shows header
-    const WALLET_COLLAPSE_THRESHOLD = 80; // When wallet gets below this, snap to collapsed
+    const WALLET_COLLAPSE_THRESHOLD = 50; // When wallet gets below this, snap to collapsed
     const startHeightRef = useRef(chartTopHeight);
-    // Using a large but finite number instead of Infinity for CSS compatibility
+    const WALLET_MAX = 187; // Maximum height for wallet section
+
     const [maxTop, setMaxTop] = useState<number>(10000);
     const userRatioRef = useRef<number | null>(null);
     const hasUserOverrideRef = useRef<boolean>(false);
-    const [isWalletCollapsed, setIsWalletCollapsed] = useState(false);
 
     const chartTopHeightRef = useRef<number>(chartTopHeight);
     useEffect(() => {
@@ -281,8 +275,6 @@ export default function Trade() {
         setMaxTop(max);
     }, [setChartTopHeightLocal]);
 
-    // Add after your existing getAvailable function
-    // Add after your existing getAvailable function
     const getRightColAvailable = () => {
         const col = rightColRef.current;
         if (!col) return null;
@@ -302,10 +294,17 @@ export default function Trade() {
             available - minWalletHeight - getGap(),
         );
     };
-
+    const getMinOrderInputHeight = () => {
+        const available = getRightColAvailable();
+        if (!available || available <= 0) return ORDER_INPUT_MIN;
+        // Minimum order input = total - max wallet - gap
+        // This prevents wallet from expanding beyond WALLET_MAX
+        return Math.max(ORDER_INPUT_MIN, available - WALLET_MAX - getGap());
+    };
     const clampOrderInputHeight = (h: number) => {
         const max = getMaxOrderInputHeight();
-        return Math.max(ORDER_INPUT_MIN, Math.min(h, max));
+        const min = getMinOrderInputHeight();
+        return Math.max(min, Math.min(h, max));
     };
 
     const setOrderInputHeightBoth = (h: number) => {
@@ -381,7 +380,7 @@ export default function Trade() {
 
     // Initialize order input height based on layout
     useEffect(() => {
-        if (orderInputHeight !== null) return; // Already initialized
+        if (orderInputHeight !== null) return;
 
         const col = rightColRef.current;
         if (!col) return;
@@ -390,16 +389,51 @@ export default function Trade() {
         const total = col.clientHeight;
         const available = Math.max(0, total - gap);
 
-        // Calculate initial height: total - wallet default (195px) - gap
-        const WALLET_DEFAULT = 195;
+        // Calculate initial height based on whether wallet is collapsed
+        const initialWalletHeight = isWalletCollapsed
+            ? WALLET_COLLAPSED
+            : WALLET_DEFAULT;
+
         const initial = Math.max(
             ORDER_INPUT_MIN,
-            available - WALLET_DEFAULT - gap,
+            available - initialWalletHeight - gap,
         );
 
         setOrderInputHeight(initial);
         orderInputHeightRef.current = initial;
-    }, [orderInputHeight]);
+    }, [orderInputHeight, isWalletCollapsed]);
+
+    // Recalculate when wallet collapsed state changes (important for initial load from storage)
+    useEffect(() => {
+        // Skip if not yet initialized
+        if (orderInputHeight === null) return;
+
+        const col = rightColRef.current;
+        if (!col) return;
+
+        const gap = getGap();
+        const total = col.clientHeight;
+        const available = Math.max(0, total - gap);
+
+        const targetWalletHeight = isWalletCollapsed
+            ? WALLET_COLLAPSED
+            : WALLET_DEFAULT;
+
+        const targetOrderInputHeight = Math.max(
+            ORDER_INPUT_MIN,
+            available - targetWalletHeight - gap,
+        );
+
+        // Only update if there's a significant difference
+        if (Math.abs(targetOrderInputHeight - orderInputHeight) > 5) {
+            console.log('📦 Adjusting for wallet state:', {
+                isWalletCollapsed,
+                targetWalletHeight,
+                targetOrderInputHeight,
+            });
+            setOrderInputHeightBoth(targetOrderInputHeight);
+        }
+    }, [isWalletCollapsed]);
     // On mount / when store changes:
     // This effect sets up the chart/table split whenever the component mounts or when storedHeight changes. If there’s no saved height, it falls back to the default layout. If there is one, it restores the user’s preferred height (clamped if needed) and remembers their ratio.
     useEffect(() => {
@@ -428,9 +462,7 @@ export default function Trade() {
     }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
 
     // Recompute (or clamp) when the left column resizes
-    // Recompute (or clamp) only when HEIGHT changes
-    // Recompute (or clamp) when the left column (re)mounts or resizes.
-    // We rebind when mobile/desktop toggles so we never hold a stale node.
+
     useEffect(() => {
         let raf = 0;
 
@@ -528,6 +560,11 @@ export default function Trade() {
             setPositionsMenuOpen(false);
         }
     }, [activeTab, positionsMenuOpen]);
+    useEffect(() => {
+        if (!isUserConnected) {
+            collapseTableToBar();
+        }
+    }, [isUserConnected]);
 
     const [isTablet, setIsTablet] = useState(false);
 
@@ -838,13 +875,13 @@ export default function Trade() {
             </>
         );
     }
-    const resizableSize = isUserConnected
-        ? { width: '100%', height: chartTopHeight }
-        : { width: '100%', height: '100%' };
+    // const resizableSize = isUserConnected
+    //     ? { width: '100%', height: chartTopHeight }
+    //     : { width: '100%', height: '100%' };
 
-    const resizableEnable = isUserConnected
-        ? { bottom: true }
-        : { bottom: false };
+    // const resizableEnable = isUserConnected
+    //     ? { bottom: true }
+    //     : { bottom: false };
 
     return (
         <>
@@ -859,40 +896,35 @@ export default function Trade() {
                         key={isMobile ? 'm' : 'd'}
                     >
                         <Resizable
-                            size={resizableSize}
+                            size={{ width: '100%', height: chartTopHeight }}
                             minHeight={CHART_MIN}
-                            maxHeight={
-                                isUserConnected
-                                    ? maxTop
-                                    : Number.POSITIVE_INFINITY
-                            }
-                            enable={resizableEnable}
+                            maxHeight={maxTop}
+                            enable={{ bottom: true }}
                             handleStyles={{
                                 bottom: { height: '8px', cursor: 'row-resize' },
                             }}
                             onResizeStart={() => {
-                                if (!isUserConnected) return;
                                 startHeightRef.current = chartTopHeight;
                             }}
                             onResize={(e, dir, ref, d: NumberSize) => {
-                                if (!isUserConnected) return;
                                 const tentative = clamp(
                                     startHeightRef.current + d.height,
                                 );
                                 setChartTopHeightLocal(tentative);
+
                                 const available = getAvailable();
-                                if (available && available > 0)
+                                if (available && available > 0) {
                                     userRatioRef.current =
                                         tentative / available;
+                                }
                             }}
                             onResizeStop={(e, dir, ref, d: NumberSize) => {
-                                if (!isUserConnected) return;
                                 const next = clamp(
                                     startHeightRef.current + d.height,
                                 );
                                 hasUserOverrideRef.current = true;
 
-                                const available = getAvailable();
+                                const available = getAvailable(); // total height available for chart + table
                                 if (!available || available <= 0) {
                                     setHeightBoth(next);
                                     return;
@@ -907,14 +939,17 @@ export default function Trade() {
                                     (!(startHeight <= TABLE_COLLAPSED) ||
                                         tableHeight === TABLE_COLLAPSED)
                                 ) {
+                                    // SNAP DOWN: collapse the table to a thin bar
                                     const snapTo = available - TABLE_COLLAPSED;
                                     setHeightBoth(snapTo);
                                     userRatioRef.current = snapTo / available;
                                 } else if (tableHeight < TABLE_MIN) {
+                                    // too small but not past the collapse trigger → snap back up to min
                                     const snapTo = available - TABLE_MIN;
                                     setHeightBoth(snapTo);
                                     userRatioRef.current = snapTo / available;
                                 } else {
+                                    // normal persisted height
                                     setHeightBoth(next);
                                     userRatioRef.current = next / available;
                                 }
@@ -982,67 +1017,78 @@ export default function Trade() {
                         </Resizable>
 
                         {/* BOTTOM: table auto-fills leftover space */}
-                        {/* BOTTOM: table auto-fills leftover space */}
-                        {isUserConnected && (
-                            <section
-                                className={styles.table}
-                                id='tutorial-trade-table'
-                                ref={tableSectionRef}
-                                onClick={(e) => {
-                                    const el = e.target as HTMLElement | null;
-                                    if (!el) return;
-                                    const isInteractive = isInteractiveEl(el);
-                                    if (isInteractive && isTableCollapsed()) {
-                                        requestAnimationFrame(() => {
-                                            openTableToDefault();
-                                        });
-                                    }
-                                }}
-                                onDoubleClick={(e) => {
-                                    if (isMobile) return;
-                                    const target =
-                                        e.target as HTMLElement | null;
-                                    if (!target) return;
-                                    if (isInteractiveEl(target)) return;
-                                    const headerEl =
-                                        tableSectionRef.current?.querySelector(
-                                            '[data-tabs]',
-                                        ) as HTMLElement | null;
-                                    if (!headerEl) return;
-                                    const r = headerEl.getBoundingClientRect();
-                                    const insideHeader =
-                                        e.clientY >= r.top &&
-                                        e.clientY <= r.bottom &&
-                                        e.clientX >= r.left &&
-                                        e.clientX <= r.right;
-                                    if (!insideHeader) return;
-                                    if (
-                                        target.closest(
-                                            'button, [role="tab"], [data-tabs-right], [data-tabs-arrow]',
-                                        )
-                                    )
-                                        return;
-                                    if (isTableCollapsed())
+
+                        <section
+                            className={styles.table}
+                            id='tutorial-trade-table'
+                            ref={tableSectionRef}
+                            onClick={(e) => {
+                                const el = e.target as HTMLElement | null;
+                                if (!el) return;
+
+                                const isInteractive = isInteractiveEl(el);
+
+                                if (isInteractive && isTableCollapsed()) {
+                                    // defer opening until after the child click finishes
+                                    requestAnimationFrame(() => {
                                         openTableToDefault();
-                                    else collapseTableToBar();
-                                }}
-                            >
-                                <MemoizedTradeTable />
-                            </section>
-                        )}
+                                    });
+                                }
+                            }}
+                            onDoubleClick={(e) => {
+                                if (isMobile) return;
+
+                                const target = e.target as HTMLElement | null;
+                                if (!target) return;
+
+                                // Never react to generic interactives anywhere in the section
+                                if (isInteractiveEl(target)) return;
+
+                                // Find the tabs header (<Tabs ... data-tabs>)
+                                const headerEl =
+                                    tableSectionRef.current?.querySelector(
+                                        '[data-tabs]',
+                                    ) as HTMLElement | null;
+                                if (!headerEl) return;
+
+                                // Is the dblclick point inside the header rect?
+                                const r = headerEl.getBoundingClientRect();
+                                const insideHeader =
+                                    e.clientY >= r.top &&
+                                    e.clientY <= r.bottom &&
+                                    e.clientX >= r.left &&
+                                    e.clientX <= r.right;
+
+                                if (!insideHeader) return;
+
+                                // Block only direct interactives in the header: tab buttons, right actions, and arrows.
+                                if (
+                                    target.closest(
+                                        'button, [role="tab"], [data-tabs-right], [data-tabs-arrow]',
+                                    )
+                                ) {
+                                    return;
+                                }
+
+                                // Toggle: collapsed → open; otherwise collapse
+                                if (isTableCollapsed()) {
+                                    openTableToDefault();
+                                } else {
+                                    collapseTableToBar();
+                                }
+                            }}
+                        >
+                            <MemoizedTradeTable />
+                        </section>
                     </div>
 
-                    {/* RIGHT COLUMN */}
-                    {/* RIGHT COLUMN */}
-                    {/* RIGHT COLUMN */}
-                    {/* RIGHT COLUMN */}
                     <div className={styles.rightCol} ref={rightColRef}>
                         <Resizable
                             size={{
                                 width: '100%',
                                 height: orderInputHeight ?? ORDER_INPUT_DEFAULT,
                             }}
-                            minHeight={ORDER_INPUT_MIN}
+                            minHeight={getMinOrderInputHeight()}
                             maxHeight={getMaxOrderInputHeight()}
                             enable={{ bottom: true }}
                             handleStyles={{
