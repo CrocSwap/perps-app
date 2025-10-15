@@ -21,3 +21,6 @@
     align-items: center;
     gap: var(--gap-m);
 }
+.tableContent.noTabs {
+    height: 100%; /* when we hide the Tabs bar, give the content full height */
+}

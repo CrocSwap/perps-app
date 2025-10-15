@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}}注文約定",
-            "message": "{{usdValueOfFillStr}}の{{symbol}} {{side}}注文が{{fillPrice}}で約定完了"
+            "message": "{{usdValueOfFillStr}}の{{symbol}} {{side}}注文が{{fillPrice}}で約定完了",
+            "buySide": "買い",
+            "sellSide": "売り"
         },
         "errorUpdatingOrder": {
             "title": "注文更新エラー"

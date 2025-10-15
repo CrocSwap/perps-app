@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}} 주문 체결됨",
-            "message": "{{usdValueOfFillStr}}의 {{symbol}} {{side}} 주문이 {{fillPrice}}에 성공적으로 체결됨"
+            "message": "{{usdValueOfFillStr}}의 {{symbol}} {{side}} 주문이 {{fillPrice}}에 성공적으로 체결됨",
+            "buySide": "매수",
+            "sellSide": "매도"
         },
         "errorUpdatingOrder": {
             "title": "주문 업데이트 오류"

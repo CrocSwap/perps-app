@@ -42,17 +42,18 @@ import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import {
-    widget,
-    type IBasicDataFeed,
-    type IChartingLibraryWidget,
-    type LanguageCode,
-    type ResolutionString,
-    type TradingTerminalFeatureset,
+import type {
+    IBasicDataFeed,
+    IChartingLibraryWidget,
+    LanguageCode,
+    ResolutionString,
+    TradingTerminalFeatureset,
 } from '~/tv/charting_library';
 import { processSymbolUrlParam } from '~/utils/AppUtils';
 
 import i18n from 'i18next';
+
+import { loadTradingView } from '~/routes/chart/lazyLoading/useLazyTradingview';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -219,8 +220,11 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         if (!isCustomized) changeColors(getBsColor());
     }, [bsColor, chart]);
 
-    const initChart = useCallback(() => {
-        if (!info) return;
+    const initChart = useCallback(async () => {
+        if (typeof window === 'undefined') return;
+
+        const { widget } = await loadTradingView();
+        if (!info || !widget) return;
 
         dataFeedRef.current = createDataFeed(info, addToFetchedChannels);
 

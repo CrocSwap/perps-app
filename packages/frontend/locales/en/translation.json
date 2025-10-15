@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}} Order Filled",
-            "message": "Successfully filled {{side}} order for {{usdValueOfFillStr}} of {{symbol}} at {{fillPrice}}"
+            "message": "Successfully filled {{side}} order for {{usdValueOfFillStr}} of {{symbol}} at {{fillPrice}}",
+            "buySide": "Buy",
+            "sellSide": "Sell"
         },
         "errorUpdatingOrder": {
             "title": "Error updating order"

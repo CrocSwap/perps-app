@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}}订单已成交",
-            "message": "成功成交{{usdValueOfFillStr}}的{{symbol}}{{side}}订单，价格{{fillPrice}}"
+            "message": "成功成交{{usdValueOfFillStr}}的{{symbol}}{{side}}订单，价格{{fillPrice}}",
+            "buySide": "买入",
+            "sellSide": "卖出"
         },
         "errorUpdatingOrder": {
             "title": "订单更新错误"

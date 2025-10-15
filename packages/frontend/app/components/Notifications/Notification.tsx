@@ -194,7 +194,7 @@ export default function Notification(props: propsIF) {
                             color='var(--red)'
                         />
                     )}
-                    <h2>{data.title}</h2>
+                    <h2 style={{ userSelect: 'text' }}>{data.title}</h2>
                 </div>
                 <IoClose
                     className={styles.close}
@@ -202,7 +202,7 @@ export default function Notification(props: propsIF) {
                     onClick={() => dismiss(data.slug)}
                 />
             </header>
-            <p>{formatMessage(data.message)}</p>
+            <p style={{ userSelect: 'text' }}>{formatMessage(data.message)}</p>
             {data.txLink && (
                 <a
                     href={data.txLink}

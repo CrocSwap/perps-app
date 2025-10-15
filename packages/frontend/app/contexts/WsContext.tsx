@@ -14,6 +14,7 @@ interface WsContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribeAllByChannel: (channel: string) => void;
+    forceReconnect: () => void;
 }
 
 enum WebSocketReadyState {
@@ -27,6 +28,7 @@ export const WsContext = createContext<WsContextType>({
     subscribe: () => {},
     unsubscribe: () => {},
     unsubscribeAllByChannel: () => {},
+    forceReconnect: () => {},
 });
 
 export interface WsProviderProps {
@@ -34,7 +36,7 @@ export interface WsProviderProps {
     url: string;
 }
 
-interface WsSubscriptionConfig {
+export interface WsSubscriptionConfig {
     handler: (payload: any) => void;
     payload?: any;
     single?: boolean;
@@ -76,7 +78,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         } // ✅ Ensure WebSocket only runs on client side
 
         // Close the previous WebSocket if it exists
-        if (socketRef.current) {
+        if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
             socketRef.current.close();
         }
 
@@ -320,12 +322,21 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         return workers.current.get(type);
     };
 
+    const forceReconnect = () => {
+        if (sleepModeRef.current) {
+            return;
+        }
+        console.log('>>>> force reconnect !!!!!!!!!!!!!!!!!!');
+        connectWebSocket();
+    };
+
     return (
         <WsContext.Provider
             value={{
                 subscribe,
                 unsubscribe,
                 unsubscribeAllByChannel,
+                forceReconnect,
             }}
         >
             {children}

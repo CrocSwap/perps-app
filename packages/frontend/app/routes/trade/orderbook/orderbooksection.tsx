@@ -89,7 +89,9 @@ export default function OrderBookSection(props: propsIF) {
     const calculateOrderCount = useCallback(() => {
         let orderBookSection = document.getElementById('orderBookSection');
         if (!orderBookSection) {
-            orderBookSection = document.getElementById('orderBookContainer');
+            orderBookSection = document.getElementById(
+                'orderBookContainerInner',
+            );
         }
         const dummyOrderRow = document.getElementById('dummyOrderRow');
         const orderRowHeight =
@@ -134,7 +136,9 @@ export default function OrderBookSection(props: propsIF) {
             // use remaining height for trades (min 40% of available height)
             // that calculation adds more space if we can not place two rows for orderbook
             otherHeightTrades += getElementHeightWithMargins(
-                document.getElementById('orderBookContainer') as HTMLElement,
+                document.getElementById(
+                    'orderBookContainerInner',
+                ) as HTMLElement,
             );
             otherHeightTrades += getElementHeightWithMargins(
                 document.getElementById(

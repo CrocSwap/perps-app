@@ -9,6 +9,7 @@ import jaTranslation from '../locales/ja/translation.json';
 import koTranslation from '../locales/ko/translation.json';
 import zhTranslation from '../locales/zh/translation.json';
 import trTranslation from '../locales/tr/translation.json';
+import { SHOULD_LOG_ANALYTICS } from './utils/Constants';
 // import viTranslation from '../locales/vi/translation.json';
 // import deTranslation from '../locales/de/translation.json';
 
@@ -48,7 +49,7 @@ i18n.use(LanguageDetector)
         resources,
         fallbackLng: 'en',
         // debug: process.env.NODE_ENV === 'development',
-        debug: true,
+        debug: !SHOULD_LOG_ANALYTICS,
 
         interpolation: {
             escapeValue: false,

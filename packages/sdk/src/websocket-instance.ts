@@ -180,11 +180,6 @@ export class WebSocketInstance {
         this.onClose = this.onClose.bind(this);
         this.onError = this.onError.bind(this);
 
-        console.log(
-            `[${this.socketName}] WebSocketInstance created with baseUrl:`,
-            this.baseUrl,
-        );
-
         this.initializeWorkers();
 
         // Auto-connect unless explicitly disabled
@@ -236,17 +231,11 @@ export class WebSocketInstance {
     public connect = () => {
         // Prevent duplicate connection attempts
         if (this.isConnecting) {
-            console.log(
-                `[${this.socketName}] Already connecting, skipping duplicate attempt`,
-            );
             return;
         }
 
         // Check if already connected
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            console.log(
-                `[${this.socketName}] Already connected, skipping connection attempt`,
-            );
             return;
         }
 
@@ -266,7 +255,6 @@ export class WebSocketInstance {
         // Extract the base path after the protocol
         const basePath = this.baseUrl.replace(/^(https?|wss?):\/\//, '');
         const wsUrl = `${protocol}://${basePath}/ws`;
-        console.log(`[${this.socketName}] Connecting to`, wsUrl);
 
         // Create WebSocket
         try {
@@ -410,12 +398,6 @@ export class WebSocketInstance {
     };
 
     private onOpen = () => {
-        console.log(`>>> [${this.socketName}] onOpen`);
-        console.log(
-            `>>> [${this.socketName}] queuedSubscriptions`,
-            this.queuedSubscriptions,
-        );
-        console.log(`>>> [${this.socketName}] ..................... `);
         this.wsReady = true;
         this.isConnecting = false;
         this.firstMessageLogged = false;
@@ -458,17 +440,10 @@ export class WebSocketInstance {
         // Log first message to debug connection issues
         if (!this.firstMessageLogged) {
             this.firstMessageLogged = true;
-            console.log(
-                `[${this.socketName}] First message received:`,
-                message.substring ? message.substring(0, 200) : message,
-            );
         }
 
         // Skip connection established message
         if (message === 'Websocket connection established.') {
-            console.log(
-                `[${this.socketName}] Websocket connection established.`,
-            );
             return;
         }
 
@@ -489,7 +464,6 @@ export class WebSocketInstance {
             // Parse on main thread
             try {
                 const parsed = JSON.parse(message);
-                console.log('>>> parsed', parsed);
                 this.handleParsedMessage(parsed);
             } catch (error) {
                 this.log('Failed to parse message on main thread:', error);

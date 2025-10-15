@@ -6,7 +6,7 @@ import type {
     LibrarySymbolInfo,
     Mark,
     OnReadyCallback,
-} from '~/tv/charting_library/charting_library';
+} from '~/tv/charting_library';
 import {
     POLLING_API_URL,
     TIMEOUT_CANDLE_POLLING,

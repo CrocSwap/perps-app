@@ -222,13 +222,13 @@
 @media (max-width: 480px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 0.8fr 1fr 0.8fr;
+        grid-template-columns: 1fr 0.8fr 1fr;
         padding: 0 var(--padding-xs);
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 1fr 0.8fr;
+        grid-template-columns: 1fr 0.8fr 1fr;
     }
 
     .directionCell {

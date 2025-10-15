@@ -293,10 +293,12 @@ export default function Tabs(props: TabsProps) {
             {...(wrapperId ? { id: wrapperId } : {})}
             className={styles.tabsContainer}
             style={{ height: staticHeight }}
+            data-tabs
         >
             <div
                 className={`${styles.tabsWrapper} ${canScrollLeft ? styles.showLeftFade : ''} ${canScrollRight ? styles.showRightFade : ''}`}
                 ref={tabsWrapperRef}
+                data-tabs-wrapper
             >
                 {/* Left scroll arrow */}
                 {canScrollLeft && (
@@ -304,6 +306,7 @@ export default function Tabs(props: TabsProps) {
                         className={`${styles.scrollArrow} ${styles.scrollArrowLeft}`}
                         onClick={scrollLeft}
                         aria-label={t('aria.scrollTabsLeft')}
+                        data-tabs-arrow
                     >
                         <svg viewBox='0 0 24 24' fill='currentColor'>
                             <path d='M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z' />
@@ -316,6 +319,7 @@ export default function Tabs(props: TabsProps) {
                     className={styles.tabsList}
                     ref={tabsListRef}
                     onScroll={checkScroll}
+                    data-tabs-list
                 >
                     {tabs.map((tab, idx) => {
                         const tabId = getTabId(tab);
@@ -350,7 +354,9 @@ export default function Tabs(props: TabsProps) {
             </div>
 
             {rightContent && (
-                <div className={styles.rightContent}>{rightContent}</div>
+                <div className={styles.rightContent} data-tabs-right>
+                    {rightContent}
+                </div>
             )}
         </div>
     );

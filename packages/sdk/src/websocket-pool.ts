@@ -62,18 +62,18 @@ export class WebSocketPool {
         const socketsToCreate: Array<[string, WebSocketInstanceConfig]> = [];
 
         // Prepare market socket config if endpoint provided
-        if (this.config.endpoints.market) {
-            const marketConfig: WebSocketInstanceConfig = {
-                baseUrl: this.config.endpoints.market,
-                socketType: 'market',
-                socketName: 'market',
-                isDebug: this.config.isDebug,
-                numWorkers: this.config.numWorkers,
-                pingInterval: this.config.pingInterval,
-                autoConnect: false, // Don't connect immediately
-            };
-            socketsToCreate.push(['market', marketConfig]);
-        }
+        // if (this.config.endpoints.market) {
+        //     const marketConfig: WebSocketInstanceConfig = {
+        //         baseUrl: this.config.endpoints.market,
+        //         socketType: 'market',
+        //         socketName: 'market',
+        //         isDebug: this.config.isDebug,
+        //         numWorkers: this.config.numWorkers,
+        //         pingInterval: this.config.pingInterval,
+        //         autoConnect: false, // Don't connect immediately
+        //     };
+        //     socketsToCreate.push(['market', marketConfig]);
+        // }
 
         // Prepare user socket config if endpoint provided
         if (this.config.endpoints.user) {

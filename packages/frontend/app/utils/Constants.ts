@@ -174,10 +174,6 @@ export const RPC_ENDPOINT =
  */
 export const MARKET_ORDER_PRICE_OFFSET_USD = 50;
 
-console.log('Market Info Endpoint:', MARKET_INFO_ENDPOINT);
-console.log('Market WS Endpoint:', MARKET_WS_ENDPOINT);
-console.log('User WS Endpoint:', USER_WS_ENDPOINT);
-
 export const wsUrls = [
     MARKET_WS_ENDPOINT,
     'wss://pulse-api-mock.liquidity.tools/ws',

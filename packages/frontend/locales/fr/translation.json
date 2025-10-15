@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "Ordre {{side}} exécuté",
-            "message": "Ordre {{side}} exécuté avec succès pour {{usdValueOfFillStr}} de {{symbol}} à {{fillPrice}}"
+            "message": "Ordre {{side}} exécuté avec succès pour {{usdValueOfFillStr}} de {{symbol}} à {{fillPrice}}",
+            "buySide": "acheter",
+            "sellSide": "vendre"
         },
         "errorUpdatingOrder": {
             "title": "Erreur lors de la mise à jour de l'ordre"

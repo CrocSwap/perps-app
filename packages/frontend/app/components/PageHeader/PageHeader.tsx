@@ -205,10 +205,12 @@ export default function PageHeader() {
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected]);
 
+    const showDepositSlot = isUserConnected || !isShortScreen;
+
     return (
         <>
             <header id={'pageHeader'} className={styles.container}>
-                <Link to='/' style={{ marginLeft: '10px' }} viewTransition>
+                <Link to='/' className={styles.logo} viewTransition>
                     <img
                         src='/images/favicon.svg'
                         alt='Perps Logo'
@@ -284,44 +286,50 @@ export default function PageHeader() {
                     </Tooltip>
                 </nav>
                 <div className={styles.rightSide}>
-                    <span className={styles.depositSlot}>
-                        {isUserConnected ? (
-                            <section
-                                style={{ position: 'relative' }}
-                                ref={depositMenuRef}
-                            >
-                                <button
-                                    className={styles.depositButton}
-                                    onClick={() => {
-                                        if (isShortScreen) {
-                                            setIsDepositDropdownOpen(
-                                                !isDepositDropdownOpen,
-                                            );
-                                        } else {
-                                            openDepositModal();
-                                        }
-                                    }}
+                    {showDepositSlot && (
+                        <span className={styles.depositSlot}>
+                            {isUserConnected ? (
+                                <section
+                                    style={{ position: 'relative' }}
+                                    ref={depositMenuRef}
                                 >
-                                    {isShortScreen
-                                        ? t('common.transfer')
-                                        : t('common.deposit')}
-                                </button>
-                                {isDepositDropdownOpen && (
-                                    <DepositDropdown
-                                        isDropdown
-                                        marginBucket={marginBucket}
-                                        openDepositModal={openDepositModal}
-                                        openWithdrawModal={openWithdrawModal}
-                                    />
-                                )}
-                            </section>
-                        ) : (
-                            <div
-                                className={styles.depositButtonPlaceholder}
-                                aria-hidden
-                            />
-                        )}
-                    </span>
+                                    <button
+                                        className={styles.depositButton}
+                                        onClick={() => {
+                                            if (isShortScreen) {
+                                                setIsDepositDropdownOpen(
+                                                    !isDepositDropdownOpen,
+                                                );
+                                            } else {
+                                                openDepositModal();
+                                            }
+                                        }}
+                                    >
+                                        {isShortScreen
+                                            ? t('common.transfer')
+                                            : t('common.deposit')}
+                                    </button>
+
+                                    {isDepositDropdownOpen && (
+                                        <DepositDropdown
+                                            isDropdown
+                                            marginBucket={marginBucket}
+                                            openDepositModal={openDepositModal}
+                                            openWithdrawModal={
+                                                openWithdrawModal
+                                            }
+                                        />
+                                    )}
+                                </section>
+                            ) : (
+                                // desktop/tablet placeholder only (prevents layout shift on connect)
+                                <div
+                                    className={styles.depositButtonPlaceholder}
+                                    aria-hidden
+                                />
+                            )}
+                        </span>
+                    )}
 
                     {isUserConnected && showRPCButton && (
                         <section
@@ -359,8 +367,14 @@ export default function PageHeader() {
                         </section>
                     )}
                     <span
-                        className={`${!isUserConnected ? `plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Page+Header` : ''}`}
                         ref={sessionButtonRef}
+                        className={`${styles.sessionWrap} ${isUserConnected ? styles.activeSessionWrap : ''}`}
+                        data-plausible-event-name={
+                            !isUserConnected ? 'Login Button Click' : undefined
+                        }
+                        data-plausible-event-buttonlocation={
+                            !isUserConnected ? 'Page Header' : undefined
+                        }
                     >
                         <SessionButton />
                     </span>

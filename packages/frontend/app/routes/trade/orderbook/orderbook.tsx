@@ -35,7 +35,7 @@ import type { TabType } from '~/routes/trade';
 import { t } from 'i18next';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
-import { useWs } from '~/contexts/WsContext';
+import { useWs, type WsSubscriptionConfig } from '~/contexts/WsContext';
 
 interface OrderBookProps {
     orderCount: number;
@@ -66,9 +66,13 @@ const OrderBook: React.FC<OrderBookProps> = ({
     // TODO: Can be uncommented if we want to use the rest poller
     // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
-    const { subscribe, unsubscribeAllByChannel } = useWs();
+    const { subscribe, unsubscribe, forceReconnect } = useWs();
 
     const orderClickDisabled = false;
+    const forceReconnectInterval = useRef<ReturnType<
+        typeof setInterval
+    > | null>(null);
+    const forceReconnectRef = useRef(false);
 
     const [orderRowHeight, setOrderRowHeight] = useState<number>(16);
     useEffect(() => {
@@ -132,6 +136,14 @@ const OrderBook: React.FC<OrderBookProps> = ({
             return true;
         return false;
     }, [selectedResolution, symbol]);
+
+    useEffect(() => {
+        return () => {
+            if (forceReconnectInterval.current) {
+                clearInterval(forceReconnectInterval.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         const subKey = {
@@ -294,6 +306,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
             setOrderBook(buys, sells);
             setOrderBookState(TableState.FILLED);
             filledResolution.current = selectedResolution;
+            forceReconnectRef.current = false;
         },
         [selectedResolution, setOrderBook, setOrderBookState],
     );
@@ -318,9 +331,25 @@ const OrderBook: React.FC<OrderBookProps> = ({
                 single: true,
             });
 
+            forceReconnectInterval.current = setInterval(() => {
+                if (forceReconnectRef.current) {
+                    forceReconnect();
+                }
+
+                forceReconnectRef.current = true;
+            }, 2000);
+
             return () => {
                 // unsubscribeFromPoller('info', subKey);
                 // unsubscribe();
+                unsubscribe('l2Book', {
+                    payload: subKey,
+                    handler: handleOrderBookResult,
+                    single: true,
+                } as WsSubscriptionConfig);
+                if (forceReconnectInterval.current) {
+                    clearInterval(forceReconnectInterval.current);
+                }
             };
         }
     }, [subKey]);
@@ -457,7 +486,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     return (
         <div
-            id='orderBookContainer'
+            id='orderBookContainerInner'
             className={styles.orderBookContainer}
             style={{
                 ...(heightOverride && {
