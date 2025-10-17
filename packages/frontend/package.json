@@ -23,7 +23,7 @@
         "@fogo/sessions-idls": "^0.0.4",
         "@fogo/sessions-sdk": "^0.0.12",
         "@fogo/sessions-sdk-react": "^0.0.20",
-        "@fuul/sdk": "^7.0.5",
+        "@fuul/sdk": "^7.0.7",
         "@netlify/functions": "4.2.5",
         "@perps-app/sdk": "workspace:*",
         "@pythnetwork/hermes-client": "^2.0.0",

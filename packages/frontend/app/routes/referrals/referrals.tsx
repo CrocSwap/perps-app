@@ -2,7 +2,7 @@ import { t } from 'i18next';
 import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
 import ReferralsTabs from '~/components/Referrals/ReferralsTabs/ReferralsTabs';
 import styles from './referrals.module.css';
-// export function meta({}: Route.MetaArgs) {
+
 export function meta() {
     return [
         { title: 'Referrals | Ambient' },
@@ -10,7 +10,6 @@ export function meta() {
     ];
 }
 
-// export default function Referrals({ loaderData }: Route.ComponentProps) {
 export default function Referrals() {
     return (
         <div className={styles.container}>

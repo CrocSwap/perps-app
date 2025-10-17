@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 // } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation, useSearchParams } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import useMediaQuery, { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -33,6 +33,12 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
+import {
+    URL_PARAMS,
+    useUrlParams,
+    type UrlParamMethodsIF,
+} from '~/hooks/useURLParams';
+import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
 
 export default function PageHeader() {
@@ -42,27 +48,15 @@ export default function PageHeader() {
     const handleFeedbackClose = () => {
         setIsFeedbackOpen(false);
     };
-    // logic to read a URL referral code and set in state + local storage
-    const [searchParams] = useSearchParams();
+
+    const referralCodeFromURL: UrlParamMethodsIF = useUrlParams(
+        URL_PARAMS.referralCode,
+    );
+
     const userDataStore = useUserDataStore();
+
+    const referralStore = useReferralStore();
     const { t } = useTranslation();
-    useEffect(() => {
-        const REFERRAL_CODE_URL_PARAM = 'referral';
-        const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
-        const referralCode =
-            searchParams.get(REFERRAL_CODE_URL_PARAM) ||
-            searchParams.get(ALTERNATE_REFERRAL_CODE_URL_PARAM);
-        if (referralCode) {
-            userDataStore.setReferralCode(referralCode);
-            const newSearchParams = new URLSearchParams(
-                searchParams.toString(),
-            );
-            newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
-            newSearchParams.delete(ALTERNATE_REFERRAL_CODE_URL_PARAM);
-            const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
-            window.history.replaceState({}, '', newUrl); // remove referral code from URL
-        }
-    }, [searchParams]);
 
     const sessionState = useSession();
 
@@ -111,7 +105,7 @@ export default function PageHeader() {
         { name: t('navigation.trade'), path: `/v2/trade/${symbol}` },
         // { name: 'Vaults', path: '/v2/vaults' },
         // { name: 'Portfolio', path: '/v2/portfolio' },
-        // { name: 'Referrals', path: '/v2/referrals' },
+        { name: 'Referrals', path: '/v2/referrals' },
         // { name: 'Points', path: '/points' },
         // { name: 'Leaderboard', path: '/v2/leaderboard' },
         // { name: 'Strategies', path: '/strategies' },
@@ -143,7 +137,7 @@ export default function PageHeader() {
         setIsHelpDropdownOpen(false);
     }, isHelpDropdownOpen);
 
-    // logic to open and close the app settings modal
+    // logic to open and close modals
     const appSettingsModal = useModal('closed');
 
     // event handler to close dropdown menus on `Escape` keydown
@@ -169,6 +163,9 @@ export default function PageHeader() {
 
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
+
+    // determine if user is on the home page (all other perps pages are v2)
+    const onHomePage: boolean = !location.pathname.includes('v2');
 
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
@@ -202,8 +199,12 @@ export default function PageHeader() {
                 plausible('Session Ended');
             }
         }
+
+        referralCodeFromURL.value &&
+            referralStore.cache(referralCodeFromURL.value);
+
         prevIsUserConnected.current = isUserConnected;
-    }, [isUserConnected]);
+    }, [isUserConnected, userDataStore.userAddress, onHomePage]);
 
     const showDepositSlot = isUserConnected || !isShortScreen;
 

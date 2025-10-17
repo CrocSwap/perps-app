@@ -396,9 +396,13 @@
     },
     "referrals": {
         "title": "Referanslar",
-        "description": "Kullanıcıları davet et, ödül kazanın. İş Ortakları daha fazla kazanır.",
-        "tradersReferred": "Referans Edilen Traderlar",
-        "rewardsEarned": "Kazanılan Ödüller"
+        "description": "Kullanıcıları davet ederek ödüller kazanın. İş ortakları daha yüksek ödüller kazanır.",
+        "tradersReferred": "Yönlendirilen traderlar",
+        "rewardsEarned": "Kazanılan ödüller",
+        "rewardHistory": "Ödül geçmişi",
+        "enterCode": "Kodu girin",
+        "claim": "Talep et",
+        "createCode": "Kod oluştur"
     },
     "deposit": {
         "prompt": "Fogo'dan {{token}} yatır",

@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-export interface UserDataStore {
-    userAddress: string;
-    setUserAddress: (userAddress: string) => void;
+export interface ReferralStoreIF {
+    cached: string;
+    cache(refCode: string): void;
 }
 
-const LS_KEY = 'USER_DATA';
+const LS_KEY = 'AFFILIATE_DATA';
 
 const ssrSafeStorage = () =>
     (typeof window !== 'undefined'
@@ -20,16 +20,15 @@ const ssrSafeStorage = () =>
               length: 0,
           }) as Storage;
 
-export const useUserDataStore = create<UserDataStore>()(
+export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set) => ({
-            userAddress: '',
-            setUserAddress: (userAddress: string) => {
-                set({ userAddress });
+            cached: '',
+            cache(refCode: string): void {
+                set({ cached: refCode });
             },
         }),
         {
-            // local storage key for persisted data
             name: LS_KEY,
             storage: createJSONStorage(ssrSafeStorage),
             version: 1,

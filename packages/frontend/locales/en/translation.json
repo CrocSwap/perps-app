@@ -40,7 +40,9 @@
         "reset": "Reset",
         "announcements": "Announcements",
         "leverage": "Leverage",
-        "comingSoon": "Coming Soon"
+        "comingSoon": "Coming Soon",
+        "enter": "Enter",
+        "claim": "Claim"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -398,7 +400,25 @@
         "title": "Referrals",
         "description": "Refer users to earn rewards. Affiliates earn higher rewards.",
         "tradersReferred": "Traders Referred",
-        "rewardsEarned": "Rewards Earned"
+        "rewardsEarned": "Rewards Earned",
+        "rewardHistory": "Reward History",
+        "enterCode": "Enter Code",
+        "createCode": "Create Code",
+        "usingAffiliateCode": "Using Affiliate Code",
+        "overwriteCurrentReferralCode": "Overwrite current referral code",
+        "enterReferralCode": "Enter a referral code",
+        "referralCodeNotValidPleaseConfirm": "The code {{invalidCode}} is not claimed in the referral program. Please confirm the code is correct.",
+        "yourCodeIs": "Your code is {{affiliateCode}}",
+        "createAnAffiliateCode": "Create an affiliate code",
+        "createAUniqueCodeToEarn": "Create a unique code to earn 10% of referred users' fees.",
+        "codeAlreadyInUse": "Code Already In Use",
+        "connectYourWallet": {
+            "affiliate": "Connect your wallet to create an affiliate code",
+            "claim": "Connect your wallet to claim rewards"
+        },
+        "claimRewardsWithAmount": "Claim {{amount}} in rewards",
+        "selectATabToViewData": "Select a tab to view data",
+        "trackingLinkExplanation": "You will receive <0>{{affiliatePercent}}</0> of referred users fees and they will receive a <1>{{userPercent}}</1> discount. See the Docs for more."
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",

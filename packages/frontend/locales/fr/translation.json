@@ -396,9 +396,13 @@
     },
     "referrals": {
         "title": "Parrainages",
-        "description": "Parrainez des utilisateurs et gagnez des récompenses. Les affiliés gagnent plus.",
+        "description": "Parrainez des utilisateurs pour gagner des récompenses. Les affiliés obtiennent des récompenses plus élevées.",
         "tradersReferred": "Traders parrainés",
-        "rewardsEarned": "Récompenses gagnées"
+        "rewardsEarned": "Récompenses obtenues",
+        "rewardHistory": "Historique des récompenses",
+        "enterCode": "Saisir le code",
+        "claim": "Réclamer",
+        "createCode": "Créer un code"
     },
     "deposit": {
         "prompt": "Déposer {{token}} depuis Fogo",

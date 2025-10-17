@@ -394,9 +394,13 @@
     },
     "referrals": {
         "title": "Empfehlungen",
-        "description": "Werben Sie Nutzer und verdienen Sie Belohnungen. Partner erhalten höhere Prämien.",
+        "description": "Empfehle Nutzer, um Belohnungen zu verdienen. Partner erhalten höhere Belohnungen.",
         "tradersReferred": "Empfohlene Trader",
-        "rewardsEarned": "Erhaltene Belohnungen"
+        "rewardsEarned": "Verdiente Belohnungen",
+        "rewardHistory": "Belohnungsverlauf",
+        "enterCode": "Code eingeben",
+        "claim": "Einlösen",
+        "createCode": "Code erstellen"
     },
     "deposit": {
         "prompt": "{{token}} von Fogo einzahlen",
