@@ -1,7 +1,4 @@
-import type {
-    Bar,
-    ResolutionString,
-} from '~/tv/charting_library/charting_library';
+import type { Bar, ResolutionString } from '~/tv/charting_library';
 
 // transforms ws candle data to Bar object
 export const processWSCandleMessage = (payload: any): Bar => {

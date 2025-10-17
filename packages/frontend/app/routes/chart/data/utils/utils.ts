@@ -6,7 +6,7 @@ import type {
     CustomThemeColors,
     CustomThemes,
     LibrarySymbolInfo,
-} from '~/tv/charting_library/charting_library';
+} from '~/tv/charting_library';
 
 export type ChartLayout = {
     chartLayout: object;

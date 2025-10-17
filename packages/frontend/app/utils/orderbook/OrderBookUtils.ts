@@ -196,10 +196,13 @@ export const sortOrderData = (
                         ? a.side.localeCompare(b.side)
                         : b.side.localeCompare(a.side),
                 );
+
             case 'sz':
-                return [...orderData].sort((a, b) =>
-                    sortDirection === 'asc' ? a.sz - b.sz : b.sz - a.sz,
-                );
+                return [...orderData].sort((a, b) => {
+                    const va = a.sz ?? -Infinity;
+                    const vb = b.sz ?? -Infinity;
+                    return sortDirection === 'asc' ? va - vb : vb - va;
+                });
 
             case 'filledSz':
                 return [...orderData].sort((a, b) => {

@@ -32,6 +32,7 @@ export default function ExpandableOrderBook({
             className={styles.root}
             animate={{ width: open ? expanded : collapsed }}
             transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+            style={{ overflowY: 'hidden' }}
         >
             {/* Toggle handle (always visible) */}
             <button

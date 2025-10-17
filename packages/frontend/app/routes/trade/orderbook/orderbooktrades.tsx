@@ -1,18 +1,17 @@
-import type { Info } from '@perps-app/sdk';
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { t } from 'i18next';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
-import { useSdk } from '~/hooks/useSdk';
+import { useWs, type WsSubscriptionConfig } from '~/contexts/WsContext';
 import { processTrades } from '~/processors/processOrderBook';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { TableState } from '~/utils/CommonIFs';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './orderbooktrades.module.css';
 import OrderTradeRow from './ordertraderow/ordertraderow';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { t } from 'i18next';
 
 interface OrderBookTradesProps {
     maxHeight?: number;
@@ -21,11 +20,8 @@ interface OrderBookTradesProps {
 const TRADES_LIMIT = 50;
 
 const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ maxHeight }) => {
-    const { info } = useSdk();
+    const { subscribe, unsubscribe, unsubscribeAllByChannel } = useWs();
     const { trades, setTrades } = useOrderBookStore();
-
-    const infoRef = useRef<Info | null>(null);
-    infoRef.current = info;
 
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
@@ -43,13 +39,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ maxHeight }) => {
 
     useEffect(() => {
         return () => {
-            infoRef.current?.hardUnsubscribe(
-                {
-                    type: WsChannels.ORDERBOOK_TRADES,
-                    coin: symbolRef.current,
-                },
-                postOrderBookTrades,
-            );
+            unsubscribeAllByChannel(WsChannels.ORDERBOOK_TRADES);
         };
     }, []);
 
@@ -85,27 +75,29 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ maxHeight }) => {
     );
 
     useEffect(() => {
-        if (!infoRef.current) return;
         if (!symbol || symbol.length === 0) return;
 
         setTableState(TableState.LOADING);
 
-        const { unsubscribe } = infoRef.current.subscribe(
-            {
+        const cfg = {
+            payload: {
                 type: WsChannels.ORDERBOOK_TRADES,
                 coin: symbol,
             },
-            postOrderBookTrades,
-        );
+            handler: postOrderBookTrades,
+            single: true,
+        } as WsSubscriptionConfig;
+
+        subscribe(WsChannels.ORDERBOOK_TRADES, cfg);
 
         return () => {
-            unsubscribe();
+            unsubscribe(WsChannels.ORDERBOOK_TRADES, cfg);
         };
     }, [symbol]);
 
     const postOrderBookTrades = useCallback(
         (payload: any) => {
-            mergeTrades(processTrades(payload.data));
+            mergeTrades(processTrades(payload));
         },
         [mergeTrades, processTrades],
     );

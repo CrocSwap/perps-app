@@ -15,8 +15,8 @@ const PUBLIC_DIR = path.resolve(__dirname, '../public');
 // Define specific paths to copy
 const COPY_PATHS = [
     {
-        source: path.join(SUBMODULE_ROOT, 'charting_library/bundles'),
-        dest: path.join(PUBLIC_DIR, 'tv/charting_library/bundles'),
+        source: path.join(SUBMODULE_ROOT, 'charting_library'),
+        dest: path.join(PUBLIC_DIR, 'tv/charting_library'),
     },
     {
         source: path.join(SUBMODULE_ROOT, 'datafeeds/udf/dist/bundle.js'),
