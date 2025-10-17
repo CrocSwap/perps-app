@@ -53,8 +53,6 @@ import { processSymbolUrlParam } from '~/utils/AppUtils';
 
 import i18n from 'i18next';
 
-import { loadTradingView } from '~/routes/chart/lazyLoading/useLazyTradingview';
-
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
     isChartReady: boolean;
@@ -74,13 +72,21 @@ export interface ChartContainerProps {
     userId: string;
     fullscreen: boolean;
     autosize: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     studiesOverrides: any;
     container: string;
 }
 
-export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
-    children,
-}) => {
+export const TradingViewProvider: React.FC<{
+    children: React.ReactNode;
+    tradingviewLib?: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        widget?: new (opts: any) => IChartingLibraryWidget;
+    } | null;
+    setChartLoadingStatus: React.Dispatch<
+        React.SetStateAction<'loading' | 'error' | 'ready'>
+    >;
+}> = ({ children, tradingviewLib, setChartLoadingStatus }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
@@ -223,14 +229,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const initChart = useCallback(async () => {
         if (typeof window === 'undefined') return;
 
-        const { widget } = await loadTradingView();
-        if (!info || !widget) return;
+        if (!info || !tradingviewLib?.widget) return;
 
         dataFeedRef.current = createDataFeed(info, addToFetchedChannels);
 
         const processedSymbol = processSymbolUrlParam(marketId || 'BTC');
 
-        const tvWidget = new widget({
+        const tvWidget = new tradingviewLib.widget({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
             timezone: 'Etc/UTC',
@@ -279,6 +284,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             },
         });
 
+        tvWidget.headerReady().then(() => {
+            setChartLoadingStatus('ready');
+        });
         // tvWidget.headerReady().then(() => {
         //     const liquidationsButton = tvWidget.createButton();
 
@@ -383,7 +391,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
             setChart(tvWidget);
         });
-    }, [chartState, info]);
+    }, [chartState, info, tradingviewLib]);
 
     useEffect(() => {
         setIsChartReady(false);
@@ -405,7 +413,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 console.error(error);
             }
         };
-    }, [chartState, info, i18n.language, initChart]);
+    }, [chartState, info, i18n.language, initChart, tradingviewLib]);
 
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;
