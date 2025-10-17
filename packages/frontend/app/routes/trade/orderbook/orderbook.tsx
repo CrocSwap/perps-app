@@ -83,31 +83,42 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, []);
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
-    const [selectedResolution, setSelectedResolution] =
-        useState<OrderRowResolutionIF | null>(null);
-
-    const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
 
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
     const { formatNum } = useNumFormatter();
     const lockOrderBook = useRef<boolean>(false);
     const { getBsColor } = useAppSettings();
-    const { buys, sells, setOrderBook, addToResolutionPair, resolutionPairs } =
-        useOrderBookStore();
-
+    const {
+        buys,
+        sells,
+        selectedResolution,
+        selectedMode,
+        orderBookState,
+        setOrderBook,
+        setSelectedResolution,
+        setSelectedMode,
+        setOrderBookState,
+        addToResolutionPair,
+        resolutionPairs,
+    } = useOrderBookStore();
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
 
-    const rowLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-        null,
-    );
+    // const rowLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    //     null,
+    // );
 
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
     // No useMemo for simple arithmetic
     const buyPlaceHolderCount = Math.max(orderCount - buys?.length || 0, 0);
     const sellPlaceHolderCount = Math.max(orderCount - sells?.length || 0, 0);
+
+    // useEffect(() => {
+    //     console.log('buys', buys);
+    //     console.log('sells', sells);
+    //     console.log('orderBook');
+    // }, [buys, sells]);
 
     const {
         userOrders,
@@ -258,6 +269,14 @@ const OrderBook: React.FC<OrderBookProps> = ({
         return slots;
     }, [userSymbolOrders, sellSlots, findClosestSlot, formatNum]);
 
+    const handleOrderBookWorkerResult = useCallback(
+        ({ data }: { data: OrderBookOutput }) => {
+            setOrderBook(data.buys, data.sells);
+            setOrderBookState(TableState.FILLED);
+            filledResolution.current = selectedResolution;
+        },
+        [selectedResolution, setOrderBook, setOrderBookState],
+    );
     // code blocks were being used in sdk approach
 
     // const handleOrderBookWorkerResult = useCallback(
@@ -651,7 +670,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     background: `linear-gradient(to top,  ${getBsColor().buy} 0%, var(--bg-dark2) 100%)`,
                                 }}
                             ></div>
-                            <div className={styles.orderBookBlock}>
+                            <div
+                                id={'orderbook-sell-block'}
+                                className={styles.orderBookBlock}
+                            >
                                 {sellPlaceHolderCount === 1 ? (
                                     <div className={styles.orderRowWrapper}>
                                         <div
@@ -738,7 +760,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
                             {midHeader('orderBookMidHeader')}
 
-                            <div className={styles.orderBookBlock}>
+                            <div
+                                id={'orderbook-buy-block'}
+                                className={styles.orderBookBlock}
+                            >
                                 {buys
                                     .slice(0, orderCount)
                                     .map((order, index) => (
