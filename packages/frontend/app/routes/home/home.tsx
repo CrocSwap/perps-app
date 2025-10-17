@@ -123,7 +123,8 @@ export function meta() {
         {
             name: 'og:image',
             content:
-                'https://perps.ambient.finance/images/og/btc-on-ambient.png',
+                // 'https://perps.ambient.finance/images/og/btc-on-ambient.png',
+                'https://perps-banner-1080663129748.europe-west1.run.app/on-ambient/btc',
         },
     ];
 }

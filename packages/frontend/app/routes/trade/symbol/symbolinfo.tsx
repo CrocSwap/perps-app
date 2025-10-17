@@ -68,9 +68,9 @@ const SymbolInfo: React.FC = React.memo(() => {
             return `${symbolInfo?.markPx ? '$' + formatNum(symbolInfo?.markPx) + ' | ' : ''} ${marketId?.toUpperCase() ? marketId?.toUpperCase() + ' | ' : ''}Ambient`;
         }
     }, [symbolInfo?.markPx, marketId, titleOverride]);
-
     const ogImage = useMemo(() => {
-        return `https://perps.ambient.finance/images/og/${marketIdWithFallback.toLowerCase()}-on-ambient.png`;
+        // return `https://perps.ambient.finance/images/og/${marketIdWithFallback.toLowerCase()}-on-ambient.png`;
+        return `https://perps-banner-1080663129748.europe-west1.run.app/on-ambient/${marketIdWithFallback.toLowerCase()}`;
     }, [marketIdWithFallback]);
 
     return (
