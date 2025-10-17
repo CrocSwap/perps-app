@@ -16,7 +16,7 @@ import React, {
     useState,
 } from 'react';
 import { GoZap } from 'react-icons/go';
-import { LuCircleHelp } from 'react-icons/lu';
+import { LuCircleHelp, LuOctagonX } from 'react-icons/lu';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
@@ -117,18 +117,18 @@ function OrderInput({
                   icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
               },
               // disabled code 21 Jul 25
-              //   {
-              //       value: 'stop_market',
-              //       label: 'Stop Market',
-              //       blurb: 'Triggers a market order at a set price',
-              //       icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-              //   },
-              //   {
-              //       value: 'stop_limit',
-              //       label: 'Stop Limit',
-              //       blurb: 'Triggers a limit order at a set price',
-              //       icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-              //   },
+              {
+                  value: 'stop_market',
+                  label: 'Stop Market',
+                  blurb: 'Triggers a market order at a set price',
+                  icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+              },
+              {
+                  value: 'stop_limit',
+                  label: 'Stop Limit',
+                  blurb: 'Triggers a limit order at a set price',
+                  icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+              },
               //   {
               //       value: 'twap',
               //       label: 'TWAP',
@@ -215,6 +215,17 @@ function OrderInput({
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
+    // Take Profit / Stop Loss state
+    const [takeProfitPrice, setTakeProfitPrice] = useState('');
+    const [stopLossPrice, setStopLossPrice] = useState('');
+    const [takeProfitGain, setTakeProfitGain] = useState('');
+    const [stopLossLoss, setStopLossLoss] = useState('');
+    const [tpGainCurrency, setTpGainCurrency] = useState<'$' | '%'>('$');
+    const [slLossCurrency, setSlLossCurrency] = useState<'$' | '%'>('$');
+
+    const minNotionalUsdOrderSize = 0.99;
+    const [maxNotionalUsdOrderSize, setMaxNotionalUsdOrderSize] =
+        useState<number>(100_000);
     const [maxRemainingOI, setMaxRemainingOI] = useState<number>(100_000);
 
     const OI_BUFFER = 0.9995;
@@ -1021,6 +1032,22 @@ function OrderInput({
             handleToggleRandomize,
             isChasingIntervalEnabled,
             handleToggleIsChasingInterval: handleToggleChasingInterval,
+            takeProfitPrice,
+            setTakeProfitPrice,
+            stopLossPrice,
+            setStopLossPrice,
+            takeProfitGain,
+            setTakeProfitGain,
+            stopLossLoss,
+            setStopLossLoss,
+            tpGainCurrency,
+            setTpGainCurrency,
+            slLossCurrency,
+            setSlLossCurrency,
+            markPx: markPx || 0,
+            symbol: symbol || '',
+            notionalSymbolQtyNum: notionalQtyNum,
+            tradeDirection,
         }),
         [
             isReduceOnlyEnabled,
@@ -1032,6 +1059,16 @@ function OrderInput({
             handleToggleRandomize,
             isChasingIntervalEnabled,
             handleToggleChasingInterval,
+            takeProfitPrice,
+            stopLossPrice,
+            takeProfitGain,
+            stopLossLoss,
+            tpGainCurrency,
+            slLossCurrency,
+            markPx,
+            symbol,
+            notionalQtyNum,
+            tradeDirection,
         ],
     );
 
@@ -2314,7 +2351,7 @@ function OrderInput({
                                 >
                                     <div className={styles.name_and_icon}>
                                         {mo.icon}
-                                        <h4>{mo.label}</h4>
+                                        <h4>{mo.label} </h4>
                                     </div>
                                     <div>
                                         <p>{mo.blurb}</p>
