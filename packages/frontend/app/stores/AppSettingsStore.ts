@@ -43,11 +43,18 @@ type AppSettingsStore = {
 
     chartTopHeight: number | null;
     setChartTopHeight: (h: number | null) => void;
+    leftColWidth: number | null;
+    setLeftColWidth: (w: number | null) => void;
     resetLayoutHeights: () => void;
+
+    isWalletCollapsed: boolean;
+    setIsWalletCollapsed: (collapsed: boolean) => void;
 };
 
 const LS_KEY = 'VISUAL_SETTINGS';
 const DEFAULT_CHART_TOP_HEIGHT: number | null = null;
+const DEFAULT_LEFT_COL_WIDTH: number | null = null;
+const DEFAULT_WALLET_COLLAPSED = false;
 
 const ssrSafeStorage = () =>
     (typeof window !== 'undefined'
@@ -77,27 +84,57 @@ export const useAppSettings = create<AppSettingsStore>()(
 
             chartTopHeight: DEFAULT_CHART_TOP_HEIGHT,
             setChartTopHeight: (h) => set({ chartTopHeight: h }),
+
+            leftColWidth: DEFAULT_LEFT_COL_WIDTH,
+            setLeftColWidth: (w) => set({ leftColWidth: w }),
+
             resetLayoutHeights: () =>
-                set({ chartTopHeight: DEFAULT_CHART_TOP_HEIGHT }),
+                set({
+                    chartTopHeight: DEFAULT_CHART_TOP_HEIGHT,
+                    leftColWidth: DEFAULT_LEFT_COL_WIDTH,
+                }),
+            isWalletCollapsed: DEFAULT_WALLET_COLLAPSED,
+            setIsWalletCollapsed: (collapsed) =>
+                set({ isWalletCollapsed: collapsed }),
         }),
+
         {
             name: LS_KEY,
             storage: createJSONStorage(ssrSafeStorage),
-            version: 3,
+            version: 5,
             migrate: (persistedState: unknown, version: number) => {
+                const state = persistedState as AppSettingsStore;
+
                 if (version < 3) {
                     return {
-                        ...(persistedState as AppSettingsStore),
+                        ...state,
                         bsColor: 'colors.default',
                     };
                 }
+
+                if (version < 4) {
+                    return {
+                        ...state,
+                        leftColWidth: DEFAULT_LEFT_COL_WIDTH,
+                    };
+                }
+                if (version < 5) {
+                    return {
+                        ...state,
+                        isWalletCollapsed: DEFAULT_WALLET_COLLAPSED,
+                    };
+                }
+
                 return persistedState;
             },
+
             partialize: (state) => ({
                 bsColor: state.bsColor,
                 numFormat: state.numFormat,
                 // orderBookMode: state.orderBookMode,
                 chartTopHeight: state.chartTopHeight,
+                leftColWidth: state.leftColWidth,
+                isWalletCollapsed: state.isWalletCollapsed,
             }),
         },
     ),
