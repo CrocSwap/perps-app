@@ -3,7 +3,8 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { reactRouter } from '@react-router/dev/vite';
-import netlifyPlugin from '@netlify/vite-plugin-react-router';
+// Remove Netlify plugin as it conflicts with React Router SSR builds
+// import netlifyPlugin from '@netlify/vite-plugin-react-router';
 
 const appName = 'Ambient Perps';
 const appDescription = 'A modern, performant app for perpetual contracts.';
@@ -34,7 +35,7 @@ export default defineConfig({
         }),
         tsconfigPaths(),
         reactRouter(),
-        netlifyPlugin(),
+        // Removed Netlify plugin due to React Router SSR conflicts
         VitePWA({
             registerType: 'autoUpdate',
             workbox: {

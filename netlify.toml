@@ -1,7 +1,7 @@
 [build]
   base = "packages/frontend"
   command = "node scripts/generate-announcements.js && node scripts/write-version.js && pnpm build"
-  publish = "build"
+  publish = "build/client"
   functions = "netlify/functions"
 
 [build.environment]
@@ -21,7 +21,7 @@ VITE_CONTEXT = "branch-deploy"
   port = 3002
   targetPort = 3002
   framework = "vite"
-  publish = "build"
+  publish = "build/client"
   autoLaunch = true
 
 # Handle client-side routing
