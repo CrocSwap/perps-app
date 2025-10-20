@@ -276,6 +276,15 @@ export function Document({ children }: { children: React.ReactNode }) {
     );
 }
 
+// HydrateFallback component for SPA mode
+export function HydrateFallback() {
+    return (
+        <div className='hydrate-fallback'>
+            <LogoLoadingIndicator />
+        </div>
+    );
+}
+
 // Main App Component
 export default function App() {
     const { wsEnvironment } = useDebugStore();

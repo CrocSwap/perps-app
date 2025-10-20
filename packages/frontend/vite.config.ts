@@ -12,7 +12,8 @@ export default defineConfig({
     build: {
         outDir: 'build',
         emptyOutDir: true,
-        ssr: false,
+        // Enable SSR for prerender builds
+        ssr: true,
     },
     ssr: {
         noExternal: ['@fogo/sessions-sdk-react'],
