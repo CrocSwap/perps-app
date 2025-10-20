@@ -13,6 +13,9 @@ export default defineConfig({
         outDir: 'build',
         emptyOutDir: true,
         ssr: true,
+        rollupOptions: {
+            external: ['@noble/hashes'],
+        },
     },
     ssr: {
         noExternal: ['@fogo/sessions-sdk-react'],
