@@ -12,7 +12,7 @@ export default defineConfig({
     build: {
         outDir: 'build',
         emptyOutDir: true,
-        ssr: true,
+        ssr: false,
     },
     ssr: {
         noExternal: ['@fogo/sessions-sdk-react'],
