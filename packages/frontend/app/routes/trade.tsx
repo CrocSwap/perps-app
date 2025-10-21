@@ -34,6 +34,7 @@ import { getSizePercentageSegment } from '~/utils/functions/getSegment';
 import { useTranslation } from 'react-i18next';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import ExpandableOrderBook from './trade/orderbook/ExpandableOrderBook';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -43,6 +44,9 @@ const MemoizedSymbolInfo = memo(SymbolInfo);
 export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
 export default function Trade() {
+    const sessionState = useSession();
+    const isUserConnected = isEstablished(sessionState);
+
     const { symbol, selectedTradeTab, setSelectedTradeTab } =
         useTradeDataStore();
     // Mobile-only dropdown state
@@ -541,6 +545,30 @@ export default function Trade() {
         const tableHeight = available - currentTop;
         return tableHeight <= TABLE_COLLAPSED + 0.5;
     };
+    const autoCollapsedForGuestRef = useRef(false);
+
+    useEffect(() => {
+        const canMeasure = !!leftColRef.current;
+
+        if (
+            !isUserConnected &&
+            canMeasure &&
+            !autoCollapsedForGuestRef.current
+        ) {
+            if (!isTableCollapsed()) {
+                requestAnimationFrame(() => {
+                    collapseTableToBar();
+                    autoCollapsedForGuestRef.current = true;
+                });
+            } else {
+                autoCollapsedForGuestRef.current = true;
+            }
+        }
+
+        if (isUserConnected) {
+            autoCollapsedForGuestRef.current = false;
+        }
+    }, [isUserConnected, leftColRef, isTableCollapsed]);
 
     const openTableToDefault = () => {
         const available = getAvailable();
