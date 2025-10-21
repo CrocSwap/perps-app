@@ -21,8 +21,8 @@
     "dependencies": {
         "@crocswap-libs/ambient-ember": "^0.1.59",
         "@fogo/sessions-idls": "^0.0.7",
-        "@fogo/sessions-sdk": "^0.0.12",
-        "@fogo/sessions-sdk-react": "^0.0.20",
+        "@fogo/sessions-sdk": "^0.0.16",
+        "@fogo/sessions-sdk-react": "^0.0.26",
         "@fuul/sdk": "^7.0.5",
         "@netlify/functions": "4.2.5",
         "@perps-app/sdk": "workspace:*",
