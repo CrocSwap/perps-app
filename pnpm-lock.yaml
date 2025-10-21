@@ -24,8 +24,8 @@ importers:
         specifier: ^0.1.59
         version: 0.1.59(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@fogo/sessions-idls':
-        specifier: ^0.0.4
-        version: 0.0.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+        specifier: ^0.0.7
+        version: 0.0.7(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@fogo/sessions-sdk':
         specifier: ^0.0.12
         version: 0.0.12(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
@@ -1194,6 +1194,9 @@ packages:
 
   '@fogo/sessions-idls@0.0.4':
     resolution: {integrity: sha512-VQ6ZnXTSeLrwcENyQqD11xMpZOjtgBmE2QYQdu4Wy2Nc2D/g/T8EeqAOJJ0OFiR08LDo2ggffQn5ansc1PL2rg==}
+
+  '@fogo/sessions-idls@0.0.7':
+    resolution: {integrity: sha512-bYYBD6SJfl8ubuakq2aE78B/4IcGdZpBY9rz26dt8T61gwK3343KU0ZKZAkT4rAqWxTNz9j6lujXaWY/FnmKTA==}
 
   '@fogo/sessions-sdk-react@0.0.20':
     resolution: {integrity: sha512-pJYUAO7cmUM3CZp1u0sMe6N8ipCU06aes4E3QfQPJpM0UytgJQX1ZLNtEAFyQpnrgkDC5ODVygt5OzczRYmG2g==}
@@ -9948,6 +9951,15 @@ snapshots:
       '@emurgo/cardano-serialization-lib-nodejs': 13.2.0
 
   '@fogo/sessions-idls@0.0.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+
+  '@fogo/sessions-idls@0.0.7(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
