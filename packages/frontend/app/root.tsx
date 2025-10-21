@@ -284,6 +284,10 @@ export default function App() {
 
     const restrictedSiteModal = useModal('closed');
 
+    useEffect(() => {
+        console.log('versionLog', process.version);
+    }, []);
+
     return (
         <Document>
             <FogoSessionProvider
