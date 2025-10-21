@@ -1,3 +1,4 @@
+import useMediaQuery from '~/hooks/useMediaQuery';
 import styles from './symbollist.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
 
@@ -23,6 +24,7 @@ export default function SymbolListTableHeader({
     const handleSort = (key: string) => {
         sortClickHandler(key);
     };
+    const isMobileVersion = useMediaQuery('(max-width: 560px)');
 
     const tableHeaders: HeaderCell[] = [
         {
@@ -61,11 +63,11 @@ export default function SymbolListTableHeader({
             className: styles.volumeCell,
         },
         {
-            name: 'Last / 24h',
+            name: 'Price/24h',
             key: 'lastChangeCombo',
-            sortable: true,
+            sortable: isMobileVersion ? false : true,
             onClick: () => handleSort('lastPrice'),
-            className: styles.priceChangeCombo,
+            className: styles.priceChangeComboHeader,
         },
 
         {

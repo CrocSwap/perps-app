@@ -17,16 +17,10 @@ const SymbolSearch: React.FunctionComponent = () => {
     const symbolSearchBackdropRef = useOutsideClick<HTMLDivElement>(() => {
         setIsOpen(false);
     }, true);
-    // Separate ref for the mobile sheet so inside clicks don’t close it.
-    const sheetRef = useRef<HTMLDivElement | null>(null);
-    // useOutsideClick<HTMLDivElement>(
-    //     () => {
-    //         if (!isMobile) return;
-    //         setIsOpen(false);
-    //     },
-    //     true,
-    //     sheetRef,
-    // );
+
+    const sheetRef = useOutsideClick<HTMLDivElement>(() => {
+        setIsOpen(false);
+    }, isOpen);
 
     const wrapperClickHandler = () => {
         setIsOpen(!isOpen);
@@ -50,7 +44,7 @@ const SymbolSearch: React.FunctionComponent = () => {
     if (isMobile && isOpen) {
         return (
             <div className={styles.sheetBackdrop}>
-                <div className={styles.sheet}>
+                <div className={styles.sheet} ref={sheetRef}>
                     <div className={styles.sheetHeader}>
                         <div className={styles.sheetTitle}>Select Market</div>
                         <button

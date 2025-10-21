@@ -166,7 +166,8 @@
     justify-content: flex-end;
 }
 
-.priceChangeCombo {
+.priceChangeCombo,
+.priceChangeComboHeader {
     display: none;
 }
 .symbolListSearchClose:hover {
@@ -206,78 +207,84 @@
     color: var(--text2);
 }
 
-/* Overrides when rendered inside the full-screen sheet */
 .symbolListWrapperSheet {
-    position: static !important; /* stop anchoring to trigger */
+    position: static !important;
     top: auto !important;
     left: auto !important;
     width: 100% !important;
     max-width: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
-    background: transparent; /* the sheet provides the container bg */
-    padding: 0 !important; /* sheet has its own padding */
+    background: transparent;
+    padding: 0 !important;
     z-index: auto !important;
 }
 
-/* Optional: better behavior in the sheet */
 .symbolListWrapperSheet .symbolList {
-    height: auto; /* let parent control height */
+    height: auto;
     max-height: none;
+    scrollbar-width: none !important;
 }
-/* --- Responsive column pruning like Hyperliquid --- */
+.symbolListWrapperSheet .symbolList::-webkit-scrollbar {
+    display: none !important;
+}
 
 /* Priority order (keep longest): 
    1) symbol  2) last price  3) 24h change  4) volume  5) open interest  6) funding  */
 
 /* ≤ 1000px: drop Funding */
 @media (max-width: 1000px) {
+    .rowContainer:nth-child(even) {
+        background-color: var(--bg-dark3);
+    }
+
     .headerContainer,
     .rowContainer {
-        grid-template-columns: 1.7fr 1fr 1.5fr 1fr 1fr; /* symbol | last | change | volume | OI */
+        grid-template-columns: 1.7fr 1fr 1.5fr 1fr 1fr;
     }
     .fundingCell {
         display: none !important;
     }
 }
 
-/* ≤ 760px: also drop Open Interest */
 @media (max-width: 760px) {
     .headerContainer,
     .rowContainer {
-        grid-template-columns: 1.7fr 1fr 1.5fr 1fr; /* symbol | last | change | volume */
+        grid-template-columns: 1.7fr 1fr 1.5fr 1fr;
     }
     .openInterestCell {
         display: none !important;
     }
 }
 
-/* ≤ 560px: keep Symbol | Volume | (Last/24h combined) */
 @media (max-width: 560px) {
     .rowContainer {
-        height: 30px;
+        height: 40px;
     }
     .headerContainer,
     .rowContainer {
-        /* symbol | volume | last/change combo */
         grid-template-columns: 1.7fr 1fr 1.4fr;
     }
 
-    /* hide standalone Last and Change columns */
     .lastPriceCell,
     .changeCell {
         display: none !important;
     }
 
-    /* show the combined cell */
     .priceChangeCombo {
-        display: flex !important;
+        display: flex;
         flex-direction: column;
-        align-items: flex-end; /* right-align numbers to match your numeric cols */
+        align-items: flex-end;
+        gap: 2px;
+    }
+    .priceChangeComboHeader {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
         gap: 2px;
     }
 
-    /* small visual tweaks */
     .comboPrice {
         font-variant-numeric: tabular-nums;
     }
@@ -286,7 +293,6 @@
         opacity: 0.9;
     }
 
-    /* existing tight-layout tweaks can stay */
     .symbolCell {
         gap: 8px;
     }
@@ -299,18 +305,22 @@
     .rowContainer {
         padding-right: 8px;
     }
-}
-
-/* ≤ 420px (optional): Super-compact
-   If you want to drop Volume here and keep Symbol | (Last/24h),
-   include this block. If not, you can omit it. */
-@media (max-width: 420px) {
-    .headerContainer,
-    .rowContainer {
-        /* symbol | last/change combo */
-        grid-template-columns: 1.8fr 1.2fr;
+    .symbolCell {
+        display: grid;
+        grid-template-columns: auto 1fr; /* heart | name+leverage */
+        grid-template-rows: auto auto; /* two rows: name + leverage */
+        column-gap: 8px;
+        row-gap: 4px;
     }
-    .volumeCell {
-        display: none !important;
+
+    .favIcon {
+        grid-row: 1 / span 2;
+        align-self: center;
+        justify-self: center;
+    }
+
+    .leverageLabel {
+        grid-column: 2 / 3;
+        justify-self: start;
     }
 }
