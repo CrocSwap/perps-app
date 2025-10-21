@@ -27,8 +27,8 @@ importers:
         specifier: ^0.0.7
         version: 0.0.7(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@fogo/sessions-sdk':
-        specifier: ^0.0.16
-        version: 0.0.16(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        specifier: ^0.0.17
+        version: 0.0.17(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@fogo/sessions-sdk-react':
         specifier: ^0.0.26
         version: 0.0.26(@babel/runtime@7.28.4)(@netlify/blobs@10.0.10)(@react-native-async-storage/async-storage@1.24.0(react-native@0.81.1(@babel/core@7.28.4)(@types/react@19.1.13)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10)))(@solana/sysvars@4.0.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2))(@types/emscripten@1.41.1)(@types/react@19.1.13)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.1(react@19.1.1))(react-native@0.81.1(@babel/core@7.28.4)(@types/react@19.1.13)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10))(react@19.1.1)(tslib@2.8.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
@@ -1192,9 +1192,6 @@ packages:
   '@fivebinaries/coin-selection@3.0.0':
     resolution: {integrity: sha512-h25Pn1ZA7oqQBQDodGAgIsQt66T2wDge9onBKNqE66WNWL0KJiKJbpij8YOLo5AAlEIg5IS7EB1QjBgDOIg6DQ==}
 
-  '@fogo/sessions-idls@0.0.6':
-    resolution: {integrity: sha512-xmC1kSkPJHeLfyK8WiM0l4qGrUB/wGl+cM5Lcp0+sxrtBed5Ata/F79hda83jCo5V1992pfcs9BPGAZ1RBuj/Q==}
-
   '@fogo/sessions-idls@0.0.7':
     resolution: {integrity: sha512-bYYBD6SJfl8ubuakq2aE78B/4IcGdZpBY9rz26dt8T61gwK3343KU0ZKZAkT4rAqWxTNz9j6lujXaWY/FnmKTA==}
 
@@ -1206,10 +1203,6 @@ packages:
 
   '@fogo/sessions-sdk-web@0.0.11':
     resolution: {integrity: sha512-P33MVH20dG0Xo+mml4k02wA0FXvOs/nVwbPPuLxHAUmbWfz8xn64qf5dYAz3BeTTEx8ftxXV+HqCM87UTOKqVg==}
-    engines: {node: '>=18'}
-
-  '@fogo/sessions-sdk@0.0.16':
-    resolution: {integrity: sha512-Pfqp6p4F6vYdDvrrlusCcosgI/bT1SEUaPvWlUAIE71ID8Jwkw0f31ZCcPxthpzSc/oYMalacvHEfNHoMjN/lA==}
     engines: {node: '>=18'}
 
   '@fogo/sessions-sdk@0.0.17':
@@ -10214,15 +10207,6 @@ snapshots:
       '@emurgo/cardano-serialization-lib-browser': 13.2.1
       '@emurgo/cardano-serialization-lib-nodejs': 13.2.0
 
-  '@fogo/sessions-idls@0.0.6(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - typescript
-      - utf-8-validate
-
   '@fogo/sessions-idls@0.0.7(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
@@ -10307,29 +10291,6 @@ snapshots:
       '@solana/web3.js': 1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@solana/webcrypto-ed25519-polyfill': 2.3.0(typescript@5.9.2)
       idb: 8.0.3
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - fastestsmallesttextencoderdecoder
-      - typescript
-      - utf-8-validate
-      - ws
-
-  '@fogo/sessions-sdk@0.0.16(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
-    dependencies:
-      '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      '@fogo/sessions-idls': 0.0.6(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      '@metaplex-foundation/mpl-token-metadata': 3.4.0(@metaplex-foundation/umi@1.4.1)
-      '@metaplex-foundation/umi': 1.4.1
-      '@metaplex-foundation/umi-bundle-defaults': 1.4.1(@metaplex-foundation/umi@1.4.1)(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))
-      '@noble/hashes': 1.8.0
-      '@solana/compat': 4.0.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)
-      '@solana/kit': 4.0.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
-      '@solana/spl-token': 0.4.14(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      '@solana/web3.js': 1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      bn.js: 5.2.2
-      bs58: 6.0.0
-      zod: 3.25.76
     transitivePeerDependencies:
       - bufferutil
       - encoding
