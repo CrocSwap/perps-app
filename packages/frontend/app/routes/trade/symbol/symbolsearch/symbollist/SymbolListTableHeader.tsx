@@ -30,21 +30,21 @@ export default function SymbolListTableHeader({
             key: 'symbol',
             sortable: true,
             onClick: () => handleSort('symbol'),
-            className: 'symbolCell',
+            className: styles.symbolCell,
         },
         {
             name: 'Last Price',
             key: 'lastPrice',
             sortable: true,
             onClick: () => handleSort('lastPrice'),
-            className: 'lastPriceCell',
+            className: styles.lastPriceCell,
         },
         {
             name: '24hr Change',
             key: 'change',
             sortable: true,
             onClick: () => handleSort('change'),
-            className: 'changeCell',
+            className: styles.changeCell,
         },
         {
             name: '8hr Funding',
@@ -60,6 +60,14 @@ export default function SymbolListTableHeader({
             onClick: () => handleSort('volume'),
             className: styles.volumeCell,
         },
+        {
+            name: 'Last / 24h',
+            key: 'lastChangeCombo',
+            sortable: true,
+            onClick: () => handleSort('lastPrice'),
+            className: styles.priceChangeCombo,
+        },
+
         {
             name: 'Open Interest',
             key: 'openInterest',

@@ -166,6 +166,9 @@
     justify-content: flex-end;
 }
 
+.priceChangeCombo {
+    display: none;
+}
 .symbolListSearchClose:hover {
     color: var(--text1);
 }
@@ -201,4 +204,113 @@
 .symbolListEmptyIcon {
     font-size: 2rem;
     color: var(--text2);
+}
+
+/* Overrides when rendered inside the full-screen sheet */
+.symbolListWrapperSheet {
+    position: static !important; /* stop anchoring to trigger */
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: transparent; /* the sheet provides the container bg */
+    padding: 0 !important; /* sheet has its own padding */
+    z-index: auto !important;
+}
+
+/* Optional: better behavior in the sheet */
+.symbolListWrapperSheet .symbolList {
+    height: auto; /* let parent control height */
+    max-height: none;
+}
+/* --- Responsive column pruning like Hyperliquid --- */
+
+/* Priority order (keep longest): 
+   1) symbol  2) last price  3) 24h change  4) volume  5) open interest  6) funding  */
+
+/* ≤ 1000px: drop Funding */
+@media (max-width: 1000px) {
+    .headerContainer,
+    .rowContainer {
+        grid-template-columns: 1.7fr 1fr 1.5fr 1fr 1fr; /* symbol | last | change | volume | OI */
+    }
+    .fundingCell {
+        display: none !important;
+    }
+}
+
+/* ≤ 760px: also drop Open Interest */
+@media (max-width: 760px) {
+    .headerContainer,
+    .rowContainer {
+        grid-template-columns: 1.7fr 1fr 1.5fr 1fr; /* symbol | last | change | volume */
+    }
+    .openInterestCell {
+        display: none !important;
+    }
+}
+
+/* ≤ 560px: keep Symbol | Volume | (Last/24h combined) */
+@media (max-width: 560px) {
+    .rowContainer {
+        height: 30px;
+    }
+    .headerContainer,
+    .rowContainer {
+        /* symbol | volume | last/change combo */
+        grid-template-columns: 1.7fr 1fr 1.4fr;
+    }
+
+    /* hide standalone Last and Change columns */
+    .lastPriceCell,
+    .changeCell {
+        display: none !important;
+    }
+
+    /* show the combined cell */
+    .priceChangeCombo {
+        display: flex !important;
+        flex-direction: column;
+        align-items: flex-end; /* right-align numbers to match your numeric cols */
+        gap: 2px;
+    }
+
+    /* small visual tweaks */
+    .comboPrice {
+        font-variant-numeric: tabular-nums;
+    }
+    .comboChange {
+        font-size: var(--font-size-xs);
+        opacity: 0.9;
+    }
+
+    /* existing tight-layout tweaks can stay */
+    .symbolCell {
+        gap: 8px;
+    }
+    .leverageLabel {
+        padding: 2px 6px;
+    }
+    .headerCell {
+        font-size: 11px;
+    }
+    .rowContainer {
+        padding-right: 8px;
+    }
+}
+
+/* ≤ 420px (optional): Super-compact
+   If you want to drop Volume here and keep Symbol | (Last/24h),
+   include this block. If not, you can omit it. */
+@media (max-width: 420px) {
+    .headerContainer,
+    .rowContainer {
+        /* symbol | last/change combo */
+        grid-template-columns: 1.8fr 1.2fr;
+    }
+    .volumeCell {
+        display: none !important;
+    }
 }

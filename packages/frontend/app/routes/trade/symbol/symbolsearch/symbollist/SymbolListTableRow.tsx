@@ -89,6 +89,25 @@ export default function SymbolListTableRow(props: SymbolListTableRowProps) {
             <div className={`${styles.cell} ${styles.volumeCell}`}>
                 {formatNum(symbol.dayNtlVlm)}
             </div>
+            {/* Combined Last/Change for small screens */}
+            <div className={`${styles.cell} ${styles.priceChangeCombo}`}>
+                <span className={styles.comboPrice}>
+                    {formatNum(symbol.markPx)}
+                </span>
+                <span
+                    className={styles.comboChange}
+                    style={{
+                        color:
+                            get24hChangeString().usdChange > 0
+                                ? getBsColor().buy
+                                : get24hChangeString().usdChange < 0
+                                  ? getBsColor().sell
+                                  : 'var(--text2)',
+                    }}
+                >
+                    {get24hChangeString().str}
+                </span>
+            </div>
             <div className={`${styles.cell} ${styles.openInterestCell}`}>
                 {formatNum(symbol.openInterestDollarized)}
             </div>
