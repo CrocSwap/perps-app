@@ -276,6 +276,9 @@ export function Document({ children }: { children: React.ReactNode }) {
     );
 }
 
+console.log('SSR process.version:', process.version);
+console.log('SSR process.env:', process.env);
+
 // Main App Component
 export default function App() {
     const { wsEnvironment } = useDebugStore();
@@ -283,11 +286,6 @@ export default function App() {
     const isHomePage = location.pathname === '/' || location.pathname === '';
 
     const restrictedSiteModal = useModal('closed');
-
-    useEffect(() => {
-        console.log('versionLog', process.version);
-    }, []);
-
     return (
         <Document>
             <FogoSessionProvider
