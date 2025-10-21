@@ -285,8 +285,8 @@ export default function App() {
     const restrictedSiteModal = useModal('closed');
 
     return (
-        <Document>
-            <ErrorBoundary>
+        <ErrorBoundary>
+            <Document>
                 <FogoSessionProvider
                     endpoint={RPC_ENDPOINT}
                     domain='https://perps.ambient.finance'
@@ -356,8 +356,8 @@ export default function App() {
                         </WsProvider>
                     </AppProvider>
                 </FogoSessionProvider>
-            </ErrorBoundary>
-        </Document>
+            </Document>
+        </ErrorBoundary>
     );
 }
 
