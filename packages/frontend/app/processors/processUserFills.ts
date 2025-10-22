@@ -131,6 +131,14 @@ export function sortUserFills(
                         return b.closedPnl - a.closedPnl;
                     }
                 });
+            case 'dir':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.dir.localeCompare(b.dir);
+                    } else {
+                        return b.dir.localeCompare(a.dir);
+                    }
+                });
             default:
                 return fills.sort((a, b) => {
                     if (sortDirection === 'asc') {
