@@ -34,6 +34,7 @@ import { getSizePercentageSegment } from '~/utils/functions/getSegment';
 import { useTranslation } from 'react-i18next';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import ExpandableOrderBook from './trade/orderbook/ExpandableOrderBook';
+import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 
 const MemoizedTradeTable = memo(TradeTable);
@@ -94,6 +95,9 @@ export default function Trade() {
         'common.tradeHistory',
         'common.orderHistory',
     ];
+
+    const sessionState = useSession();
+    const isUserConnected = isEstablished(sessionState);
     const { marginBucket } = useUnifiedMarginData();
     const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
@@ -109,6 +113,8 @@ export default function Trade() {
         chartTopHeight: storedHeight,
         setChartTopHeight,
         resetLayoutHeights,
+        isWalletCollapsed,
+        setIsWalletCollapsed,
     } = useAppSettings();
 
     const { marketId } = useParams<{ marketId: string }>();
@@ -197,19 +203,38 @@ export default function Trade() {
 
     const leftColRef = useRef<HTMLDivElement | null>(null);
     const tableSectionRef = useRef<HTMLElement | null>(null);
-    const HEADER_HIT_HEIGHT = 10;
 
     // local state used while dragging for immediate feedback
     const [chartTopHeight, setChartTopHeightLocal] = useState<number>(
         storedHeight ?? 570,
     );
     const startHeightRef = useRef(chartTopHeight);
-    // Using a large but finite number instead of Infinity for CSS compatibility
     const [maxTop, setMaxTop] = useState<number>(10000);
     const userRatioRef = useRef<number | null>(null);
     const hasUserOverrideRef = useRef<boolean>(false);
 
     const chartTopHeightRef = useRef<number>(chartTopHeight);
+
+    const orderInputStartHeightRef = useRef<number>(450);
+    const orderInputHeightRef = useRef<number>(450);
+    const rightColRef = useRef<HTMLDivElement | null>(null);
+    const isWalletCollapsedRef = useRef(isWalletCollapsed);
+    useEffect(() => {
+        isWalletCollapsedRef.current = isWalletCollapsed;
+    }, [isWalletCollapsed]);
+
+    // Constants for order input resize
+    const ORDER_INPUT_DEFAULT = 450;
+    const ORDER_INPUT_MIN = 300;
+    const WALLET_MIN = 30;
+    const WALLET_DEFAULT = 195;
+    const WALLET_COLLAPSED = 40; // Just shows header
+    const WALLET_COLLAPSE_THRESHOLD = 50; // When wallet gets below this, snap to collapsed
+    const WALLET_MAX = 187; // Maximum height for wallet section
+    const WALLET_EXPAND_HYSTERESIS = 20;
+    const [orderInputHeight, setOrderInputHeight] =
+        useState<number>(ORDER_INPUT_DEFAULT);
+
     useEffect(() => {
         chartTopHeightRef.current = chartTopHeight;
     }, [chartTopHeight]);
@@ -264,6 +289,118 @@ export default function Trade() {
         setMaxTop(max);
     }, [setChartTopHeightLocal]);
 
+    const getRightColAvailable = () => {
+        const col = rightColRef.current;
+        if (!col) return null;
+        const gap = getGap();
+        const total = col.clientHeight;
+        return Math.max(0, total - gap);
+    };
+    const getMaxOrderInputHeight = () => {
+        const available = getRightColAvailable();
+        if (!available || available <= 0) return ORDER_INPUT_DEFAULT;
+        const minWalletHeight = isWalletCollapsed
+            ? WALLET_COLLAPSED
+            : WALLET_MIN;
+        return Math.max(
+            ORDER_INPUT_MIN,
+            available - minWalletHeight - getGap(),
+        );
+    };
+    const getMinOrderInputHeight = () => {
+        const available = getRightColAvailable();
+        if (!available || available <= 0) return ORDER_INPUT_MIN;
+        // Minimum order input = total - max wallet - gap
+        // This prevents wallet from expanding beyond WALLET_MAX
+        return Math.max(ORDER_INPUT_MIN, available - WALLET_MAX - getGap());
+    };
+
+    const clampOrderInputHeight = (h: number) => {
+        const max = getMaxOrderInputHeight();
+        const min = getMinOrderInputHeight();
+        return Math.max(min, Math.min(h, max));
+    };
+    const setOrderInputHeightBoth = (h: number) => {
+        const clamped = clampOrderInputHeight(h);
+        setOrderInputHeight(clamped);
+        orderInputHeightRef.current = clamped;
+    };
+    const expandWalletToDefault = () => {
+        const available = getRightColAvailable();
+        if (!available || available <= 0) return;
+
+        const targetOrderInputHeight = Math.max(
+            ORDER_INPUT_MIN,
+            available - WALLET_DEFAULT - getGap(),
+        );
+
+        setIsWalletCollapsed(false);
+        setOrderInputHeightBoth(targetOrderInputHeight);
+    };
+
+    const collapseWallet = () => {
+        const available = getRightColAvailable();
+        if (!available || available <= 0) return;
+
+        const targetOrderInputHeight = Math.max(
+            ORDER_INPUT_MIN,
+            available - WALLET_COLLAPSED - getGap(),
+        );
+
+        setIsWalletCollapsed(true);
+        setOrderInputHeightBoth(targetOrderInputHeight);
+    };
+    // Initialize order input height based on layout
+    useLayoutEffect(() => {
+        const col = rightColRef.current;
+        if (!col) return;
+
+        const gap = getGap();
+        const total = col.clientHeight;
+        const available = Math.max(0, total - gap);
+
+        // Calculate initial height based on whether wallet is collapsed
+        const initialWalletHeight = isWalletCollapsed
+            ? WALLET_COLLAPSED
+            : WALLET_DEFAULT;
+
+        const initial = Math.max(
+            ORDER_INPUT_MIN,
+            available - initialWalletHeight - gap,
+        );
+
+        setOrderInputHeight(initial);
+        orderInputHeightRef.current = initial;
+    }, []);
+
+    // Recalculate when wallet collapsed state changes (important for initial load from storage)
+    useEffect(() => {
+        const col = rightColRef.current;
+        if (!col) return;
+
+        const gap = getGap();
+        const total = col.clientHeight;
+        const available = Math.max(0, total - gap);
+
+        const targetWalletHeight = isWalletCollapsed
+            ? WALLET_COLLAPSED
+            : WALLET_DEFAULT;
+
+        const targetOrderInputHeight = Math.max(
+            ORDER_INPUT_MIN,
+            available - targetWalletHeight - gap,
+        );
+
+        // Only update if there's a significant difference
+        if (Math.abs(targetOrderInputHeight - orderInputHeight) > 5) {
+            console.log('📦 Adjusting for wallet state:', {
+                isWalletCollapsed,
+                targetWalletHeight,
+                targetOrderInputHeight,
+            });
+            setOrderInputHeightBoth(targetOrderInputHeight);
+        }
+    }, [isWalletCollapsed]);
     // On mount / when store changes:
     // This effect sets up the chart/table split whenever the component mounts or when storedHeight changes. If there’s no saved height, it falls back to the default layout. If there is one, it restores the user’s preferred height (clamped if needed) and remembers their ratio.
     useEffect(() => {
@@ -292,9 +429,6 @@ export default function Trade() {
     }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
 
     // Recompute (or clamp) when the left column resizes
-    // Recompute (or clamp) only when HEIGHT changes
-    // Recompute (or clamp) when the left column (re)mounts or resizes.
-    // We rebind when mobile/desktop toggles so we never hold a stale node.
     useEffect(() => {
         let raf = 0;
 
@@ -726,7 +860,6 @@ export default function Trade() {
             </>
         );
     }
-
     return (
         <>
             <TradeRouteHandler />
@@ -926,22 +1059,174 @@ export default function Trade() {
                     </div>
 
                     {/* RIGHT COLUMN */}
-                    <div className={styles.rightCol}>
-                        <section className={styles.order_input}>
-                            <OrderInput
-                                marginBucket={marginBucket}
-                                isAnyPortfolioModalOpen={
-                                    isAnyPortfolioModalOpen
+                    <div className={styles.rightCol} ref={rightColRef}>
+                        <Resizable
+                            size={{
+                                width: '100%',
+                                height: orderInputHeight ?? ORDER_INPUT_DEFAULT,
+                            }}
+                            minHeight={getMinOrderInputHeight()}
+                            maxHeight={getMaxOrderInputHeight()}
+                            enable={{ bottom: true }}
+                            handleStyles={{
+                                bottom: {
+                                    height: '8px',
+                                    cursor: 'row-resize',
+                                    background: 'transparent',
+                                    zIndex: 10,
+                                },
+                            }}
+                            onResizeStart={() => {
+                                orderInputStartHeightRef.current =
+                                    orderInputHeight;
+                            }}
+                            onResize={(e, dir, ref, d: NumberSize) => {
+                                const tentative =
+                                    orderInputStartHeightRef.current + d.height;
+                                const clamped =
+                                    clampOrderInputHeight(tentative);
+
+                                // live height update while dragging
+                                setOrderInputHeight(clamped);
+
+                                // >>> NEW: flip wallet content immediately based on live height
+                                const available = getRightColAvailable();
+                                if (available && available > 0) {
+                                    const walletHeight =
+                                        available - clamped - getGap();
+
+                                    // collapse immediately when below threshold
+                                    if (
+                                        walletHeight <=
+                                            WALLET_COLLAPSE_THRESHOLD &&
+                                        !isWalletCollapsedRef.current
+                                    ) {
+                                        isWalletCollapsedRef.current = true;
+                                        setIsWalletCollapsed(true);
+                                    }
+
+                                    // re-expand only after we're clearly above collapsed height (hysteresis)
+                                    if (
+                                        walletHeight >=
+                                            WALLET_COLLAPSED +
+                                                WALLET_EXPAND_HYSTERESIS &&
+                                        isWalletCollapsedRef.current
+                                    ) {
+                                        isWalletCollapsedRef.current = false;
+                                        setIsWalletCollapsed(false);
+                                    }
                                 }
-                            />
+                            }}
+                            onResizeStop={(e, dir, ref, d: NumberSize) => {
+                                const next =
+                                    orderInputStartHeightRef.current + d.height;
+                                const available = getRightColAvailable();
+
+                                if (!available || available <= 0) {
+                                    setOrderInputHeightBoth(next);
+                                    return;
+                                }
+
+                                const walletHeight =
+                                    available - next - getGap();
+
+                                // Check if we should snap to collapsed
+                                if (
+                                    walletHeight <= WALLET_COLLAPSE_THRESHOLD &&
+                                    !isWalletCollapsed
+                                ) {
+                                    collapseWallet();
+                                }
+                                // Check if we should expand from collapsed
+                                else if (
+                                    walletHeight > WALLET_COLLAPSED + 20 &&
+                                    isWalletCollapsed
+                                ) {
+                                    setIsWalletCollapsed(false);
+                                    setOrderInputHeightBoth(next);
+                                }
+                                // Normal resize
+                                else {
+                                    setOrderInputHeightBoth(next);
+                                }
+                            }}
+                        >
+                            <section
+                                className={styles.order_input}
+                                style={{ height: '100%' }}
+                            >
+                                <OrderInput
+                                    marginBucket={marginBucket}
+                                    isAnyPortfolioModalOpen={
+                                        isAnyPortfolioModalOpen
+                                    }
+                                />
+                            </section>
+                        </Resizable>
+
+                        <section
+                            className={`${styles.wallet} ${isWalletCollapsed ? styles.walletCollapsed : ''}`}
+                            onClick={(e) => {
+                                if (isWalletCollapsed) {
+                                    e.stopPropagation();
+                                    expandWalletToDefault();
+                                }
+                            }}
+                        >
+                            {isWalletCollapsed ? (
+                                <div className={styles.walletCollapsedHeader}>
+                                    <span>Account Overview</span>
+                                </div>
+                            ) : (
+                                <DepositDropdown
+                                    marginBucket={marginBucket}
+                                    openDepositModal={openDepositModal}
+                                    openWithdrawModal={openWithdrawModal}
+                                />
+                            )}
                         </section>
-                        <section className={styles.wallet}>
-                            <DepositDropdown
-                                marginBucket={marginBucket}
-                                openDepositModal={openDepositModal}
-                                openWithdrawModal={openWithdrawModal}
-                            />
-                        </section>
+                        {/* Toggle under the wallet (inline like OrderDetails) */}
+                        <motion.button
+                            type='button'
+                            className={styles.scroll_button}
+                            onClick={() => {
+                                if (isWalletCollapsed) {
+                                    expandWalletToDefault();
+                                } else {
+                                    collapseWallet();
+                                }
+                            }}
+                            aria-label={
+                                isWalletCollapsed
+                                    ? t?.(
+                                          'portfolio.expandWallet',
+                                          'Expand wallet',
+                                      )
+                                    : t?.(
+                                          'portfolio.collapseWallet',
+                                          'Collapse wallet',
+                                      )
+                            }
+                            whileHover={{ scale: 1.06 }}
+                            whileTap={{ scale: 0.96 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <motion.div
+                                animate={{
+                                    rotate: isWalletCollapsed ? 180 : 0,
+                                }}
+                                transition={{
+                                    duration: 0.2,
+                                    ease: [0.4, 0.0, 0.2, 1],
+                                }}
+                            >
+                                {!isWalletCollapsed && isUserConnected && (
+                                    <HiOutlineChevronDoubleDown
+                                        className={styles.scroll_icon}
+                                    />
+                                )}
+                            </motion.div>
+                        </motion.button>
                     </div>
                     {PortfolioModalsRenderer}
                 </div>
