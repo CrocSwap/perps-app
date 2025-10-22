@@ -96,8 +96,6 @@ export default function Trade() {
         'common.orderHistory',
     ];
 
-    const sessionState = useSession();
-    const isUserConnected = isEstablished(sessionState);
     const { marginBucket } = useUnifiedMarginData();
     const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
