@@ -1,6 +1,9 @@
+import LiquidationsChart from '~/routes/trade/liquidationsChart/LiquidationOBChart';
 import { useLiqudationLines } from './hooks/useLiquidationLines';
 import LiqLineTooltip from './LiqLinesTooltip';
-import LiqudationLines, { type HorizontalLineData } from './LiqudationLines';
+import LiqudationLines from './LiqudationLines';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useEffect, useState } from 'react';
 
 export interface LiqProps {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -21,8 +24,54 @@ const LiqComponent = ({
 }: LiqProps) => {
     const lines = useLiqudationLines(scaleData);
 
+    const { highResBuys, highResSells, liqBuys, liqSells } =
+        useOrderBookStore();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [overlayLiqCanvasAttr, setOverlayLiqCanvasAttr] = useState<any>();
+
+    useEffect(() => {
+        const canvasRect = overlayCanvasRef.current?.getBoundingClientRect();
+
+        if (canvasRect) {
+            const dpr = window.devicePixelRatio || 1;
+
+            setOverlayLiqCanvasAttr({
+                top: canvasRect.top,
+                left: canvasRect.left,
+                height: canvasSize.height / dpr,
+                width: canvasSize.width / dpr,
+            });
+        }
+    }, [canvasSize]);
+
     return (
         <>
+            {overlayLiqCanvasAttr && (
+                <div
+                    id='liq-mobile'
+                    style={{
+                        position: 'absolute',
+                        top: overlayLiqCanvasAttr.top,
+                        left: overlayLiqCanvasAttr.left,
+                        pointerEvents: 'none',
+                        width: overlayLiqCanvasAttr.width,
+                        height: overlayLiqCanvasAttr.height,
+                        overflow: 'hidden',
+                    }}
+                >
+                    <LiquidationsChart
+                        buyData={highResBuys}
+                        sellData={highResSells}
+                        liqBuys={liqBuys}
+                        liqSells={liqSells}
+                        width={overlayLiqCanvasAttr.width}
+                        height={overlayLiqCanvasAttr.height}
+                        scaleData={scaleData}
+                        location={'liqMobile'}
+                    />
+                </div>
+            )}
             <LiqLineTooltip
                 canvasWrapperRef={canvasWrapperRef}
                 overlayCanvasRef={overlayCanvasRef}

@@ -242,6 +242,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             liqSells={liqSells}
                             width={dimensions.width}
                             height={dimensions.height}
+                            location={'obBook'}
                         />
                     </motion.div>
                 );
