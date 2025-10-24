@@ -1,3 +1,4 @@
+import type { DetailedHTMLProps, HTMLAttributes } from 'react';
 import { bsColorSets, type colorSetIF } from '~/stores/AppSettingsStore';
 import type { ResolutionString } from '~/tv/charting_library';
 
@@ -7,6 +8,26 @@ import type {
     CustomThemes,
     LibrarySymbolInfo,
 } from '~/tv/charting_library';
+
+declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace JSX {
+        interface IntrinsicElements {
+            'd3fc-group': DetailedHTMLProps<
+                HTMLAttributes<HTMLDivElement>,
+                HTMLDivElement
+            >;
+            'd3fc-svg': DetailedHTMLProps<
+                HTMLAttributes<HTMLDivElement>,
+                HTMLDivElement
+            >;
+            'd3fc-canvas': DetailedHTMLProps<
+                HTMLAttributes<HTMLCanvasElement | HTMLDivElement>,
+                HTMLCanvasElement | HTMLDivElement
+            >;
+        }
+    }
+}
 
 export type ChartLayout = {
     chartLayout: object;

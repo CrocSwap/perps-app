@@ -15,7 +15,10 @@ export const scaleDataRef: { current: ScaleData | null } = {
 };
 
 export const mousePositionRef = { current: { x: 0, y: 0 } };
-
+export type CanvasSize = {
+    width: number;
+    height: number;
+};
 export function findLimitLabelAtPosition(
     x: number,
     y: number,
@@ -65,17 +68,17 @@ export function findLimitLabelAtPosition(
 export function getXandYLocationForChartDrag(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event: any,
-    rect: DOMRect,
+    dpr: number,
 ) {
-    let offsetY = event.sourceEvent.clientY - rect?.top;
-    let offsetX = event.sourceEvent.clientX - rect?.left;
+    let offsetY = event.y * dpr;
+    let offsetX = event.x * dpr;
 
     if (
         typeof TouchEvent !== 'undefined' &&
         event.sourceEvent instanceof TouchEvent
     ) {
-        offsetY = event.sourceEvent.touches[0].clientY;
-        offsetX = event.sourceEvent.touches[0].clientX - rect?.left;
+        offsetY = event.sourceEvent.touches[0].clientY * dpr;
+        offsetX = event.sourceEvent.touches[0].clientX * dpr;
     }
 
     return { offsetX: offsetX, offsetY: offsetY };
@@ -182,3 +185,19 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
         paneCanvas: paneCanvases[paneIndex] ?? null,
     };
 }
+
+export const updateOverlayCanvasSize = (
+    canvas: HTMLCanvasElement,
+    canvasSize: CanvasSize,
+) => {
+    const dpr = window.devicePixelRatio || 1;
+
+    const width = canvasSize.width;
+    const height = canvasSize.height;
+
+    canvas.width = width;
+    canvas.style.width = `${width / dpr}px`;
+
+    canvas.height = height;
+    canvas.style.height = `${height / dpr}px`;
+};
