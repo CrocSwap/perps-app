@@ -396,9 +396,13 @@
     },
     "referrals": {
         "title": "紹介",
-        "description": "ユーザーを紹介して報酬を獲得。アフィリエイトはより多く報酬を得られます。",
+        "description": "ユーザーを紹介して報酬を獲得しましょう。アフィリエイトはより多くの報酬を得られます。",
         "tradersReferred": "紹介されたトレーダー",
-        "rewardsEarned": "獲得報酬"
+        "rewardsEarned": "獲得した報酬",
+        "rewardHistory": "報酬履歴",
+        "enterCode": "コードを入力",
+        "claim": "請求する",
+        "createCode": "コードを作成"
     },
     "deposit": {
         "prompt": "Fogoから{{token}}を入金",

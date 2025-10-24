@@ -20,10 +20,10 @@
     },
     "dependencies": {
         "@crocswap-libs/ambient-ember": "^0.1.59",
+        "@fuul/sdk": "^7.0.7",
         "@fogo/sessions-idls": "^0.0.7",
         "@fogo/sessions-sdk": "^0.0.17",
         "@fogo/sessions-sdk-react": "^0.0.27",
-        "@fuul/sdk": "^7.0.5",
         "@netlify/functions": "4.2.5",
         "@perps-app/sdk": "workspace:*",
         "@pythnetwork/hermes-client": "^2.0.0",

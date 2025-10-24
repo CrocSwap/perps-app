@@ -1,10 +1,15 @@
-import PortfolioWithdraw from '~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw';
 import styles from './testpage.module.css';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { useTranslation } from 'react-i18next';
 
 export default function testpage() {
+    const { t } = useTranslation();
+
     return (
         <div className={styles.testpage}>
-            <button>Open Limit Chase Modal</button>
+            <SimpleButton bg='dark2' hoverBg='accent1'>
+                {t('common.cancel')}2as
+            </SimpleButton>
         </div>
     );
 }

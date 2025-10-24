@@ -394,9 +394,13 @@
     },
     "referrals": {
         "title": "Giới thiệu",
-        "description": "Giới thiệu người dùng để nhận thưởng. Đối tác nhận thưởng cao hơn.",
-        "tradersReferred": "Nhà giao dịch đã giới thiệu",
-        "rewardsEarned": "Phần thưởng nhận được"
+        "description": "Giới thiệu người dùng để nhận phần thưởng. Đối tác nhận được phần thưởng cao hơn.",
+        "tradersReferred": "Người giao dịch đã giới thiệu",
+        "rewardsEarned": "Phần thưởng đã nhận",
+        "rewardHistory": "Lịch sử phần thưởng",
+        "enterCode": "Nhập mã",
+        "claim": "Nhận",
+        "createCode": "Tạo mã"
     },
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",

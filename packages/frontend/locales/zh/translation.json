@@ -396,9 +396,13 @@
     },
     "referrals": {
         "title": "邀请",
-        "description": "邀请用户赚奖励。合作伙伴获得更多奖励。",
-        "tradersReferred": "已邀请交易者",
-        "rewardsEarned": "已赚取奖励"
+        "description": "邀请用户以获得奖励。合作伙伴可获得更高的奖励。",
+        "tradersReferred": "已邀请的交易员",
+        "rewardsEarned": "已获得的奖励",
+        "rewardHistory": "奖励记录",
+        "enterCode": "输入代码",
+        "claim": "领取",
+        "createCode": "创建代码"
     },
     "deposit": {
         "prompt": "从Fogo充值{{token}}",
