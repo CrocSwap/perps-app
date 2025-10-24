@@ -56,9 +56,9 @@ import Modal from './components/Modal/Modal';
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
     { children: React.ReactNode },
-    { hasError: boolean }
+    { hasError: boolean; error?: Error; errorInfo?: React.ErrorInfo }
 > {
-    state = { hasError: false };
+    state = { hasError: false, error: undefined, errorInfo: undefined };
 
     static getDerivedStateFromError() {
         return { hasError: true };
@@ -66,6 +66,7 @@ class ErrorBoundary extends React.Component<
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         console.error('Error caught by boundary:', error, errorInfo);
+        this.setState({ error, errorInfo });
     }
 
     render() {
@@ -73,7 +74,66 @@ class ErrorBoundary extends React.Component<
             return (
                 <div className='error-fallback'>
                     <h2>Something went wrong</h2>
-                    <button onClick={() => this.setState({ hasError: false })}>
+                    {this.state.error && (
+                        <details
+                            style={{ margin: '1rem 0', textAlign: 'left' }}
+                        >
+                            <summary
+                                style={{
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                Error Details
+                            </summary>
+                            <pre
+                                style={{
+                                    marginTop: '0.5rem',
+                                    padding: '1rem',
+                                    backgroundColor: '#f5f5f5',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    fontSize: '12px',
+                                    whiteSpace: 'pre-wrap',
+                                    overflow: 'auto',
+                                    maxHeight: '200px',
+                                }}
+                            >
+                                {(this.state.error as Error).stack}
+                            </pre>
+                            {this.state.errorInfo && (
+                                <pre
+                                    style={{
+                                        marginTop: '0.5rem',
+                                        padding: '1rem',
+                                        backgroundColor: '#f5f5f5',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        fontSize: '12px',
+                                        whiteSpace: 'pre-wrap',
+                                        overflow: 'auto',
+                                        maxHeight: '200px',
+                                    }}
+                                >
+                                    {
+                                        (
+                                            this.state
+                                                .errorInfo as React.ErrorInfo
+                                        ).componentStack
+                                    }
+                                </pre>
+                            )}
+                        </details>
+                    )}
+                    <button
+                        onClick={() =>
+                            this.setState({
+                                hasError: false,
+                                error: undefined,
+                                errorInfo: undefined,
+                            })
+                        }
+                    >
                         Try again
                     </button>
                 </div>
