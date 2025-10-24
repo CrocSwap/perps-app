@@ -285,36 +285,37 @@ export default function App() {
     const restrictedSiteModal = useModal('closed');
 
     return (
-        <Document>
-            <FogoSessionProvider
-                endpoint={RPC_ENDPOINT}
-                domain='https://perps.ambient.finance'
-                tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}
-                defaultRequestedLimits={{
-                    fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry: 1_000_000_000n,
-                }}
-                enableUnlimited={true}
-                onStartSessionInit={() => {
-                    if (IS_RESTRICTED_SITE) {
-                        restrictedSiteModal.open();
-                    }
-                    return !IS_RESTRICTED_SITE;
-                }}
-                termsOfServiceUrl='https://ambient.finance/terms'
-                privacyPolicyUrl='https://ambient.finance/privacy'
-            >
-                <AppProvider>
-                    <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
-                        <UnifiedMarginDataProvider>
-                            <MarketDataProvider>
-                                <SdkProvider
-                                    environment={wsEnvironment}
-                                    marketEndpoint={MARKET_WS_ENDPOINT}
-                                    userEndpoint={USER_WS_ENDPOINT}
-                                >
-                                    <TutorialProvider>
-                                        <GlobalModalHost>
-                                            <ErrorBoundary>
+        <ErrorBoundary>
+            <Document>
+                <FogoSessionProvider
+                    endpoint={RPC_ENDPOINT}
+                    domain='https://perps.ambient.finance'
+                    tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}
+                    defaultRequestedLimits={{
+                        fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry:
+                            1_000_000_000n,
+                    }}
+                    enableUnlimited={true}
+                    onStartSessionInit={() => {
+                        if (IS_RESTRICTED_SITE) {
+                            restrictedSiteModal.open();
+                        }
+                        return !IS_RESTRICTED_SITE;
+                    }}
+                    termsOfServiceUrl='https://ambient.finance/terms'
+                    privacyPolicyUrl='https://ambient.finance/privacy'
+                >
+                    <AppProvider>
+                        <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
+                            <UnifiedMarginDataProvider>
+                                <MarketDataProvider>
+                                    <SdkProvider
+                                        environment={wsEnvironment}
+                                        marketEndpoint={MARKET_WS_ENDPOINT}
+                                        userEndpoint={USER_WS_ENDPOINT}
+                                    >
+                                        <TutorialProvider>
+                                            <GlobalModalHost>
                                                 <WsConnectionChecker />
                                                 <WebSocketDebug />
                                                 <div className='root-container'>
@@ -349,16 +350,16 @@ export default function App() {
                                                     )}
                                                 </div>
                                                 <RuntimeDomManipulation />
-                                            </ErrorBoundary>
-                                        </GlobalModalHost>
-                                    </TutorialProvider>
-                                </SdkProvider>
-                            </MarketDataProvider>
-                        </UnifiedMarginDataProvider>
-                    </WsProvider>
-                </AppProvider>
-            </FogoSessionProvider>
-        </Document>
+                                            </GlobalModalHost>
+                                        </TutorialProvider>
+                                    </SdkProvider>
+                                </MarketDataProvider>
+                            </UnifiedMarginDataProvider>
+                        </WsProvider>
+                    </AppProvider>
+                </FogoSessionProvider>
+            </Document>
+        </ErrorBoundary>
     );
 }
 
