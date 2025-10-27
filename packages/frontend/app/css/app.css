@@ -32,6 +32,13 @@
 
 .content.home-page {
     padding: 0;
+    overflow: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.content.home-page::-webkit-scrollbar {
+    display: none;
 }
 
 .header {
