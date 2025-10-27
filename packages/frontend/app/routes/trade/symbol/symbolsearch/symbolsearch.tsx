@@ -11,7 +11,7 @@ import useMediaQuery from '~/hooks/useMediaQuery';
 const SymbolSearch: React.FunctionComponent = () => {
     const { symbol } = useTradeDataStore();
     const [isOpen, setIsOpen] = useState(false);
-    const isSymbolSearchClickable = true;
+    const isSymbolSearchClickable = false;
     const isMobile = useMediaQuery('(max-width: 1000px)');
 
     const symbolSearchBackdropRef = useOutsideClick<HTMLDivElement>(() => {
