@@ -3,6 +3,8 @@ import type { MutableRefObject } from 'react';
 import type { PresetId } from '../types';
 
 const SECTION_SELECTOR = '[data-preset]';
+// 30% of the current speed (full speed is at 1. instant jump)
+const SCROLL_SENSITIVITY = 0.3;
 
 type SectionElement = HTMLElement & { dataset: { preset?: string } };
 
@@ -80,7 +82,10 @@ export function useSectionRegistry(
             if (!container || deltaY === 0) {
                 return;
             }
-            container.scrollBy({ top: deltaY, behavior: 'auto' });
+            container.scrollBy({
+                top: deltaY * SCROLL_SENSITIVITY,
+                behavior: 'smooth',
+            });
         },
         [containerRef],
     );
