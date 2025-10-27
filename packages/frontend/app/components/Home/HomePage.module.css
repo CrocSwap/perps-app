@@ -1,0 +1,303 @@
+/* ==========================================================================
+   Home Component Styles
+   ========================================================================== */
+
+/* Main container for the home page content */
+.container {
+    height: calc(100vh - var(--header-height-desktop));
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.debugCenterGuides {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    border: 1px solid cyan;
+}
+
+.debugCenterGuides::before,
+.debugCenterGuides::after {
+    content: '';
+    position: absolute;
+    background: cyan;
+}
+
+.debugCenterGuides::before {
+    left: 50%;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    transform: translateX(-50%);
+}
+
+.debugCenterGuides::after {
+    left: 0;
+    top: 50%;
+    height: 1px;
+    width: 100%;
+    transform: translateY(-50%);
+}
+
+.container :is(h1, h2, h3, h4, h5, h6, p, span) {
+    font-weight: 300 !important;
+}
+
+/* Snap container for scroll sections */
+.snapContainer {
+    height: 100vh;
+    overflow: hidden;
+    scroll-snap-type: y mandatory;
+    margin: 0;
+    padding-top: var(--header-height-desktop);
+    box-sizing: border-box;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    position: relative;
+}
+
+.snapContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.presetSection {
+    height: 100vh;
+    scroll-snap-align: start;
+    position: relative;
+    display: flex;
+    align-items: start;
+    justify-content: flex-start;
+    padding: 0;
+    overflow: hidden;
+}
+
+.heroSection {
+    height: calc(100vh - var(--header-height-desktop));
+    scroll-snap-align: start;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: flex-start;
+    padding: calc(var(--padding-xl) * 3) var(--padding-xl);
+}
+
+/* ==========================================================================
+   Typography and Content Styles
+   ========================================================================== */
+
+.heroTitle {
+    font-size: var(--font-size-xxxl);
+    line-height: 1.1;
+    margin: 0;
+    color: var(--text1);
+}
+
+.heroSubtitle {
+    font-size: var(--font-size-l);
+    line-height: 1.6;
+    margin: 0;
+    color: var(--text2);
+}
+
+.sectionTitle {
+    font-size: var(--font-size-xl);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.sectionDescription {
+    font-size: var(--font-size-l);
+    line-height: 1.6;
+    margin: 0;
+    color: var(--text2);
+}
+
+.accent {
+    color: var(--accent1);
+    background: linear-gradient(120deg, var(--accent1), var(--accent1));
+    -webkit-background-clip: text;
+    background-clip: text;
+    /* color: transparent; */
+    position: relative;
+    /* text-shadow: 0 0 12px rgba(167, 132, 255, 0.55),
+		0 0 24px rgba(167, 132, 255, 0.45), 0 0 42px rgba(115, 255, 255, 0.25); */
+}
+
+.ctaPrimary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 16px;
+    background: var(--accent1);
+    color: var(--text1);
+    border-radius: var(--radius-m);
+    font-size: var(--font-size-xl);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--ease-in-out-med);
+    box-shadow: var(--shadow-l);
+}
+
+.ctaPrimary:hover {
+    background: var(--accent1-dark);
+    /* transform: translateY(-2px); */
+}
+
+.ctaSecondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 16px;
+    background: var(--bg-dark2);
+    color: var(--text1);
+    border-radius: var(--radius-m);
+    font-size: var(--font-size-xl);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--ease-in-out-med);
+    box-shadow: var(--shadow-l);
+}
+
+.ctaSecondary:hover {
+    background: var(--bg-dark3);
+}
+
+.linksGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(2, auto);
+    gap: var(--gap-m);
+    justify-content: center;
+    justify-items: center;
+    width: 100%;
+    max-width: 1024px;
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    html,
+    body {
+        overflow-x: hidden;
+        width: 100%;
+        position: relative;
+    }
+
+    .presetSection {
+        padding: 0;
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+    }
+
+    .heroContent {
+        padding: 30% var(--padding-m) 0;
+        gap: var(--gap-m);
+        width: 100vw;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        overflow-x: hidden;
+        height: calc(100vh - 56px); /* Account for header */
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+    }
+
+    .heroText {
+        max-width: 100%;
+        width: 100%;
+        padding: 0 var(--padding-m);
+        box-sizing: border-box;
+    }
+
+    .heroContent {
+        max-width: 100%;
+        width: 100%;
+        padding: 0 var(--padding-m);
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    .heroTitle {
+        font-size: var(--font-size-xxl);
+    }
+
+    .heroSubtitle {
+        font-size: var(--font-size-m);
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+    }
+
+    .sectionContent {
+        max-width: 90%;
+        left: 32px;
+    }
+
+    .sectionTitle {
+        font-size: var(--font-size-xl);
+    }
+
+    .sectionDescription {
+        font-size: var(--font-size-m);
+    }
+
+    .overlayActions {
+        margin: auto 0 200px 0;
+        gap: var(--gap-m);
+        justify-content: center;
+        width: 100%;
+        padding: 0 var(--padding-m);
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .ctaPrimary {
+        padding: 16px 8px;
+        font-size: var(--font-size-l);
+    }
+
+    .ctaSecondary {
+        padding: 16px 8px;
+        font-size: var(--font-size-l);
+    }
+
+    .infoCards {
+        /* display: flex; */
+        flex-direction: column;
+        /* gap: 16px; */
+        /* justify-content: start; */
+        /* width: 100%; */
+    }
+
+    .linksGrid {
+        /* display: grid; */
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        grid-template-rows: repeat(8, auto);
+        /* gap: 16px; */
+        /* justify-content: center; */
+        /* justify-items: center; */
+        /* width: 100%; */
+        /* max-width: 1024px; */
+        /* margin: 0 auto; */
+    }
+}

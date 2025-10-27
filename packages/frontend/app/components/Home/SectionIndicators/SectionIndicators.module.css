@@ -1,0 +1,32 @@
+.sectionIndicator {
+    position: fixed;
+    top: calc(50% + (var(--header-height-desktop) / 2));
+    right: 32px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10;
+}
+
+.indicatorDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid var(--bg-dark5);
+    background: var(--bg-dark1);
+    cursor: pointer;
+    transition: all var(--ease-in-out-med);
+}
+
+.indicatorDotActive {
+    background: var(--accent1);
+    border-color: var(--accent1);
+    scale: 1.4;
+}
+
+@media (max-width: 768px) {
+    .sectionIndicator {
+        display: none;
+    }
+}

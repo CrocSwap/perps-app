@@ -11,6 +11,7 @@ import ethImage from '../../assets/tokens/eth.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 import Hero from '~/components/Home/Hero/Hero';
 import { useTranslation } from 'react-i18next';
+import HomePage from '~/components/Home/HomePage';
 
 interface FloatingTokenProps {
     src: string;
@@ -179,64 +180,10 @@ export default function Home(): JSX.Element {
             </Link>
         );
     }
-    const showOnlyHero = true;
-
-    if (showOnlyHero) return <Hero />;
 
     return (
-        <section className={styles.hero}>
-            <div className={styles.ambientGlow} />
-            <div className={styles.sweepLight} />
-
-            {tokenData.map((token, index) => (
-                <FloatingBgToken
-                    key={`token-${index}`}
-                    src={token.src}
-                    size={token.size}
-                    top={token.top}
-                    left={token.left}
-                    duration={token.duration}
-                    delay={token.delay}
-                    direction={token.direction}
-                />
-            ))}
-
-            <motion.div
-                className={styles.left}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: 'easeOut' }}
-            >
-                <h1>{t('home.title')}</h1>
-                <p>{t('home.subtitle')}</p>
-                <div className={styles.buttons}>
-                    <TradeButton symbol={symbol} />
-                    <button className={styles.secondary}>
-                        {t('home.learnMore')}
-                    </button>
-                </div>
-            </motion.div>
-
-            <motion.div
-                className={styles.right}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
-            >
-                <div className={styles.mockupGlow} />
-                <div className={styles.mockupContainer}>
-                    <Link to={`/v2/trade/${symbol}`} viewTransition>
-                        <img
-                            src='/images/mockup.png'
-                            alt='Perps App'
-                            className={styles.mockup}
-                            width='600'
-                            height='400'
-                            loading='eager'
-                        />
-                    </Link>
-                </div>
-            </motion.div>
-        </section>
+        <div className={styles.mainContainer}>
+            <HomePage />
+        </div>
     );
 }
