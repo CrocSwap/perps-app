@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import styles from './Ticker.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 export function Ticker() {
     const firstSetRef = useRef<HTMLDivElement | null>(null);
     const [loopWidth, setLoopWidth] = useState<number | null>(null);
 
     const { coins } = useTradeDataStore();
+
+    const { formatNum } = useNumFormatter();
 
     useEffect(() => {
         const element = firstSetRef.current;
@@ -62,7 +65,12 @@ export function Ticker() {
                                     {coin.symbol}
                                 </span>
                                 <span className={styles.price}>
-                                    ${coin.markPx.toLocaleString()}
+                                    {formatNum(
+                                        coin.markPx,
+                                        coin.markPx < 0.01 ? 3 : 2,
+                                        true,
+                                        true,
+                                    )}
                                 </span>
                                 <span
                                     className={
@@ -74,7 +82,11 @@ export function Ticker() {
                                     {coin.last24hPriceChangePercent >= 0
                                         ? '+'
                                         : ''}
-                                    {coin.last24hPriceChangePercent.toFixed(2)}%
+                                    {formatNum(
+                                        coin.last24hPriceChangePercent,
+                                        2,
+                                    )}
+                                    %
                                 </span>
                             </div>
                         ))}
