@@ -82,10 +82,7 @@ export function useSectionRegistry(
             if (!container || deltaY === 0) {
                 return;
             }
-            container.scrollBy({
-                top: deltaY * SCROLL_SENSITIVITY,
-                behavior: 'smooth',
-            });
+            container.scrollBy({ top: deltaY, behavior: 'auto' });
         },
         [containerRef],
     );
