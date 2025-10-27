@@ -1,4 +1,3 @@
-import { Ticker } from '../../Ticker/Ticker';
 import styles from '../Copy.module.css';
 import type { PresetId } from '../../types';
 import type { HeroSlideConfig } from '../../config/overlay-config';
@@ -56,11 +55,6 @@ export function HeroSlide({
                     ) : null}
                 </div>
             </div>
-            {slide.footer === 'ticker' ? (
-                <div className={styles.overlayFooter}>
-                    <Ticker />
-                </div>
-            ) : null}
         </>
     );
 }

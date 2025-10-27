@@ -4,6 +4,7 @@ import { Particles } from './Particles/Particles';
 import { SectionObserver } from './hooks/section-observer';
 import { Copy } from './Copy/Copy';
 import { SectionIndicators } from './SectionIndicators/SectionIndicators';
+import { Ticker } from './Ticker/Ticker';
 import styles from './HomePage.module.css';
 import { PRESET_IDS, type PresetId } from './types';
 import { useSectionScroll } from './hooks/use-section-scroll';
@@ -69,6 +70,7 @@ export default function HomePage() {
                 currentPreset={currentPreset}
                 onSelectPreset={scrollToPreset}
             />
+            {presets.indexOf(currentPreset) !== 5 && <Ticker />}
             <div className={styles.snapContainer} ref={snapContainerRef}>
                 <section
                     className={styles.heroSection}
