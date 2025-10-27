@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { Link } from 'react-router';
 import styles from './Ticker.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -57,8 +58,9 @@ export function Ticker() {
                         ref={setIndex === 0 ? firstSetRef : null}
                     >
                         {coins.map((coin, index) => (
-                            <div
+                            <Link
                                 key={`${setIndex}-${index}`}
+                                to={`/v2/trade/${coin.symbol}`}
                                 className={styles.tickerItem}
                             >
                                 <span className={styles.symbol}>
@@ -88,7 +90,7 @@ export function Ticker() {
                                     )}
                                     %
                                 </span>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 ))}

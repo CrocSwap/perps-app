@@ -41,6 +41,9 @@
     white-space: nowrap;
     flex-shrink: 0;
     cursor: pointer;
+    pointer-events: auto;
+    text-decoration: none;
+    color: inherit;
 }
 
 .symbol {

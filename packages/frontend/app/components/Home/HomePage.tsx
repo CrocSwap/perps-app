@@ -47,7 +47,6 @@ export default function HomePage() {
             return;
         }
         scrollByDelta(event.deltaY);
-        event.preventDefault();
     };
 
     return (
