@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
-import type { CSSProperties } from 'react';
+import { useEffect, useRef } from 'react';
 import type { PresetId } from '../types';
 import { resolveMode } from './mode';
 import styles from './Particles.module.css';
@@ -44,7 +43,7 @@ export function Particles({ preset }: DotFieldProps) {
     const { draw, startFadeIn } = useCanvasRenderer();
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const animationRef = useRef<number>();
+    const animationRef = useRef<number | undefined>(undefined);
     const responsiveConfigRef = useRef<ResponsiveConfig | null>(null);
 
     // Centralized state controller keeps track of preset + layout transitions.
@@ -56,7 +55,7 @@ export function Particles({ preset }: DotFieldProps) {
 
     const { state, setPreset, setModes, presetRef, modeRef } = transition;
 
-    const { handleResize, debugRect } = useParticleResponsiveConfig({
+    const { handleResize } = useParticleResponsiveConfig({
         canvasRef,
         isMobile: isMobileDevice,
         modeRef,
@@ -123,30 +122,8 @@ export function Particles({ preset }: DotFieldProps) {
         return styles.canvas;
     };
 
-    const debugOverlayStyle = useMemo<CSSProperties | undefined>(() => {
-        if (!debugRect) return undefined;
-        return {
-            position: 'fixed',
-            top: debugRect.top,
-            left: debugRect.left,
-            width: debugRect.width,
-            height: debugRect.height,
-            pointerEvents: 'none',
-        };
-    }, [debugRect]);
-
-    // Visual helper renders the responsive bounding box when debug data exists.
-    const debugOverlayNode = debugOverlayStyle ? (
-        <div
-            className={styles.debugBox}
-            style={debugOverlayStyle}
-            aria-hidden='true'
-        />
-    ) : null;
-
     return (
         <>
-            {debugOverlayNode}
             <canvas ref={canvasRef} className={getCanvasClassName()} />
         </>
     );
