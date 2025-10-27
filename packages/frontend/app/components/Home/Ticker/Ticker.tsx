@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import styles from './Ticker.module.css';
-import { MOCK_TICKER_DATA } from '../config/ticker-data';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 export function Ticker() {
     const firstSetRef = useRef<HTMLDivElement | null>(null);
     const [loopWidth, setLoopWidth] = useState<number | null>(null);
+
+    const { coins } = useTradeDataStore();
 
     useEffect(() => {
         const element = firstSetRef.current;
@@ -38,6 +40,10 @@ export function Ticker() {
         } as CSSProperties;
     }
 
+    if (!coins || coins.length === 0) {
+        return null;
+    }
+
     return (
         <div className={styles.tickerContainer}>
             <div className={styles.tickerTrack} style={trackStyle}>
@@ -47,31 +53,30 @@ export function Ticker() {
                         className={styles.tickerSet}
                         ref={setIndex === 0 ? firstSetRef : null}
                     >
-                        {MOCK_TICKER_DATA.map((crypto, index) => (
-                            <a
+                        {coins.map((coin, index) => (
+                            <div
                                 key={`${setIndex}-${index}`}
-                                href={crypto.href}
-                                target='_blank'
-                                rel='noreferrer'
                                 className={styles.tickerItem}
                             >
                                 <span className={styles.symbol}>
-                                    {crypto.symbol}
+                                    {coin.symbol}
                                 </span>
                                 <span className={styles.price}>
-                                    ${crypto.price.toLocaleString()}
+                                    ${coin.markPx.toLocaleString()}
                                 </span>
                                 <span
                                     className={
-                                        crypto.change >= 0
+                                        coin.last24hPriceChangePercent >= 0
                                             ? styles.changePositive
                                             : styles.changeNegative
                                     }
                                 >
-                                    {crypto.change >= 0 ? '+' : ''}
-                                    {crypto.change.toFixed(2)}%
+                                    {coin.last24hPriceChangePercent >= 0
+                                        ? '+'
+                                        : ''}
+                                    {coin.last24hPriceChangePercent.toFixed(2)}%
                                 </span>
-                            </a>
+                            </div>
                         ))}
                     </div>
                 ))}
