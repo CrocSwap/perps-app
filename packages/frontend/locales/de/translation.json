@@ -550,5 +550,11 @@
     "meta": {
         "title": "Startseite | Ambient",
         "content": "Handeln Sie Perps mit Ambient"
+    },
+    "docs": {
+        "menuTerms": "Terms of Service",
+        "menuPrivacy": "Privacy",
+        "terms": "CROCODILE Labs Terms of Service",
+        "privacy": "Privacy Policy"
     }
 }
