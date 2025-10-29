@@ -137,7 +137,12 @@ export function Copy({
                         tabIndex={-1}
                         data-focus-state={focusState}
                     >
-                        {renderSlideContent(slide, headingId, scrollToPreset)}
+                        {renderSlideContent(
+                            slide,
+                            headingId,
+                            scrollToPreset,
+                            isSlideActive(slide.id),
+                        )}
                     </div>
                 );
             })}
@@ -149,6 +154,7 @@ function renderSlideContent(
     slide: SlideConfig,
     headingId: string,
     scrollToPreset: (preset: PresetId) => void,
+    isActive: boolean,
 ) {
     if (slide.type === 'hero') {
         return (
@@ -156,6 +162,7 @@ function renderSlideContent(
                 slide={slide as HeroSlideConfig}
                 headingId={headingId}
                 onScrollToPreset={scrollToPreset}
+                isActive={isActive}
             />
         );
     }

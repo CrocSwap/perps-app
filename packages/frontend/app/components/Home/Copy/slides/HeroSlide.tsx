@@ -9,12 +9,14 @@ interface HeroSlideProps {
     slide: HeroSlideConfig;
     headingId: string;
     onScrollToPreset: (preset: PresetId) => void;
+    isActive: boolean;
 }
 
 export function HeroSlide({
     slide,
     headingId,
     onScrollToPreset,
+    isActive,
 }: HeroSlideProps) {
     const { t } = useTranslation();
     const { symbol } = useTradeDataStore();
@@ -34,11 +36,12 @@ export function HeroSlide({
         'Ambi',
         ['tious', 'ent'],
         5000,
+        isActive,
     );
 
     // Only apply morphing to the hero slide
     const displayText =
-        slide.id === 'hero' ? (
+        slide.type === 'hero' ? (
             <>
                 {prefix}
                 <span
