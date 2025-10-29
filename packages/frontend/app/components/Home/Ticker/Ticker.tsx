@@ -7,8 +7,21 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 export function Ticker() {
     const firstSetRef = useRef<HTMLDivElement | null>(null);
     const [loopWidth, setLoopWidth] = useState<number | null>(null);
+    const [isPaused, setIsPaused] = useState(false);
+    const trackRef = useRef<HTMLDivElement>(null);
 
     const { coins } = useTradeDataStore();
+
+    useEffect(() => {
+        const track = trackRef.current;
+        if (!track) return;
+
+        if (isPaused) {
+            track.style.animationPlayState = 'paused';
+        } else {
+            track.style.animationPlayState = 'running';
+        }
+    }, [isPaused]);
 
     const { formatNum } = useNumFormatter();
 
@@ -41,6 +54,7 @@ export function Ticker() {
         trackStyle = {
             '--loop-offset': `-${loopWidth}px`,
             '--loop-duration': `${durationSeconds}s`,
+            '--play-state': isPaused ? 'paused' : 'running',
         } as CSSProperties;
     }
 
@@ -50,7 +64,13 @@ export function Ticker() {
 
     return (
         <div className={styles.tickerContainer}>
-            <div className={styles.tickerTrack} style={trackStyle}>
+            <div
+                ref={trackRef}
+                className={styles.tickerTrack}
+                style={trackStyle}
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+            >
                 {Array.from({ length: 2 }).map((_, setIndex) => (
                     <div
                         key={setIndex}
