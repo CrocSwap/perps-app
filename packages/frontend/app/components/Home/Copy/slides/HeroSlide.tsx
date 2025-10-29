@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import styles from '../Copy.module.css';
 import type { PresetId } from '../../types';
 import type { HeroSlideConfig } from '../../config/overlay-config';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 interface HeroSlideProps {
     slide: HeroSlideConfig;
@@ -15,11 +16,17 @@ export function HeroSlide({
     onScrollToPreset,
 }: HeroSlideProps) {
     const { t } = useTranslation();
+    const { symbol } = useTradeDataStore();
     const handleSecondaryCtaClick = () => {
         if (slide.ctaSecondary.action === 'scrollTo') {
             onScrollToPreset(slide.ctaSecondary.target);
         }
     };
+
+    const ctaHref =
+        slide.ctaPrimary.labelKey === 'home.startTrading'
+            ? `/v2/trade/${symbol}`
+            : slide.ctaPrimary.href;
 
     return (
         <>
@@ -41,10 +48,7 @@ export function HeroSlide({
                     ) : null}
                 </div>
                 <div className={styles.overlayActions}>
-                    <a
-                        href={slide.ctaPrimary.href}
-                        className={styles.ctaPrimary}
-                    >
+                    <a href={ctaHref} className={styles.ctaPrimary}>
                         {t(slide.ctaPrimary.labelKey)}
                     </a>
                     {slide.ctaSecondary.action === 'scrollTo' ? (
