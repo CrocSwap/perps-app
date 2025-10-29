@@ -63,13 +63,15 @@ export function Ticker() {
     }
 
     return (
-        <div className={styles.tickerContainer}>
+        <div
+            className={styles.tickerContainer}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+        >
             <div
                 ref={trackRef}
                 className={styles.tickerTrack}
                 style={trackStyle}
-                onMouseEnter={() => setIsPaused(true)}
-                onMouseLeave={() => setIsPaused(false)}
             >
                 {Array.from({ length: 2 }).map((_, setIndex) => (
                     <div
