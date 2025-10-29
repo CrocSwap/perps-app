@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import styles from '../Copy.module.css';
 import type { PresetId } from '../../types';
 import type { HeroSlideConfig } from '../../config/overlay-config';
@@ -13,6 +14,7 @@ export function HeroSlide({
     headingId,
     onScrollToPreset,
 }: HeroSlideProps) {
+    const { t } = useTranslation();
     const handleSecondaryCtaClick = () => {
         if (slide.ctaSecondary.action === 'scrollTo') {
             onScrollToPreset(slide.ctaSecondary.target);
@@ -43,7 +45,7 @@ export function HeroSlide({
                         href={slide.ctaPrimary.href}
                         className={styles.ctaPrimary}
                     >
-                        {slide.ctaPrimary.label}
+                        {t(slide.ctaPrimary.labelKey)}
                     </a>
                     {slide.ctaSecondary.action === 'scrollTo' ? (
                         <button
