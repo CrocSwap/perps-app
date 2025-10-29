@@ -288,7 +288,6 @@ export default function App() {
         <Document>
             <FogoSessionProvider
                 network={Network.Testnet}
-                endpoint={RPC_ENDPOINT}
                 domain='https://perps.ambient.finance'
                 tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}
                 defaultRequestedLimits={{
