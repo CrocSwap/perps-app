@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 // } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation, useSearchParams } from 'react-router';
+import { Link, useLocation, useSearchParams, useNavigate } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import useMediaQuery, { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -206,11 +206,37 @@ export default function PageHeader() {
     }, [isUserConnected]);
 
     const showDepositSlot = isUserConnected || !isShortScreen;
+    const navigate = useNavigate();
+    const isHomePage = location.pathname === '/';
+
+    const handleLogoClick = () => {
+        if (isHomePage) {
+            // Scroll to hero section if already on homepage
+            const snapContainer = document.querySelector(
+                '[class*="snapContainer"]',
+            ) as HTMLElement;
+            if (snapContainer) {
+                const heroSection = snapContainer.querySelector(
+                    '[data-preset="hero"]',
+                ) as HTMLElement;
+                if (heroSection) {
+                    heroSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        } else {
+            // Navigate to homepage if not already there
+            navigate('/');
+        }
+    };
 
     return (
         <>
             <header id={'pageHeader'} className={styles.container}>
-                <Link to='/' className={styles.logo} viewTransition>
+                <button
+                    onClick={handleLogoClick}
+                    className={styles.logo}
+                    aria-label='Go to home'
+                >
                     <img
                         src='/images/favicon.svg'
                         alt='Perps Logo'
@@ -218,7 +244,7 @@ export default function PageHeader() {
                         height='70px'
                         loading='eager'
                     />
-                </Link>
+                </button>
                 <nav
                     className={`${styles.nav} ${
                         isMenuOpen ? styles.showMenu : ''
