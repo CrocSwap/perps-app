@@ -84,7 +84,7 @@ export const OVERLAY_SLIDE_CONFIG: SlideConfig[] = [
         id: 'vault',
         type: 'feature',
         title: 'Vaults run by',
-        accent: 'Jump Trading',
+        accent: '...',
         subtitle:
             'Ambient ALP vaults target the safest, highest APY on your assets.',
         listItems: [
