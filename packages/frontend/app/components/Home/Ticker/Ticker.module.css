@@ -22,7 +22,8 @@
 .tickerTrack {
     display: flex;
     width: max-content;
-    animation: scroll var(--loop-duration, 20s) linear infinite;
+    animation: scroll var(--loop-duration, 180s) linear infinite;
+    animation-delay: var(--ticker-delay, 2s);
     animation-play-state: running;
     will-change: transform;
     position: relative;
@@ -118,7 +119,7 @@
         transform: translate3d(0, 0, 0);
     }
     100% {
-        transform: translate3d(calc(-100% - 32px), 0, 0);
+        transform: translate3d(calc(-600% - 192px), 0, 0);
     }
 }
 

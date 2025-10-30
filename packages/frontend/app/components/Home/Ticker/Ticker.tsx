@@ -60,19 +60,40 @@ export const Ticker = memo(function Ticker() {
         return state.coins as CoinData[];
     });
 
-    // Memoize coins to prevent unnecessary re-renders
-    const memoizedCoins = useMemo(
-        () => coins,
-        [
-            JSON.stringify(
-                coins.map((coin) => ({
-                    symbol: coin.symbol,
-                    markPx: coin.markPx,
-                    last24hPriceChangePercent: coin.last24hPriceChangePercent,
-                })),
-            ),
-        ],
-    );
+    // Create a safe array of coins with proper type checking
+    const memoizedCoins = useMemo(() => {
+        if (!coins || coins.length === 0) return [];
+
+        // Take top 5 coins
+        const top5Coins = coins.slice(0, 5);
+        // If we have fewer than 5 coins, just return the coins as is
+        if (top5Coins.length < 5) return [...coins];
+
+        // concatenate copies of  coins until we have 500 coins
+        const coinsLength = coins.length;
+        const numCopies = Math.floor(1500 / coinsLength);
+        const coinsArray = coins.concat(
+            ...Array.from({ length: numCopies - 1 }, () => coins),
+        );
+        // Create a new array where every 3rd element is from top5Coins
+        return coinsArray
+            .map((coin, index) => {
+                if (index % 3 === 0) {
+                    // Use modulo to safely cycle through top5Coins
+                    return top5Coins[index % top5Coins.length] || coin;
+                }
+                return coin;
+            })
+            .filter(Boolean); // Remove any potential undefined values
+    }, [
+        JSON.stringify(
+            coins.map((coin) => ({
+                symbol: coin.symbol,
+                markPx: coin.markPx,
+                last24hPriceChangePercent: coin.last24hPriceChangePercent,
+            })),
+        ),
+    ]);
 
     // Memoize the formatNum function
     const { formatNum } = useNumFormatter();
@@ -87,9 +108,9 @@ export const Ticker = memo(function Ticker() {
                 className={styles.tickerSet}
                 ref={setIndex === 0 ? firstSetRef : null}
             >
-                {memoizedCoins.map((coin: CoinData) => (
+                {memoizedCoins.map((coin: CoinData, coinIndex) => (
                     <TickerItem
-                        key={`${setIndex}-${coin.symbol}`}
+                        key={`${setIndex}-${coin.symbol}-${coinIndex}`}
                         coin={coin}
                         formatNum={formatNum}
                     />
