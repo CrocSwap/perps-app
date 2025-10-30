@@ -84,6 +84,12 @@
     color: var(--red);
 }
 
+.changeZero {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+}
+
 .tickerContainer::before,
 .tickerContainer::after {
     content: '';
