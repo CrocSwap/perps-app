@@ -67,7 +67,7 @@ export const Ticker = memo(function Ticker() {
     const firstSetRef = useRef<HTMLDivElement | null>(null);
     const [isPaused, setIsPaused] = useState(false);
     const trackRef = useRef<HTMLDivElement>(null);
-    const prevPriceChangePercentRef = useRef<Record<string, number>>({});
+    const prevPriceChangePercentNumberRef = useRef<Record<string, number>>({});
 
     // Get coins from store with proper typing
     const coins = useTradeDataStore((state) => {
@@ -116,29 +116,34 @@ export const Ticker = memo(function Ticker() {
 
     // Track price changes and determine animation state
     const getPriceChangeState = useCallback((coin: CoinData) => {
-        if (!prevPriceChangePercentRef.current[coin.symbol]) {
-            prevPriceChangePercentRef.current[coin.symbol] =
+        if (!prevPriceChangePercentNumberRef.current[coin.symbol]) {
+            prevPriceChangePercentNumberRef.current[coin.symbol] =
                 coin.last24hPriceChangePercent;
             return null;
         }
 
-        const prevPriceChangePercent =
-            prevPriceChangePercentRef.current[coin.symbol];
+        const prevPriceChangePercentNumber =
+            prevPriceChangePercentNumberRef.current[coin.symbol];
 
         const lastChangeTruncated = formatNum(
             coin.last24hPriceChangePercent,
             1,
         );
-        const prevChangeTruncated = formatNum(prevPriceChangePercent, 1);
-        const change = coin.last24hPriceChangePercent - prevPriceChangePercent;
+        const change =
+            coin.last24hPriceChangePercent - prevPriceChangePercentNumber;
 
         if (coin.symbol.toLowerCase() === 'eth') {
             console.log({ coin, change });
             console.log(coin.last24hPriceChangePercent);
         }
+
+        const prevPriceChangePercentTruncated = formatNum(
+            prevPriceChangePercentNumber,
+            1,
+        );
         // Only update previous price if the change is significant
-        if (lastChangeTruncated !== prevChangeTruncated) {
-            prevPriceChangePercentRef.current[coin.symbol] =
+        if (lastChangeTruncated !== prevPriceChangePercentTruncated) {
+            prevPriceChangePercentNumberRef.current[coin.symbol] =
                 coin.last24hPriceChangePercent;
             return change > 0 ? 'up' : 'down';
         }
