@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 
-function useStableSuffixes(secondWord: string[]) {
+function useStableSecondWords(secondWord: string[]) {
     return useMemo(() => secondWord, []);
 }
 
@@ -9,7 +9,7 @@ export function useTextMorph(
     interval = 5000,
     isActive: boolean,
 ) {
-    const stableSuffixes = useStableSuffixes(secondWord);
+    const stableSecondWords = useStableSecondWords(secondWord);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(true);
     const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -35,7 +35,7 @@ export function useTextMorph(
         let isMounted = true;
         let initialAnimationComplete = false;
 
-        const changeSuffix = () => {
+        const changeSecondWord = () => {
             if (!isMounted) return;
 
             // Start fade out
@@ -45,7 +45,9 @@ export function useTextMorph(
             timerRef.current = setTimeout(() => {
                 if (!isMounted) return;
 
-                setCurrentIndex((prev) => (prev + 1) % stableSuffixes.length);
+                setCurrentIndex(
+                    (prev) => (prev + 1) % stableSecondWords.length,
+                );
 
                 // Add a small delay before fading back in to ensure the text has updated
                 timerRef.current = setTimeout(() => {
@@ -56,7 +58,7 @@ export function useTextMorph(
                             initialAnimationComplete = true;
                             // Set up the interval for subsequent animations
                             intervalRef.current = setInterval(
-                                changeSuffix,
+                                changeSecondWord,
                                 interval,
                             );
                         }
@@ -69,7 +71,7 @@ export function useTextMorph(
         const initialDelay = setTimeout(() => {
             if (!isMounted) return;
             // Start the first animation after the initial delay
-            timerRef.current = setTimeout(changeSuffix, interval);
+            timerRef.current = setTimeout(changeSecondWord, interval);
         }, 1000); // Wait 1 second before starting the first transition
 
         return () => {
@@ -78,12 +80,12 @@ export function useTextMorph(
             if (timerRef.current) clearTimeout(timerRef.current);
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [isActive, stableSuffixes, interval]);
+    }, [isActive, stableSecondWords, interval]);
 
-    const currentSuffix = stableSuffixes[currentIndex];
+    const currentSecondWord = stableSecondWords[currentIndex];
 
     return {
-        secondWord: currentSuffix,
+        secondWord: currentSecondWord,
         isVisible,
         animationDuration: '800ms',
     };
