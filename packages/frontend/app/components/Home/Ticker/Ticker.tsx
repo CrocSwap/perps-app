@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import styles from './Ticker.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -6,7 +6,6 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 
 export function Ticker() {
     const firstSetRef = useRef<HTMLDivElement | null>(null);
-    const [loopWidth, setLoopWidth] = useState<number | null>(null);
     const [isPaused, setIsPaused] = useState(false);
     const trackRef = useRef<HTMLDivElement>(null);
 
@@ -24,28 +23,6 @@ export function Ticker() {
     }, [isPaused]);
 
     const { formatNum } = useNumFormatter();
-
-    useEffect(() => {
-        const element = firstSetRef.current;
-        if (!element) {
-            return;
-        }
-
-        const updateWidth = () => {
-            setLoopWidth(element.offsetWidth);
-        };
-
-        updateWidth();
-
-        if (typeof ResizeObserver !== 'undefined') {
-            const observer = new ResizeObserver(updateWidth);
-            observer.observe(element);
-            return () => observer.disconnect();
-        }
-
-        window.addEventListener('resize', updateWidth);
-        return () => window.removeEventListener('resize', updateWidth);
-    }, []);
 
     if (!coins || coins.length === 0) {
         return null;
