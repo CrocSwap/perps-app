@@ -1,74 +1,89 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 
-function useStableSuffixes(suffixes: string[]) {
-    return useMemo(() => suffixes, []);
+function useStableSuffixes(secondWord: string[]) {
+    return useMemo(() => secondWord, []);
 }
 
 export function useTextMorph(
-    prefix: string,
-    suffixes: string[],
+    secondWord: string[],
     interval = 5000,
     isActive: boolean,
 ) {
-    const stableSuffixes = useStableSuffixes(suffixes);
+    const stableSuffixes = useStableSuffixes(secondWord);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(true);
     const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-    // Reset the animation state when isActive changes
     useEffect(() => {
-        if (isActive) {
-            // Reset to initial state when becoming active
-            setCurrentIndex(0);
-            setIsVisible(true);
-        } else {
+        if (!isActive) {
             // Clear any pending timers when becoming inactive
             if (timerRef.current) clearTimeout(timerRef.current);
             if (intervalRef.current) clearInterval(intervalRef.current);
+            return;
         }
 
-        return () => {
-            if (timerRef.current) clearTimeout(timerRef.current);
-            if (intervalRef.current) clearInterval(intervalRef.current);
-        };
-    }, [isActive]);
+        // Reset to initial state when becoming active
+        setCurrentIndex(0);
+        setIsVisible(true);
 
-    useEffect(() => {
-        if (!isActive) return;
+        // Clear any existing timers before setting new ones
+        if (timerRef.current) clearTimeout(timerRef.current);
+        if (intervalRef.current) clearInterval(intervalRef.current);
+
+        const FADE_DURATION = 800; // Match this with the CSS transition duration
+        let isMounted = true;
+        let initialAnimationComplete = false;
 
         const changeSuffix = () => {
+            if (!isMounted) return;
+
             // Start fade out
             setIsVisible(false);
 
             // After fade out completes, change suffix and fade back in
             timerRef.current = setTimeout(() => {
+                if (!isMounted) return;
+
                 setCurrentIndex((prev) => (prev + 1) % stableSuffixes.length);
-                setIsVisible(true);
-            }, 800); // Fade out duration
+
+                // Add a small delay before fading back in to ensure the text has updated
+                timerRef.current = setTimeout(() => {
+                    if (isMounted) {
+                        setIsVisible(true);
+                        // After first animation completes, set up the interval
+                        if (!initialAnimationComplete) {
+                            initialAnimationComplete = true;
+                            // Set up the interval for subsequent animations
+                            intervalRef.current = setInterval(
+                                changeSuffix,
+                                interval,
+                            );
+                        }
+                    }
+                }, 50);
+            }, FADE_DURATION);
         };
 
-        // Initial delay before starting the animation
-        timerRef.current = setTimeout(() => {
-            changeSuffix();
-
-            // Set up the interval for subsequent changes
-            intervalRef.current = setInterval(() => {
-                changeSuffix();
-            }, interval);
-        }, interval);
+        // Initial delay before starting the first animation
+        const initialDelay = setTimeout(() => {
+            if (!isMounted) return;
+            // Start the first animation after the initial delay
+            timerRef.current = setTimeout(changeSuffix, interval);
+        }, 1000); // Wait 1 second before starting the first transition
 
         return () => {
+            isMounted = false;
+            clearTimeout(initialDelay);
             if (timerRef.current) clearTimeout(timerRef.current);
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [stableSuffixes, interval, isActive]);
+    }, [isActive, stableSuffixes, interval]);
 
     const currentSuffix = stableSuffixes[currentIndex];
 
     return {
-        prefix,
-        suffix: currentSuffix,
+        secondWord: currentSuffix,
         isVisible,
         animationDuration: '800ms',
     };

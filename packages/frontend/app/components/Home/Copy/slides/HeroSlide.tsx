@@ -31,10 +31,9 @@ export function HeroSlide({
             ? `/v2/trade/${symbol}`
             : slide.ctaPrimary.href;
 
-    // Use text morphing effect for the accent text with fade animation
-    const { prefix, suffix, isVisible, animationDuration } = useTextMorph(
-        'Ambi',
-        ['tious', 'ent'],
+    // Use text morphing effect to switch between 'Ambitious' and 'Perps'
+    const { secondWord, isVisible } = useTextMorph(
+        ['Ambitious', 'Perps'],
         5000,
         isActive,
     );
@@ -42,37 +41,99 @@ export function HeroSlide({
     // Only apply morphing to the hero slide
     const displayText =
         slide.type === 'hero' ? (
-            <>
-                {prefix}
+            <span
+                className={styles.accent}
+                style={{ display: 'inline-block', minWidth: '100px' }}
+            >
                 <span
-                    className={styles.accent}
                     style={{
-                        transition: `opacity ${animationDuration} ease-in-out`,
-                        opacity: isVisible ? 1 : 0,
-                        display: 'inline-block',
-                        minWidth: '60px', // Adjust based on the longest suffix
+                        transition: 'opacity 800ms ease-in-out',
+                        opacity:
+                            secondWord === 'Ambitious'
+                                ? isVisible
+                                    ? 1
+                                    : 0
+                                : isVisible
+                                  ? 0
+                                  : 1,
+                        display: secondWord === 'Ambitious' ? 'inline' : 'none',
                     }}
                 >
-                    {suffix}
+                    Ambitious
                 </span>
-            </>
+                <span
+                    style={{
+                        transition: 'opacity 800ms ease-in-out',
+                        opacity:
+                            secondWord === 'Perps'
+                                ? isVisible
+                                    ? 1
+                                    : 0
+                                : isVisible
+                                  ? 0
+                                  : 1,
+                        display: secondWord === 'Perps' ? 'inline' : 'none',
+                    }}
+                >
+                    Perps
+                </span>
+            </span>
         ) : (
             slide.accent
         );
+
     return (
         <>
             <div className={styles.heroContent}>
                 <div className={styles.heroText}>
                     <h1 id={headingId} className={styles.heroTitle}>
-                        {slide.title}
-                        {displayText ? (
-                            <>
-                                {' '}
-                                <span className={styles.accent}>
-                                    {displayText}
-                                </span>
-                            </>
-                        ) : null}
+                        <div
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.25em',
+                            }}
+                        >
+                            <span
+                                style={{
+                                    transition: 'opacity 800ms ease-in-out',
+                                    opacity:
+                                        secondWord === 'Ambitious'
+                                            ? isVisible
+                                                ? 1
+                                                : 0
+                                            : isVisible
+                                              ? 0
+                                              : 1,
+                                    display:
+                                        secondWord === 'Ambitious'
+                                            ? 'inline'
+                                            : 'none',
+                                }}
+                            >
+                                Perpetually
+                            </span>
+                            <span
+                                style={{
+                                    transition: 'opacity 800ms ease-in-out',
+                                    opacity:
+                                        secondWord === 'Perps'
+                                            ? isVisible
+                                                ? 1
+                                                : 0
+                                            : isVisible
+                                              ? 0
+                                              : 1,
+                                    display:
+                                        secondWord === 'Perps'
+                                            ? 'inline'
+                                            : 'none',
+                                }}
+                            >
+                                Ambient
+                            </span>
+                        </div>
+                        {displayText ? <> {displayText}</> : null}
                     </h1>
                     {slide.subtitle ? (
                         <p className={styles.heroSubtitle}>{slide.subtitle}</p>
