@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo, memo } from 'react';
+import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { Link } from 'react-router';
 import styles from './Ticker.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -11,47 +11,55 @@ interface CoinData {
 }
 
 // Memoized TickerItem to prevent re-renders of individual items
+interface TickerItemProps {
+    coin: any;
+    formatNum: (
+        value: number,
+        decimals?: number,
+        compact?: boolean,
+        isPrice?: boolean,
+    ) => string;
+    priceChangeState: 'up' | 'down' | null;
+}
+
 const TickerItem = memo(
-    ({
-        coin,
-        formatNum,
-    }: {
-        coin: any;
-        formatNum: (
-            value: number,
-            decimals?: number,
-            compact?: boolean,
-            isPrice?: boolean,
-        ) => string;
-    }) => (
-        <Link
-            to={`/v2/trade/${coin.symbol}`}
-            className={styles.tickerItem}
-            viewTransition
-        >
-            <span className={styles.symbol}>{coin.symbol}</span>
-            <span className={styles.price}>
-                {formatNum(coin.markPx, undefined, true, true)}
-            </span>
-            <span
-                className={
-                    coin.last24hPriceChangePercent > -0.1 &&
-                    coin.last24hPriceChangePercent < 0.1
-                        ? styles.changeZero
-                        : coin.last24hPriceChangePercent >= 0.1
-                          ? styles.changePositive
-                          : styles.changeNegative
-                }
+    ({ coin, formatNum, priceChangeState }: TickerItemProps) => {
+        return (
+            <Link
+                to={`/v2/trade/${coin.symbol}`}
+                className={`${styles.tickerItem} ${
+                    priceChangeState === 'up'
+                        ? styles.priceUp
+                        : priceChangeState === 'down'
+                          ? styles.priceDown
+                          : ''
+                }`}
+                viewTransition
             >
-                {coin.last24hPriceChangePercent >= 0.1 ? '+' : ''}
-                {coin.last24hPriceChangePercent > -0.1 &&
-                coin.last24hPriceChangePercent < 0.1
-                    ? '0.0'
-                    : formatNum(coin.last24hPriceChangePercent, 1)}
-                %
-            </span>
-        </Link>
-    ),
+                <span className={styles.symbol}>{coin.symbol}</span>
+                <span className={styles.price}>
+                    {formatNum(coin.markPx, undefined, true, true)}
+                </span>
+                <span
+                    className={
+                        coin.last24hPriceChangePercent > -0.1 &&
+                        coin.last24hPriceChangePercent < 0.1
+                            ? styles.changeZero
+                            : coin.last24hPriceChangePercent >= 0.1
+                              ? styles.changePositive
+                              : styles.changeNegative
+                    }
+                >
+                    {coin.last24hPriceChangePercent >= 0.1 ? '+' : ''}
+                    {coin.last24hPriceChangePercent > -0.1 &&
+                    coin.last24hPriceChangePercent < 0.1
+                        ? '0.0'
+                        : formatNum(coin.last24hPriceChangePercent, 1)}
+                    %
+                </span>
+            </Link>
+        );
+    },
 );
 
 // Main Ticker component
@@ -59,6 +67,7 @@ export const Ticker = memo(function Ticker() {
     const firstSetRef = useRef<HTMLDivElement | null>(null);
     const [isPaused, setIsPaused] = useState(false);
     const trackRef = useRef<HTMLDivElement>(null);
+    const prevPriceChangePercentRef = useRef<Record<string, number>>({});
 
     // Get coins from store with proper typing
     const coins = useTradeDataStore((state) => {
@@ -105,6 +114,38 @@ export const Ticker = memo(function Ticker() {
     // Memoize the formatNum function
     const { formatNum } = useNumFormatter();
 
+    // Track price changes and determine animation state
+    const getPriceChangeState = useCallback((coin: CoinData) => {
+        if (!prevPriceChangePercentRef.current[coin.symbol]) {
+            prevPriceChangePercentRef.current[coin.symbol] =
+                coin.last24hPriceChangePercent;
+            return null;
+        }
+
+        const prevPriceChangePercent =
+            prevPriceChangePercentRef.current[coin.symbol];
+
+        const lastChangeTruncated = formatNum(
+            coin.last24hPriceChangePercent,
+            1,
+        );
+        const prevChangeTruncated = formatNum(prevPriceChangePercent, 1);
+        const change = coin.last24hPriceChangePercent - prevPriceChangePercent;
+
+        if (coin.symbol.toLowerCase() === 'eth') {
+            console.log({ coin, change });
+            console.log(coin.last24hPriceChangePercent);
+        }
+        // Only update previous price if the change is significant
+        if (lastChangeTruncated !== prevChangeTruncated) {
+            prevPriceChangePercentRef.current[coin.symbol] =
+                coin.last24hPriceChangePercent;
+            return change > 0 ? 'up' : 'down';
+        }
+
+        return null;
+    }, []);
+
     // Memoize the ticker items to prevent re-renders
     const tickerItems = useMemo(() => {
         if (!memoizedCoins || memoizedCoins.length === 0) return [];
@@ -120,6 +161,7 @@ export const Ticker = memo(function Ticker() {
                         key={`${setIndex}-${coin.symbol}-${coinIndex}`}
                         coin={coin}
                         formatNum={formatNum}
+                        priceChangeState={getPriceChangeState(coin)}
                     />
                 ))}
             </div>

@@ -59,11 +59,44 @@
     text-decoration: none;
     color: inherit;
     background: transparent;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease-in-out;
     transform: translateZ(0);
     backface-visibility: hidden;
     width: 140px; /* Fixed width for each ticker item */
     -webkit-font-smoothing: subpixel-antialiased;
+    border-radius: 4px;
+}
+
+@keyframes flashGreen {
+    0% {
+        background-color: var(--green-dark);
+    }
+    50% {
+        background-color: var(--green-dark);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+@keyframes flashRed {
+    0% {
+        background-color: var(--red-dark);
+    }
+    50% {
+        background-color: var(--red-dark);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+.tickerItem.priceUp {
+    animation: flashGreen 3s ease-out;
+}
+
+.tickerItem.priceDown {
+    animation: flashRed 3s ease-out;
 }
 
 .symbol {
