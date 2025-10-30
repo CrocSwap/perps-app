@@ -42,6 +42,11 @@
     flex-shrink: 0;
 }
 
+/* Add 50px offset to the first ticker item in the first set */
+.tickerSet:first-child .tickerItem:first-child {
+    margin-left: 80px;
+}
+
 .tickerItem {
     display: flex;
     align-items: center;

@@ -35,9 +35,10 @@ const TickerItem = memo(
             </span>
             <span
                 className={
-                    coin.last24hPriceChangePercent === 0
+                    coin.last24hPriceChangePercent > -0.1 &&
+                    coin.last24hPriceChangePercent < 0.1
                         ? styles.changeZero
-                        : coin.last24hPriceChangePercent >= 0
+                        : coin.last24hPriceChangePercent >= 0.1
                           ? styles.changePositive
                           : styles.changeNegative
                 }
