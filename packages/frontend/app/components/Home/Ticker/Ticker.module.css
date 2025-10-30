@@ -13,6 +13,10 @@
     align-items: center;
     padding: 4px 0;
     box-sizing: border-box;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-backface-visibility: hidden;
 }
 
 .tickerTrack {
@@ -25,6 +29,9 @@
     z-index: 0;
     max-width: 100%;
     pointer-events: none;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .tickerSet {
@@ -47,6 +54,9 @@
     color: inherit;
     background: transparent;
     transition: background-color 0.2s ease;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .symbol {
@@ -108,7 +118,7 @@
         transform: translate3d(0, 0, 0);
     }
     100% {
-        transform: translate3d(var(--loop-offset, -100%), 0, 0);
+        transform: translate3d(calc(-100% - 32px), 0, 0);
     }
 }
 
