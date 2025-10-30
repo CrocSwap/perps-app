@@ -47,17 +47,6 @@ export function Ticker() {
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
-    let trackStyle: CSSProperties | undefined;
-    if (loopWidth && loopWidth > 0) {
-        const SPEED_PX_PER_SECOND = 60;
-        const durationSeconds = Math.max(loopWidth / SPEED_PX_PER_SECOND, 12);
-        trackStyle = {
-            '--loop-offset': `-${loopWidth}px`,
-            '--loop-duration': `${durationSeconds}s`,
-            '--play-state': isPaused ? 'paused' : 'running',
-        } as CSSProperties;
-    }
-
     if (!coins || coins.length === 0) {
         return null;
     }
@@ -68,11 +57,7 @@ export function Ticker() {
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
-            <div
-                ref={trackRef}
-                className={styles.tickerTrack}
-                style={trackStyle}
-            >
+            <div ref={trackRef} className={styles.tickerTrack}>
                 {Array.from({ length: 2 }).map((_, setIndex) => (
                     <div
                         key={setIndex}
