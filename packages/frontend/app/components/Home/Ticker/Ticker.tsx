@@ -42,9 +42,9 @@ const TickerItem = memo(
                           : styles.changeNegative
                 }
             >
-                {coin.last24hPriceChangePercent >= 0.01 ? '+' : ''}
-                {coin.last24hPriceChangePercent > -0.01 &&
-                coin.last24hPriceChangePercent < 0.01
+                {coin.last24hPriceChangePercent >= 0.1 ? '+' : ''}
+                {coin.last24hPriceChangePercent > -0.1 &&
+                coin.last24hPriceChangePercent < 0.1
                     ? '0.0'
                     : formatNum(coin.last24hPriceChangePercent, 1)}
                 %
