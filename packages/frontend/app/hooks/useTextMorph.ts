@@ -1,15 +1,17 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 
-function useStableSecondWords(secondWord: string[]) {
-    return useMemo(() => secondWord, []);
+function useStableWords(words: string[]) {
+    return useMemo(() => words, []);
 }
 
 export function useTextMorph(
+    firstWord: string[],
     secondWord: string[],
     interval = 5000,
     isActive: boolean,
 ) {
-    const stableSecondWords = useStableSecondWords(secondWord);
+    const stableFirstWords = useStableWords(firstWord);
+    const stableSecondWords = useStableWords(secondWord);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(true);
     const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -82,9 +84,11 @@ export function useTextMorph(
         };
     }, [isActive, stableSecondWords, interval]);
 
+    const currentFirstWord = stableFirstWords[currentIndex];
     const currentSecondWord = stableSecondWords[currentIndex];
 
     return {
+        firstWord: currentFirstWord,
         secondWord: currentSecondWord,
         isVisible,
         animationDuration: '800ms',

@@ -31,56 +31,13 @@ export function HeroSlide({
             ? `/v2/trade/${symbol}`
             : slide.ctaPrimary.href;
 
-    // Use text morphing effect to switch between 'Ambitious' and 'Perps'
-    const { secondWord, isVisible } = useTextMorph(
-        ['Ambitious', 'Perps'],
+    // Use text morphing effect to switch between word pairs
+    const { firstWord, secondWord, isVisible } = useTextMorph(
+        ['Perpetually', 'Ambient'], // firstWord values
+        ['Ambitious', 'Perps'], // secondWord values
         5000,
         isActive,
     );
-
-    // Only apply morphing to the hero slide
-    const displayText =
-        slide.type === 'hero' ? (
-            <span
-                className={styles.accent}
-                style={{ display: 'inline-block', minWidth: '100px' }}
-            >
-                <span
-                    style={{
-                        transition: 'opacity 800ms ease-in-out',
-                        opacity:
-                            secondWord === 'Ambitious'
-                                ? isVisible
-                                    ? 1
-                                    : 0
-                                : isVisible
-                                  ? 0
-                                  : 1,
-                        display: secondWord === 'Ambitious' ? 'inline' : 'none',
-                    }}
-                >
-                    Ambitious
-                </span>
-                <span
-                    style={{
-                        transition: 'opacity 800ms ease-in-out',
-                        opacity:
-                            secondWord === 'Perps'
-                                ? isVisible
-                                    ? 1
-                                    : 0
-                                : isVisible
-                                  ? 0
-                                  : 1,
-                        display: secondWord === 'Perps' ? 'inline' : 'none',
-                    }}
-                >
-                    Perps
-                </span>
-            </span>
-        ) : (
-            slide.accent
-        );
 
     return (
         <>
@@ -91,49 +48,41 @@ export function HeroSlide({
                             style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: '0.25em',
                             }}
                         >
                             <span
                                 style={{
-                                    transition: 'opacity 800ms ease-in-out',
-                                    opacity:
-                                        secondWord === 'Ambitious'
-                                            ? isVisible
-                                                ? 1
-                                                : 0
-                                            : isVisible
-                                              ? 0
-                                              : 1,
-                                    display:
-                                        secondWord === 'Ambitious'
-                                            ? 'inline'
-                                            : 'none',
+                                    display: 'inline-flex',
+                                    gap: '0.25em',
                                 }}
                             >
-                                Perpetually
-                            </span>
-                            <span
-                                style={{
-                                    transition: 'opacity 800ms ease-in-out',
-                                    opacity:
-                                        secondWord === 'Perps'
-                                            ? isVisible
-                                                ? 1
-                                                : 0
-                                            : isVisible
-                                              ? 0
-                                              : 1,
-                                    display:
-                                        secondWord === 'Perps'
-                                            ? 'inline'
-                                            : 'none',
-                                }}
-                            >
-                                Ambient
+                                <span
+                                    style={{
+                                        transition: 'opacity 800ms ease-in-out',
+                                        opacity: isVisible ? 1 : 0,
+                                        display: 'inline-block',
+                                        minWidth: '100px',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    {firstWord}
+                                </span>
+                                {slide.type === 'hero' && (
+                                    <span
+                                        className={styles.accent}
+                                        style={{
+                                            transition:
+                                                'opacity 800ms ease-in-out',
+                                            opacity: isVisible ? 1 : 0,
+                                            display: 'inline-block',
+                                            minWidth: '100px',
+                                        }}
+                                    >
+                                        {secondWord}
+                                    </span>
+                                )}
                             </span>
                         </div>
-                        {displayText ? <> {displayText}</> : null}
                     </h1>
                     {slide.subtitle ? (
                         <p className={styles.heroSubtitle}>{slide.subtitle}</p>
