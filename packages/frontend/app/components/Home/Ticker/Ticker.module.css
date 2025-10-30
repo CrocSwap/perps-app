@@ -57,6 +57,7 @@
     transition: background-color 0.2s ease;
     transform: translateZ(0);
     backface-visibility: hidden;
+    width: 140px; /* Fixed width for each ticker item */
     -webkit-font-smoothing: subpixel-antialiased;
 }
 

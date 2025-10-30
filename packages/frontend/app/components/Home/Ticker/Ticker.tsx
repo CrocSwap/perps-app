@@ -31,7 +31,7 @@ const TickerItem = memo(
         >
             <span className={styles.symbol}>{coin.symbol}</span>
             <span className={styles.price}>
-                {formatNum(coin.markPx, coin.markPx < 0.01 ? 3 : 2, true, true)}
+                {formatNum(coin.markPx, undefined, true, true)}
             </span>
             <span
                 className={
