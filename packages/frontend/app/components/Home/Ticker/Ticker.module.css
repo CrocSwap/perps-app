@@ -37,8 +37,8 @@
 
 .tickerSet {
     display: flex;
-    gap: 32px;
-    padding-right: 32px;
+    gap: 16px;
+    padding-right: 16px;
     flex-shrink: 0;
 }
 
@@ -50,6 +50,7 @@
 .tickerItem {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 4px 8px;
     white-space: nowrap;
@@ -62,7 +63,7 @@
     transition: all 0.3s ease-in-out;
     transform: translateZ(0);
     backface-visibility: hidden;
-    width: 140px; /* Fixed width for each ticker item */
+    width: 150px; /* Fixed width for each ticker item */
     -webkit-font-smoothing: subpixel-antialiased;
     border-radius: 4px;
 }
