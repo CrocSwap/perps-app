@@ -15,13 +15,13 @@ export function useTextMorph(
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(true);
     const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
-    const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
+    const intervalRef = useRef<number | undefined>(undefined);
 
     useEffect(() => {
         if (!isActive) {
             // Clear any pending timers when becoming inactive
-            if (timerRef.current) clearTimeout(timerRef.current);
-            if (intervalRef.current) clearInterval(intervalRef.current);
+            clearTimeout(timerRef.current);
+            cancelAnimationFrame(intervalRef.current as unknown as number);
             return;
         }
 
@@ -30,59 +30,71 @@ export function useTextMorph(
         setIsVisible(true);
 
         // Clear any existing timers before setting new ones
-        if (timerRef.current) clearTimeout(timerRef.current);
-        if (intervalRef.current) clearInterval(intervalRef.current);
+        clearTimeout(timerRef.current);
+        cancelAnimationFrame(intervalRef.current as unknown as number);
 
         const FADE_DURATION = 800; // Match this with the CSS transition duration
         let isMounted = true;
-        let initialAnimationComplete = false;
+        let animationFrameId: number;
 
-        const changeSecondWord = () => {
+        const scheduleNextChange = () => {
+            if (!isMounted) return;
+            const startTime = performance.now();
+
+            const animate = () => {
+                if (!isMounted) return;
+                const now = performance.now();
+                const elapsed = now - startTime;
+
+                if (elapsed >= interval) {
+                    changeWords();
+                } else {
+                    animationFrameId = requestAnimationFrame(animate);
+                }
+            };
+
+            animationFrameId = requestAnimationFrame(animate);
+        };
+
+        const changeWords = () => {
             if (!isMounted) return;
 
             // Start fade out
             setIsVisible(false);
 
-            // After fade out completes, change suffix and fade back in
+            // After fade out completes, change words and fade back in
             timerRef.current = setTimeout(() => {
                 if (!isMounted) return;
 
-                setCurrentIndex(
-                    (prev) => (prev + 1) % stableSecondWords.length,
-                );
+                // Update both words simultaneously
+                setCurrentIndex((prev) => (prev + 1) % stableFirstWords.length);
 
-                // Add a small delay before fading back in to ensure the text has updated
+                // Fade back in after a small delay to ensure the text has updated
                 timerRef.current = setTimeout(() => {
                     if (isMounted) {
                         setIsVisible(true);
-                        // After first animation completes, set up the interval
-                        if (!initialAnimationComplete) {
-                            initialAnimationComplete = true;
-                            // Set up the interval for subsequent animations
-                            intervalRef.current = setInterval(
-                                changeSecondWord,
-                                interval,
-                            );
-                        }
+                        // Schedule the next word change
+                        scheduleNextChange();
                     }
                 }, 50);
             }, FADE_DURATION);
         };
 
-        // Initial delay before starting the first animation
+        // Start the first animation after a delay
         const initialDelay = setTimeout(() => {
-            if (!isMounted) return;
-            // Start the first animation after the initial delay
-            timerRef.current = setTimeout(changeSecondWord, interval);
-        }, 1000); // Wait 1 second before starting the first transition
+            if (isMounted) {
+                changeWords();
+            }
+        }, 5000); // Initial delay before first transition
 
         return () => {
             isMounted = false;
             clearTimeout(initialDelay);
-            if (timerRef.current) clearTimeout(timerRef.current);
-            if (intervalRef.current) clearInterval(intervalRef.current);
+            clearTimeout(timerRef.current);
+            cancelAnimationFrame(animationFrameId);
+            cancelAnimationFrame(intervalRef.current as unknown as number);
         };
-    }, [isActive, stableSecondWords, interval]);
+    }, [isActive, stableFirstWords, stableSecondWords, interval]);
 
     const currentFirstWord = stableFirstWords[currentIndex];
     const currentSecondWord = stableSecondWords[currentIndex];
