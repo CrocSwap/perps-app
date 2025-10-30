@@ -67,7 +67,6 @@ export function useDepositService(): UseDepositServiceReturn {
             // Try to find the correct user wallet public key
             const userWalletKey =
                 sessionState.walletPublicKey || sessionState.sessionPublicKey;
-            console.log({ userWalletKey });
             const userBalance =
                 await depositService.getUserBalance(userWalletKey);
             setBalance(userBalance);
