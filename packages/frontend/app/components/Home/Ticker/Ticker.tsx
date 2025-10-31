@@ -147,6 +147,7 @@ export const Ticker = memo(function Ticker() {
 
     // Track price changes and determine animation state
     const getPriceChangeState = useCallback((coin: CoinData) => {
+        if (!coin || !coin.symbol) return null;
         if (!prevPriceChangePercentNumberRef.current[coin.symbol]) {
             prevPriceChangePercentNumberRef.current[coin.symbol] =
                 coin.last24hPriceChangePercent;
@@ -182,27 +183,28 @@ export const Ticker = memo(function Ticker() {
         return null;
     }, []);
 
-    // Memoize the ticker items to prevent re-renders
+    // Memoize the ticker items to prevent unnecessary re-renders
     const tickerItems = useMemo(() => {
-        if (!memoizedCoins || memoizedCoins.length === 0) return [];
+        if (!memoizedCoins || memoizedCoins.length === 0) return null;
 
-        return Array.from({ length: 2 }).flatMap((_, setIndex) => (
-            <div
-                key={setIndex}
-                className={styles.tickerSet}
-                ref={setIndex === 0 ? firstSetRef : null}
-            >
-                {memoizedCoins.map((coin: CoinData, coinIndex) => (
-                    <TickerItem
-                        key={`${setIndex}-${coin.symbol}-${coinIndex}`}
-                        coin={coin}
-                        formatNum={formatNum}
-                        priceChangeState={getPriceChangeState(coin)}
-                    />
-                ))}
+        return (
+            <div className={styles.tickerSet} ref={firstSetRef}>
+                {memoizedCoins.map((coin: CoinData, coinIndex) => {
+                    // Get the price change state for this specific coin
+                    const priceChangeState = getPriceChangeState(coin);
+
+                    return (
+                        <TickerItem
+                            key={`${coin.symbol}-${coinIndex}`}
+                            coin={coin}
+                            formatNum={formatNum}
+                            priceChangeState={priceChangeState}
+                        />
+                    );
+                })}
             </div>
-        ));
-    }, [memoizedCoins, formatNum]);
+        );
+    }, [memoizedCoins, formatNum, getPriceChangeState]);
 
     // Handle animation state
     useEffect(() => {
@@ -218,11 +220,11 @@ export const Ticker = memo(function Ticker() {
 
     return (
         <div
-            className={styles.tickerContainer}
+            className={`${styles.tickerContainer} ${isPaused ? styles.paused : ''}`}
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
-            <div ref={trackRef} className={styles.tickerTrack}>
+            <div className={styles.tickerTrack} ref={trackRef}>
                 {tickerItems}
             </div>
         </div>
