@@ -144,9 +144,11 @@
     background: linear-gradient(
         to right,
         var(--bg-dark1) 0%,
-        rgba(6, 6, 12, 0.85) 45%,
+        var(--bg-dark1) 20%,
+        rgba(6, 6, 12, 0.7) 50%,
         transparent 100%
     );
+    z-index: 3; /* Ensure it's above the ticker items */
 }
 
 .tickerContainer::after {
