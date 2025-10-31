@@ -44,45 +44,35 @@ export function HeroSlide({
             <div className={styles.heroContent}>
                 <div className={styles.heroText}>
                     <h1 id={headingId} className={styles.heroTitle}>
-                        <div
+                        <span
                             style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
+                                display: 'inline',
                             }}
                         >
                             <span
                                 style={{
-                                    display: 'inline-flex',
-                                    gap: '0.25em',
+                                    transition: 'opacity 800ms ease-in-out',
+                                    opacity: isVisible ? 1 : 0,
+                                    display: 'inline',
+                                    whiteSpace: 'nowrap',
                                 }}
                             >
+                                {firstWord}
+                            </span>{' '}
+                            {slide.type === 'hero' && (
                                 <span
+                                    className={styles.accent}
                                     style={{
                                         transition: 'opacity 800ms ease-in-out',
                                         opacity: isVisible ? 1 : 0,
-                                        display: 'inline-block',
-                                        minWidth: '100px',
+                                        display: 'inline',
                                         whiteSpace: 'nowrap',
                                     }}
                                 >
-                                    {firstWord}
+                                    {secondWord}
                                 </span>
-                                {slide.type === 'hero' && (
-                                    <span
-                                        className={styles.accent}
-                                        style={{
-                                            transition:
-                                                'opacity 800ms ease-in-out',
-                                            opacity: isVisible ? 1 : 0,
-                                            display: 'inline-block',
-                                            minWidth: '100px',
-                                        }}
-                                    >
-                                        {secondWord}
-                                    </span>
-                                )}
-                            </span>
-                        </div>
+                            )}
+                        </span>
                     </h1>
                     {slide.subtitle ? (
                         <p className={styles.heroSubtitle}>{slide.subtitle}</p>
