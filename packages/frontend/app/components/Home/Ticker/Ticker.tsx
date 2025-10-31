@@ -99,6 +99,10 @@ export const Ticker = memo(function Ticker() {
     const [isPaused, setIsPaused] = useState(false);
     const trackRef = useRef<HTMLDivElement>(null);
     const prevPriceChangePercentNumberRef = useRef<Record<string, number>>({});
+    const [priceChangeStates, setPriceChangeStates] = useState<
+        Record<string, 'up' | 'down' | null>
+    >({});
+    const priceChangeTimeoutsRef = useRef<Record<string, NodeJS.Timeout>>({});
 
     // Get coins from store with proper typing
     const coins = useTradeDataStore((state) => {
@@ -107,34 +111,18 @@ export const Ticker = memo(function Ticker() {
         return state.coins as CoinData[];
     });
 
-    // Create a safe array of coins with proper type checking
+    // Create a safe array of coins limited to 15 items
     const memoizedCoins = useMemo(() => {
         if (!coins || coins.length === 0) return [];
 
-        // Take top 5 coins
-        const top5Coins = coins.slice(0, 5);
-        // If we have fewer than 5 coins, just return the coins as is
-        if (top5Coins.length < 5) return [...coins];
+        // Limit to maximum 15 items
+        const maxItems = 15;
+        const limitedCoins = coins.slice(0, Math.min(maxItems, coins.length));
 
-        // concatenate copies of  coins until we have 500 coins
-        const coinsLength = coins.length;
-        const numCopies = Math.floor(1500 / coinsLength);
-        const coinsArray = coins.concat(
-            ...Array.from({ length: numCopies - 1 }, () => coins),
-        );
-        // Create a new array where every 3rd element is from top5Coins
-        return coinsArray
-            .map((coin, index) => {
-                if (index % 3 === 0) {
-                    // Use modulo to safely cycle through top5Coins
-                    return top5Coins[index % top5Coins.length] || coin;
-                }
-                return coin;
-            })
-            .filter(Boolean); // Remove any potential undefined values
+        return limitedCoins;
     }, [
         JSON.stringify(
-            coins.map((coin) => ({
+            coins.slice(0, 15).map((coin) => ({
                 symbol: coin.symbol,
                 markPx: coin.markPx,
                 last24hPriceChangePercent: coin.last24hPriceChangePercent,
@@ -145,57 +133,89 @@ export const Ticker = memo(function Ticker() {
     // Memoize the formatNum function
     const { formatNum } = useNumFormatter();
 
-    // Track price changes and determine animation state
-    const getPriceChangeState = useCallback((coin: CoinData) => {
-        if (!coin || !coin.symbol) return null;
-        if (!prevPriceChangePercentNumberRef.current[coin.symbol]) {
-            prevPriceChangePercentNumberRef.current[coin.symbol] =
-                coin.last24hPriceChangePercent;
-            return null;
-        }
+    // Track price changes and trigger animations that last at least 5 seconds
+    useEffect(() => {
+        memoizedCoins.forEach((coin) => {
+            if (!coin || !coin.symbol) return;
 
-        const prevPriceChangePercentNumber =
-            prevPriceChangePercentNumberRef.current[coin.symbol];
+            // Initialize previous price if not set
+            if (!prevPriceChangePercentNumberRef.current[coin.symbol]) {
+                prevPriceChangePercentNumberRef.current[coin.symbol] =
+                    coin.last24hPriceChangePercent;
+                return;
+            }
 
-        const lastChangeTruncated = formatNum(
-            coin.last24hPriceChangePercent,
-            1,
-        );
-        const change =
-            coin.last24hPriceChangePercent - prevPriceChangePercentNumber;
+            const prevPriceChangePercentNumber =
+                prevPriceChangePercentNumberRef.current[coin.symbol];
 
-        if (coin.symbol.toLowerCase() === 'eth') {
-            console.log({ coin, change });
-            console.log(coin.last24hPriceChangePercent);
-        }
+            const lastChangeTruncated = formatNum(
+                coin.last24hPriceChangePercent,
+                1,
+            );
+            const prevPriceChangePercentTruncated = formatNum(
+                prevPriceChangePercentNumber,
+                1,
+            );
 
-        const prevPriceChangePercentTruncated = formatNum(
-            prevPriceChangePercentNumber,
-            1,
-        );
-        // Only update previous price if the change is significant
-        if (lastChangeTruncated !== prevPriceChangePercentTruncated) {
-            prevPriceChangePercentNumberRef.current[coin.symbol] =
-                coin.last24hPriceChangePercent;
-            return change > 0 ? 'up' : 'down';
-        }
+            // Only trigger animation if the truncated value changed
+            if (lastChangeTruncated !== prevPriceChangePercentTruncated) {
+                const change =
+                    coin.last24hPriceChangePercent -
+                    prevPriceChangePercentNumber;
+                const newState = change > 0 ? 'up' : 'down';
 
-        return null;
+                // Clear any existing timeout for this coin
+                if (priceChangeTimeoutsRef.current[coin.symbol]) {
+                    clearTimeout(priceChangeTimeoutsRef.current[coin.symbol]);
+                }
+
+                // Set the new animation state
+                setPriceChangeStates((prev) => ({
+                    ...prev,
+                    [coin.symbol]: newState,
+                }));
+
+                // Update the stored price
+                prevPriceChangePercentNumberRef.current[coin.symbol] =
+                    coin.last24hPriceChangePercent;
+
+                // Clear the animation state after 5 seconds
+                priceChangeTimeoutsRef.current[coin.symbol] = setTimeout(() => {
+                    setPriceChangeStates((prev) => ({
+                        ...prev,
+                        [coin.symbol]: null,
+                    }));
+                }, 5000);
+            }
+        });
+    }, [memoizedCoins, formatNum]);
+
+    // Clean up timeouts on unmount
+    useEffect(() => {
+        return () => {
+            Object.values(priceChangeTimeoutsRef.current).forEach((timeout) => {
+                clearTimeout(timeout);
+            });
+        };
     }, []);
 
-    // Memoize the ticker items to prevent unnecessary re-renders
-    const tickerItems = useMemo(() => {
+    // Create ticker set component
+    const renderTickerSet = (
+        keyPrefix: string,
+        setRef?: React.RefObject<HTMLDivElement | null>,
+    ) => {
         if (!memoizedCoins || memoizedCoins.length === 0) return null;
 
         return (
-            <div className={styles.tickerSet} ref={firstSetRef}>
+            <div className={styles.tickerSet} ref={setRef || null}>
                 {memoizedCoins.map((coin: CoinData, coinIndex) => {
                     // Get the price change state for this specific coin
-                    const priceChangeState = getPriceChangeState(coin);
+                    const priceChangeState =
+                        priceChangeStates[coin.symbol] || null;
 
                     return (
                         <TickerItem
-                            key={`${coin.symbol}-${coinIndex}`}
+                            key={`${keyPrefix}-${coin.symbol}-${coinIndex}`}
                             coin={coin}
                             formatNum={formatNum}
                             priceChangeState={priceChangeState}
@@ -204,7 +224,7 @@ export const Ticker = memo(function Ticker() {
                 })}
             </div>
         );
-    }, [memoizedCoins, formatNum, getPriceChangeState]);
+    };
 
     // Handle animation state
     useEffect(() => {
@@ -225,7 +245,8 @@ export const Ticker = memo(function Ticker() {
             onMouseLeave={() => setIsPaused(false)}
         >
             <div className={styles.tickerTrack} ref={trackRef}>
-                {tickerItems}
+                {renderTickerSet('set1', firstSetRef)}
+                {renderTickerSet('set2')}
             </div>
         </div>
     );

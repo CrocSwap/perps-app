@@ -22,13 +22,12 @@
 .tickerTrack {
     display: flex;
     width: max-content;
-    animation: scroll var(--loop-duration, 180s) linear infinite;
-    animation-delay: var(--ticker-delay, 2s);
+    animation: scroll 60s linear infinite;
+    animation-delay: 2s;
     animation-play-state: running;
     will-change: transform;
     position: relative;
     z-index: 1;
-    max-width: 100%;
     backface-visibility: hidden;
     transform: translateZ(0);
     -webkit-font-smoothing: subpixel-antialiased;
@@ -41,9 +40,9 @@
     flex-shrink: 0;
 }
 
-/* Add 50px offset to the first ticker item in the first set */
-.tickerSet:first-child .tickerItem:first-child {
-    margin-left: 80px;
+/* Add 40px offset to the first ticker item in all sets for seamless loop */
+.tickerSet .tickerItem:first-child {
+    margin-left: 16px;
 }
 
 .tickerItem {
@@ -133,7 +132,7 @@
     content: '';
     position: absolute;
     top: 0;
-    width: 96px;
+    width: 20px;
     height: 100%;
     pointer-events: none;
     z-index: 1;
@@ -166,7 +165,7 @@
         transform: translate3d(0, 0, 0);
     }
     100% {
-        transform: translate3d(calc(-600% - 192px), 0, 0);
+        transform: translate3d(-50%, 0, 0);
     }
 }
 
@@ -189,7 +188,7 @@
     }
 
     .tickerTrack {
-        animation-duration: var(--loop-duration, 8s);
+        animation-duration: 45s;
     }
 
     .tickerSet {
