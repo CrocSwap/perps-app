@@ -27,9 +27,8 @@
     animation-play-state: running;
     will-change: transform;
     position: relative;
-    z-index: 0;
+    z-index: 1;
     max-width: 100%;
-    pointer-events: none;
     backface-visibility: hidden;
     transform: translateZ(0);
     -webkit-font-smoothing: subpixel-antialiased;
@@ -56,48 +55,48 @@
     white-space: nowrap;
     flex-shrink: 0;
     cursor: pointer;
-    pointer-events: auto;
     text-decoration: none;
     color: inherit;
     background: transparent;
     transition: all 0.3s ease-in-out;
     transform: translateZ(0);
     backface-visibility: hidden;
-    width: 150px; /* Fixed width for each ticker item */
+    width: 150px;
     -webkit-font-smoothing: subpixel-antialiased;
     border-radius: 4px;
+    position: relative;
+    z-index: 2;
 }
 
-@keyframes flashGreen {
-    0% {
-        background-color: var(--green-dark);
-    }
-    50% {
-        background-color: var(--green-dark);
-    }
-    100% {
-        background-color: transparent;
-    }
+.tickerItem {
+    --flash-opacity: 0;
 }
 
-@keyframes flashRed {
-    0% {
-        background-color: var(--red-dark);
-    }
-    50% {
-        background-color: var(--red-dark);
-    }
-    100% {
-        background-color: transparent;
-    }
+.tickerItem {
+    animation: none; /* Reset any existing animation */
 }
 
 .tickerItem.priceUp {
-    animation: flashGreen 5s ease-out;
+    animation: flash 5s ease-in-out forwards;
+    --flash-color: var(--buy-color);
 }
 
 .tickerItem.priceDown {
-    animation: flashRed 5s ease-out;
+    animation: flash 5s ease-in-out forwards;
+    --flash-color: var(--sell-color);
+}
+
+@keyframes flash {
+    0% {
+        background-color: color-mix(
+            in srgb,
+            var(--flash-color) 50%,
+            transparent
+        );
+    }
+    100% {
+        background-color: transparent;
+    }
 }
 
 .symbol {
@@ -177,8 +176,9 @@
 
 /* Hover effect for ticker items */
 .tickerItem:hover {
-    background-color: var(--bg-dark3);
+    background-color: var(--bg-dark3) !important;
     border-radius: 4px;
+    transform: translateZ(0);
 }
 
 @media (max-width: 768px) {

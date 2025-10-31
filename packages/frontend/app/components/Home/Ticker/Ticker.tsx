@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import styles from './Ticker.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface CoinData {
     symbol: string;
@@ -22,45 +23,75 @@ interface TickerItemProps {
     priceChangeState: 'up' | 'down' | null;
 }
 
-const TickerItem = memo(
-    ({ coin, formatNum, priceChangeState }: TickerItemProps) => {
-        return (
-            <Link
-                to={`/v2/trade/${coin.symbol}`}
-                className={`${styles.tickerItem} ${
-                    priceChangeState === 'up'
-                        ? styles.priceUp
-                        : priceChangeState === 'down'
-                          ? styles.priceDown
-                          : ''
-                }`}
-                viewTransition
-            >
-                <span className={styles.symbol}>{coin.symbol}</span>
-                <span className={styles.price}>
-                    {formatNum(coin.markPx, undefined, true, true)}
-                </span>
-                <span
-                    className={
-                        coin.last24hPriceChangePercent > -0.1 &&
-                        coin.last24hPriceChangePercent < 0.1
-                            ? styles.changeZero
-                            : coin.last24hPriceChangePercent >= 0.1
-                              ? styles.changePositive
-                              : styles.changeNegative
-                    }
-                >
-                    {coin.last24hPriceChangePercent >= 0.1 ? '+' : ''}
-                    {coin.last24hPriceChangePercent > -0.1 &&
+const TickerItem = memo(function TickerItem({
+    coin,
+    formatNum,
+    priceChangeState,
+}: TickerItemProps) {
+    const { getBsColor } = useAppSettings();
+    const buyColor = getBsColor().buy;
+    const sellColor = getBsColor().sell;
+
+    const getFlashStyle = () => {
+        if (priceChangeState === 'up') {
+            return {
+                '--buy-color': buyColor,
+                '--flash-color': buyColor,
+            } as React.CSSProperties;
+        } else if (priceChangeState === 'down') {
+            return {
+                '--sell-color': sellColor,
+                '--flash-color': sellColor,
+            } as React.CSSProperties;
+        }
+        return {};
+    };
+
+    return (
+        <Link
+            to={`/v2/trade/${coin.symbol}`}
+            className={`${styles.tickerItem} ${
+                priceChangeState === 'up'
+                    ? styles.priceUp
+                    : priceChangeState === 'down'
+                      ? styles.priceDown
+                      : ''
+            }`}
+            style={getFlashStyle()}
+            viewTransition
+        >
+            <span className={styles.symbol}>{coin.symbol}</span>
+            <span className={styles.price}>
+                {formatNum(coin.markPx, undefined, true, true)}
+            </span>
+            <span
+                className={
+                    coin.last24hPriceChangePercent > -0.1 &&
                     coin.last24hPriceChangePercent < 0.1
-                        ? '0.0'
-                        : formatNum(coin.last24hPriceChangePercent, 1)}
-                    %
-                </span>
-            </Link>
-        );
-    },
-);
+                        ? styles.changeZero
+                        : coin.last24hPriceChangePercent >= 0.1
+                          ? styles.changePositive
+                          : styles.changeNegative
+                }
+                style={{
+                    color:
+                        coin.last24hPriceChangePercent >= 0.1
+                            ? buyColor
+                            : coin.last24hPriceChangePercent <= -0.1
+                              ? sellColor
+                              : undefined,
+                }}
+            >
+                {coin.last24hPriceChangePercent >= 0.1 ? '+' : ''}
+                {coin.last24hPriceChangePercent > -0.1 &&
+                coin.last24hPriceChangePercent < 0.1
+                    ? '0.0'
+                    : formatNum(coin.last24hPriceChangePercent, 1)}
+                %
+            </span>
+        </Link>
+    );
+});
 
 // Main Ticker component
 export const Ticker = memo(function Ticker() {
