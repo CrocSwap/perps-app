@@ -213,16 +213,15 @@ export const Ticker = memo(function Ticker() {
         if (hasUpdates) {
             setPriceChangeStates((prev) => ({ ...prev, ...updates }));
         }
-    }, [memoizedCoins, formatNum]);
 
-    // Clean up timeouts on unmount
-    useEffect(() => {
+        // Clean up all timeouts when effect re-runs or unmounts
         return () => {
             Object.values(priceChangeTimeoutsRef.current).forEach((timeout) => {
                 clearTimeout(timeout);
             });
+            priceChangeTimeoutsRef.current = {};
         };
-    }, []);
+    }, [memoizedCoins, formatNum]);
 
     // Create ticker set component
     const renderTickerSet = (
