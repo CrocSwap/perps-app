@@ -13,7 +13,7 @@ interface CoinData {
 
 // Memoized TickerItem to prevent re-renders of individual items
 interface TickerItemProps {
-    coin: any;
+    coin: CoinData;
     formatNum: (
         value: number,
         decimals?: number,
@@ -21,17 +21,17 @@ interface TickerItemProps {
         isPrice?: boolean,
     ) => string;
     priceChangeState: 'up' | 'down' | null;
+    buyColor: string;
+    sellColor: string;
 }
 
 const TickerItem = memo(function TickerItem({
     coin,
     formatNum,
     priceChangeState,
+    buyColor,
+    sellColor,
 }: TickerItemProps) {
-    const { getBsColor } = useAppSettings();
-    const buyColor = getBsColor().buy;
-    const sellColor = getBsColor().sell;
-
     const getFlashStyle = () => {
         if (priceChangeState === 'up') {
             return {
@@ -47,6 +47,28 @@ const TickerItem = memo(function TickerItem({
         return {};
     };
 
+    // Memoize change calculations
+    const isZeroChange =
+        coin.last24hPriceChangePercent > -0.1 &&
+        coin.last24hPriceChangePercent < 0.1;
+    const isPositive = coin.last24hPriceChangePercent >= 0.1;
+    const isNegative = coin.last24hPriceChangePercent <= -0.1;
+
+    const changeClassName = isZeroChange
+        ? styles.changeZero
+        : isPositive
+          ? styles.changePositive
+          : styles.changeNegative;
+
+    const changeColor = isPositive
+        ? buyColor
+        : isNegative
+          ? sellColor
+          : undefined;
+    const formattedChange = isZeroChange
+        ? '0.0'
+        : formatNum(coin.last24hPriceChangePercent, 1);
+
     return (
         <Link
             to={`/v2/trade/${coin.symbol}`}
@@ -59,35 +81,15 @@ const TickerItem = memo(function TickerItem({
             }`}
             style={getFlashStyle()}
             viewTransition
+            aria-label={`${coin.symbol} trading at ${formatNum(coin.markPx, undefined, true, true)}, ${isPositive ? 'up' : isNegative ? 'down' : ''} ${formattedChange}%`}
         >
             <span className={styles.symbol}>{coin.symbol}</span>
             <span className={styles.price}>
                 {formatNum(coin.markPx, undefined, true, true)}
             </span>
-            <span
-                className={
-                    coin.last24hPriceChangePercent > -0.1 &&
-                    coin.last24hPriceChangePercent < 0.1
-                        ? styles.changeZero
-                        : coin.last24hPriceChangePercent >= 0.1
-                          ? styles.changePositive
-                          : styles.changeNegative
-                }
-                style={{
-                    color:
-                        coin.last24hPriceChangePercent >= 0.1
-                            ? buyColor
-                            : coin.last24hPriceChangePercent <= -0.1
-                              ? sellColor
-                              : undefined,
-                }}
-            >
-                {coin.last24hPriceChangePercent >= 0.1 ? '+' : ''}
-                {coin.last24hPriceChangePercent > -0.1 &&
-                coin.last24hPriceChangePercent < 0.1
-                    ? '0.0'
-                    : formatNum(coin.last24hPriceChangePercent, 1)}
-                %
+            <span className={changeClassName} style={{ color: changeColor }}>
+                {isPositive ? '+' : ''}
+                {formattedChange}%
             </span>
         </Link>
     );
@@ -111,35 +113,43 @@ export const Ticker = memo(function Ticker() {
         return state.coins as CoinData[];
     });
 
+    // Create a stable key for coins memoization
+    const coinsKey = coins
+        .slice(0, 15)
+        .map(
+            (coin) =>
+                `${coin.symbol}-${coin.markPx}-${coin.last24hPriceChangePercent}`,
+        )
+        .join('|');
+
     // Create a safe array of coins limited to 15 items
     const memoizedCoins = useMemo(() => {
         if (!coins || coins.length === 0) return [];
+        return coins.slice(0, 15);
+    }, [coinsKey]);
 
-        // Limit to maximum 15 items
-        const maxItems = 15;
-        const limitedCoins = coins.slice(0, Math.min(maxItems, coins.length));
-
-        return limitedCoins;
-    }, [
-        JSON.stringify(
-            coins.slice(0, 15).map((coin) => ({
-                symbol: coin.symbol,
-                markPx: coin.markPx,
-                last24hPriceChangePercent: coin.last24hPriceChangePercent,
-            })),
-        ),
-    ]);
-
-    // Memoize the formatNum function
+    // Memoize the formatNum function and color values
     const { formatNum } = useNumFormatter();
+    const bsColor = useAppSettings((state) => state.bsColor);
+    const colors = useMemo(() => {
+        const { getBsColor } = useAppSettings.getState();
+        return getBsColor();
+    }, [bsColor]);
+    const { buy: buyColor, sell: sellColor } = colors;
 
-    // Track price changes and trigger animations that last at least 5 seconds
+    // Track price changes and trigger animations - batch state updates
     useEffect(() => {
+        const updates: Record<string, 'up' | 'down' | null> = {};
+        let hasUpdates = false;
+
         memoizedCoins.forEach((coin) => {
             if (!coin || !coin.symbol) return;
 
             // Initialize previous price if not set
-            if (!prevPriceChangePercentNumberRef.current[coin.symbol]) {
+            if (
+                prevPriceChangePercentNumberRef.current[coin.symbol] ===
+                undefined
+            ) {
                 prevPriceChangePercentNumberRef.current[coin.symbol] =
                     coin.last24hPriceChangePercent;
                 return;
@@ -148,14 +158,27 @@ export const Ticker = memo(function Ticker() {
             const prevPriceChangePercentNumber =
                 prevPriceChangePercentNumberRef.current[coin.symbol];
 
-            const lastChangeTruncated = formatNum(
-                coin.last24hPriceChangePercent,
-                1,
-            );
-            const prevPriceChangePercentTruncated = formatNum(
-                prevPriceChangePercentNumber,
-                1,
-            );
+            // Check if values are in the "zero change" range (-0.1 to 0.1)
+            // This matches the display logic in TickerItem
+            const currentIsZero =
+                coin.last24hPriceChangePercent > -0.1 &&
+                coin.last24hPriceChangePercent < 0.1;
+            const prevIsZero =
+                prevPriceChangePercentNumber > -0.1 &&
+                prevPriceChangePercentNumber < 0.1;
+
+            // If both are in zero range, don't trigger animation
+            if (currentIsZero && prevIsZero) {
+                return;
+            }
+
+            // Use the same formatting logic as the display: "0.0" for zero range
+            const lastChangeTruncated = currentIsZero
+                ? '0.0'
+                : formatNum(coin.last24hPriceChangePercent, 1);
+            const prevPriceChangePercentTruncated = prevIsZero
+                ? '0.0'
+                : formatNum(prevPriceChangePercentNumber, 1);
 
             // Only trigger animation if the truncated value changed
             if (lastChangeTruncated !== prevPriceChangePercentTruncated) {
@@ -169,25 +192,27 @@ export const Ticker = memo(function Ticker() {
                     clearTimeout(priceChangeTimeoutsRef.current[coin.symbol]);
                 }
 
-                // Set the new animation state
-                setPriceChangeStates((prev) => ({
-                    ...prev,
-                    [coin.symbol]: newState,
-                }));
+                updates[coin.symbol] = newState;
+                hasUpdates = true;
 
                 // Update the stored price
                 prevPriceChangePercentNumberRef.current[coin.symbol] =
                     coin.last24hPriceChangePercent;
 
-                // Clear the animation state after 5 seconds
+                // Clear the animation state after 2 seconds (reduced from 5)
                 priceChangeTimeoutsRef.current[coin.symbol] = setTimeout(() => {
                     setPriceChangeStates((prev) => ({
                         ...prev,
                         [coin.symbol]: null,
                     }));
-                }, 5000);
+                }, 2000);
             }
         });
+
+        // Batch all state updates into a single setState call
+        if (hasUpdates) {
+            setPriceChangeStates((prev) => ({ ...prev, ...updates }));
+        }
     }, [memoizedCoins, formatNum]);
 
     // Clean up timeouts on unmount
@@ -219,6 +244,8 @@ export const Ticker = memo(function Ticker() {
                             coin={coin}
                             formatNum={formatNum}
                             priceChangeState={priceChangeState}
+                            buyColor={buyColor}
+                            sellColor={sellColor}
                         />
                     );
                 })}
@@ -243,6 +270,8 @@ export const Ticker = memo(function Ticker() {
             className={`${styles.tickerContainer} ${isPaused ? styles.paused : ''}`}
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
+            role='region'
+            aria-label='Market ticker showing cryptocurrency prices'
         >
             <div className={styles.tickerTrack} ref={trackRef}>
                 {renderTickerSet('set1', firstSetRef)}

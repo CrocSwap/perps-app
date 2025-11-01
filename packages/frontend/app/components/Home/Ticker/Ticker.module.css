@@ -57,7 +57,7 @@
     text-decoration: none;
     color: inherit;
     background: transparent;
-    transition: all 0.3s ease-in-out;
+    transition: background-color 0.2s ease-in-out;
     transform: translateZ(0);
     backface-visibility: hidden;
     width: 150px;
@@ -76,12 +76,12 @@
 }
 
 .tickerItem.priceUp {
-    animation: flash 5s ease-in-out forwards;
+    animation: flash 3s ease-out forwards;
     --flash-color: var(--buy-color);
 }
 
 .tickerItem.priceDown {
-    animation: flash 5s ease-in-out forwards;
+    animation: flash 3s ease-out forwards;
     --flash-color: var(--sell-color);
 }
 
@@ -89,12 +89,28 @@
     0% {
         background-color: color-mix(
             in srgb,
-            var(--flash-color) 50%,
+            var(--flash-color) 40%,
             transparent
         );
     }
     100% {
         background-color: transparent;
+    }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .tickerTrack {
+        animation: none;
+    }
+
+    .tickerItem.priceUp,
+    .tickerItem.priceDown {
+        animation: none;
+    }
+
+    .tickerItem {
+        transition: none;
     }
 }
 
@@ -180,6 +196,13 @@
     background-color: var(--bg-dark3) !important;
     border-radius: 4px;
     transform: translateZ(0);
+}
+
+/* Focus state for keyboard navigation */
+.tickerItem:focus-visible {
+    outline: 2px solid var(--accent1);
+    outline-offset: 2px;
+    border-radius: 4px;
 }
 
 @media (max-width: 768px) {
