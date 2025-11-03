@@ -379,20 +379,10 @@
         "connectWalletForTrading": "Gas ücreti olmadan işlem yapmak için cüzdanınızı bağlayın."
     },
     "home": {
-        "title": "Ambient ile Perpetual Ticaret",
-        "subtitle": "Hızlı işlem. Taker ücreti yok. 100x kaldıraç imkanı.",
-        "startTrading": "Ticarete Başla",
-        "learnMore": "Daha fazla bilgi",
-        "hero": {
-            "heading1": "Sıfırdan-",
-            "one": "Bire",
-            "heading2": "Merkeziyetsiz Ticaret Protokolü",
-            "description": "Ambient, benzersiz DeFi ürünleriyle CEX düzeyinde bir kullanıcı deneyimini birleştiren tamamen yeni bir merkeziyetsiz perpetual DEX'tir",
-            "stats": {
-                "totalVolume": "Toplam Hacim",
-                "activeUsers": "Aktif Kullanıcı"
-            }
-        }
+        "title": "Ambient ile Perp İşlemleri Yap",
+        "tradeNow": "Hemen işlem yap",
+        "explore": "Keşfet",
+        "subtitle": "En hızlı zincir üstü işlem deneyimi geldi"
     },
     "referrals": {
         "title": "Referanslar",
@@ -551,12 +541,12 @@
     },
     "meta": {
         "title": "Ana Sayfa | Ambient",
-        "content": "Ambient ile vadeli işlemleri alıp satın"
+        "content": "Ambient ile Sürekli Vadeli İşlemler"
     },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "Hizmet Şartları",
+        "menuPrivacy": "Gizlilik",
+        "terms": "CROCODILE Labs Hizmet Şartları",
+        "privacy": "Gizlilik Politikası"
     }
 }

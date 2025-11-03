@@ -12,7 +12,7 @@ export interface HeroSlideConfig extends BaseSlideConfig {
     type: 'hero';
     title: string;
     ctaPrimary: { labelKey: string; href: string };
-    ctaSecondary: { label: string; action: 'scrollTo'; target: PresetId };
+    ctaSecondary: { labelKey: string; action: 'scrollTo'; target: PresetId };
     footer?: 'ticker';
 }
 
@@ -37,9 +37,13 @@ export const OVERLAY_SLIDE_CONFIG: SlideConfig[] = [
         type: 'hero',
         title: 'Perpetually',
         accent: 'Ambitious',
-        subtitle: 'The fastest onchain trading experience has arrived',
-        ctaPrimary: { labelKey: 'home.startTrading', href: '#' },
-        ctaSecondary: { label: 'Explore', action: 'scrollTo', target: 'speed' },
+        subtitle: 'home.subtitle',
+        ctaPrimary: { labelKey: 'home.tradeNow', href: '#' },
+        ctaSecondary: {
+            labelKey: 'home.explore',
+            action: 'scrollTo',
+            target: 'speed',
+        },
         footer: 'ticker',
     },
     {

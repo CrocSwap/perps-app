@@ -146,41 +146,6 @@ export function meta() {
 }
 
 export default function Home(): JSX.Element {
-    // const [hasVisited, setHasVisited] = useState(false);
-
-    // useEffect(() => {
-    //     try {
-    //         const visited = sessionStorage.getItem('hasVisitedHome') === 'true';
-    //         setHasVisited(visited);
-
-    //         if (!visited) {
-    //             sessionStorage.setItem('hasVisitedHome', 'true');
-    //         }
-    //     } catch (e) {
-    //         console.error('Session storage error:', e);
-    //     }
-    // }, []);
-
-    const navigation = useNavigation();
-
-    const { t } = useTranslation();
-
-    const { symbol } = useTradeDataStore();
-
-    function TradeButton({ symbol }: { symbol: string }) {
-        const isNavigating = navigation.state !== 'idle';
-
-        return (
-            <Link
-                to={`/v2/trade/${symbol}`}
-                className={styles.primary}
-                viewTransition
-            >
-                {isNavigating ? t('common.loading') : t('home.startTrading')}
-            </Link>
-        );
-    }
-
     return (
         <div className={styles.mainContainer}>
             <HomePage />

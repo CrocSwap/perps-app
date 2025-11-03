@@ -27,7 +27,7 @@ export function HeroSlide({
     };
 
     const ctaHref =
-        slide.ctaPrimary.labelKey === 'home.startTrading'
+        slide.ctaPrimary.labelKey === 'home.tradeNow'
             ? `/v2/trade/${symbol}`
             : slide.ctaPrimary.href;
 
@@ -75,7 +75,9 @@ export function HeroSlide({
                         </span>
                     </h1>
                     {slide.subtitle ? (
-                        <p className={styles.heroSubtitle}>{slide.subtitle}</p>
+                        <p className={styles.heroSubtitle}>
+                            {t(slide.subtitle)}
+                        </p>
                     ) : null}
                 </div>
                 <div className={styles.overlayActions}>
@@ -87,7 +89,7 @@ export function HeroSlide({
                             className={styles.ctaSecondary}
                             onClick={handleSecondaryCtaClick}
                         >
-                            {slide.ctaSecondary.label}
+                            {t(slide.ctaSecondary.labelKey)}
                         </button>
                     ) : null}
                 </div>

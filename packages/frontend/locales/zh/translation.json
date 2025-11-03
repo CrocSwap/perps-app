@@ -53,14 +53,14 @@
         "availableToTrade": "可用交易额",
         "availableToTradeTooltip": "已存入{{symbol}}",
         "currentPosition": "当前持仓",
-        "currentPositionTooltip": "当前{{symbol}}持仓数量",
+        "currentPositionTooltip": "{{symbol}}的当前持仓数量",
         "maxOpenInterestReached": "已达最大未平仓量",
         "depositToTrade": "存入资金进行交易",
         "switchDirectionToReduce": "切换方向减少持仓",
         "maxLongDepositToTrade": "Max Long - 存入资金进行交易",
         "maxShortDepositToTrade": "Max Short - 存入资金进行交易",
         "minimumOr100Percent": "最低或100%",
-        "minimum": "最低数量",
+        "minimum": "最小值",
         "invalidPrice": "价格无效",
         "orderSizeBelowMinimum": "订单数量低于最低限额",
         "orderSizeExceedsPositionLimits": "订单数量超出持仓限制",
@@ -71,16 +71,16 @@
         "limitOrderFailed": "限价订单失败",
         "unknownErrorOccurred": "发生未知错误",
         "failedToPlaceLimitOrder": "无法提交限价订单",
-        "sellShortLimitOrderPlaced": "卖 / Short 限价订单已提交",
-        "sellShortLimitOrderPending": "卖 / Short 限价订单等待中",
+        "sellShortLimitOrderPlaced": "卖/Short限价订单已提交",
+        "sellShortLimitOrderPending": "卖/Short限价订单等待中",
         "successfullyPlacedSellOrderFor": "卖出订单已提交：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
-        "placingSellShortLimitOrderFor": "正在提交卖 / Short 限价订单：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
+        "placingSellShortLimitOrderFor": "正在提交卖/Short限价订单：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
         "enterValidLimitPrice": "请输入有效的限价",
         "enterValidOrderSize": "请输入有效的订单数量",
-        "buyLongLimitOrderPlaced": "买 / Long 限价订单已提交",
+        "buyLongLimitOrderPlaced": "买/Long限价订单已提交",
         "successfullyPlacedBuyOrderFor": "买入订单已提交：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
-        "buyLongLimitOrderPending": "买 / Long 限价订单等待中",
-        "placingBuyLongLimitOrderFor": "正在提交买 / Long 限价订单：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
+        "buyLongLimitOrderPending": "买/Long限价订单等待中",
+        "placingBuyLongLimitOrderFor": "正在提交买/Long限价订单：{{usdValueOfOrderStr}} {{symbol}}，价格{{limitPrice}}",
         "priceDistribution": "价格分布",
         "flat": "平盘",
         "flatPriceDistribution": "平盘价格分布",
@@ -94,8 +94,8 @@
         "total": "总计",
         "action": "操作",
         "ratio": "比例",
-        "buyLong": "买 / Long",
-        "sellShort": "卖 / Short",
+        "buyLong": "买/Long",
+        "sellShort": "卖/Short",
         "confirmingTransaction": "交易确认中...",
         "processing": "处理中...",
         "dontShowThisAgain": "不再显示",
@@ -144,7 +144,7 @@
         "cancelling": "正在取消...",
         "midButton": "MID",
         "positionClosed": "持仓已平仓",
-        "successfullyClosedPosition": "成功平仓{{usdValueOfOrderStr}} {{symbol}}持仓",
+        "successfullyClosedPosition": "成功平仓{{symbol}}持仓{{usdValueOfOrderStr}}",
         "failedToClosePosition": "平仓失败",
         "transactionTimedOut": "交易{{timeInSeconds}}秒后超时",
         "txFailedOrNotConfirmed": "交易失败或未确认",
@@ -157,7 +157,7 @@
         "successfullyWithdrawn": "成功提现{{amount}} {{unit}}",
         "withdrawFailed": "提现失败",
         "availableToDeposit": "可充值金额",
-        "availableToDepositTooltip": "基于保险库容量和钱包余额的可充值金额",
+        "availableToDepositTooltip": "基于资金库容量和钱包余额的可充值金额",
         "availableToWithdraw": "可提现金额",
         "availableToWithdrawTooltip": "您的资产组合可提现总金额",
         "invalidAmount": "金额无效",
@@ -258,7 +258,7 @@
         "created": {
             "title": "子账户已创建",
             "message": "已创建新策略子账户{{name}}",
-            "message2": "已创建新自主管理子账户{{name}}"
+            "message2": "已创建新自由交易子账户{{name}}"
         }
     },
     "strategies": {
@@ -379,20 +379,10 @@
         "connectWalletForTrading": "连接钱包即可零Gas费交易。"
     },
     "home": {
-        "title": "Ambient合约交易",
-        "subtitle": "极速成交。零Taker费。最高100倍杠杆。",
-        "startTrading": "开始交易",
-        "learnMore": "了解更多",
-        "hero": {
-            "heading1": "从零",
-            "one": "到一",
-            "heading2": "去中心化交易协议",
-            "description": "Ambient是集DeFi原生产品与CEX级体验于一体的全新去中心化合约DEX平台",
-            "stats": {
-                "totalVolume": "总交易量",
-                "activeUsers": "活跃用户"
-            }
-        }
+        "title": "使用 Ambient 交易永续合约",
+        "tradeNow": "立即交易",
+        "explore": "探索",
+        "subtitle": "最快的链上交易体验来了"
     },
     "referrals": {
         "title": "邀请",
@@ -429,7 +419,7 @@
         "language": "语言"
     },
     "symbolInfo": {
-        "mark": "标记",
+        "mark": "标记价格",
         "markTooltip": "按照公平原则计算的估价，防止不公平强平",
         "oracle": "预言机",
         "oracleTooltip": "Pyth Network预言机实时价格",
@@ -442,7 +432,7 @@
         "openInterest": "未平仓合约量",
         "openInterestTooltip": "市场总未平仓合约量",
         "fundingRate": "资金费率",
-        "fundingRateTooltip": "多头支付空头（或反之），每小时费率。无额外费用；资金费率用于锚定现货市场价格。",
+        "fundingRateTooltip": "多头向空头支付（或反之）的每小时费率。无额外费用；资金费率是用于锚定现货价格的点对点支付。",
         "fundingCountdown": "资金倒计时",
         "fundingCountdownTooltip": "距离下次资金发放剩余时间"
     },
@@ -492,7 +482,7 @@
     },
     "leverage": {
         "title": "调整杠杆",
-        "closePositionPrompt": "关闭持仓以降低最低杠杆"
+        "closePositionPrompt": "平仓以降低最小杠杆倍数"
     },
     "share": {
         "prompt": "自定义您的文本",
@@ -547,16 +537,16 @@
         "toggleLimitPrice": "切换限价"
     },
     "chart": {
-        "liqPrice": "清算价格"
+        "liqPrice": "强平价格"
     },
     "meta": {
         "title": "首页 | Ambient",
         "content": "在Ambient进行永续合约交易"
     },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "服务条款",
+        "menuPrivacy": "隐私政策",
+        "terms": "CROCODILE Labs 服务条款",
+        "privacy": "隐私政策"
     }
 }

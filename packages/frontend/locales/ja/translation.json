@@ -71,15 +71,15 @@
         "limitOrderFailed": "指値注文失敗",
         "unknownErrorOccurred": "不明なエラーが発生しました",
         "failedToPlaceLimitOrder": "指値注文を出せませんでした",
-        "sellShortLimitOrderPlaced": "売り / Short 指値注文発注済み",
-        "sellShortLimitOrderPending": "売り / Short 指値注文保留中",
+        "sellShortLimitOrderPlaced": "売り/Short指値注文発注済み",
+        "sellShortLimitOrderPending": "売り/Short指値注文保留中",
         "successfullyPlacedSellOrderFor": "{{usdValueOfOrderStr}} {{symbol}} の売り注文（価格：{{limitPrice}}）を発注しました",
         "placingSellShortLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} の指値売り注文（価格：{{limitPrice}}）を発注しています",
         "enterValidLimitPrice": "有効な指値価格を入力してください",
         "enterValidOrderSize": "有効な注文サイズを入力してください",
-        "buyLongLimitOrderPlaced": "買い / Long 指値注文発注済み",
+        "buyLongLimitOrderPlaced": "買い/Long指値注文発注済み",
         "successfullyPlacedBuyOrderFor": "{{usdValueOfOrderStr}} {{symbol}} の買い注文（価格：{{limitPrice}}）を発注しました",
-        "buyLongLimitOrderPending": "買い / Long 指値注文保留中",
+        "buyLongLimitOrderPending": "買い/Long指値注文保留中",
         "placingBuyLongLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} の指値買い注文（価格：{{limitPrice}}）を発注しています",
         "priceDistribution": "価格分布",
         "flat": "フラット",
@@ -94,8 +94,8 @@
         "total": "合計",
         "action": "アクション",
         "ratio": "比率",
-        "buyLong": "買い / Long",
-        "sellShort": "売り / Short",
+        "buyLong": "買い/Long",
+        "sellShort": "売り/Short",
         "confirmingTransaction": "取引を確認中...",
         "processing": "処理中...",
         "dontShowThisAgain": "これを再表示しない",
@@ -118,7 +118,7 @@
         "averageEntryPrice": "平均エントリー価格",
         "marginRequired": "必要証拠金",
         "maxPosSizeLimitedByOiCap": "最大ポジションサイズは建玉上限で制限されます",
-        "openPositionIsXSwitchToY": "オープンポジション: {{x}}。{{y}}に切替。",
+        "openPositionIsXSwitchToY": "保有ポジション：{{x}}。{{y}}に切り替えてください。",
         "buySellAtCurrentPrice": "現行価格で買い/売り",
         "buySellAtSpecificPrice": "指定価格で買い/売り",
         "maxTradeSizeLimitedTo": "最大取引サイズに制限あり",
@@ -135,17 +135,17 @@
         "sellOrderFailed": "売り注文失敗",
         "transactionFailed": "取引失敗",
         "buyOrderFailed": "買い注文失敗",
-        "closeFailed": "ポジション終了失敗",
-        "closeFailedTitle": "終了失敗",
+        "closeFailed": "ポジション決済失敗",
+        "closeFailedTitle": "決済失敗",
         "liquidationPrice": "清算価格",
         "enterPrice": "価格を入力",
         "enterSize": "サイズを入力",
         "totalSize": "合計サイズ",
         "cancelling": "キャンセル中...",
         "midButton": "MID",
-        "positionClosed": "ポジション終了",
+        "positionClosed": "ポジション決済完了",
         "successfullyClosedPosition": "{{usdValueOfOrderStr}} {{symbol}}ポジションの終了完了",
-        "failedToClosePosition": "ポジション終了失敗",
+        "failedToClosePosition": "ポジション決済失敗",
         "transactionTimedOut": "取引が{{timeInSeconds}}秒後タイムアウト",
         "txFailedOrNotConfirmed": "取引失敗または未確認",
         "walletBalance": "ウォレット残高",
@@ -157,7 +157,7 @@
         "successfullyWithdrawn": "{{amount}} {{unit}}出金完了",
         "withdrawFailed": "出金失敗",
         "availableToDeposit": "入金可能額",
-        "availableToDepositTooltip": "ボールト容量・ウォレット残高に基づく入金可能額",
+        "availableToDepositTooltip": "ボールト容量とウォレット残高に基づいて入金可能な金額",
         "availableToWithdraw": "出金可能額",
         "availableToWithdrawTooltip": "ポートフォリオから出金可能な総額",
         "invalidAmount": "無効な金額",
@@ -306,12 +306,12 @@
         "buyingPower": "購入可能額",
         "contract": "契約",
         "positionValue": "ポジション価値",
-        "entryPrice": "約定価格",
+        "entryPrice": "エントリー価格",
         "pnl": "損益（ROE%）",
         "liqPrice": "清算価格",
         "margin": "証拠金",
         "funding": "資金調達",
-        "close": "ポジションを決済",
+        "close": "ポジション決済",
         "originalSize": "元のサイズ",
         "cancelAll": "すべてキャンセル",
         "noTradeHistory": "取引履歴なし",
@@ -379,20 +379,10 @@
         "connectWalletForTrading": "ガス手数料ゼロで取引するためにウォレットを接続してください。"
     },
     "home": {
-        "title": "Ambientでパーペチュアル取引",
-        "subtitle": "高速執行。テイカー手数料ゼロ。最大100倍レバレッジ。",
-        "startTrading": "取引を開始",
-        "learnMore": "詳細はこちら",
-        "hero": {
-            "heading1": "ゼロから",
-            "one": "1",
-            "heading2": "分散型取引プロトコル",
-            "description": "Ambientは、ユニークなDeFi商品とCEX並みのユーザー体験を組み合わせた全く新しい分散型パーペチュアルDEXです",
-            "stats": {
-                "totalVolume": "総取引量",
-                "activeUsers": "アクティブユーザー"
-            }
-        }
+        "title": "Ambientでパーペチュアルを取引",
+        "tradeNow": "今すぐ取引",
+        "explore": "探索",
+        "subtitle": "最速のオンチェーントレーディング体験が登場"
     },
     "referrals": {
         "title": "紹介",
@@ -484,7 +474,7 @@
     "newVersion": {
         "title": "新バージョン利用可能",
         "message": {
-            "withVersionNumber": "バージョン{{version}}が新機能および改善点で利用可能です。",
+            "withVersionNumber": "バージョン{{version}}が新機能と改善を含んでインストール可能です。",
             "noVersionNumber": "最新の機能と改善を利用するためにページを再読み込みしてください。"
         },
         "updateButton": "今すぐアップデート",
@@ -503,9 +493,9 @@
     "colors": {
         "default": "デフォルト",
         "opposite": "反転",
-        "deuteranopia": "色覚異常（緑）",
-        "tritanopia": "色覚異常（青）",
-        "protanopia": "色覚異常（赤）"
+        "deuteranopia": "2型色覚（緑色弱）",
+        "tritanopia": "3型色覚（青色弱）",
+        "protanopia": "1型色覚（赤色弱）"
     },
     "aria": {
         "closeAnnouncement": "お知らせを閉じる",
@@ -527,8 +517,8 @@
             "hours": "実行価格（時間）入力欄"
         },
         "yourDepositAmount": "ご入金額",
-        "flatPriceDistribution": "均等価格分布",
-        "evenPriceDistribution": "平均価格分布",
+        "flatPriceDistribution": "フラットな価格分布",
+        "evenPriceDistribution": "均等な価格分布",
         "thumbsUp": "高評価",
         "thumbsDown": "低評価",
         "closeNav": "ナビゲーションメニューを閉じる",
@@ -554,9 +544,9 @@
         "content": "Ambientでパーペチュアル取引"
     },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "利用規約",
+        "menuPrivacy": "プライバシー",
+        "terms": "CROCODILE Labs 利用規約",
+        "privacy": "プライバシーポリシー"
     }
 }

@@ -379,20 +379,10 @@
         "connectWalletForTrading": "지갑을 연결하고 가스비 없이 거래해 보세요."
     },
     "home": {
-        "title": "Ambient - 탈중앙화 선물거래소",
-        "subtitle": "빠른 체결. 테이커 수수료 없음. 최대 100x 레버리지",
-        "startTrading": "거래 시작하기",
-        "learnMore": "자세히 알아보기",
-        "hero": {
-            "heading1": "0에서  ",
-            "one": "1",
-            "heading2": "탈중앙화 거래 프로토콜",
-            "description": "Ambient - 유니크한 DeFi 상품, CEX 수준의 UX를 제공하는 새로운 선물 DEX",
-            "stats": {
-                "totalVolume": "총 거래량",
-                "activeUsers": "실시간 사용자"
-            }
-        }
+        "title": "Ambient로 퍼프 거래하기",
+        "tradeNow": "지금 거래하기",
+        "explore": "탐색",
+        "subtitle": "가장 빠른 온체인 트레이딩 경험이 도착했습니다"
     },
     "referrals": {
         "title": "추천",
@@ -503,9 +493,9 @@
     "colors": {
         "default": "기본",
         "opposite": "반전",
-        "deuteranopia": "적록색약 모드",
-        "tritanopia": "청황색약 모드",
-        "protanopia": "적색약 모드"
+        "deuteranopia": "녹색약 (2색형 색각이상)",
+        "tritanopia": "청색약 (3색형 색각이상)",
+        "protanopia": "적색약 (1색형 색각이상)"
     },
     "aria": {
         "closeAnnouncement": "공지 닫기",
@@ -551,12 +541,12 @@
     },
     "meta": {
         "title": "홈 | Ambient",
-        "content": "앰비언트에서 페페츄얼 거래"
+        "content": "Ambient에서 무기한 선물 거래하기"
     },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "서비스 이용약관",
+        "menuPrivacy": "개인정보처리방침",
+        "terms": "CROCODILE Labs 서비스 이용약관",
+        "privacy": "개인정보처리방침"
     }
 }
