@@ -105,6 +105,9 @@ export const Ticker = memo(function Ticker() {
         Record<string, 'up' | 'down' | null>
     >({});
     const priceChangeTimeoutsRef = useRef<Record<string, NodeJS.Timeout>>({});
+    const scrollPositionRef = useRef<number>(0);
+    const isHoveringRef = useRef<boolean>(false);
+    const animationFrameRef = useRef<number | null>(null);
 
     // Get coins from store with proper typing
     const coins = useTradeDataStore((state) => {
@@ -252,13 +255,130 @@ export const Ticker = memo(function Ticker() {
         );
     };
 
-    // Handle animation state
-    useEffect(() => {
-        const track = trackRef.current;
-        if (!track) return;
+    // Handle wheel scrolling
+    const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+        if (!trackRef.current || !firstSetRef.current) return;
 
-        track.style.animationPlayState = isPaused ? 'paused' : 'running';
-    }, [isPaused]);
+        const track = trackRef.current;
+        const firstSet = firstSetRef.current;
+        const setWidth = firstSet.offsetWidth;
+
+        // Update scroll position
+        scrollPositionRef.current += e.deltaY * 0.5;
+
+        // Wrap around to create endless effect
+        // The animation goes from 0 to -50% (one set width)
+        while (scrollPositionRef.current <= -setWidth) {
+            scrollPositionRef.current += setWidth;
+        }
+        while (scrollPositionRef.current > 0) {
+            scrollPositionRef.current -= setWidth;
+        }
+
+        // Apply the transform
+        track.style.transform = `translate3d(${scrollPositionRef.current}px, 0, 0)`;
+    }, []);
+
+    // Handle mouse enter - pause and capture current position
+    const handleMouseEnter = useCallback(() => {
+        if (!trackRef.current || !firstSetRef.current) return;
+
+        const track = trackRef.current;
+
+        // Cancel any ongoing animation
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = null;
+        }
+
+        // If CSS animation is still running, capture its position
+        const computedStyle = window.getComputedStyle(track);
+        const matrix = new DOMMatrix(computedStyle.transform);
+
+        // Capture current position from animation or transform
+        scrollPositionRef.current = matrix.m41;
+        isHoveringRef.current = true;
+
+        // Pause animation and set to current position
+        track.style.animation = 'none';
+        track.style.transform = `translate3d(${scrollPositionRef.current}px, 0, 0)`;
+
+        setIsPaused(true);
+    }, []);
+
+    // Animate the ticker continuously using requestAnimationFrame
+    const animateTicker = useCallback(() => {
+        if (!trackRef.current || !firstSetRef.current || isHoveringRef.current)
+            return;
+
+        const track = trackRef.current;
+        const firstSet = firstSetRef.current;
+        const setWidth = firstSet.offsetWidth;
+
+        // Get animation duration from CSS (60s default, 45s on mobile)
+        const animationDuration = window.innerWidth <= 768 ? 45 : 60;
+        // Speed in pixels per second
+        const speed = setWidth / animationDuration;
+        // Move by speed/60 pixels per frame (assuming 60fps)
+        const moveAmount = speed / 60;
+
+        // Update position
+        scrollPositionRef.current -= moveAmount;
+
+        // Wrap around to create endless effect
+        if (scrollPositionRef.current <= -setWidth) {
+            scrollPositionRef.current += setWidth;
+        }
+
+        // Apply the transform
+        track.style.transform = `translate3d(${scrollPositionRef.current}px, 0, 0)`;
+
+        // Continue animation
+        animationFrameRef.current = requestAnimationFrame(animateTicker);
+    }, []);
+
+    // Handle mouse leave - resume animation from current position
+    const handleMouseLeave = useCallback(() => {
+        if (!trackRef.current || !firstSetRef.current) return;
+
+        isHoveringRef.current = false;
+        setIsPaused(false);
+
+        // Start the animation loop from current position
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+        }
+        animationFrameRef.current = requestAnimationFrame(animateTicker);
+    }, [animateTicker]);
+
+    // Initialize animation on mount and cleanup on unmount
+    useEffect(() => {
+        // Let CSS animation run initially for 2 seconds (as per animation-delay)
+        const initTimeout = setTimeout(() => {
+            if (
+                !isHoveringRef.current &&
+                trackRef.current &&
+                firstSetRef.current
+            ) {
+                const track = trackRef.current;
+                const computedStyle = window.getComputedStyle(track);
+                const matrix = new DOMMatrix(computedStyle.transform);
+                scrollPositionRef.current = matrix.m41;
+
+                // Switch to requestAnimationFrame after initial CSS animation
+                track.style.animation = 'none';
+                animationFrameRef.current =
+                    requestAnimationFrame(animateTicker);
+            }
+        }, 2000);
+
+        return () => {
+            clearTimeout(initTimeout);
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+        };
+    }, [animateTicker]);
 
     if (!memoizedCoins || memoizedCoins.length === 0) {
         return null;
@@ -267,8 +387,9 @@ export const Ticker = memo(function Ticker() {
     return (
         <div
             className={`${styles.tickerContainer} ${isPaused ? styles.paused : ''}`}
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onWheel={handleWheel}
             role='region'
             aria-label='Market ticker showing cryptocurrency prices'
         >
