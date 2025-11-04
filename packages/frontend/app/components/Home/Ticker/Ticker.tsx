@@ -263,8 +263,16 @@ export const Ticker = memo(function Ticker() {
         const firstSet = firstSetRef.current;
         const setWidth = firstSet.offsetWidth;
 
+        // Detect macOS - use modern userAgentData if available, fallback to platform
+        const isMacOS =
+            (navigator as any).userAgentData?.platform
+                ?.toLowerCase()
+                .includes('mac') ||
+            navigator.userAgent.toLowerCase().includes('mac os x');
+        const deltaY = isMacOS ? -e.deltaY : e.deltaY;
+
         // Update scroll position
-        scrollPositionRef.current += e.deltaY * 0.5;
+        scrollPositionRef.current += deltaY * 0.5;
 
         // Wrap around to create endless effect
         // The animation goes from 0 to -50% (one set width)
