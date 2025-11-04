@@ -1,11 +1,24 @@
 import DocWrapper from '~/components/DocWrapper/DocWrapper';
 import styles from './terms.module.css';
 import { useTranslation } from 'react-i18next';
+import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 
 export default function Privacy() {
     const { t } = useTranslation();
     return (
         <div className={styles.styles}>
+            <AnimatedBackground
+                mode='absolute'
+                layers={1}
+                opacity={1}
+                duration='15s'
+                strokeWidth='2'
+                palette={{
+                    color1: '#1E1E24',
+                    color2: '#7371FC',
+                    color3: '#CDC1FF',
+                }}
+            />
             <DocWrapper title={t('docs.terms')} lastUpdated='May 24, 2023'>
                 <p>
                     These Terms of Use (these “
