@@ -100,13 +100,13 @@
         "processing": "Processing...",
         "dontShowThisAgain": "Don't show this again",
         "estLiquidationPrice": "Estimated Liquidation Price",
-        "estimatedPriceAtWhichPosWillBeLiquidated": "Estimated liquidation price for your position",
+        "estimatedPriceAtWhichPosWillBeLiquidated": "Estimated price at which your position will be liquidated",
         "orderValue": "Order Value",
         "hideSmallBalances": "Hide Small Balances",
         "increasing": "Increasing",
         "decreasing": "Decreasing",
         "totalOrders": "Total Orders",
-        "orderRatioSumMustBe100": "Sum of order ratios must be 100%",
+        "orderRatioSumMustBe100": "Sum of order ratios must equal 100%",
         "collapseDetails": "Collapse Details",
         "expandDetails": "Expand Details",
         "frequency": "Frequency",
@@ -380,19 +380,9 @@
     },
     "home": {
         "title": "Trade Perps With Ambient",
-        "subtitle": "Fast execution. Zero taker fees. Up to 100x leverage.",
-        "startTrading": "Start Trading",
-        "learnMore": "Learn More",
-        "hero": {
-            "heading1": "Zero-to-",
-            "one": "One",
-            "heading2": "Decentralized Trading Protocol",
-            "description": "Ambient is an entirely new kind of decentralized perp DEX combining unique DeFi native products with a user experience rivaling CEXes",
-            "stats": {
-                "totalVolume": "Total Volume",
-                "activeUsers": "Active Users"
-            }
-        }
+        "tradeNow": "Trade Now",
+        "explore": "Explore",
+        "subtitle": "The fastest onchain trading experience has arrived"
     },
     "referrals": {
         "title": "Referrals",
@@ -498,7 +488,7 @@
         "prompt": "Customize your text",
         "xCTA": "Share on 𝕏",
         "copyLinkCTA": "Copy Link",
-        "textPlaceholder": "Trade {{coin}} perps at {{twitter}} on {{fogo}} Testnet now"
+        "textPlaceholder": "Trade {{coin}} perps on {{fogo}} Testnet at {{twitter}} now"
     },
     "colors": {
         "default": "Default",
@@ -552,5 +542,11 @@
     "meta": {
         "title": "Home | Ambient",
         "content": "Trade Perps With Ambient"
+    },
+    "docs": {
+        "menuTerms": "Terms of Service",
+        "menuPrivacy": "Privacy",
+        "terms": "CROCODILE Labs Terms of Service",
+        "privacy": "Privacy Policy"
     }
 }

@@ -11,8 +11,8 @@ interface BaseSlideConfig {
 export interface HeroSlideConfig extends BaseSlideConfig {
     type: 'hero';
     title: string;
-    ctaPrimary: { label: string; href: string };
-    ctaSecondary: { label: string; action: 'scrollTo'; target: PresetId };
+    ctaPrimary: { labelKey: string; href: string };
+    ctaSecondary: { labelKey: string; action: 'scrollTo'; target: PresetId };
     footer?: 'ticker';
 }
 
@@ -37,9 +37,13 @@ export const OVERLAY_SLIDE_CONFIG: SlideConfig[] = [
         type: 'hero',
         title: 'Perpetually',
         accent: 'Ambitious',
-        subtitle: 'The fastest onchain trading experience has arrived',
-        ctaPrimary: { label: 'Trade Now', href: '#' },
-        ctaSecondary: { label: 'Explore', action: 'scrollTo', target: 'speed' },
+        subtitle: 'home.subtitle',
+        ctaPrimary: { labelKey: 'home.tradeNow', href: '#' },
+        ctaSecondary: {
+            labelKey: 'home.explore',
+            action: 'scrollTo',
+            target: 'speed',
+        },
         footer: 'ticker',
     },
     {
@@ -84,7 +88,7 @@ export const OVERLAY_SLIDE_CONFIG: SlideConfig[] = [
         id: 'vault',
         type: 'feature',
         title: 'Vaults run by',
-        accent: 'Jump Trading',
+        accent: '...',
         subtitle:
             'Ambient ALP vaults target the safest, highest APY on your assets.',
         listItems: [

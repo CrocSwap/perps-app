@@ -1,4 +1,8 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import {
+    isEstablished,
+    useConnection,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useState } from 'react';
 import {
     CancelOrderService,
@@ -19,6 +23,7 @@ export interface UseCancelOrderServiceReturn {
  */
 export function useCancelOrderService(): UseCancelOrderServiceReturn {
     const sessionState = useSession();
+    const connection = useConnection();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [cancelOrderService, setCancelOrderService] =
@@ -27,7 +32,7 @@ export function useCancelOrderService(): UseCancelOrderServiceReturn {
     // Initialize cancel order service when session is established
     useEffect(() => {
         if (isEstablished(sessionState)) {
-            const service = new CancelOrderService(sessionState.connection);
+            const service = new CancelOrderService(connection);
             setCancelOrderService(service);
         } else {
             console.log(
@@ -35,7 +40,7 @@ export function useCancelOrderService(): UseCancelOrderServiceReturn {
             );
             setCancelOrderService(null);
         }
-    }, [sessionState]);
+    }, [sessionState, connection]);
 
     // Execute cancel order transaction
     const executeCancelOrder = useCallback(

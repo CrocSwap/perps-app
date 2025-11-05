@@ -1,4 +1,8 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import {
+    isEstablished,
+    useConnection,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useState } from 'react';
 import {
     SetUserMarginService,
@@ -19,6 +23,7 @@ export interface UseSetUserMarginServiceReturn {
  */
 export function useSetUserMarginService(): UseSetUserMarginServiceReturn {
     const sessionState = useSession();
+    const connection = useConnection();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [setUserMarginService, setSetUserMarginService] =
@@ -27,7 +32,7 @@ export function useSetUserMarginService(): UseSetUserMarginServiceReturn {
     // Initialize set user margin service when session is established
     useEffect(() => {
         if (isEstablished(sessionState)) {
-            const service = new SetUserMarginService(sessionState.connection);
+            const service = new SetUserMarginService(connection);
             setSetUserMarginService(service);
         } else {
             console.log(
@@ -35,7 +40,7 @@ export function useSetUserMarginService(): UseSetUserMarginServiceReturn {
             );
             setSetUserMarginService(null);
         }
-    }, [sessionState]);
+    }, [sessionState, connection]);
 
     // Execute set user margin transaction
     const executeSetUserMargin = useCallback(

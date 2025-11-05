@@ -157,7 +157,7 @@
         "successfullyWithdrawn": "Retiro exitoso de {{amount}} {{unit}}",
         "withdrawFailed": "Retiro fallido",
         "availableToDeposit": "Disponible para depositar",
-        "availableToDepositTooltip": "Disponible para depósito según capacidad del vault y saldo de cartera",
+        "availableToDepositTooltip": "Disponible para depositar según la capacidad del vault y el saldo de la cartera",
         "availableToWithdraw": "Disponible para retirar",
         "availableToWithdrawTooltip": "Cantidad total disponible para retirar de su portafolio",
         "invalidAmount": "Cantidad inválida",
@@ -242,9 +242,9 @@
             "title": "Actualización de orden limitada pendiente",
             "message": "Actualizando orden {{side}} por {{value}} de {{coin}} a {{limitPrice}}"
         },
-        "filled": "Completada",
+        "filled": "Ejecutada",
         "open": "Abierta",
-        "partiallyFilled": "Parcialmente completada",
+        "partiallyFilled": "Parcialmente ejecutada",
         "canceled": "Cancelada",
         "pending": "Pendiente",
         "limitTxFailedFallbackMessage": "La transacción de orden limitada falló",
@@ -310,7 +310,7 @@
         "pnl": "PnL (ROE%)",
         "liqPrice": "Precio de liquidación",
         "margin": "Margen",
-        "funding": "Financiamiento",
+        "funding": "Fondeo",
         "close": "Cerrar posición",
         "originalSize": "Cantidad original",
         "cancelAll": "Cancelar todas",
@@ -379,20 +379,10 @@
         "connectWalletForTrading": "Conecta tu billetera para operar con cero comisiones de gas."
     },
     "home": {
-        "title": "Opera Perps con Ambient",
-        "subtitle": "Ejecución rápida. Cero comisiones taker. Hasta 100x apalancamiento.",
-        "startTrading": "Comenzar trading",
-        "learnMore": "Más información",
-        "hero": {
-            "heading1": "De cero a ",
-            "one": "Uno",
-            "heading2": "Protocolo de Trading Descentralizado",
-            "description": "Ambient es un tipo nuevo de DEX de perpetuos que combina productos DeFi únicos con una experiencia de usuario a nivel de CEX",
-            "stats": {
-                "totalVolume": "Volumen total",
-                "activeUsers": "Usuarios activos"
-            }
-        }
+        "title": "Opera Perpétuos con Ambient",
+        "tradeNow": "Operar ahora",
+        "explore": "Explorar",
+        "subtitle": "La experiencia de trading en cadena más rápida ha llegado"
     },
     "referrals": {
         "title": "Referidos",
@@ -402,14 +392,14 @@
     },
     "deposit": {
         "prompt": "Deposita {{token}} desde Fogo",
-        "input_prompt": "Introduce la cantidad (mín ${{MIN_DEPOSIT_AMOUNT}})",
+        "input_prompt": "Ingrese la cantidad (mín ${{MIN_DEPOSIT_AMOUNT}})",
         "availableToDeposit": "Disponible para depositar"
     },
     "withdraw": {
         "prompt": "Retira {{token}} a Fogo",
         "explanation": "{{token}} será enviado a tu dirección.",
         "availableToWithdraw": "Disponible para retirar",
-        "input_prompt": "Introduce la cantidad (mín ${{MIN_WITHDRAW_AMOUNT}})"
+        "input_prompt": "Ingrese la cantidad (mín ${{MIN_WITHDRAW_AMOUNT}})"
     },
     "orderBook": {
         "tab": "Pestaña",
@@ -442,8 +432,8 @@
         "openInterest": "Interés abierto",
         "openInterestTooltip": "Interés abierto total en el mercado",
         "fundingRate": "Tasa de fondeo",
-        "fundingRateTooltip": "Tasa por hora donde los longs pagan a los shorts (o viceversa si negativa). Sin comisiones extra; el fondeo ajusta precios según el mercado spot.",
-        "fundingCountdown": "Cuenta fondeo",
+        "fundingRateTooltip": "Tasa horaria que los longs pagan a los shorts (o viceversa si es negativa) para mantener el precio alineado con el mercado spot. Sin comisiones adicionales; el fondeo es un pago entre pares.",
+        "fundingCountdown": "Cuenta regresiva de fondeo",
         "fundingCountdownTooltip": "Tiempo restante hasta próximo fondeo"
     },
     "feedback": {
@@ -547,10 +537,16 @@
         "toggleLimitPrice": "Alternar precio límite"
     },
     "chart": {
-        "liqPrice": "Precio liq."
+        "liqPrice": "Precio de liq."
     },
     "meta": {
         "title": "Inicio | Ambient",
         "content": "Opera Perps con Ambient"
+    },
+    "docs": {
+        "menuTerms": "Términos de servicio",
+        "menuPrivacy": "Privacidad",
+        "terms": "Términos de servicio de CROCODILE Labs",
+        "privacy": "Política de privacidad"
     }
 }

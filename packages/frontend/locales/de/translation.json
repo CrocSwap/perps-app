@@ -25,10 +25,10 @@
         "min": "Min.",
         "positions": "Positionen",
         "balances": "Kontostände",
-        "openOrders": "Offene Aufträge",
+        "openOrders": "Offene Orders",
         "tradeHistory": "Handelshistorie",
         "fundingHistory": "Finanzierungshistorie",
-        "orderHistory": "Auftragshistorie",
+        "orderHistory": "Order-Historie",
         "depositsAndWithdrawals": "Ein- & Auszahlungen",
         "twap": "TWAP",
         "all": "Alle",
@@ -53,7 +53,7 @@
         "availableToTrade": "Für Handel verfügbar",
         "availableToTradeTooltip": "Eingezahlt: {{symbol}}",
         "currentPosition": "Aktuelle Position",
-        "currentPositionTooltip": "Derzeitige Position von {{symbol}}",
+        "currentPositionTooltip": "Aktuelle Positionsgröße in {{symbol}}",
         "maxOpenInterestReached": "Maximales Open Interest erreicht",
         "depositToTrade": "Für Handel einzahlen",
         "switchDirectionToReduce": "Richtung wechseln, um zu reduzieren",
@@ -377,20 +377,10 @@
         "connectWalletForTrading": "Wallet verbinden, um ohne Gas-Gebühren zu handeln."
     },
     "home": {
-        "title": "Handeln Sie Perpetuals mit Ambient",
-        "subtitle": "Schnelle Ausführung. Keine Taker-Gebühren. Bis zu 100x Hebel.",
-        "startTrading": "Jetzt handeln",
-        "learnMore": "Mehr erfahren",
-        "hero": {
-            "heading1": "Von Null-zu-",
-            "one": "Eins",
-            "heading2": "Dezentrale Handlungsprotokolle",
-            "description": "Ambient ist eine völlig neue Art dezentraler Perpetual-DEX, die einzigartige DeFi-Produkte mit CEX-ähnlicher Benutzererfahrung verbindet",
-            "stats": {
-                "totalVolume": "Gesamtvolumen",
-                "activeUsers": "Aktive Nutzer"
-            }
-        }
+        "title": "Handle Perps mit Ambient",
+        "tradeNow": "Jetzt handeln",
+        "explore": "Entdecken",
+        "subtitle": "Das schnellste Onchain-Handelserlebnis ist da"
     },
     "referrals": {
         "title": "Empfehlungen",
@@ -550,5 +540,11 @@
     "meta": {
         "title": "Startseite | Ambient",
         "content": "Handeln Sie Perps mit Ambient"
+    },
+    "docs": {
+        "menuTerms": "Nutzungsbedingungen",
+        "menuPrivacy": "Datenschutz",
+        "terms": "CROCODILE Labs Nutzungsbedingungen",
+        "privacy": "Datenschutzerklärung"
     }
 }

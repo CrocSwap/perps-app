@@ -1,4 +1,8 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import {
+    isEstablished,
+    useConnection,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { WithdrawService } from '~/services/withdrawService';
 
@@ -31,6 +35,7 @@ export interface UseWithdrawServiceReturn {
  */
 export function useWithdrawService(): UseWithdrawServiceReturn {
     const sessionState = useSession();
+    const connection = useConnection();
     const [availableBalance, setAvailableBalance] =
         useState<AvailableWithdrawBalance | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -42,12 +47,12 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
     // Initialize withdraw service when session is established
     useEffect(() => {
         if (isEstablished(sessionState)) {
-            const service = new WithdrawService(sessionState.connection);
+            const service = new WithdrawService(connection);
             setWithdrawService(service);
         } else {
             setWithdrawService(null);
         }
-    }, [sessionState]);
+    }, [sessionState, connection]);
 
     // Fetch available withdraw balance
     const refreshBalance = useCallback(async () => {
@@ -170,7 +175,9 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
                         )
                             .filter(
                                 (key) =>
-                                    typeof sessionState[key] === 'function',
+                                    typeof sessionState[
+                                        key as keyof typeof sessionState
+                                    ] === 'function',
                             )
                             .join(', ')}`,
                     );

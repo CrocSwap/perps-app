@@ -1,3 +1,12 @@
+.outer {
+    width: 100%;
+    height: 100%;
+    /* background: radial-gradient(
+        43.75% 50% at 0% 70%,
+        rgba(115, 113, 252, 0.2) 0%,
+        rgba(115, 113, 252, 0) 100%
+    ); */
+}
 .container {
     --container-width: 1280px;
     --container-gap: 48px;
@@ -14,6 +23,7 @@
     padding-bottom: var(--padding-m);
     overflow-y: hidden;
 }
+
 .container header {
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-xl, 36px);

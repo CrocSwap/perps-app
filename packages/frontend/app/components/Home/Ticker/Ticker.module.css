@@ -7,40 +7,111 @@
     max-width: 100vw;
     overflow: hidden;
     z-index: 25;
-    pointer-events: none;
     background-color: var(--bg-dark1);
     border-top: 1px solid var(--bg-dark3);
     display: flex;
     align-items: center;
     padding: 4px 0;
     box-sizing: border-box;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-backface-visibility: hidden;
 }
 
 .tickerTrack {
     display: flex;
     width: max-content;
-    animation: scroll var(--loop-duration, 20s) linear infinite;
+    animation: scroll 60s linear infinite;
+    animation-delay: 2s;
+    animation-play-state: running;
     will-change: transform;
     position: relative;
-    z-index: 0;
-    max-width: 100%;
+    z-index: 1;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .tickerSet {
     display: flex;
-    gap: 32px;
-    padding-right: 32px;
+    gap: 16px;
+    padding-right: 16px;
     flex-shrink: 0;
+}
+
+/* Add 40px offset to the first ticker item in all sets for seamless loop */
+.tickerSet .tickerItem:first-child {
+    margin-left: 16px;
 }
 
 .tickerItem {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 4px 8px;
     white-space: nowrap;
     flex-shrink: 0;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    background: transparent;
+    transition: background-color 0.2s ease-in-out;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    width: 150px;
+    -webkit-font-smoothing: subpixel-antialiased;
+    border-radius: 4px;
+    position: relative;
+    z-index: 2;
+}
+
+.tickerItem {
+    --flash-opacity: 0;
+}
+
+.tickerItem {
+    animation: none; /* Reset any existing animation */
+}
+
+.tickerItem.priceUp {
+    animation: flash 3s ease-out forwards;
+    --flash-color: var(--buy-color);
+}
+
+.tickerItem.priceDown {
+    animation: flash 3s ease-out forwards;
+    --flash-color: var(--sell-color);
+}
+
+@keyframes flash {
+    0% {
+        background-color: color-mix(
+            in srgb,
+            var(--flash-color) 40%,
+            transparent
+        );
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .tickerTrack {
+        animation: none;
+    }
+
+    .tickerItem.priceUp,
+    .tickerItem.priceDown {
+        animation: none;
+    }
+
+    .tickerItem {
+        transition: none;
+    }
 }
 
 .symbol {
@@ -66,12 +137,18 @@
     color: var(--red);
 }
 
+.changeZero {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+}
+
 .tickerContainer::before,
 .tickerContainer::after {
     content: '';
     position: absolute;
     top: 0;
-    width: 96px;
+    width: 20px;
     height: 100%;
     pointer-events: none;
     z-index: 1;
@@ -82,9 +159,11 @@
     background: linear-gradient(
         to right,
         var(--bg-dark1) 0%,
-        rgba(6, 6, 12, 0.85) 45%,
+        var(--bg-dark1) 20%,
+        rgba(6, 6, 12, 0.7) 50%,
         transparent 100%
     );
+    z-index: 3; /* Ensure it's above the ticker items */
 }
 
 .tickerContainer::after {
@@ -102,8 +181,28 @@
         transform: translate3d(0, 0, 0);
     }
     100% {
-        transform: translate3d(var(--loop-offset, -100%), 0, 0);
+        transform: translate3d(-50%, 0, 0);
     }
+}
+
+/* Hover state for the ticker track */
+.tickerTrack[style*='--play-state: paused'],
+.tickerTrack[style*='--play-state: paused'] {
+    animation-play-state: paused !important;
+}
+
+/* Hover effect for ticker items */
+.tickerItem:hover {
+    background-color: var(--bg-dark3) !important;
+    border-radius: 4px;
+    transform: translateZ(0);
+}
+
+/* Focus state for keyboard navigation */
+.tickerItem:focus-visible {
+    outline: 2px solid var(--accent1);
+    outline-offset: 2px;
+    border-radius: 4px;
 }
 
 @media (max-width: 768px) {
@@ -112,7 +211,7 @@
     }
 
     .tickerTrack {
-        animation-duration: var(--loop-duration, 8s);
+        animation-duration: 45s;
     }
 
     .tickerSet {

@@ -27,7 +27,7 @@ import { MarketDataProvider } from './contexts/MarketDataContext';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
-import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+import { FogoSessionProvider, Network } from '@fogo/sessions-sdk-react';
 import { WsProvider } from './contexts/WsContext';
 
 // Config
@@ -287,7 +287,7 @@ export default function App() {
     return (
         <Document>
             <FogoSessionProvider
-                endpoint={RPC_ENDPOINT}
+                network={Network.Testnet}
                 domain='https://perps.ambient.finance'
                 tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}
                 defaultRequestedLimits={{
@@ -300,8 +300,8 @@ export default function App() {
                     }
                     return !IS_RESTRICTED_SITE;
                 }}
-                termsOfServiceUrl='https://ambient.finance/terms'
-                privacyPolicyUrl='https://ambient.finance/privacy'
+                termsOfServiceUrl='/v2/terms'
+                privacyPolicyUrl='/v2/privacy'
             >
                 <AppProvider>
                     <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>

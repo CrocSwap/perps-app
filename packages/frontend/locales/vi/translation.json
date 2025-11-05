@@ -33,8 +33,8 @@
         "twap": "TWAP",
         "all": "Tất cả",
         "active": "Hoạt động",
-        "long": "Mua (Long)",
-        "short": "Bán (Short)",
+        "long": "Long",
+        "short": "Short",
         "create": "Tạo",
         "update": "Cập nhật",
         "reset": "Đặt lại",
@@ -51,9 +51,9 @@
         "confirmLimitBuyOrder": "Xác nhận lệnh mua giới hạn",
         "confirmLimitSellOrder": "Xác nhận lệnh bán giới hạn",
         "availableToTrade": "Số dư khả dụng để giao dịch",
-        "availableToTradeTooltip": "{{symbol}} đã nạp",
+        "availableToTradeTooltip": "Số {{symbol}} đã nạp",
         "currentPosition": "Vị thế hiện tại",
-        "currentPositionTooltip": "Kích thước vị thế {{symbol}} hiện tại",
+        "currentPositionTooltip": "Khối lượng vị thế {{symbol}} hiện tại của bạn",
         "maxOpenInterestReached": "Đã đạt giới hạn vị thế mở tối đa",
         "depositToTrade": "Nạp tiền để giao dịch",
         "switchDirectionToReduce": "Đổi hướng để giảm vị thế",
@@ -71,15 +71,15 @@
         "limitOrderFailed": "Lệnh giới hạn thất bại",
         "unknownErrorOccurred": "Đã xảy ra lỗi không xác định",
         "failedToPlaceLimitOrder": "Không thể đặt lệnh giới hạn",
-        "sellShortLimitOrderPlaced": "Lệnh bán/Short giới hạn đã đặt",
-        "sellShortLimitOrderPending": "Lệnh bán/Short giới hạn đang chờ",
+        "sellShortLimitOrderPlaced": "Lệnh giới hạn Bán/Short đã đặt",
+        "sellShortLimitOrderPending": "Lệnh giới hạn Bán/Short đang chờ",
         "successfullyPlacedSellOrderFor": "Đã đặt lệnh bán {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
         "placingSellShortLimitOrderFor": "Đang đặt lệnh bán giới hạn {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
         "enterValidLimitPrice": "Vui lòng nhập giá giới hạn hợp lệ",
         "enterValidOrderSize": "Vui lòng nhập kích thước lệnh hợp lệ",
-        "buyLongLimitOrderPlaced": "Lệnh mua/Long giới hạn đã đặt",
+        "buyLongLimitOrderPlaced": "Lệnh giới hạn Mua/Long đã đặt",
         "successfullyPlacedBuyOrderFor": "Đã đặt lệnh mua {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
-        "buyLongLimitOrderPending": "Lệnh mua/Long giới hạn đang chờ",
+        "buyLongLimitOrderPending": "Lệnh giới hạn Mua/Long đang chờ",
         "placingBuyLongLimitOrderFor": "Đang đặt lệnh mua giới hạn {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
         "priceDistribution": "Phân phối giá",
         "flat": "Phẳng",
@@ -89,13 +89,13 @@
         "market": "Thị trường",
         "limit": "Giới hạn",
         "price": "Giá",
-        "size": "Kích thước",
+        "size": "Khối lượng",
         "time": "Thời gian",
         "total": "Tổng cộng",
         "action": "Thao tác",
         "ratio": "Tỷ lệ",
-        "buyLong": "Mua/Long",
-        "sellShort": "Bán/Short",
+        "buyLong": "Mua / Long",
+        "sellShort": "Bán / Short",
         "confirmingTransaction": "Đang xác nhận giao dịch...",
         "processing": "Đang xử lý...",
         "dontShowThisAgain": "Không hiển thị lại",
@@ -122,7 +122,7 @@
         "buySellAtCurrentPrice": "Mua/bán theo giá hiện tại",
         "buySellAtSpecificPrice": "Mua/bán theo giá chỉ định",
         "maxTradeSizeLimitedTo": "Giới hạn kích thước giao dịch tối đa",
-        "yourPositionIsLimitedByOpenInterest": "Vị thế {{coin}} của bạn bị giới hạn bởi {{limitedBy}}",
+        "yourPositionIsLimitedByOpenInterest": "Vị thế {{coin}} của bạn bị giới hạn bởi hạn mức {{limitedBy}}",
         "currentMaxTradeSizeForMarket": "Kích thước giao dịch lớn nhất hiện tại cho thị trường này: {{limit}}",
         "placingLimitOrderFor": "Đang đặt lệnh giới hạn cho {{usdValueOfOrderStr}} {{symbol}} tại {{limitPrice}}",
         "sellOrderPending": "Lệnh bán đang chờ xử lý",
@@ -144,7 +144,7 @@
         "cancelling": "Đang hủy...",
         "midButton": "MID",
         "positionClosed": "Vị thế đã đóng",
-        "successfullyClosedPosition": "Đã đóng thành công {{usdValueOfOrderStr}} vị thế {{symbol}}",
+        "successfullyClosedPosition": "Đã đóng thành công vị thế {{symbol}} trị giá {{usdValueOfOrderStr}}",
         "failedToClosePosition": "Đóng vị thế thất bại",
         "transactionTimedOut": "Giao dịch bị hết thời gian sau {{timeInSeconds}} giây",
         "txFailedOrNotConfirmed": "Giao dịch thất bại hoặc chưa xác nhận",
@@ -172,7 +172,7 @@
         },
         "cancelOrderPending": {
             "title": "Đang chờ hủy lệnh",
-            "message": "Đang hủy lệnh {{usdValueOfOrderStr}} cho {{symbol}}"
+            "message": "Đang hủy lệnh {{symbol}} trị giá {{usdValueOfOrderStr}}"
         },
         "cancelOrderConfirmed": {
             "title": "Lệnh đã hủy",
@@ -256,7 +256,7 @@
         "created": {
             "title": "Tài khoản phụ đã tạo",
             "message": "Đã tạo tài khoản phụ chiến lược mới {{name}}",
-            "message2": "Đã tạo tài khoản phụ tự quản mới {{name}}"
+            "message2": "Đã tạo tài khoản phụ tùy ý mới {{name}}"
         }
     },
     "strategies": {
@@ -377,20 +377,10 @@
         "connectWalletForTrading": "Kết nối ví để giao dịch miễn phí phí gas."
     },
     "home": {
-        "title": "Giao dịch Perps cùng Ambient",
-        "subtitle": "Khớp lệnh nhanh. Không phí taker. Đòn bẩy lên đến 100x.",
-        "startTrading": "Bắt đầu giao dịch",
-        "learnMore": "Tìm hiểu thêm",
-        "hero": {
-            "heading1": "Từ số 0 đến",
-            "one": "Một",
-            "heading2": "Giao thức giao dịch phi tập trung",
-            "description": "Ambient là DEX hợp đồng vĩnh viễn đột phá, kết hợp sản phẩm DeFi độc đáo cùng trải nghiệm người dùng sánh ngang với CEX",
-            "stats": {
-                "totalVolume": "Tổng khối lượng",
-                "activeUsers": "Người dùng hoạt động"
-            }
-        }
+        "title": "Giao dịch Perp với Ambient",
+        "tradeNow": "Giao dịch ngay",
+        "explore": "Khám phá",
+        "subtitle": "Trải nghiệm giao dịch on‑chain nhanh nhất đã đến"
     },
     "referrals": {
         "title": "Giới thiệu",
@@ -401,12 +391,12 @@
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",
         "input_prompt": "Nhập số tiền (tối thiểu ${{MIN_DEPOSIT_AMOUNT}})",
-        "availableToDeposit": "Sẵn sàng để nạp"
+        "availableToDeposit": "Khả dụng để nạp"
     },
     "withdraw": {
         "prompt": "Rút {{token}} về Fogo",
         "explanation": "{{token}} sẽ được gửi tới địa chỉ của bạn.",
-        "availableToWithdraw": "Sẵn sàng để rút",
+        "availableToWithdraw": "Khả dụng để rút",
         "input_prompt": "Nhập số tiền (tối thiểu ${{MIN_WITHDRAW_AMOUNT}})"
     },
     "orderBook": {
@@ -440,8 +430,7 @@
         "openInterest": "Vị thế mở",
         "openInterestTooltip": "Tổng vị thế mở trên thị trường",
         "fundingRate": "Tỷ lệ funding",
-        "fundingRateTooltip": "Tỷ lệ mỗi giờ mà Long trả cho Short (hoặc ngược lại nếu âm). Không phí bổ sung; funding là khoản thanh toán P2P để giữ giá sát thị trường giao ngay.",
-        "fundingCountdown": "Đếm ngược funding",
+        "fundingRateTooltip": "Tỷ lệ theo giờ mà bên Long trả cho bên Short (hoặc ngược lại nếu âm). Không phí bổ sung; funding là thanh toán ngang hàng để duy trì giá sát với thị trường giao ngay.",
         "fundingCountdownTooltip": "Thời gian còn lại đến funding tiếp theo"
     },
     "feedback": {
@@ -501,9 +490,9 @@
     "colors": {
         "default": "Mặc định",
         "opposite": "Đối lập",
-        "deuteranopia": "Deuteranopia",
-        "tritanopia": "Tritanopia",
-        "protanopia": "Protanopia"
+        "deuteranopia": "Mù màu đỏ-xanh lục",
+        "tritanopia": "Mù màu xanh-vàng",
+        "protanopia": "Mù màu đỏ"
     },
     "aria": {
         "closeAnnouncement": "Đóng thông báo",
@@ -549,6 +538,12 @@
     },
     "meta": {
         "title": "Trang chủ | Ambient",
-        "content": "Giao dịch Perps với Ambient"
+        "content": "Giao dịch Hợp đồng Vĩnh viễn với Ambient"
+    },
+    "docs": {
+        "menuTerms": "Điều khoản Dịch vụ",
+        "menuPrivacy": "Quyền riêng tư",
+        "terms": "Điều khoản Dịch vụ CROCODILE Labs",
+        "privacy": "Chính sách Quyền riêng tư"
     }
 }

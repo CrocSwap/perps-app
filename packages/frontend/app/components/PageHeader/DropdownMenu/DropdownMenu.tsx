@@ -1,4 +1,9 @@
-import { FaDiscord, FaCommentAlt } from 'react-icons/fa';
+import {
+    FaDiscord,
+    FaCommentAlt,
+    FaUserSecret,
+    FaFileAlt,
+} from 'react-icons/fa';
 import { RiTwitterXFill } from 'react-icons/ri';
 // import { IoIosInformationCircle } from 'react-icons/io';
 // import { useTutorial } from '~/hooks/useTutorial';
@@ -7,6 +12,7 @@ import packageJson from '../../../../package.json';
 import styles from './DropdownMenu.module.css';
 import { externalURLs } from '~/utils/Constants';
 import { t } from 'i18next';
+import { useNavigate } from 'react-router';
 
 interface DropdownMenuProps {
     setIsDropdownMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -18,7 +24,7 @@ const DropdownMenu = ({
     onFeedbackClick,
 }: DropdownMenuProps) => {
     const sessionState = useSession();
-
+    const navigate = useNavigate();
     const handleFeedbackClick = () => {
         onFeedbackClick();
         setIsDropdownMenuOpen(false);
@@ -41,9 +47,17 @@ const DropdownMenu = ({
             icon: <FaCommentAlt />,
             onClick: handleFeedbackClick,
         },
+        {
+            name: t('docs.menuPrivacy'),
+            icon: <FaUserSecret />,
+            url: '/v2/privacy',
+        },
+        {
+            name: t('docs.menuTerms'),
+            icon: <FaFileAlt />,
+            url: '/v2/terms',
+        },
         // { name: 'Medium', icon: <FaMediumM /> },
-        // { name: 'Privacy', icon: <FaUserSecret /> },
-        // { name: 'Terms of Service', icon: <FaFileAlt /> },
         // { name: 'FAQ', icon: <LuCircleHelp /> },
     ];
 
@@ -55,7 +69,19 @@ const DropdownMenu = ({
                     className={styles.menuItem}
                     onClick={() => {
                         if (item.url) {
-                            window.open(item.url, '_blank');
+                            // get current path
+                            const currentPath = window.location.pathname;
+                            // if user clicks privacy or terms and user is already on privacy or terms, open in same tab
+                            if (
+                                (item.url.startsWith('/v2/privacy') ||
+                                    item.url.startsWith('/v2/terms')) &&
+                                (currentPath.startsWith('/v2/privacy') ||
+                                    currentPath.startsWith('/v2/terms'))
+                            ) {
+                                navigate(item.url);
+                            } else {
+                                window.open(item.url, '_blank');
+                            }
                             if (typeof plausible === 'function') {
                                 plausible('External Link Clicked', {
                                     props: {

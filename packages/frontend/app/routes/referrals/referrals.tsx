@@ -2,6 +2,7 @@ import { t } from 'i18next';
 import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
 import ReferralsTabs from '~/components/Referrals/ReferralsTabs/ReferralsTabs';
 import styles from './referrals.module.css';
+import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 // export function meta({}: Route.MetaArgs) {
 export function meta() {
     return [
@@ -14,6 +15,18 @@ export function meta() {
 export default function Referrals() {
     return (
         <div className={styles.container}>
+            <AnimatedBackground
+                mode='absolute' // anchors to .container
+                layers={1} // 1–3; 2 is a nice depth without cost
+                opacity={1}
+                duration='15s'
+                strokeWidth='2'
+                palette={{
+                    color1: '#1E1E24',
+                    color2: '#7371FC',
+                    color3: '#CDC1FF',
+                }}
+            />
             <header>
                 {t('referrals.title')}
                 <p>

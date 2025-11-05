@@ -36,31 +36,31 @@ export const OVERLAY_LINKS: OverlayLink[] = [
     {
         title: 'SDK',
         subtitle: 'Seamlessly integrate with Ambient Finance',
-        href: 'https://github.com/ambientxyz/ambient-ts-sdk',
+        href: 'https://github.com/CrocSwap/perps-app',
         iconSrc: sdkIconUrl,
     },
     {
         title: 'Github',
         subtitle: 'View our code',
-        href: 'https://github.com/ambientxyz',
+        href: 'https://github.com/CrocSwap',
         iconSrc: githubIconUrl,
     },
     {
         title: 'Terms of Service',
         subtitle: 'Our rules for using the platform',
-        href: 'https://ambient.finance/terms',
+        href: '/v2/terms',
         iconSrc: docsIconUrl,
     },
     {
         title: 'Privacy Policy',
         subtitle: 'View our policies around data',
-        href: 'https://ambient.finance/privacy',
+        href: '/v2/privacy',
         iconSrc: privacyIconUrl,
     },
     {
         title: 'Brand Kit',
         subtitle: 'Download our brand kit',
-        href: 'https://ambient.finance/brand',
+        href: 'https://perps.ambient.finance/v2/brand',
         iconSrc: ambientIconUrl,
     },
 ];

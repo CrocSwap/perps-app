@@ -23,9 +23,9 @@ export function SectionObserver({
     onPresetChange,
 }: SectionObserverProps) {
     const registry = useSectionRegistry(containerRef);
-    const observerCleanupRef = useRef<() => void>();
+    const observerCleanupRef = useRef<() => void | undefined>(undefined);
     const hasInitializedRef = useRef(false);
-    const initializationTimeoutRef = useRef<number>();
+    const initializationTimeoutRef = useRef<number | undefined>(undefined);
 
     useEffect(() => {
         hasInitializedRef.current = false;

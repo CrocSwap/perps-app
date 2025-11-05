@@ -1,4 +1,8 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import {
+    isEstablished,
+    useConnection,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useState } from 'react';
 import {
     MarketOrderService,
@@ -20,6 +24,7 @@ export interface UseMarketOrderServiceReturn {
  */
 export function useMarketOrderService(): UseMarketOrderServiceReturn {
     const sessionState = useSession();
+    const connection = useConnection();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [signature, setSignature] = useState<string | undefined>(undefined);
@@ -29,7 +34,7 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
     // Initialize market order service when session is established
     useEffect(() => {
         if (isEstablished(sessionState)) {
-            const service = new MarketOrderService(sessionState.connection);
+            const service = new MarketOrderService(connection);
             setMarketOrderService(service);
         } else {
             console.log(
@@ -37,7 +42,7 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
             );
             setMarketOrderService(null);
         }
-    }, [sessionState]);
+    }, [sessionState, connection]);
 
     // Execute market order transaction
     const executeMarketOrder = useCallback(
