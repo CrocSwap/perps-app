@@ -53,6 +53,11 @@ export default function HomePage() {
                 return;
             }
 
+            // Only respond to significant scroll events (trackpad gestures fire many small events)
+            if (Math.abs(event.deltaY) < 10) {
+                return;
+            }
+
             // Set cooldown to prevent multiple slides from single gesture
             scrollCooldownRef.current = true;
 
