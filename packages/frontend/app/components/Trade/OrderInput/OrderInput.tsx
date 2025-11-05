@@ -2310,237 +2310,207 @@ function OrderInput({
 
     return (
         <div ref={orderInputRef} className={styles.order_input}>
-            <AnimatePresence mode='wait'>
-                {showLaunchpad ? (
-                    <motion.div
-                        key='launchpad'
-                        className={styles.launchpad}
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 50 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    >
-                        <header>
-                            <div
-                                className={styles.exit_launchpad}
-                                onClick={() => setShowLaunchpad(false)}
+            {showLaunchpad ? (
+                <div className={styles.launchpad}>
+                    <header>
+                        <div
+                            className={styles.exit_launchpad}
+                            onClick={() => setShowLaunchpad(false)}
+                        >
+                            <MdKeyboardArrowLeft
+                                aria-label={t('aria.closeTradeTypeMenu')}
+                            />
+                        </div>
+                        <h3>{t('transactions.orderTypes')}</h3>
+                        <button
+                            className={styles.trade_type_toggle}
+                            aria-label={t('aria.tradeType')}
+                            onClick={() => setShowLaunchpad(false)}
+                        >
+                            <PiSquaresFour
+                                aria-label={t('aria.closeTradeTypeMenu')}
+                            />
+                        </button>
+                    </header>
+                    <ul className={styles.launchpad_clickables}>
+                        {marketOrderTypes.map((mo: OrderTypeOption) => (
+                            <li
+                                key={JSON.stringify(mo.value)}
+                                onClick={() => {
+                                    handleMarketOrderTypeChange(mo.value);
+                                    setShowLaunchpad(false);
+                                }}
                             >
-                                <MdKeyboardArrowLeft
-                                    aria-label={t('aria.closeTradeTypeMenu')}
-                                />
-                            </div>
-                            <h3>{t('transactions.orderTypes')}</h3>
+                                <div className={styles.name_and_icon}>
+                                    {mo.icon}
+                                    <h4>{mo.label}</h4>
+                                </div>
+                                <div>
+                                    <p>{mo.blurb}</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ) : (
+                <>
+                    <div className={styles.mainContent}>
+                        <div
+                            className={styles.orderTypeDropdownContainer}
+                            id='tutorial-order-type'
+                        >
+                            <OrderDropdown
+                                options={marketOrderTypes}
+                                value={marketOrderType}
+                                onChange={handleMarketOrderTypeChange}
+                            />
+                            <SimpleButton
+                                className={styles.margin_type_btn}
+                                onClick={() => confirmOrderModal.open('margin')}
+                                bg='dark3'
+                                hoverBg='accent1'
+                            >
+                                {t(marginMode)}
+                            </SimpleButton>
                             <button
                                 className={styles.trade_type_toggle}
                                 aria-label={t('aria.tradeType')}
-                                onClick={() => setShowLaunchpad(false)}
+                                onClick={() => setShowLaunchpad(true)}
                             >
-                                <PiSquaresFour
-                                    aria-label={t('aria.closeTradeTypeMenu')}
-                                />
+                                <PiSquaresFour />
                             </button>
-                        </header>
-                        <ul className={styles.launchpad_clickables}>
-                            {marketOrderTypes.map((mo: OrderTypeOption) => (
-                                <li
-                                    key={JSON.stringify(mo.value)}
-                                    onClick={() => {
-                                        handleMarketOrderTypeChange(mo.value);
-                                        setShowLaunchpad(false);
-                                    }}
+                        </div>
+                        <TradeDirection
+                            tradeDirection={tradeDirection}
+                            setTradeDirection={setTradeDirection}
+                        />
+
+                        <LeverageSlider {...leverageSliderProps} />
+
+                        <div className={styles.inputDetailsDataContainer}>
+                            {inputDetailsData.map((data, idx) => (
+                                <div
+                                    key={idx}
+                                    className={styles.inputDetailsDataContent}
                                 >
-                                    <div className={styles.name_and_icon}>
-                                        {mo.icon}
-                                        <h4>{mo.label} </h4>
+                                    <div className={styles.inputDetailsLabel}>
+                                        <span>{data.label}</span>
+                                        <Tooltip
+                                            content={data?.tooltipLabel}
+                                            position='right'
+                                        >
+                                            <LuCircleHelp size={12} />
+                                        </Tooltip>
                                     </div>
-                                    <div>
-                                        <p>{mo.blurb}</p>
-                                    </div>
-                                </li>
+                                    <span className={styles.inputDetailValue}>
+                                        {data.value}
+                                    </span>
+                                </div>
                             ))}
-                        </ul>
-                    </motion.div>
-                ) : (
-                    <>
-                        <motion.div
-                            key='orderinput'
-                            className={styles.mainContent}
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -50 }}
-                            transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        >
-                            <div
-                                className={styles.orderTypeDropdownContainer}
-                                id='tutorial-order-type'
-                            >
-                                <OrderDropdown
-                                    options={marketOrderTypes}
-                                    value={marketOrderType}
-                                    onChange={handleMarketOrderTypeChange}
-                                />
-                                <SimpleButton
-                                    className={styles.margin_type_btn}
-                                    onClick={() =>
-                                        confirmOrderModal.open('margin')
-                                    }
-                                    bg='dark3'
-                                    hoverBg='accent1'
-                                >
-                                    {t(marginMode)}
-                                </SimpleButton>
-                                <button
-                                    className={styles.trade_type_toggle}
-                                    aria-label={t('aria.tradeType')}
-                                    onClick={() => setShowLaunchpad(true)}
-                                >
-                                    <PiSquaresFour />
-                                </button>
-                            </div>
-                            <TradeDirection
-                                tradeDirection={tradeDirection}
-                                setTradeDirection={setTradeDirection}
-                            />
-
-                            <LeverageSlider {...leverageSliderProps} />
-
-                            <div className={styles.inputDetailsDataContainer}>
-                                {inputDetailsData.map((data, idx) => (
+                            {!isReduceOnlyEnabled &&
+                                maxOrderSizeWouldExceedRemainingOIDebounced &&
+                                (!!sizePercentageValue || !!sizeDisplay) && (
                                     <div
-                                        key={idx}
-                                        className={
-                                            styles.inputDetailsDataContent
-                                        }
+                                        style={{
+                                            width: '100%',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                        }}
                                     >
                                         <div
-                                            className={styles.inputDetailsLabel}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px',
+                                                color: 'var(--orange)',
+                                                justifyContent: 'center',
+                                                width: '100%',
+                                                fontSize: 'var(--font-size-s)',
+                                            }}
                                         >
-                                            <span>{data.label}</span>
+                                            <span
+                                                style={{
+                                                    cursor: 'default',
+                                                }}
+                                            >
+                                                {maxTradeSizeWarningShort}
+                                            </span>
                                             <Tooltip
-                                                content={data?.tooltipLabel}
-                                                position='right'
+                                                content={
+                                                    maxTradeSizeWarningLong
+                                                }
+                                                position='bottom'
                                             >
                                                 <LuCircleHelp size={12} />
                                             </Tooltip>
                                         </div>
-                                        <span
-                                            className={styles.inputDetailValue}
-                                        >
-                                            {data.value}
-                                        </span>
                                     </div>
-                                ))}
-                                {!isReduceOnlyEnabled &&
-                                    maxOrderSizeWouldExceedRemainingOIDebounced &&
-                                    (!!sizePercentageValue ||
-                                        !!sizeDisplay) && (
-                                        <div
-                                            style={{
-                                                width: '100%',
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                            }}
-                                        >
-                                            <div
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '4px',
-                                                    color: 'var(--orange)',
-                                                    justifyContent: 'center',
-                                                    width: '100%',
-                                                    fontSize:
-                                                        'var(--font-size-s)',
-                                                }}
-                                            >
-                                                <span
-                                                    style={{
-                                                        cursor: 'default',
-                                                    }}
-                                                >
-                                                    {maxTradeSizeWarningShort}
-                                                </span>
-                                                <Tooltip
-                                                    content={
-                                                        maxTradeSizeWarningLong
-                                                    }
-                                                    position='bottom'
-                                                >
-                                                    <LuCircleHelp size={12} />
-                                                </Tooltip>
-                                            </div>
-                                        </div>
-                                    )}
-                            </div>
+                                )}
+                        </div>
 
-                            {/* {marketOrderType === 'chase_limit' && (
+                        {/* {marketOrderType === 'chase_limit' && (
                                 <ChasePrice {...chasePriceProps} / predu>
                             )} */}
 
-                            {showStopPriceComponent && (
-                                <StopPrice {...stopPriceProps} />
-                            )}
-                            {showPriceInputComponent && (
-                                <PriceInput {...priceInputProps} />
-                            )}
-                            <SizeInput {...sizeInputProps} />
-                            <PositionSize {...sizeSliderPercentageValueProps} />
+                        {showStopPriceComponent && (
+                            <StopPrice {...stopPriceProps} />
+                        )}
+                        {showPriceInputComponent && (
+                            <PriceInput {...priceInputProps} />
+                        )}
+                        <SizeInput {...sizeInputProps} />
+                        <PositionSize {...sizeSliderPercentageValueProps} />
 
-                            {showPriceRangeComponent && (
-                                <PriceRange {...priceRangeProps} />
-                            )}
-                            {marketOrderType === 'scale' &&
-                                priceDistributionButtons}
-                            {marketOrderType === 'twap' && <RunningTime />}
+                        {showPriceRangeComponent && (
+                            <PriceRange {...priceRangeProps} />
+                        )}
+                        {marketOrderType === 'scale' &&
+                            priceDistributionButtons}
+                        {marketOrderType === 'twap' && <RunningTime />}
 
-                            <ReduceAndProfitToggle
-                                {...reduceAndProfitToggleProps}
-                            />
-                        </motion.div>
-                        <motion.div
-                            key='buttondetails'
-                            className={styles.button_details_container}
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -50 }}
-                            transition={{ duration: 0.25, ease: 'easeInOut' }}
-                        >
-                            {isUserLoggedIn && (
-                                <Tooltip
-                                    content={disabledReason}
-                                    position='top'
-                                    disabled={!isDisabled}
+                        <ReduceAndProfitToggle
+                            {...reduceAndProfitToggleProps}
+                        />
+                    </div>
+                    <div
+                        key='buttondetails'
+                        className={styles.button_details_container}
+                    >
+                        {isUserLoggedIn && (
+                            <Tooltip
+                                content={disabledReason}
+                                position='top'
+                                disabled={!isDisabled}
+                            >
+                                <button
+                                    data-testid='submit-order-button'
+                                    className={`${styles.submit_button}`}
+                                    style={{
+                                        backgroundColor:
+                                            tradeDirection === 'buy'
+                                                ? buyColor
+                                                : sellColor,
+                                        fontSize:
+                                            submitButtonText.length > 20
+                                                ? 'var(--font-size-s)'
+                                                : 'var(--font-size-m)',
+                                    }}
+                                    onClick={handleSubmitOrder}
+                                    disabled={isDisabled}
                                 >
-                                    <button
-                                        data-testid='submit-order-button'
-                                        className={`${styles.submit_button}`}
-                                        style={{
-                                            backgroundColor:
-                                                tradeDirection === 'buy'
-                                                    ? buyColor
-                                                    : sellColor,
-                                            fontSize:
-                                                submitButtonText.length > 20
-                                                    ? 'var(--font-size-s)'
-                                                    : 'var(--font-size-m)',
-                                        }}
-                                        onClick={handleSubmitOrder}
-                                        disabled={isDisabled}
-                                    >
-                                        {submitButtonText}
-                                    </button>
-                                </Tooltip>
-                            )}
-                            <OrderDetails
-                                orderMarketPrice={marketOrderType}
-                                usdOrderValue={usdOrderValue}
-                                marginRequired={marginRequired}
-                                liquidationPrice={liquidationPrice}
-                            />
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+                                    {submitButtonText}
+                                </button>
+                            </Tooltip>
+                        )}
+                        <OrderDetails
+                            orderMarketPrice={marketOrderType}
+                            usdOrderValue={usdOrderValue}
+                            marginRequired={marginRequired}
+                            liquidationPrice={liquidationPrice}
+                        />
+                    </div>
+                </>
+            )}
             {confirmOrderModal.isOpen && (
                 <Modal
                     close={confirmOrderModal.close}

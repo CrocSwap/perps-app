@@ -553,5 +553,11 @@
     "meta": {
         "title": "Inicio | Ambient",
         "content": "Opera Perps con Ambient"
+    },
+    "docs": {
+        "menuTerms": "Terms of Service",
+        "menuPrivacy": "Privacy",
+        "terms": "CROCODILE Labs Terms of Service",
+        "privacy": "Privacy Policy"
     }
 }

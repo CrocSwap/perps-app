@@ -553,5 +553,11 @@
     "meta": {
         "title": "홈 | Ambient",
         "content": "앰비언트에서 페페츄얼 거래"
+    },
+    "docs": {
+        "menuTerms": "Terms of Service",
+        "menuPrivacy": "Privacy",
+        "terms": "CROCODILE Labs Terms of Service",
+        "privacy": "Privacy Policy"
     }
 }

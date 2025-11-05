@@ -5,7 +5,8 @@
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 [context.production.environment]
   VITE_CONTEXT = "production"

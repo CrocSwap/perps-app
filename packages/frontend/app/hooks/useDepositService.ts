@@ -1,4 +1,8 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import {
+    isEstablished,
+    useConnection,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DepositService } from '~/services/depositService';
 
@@ -37,15 +41,17 @@ export function useDepositService(): UseDepositServiceReturn {
     );
     const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+    const connection = useConnection();
+
     // Initialize deposit service when session is established
     useEffect(() => {
         if (isEstablished(sessionState)) {
-            const service = new DepositService(sessionState.connection);
+            const service = new DepositService(connection);
             setDepositService(service);
         } else {
             setDepositService(null);
         }
-    }, [sessionState]);
+    }, [sessionState, connection]);
 
     // Fetch user balance
     const refreshBalance = useCallback(async () => {
@@ -61,7 +67,6 @@ export function useDepositService(): UseDepositServiceReturn {
             // Try to find the correct user wallet public key
             const userWalletKey =
                 sessionState.walletPublicKey || sessionState.sessionPublicKey;
-
             const userBalance =
                 await depositService.getUserBalance(userWalletKey);
             setBalance(userBalance);
@@ -148,7 +153,9 @@ export function useDepositService(): UseDepositServiceReturn {
                         )
                             .filter(
                                 (key) =>
-                                    typeof sessionState[key] === 'function',
+                                    typeof sessionState[
+                                        key as keyof typeof sessionState
+                                    ] === 'function',
                             )
                             .join(', ')}`,
                     );

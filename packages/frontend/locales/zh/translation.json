@@ -553,5 +553,11 @@
     "meta": {
         "title": "首页 | Ambient",
         "content": "在Ambient进行永续合约交易"
+    },
+    "docs": {
+        "menuTerms": "Terms of Service",
+        "menuPrivacy": "Privacy",
+        "terms": "CROCODILE Labs Terms of Service",
+        "privacy": "Privacy Policy"
     }
 }

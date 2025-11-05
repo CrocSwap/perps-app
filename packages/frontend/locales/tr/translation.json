@@ -553,5 +553,11 @@
     "meta": {
         "title": "Ana Sayfa | Ambient",
         "content": "Ambient ile vadeli işlemleri alıp satın"
+    },
+    "docs": {
+        "menuTerms": "Terms of Service",
+        "menuPrivacy": "Privacy",
+        "terms": "CROCODILE Labs Terms of Service",
+        "privacy": "Privacy Policy"
     }
 }

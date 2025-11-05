@@ -71,4 +71,8 @@ export default [
     route('v2/showcase/tabs', 'routes/showcase/tabShowcase/tabShowcase.tsx'),
 
     route('*', 'routes/notFound/notFound.tsx'),
+
+    route('v2/terms', 'routes/terms/terms.tsx'),
+
+    route('v2/privacy', 'routes/privacy/privacy.tsx'),
 ] satisfies RouteConfig;

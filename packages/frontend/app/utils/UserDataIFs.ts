@@ -78,6 +78,7 @@ export type UserFillSortBy =
     | 'closedPnl'
     | 'status'
     | 'tradeValue'
+    | 'dir'
     | undefined;
 
 export type DepositAndWithDrawalSortBy =

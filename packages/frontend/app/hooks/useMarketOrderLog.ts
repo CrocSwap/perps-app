@@ -1,4 +1,8 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import {
+    isEstablished,
+    useConnection,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useRef } from 'react';
 import { marketOrderLogManager } from '~/services/MarketOrderLogManager';
 
@@ -9,6 +13,7 @@ import { marketOrderLogManager } from '~/services/MarketOrderLogManager';
  */
 export function useMarketOrderLog() {
     const sessionState = useSession();
+    const connection = useConnection();
     const hasSubscribedRef = useRef(false);
     const lastSessionStateRef = useRef<boolean>(false);
 
@@ -32,7 +37,7 @@ export function useMarketOrderLog() {
         // Subscribe only if not already subscribed and session just became established
         if (!hasSubscribedRef.current && sessionChanged) {
             hasSubscribedRef.current = true;
-            marketOrderLogManager.subscribe(sessionState.connection);
+            marketOrderLogManager.subscribe(connection);
         }
 
         // Cleanup function - runs on unmount and when dependencies change
@@ -42,7 +47,7 @@ export function useMarketOrderLog() {
                 marketOrderLogManager.unsubscribe();
             }
         };
-    }, [isSessionEstablished]); // Only depend on session established state
+    }, [isSessionEstablished, connection]); // Only depend on session established state
 
     const forceRefresh = useCallback(async () => {
         if (!isSessionEstablished) {

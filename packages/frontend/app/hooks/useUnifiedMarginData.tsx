@@ -1,5 +1,9 @@
 import type { MarginBucketAvail } from '@crocswap-libs/ambient-ember';
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import {
+    isEstablished,
+    useConnection,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { Connection, PublicKey } from '@solana/web3.js';
 import {
     useCallback,
@@ -45,6 +49,7 @@ export const UnifiedMarginDataProvider: React.FC<
     UnifiedMarginDataProviderProps
 > = ({ children }) => {
     const sessionState = useSession();
+    const connection = useConnection();
     const hasSubscribedRef = useRef(false);
     const lastSessionStateRef = useRef<boolean>(false);
 
@@ -114,7 +119,7 @@ export const UnifiedMarginDataProvider: React.FC<
         ) {
             hasSubscribedRef.current = true;
             unifiedMarginPollingManager.subscribe(
-                sessionState.connection,
+                connection,
                 sessionState.walletPublicKey,
             );
             lastSubscribedAddressRef.current =
@@ -155,7 +160,7 @@ export const UnifiedMarginDataProvider: React.FC<
             ) {
                 unifiedMarginPollingManager.unsubscribe();
                 unifiedMarginPollingManager.subscribe(
-                    sessionState.connection,
+                    connection,
                     new PublicKey(manualAddress),
                 );
                 lastSubscribedAddressRef.current = manualAddress;
@@ -177,7 +182,7 @@ export const UnifiedMarginDataProvider: React.FC<
                 ) {
                     unifiedMarginPollingManager.unsubscribe();
                     unifiedMarginPollingManager.subscribe(
-                        sessionState.connection,
+                        connection,
                         sessionState.walletPublicKey,
                     );
                     lastSubscribedAddressRef.current =
