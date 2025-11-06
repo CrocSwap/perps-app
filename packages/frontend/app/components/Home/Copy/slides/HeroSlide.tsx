@@ -51,7 +51,7 @@ export function HeroSlide({
                         >
                             <span
                                 style={{
-                                    transition: 'opacity 800ms ease-in-out',
+                                    transition: 'opacity 400ms ease-in-out',
                                     opacity: isVisible ? 1 : 0,
                                     display: 'inline',
                                     whiteSpace: 'nowrap',
@@ -63,7 +63,7 @@ export function HeroSlide({
                                 <span
                                     className={styles.accent}
                                     style={{
-                                        transition: 'opacity 800ms ease-in-out',
+                                        transition: 'opacity 400ms ease-in-out',
                                         opacity: isVisible ? 1 : 0,
                                         display: 'inline',
                                         whiteSpace: 'nowrap',

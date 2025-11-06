@@ -4,7 +4,7 @@ import type { PresetId } from '../types';
 
 const SECTION_SELECTOR = '[data-preset]';
 // 30% of the current speed (full speed is at 1. instant jump)
-const SCROLL_SENSITIVITY = 0.3;
+const SCROLL_SENSITIVITY = 1.8;
 
 type SectionElement = HTMLElement & { dataset: { preset?: string } };
 
@@ -79,10 +79,12 @@ export function useSectionRegistry(
     const scrollByDelta = useCallback(
         (deltaY: number) => {
             const container = containerRef.current;
-            if (!container || deltaY === 0) {
-                return;
-            }
-            container.scrollBy({ top: deltaY, behavior: 'auto' });
+            if (!container || deltaY === 0) return;
+
+            container.scrollBy({
+                top: deltaY * SCROLL_SENSITIVITY,
+                behavior: 'auto',
+            });
         },
         [containerRef],
     );
@@ -92,7 +94,7 @@ export function useSectionRegistry(
             refreshSections();
             const container = containerRef.current;
             const options: IntersectionObserverInit = {
-                threshold: 0.5,
+                threshold: 0.2,
                 root: container ?? null,
                 rootMargin: '-10% 0px -10% 0px',
             };

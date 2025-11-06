@@ -3,7 +3,7 @@ import type { Dot } from '../presets/types';
 import { TWO_PI } from '../presets/types';
 
 export function useCanvasRenderer() {
-    const fadeInDurationRef = useRef(1500); // 1.5 seconds fade-in
+    const fadeInDurationRef = useRef(200);
     const fadeInStartTimeRef = useRef<number | null>(null);
 
     const draw = useCallback(
