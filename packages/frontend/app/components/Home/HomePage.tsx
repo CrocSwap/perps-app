@@ -1,4 +1,4 @@
-import { useRef, useState, type WheelEventHandler } from 'react';
+import { useRef, useState, useCallback, type WheelEventHandler } from 'react';
 import { Background } from './Background/Background';
 import { Particles } from './Particles/Particles';
 import { SectionObserver } from './hooks/section-observer';
@@ -23,31 +23,55 @@ export default function HomePage() {
     const snapContainerRef = useRef<HTMLDivElement>(null);
     const { scrollToPreset, scrollByDelta } =
         useSectionScroll(snapContainerRef);
+    // Cooldown to prevent multiple scrolls from a single trackpad gesture
+    const scrollCooldownRef = useRef(false);
 
     const presets = PRESET_IDS;
 
-    const handleSwipe = (direction: 'next' | 'prev') => {
-        const currentIndex = presets.indexOf(currentPreset);
-        if (currentIndex === -1) {
-            return;
-        }
-        const targetIndex =
-            direction === 'next'
-                ? Math.min(currentIndex + 1, presets.length - 1)
-                : Math.max(currentIndex - 1, 0);
-        if (targetIndex === currentIndex) {
-            return;
-        }
-        scrollToPreset(presets[targetIndex], 'smooth');
-    };
+    const handleSwipe = useCallback(
+        (direction: 'next' | 'prev') => {
+            const currentIndex = presets.indexOf(currentPreset);
+            if (currentIndex === -1) {
+                return;
+            }
+            const targetIndex =
+                direction === 'next'
+                    ? Math.min(currentIndex + 1, presets.length - 1)
+                    : Math.max(currentIndex - 1, 0);
+            if (targetIndex === currentIndex) {
+                return;
+            }
+            scrollToPreset(presets[targetIndex], 'smooth');
+        },
+        [currentPreset, presets, scrollToPreset],
+    );
 
     // Divert overlay wheel gestures to the snap container so copy and visuals stay in sync.
-    const handleOverlayWheel: WheelEventHandler<HTMLDivElement> = (event) => {
-        if (event.deltaY === 0) {
-            return;
-        }
-        scrollByDelta(event.deltaY);
-    };
+    const handleOverlayWheel: WheelEventHandler<HTMLDivElement> = useCallback(
+        (event) => {
+            if (event.deltaY === 0 || scrollCooldownRef.current) {
+                return;
+            }
+
+            // Only respond to significant scroll events (trackpad gestures fire many small events)
+            if (Math.abs(event.deltaY) < 10) {
+                return;
+            }
+
+            // Set cooldown to prevent multiple slides from single gesture
+            scrollCooldownRef.current = true;
+
+            // Determine direction and navigate to next/prev slide
+            const direction = event.deltaY > 0 ? 'next' : 'prev';
+            handleSwipe(direction);
+
+            // Release cooldown after animation completes
+            setTimeout(() => {
+                scrollCooldownRef.current = false;
+            }, 800); // Matches smooth scroll duration
+        },
+        [handleSwipe],
+    );
 
     return (
         <div className={styles.container}>
