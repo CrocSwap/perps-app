@@ -53,7 +53,9 @@ export default function HomePage() {
         <div className={styles.container}>
             {/* <div className={styles.debugCenterGuides} aria-hidden='true' /> */}
             <Background />
-            <Particles preset={currentPreset} />
+            <div className={styles.particlesWrap}>
+                <Particles preset={currentPreset} />
+            </div>
             <SectionObserver
                 containerRef={snapContainerRef}
                 onPresetChange={setCurrentPreset}

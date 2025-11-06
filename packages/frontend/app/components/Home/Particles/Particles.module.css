@@ -1,3 +1,7 @@
+:root {
+    --particles-shift-x: 56px;
+}
+
 .canvas {
     position: fixed;
     top: 0;
@@ -6,11 +10,11 @@
     height: 100%;
     pointer-events: none;
     z-index: 0;
+    /* background-color: red; */
 }
 
 /* Removed red border */
 .canvasRightSide {
-    left: 0%;
     width: 100%;
 }
 
@@ -27,3 +31,10 @@
     pointer-events: none;
     z-index: 5;
 }
+
+/* @media (max-width: 1080px) and (min-width: 769px) {
+  .canvasRightSide {
+    left: calc(-1 * var(--particles-shift-x));
+    width: calc(100% + (2 * var(--particles-shift-x)));
+  }
+} */

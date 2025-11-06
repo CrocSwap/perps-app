@@ -24,6 +24,17 @@
     border-color: var(--accent1);
     scale: 1.4;
 }
+@media (max-width: 1080px) {
+    .sectionIndicator {
+        position: fixed;
+        top: 80% !important;
+        right: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        z-index: 10;
+    }
+}
 
 @media (max-width: 768px) {
     .sectionIndicator {

@@ -10,6 +10,7 @@ import { useParticleVisibility } from './hooks/use-particle-visibility';
 import { useParticleResponsiveConfig } from './hooks/use-particle-responsive-config';
 import { useParticleLifecycle } from './hooks/use-particle-lifecycle';
 import { usePresetTransitionController } from './hooks/use-preset-transition';
+import useMediaQuery from '~/hooks/useMediaQuery';
 
 // ============================================================================
 // TYPES
@@ -23,7 +24,7 @@ interface DotFieldProps {
 // COMPONENT
 
 export function Particles({ preset }: DotFieldProps) {
-    const isMobileDevice = useIsMobile();
+    const isMobileDevice = useMediaQuery('(max-width: 768px)');
     // Resolve how the preset should be displayed based on device breakpoint.
     const { mode: resolvedMode, effectiveMode } = resolveMode({
         preset,

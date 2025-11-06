@@ -32,7 +32,10 @@ export function FeatureSlide({ slide, headingId }: FeatureSlideProps) {
                         </p>
                     ) : null}
                 </div>
-                <RotatingList items={slide.listItems} />
+                <RotatingList
+                    items={slide.listItems}
+                    className={styles.metricList}
+                />
             </div>
         </div>
     );

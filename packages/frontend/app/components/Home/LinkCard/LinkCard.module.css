@@ -89,11 +89,17 @@
 }
 
 /* Action buttons removed as per request */
+@media (max-width: 1080px) {
+    .card {
+        width: 100%;
+    }
+}
 
 @media (max-width: 768px) {
     .card {
-        width: 85%;
-        max-width: 85%;
+        /* width: 85%;
+        max-width: 85%; */
+        width: 100%;
         height: 72px; /* Fixed height for all cards */
     }
 

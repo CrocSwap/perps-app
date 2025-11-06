@@ -124,9 +124,11 @@ export function createResponsiveConfig(
 // SHARED CONSTANTS
 // ============================================================================
 
-export const LERP_SPEED_SLOW = 0.01;
+// Controls how quickly opacity and size ease to their targets (higher = faster fade/size changes)
+export const LERP_SPEED_SLOW = 0.03;
 export const LERP_SPEED_MEDIUM = 0.02;
-export const LERP_SPEED_TRANSITION = 0.02;
+// Controls how quickly dot positions move toward their targets (higher = faster movement)
+export const LERP_SPEED_TRANSITION = 0.08;
 
 // Color Constants - Used across all presets for consistent theming
 export const COLORS = {
