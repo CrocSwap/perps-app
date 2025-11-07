@@ -1,13 +1,13 @@
-import { useRef, useState, useCallback, type WheelEventHandler } from 'react';
+import { useCallback, useRef, useState, type WheelEventHandler } from 'react';
 import { Background } from './Background/Background';
-import { Particles } from './Particles/Particles';
-import { SectionObserver } from './hooks/section-observer';
 import { Copy } from './Copy/Copy';
+import styles from './HomePage.module.css';
+import { Particles } from './Particles/Particles';
 import { SectionIndicators } from './SectionIndicators/SectionIndicators';
 import { Ticker } from './Ticker/Ticker';
-import styles from './HomePage.module.css';
-import { PRESET_IDS, type PresetId } from './types';
+import { SectionObserver } from './hooks/section-observer';
 import { useSectionScroll } from './hooks/use-section-scroll';
+import { PRESET_IDS, type PresetId } from './types';
 
 /*************  ✨ Windsurf Command ⭐  *************/
 /**
