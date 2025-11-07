@@ -17,6 +17,7 @@
     backface-visibility: hidden;
     perspective: 1000px;
     -webkit-backface-visibility: hidden;
+    contain: layout style paint;
 }
 
 .tickerTrack {

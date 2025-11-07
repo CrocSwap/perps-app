@@ -53,8 +53,6 @@ export default function HomePage() {
                 return;
             }
 
-            console.log(event.deltaY);
-
             // Only respond to significant scroll events (trackpad gestures fire many small events)
             if (Math.abs(event.deltaY) < 4) {
                 return;
@@ -100,7 +98,7 @@ export default function HomePage() {
                 currentPreset={currentPreset}
                 onSelectPreset={scrollToPreset}
             />
-            {presets.indexOf(currentPreset) !== 5 && <Ticker />}
+            {currentPreset !== 'links' && <Ticker />}
             <div className={styles.snapContainer} ref={snapContainerRef}>
                 <section
                     className={styles.heroSection}
