@@ -49,7 +49,7 @@ export default function HomePage() {
     // Divert overlay wheel gestures to the snap container so copy and visuals stay in sync.
     const handleOverlayWheel: WheelEventHandler<HTMLDivElement> = useCallback(
         (event) => {
-            if (event.deltaY === 0 || scrollCooldownRef.current) {
+            if (event.deltaY === 0) {
                 return;
             }
 
@@ -60,7 +60,10 @@ export default function HomePage() {
                 return;
             }
 
-            // Set cooldown to prevent multiple slides from single gesture
+            // Immediately set cooldown to block subsequent significant events
+            if (scrollCooldownRef.current) {
+                return;
+            }
             scrollCooldownRef.current = true;
 
             // Determine direction and navigate to next/prev slide
@@ -70,7 +73,7 @@ export default function HomePage() {
             // Release cooldown after animation completes
             setTimeout(() => {
                 scrollCooldownRef.current = false;
-            }, 800); // Matches smooth scroll duration
+            }, 1200); // Matches smooth scroll duration
         },
         [handleSwipe],
     );
