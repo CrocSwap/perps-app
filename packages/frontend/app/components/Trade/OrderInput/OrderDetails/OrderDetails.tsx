@@ -167,7 +167,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                         if (!isVisible) return null;
 
                         return (
-                            <div className={styles.detail_item}>
+                            <div key={idx} className={styles.detail_item}>
                                 <div className={styles.detail_label}>
                                     <span>{data.label}</span>
                                     <Tooltip
