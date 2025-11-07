@@ -53,8 +53,10 @@ export default function HomePage() {
                 return;
             }
 
+            console.log(event.deltaY);
+
             // Only respond to significant scroll events (trackpad gestures fire many small events)
-            if (Math.abs(event.deltaY) < 10) {
+            if (Math.abs(event.deltaY) < 4) {
                 return;
             }
 
