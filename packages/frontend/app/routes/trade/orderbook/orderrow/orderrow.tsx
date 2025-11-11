@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { type colorSetIF } from '~/stores/AppSettingsStore';
 import { useTradeModuleStore } from '~/stores/TradeModuleStore';
 import type {
@@ -49,7 +49,7 @@ const OrderRow: React.FC<OrderRowProps> = ({
         return formatNum(order.px, resolution);
     }, [order.px, resolution]);
 
-    const handleClick = () => {
+    const handleRowClick = () => {
         setTradeSlot({
             coin: order.coin,
             amount: order.sz,
@@ -57,33 +57,39 @@ const OrderRow: React.FC<OrderRowProps> = ({
             type: order.type,
         });
 
-        // Use setTimeout to ensure the DOM has updated with the new trade slot
-        setTimeout(() => {
-            // Find the size input element
+        // Use requestAnimationFrame for better performance than setTimeout
+        requestAnimationFrame(() => {
             const sizeInput = document.getElementById(
                 'trade-module-size-input',
             ) as HTMLInputElement;
-            // Find the submit button
             const submitButton = document.querySelector(
                 '[data-testid="submit-order-button"]',
             ) as HTMLButtonElement;
 
             if (sizeInput && submitButton) {
                 if (!sizeInput.value) {
-                    // If size input is empty, focus it
                     sizeInput.focus();
                 } else {
-                    // Otherwise, focus the submit button
                     submitButton.focus();
                 }
             }
-        }, 0);
+        });
     };
+    const handlePriceClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        clickListener(order, OrderRowClickTypes.PRICE, rowIndex);
+    };
+
+    const handleAmountClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        clickListener(order, OrderRowClickTypes.AMOUNT, rowIndex);
+    };
+
     return (
         <div
             id={`order-row-${order.px}`}
             className={`${styles.orderRow} ${userSlots.has(formattedPrice) ? styles.userOrder : ''}`}
-            onClick={handleClick}
+            onClick={handleRowClick}
         >
             {userSlots.has(formattedPrice) && (
                 <div className={styles.userOrderIndicator}></div>
@@ -96,31 +102,18 @@ const OrderRow: React.FC<OrderRowProps> = ({
                             ? getBsColor().buy
                             : getBsColor().sell,
                 }}
-                onClick={() =>
-                    clickListener(order, OrderRowClickTypes.PRICE, rowIndex)
-                }
+                onClick={handlePriceClick}
             >
                 {formattedPrice}
             </div>
-            <div
-                className={styles.orderRowSize}
-                onClick={() =>
-                    clickListener(order, OrderRowClickTypes.AMOUNT, rowIndex)
-                }
-            >
+            <div className={styles.orderRowSize} onClick={handleAmountClick}>
                 {formatNum(order.sz * coef)}
             </div>
-            <div
-                className={styles.orderRowTotal}
-                onClick={() =>
-                    clickListener(order, OrderRowClickTypes.AMOUNT, rowIndex)
-                }
-            >
+            <div className={styles.orderRowTotal} onClick={handleAmountClick}>
                 {formatNum(order.total * coef)}
             </div>
-            {/* <div className={styles.fadeOverlay}></div> */}
         </div>
     );
 };
 
-export default OrderRow;
+export default React.memo(OrderRow);

@@ -225,7 +225,8 @@ export default function LeverageSlider({
 
     const shouldShowInteractiveWarning = useMemo(() => {
         // Don't show warnings if minimumValue is undefined or equals 1
-        if (!shouldShowMinimumConstraints) return false;
+        if (!shouldShowMinimumConstraints || !unconstrainedSliderValue)
+            return false;
 
         const minWithBuffer = minimumValue * 10 ** -0.08;
         const isDraggingBelowMinimum =
