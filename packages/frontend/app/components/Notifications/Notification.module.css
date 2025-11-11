@@ -12,6 +12,11 @@
     user-select: none;
 }
 
+/* taller notification for long messages with txLink */
+.notification.tallNotification {
+    height: 130px;
+}
+
 /* top content in the notification card */
 .notification > header {
     display: flex;
@@ -31,6 +36,11 @@
 /* headline in the <header> elem */
 .header_content > h2 {
     font-size: var(--font-size-m);
+}
+
+/* smaller font size for long titles that might wrap */
+.header_content > h2.smallTitle {
+    font-size: var(--font-size-s);
 }
 
 /* descriptive text at bottom of the notification card */
