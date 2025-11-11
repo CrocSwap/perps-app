@@ -13,6 +13,9 @@
     justify-content: space-between;
     gap: var(--gap-l);
     position: relative;
+    padding: var(--padding-s) var(--padding-l);
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .container > * {
@@ -30,7 +33,7 @@
 
 .container nav a,
 .moreButton {
-    color: var(--text2, #6a6a6d);
+    color: var(--text1);
     font-size: var(--font-size-m, 18px);
     white-space: nowrap;
 }
@@ -41,7 +44,10 @@
     flex: 1 1 auto;
     min-width: 0;
 }
-
+.logo img {
+    height: 40px;
+    width: auto;
+}
 .sessionWrap {
     flex: 0 0 auto;
     min-width: 0;
@@ -98,12 +104,12 @@
 
 .container nav a:hover,
 .moreButton:hover {
-    color: var(--text1);
+    color: var(--accent1);
     transition: all var(--ease-in-out-med);
 }
 
 .activeNavLink {
-    color: var(--text1) !important;
+    color: var(--accent1) !important;
 }
 
 .rightSide {
