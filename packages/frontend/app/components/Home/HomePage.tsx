@@ -1,13 +1,13 @@
-import { useRef, useState, useCallback, type WheelEventHandler } from 'react';
+import { useCallback, useRef, useState, type WheelEventHandler } from 'react';
 import { Background } from './Background/Background';
-import { Particles } from './Particles/Particles';
-import { SectionObserver } from './hooks/section-observer';
 import { Copy } from './Copy/Copy';
+import styles from './HomePage.module.css';
+import { Particles } from './Particles/Particles';
 import { SectionIndicators } from './SectionIndicators/SectionIndicators';
 import { Ticker } from './Ticker/Ticker';
-import styles from './HomePage.module.css';
-import { PRESET_IDS, type PresetId } from './types';
+import { SectionObserver } from './hooks/section-observer';
 import { useSectionScroll } from './hooks/use-section-scroll';
+import { PRESET_IDS, type PresetId } from './types';
 
 /*************  ✨ Windsurf Command ⭐  *************/
 /**
@@ -25,6 +25,9 @@ export default function HomePage() {
         useSectionScroll(snapContainerRef);
     // Cooldown to prevent multiple scrolls from a single trackpad gesture
     const scrollCooldownRef = useRef(false);
+    const lastScrollTimeRef = useRef(0);
+    const accumulatedDeltaRef = useRef(0);
+    const lastEventTimeRef = useRef(0);
 
     const presets = PRESET_IDS;
 
@@ -53,22 +56,56 @@ export default function HomePage() {
                 return;
             }
 
-            // Only respond to significant scroll events (trackpad gestures fire many small events)
-            if (Math.abs(event.deltaY) < 10) {
-                return;
+            const now = Date.now();
+            const timeSinceLastEvent = now - lastEventTimeRef.current;
+            lastEventTimeRef.current = now;
+
+            // Detect trackpad vs mouse wheel
+            // Trackpad: frequent events (< 100ms apart) with smaller deltas
+            // Mouse wheel: discrete events with larger deltas
+            const isTrackpad =
+                Math.abs(event.deltaY) < 50 && timeSinceLastEvent < 100;
+
+            if (isTrackpad) {
+                // Trackpad logic: accumulate delta over time
+                accumulatedDeltaRef.current += event.deltaY;
+
+                // Reset accumulator if gesture paused (> 100ms gap)
+                if (timeSinceLastEvent > 100) {
+                    accumulatedDeltaRef.current = event.deltaY;
+                }
+
+                // Only trigger when accumulated delta crosses threshold
+                if (Math.abs(accumulatedDeltaRef.current) < 50) {
+                    return;
+                }
+
+                // Trigger swipe and reset
+                const direction =
+                    accumulatedDeltaRef.current > 0 ? 'next' : 'prev';
+                accumulatedDeltaRef.current = 0;
+                scrollCooldownRef.current = true;
+                lastScrollTimeRef.current = now;
+                handleSwipe(direction);
+
+                setTimeout(() => {
+                    scrollCooldownRef.current = false;
+                }, 1200);
+            } else {
+                // Mouse wheel logic: respond immediately to significant events
+                if (Math.abs(event.deltaY) < 4) {
+                    return;
+                }
+
+                const direction = event.deltaY > 0 ? 'next' : 'prev';
+                scrollCooldownRef.current = true;
+                lastScrollTimeRef.current = now;
+                handleSwipe(direction);
+
+                setTimeout(() => {
+                    scrollCooldownRef.current = false;
+                }, 1200);
             }
-
-            // Set cooldown to prevent multiple slides from single gesture
-            scrollCooldownRef.current = true;
-
-            // Determine direction and navigate to next/prev slide
-            const direction = event.deltaY > 0 ? 'next' : 'prev';
-            handleSwipe(direction);
-
-            // Release cooldown after animation completes
-            setTimeout(() => {
-                scrollCooldownRef.current = false;
-            }, 800); // Matches smooth scroll duration
         },
         [handleSwipe],
     );
@@ -95,7 +132,7 @@ export default function HomePage() {
                 currentPreset={currentPreset}
                 onSelectPreset={scrollToPreset}
             />
-            {presets.indexOf(currentPreset) !== 5 && <Ticker />}
+            {currentPreset !== 'links' && <Ticker />}
             <div className={styles.snapContainer} ref={snapContainerRef}>
                 <section
                     className={styles.heroSection}

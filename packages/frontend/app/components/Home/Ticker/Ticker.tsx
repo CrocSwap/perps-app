@@ -108,6 +108,12 @@ export const Ticker = memo(function Ticker() {
     const scrollPositionRef = useRef<number>(0);
     const isHoveringRef = useRef<boolean>(false);
     const animationFrameRef = useRef<number | null>(null);
+    const isMacOSRef = useRef<boolean>(
+        (navigator as any).userAgentData?.platform
+            ?.toLowerCase()
+            .includes('mac') ||
+            navigator.userAgent.toLowerCase().includes('mac os x'),
+    );
 
     // Get coins from store with proper typing
     const coins = useTradeDataStore((state) => {
@@ -116,20 +122,12 @@ export const Ticker = memo(function Ticker() {
         return state.coins as CoinData[];
     });
 
-    // Create a stable key for coins memoization
-    const coinsKey = coins
-        .slice(0, 15)
-        .map(
-            (coin) =>
-                `${coin.symbol}-${coin.markPx}-${coin.last24hPriceChangePercent}`,
-        )
-        .join('|');
-
-    // Create a safe array of coins limited to 15 items
+    // Create a safe array of coins limited to 15 items with stable reference
+    // Depend on coins directly - the store should handle memoization
     const memoizedCoins = useMemo(() => {
         if (!coins || coins.length === 0) return [];
         return coins.slice(0, 15);
-    }, [coinsKey]);
+    }, [coins]);
 
     // Memoize the formatNum function and color values
     const { formatNum } = useNumFormatter();
@@ -142,6 +140,9 @@ export const Ticker = memo(function Ticker() {
 
     // Track price changes and trigger animations - batch state updates
     useEffect(() => {
+        // Skip if no coins to avoid unnecessary work
+        if (!memoizedCoins.length) return;
+
         const updates: Record<string, 'up' | 'down' | null> = {};
         let hasUpdates = false;
 
@@ -202,13 +203,13 @@ export const Ticker = memo(function Ticker() {
                 prevPriceChangePercentNumberRef.current[coin.symbol] =
                     coin.last24hPriceChangePercent;
 
-                // Clear the animation state after 2 seconds (reduced from 5)
+                // Clear the animation state after 3 seconds to match CSS animation
                 priceChangeTimeoutsRef.current[coin.symbol] = setTimeout(() => {
                     setPriceChangeStates((prev) => ({
                         ...prev,
                         [coin.symbol]: null,
                     }));
-                }, 2000);
+                }, 3000);
             }
         });
 
@@ -263,13 +264,8 @@ export const Ticker = memo(function Ticker() {
         const firstSet = firstSetRef.current;
         const setWidth = firstSet.offsetWidth;
 
-        // Detect macOS - use modern userAgentData if available, fallback to platform
-        const isMacOS =
-            (navigator as any).userAgentData?.platform
-                ?.toLowerCase()
-                .includes('mac') ||
-            navigator.userAgent.toLowerCase().includes('mac os x');
-        const deltaY = isMacOS ? -e.deltaY : e.deltaY;
+        // Use cached macOS detection
+        const deltaY = isMacOSRef.current ? -e.deltaY : e.deltaY;
 
         // Update scroll position
         scrollPositionRef.current += deltaY * 0.5;
