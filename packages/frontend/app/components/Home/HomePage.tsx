@@ -8,6 +8,7 @@ import { Ticker } from './Ticker/Ticker';
 import { SectionObserver } from './hooks/section-observer';
 import { useSectionScroll } from './hooks/use-section-scroll';
 import { PRESET_IDS, type PresetId } from './types';
+import PreventPullToRefresh from './hooks/PreventPullToRefresh';
 
 /*************  ✨ Windsurf Command ⭐  *************/
 /**
@@ -111,60 +112,62 @@ export default function HomePage() {
     );
 
     return (
-        <div className={styles.container}>
-            {/* <div className={styles.debugCenterGuides} aria-hidden='true' /> */}
-            <Background />
-            <div className={styles.particlesWrap}>
-                <Particles preset={currentPreset} />
+        <PreventPullToRefresh enabled={currentPreset !== 'hero'}>
+            <div className={styles.container}>
+                {/* <div className={styles.debugCenterGuides} aria-hidden='true' /> */}
+                <Background />
+                <div className={styles.particlesWrap}>
+                    <Particles preset={currentPreset} />
+                </div>
+                <SectionObserver
+                    containerRef={snapContainerRef}
+                    onPresetChange={setCurrentPreset}
+                />
+                <Copy
+                    active={currentPreset}
+                    onWheel={handleOverlayWheel}
+                    onScrollToPreset={scrollToPreset}
+                    onSwipe={handleSwipe}
+                />
+                <SectionIndicators
+                    presets={presets}
+                    currentPreset={currentPreset}
+                    onSelectPreset={scrollToPreset}
+                />
+                {currentPreset !== 'links' && <Ticker />}
+                <div className={styles.snapContainer} ref={snapContainerRef}>
+                    <section
+                        className={styles.heroSection}
+                        data-preset='hero'
+                        aria-hidden='true'
+                    />
+                    <section
+                        className={styles.presetSection}
+                        data-preset='speed'
+                        aria-hidden='true'
+                    />
+                    <section
+                        className={styles.presetSection}
+                        data-preset='fees'
+                        aria-hidden='true'
+                    />
+                    <section
+                        className={styles.presetSection}
+                        data-preset='mev'
+                        aria-hidden='true'
+                    />
+                    <section
+                        className={styles.presetSection}
+                        data-preset='vault'
+                        aria-hidden='true'
+                    />
+                    <section
+                        className={styles.presetSection}
+                        data-preset='links'
+                        aria-hidden='true'
+                    />
+                </div>
             </div>
-            <SectionObserver
-                containerRef={snapContainerRef}
-                onPresetChange={setCurrentPreset}
-            />
-            <Copy
-                active={currentPreset}
-                onWheel={handleOverlayWheel}
-                onScrollToPreset={scrollToPreset}
-                onSwipe={handleSwipe}
-            />
-            <SectionIndicators
-                presets={presets}
-                currentPreset={currentPreset}
-                onSelectPreset={scrollToPreset}
-            />
-            {currentPreset !== 'links' && <Ticker />}
-            <div className={styles.snapContainer} ref={snapContainerRef}>
-                <section
-                    className={styles.heroSection}
-                    data-preset='hero'
-                    aria-hidden='true'
-                />
-                <section
-                    className={styles.presetSection}
-                    data-preset='speed'
-                    aria-hidden='true'
-                />
-                <section
-                    className={styles.presetSection}
-                    data-preset='fees'
-                    aria-hidden='true'
-                />
-                <section
-                    className={styles.presetSection}
-                    data-preset='mev'
-                    aria-hidden='true'
-                />
-                <section
-                    className={styles.presetSection}
-                    data-preset='vault'
-                    aria-hidden='true'
-                />
-                <section
-                    className={styles.presetSection}
-                    data-preset='links'
-                    aria-hidden='true'
-                />
-            </div>
-        </div>
+        </PreventPullToRefresh>
     );
 }

@@ -281,6 +281,9 @@
 @media (max-width: 768px) {
     .linksGrid {
         padding: 0 10%;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        grid-auto-rows: auto;
     }
     .heroContent,
     .overlayContent {
@@ -291,7 +294,7 @@
         box-sizing: border-box;
         margin: 0;
         overflow-x: hidden;
-        height: calc(100vh - 56px);
+        height: calc(100svh - 56px);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -302,6 +305,12 @@
         margin-left: -50vw;
         margin-right: -50vw;
         /* border: 1px solid red; */
+    }
+
+    .linksOnly {
+        padding: 24px var(--padding-m);
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .heroText,
@@ -361,15 +370,42 @@
         padding: 16px 8px;
         font-size: var(--font-size-l);
     }
-
-    .linksGrid {
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-        grid-template-rows: repeat(8, auto);
-    }
 }
 
 @media (max-width: 480px) {
     .linksGrid {
-        padding: 0 7%;
+        padding: 0 5%;
+        gap: 10px;
+    }
+    .overlayActions {
+        margin: 40px 0;
+    }
+    .linksOnly {
+        padding: 16px var(--padding-s);
+    }
+}
+
+/* Smaller mobile devices (iPhone 16, etc.) */
+@media (max-width: 430px) {
+    .heroTitle {
+        font-size: 48px;
+    }
+
+    .heroSubtitle {
+        font-size: 16px;
+    }
+
+    .sectionTitle {
+        font-size: var(--font-size-l);
+    }
+
+    .sectionDescription {
+        font-size: var(--font-size-m);
+    }
+
+    .ctaPrimary,
+    .ctaSecondary {
+        padding: 14px 8px;
+        font-size: var(--font-size-m);
     }
 }

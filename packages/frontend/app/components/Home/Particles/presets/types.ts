@@ -106,8 +106,28 @@ export function createResponsiveConfig(
     const isMobile = isMobileDevice;
     const isTablet = !isMobile && minDimension >= 768 && minDimension < 1024;
 
-    // Mobile: 280px, Tablet: 400px, Desktop: 500px
-    const containerSize = isMobile ? 380 : isTablet ? 400 : 500;
+    let containerSize: number;
+
+    if (isMobile) {
+        // For very small screens (400px and below)
+        if (width <= 375) {
+            containerSize = 250;
+        } else if (width <= 400) {
+            containerSize = 280;
+        }
+        // For mid-size mobile screens (401–480px, e.g. Pixel 7 at 412px)
+        else if (width <= 480) {
+            containerSize = 320;
+        }
+        // For larger phones
+        else {
+            containerSize = 380;
+        }
+    } else if (isTablet) {
+        containerSize = 400;
+    } else {
+        containerSize = 500;
+    }
 
     return {
         isMobile,
