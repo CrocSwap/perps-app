@@ -10,7 +10,7 @@ import { useParticleVisibility } from './hooks/use-particle-visibility';
 import { useParticleResponsiveConfig } from './hooks/use-particle-responsive-config';
 import { useParticleLifecycle } from './hooks/use-particle-lifecycle';
 import { usePresetTransitionController } from './hooks/use-preset-transition';
-import useMediaQuery from '~/hooks/useMediaQuery';
+import useMediaQuery, { useMobileLandscape } from '~/hooks/useMediaQuery';
 
 // ============================================================================
 // TYPES
@@ -25,6 +25,8 @@ interface DotFieldProps {
 
 export function Particles({ preset }: DotFieldProps) {
     const isMobileDevice = useMediaQuery('(max-width: 768px)');
+    const isMobileLandscape = useMobileLandscape();
+
     // Resolve how the preset should be displayed based on device breakpoint.
     const { mode: resolvedMode, effectiveMode } = resolveMode({
         preset,
@@ -59,6 +61,7 @@ export function Particles({ preset }: DotFieldProps) {
     const { handleResize } = useParticleResponsiveConfig({
         canvasRef,
         isMobile: isMobileDevice,
+        isLandscape: isMobileLandscape,
         modeRef,
         presetRef,
         responsiveConfigRef,
@@ -115,12 +118,20 @@ export function Particles({ preset }: DotFieldProps) {
                 ? 'bottom'
                 : displayMode;
 
+        let className = styles.canvas;
+
         if (effectiveModeForLayout === 'right-side') {
-            return `${styles.canvas} ${styles.canvasRightSide}`;
+            className = `${className} ${styles.canvasRightSide}`;
         } else if (effectiveModeForLayout === 'bottom') {
-            return `${styles.canvas} ${styles.canvasBottom}`;
+            className = `${className} ${styles.canvasBottom}`;
         }
-        return styles.canvas;
+
+        // Add special class for links preset on mobile to avoid footer overlap
+        if (preset === 'links' && responsiveConfigRef.current.isMobile) {
+            className = `${className} ${styles.canvasLinks}`;
+        }
+
+        return className;
     };
 
     return (

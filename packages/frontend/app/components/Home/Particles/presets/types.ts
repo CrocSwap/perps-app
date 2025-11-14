@@ -99,6 +99,7 @@ export function createResponsiveConfig(
     width: number,
     height: number,
     isMobileDevice: boolean,
+    isLandscapeMode: boolean = false,
 ): ResponsiveConfig {
     const minDimension = Math.min(width, height);
 
@@ -109,8 +110,12 @@ export function createResponsiveConfig(
     let containerSize: number;
 
     if (isMobile) {
+        if (isLandscapeMode) {
+            // Mobile landscape mode - smaller particles
+            containerSize = 240;
+        }
         // For very small screens (400px and below)
-        if (width <= 375) {
+        else if (width <= 375) {
             containerSize = 250;
         } else if (width <= 400) {
             containerSize = 280;

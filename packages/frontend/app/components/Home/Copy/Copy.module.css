@@ -409,3 +409,124 @@
         font-size: var(--font-size-m);
     }
 }
+/* Mobile landscape orientation ONLY
+   (phones like iPhone landscape; tablets stay on desktop/tablet layout) */
+@media (max-width: 926px) and (max-height: 428px) and (orientation: landscape) {
+    /* Main hero / feature container: side-by-side layout */
+    .heroContent,
+    .overlayContent {
+        padding: 24px var(--padding-m) 16px;
+        gap: var(--gap-m);
+        flex-direction: row; /* ← side-by-side like desktop */
+        align-items: center;
+        justify-content: space-between;
+
+        /* Undo the 100vw + -50vw trick from the <=768 block */
+        width: 100%;
+        max-width: 100%;
+        height: calc(100svh - 56px);
+        margin: 0 auto;
+        position: static;
+        left: auto;
+        right: auto;
+        margin-left: 0;
+        margin-right: 0;
+        overflow-x: hidden;
+    }
+
+    /* Text block on the left */
+    .heroText,
+    .overlayText {
+        max-width: 50%;
+        width: 50%;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        text-align: left;
+        gap: var(--gap-s);
+    }
+
+    .overlayText {
+        min-height: auto;
+        max-width: 50%;
+    }
+    .metricList {
+        max-width: 50%;
+        width: 50%;
+        margin: 0;
+    }
+
+    /* Metrics / feature slides: text left, metrics/particles right */
+    /* Feature slides: stack all text on the LEFT */
+    .featureContentGroup {
+        display: flex;
+        flex-direction: column; /* title + subtitle + changing text under each other */
+        align-items: flex-start; /* left aligned, not centered */
+        justify-content: center;
+        width: min(560px, 100%); /* keep it as a left column */
+        max-width: 100%;
+        gap: var(--gap-s);
+    }
+
+    /* Text column on the left */
+    .featureContentGroup .overlayText {
+        max-width: 55%;
+        width: 55%;
+    }
+
+    /* Rotating list / metrics on the right */
+    .featureContentGroup .metricList {
+        width: 100%;
+        max-width: 100%;
+        margin: 8px 0 0;
+    }
+
+    /* Hero typography a bit smaller for landscape */
+    .heroTitle {
+        font-size: 42px;
+        line-height: 1.1;
+    }
+
+    .heroSubtitle {
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    .sectionTitle {
+        font-size: var(--font-size-l);
+    }
+
+    .sectionDescription {
+        font-size: var(--font-size-m);
+        line-height: 1.4;
+    }
+
+    /* CTAs stay grouped with the text, but tighter spacing */
+    .overlayActions {
+        margin: 0;
+        margin-top: var(--gap-s);
+        gap: var(--gap-s);
+        flex-direction: row;
+        width: auto;
+        align-self: flex-start;
+    }
+
+    .ctaPrimary,
+    .ctaSecondary {
+        padding: 8px 16px;
+        font-size: var(--font-size-s);
+    }
+
+    /* Links slide: keep everything visible in one row grid */
+    .linksOnly {
+        padding: 16px var(--padding-m);
+        gap: var(--gap-s);
+    }
+
+    .linksGrid {
+        padding: 0;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        max-width: 100%;
+    }
+}
