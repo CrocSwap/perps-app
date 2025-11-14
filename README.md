@@ -1,10 +1,20 @@
 # Perps App Monorepo
 
-## Getting Started on Local Instance
+## Run App Locally with Docker (in case the Ambient Perps Website is down)
+
+1. Install Docker Desktop (https://www.docker.com/get-started/)
+2. Open the Terminal within Docker Desktop (in the bottom right corner)
+3. Run `docker run -p 4003:3002 -e HOST_PORT=4003 crocswap/ambient-perps-frontend`
+4. Wait until terminal displays `Production server running at http://localhost:4003` (this could take a few minutes)
+5. Open http://localhost:4003 in your browser
+
+### Note: the chart on the trade page will not be available when running in Docker
+
+## Getting Started as a Developer on a Local Instance
 
 1. Make sure you have pnpm package manager installed
 2. Run `git submodule update --init --recursive` to update
-3. **NOTE:** You'll need to request access to TradingView advanced charting library
+3. **NOTE:** You'll need to request access from the team if you need access to the TradingView advanced charting library
 4. Run `pnpm dev` to launch a local host
 
 ## Setup
