@@ -100,11 +100,14 @@ export const Ticker = memo(function Ticker() {
     const firstSetRef = useRef<HTMLDivElement | null>(null);
     const [isPaused, setIsPaused] = useState(false);
     const trackRef = useRef<HTMLDivElement>(null);
-    const prevPriceChangePercentNumberRef = useRef<Record<string, number>>({});
+    const prevDisplayedChangeRef = useRef<Record<string, string>>({});
     const [priceChangeStates, setPriceChangeStates] = useState<
         Record<string, 'up' | 'down' | null>
     >({});
     const priceChangeTimeoutsRef = useRef<Record<string, NodeJS.Timeout>>({});
+    const animationResetTimeoutsRef = useRef<Record<string, NodeJS.Timeout>>(
+        {},
+    );
     const scrollPositionRef = useRef<number>(0);
     const isHoveringRef = useRef<boolean>(false);
     const animationFrameRef = useRef<number | null>(null);
@@ -130,102 +133,123 @@ export const Ticker = memo(function Ticker() {
     }, [coins]);
 
     // Memoize the formatNum function and color values
-    const { formatNum } = useNumFormatter();
-    const bsColor = useAppSettings((state) => state.bsColor);
+    const { formatNum, parseFormattedNum } = useNumFormatter();
+    const { bsColor, numFormat } = useAppSettings();
     const colors = useMemo(() => {
         const { getBsColor } = useAppSettings.getState();
         return getBsColor();
     }, [bsColor]);
     const { buy: buyColor, sell: sellColor } = colors;
 
-    // Track price changes and trigger animations - batch state updates
+    // Track price changes and trigger animations
     useEffect(() => {
         // Skip if no coins to avoid unnecessary work
         if (!memoizedCoins.length) return;
 
-        const updates: Record<string, 'up' | 'down' | null> = {};
-        let hasUpdates = false;
-
         memoizedCoins.forEach((coin) => {
             if (!coin || !coin.symbol) return;
-
-            // Initialize previous price if not set
-            if (
-                prevPriceChangePercentNumberRef.current[coin.symbol] ===
-                undefined
-            ) {
-                prevPriceChangePercentNumberRef.current[coin.symbol] =
-                    coin.last24hPriceChangePercent;
-                return;
-            }
-
-            const prevPriceChangePercentNumber =
-                prevPriceChangePercentNumberRef.current[coin.symbol];
 
             // Check if values are in the "zero change" range (-0.1 to 0.1)
             // This matches the display logic in TickerItem
             const currentIsZero =
                 coin.last24hPriceChangePercent > -0.1 &&
                 coin.last24hPriceChangePercent < 0.1;
-            const prevIsZero =
-                prevPriceChangePercentNumber > -0.1 &&
-                prevPriceChangePercentNumber < 0.1;
 
-            // If both are in zero range, don't trigger animation
-            if (currentIsZero && prevIsZero) {
+            // Calculate the displayed string (what the user actually sees)
+            const currentDisplayedChange = currentIsZero
+                ? '0.0'
+                : formatNum(coin.last24hPriceChangePercent, 1);
+
+            // Get the previous displayed value
+            const prevDisplayedChange =
+                prevDisplayedChangeRef.current[coin.symbol];
+
+            // Initialize if this is the first time we're seeing this coin
+            if (prevDisplayedChange === undefined) {
+                prevDisplayedChangeRef.current[coin.symbol] =
+                    currentDisplayedChange;
                 return;
             }
 
-            // Use the same formatting logic as the display: "0.0" for zero range
-            const lastChangeTruncated = currentIsZero
-                ? '0.0'
-                : formatNum(coin.last24hPriceChangePercent, 1);
-            const prevPriceChangePercentTruncated = prevIsZero
-                ? '0.0'
-                : formatNum(prevPriceChangePercentNumber, 1);
-
-            // Only trigger animation if the truncated value changed
-            if (lastChangeTruncated !== prevPriceChangePercentTruncated) {
+            // Only trigger animation if the DISPLAYED value changed
+            if (currentDisplayedChange !== prevDisplayedChange) {
+                // Determine direction based on current vs previous raw values
+                const prevPriceChangePercentNumber =
+                    parseFormattedNum(prevDisplayedChange);
                 const change =
-                    coin.last24hPriceChangePercent -
+                    parseFormattedNum(currentDisplayedChange) -
                     prevPriceChangePercentNumber;
                 const newState = change > 0 ? 'up' : 'down';
 
-                // Clear any existing timeout for this coin
+                // Clear any existing timeouts for this coin
                 if (priceChangeTimeoutsRef.current[coin.symbol]) {
                     clearTimeout(priceChangeTimeoutsRef.current[coin.symbol]);
                 }
+                if (animationResetTimeoutsRef.current[coin.symbol]) {
+                    clearTimeout(
+                        animationResetTimeoutsRef.current[coin.symbol],
+                    );
+                }
 
-                updates[coin.symbol] = newState;
-                hasUpdates = true;
+                // Immediately set to null to force animation restart
+                setPriceChangeStates((prev) => ({
+                    ...prev,
+                    [coin.symbol]: null,
+                }));
 
-                // Update the stored price
-                prevPriceChangePercentNumberRef.current[coin.symbol] =
-                    coin.last24hPriceChangePercent;
+                prevDisplayedChangeRef.current[coin.symbol] =
+                    currentDisplayedChange;
 
-                // Clear the animation state after 3 seconds to match CSS animation
+                // Use setTimeout to apply the new state after null is rendered
+                // This forces a reflow and ensures the animation restarts
                 priceChangeTimeoutsRef.current[coin.symbol] = setTimeout(() => {
                     setPriceChangeStates((prev) => ({
                         ...prev,
-                        [coin.symbol]: null,
+                        [coin.symbol]: newState,
                     }));
-                }, 3000);
+
+                    // Clear the animation state after 3 seconds to match CSS animation
+                    animationResetTimeoutsRef.current[coin.symbol] = setTimeout(
+                        () => {
+                            setPriceChangeStates((prev) => ({
+                                ...prev,
+                                [coin.symbol]: null,
+                            }));
+                        },
+                        3000,
+                    );
+                }, 10);
             }
         });
-
-        // Batch all state updates into a single setState call
-        if (hasUpdates) {
-            setPriceChangeStates((prev) => ({ ...prev, ...updates }));
-        }
 
         // Clean up all timeouts when effect re-runs or unmounts
         return () => {
             Object.values(priceChangeTimeoutsRef.current).forEach((timeout) => {
                 clearTimeout(timeout);
             });
+            Object.values(animationResetTimeoutsRef.current).forEach(
+                (timeout) => {
+                    clearTimeout(timeout);
+                },
+            );
             priceChangeTimeoutsRef.current = {};
+            animationResetTimeoutsRef.current = {};
         };
     }, [memoizedCoins, formatNum]);
+
+    // Reset cached displayed changes when number format changes so comparisons stay consistent
+    useEffect(() => {
+        prevDisplayedChangeRef.current = {};
+        Object.values(priceChangeTimeoutsRef.current).forEach((timeout) => {
+            clearTimeout(timeout);
+        });
+        Object.values(animationResetTimeoutsRef.current).forEach((timeout) => {
+            clearTimeout(timeout);
+        });
+        priceChangeTimeoutsRef.current = {};
+        animationResetTimeoutsRef.current = {};
+        setPriceChangeStates({});
+    }, [numFormat]);
 
     // Create ticker set component
     const renderTickerSet = (
@@ -387,7 +411,6 @@ export const Ticker = memo(function Ticker() {
     if (!memoizedCoins || memoizedCoins.length === 0) {
         return null;
     }
-    console.log('coins in ticker', coins);
 
     return (
         <div
