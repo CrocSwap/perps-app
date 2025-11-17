@@ -208,27 +208,6 @@
 
 @media (max-width: 768px) {
     .tickerContainer {
-        bottom: 8px;
-    }
-
-    .tickerTrack {
-        animation-duration: 45s;
-    }
-
-    .tickerSet {
-        gap: 24px;
-        padding-right: 24px;
-    }
-
-    .tickerItem {
-        gap: 6px;
-        padding: 4px 6px;
-    }
-
-    .symbol,
-    .price,
-    .changePositive,
-    .changeNegative {
-        font-size: 12px;
+        display: none;
     }
 }

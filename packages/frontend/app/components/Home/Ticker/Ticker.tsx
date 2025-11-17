@@ -387,6 +387,7 @@ export const Ticker = memo(function Ticker() {
     if (!memoizedCoins || memoizedCoins.length === 0) {
         return null;
     }
+    console.log('coins in ticker', coins);
 
     return (
         <div

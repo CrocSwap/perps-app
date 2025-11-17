@@ -302,9 +302,9 @@ export default function PageHeader() {
                     </section>
                     <Tooltip content='Ambient v1 Spot DEX' position='bottom'>
                         <a
-                            href='/trade'
-                            // target='_blank'
-                            // rel='noopener noreferrer'
+                            href='https://ambient.finance/trade'
+                            target='_blank'
+                            rel='noopener noreferrer'
                             className={styles.ambientmm}
                         >
                             Ambient AMM

@@ -11,6 +11,7 @@ import type { DotFieldMode, PresetId } from '../../types';
 interface UseParticleResponsiveConfigOptions {
     canvasRef: MutableRefObject<HTMLCanvasElement | null>;
     isMobile: boolean;
+    isLandscape: boolean;
     modeRef: MutableRefObject<DotFieldMode>;
     presetRef: MutableRefObject<PresetId>;
     responsiveConfigRef: MutableRefObject<ResponsiveConfig | null>;
@@ -40,6 +41,7 @@ interface UseParticleResponsiveConfigResult {
 export function useParticleResponsiveConfig({
     canvasRef,
     isMobile,
+    isLandscape,
     modeRef,
     presetRef,
     responsiveConfigRef,
@@ -65,7 +67,12 @@ export function useParticleResponsiveConfig({
         canvas.width = width;
         canvas.height = height;
 
-        const responsive = createResponsiveConfig(width, height, isMobile);
+        const responsive = createResponsiveConfig(
+            width,
+            height,
+            isMobile,
+            isLandscape,
+        );
         const previousConfig = responsiveConfigRef.current;
         responsiveConfigRef.current = responsive;
 
@@ -127,6 +134,7 @@ export function useParticleResponsiveConfig({
     }, [
         canvasRef,
         isMobile,
+        isLandscape,
         modeRef,
         presetRef,
         responsiveConfigRef,
