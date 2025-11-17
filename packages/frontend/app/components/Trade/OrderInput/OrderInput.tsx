@@ -83,6 +83,26 @@ const useOnlyMarket = false;
 //     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
 // ];
 
+// Custom hook for debouncing boolean values (only debounces true values)
+function useDebounceOnTrue(value: boolean, delay: number): boolean {
+    const [debouncedValue, setDebouncedValue] = useState<boolean>(value);
+
+    useEffect(() => {
+        // Only set the debounced value if value is true
+        if (value) {
+            const timer = setTimeout(() => {
+                setDebouncedValue(true);
+            }, delay);
+            return () => clearTimeout(timer);
+        } else {
+            setDebouncedValue(false);
+            return () => {};
+        }
+    }, [value, delay]);
+
+    return debouncedValue;
+}
+
 function OrderInput({
     marginBucket,
     isAnyPortfolioModalOpen,
@@ -587,25 +607,6 @@ function OrderInput({
               );
     }, [currentPositionNotionalSize, activeGroupSeparator]);
 
-    function useDebounceOnTrue(value: boolean, delay: number): boolean {
-        const [debouncedValue, setDebouncedValue] = useState<boolean>(value);
-
-        useEffect(() => {
-            // Only set the debounced value if value is true
-            if (value) {
-                const timer = setTimeout(() => {
-                    setDebouncedValue(true);
-                }, delay);
-                return () => clearTimeout(timer);
-            } else {
-                setDebouncedValue(false);
-                return () => {};
-            }
-        }, [value, delay]);
-
-        return debouncedValue;
-    }
-
     const isMarginInsufficientDebounced = useDebounceOnTrue(
         isMarginInsufficient,
         500,
@@ -1006,7 +1007,13 @@ function OrderInput({
                 </div>
             </div>
         ),
-        [styles.priceDistributionContainer],
+        [
+            styles.priceDistributionContainer,
+            styles.inputDetailsLabel,
+            styles.actionButtonsContainer,
+            confirmOrderModal,
+            t,
+        ],
     );
 
     // -----------------------------PROPS----------------------------------------
@@ -1135,11 +1142,13 @@ function OrderInput({
             'trade-module-size-input',
         ) as HTMLInputElement | null;
 
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             if (!notionalQtyNum) {
                 el?.focus();
             }
-        }, 850);
+        }, 700);
+
+        return () => clearTimeout(timeoutId);
     }, [tradeDirection, marketOrderType]);
 
     const sizeSliderPercentageValueProps = useMemo(
@@ -1188,8 +1197,12 @@ function OrderInput({
         () => MIN_ORDER_VALUE / (markPx || 1),
         [markPx],
     );
+
+    // logic to dispatch a notification on demand
+    const notifications: NotificationStoreIF = useNotificationStore();
+
     // fn to submit a 'Buy' market order
-    async function submitMarketBuy(): Promise<void> {
+    const submitMarketBuy = useCallback(async (): Promise<void> => {
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
@@ -1354,10 +1367,27 @@ function OrderInput({
             setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
-    }
+    }, [
+        notionalQtyNum,
+        sells,
+        markPx,
+        activeOptions.skipOpenOrderConfirm,
+        symbol,
+        executeMarketOrder,
+        isSubminimumClose,
+        subminimumCloseQty,
+        leverage,
+        isReduceOnlyEnabled,
+        notifications,
+        confirmOrderModal,
+        t,
+        formatNum,
+        maxActive,
+        sizePercentageValue,
+    ]);
 
     // fn to submit a 'Sell' market order
-    async function submitMarketSell(): Promise<void> {
+    const submitMarketSell = useCallback(async (): Promise<void> => {
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
@@ -1522,10 +1552,27 @@ function OrderInput({
             setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
-    }
+    }, [
+        notionalQtyNum,
+        buys,
+        markPx,
+        activeOptions.skipOpenOrderConfirm,
+        symbol,
+        executeMarketOrder,
+        isSubminimumClose,
+        subminimumCloseQty,
+        leverage,
+        isReduceOnlyEnabled,
+        notifications,
+        confirmOrderModal,
+        t,
+        formatNum,
+        maxActive,
+        sizePercentageValue,
+    ]);
 
     // fn to submit a 'Buy' limit order
-    async function submitLimitBuy(): Promise<void> {
+    const submitLimitBuy = useCallback(async (): Promise<void> => {
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
@@ -1699,10 +1746,26 @@ function OrderInput({
             setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
-    }
+    }, [
+        notionalQtyNum,
+        price,
+        parseFormattedNum,
+        activeOptions.skipOpenOrderConfirm,
+        symbol,
+        markPx,
+        executeLimitOrder,
+        leverage,
+        isReduceOnlyEnabled,
+        notifications,
+        confirmOrderModal,
+        t,
+        formatNum,
+        maxActive,
+        sizePercentageValue,
+    ]);
 
     // fn to submit a 'Sell' limit order
-    async function submitLimitSell(): Promise<void> {
+    const submitLimitSell = useCallback(async (): Promise<void> => {
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
@@ -1872,10 +1935,23 @@ function OrderInput({
             setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
-    }
-
-    // logic to dispatch a notification on demand
-    const notifications: NotificationStoreIF = useNotificationStore();
+    }, [
+        notionalQtyNum,
+        price,
+        parseFormattedNum,
+        activeOptions.skipOpenOrderConfirm,
+        symbol,
+        markPx,
+        executeLimitOrder,
+        leverage,
+        isReduceOnlyEnabled,
+        notifications,
+        confirmOrderModal,
+        t,
+        formatNum,
+        maxActive,
+        sizePercentageValue,
+    ]);
 
     // bool to handle toggle of order type launchpad mode
     const [showLaunchpad, setShowLaunchpad] = useState<boolean>(false);

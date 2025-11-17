@@ -4,7 +4,6 @@
     align-items: center;
     justify-content: center;
     gap: var(--gap-xs);
-    gap: var(--gap-xs);
 }
 
 .orderBookContainer {
@@ -95,6 +94,16 @@
 .obGradientEffectBottom {
     top: auto;
     bottom: 0;
+}
+
+.errorMessage {
+    padding: var(--padding-xs) var(--padding-m);
+    background-color: rgba(255, 59, 48, 0.1);
+    border-left: 3px solid rgba(255, 59, 48, 0.8);
+    color: rgba(255, 59, 48, 1);
+    font-size: 0.85rem;
+    margin: var(--margin-xs) 0;
+    border-radius: 4px;
 }
 
 @media (max-width: 768px) {
