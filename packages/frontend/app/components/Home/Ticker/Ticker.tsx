@@ -134,7 +134,7 @@ export const Ticker = memo(function Ticker() {
 
     // Memoize the formatNum function and color values
     const { formatNum, parseFormattedNum } = useNumFormatter();
-    const bsColor = useAppSettings((state) => state.bsColor);
+    const { bsColor, numFormat } = useAppSettings();
     const colors = useMemo(() => {
         const { getBsColor } = useAppSettings.getState();
         return getBsColor();
@@ -236,6 +236,20 @@ export const Ticker = memo(function Ticker() {
             animationResetTimeoutsRef.current = {};
         };
     }, [memoizedCoins, formatNum]);
+
+    // Reset cached displayed changes when number format changes so comparisons stay consistent
+    useEffect(() => {
+        prevDisplayedChangeRef.current = {};
+        Object.values(priceChangeTimeoutsRef.current).forEach((timeout) => {
+            clearTimeout(timeout);
+        });
+        Object.values(animationResetTimeoutsRef.current).forEach((timeout) => {
+            clearTimeout(timeout);
+        });
+        priceChangeTimeoutsRef.current = {};
+        animationResetTimeoutsRef.current = {};
+        setPriceChangeStates({});
+    }, [numFormat]);
 
     // Create ticker set component
     const renderTickerSet = (
