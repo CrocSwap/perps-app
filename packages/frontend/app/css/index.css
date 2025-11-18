@@ -218,6 +218,7 @@
 html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    background: #06060c;
 }
 
 body {
@@ -228,6 +229,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
     background: var(--bg-dark1);
     overflow-y: hidden;
+}
+
+#root {
+    background: #06060c;
+    min-height: 100vh;
 }
 body,
 h1,
@@ -241,7 +247,7 @@ ol,
 ul {
     margin: 0;
     padding: 0;
-    font-weight: normal !important;
+    font-weight: 300 !important;
 }
 
 img,

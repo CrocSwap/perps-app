@@ -10,15 +10,6 @@ export interface AlreadySeenStoreIF {
     markAsViewed: (message: string | string[]) => void;
 }
 
-const ssrSafeStorage = () =>
-    (typeof window !== 'undefined'
-        ? window.localStorage
-        : {
-              getItem: () => null,
-              setItem: () => {},
-              removeItem: () => {},
-          }) as Storage;
-
 // the actual data store
 export const useViewed = create<AlreadySeenStoreIF>()(
     // persist data in local storage (only values, not reducers)
@@ -41,7 +32,7 @@ export const useViewed = create<AlreadySeenStoreIF>()(
             // key for local storage
             name: LS_KEY,
             // format and destination of data
-            storage: createJSONStorage(ssrSafeStorage),
+            storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({ viewed: state.viewed }),
         },
     ),

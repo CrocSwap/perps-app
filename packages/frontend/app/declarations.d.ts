@@ -5,3 +5,10 @@ declare function plausible(
         callback?: () => void;
     },
 ): void;
+
+declare module '*?routes' {
+    import type { RouteObject } from 'react-router';
+
+    const routes: RouteObject[];
+    export default routes;
+}

@@ -2,21 +2,74 @@ import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { reactRouter } from '@react-router/dev/vite';
-import netlifyPlugin from '@netlify/vite-plugin-react-router';
 
 const appName = 'Ambient Perps';
 const appDescription = 'A modern, performant app for perpetual contracts.';
 
 export default defineConfig({
+    // Optimize dependency pre-bundling
+    optimizeDeps: {
+        include: [
+            'react',
+            'react-dom',
+            'react-router',
+            'zustand',
+            'd3',
+            'd3fc',
+            '@solana/web3.js',
+        ],
+        esbuildOptions: {
+            // Force proper CommonJS interop for default exports
+            mainFields: ['module', 'main'],
+            resolveExtensions: [
+                '.mjs',
+                '.js',
+                '.mts',
+                '.ts',
+                '.jsx',
+                '.tsx',
+                '.json',
+            ],
+        },
+    },
     build: {
         outDir: 'build',
         emptyOutDir: true,
-        ssr: true,
-    },
-    ssr: {
-        noExternal: ['@fogo/sessions-sdk-react'],
-        target: 'node',
+        sourcemap: false, // Disable sourcemaps in production for smaller bundle
+        minify: 'terser', // Use terser for better compression
+        terserOptions: {
+            compress: {
+                drop_console: true, // Remove console.logs in production
+                drop_debugger: true,
+                pure_funcs: ['console.log', 'console.debug'], // Remove specific console methods
+            },
+        },
+        cssCodeSplit: true, // Enable CSS code splitting
+        commonjsOptions: {
+            // Ensure proper default export handling for CommonJS modules
+            transformMixedEsModules: true,
+        },
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Split vendor chunks for better caching
+                    'react-vendor': ['react', 'react-dom', 'react-router'],
+                    'd3-vendor': ['d3', 'd3fc'],
+                    'i18n-vendor': [
+                        'i18next',
+                        'react-i18next',
+                        'i18next-browser-languagedetector',
+                    ],
+                    'animation-vendor': ['framer-motion'],
+                },
+                // Optimize chunk file names for better caching
+                chunkFileNames: 'assets/[name]-[hash].js',
+                entryFileNames: 'assets/[name]-[hash].js',
+                assetFileNames: 'assets/[name]-[hash].[ext]',
+            },
+        },
+        chunkSizeWarningLimit: 1000, // Increase limit for large dependencies
+        reportCompressedSize: false, // Disable to speed up build
     },
     resolve: {
         alias: [
@@ -32,13 +85,44 @@ export default defineConfig({
             },
         }),
         tsconfigPaths(),
-        reactRouter(),
-        netlifyPlugin(),
         VitePWA({
             registerType: 'autoUpdate',
             workbox: {
-                maximumFileSizeToCacheInBytes: 3_000_000,
-                globPatterns: ['**/*.{js,css,html,png,svg}'], // Add asset patterns
+                maximumFileSizeToCacheInBytes: 5_000_000,
+                globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
+                // Don't cache large chunks or service worker itself
+                globIgnores: ['**/sw.js', '**/workbox-*.js'],
+                // Runtime caching strategies
+                runtimeCaching: [
+                    {
+                        urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'google-fonts-cache',
+                            expiration: {
+                                maxEntries: 10,
+                                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+                            },
+                            cacheableResponse: {
+                                statuses: [0, 200],
+                            },
+                        },
+                    },
+                    {
+                        urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'gstatic-fonts-cache',
+                            expiration: {
+                                maxEntries: 10,
+                                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+                            },
+                            cacheableResponse: {
+                                statuses: [0, 200],
+                            },
+                        },
+                    },
+                ],
             },
             devOptions: {
                 enabled: process.env.NODE_ENV === 'development',
@@ -48,7 +132,7 @@ export default defineConfig({
                 short_name: appName,
                 description: appDescription,
                 theme_color: '#7371fc',
-                background_color: '#7371fc',
+                background_color: '#06060c',
                 display: 'standalone',
                 start_url: '/',
                 id: '/',

@@ -10,18 +10,6 @@ interface ChartStore {
     loadLayout: () => ChartLayout | null;
 }
 
-const ssrSafeStorage = () =>
-    (typeof window !== 'undefined'
-        ? window.localStorage
-        : {
-              getItem: (_key: string) => null,
-              setItem: (_key: string, _value: string) => {},
-              removeItem: (_key: string) => {},
-              clear: () => {},
-              key: (_index: number) => null,
-              length: 0,
-          }) as Storage;
-
 export const useChartStore = create<ChartStore>()(
     persist(
         (set, get) => ({
@@ -31,7 +19,7 @@ export const useChartStore = create<ChartStore>()(
         }),
         {
             name: CHART_LAYOUT_KEY,
-            storage: createJSONStorage(ssrSafeStorage),
+            storage: createJSONStorage(() => localStorage),
             version: 1,
             migrate: (persistedState) => {
                 if (

@@ -4,6 +4,7 @@ import {
     Exchange,
     Info,
     type ActiveSubscription,
+    type Environment,
 } from '@perps-app/sdk';
 import React, {
     createContext,
@@ -77,9 +78,7 @@ export const SdkProvider: React.FC<{
             stashedSubs.current = {};
 
             // Debug: Log WebSocket connections to console
-            if (typeof window !== 'undefined') {
-                (window as any).__perps_websockets__ = newInfo;
-            }
+            (window as any).__perps_websockets__ = newInfo;
         } else {
             info.setEnvironment(environment);
         }
