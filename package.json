@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "pnpm i && pnpm prepare && pnpm update-submodules && pnpm --filter frontend dev",
+        "prod": "pnpm i && pnpm prepare && pnpm update-submodules && pnpm --filter frontend prod",
         "prepare": "husky",
         "prettier": "prettier --write .",
         "update-submodules": "git submodule update --remote --recursive --merge"

@@ -8,8 +8,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to package.json
+// Path to announcement files
 const announcementsJsonPath = path.join(__dirname, '../app/announcements.json');
+const outputAnnouncementsPath = path.join(
+    __dirname,
+    '../public/announcements.json',
+);
 
 // Read and parse package.json
 const announcementsJson = JSON.parse(
@@ -35,13 +39,38 @@ const outputJson = {
     })),
 };
 
+// Function to check if announcements need updating
+function needsAnnouncementsUpdate() {
+    if (!fs.existsSync(outputAnnouncementsPath)) {
+        return true;
+    }
+
+    try {
+        const existingAnnouncements = JSON.parse(
+            fs.readFileSync(outputAnnouncementsPath, 'utf8'),
+        );
+        // Compare the generated output with existing file
+        return (
+            JSON.stringify(existingAnnouncements) !== JSON.stringify(outputJson)
+        );
+    } catch (e) {
+        return true; // If file is corrupted, rewrite it
+    }
+}
+
 // Write to the public directory so it gets copied to the build output
 const outDir = path.join(__dirname, '../public');
 
 if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir, { recursive: true });
 }
-fs.writeFileSync(
-    path.join(outDir, 'announcements.json'),
-    JSON.stringify(outputJson, null, 2),
-);
+
+if (needsAnnouncementsUpdate()) {
+    fs.writeFileSync(
+        outputAnnouncementsPath,
+        JSON.stringify(outputJson, null, 2),
+    );
+    console.log(`Announcements updated: ${outputJson.news.length} items`);
+} else {
+    console.log('Announcements unchanged, skipping regeneration.');
+}

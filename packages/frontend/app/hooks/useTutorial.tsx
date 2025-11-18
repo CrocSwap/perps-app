@@ -52,18 +52,14 @@ export const TutorialProvider: React.FC<{
         console.log('Tutorial completed');
         setShowTutorial(false);
         setHasCompletedTutorial(true);
-        if (typeof window !== 'undefined') {
-            window.localStorage.setItem(tutorialKey, 'true');
-        }
+        localStorage.setItem(tutorialKey, 'true');
     };
 
     const handleTutorialSkip = (): void => {
         console.log('Tutorial skipped');
         setShowTutorial(false);
         setHasCompletedTutorial(true);
-        if (typeof window !== 'undefined') {
-            window.localStorage.setItem(tutorialKey, 'true');
-        }
+        localStorage.setItem(tutorialKey, 'true');
     };
 
     // Note: handleRestartTutorial is implemented in the hook to enable navigation
@@ -103,8 +99,7 @@ export const useTutorial = (): TutorialContextType => {
 
         // First navigate to the trade page (using the default symbol)
         // We can get the current URL to check if we're already on the trade page
-        const currentPath =
-            typeof window !== 'undefined' ? window.location.pathname : '';
+        const currentPath = window.location.pathname;
         const isOnTradePage = currentPath.includes('/trade');
 
         if (!isOnTradePage) {
