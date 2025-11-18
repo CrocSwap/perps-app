@@ -89,40 +89,9 @@ export default defineConfig({
             registerType: 'autoUpdate',
             workbox: {
                 maximumFileSizeToCacheInBytes: 5_000_000,
-                globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
+                globPatterns: ['**/*.{js,css,html,png,svg,woff2,ttf}'],
                 // Don't cache large chunks or service worker itself
                 globIgnores: ['**/sw.js', '**/workbox-*.js'],
-                // Runtime caching strategies
-                runtimeCaching: [
-                    {
-                        urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-                        handler: 'CacheFirst',
-                        options: {
-                            cacheName: 'google-fonts-cache',
-                            expiration: {
-                                maxEntries: 10,
-                                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-                            },
-                            cacheableResponse: {
-                                statuses: [0, 200],
-                            },
-                        },
-                    },
-                    {
-                        urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-                        handler: 'CacheFirst',
-                        options: {
-                            cacheName: 'gstatic-fonts-cache',
-                            expiration: {
-                                maxEntries: 10,
-                                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-                            },
-                            cacheableResponse: {
-                                statuses: [0, 200],
-                            },
-                        },
-                    },
-                ],
             },
             devOptions: {
                 enabled: process.env.NODE_ENV === 'development',
