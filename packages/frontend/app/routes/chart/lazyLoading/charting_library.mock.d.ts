@@ -226,4 +226,33 @@ declare module '~/tv/charting_library' {
     export interface CustomThemes {
         [name: string]: CustomThemeColors;
     }
+
+    export interface MouseEventParams {
+        clientX: number;
+        clientY: number;
+        pageX: number;
+        pageY: number;
+        screenX: number;
+        screenY: number;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    export interface ISubscription<TFunc extends (...args: any[]) => void> {
+        subscribe(
+            obj: object | null,
+            member: TFunc,
+            singleshot?: boolean,
+        ): void;
+        unsubscribe(obj: object | null, member: TFunc): void;
+        unsubscribeAll(obj: object | null): void;
+    }
+
+    export interface CrossHairMovedEventParams {
+        time: number;
+        price: number;
+        userTime?: number;
+        entityValues?: Record<EntityId, CrossHairMovedEventSource>;
+        offsetX?: number;
+        offsetY?: number;
+    }
 }

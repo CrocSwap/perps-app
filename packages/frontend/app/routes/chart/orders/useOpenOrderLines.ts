@@ -111,6 +111,7 @@ export const useOpenOrderLines = (): LineData[] => {
                     lineStyle: 3,
                     lineWidth: 1,
                     side: side,
+                    dash: [6, 6],
                 };
             });
 

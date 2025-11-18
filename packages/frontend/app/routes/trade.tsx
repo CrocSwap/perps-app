@@ -32,6 +32,7 @@ import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
 import { getSizePercentageSegment } from '~/utils/functions/getSegment';
 import { useTranslation } from 'react-i18next';
+import LiquidationsChartSection from './trade/liquidationsChart/LiquidationsChartSection';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import ExpandableOrderBook from './trade/orderbook/ExpandableOrderBook';
 import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
@@ -146,7 +147,8 @@ export default function Trade() {
     const [activeTab, setActiveTab] = useState<TabType>('order');
     const [isMobile, setIsMobile] = useState<boolean>(false);
 
-    const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
+    const { debugToolbarOpen, setDebugToolbarOpen, liquidationsActive } =
+        useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
 
@@ -810,6 +812,7 @@ export default function Trade() {
                         <MemoizedTradingViewWrapper />
                     )}
                 </div>
+
                 <div
                     className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
                     style={{ display: activeTab === 'book' ? 'block' : 'none' }}
@@ -934,38 +937,56 @@ export default function Trade() {
                                 style={{ height: '100%' }}
                             >
                                 <div
-                                    id='trade-page-left-section'
-                                    className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper} ${debugToolbarOpen ? styles.debugToolbarOpen : ''}`}
+                                    className={`${styles.chartLayout} ${liquidationsActive ? styles.liqActive : ''}`}
                                 >
-                                    {debugToolbarOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -10 }}
-                                            transition={{ duration: 0.2 }}
-                                            className={`${styles.debugToolbar} ${debugToolbarOpen ? styles.open : ''}`}
+                                    <div
+                                        id='trade-page-left-section'
+                                        className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper} ${debugToolbarOpen ? styles.debugToolbarOpen : ''}`}
+                                    >
+                                        {debugToolbarOpen && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                transition={{ duration: 0.2 }}
+                                                className={`${styles.debugToolbar} ${debugToolbarOpen ? styles.open : ''}`}
+                                            >
+                                                <ComboBoxContainer />
+                                            </motion.div>
+                                        )}
+                                        <div
+                                            id='watchlistSection'
+                                            className={styles.watchlist}
                                         >
-                                            <ComboBoxContainer />
+                                            <WatchList />
+                                        </div>
+                                        <div
+                                            id='symbolInfoSection'
+                                            className={styles.symbolInfo}
+                                        >
+                                            <MemoizedSymbolInfo />
+                                        </div>
+                                        <div
+                                            id='chartSection'
+                                            className={styles.chart}
+                                        >
+                                            <MemoizedTradingViewWrapper />
+                                        </div>
+                                    </div>
+                                    {liquidationsActive && (
+                                        <motion.div
+                                            id='liquidationsChart'
+                                            className={styles.liquidationsChart}
+                                            initial={{ opacity: 0, x: 10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -10 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <LiquidationsChartSection
+                                                symbol={symbol}
+                                            />
                                         </motion.div>
                                     )}
-                                    <div
-                                        id='watchlistSection'
-                                        className={styles.watchlist}
-                                    >
-                                        <WatchList />
-                                    </div>
-                                    <div
-                                        id='symbolInfoSection'
-                                        className={styles.symbolInfo}
-                                    >
-                                        <MemoizedSymbolInfo />
-                                    </div>
-                                    <div
-                                        id='chartSection'
-                                        className={styles.chart}
-                                    >
-                                        <MemoizedTradingViewWrapper />
-                                    </div>
                                 </div>
                                 <div
                                     id='orderBookSection'
