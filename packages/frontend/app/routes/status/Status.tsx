@@ -325,11 +325,6 @@ export default function Status() {
 
     useEffect(() => {
         checkAllEndpoints();
-
-        // Check every 30 seconds
-        const interval = setInterval(checkAllEndpoints, 30000);
-
-        return () => clearInterval(interval);
     }, []);
 
     const getStatusColor = (status: EndpointStatus['status']) => {
