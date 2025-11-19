@@ -65,7 +65,7 @@ const ENDPOINTS_TO_MONITOR: EndpointConfig[] = [
 const MIN_SPIN_TIME = 0.5; // seconds
 
 // JSON syntax highlighter component
-const JsonHighlight = ({ data }: { data: unknown }) => {
+const JsonHighlight = ({ data }: { data: unknown }): ReactElement => {
     const highlightJson = (obj: unknown, indent = 0): ReactElement[] => {
         const elements: ReactElement[] = [];
         const indentStr = '  '.repeat(indent);
@@ -197,7 +197,7 @@ const JsonHighlight = ({ data }: { data: unknown }) => {
     return <pre className={styles.json_display}>{highlightJson(data)}</pre>;
 };
 
-export default function Status() {
+export default function Status(): ReactElement {
     const [endpoints, setEndpoints] = useState<EndpointStatus[]>(
         ENDPOINTS_TO_MONITOR.map((ep) => ({
             ...ep,
@@ -219,7 +219,7 @@ export default function Status() {
         [],
     );
 
-    const toggleAccordion = (key: string) => {
+    const toggleAccordion = (key: string): void => {
         setExpandedAccordions((prev) => {
             const newSet = new Set(prev);
             if (newSet.has(key)) {
@@ -231,7 +231,7 @@ export default function Status() {
         });
     };
 
-    const copyToClipboard = async (url: string) => {
+    const copyToClipboard = async (url: string): Promise<void> => {
         try {
             await navigator.clipboard.writeText(url);
             setCopiedUrl(url);
@@ -322,7 +322,7 @@ export default function Status() {
         }
     };
 
-    const checkAllEndpoints = async () => {
+    const checkAllEndpoints = async (): Promise<void> => {
         const startTime = performance.now();
 
         // Set all endpoints to checking first
@@ -346,7 +346,7 @@ export default function Status() {
         setEndpoints(updatedEndpoints);
     };
 
-    const checkSingleEndpoint = async (index: number) => {
+    const checkSingleEndpoint = async (index: number): Promise<void> => {
         const endpoint = endpoints[index];
         const startTime = performance.now();
 
@@ -378,7 +378,7 @@ export default function Status() {
         checkAllEndpoints();
     }, []);
 
-    const getStatusColor = (status: EndpointStatus['status']) => {
+    const getStatusColor = (status: EndpointStatus['status']): string => {
         switch (status) {
             case 'operational':
                 return styles.status_operational;
@@ -389,7 +389,7 @@ export default function Status() {
         }
     };
 
-    const getStatusCodeColor = (statusCode: number) => {
+    const getStatusCodeColor = (statusCode: number): string => {
         if (statusCode >= 100 && statusCode < 200)
             return styles.status_code_1xx;
         if (statusCode >= 200 && statusCode < 300)
