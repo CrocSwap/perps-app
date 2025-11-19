@@ -3,6 +3,7 @@ import { createServer as createViteServer } from 'vite';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
+import os from 'node:os';
 
 const PORT = Number.parseInt(process.env.PORT || '3000');
 const __filename = fileURLToPath(import.meta.url);
@@ -11,6 +12,19 @@ const root = __dirname;
 
 const app = express();
 app.disable('x-powered-by');
+
+const getLanAddresses = () => {
+    const nets = os.networkInterfaces();
+    const results = new Set();
+    Object.values(nets).forEach((interfaces) => {
+        interfaces?.forEach((net) => {
+            if (net.family === 'IPv4' && !net.internal) {
+                results.add(net.address);
+            }
+        });
+    });
+    return [...results];
+};
 
 const originalWarn = console.warn;
 const ignoredSourceMapPattern = /Sourcemap for /;
@@ -53,4 +67,16 @@ app.use(async (req, res, next) => {
 
 app.listen(PORT, () => {
     console.log(`SPA dev server running at http://localhost:${PORT}`);
+    const lanAddresses = getLanAddresses();
+    if (lanAddresses.length > 0) {
+        lanAddresses.forEach((address) => {
+            console.log(
+                `LAN dev server available at http://${address}:${PORT}`,
+            );
+        });
+    } else {
+        console.log(
+            'LAN IP not detected automatically. Run `ipconfig getiflist` to find your interface.',
+        );
+    }
 });

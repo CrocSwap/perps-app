@@ -50,6 +50,11 @@ export default function PriceInput(props: PropsIF) {
         }
     }, []);
 
+    const handleInputFocus = useCallback(() => {
+        if (!showMidButton || !isMidModeActive) return;
+        setIsMidModeActive(false);
+    }, [showMidButton, isMidModeActive, setIsMidModeActive]);
+
     return (
         <div
             id='trade-module-price-input-container'
@@ -65,6 +70,7 @@ export default function PriceInput(props: PropsIF) {
                 id='trade-module-price-input'
                 value={value}
                 onChange={onChange}
+                onFocus={handleInputFocus}
                 onBlur={onBlur}
                 onKeyDown={onKeyDown}
                 className={className}

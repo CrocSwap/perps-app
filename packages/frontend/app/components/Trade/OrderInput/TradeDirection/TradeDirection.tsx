@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 interface propsIF {
     tradeDirection: OrderSide;
-    setTradeDirection: React.Dispatch<React.SetStateAction<OrderSide>>;
+    setTradeDirection: (direction: OrderSide) => void;
 }
 
 // In case of any bugs or issues with this component, please reach out to Jr.

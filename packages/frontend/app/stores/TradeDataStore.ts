@@ -8,6 +8,7 @@ import {
     createUserTradesSlice,
     type UserTradeDataStore,
 } from './UserTradeDataStore';
+import type { OrderSide } from '~/utils/CommonIFs';
 
 export type marginModesT = 'margin.cross.title' | 'margin.isolated.title';
 
@@ -44,6 +45,12 @@ type TradeDataStore = UserTradeDataStore & {
     setIsTradeInfoExpanded: (shouldExpand: boolean) => void;
     updateSymbolInfo: (symbolInfo: TokenDetailsIF) => void; // used for updating symbol info from REST API while ws is sleeping
     addToFetchedChannels: (channel: string) => void;
+    orderInputPriceValue: number;
+    setOrderInputPriceValue: (price: number) => void;
+    tradeDirection: OrderSide;
+    setTradeDirection: (direction: OrderSide) => void;
+    setIsMidModeActive: (isActive: boolean) => void;
+    isMidModeActive: boolean;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -145,6 +152,15 @@ const useTradeDataStore = create<TradeDataStore>()(
             addToFetchedChannels: (channel: string) => {
                 get().fetchedChannels.add(channel);
             },
+            orderInputPriceValue: 0,
+            setOrderInputPriceValue: (price: number) =>
+                set({ orderInputPriceValue: price }),
+            tradeDirection: 'buy',
+            setTradeDirection: (direction: OrderSide) =>
+                set({ tradeDirection: direction }),
+            setIsMidModeActive: (isActive: boolean) =>
+                set({ isMidModeActive: isActive }),
+            isMidModeActive: true,
         }),
         {
             name: 'TRADE_DATA',
