@@ -171,6 +171,33 @@
     gap: 0.75rem;
 }
 
+.copy_button {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #999);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+    border-radius: 4px;
+}
+
+.copy_button:hover {
+    color: var(--text-primary, #ffffff);
+    background: var(--bg-tertiary, #2a2a2a);
+}
+
+.copy_button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.copy_icon_success {
+    color: #22c55e;
+}
+
 .detail_label {
     font-weight: 600;
     color: var(--text-secondary, #999);

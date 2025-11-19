@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { LuRefreshCcw } from 'react-icons/lu';
+import { LuRefreshCcw, LuCopy, LuCheck } from 'react-icons/lu';
 import styles from './Status.module.css';
 import { POLLING_API_INFO_ENDPOINT, RPC_ENDPOINT } from '~/utils/Constants';
 
@@ -175,6 +175,7 @@ export default function Status() {
     const [expandedAccordions, setExpandedAccordions] = useState<Set<string>>(
         new Set(),
     );
+    const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
     const toggleAccordion = (key: string) => {
         setExpandedAccordions((prev) => {
@@ -186,6 +187,16 @@ export default function Status() {
             }
             return newSet;
         });
+    };
+
+    const copyToClipboard = async (url: string) => {
+        try {
+            await navigator.clipboard.writeText(url);
+            setCopiedUrl(url);
+            setTimeout(() => setCopiedUrl(null), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
     };
 
     const checkEndpoint = async (
@@ -397,6 +408,23 @@ export default function Status() {
                                         <span className={styles.detail_value}>
                                             {endpoint.url}
                                         </span>
+                                        <button
+                                            onClick={() =>
+                                                copyToClipboard(endpoint.url)
+                                            }
+                                            className={styles.copy_button}
+                                            title='Copy URL to clipboard'
+                                        >
+                                            {copiedUrl === endpoint.url ? (
+                                                <LuCheck
+                                                    className={
+                                                        styles.copy_icon_success
+                                                    }
+                                                />
+                                            ) : (
+                                                <LuCopy />
+                                            )}
+                                        </button>
                                     </div>
 
                                     {endpoint.responseTime !== undefined && (
