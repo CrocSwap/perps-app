@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactElement } from 'react';
 import { LuRefreshCcw, LuCopy, LuCheck } from 'react-icons/lu';
 import styles from './Status.module.css';
 import { POLLING_API_INFO_ENDPOINT, RPC_ENDPOINT } from '~/utils/Constants';
+import { useKeydown } from '~/hooks/useKeydown';
 
 type EndpointStatus = {
     name: string;
@@ -10,6 +11,8 @@ type EndpointStatus = {
     responseTime?: number;
     lastChecked?: Date;
     error?: string;
+    requestTimestamp?: number;
+    responseTimestamp?: number;
     requestDetails?: {
         method: string;
         headers: Record<string, string>;
@@ -177,6 +180,15 @@ export default function Status() {
     );
     const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
+    // Close all accordions on Escape key
+    useKeydown(
+        'Escape',
+        () => {
+            setExpandedAccordions(new Set());
+        },
+        [],
+    );
+
     const toggleAccordion = (key: string) => {
         setExpandedAccordions((prev) => {
             const newSet = new Set(prev);
@@ -203,6 +215,7 @@ export default function Status() {
         endpoint: EndpointStatus,
     ): Promise<EndpointStatus> => {
         const startTime = performance.now();
+        const requestTimestamp = Date.now();
 
         const requestBody = { type: 'meta' };
         const requestHeaders = { 'Content-Type': 'application/json' };
@@ -220,6 +233,7 @@ export default function Status() {
             });
 
             const endTime = performance.now();
+            const responseTimestamp = Date.now();
             const responseTime = Math.round(endTime - startTime);
 
             // Extract response details
@@ -242,6 +256,8 @@ export default function Status() {
                     status: 'operational',
                     responseTime,
                     lastChecked: new Date(),
+                    requestTimestamp,
+                    responseTimestamp,
                     requestDetails,
                     responseDetails,
                 };
@@ -251,6 +267,8 @@ export default function Status() {
                     status: 'down',
                     responseTime,
                     lastChecked: new Date(),
+                    requestTimestamp,
+                    responseTimestamp,
                     error: `HTTP ${response.status}`,
                     requestDetails,
                     responseDetails,
@@ -258,6 +276,7 @@ export default function Status() {
             }
         } catch (error) {
             const endTime = performance.now();
+            const responseTimestamp = Date.now();
             const responseTime = Math.round(endTime - startTime);
 
             return {
@@ -265,6 +284,8 @@ export default function Status() {
                 status: 'down',
                 responseTime,
                 lastChecked: new Date(),
+                requestTimestamp,
+                responseTimestamp,
                 error: error instanceof Error ? error.message : 'Unknown error',
                 requestDetails,
             };
@@ -433,6 +454,38 @@ export default function Status() {
                                                 className={styles.detail_value}
                                             >
                                                 {endpoint.responseTime}ms
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {endpoint.requestTimestamp !==
+                                        undefined && (
+                                        <div className={styles.detail_row}>
+                                            <span
+                                                className={styles.detail_label}
+                                            >
+                                                Request Dispatched:
+                                            </span>
+                                            <span
+                                                className={styles.detail_value}
+                                            >
+                                                {endpoint.requestTimestamp}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {endpoint.responseTimestamp !==
+                                        undefined && (
+                                        <div className={styles.detail_row}>
+                                            <span
+                                                className={styles.detail_label}
+                                            >
+                                                Response Received:
+                                            </span>
+                                            <span
+                                                className={styles.detail_value}
+                                            >
+                                                {endpoint.responseTimestamp}
                                             </span>
                                         </div>
                                     )}

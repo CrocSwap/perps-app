@@ -279,26 +279,26 @@
 @media (hover: hover) {
     .accordion_button_request:hover {
         color: var(--text-primary, #ffffff);
-        border-color: #c586c0;
+        border-color: var(--accent2);
         background: var(--bg-tertiary, #2a2a2a);
     }
 
     .accordion_button_response:hover {
         color: var(--text-primary, #ffffff);
-        border-color: #4fc1ff;
+        border-color: var(--accent3);
         background: var(--bg-tertiary, #2a2a2a);
     }
 }
 
 .accordion_button_request_expanded {
     color: var(--text-primary, #ffffff);
-    border-color: #c586c0;
+    border-color: var(--accent2);
     background: var(--bg-tertiary, #2a2a2a);
 }
 
 .accordion_button_response_expanded {
     color: var(--text-primary, #ffffff);
-    border-color: #4fc1ff;
+    border-color: var(--accent3);
     background: var(--bg-tertiary, #2a2a2a);
 }
 
@@ -326,11 +326,11 @@
 }
 
 .accordion_label_request {
-    color: #c586c0;
+    color: var(--accent2);
 }
 
 .accordion_label_response {
-    color: #4fc1ff;
+    color: var(--accent3);
 }
 
 .accordion_content {
@@ -339,15 +339,17 @@
     border-radius: 6px;
     padding: 0.75rem;
     flex: 1;
+    max-height: 600px;
+    overflow-y: auto;
     overflow-x: auto;
 }
 
 .accordion_content_request {
-    border-color: #c586c0;
+    border-color: var(--accent2);
 }
 
 .accordion_content_response {
-    border-color: #4fc1ff;
+    border-color: var(--accent3);
 }
 
 .json_display {
