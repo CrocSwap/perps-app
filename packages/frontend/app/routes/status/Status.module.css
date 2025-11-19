@@ -276,21 +276,23 @@
     opacity: 0.7;
 }
 
-.accordion_button_request:hover {
-    color: var(--text-primary, #ffffff);
-    border-color: #c586c0;
-    background: var(--bg-tertiary, #2a2a2a);
+@media (hover: hover) {
+    .accordion_button_request:hover {
+        color: var(--text-primary, #ffffff);
+        border-color: #c586c0;
+        background: var(--bg-tertiary, #2a2a2a);
+    }
+
+    .accordion_button_response:hover {
+        color: var(--text-primary, #ffffff);
+        border-color: #4fc1ff;
+        background: var(--bg-tertiary, #2a2a2a);
+    }
 }
 
 .accordion_button_request_expanded {
     color: var(--text-primary, #ffffff);
     border-color: #c586c0;
-    background: var(--bg-tertiary, #2a2a2a);
-}
-
-.accordion_button_response:hover {
-    color: var(--text-primary, #ffffff);
-    border-color: #4fc1ff;
     background: var(--bg-tertiary, #2a2a2a);
 }
 
@@ -340,6 +342,14 @@
     overflow-x: auto;
 }
 
+.accordion_content_request {
+    border-color: #c586c0;
+}
+
+.accordion_content_response {
+    border-color: #4fc1ff;
+}
+
 .json_display {
     margin: 0;
     font-family:
@@ -374,4 +384,128 @@
 
 .json_punctuation {
     color: #d4d4d4;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .status_page {
+        padding: 1rem;
+    }
+
+    .page_header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .refresh_button {
+        width: 100%;
+    }
+
+    .endpoint_card {
+        padding: 0.75rem;
+    }
+
+    .endpoint_name {
+        font-size: 1.125rem;
+    }
+
+    .accordion_buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .accordion_button {
+        width: 100%;
+    }
+
+    .detail_row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .detail_label {
+        min-width: auto;
+    }
+
+    .copy_button {
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+    .detail_row:first-child {
+        position: relative;
+        padding-right: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .status_page {
+        padding: 0.75rem;
+    }
+
+    .title {
+        font-size: 1.25rem;
+    }
+
+    .endpoint_card {
+        padding: 0.5rem;
+        border-radius: 6px;
+    }
+
+    .endpoint_header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .endpoint_name {
+        font-size: 1rem;
+        flex: 0 1 auto;
+    }
+
+    .header_actions {
+        display: contents;
+    }
+
+    .refresh_icon_button {
+        padding: 0.375rem;
+        flex: 0 0 auto;
+    }
+
+    .status_badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        flex: 1 1 100%;
+        text-align: center;
+    }
+
+    .detail_value {
+        font-size: 0.75rem;
+        word-break: break-all;
+    }
+
+    .accordion_button_title {
+        font-size: 0.813rem;
+    }
+
+    .accordion_button_subtitle {
+        font-size: 0.688rem;
+    }
+
+    .accordion_label_text {
+        font-size: 0.75rem;
+    }
+
+    .json_display {
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
 }

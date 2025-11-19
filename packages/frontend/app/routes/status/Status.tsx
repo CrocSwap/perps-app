@@ -590,9 +590,7 @@ export default function Status() {
                                                             Request Details
                                                         </div>
                                                         <div
-                                                            className={
-                                                                styles.accordion_content
-                                                            }
+                                                            className={`${styles.accordion_content} ${styles.accordion_content_request}`}
                                                         >
                                                             <JsonHighlight
                                                                 data={
@@ -617,9 +615,7 @@ export default function Status() {
                                                             Response Details
                                                         </div>
                                                         <div
-                                                            className={
-                                                                styles.accordion_content
-                                                            }
+                                                            className={`${styles.accordion_content} ${styles.accordion_content_response}`}
                                                         >
                                                             <JsonHighlight
                                                                 data={
