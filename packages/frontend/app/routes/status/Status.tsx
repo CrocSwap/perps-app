@@ -241,6 +241,20 @@ export default function Status(): ReactElement {
         }
     };
 
+    const copyJsonToClipboard = async (
+        data: unknown,
+        key: string,
+    ): Promise<void> => {
+        try {
+            const jsonString = JSON.stringify(data, null, 2);
+            await navigator.clipboard.writeText(jsonString);
+            setCopiedUrl(key);
+            setTimeout(() => setCopiedUrl(null), 2000);
+        } catch (err) {
+            console.error('Failed to copy JSON:', err);
+        }
+    };
+
     const checkEndpoint = async (
         endpoint: EndpointStatus,
     ): Promise<EndpointStatus> => {
@@ -254,6 +268,8 @@ export default function Status(): ReactElement {
             headers: requestHeaders,
             body: requestBody,
         };
+
+        console.log(`[Status] Request to ${endpoint.name}:`, requestDetails);
 
         try {
             const response = await fetch(endpoint.url, {
@@ -279,6 +295,11 @@ export default function Status(): ReactElement {
                 headers: responseHeaders,
                 body: responseBody,
             };
+
+            console.log(
+                `[Status] Response from ${endpoint.name}:`,
+                responseDetails,
+            );
 
             if (response.ok) {
                 return {
@@ -308,6 +329,14 @@ export default function Status(): ReactElement {
             const endTime = performance.now();
             const responseTimestamp = Date.now();
             const responseTime = Math.round(endTime - startTime);
+
+            console.error(`[Status] Error checking ${endpoint.name}:`, {
+                url: endpoint.url,
+                timestamp: responseTimestamp,
+                responseTime: `${responseTime}ms`,
+                error: error instanceof Error ? error.message : 'Unknown error',
+                details: error,
+            });
 
             return {
                 ...endpoint,
@@ -674,7 +703,7 @@ export default function Status(): ReactElement {
                                                                     styles.accordion_button_title
                                                                 }
                                                             >
-                                                                Request Details
+                                                                Request
                                                             </span>
                                                             <span
                                                                 className={
@@ -719,7 +748,7 @@ export default function Status(): ReactElement {
                                                                     styles.accordion_button_title
                                                                 }
                                                             >
-                                                                Response Details
+                                                                Response
                                                             </span>
                                                             <span
                                                                 className={
@@ -750,11 +779,34 @@ export default function Status(): ReactElement {
                                                         <div
                                                             className={`${styles.accordion_label_text} ${styles.accordion_label_request}`}
                                                         >
-                                                            Request Details
+                                                            Request
                                                         </div>
                                                         <div
                                                             className={`${styles.accordion_content} ${styles.accordion_content_request}`}
                                                         >
+                                                            <button
+                                                                onClick={() =>
+                                                                    copyJsonToClipboard(
+                                                                        endpoint.requestDetails,
+                                                                        `${index}-request-json`,
+                                                                    )
+                                                                }
+                                                                className={
+                                                                    styles.copy_json_button
+                                                                }
+                                                                title='Copy JSON to clipboard'
+                                                            >
+                                                                {copiedUrl ===
+                                                                `${index}-request-json` ? (
+                                                                    <LuCheck
+                                                                        className={
+                                                                            styles.copy_icon_success
+                                                                        }
+                                                                    />
+                                                                ) : (
+                                                                    <LuCopy />
+                                                                )}
+                                                            </button>
                                                             <JsonHighlight
                                                                 data={
                                                                     endpoint.requestDetails
@@ -775,11 +827,34 @@ export default function Status(): ReactElement {
                                                         <div
                                                             className={`${styles.accordion_label_text} ${styles.accordion_label_response}`}
                                                         >
-                                                            Response Details
+                                                            Response
                                                         </div>
                                                         <div
                                                             className={`${styles.accordion_content} ${styles.accordion_content_response}`}
                                                         >
+                                                            <button
+                                                                onClick={() =>
+                                                                    copyJsonToClipboard(
+                                                                        endpoint.responseDetails,
+                                                                        `${index}-response-json`,
+                                                                    )
+                                                                }
+                                                                className={
+                                                                    styles.copy_json_button
+                                                                }
+                                                                title='Copy JSON to clipboard'
+                                                            >
+                                                                {copiedUrl ===
+                                                                `${index}-response-json` ? (
+                                                                    <LuCheck
+                                                                        className={
+                                                                            styles.copy_icon_success
+                                                                        }
+                                                                    />
+                                                                ) : (
+                                                                    <LuCopy />
+                                                                )}
+                                                            </button>
                                                             <JsonHighlight
                                                                 data={
                                                                     endpoint.responseDetails

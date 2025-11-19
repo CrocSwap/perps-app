@@ -382,6 +382,35 @@
     max-height: 600px;
     overflow-y: auto;
     overflow-x: auto;
+    position: relative;
+}
+
+.copy_json_button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: transparent;
+    border: 1px solid var(--border-color, #333);
+    color: var(--text-secondary, #999);
+    padding: 0.375rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+.copy_json_button:hover {
+    background: var(--bg-secondary, #1a1a1a);
+    color: var(--text-primary, #ffffff);
+    border-color: var(--accent1);
+}
+
+.copy_json_button svg {
+    width: 14px;
+    height: 14px;
 }
 
 .accordion_content_request {
