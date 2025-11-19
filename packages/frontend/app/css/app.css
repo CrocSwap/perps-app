@@ -81,6 +81,21 @@
         padding-right: var(--padding-s, 8px);
     }
 }
+/* ========================================= */
+/* SAFARI iOS-ONLY FIX FOR HOMEPAGE SCROLL   */
+/* ========================================= */
+@supports (-webkit-touch-callout: none) and (-webkit-overflow-scrolling: touch) {
+    @media (max-width: 768px) {
+        .content.home-page {
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .content.home-page::-webkit-scrollbar {
+            display: none !important;
+        }
+    }
+}
 
 html.modal-open,
 html.modal-open body {
