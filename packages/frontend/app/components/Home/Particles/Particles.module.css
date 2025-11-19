@@ -46,7 +46,7 @@
     .canvasLinks {
         height: calc(100svh - 60px);
         bottom: 0;
-        padding-bottom: var(--footer-h);
+        /* padding-bottom: var(--footer-h); */
     }
 }
 
