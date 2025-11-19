@@ -214,6 +214,46 @@
     color: #ef4444;
 }
 
+.status_code_1xx {
+    color: #71b5fc;
+}
+
+.status_code_2xx {
+    color: #26a69a;
+}
+
+.status_code_3xx {
+    color: #e9e980;
+}
+
+.status_code_4xx {
+    color: #e78a56;
+}
+
+.status_code_5xx {
+    color: #ef5350;
+}
+
+.response_time_great {
+    color: #26a69a;
+    font-weight: 600;
+}
+
+.response_time_ok {
+    color: #e9e980;
+    font-weight: 600;
+}
+
+.response_time_bad {
+    color: #e78a56;
+    font-weight: 600;
+}
+
+.response_time_very_bad {
+    color: #ef5350;
+    font-weight: 600;
+}
+
 .refresh_button {
     background: var(--accent-color, #3b82f6);
     color: white;

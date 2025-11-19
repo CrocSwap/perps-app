@@ -4,6 +4,16 @@ import styles from './Status.module.css';
 import { POLLING_API_INFO_ENDPOINT, RPC_ENDPOINT } from '~/utils/Constants';
 import { useKeydown } from '~/hooks/useKeydown';
 
+interface EndpointConfig {
+    name: string;
+    url: string;
+    tolerances: {
+        great: number;
+        ok: number;
+        bad: number;
+    };
+}
+
 type EndpointStatus = {
     name: string;
     url: string;
@@ -13,6 +23,11 @@ type EndpointStatus = {
     error?: string;
     requestTimestamp?: number;
     responseTimestamp?: number;
+    tolerances: {
+        great: number;
+        ok: number;
+        bad: number;
+    };
     requestDetails?: {
         method: string;
         headers: Record<string, string>;
@@ -25,6 +40,27 @@ type EndpointStatus = {
         body: unknown;
     };
 };
+
+const ENDPOINTS_TO_MONITOR: EndpointConfig[] = [
+    {
+        name: 'Polling API Info Endpoint',
+        url: POLLING_API_INFO_ENDPOINT,
+        tolerances: {
+            great: 100,
+            ok: 200,
+            bad: 300,
+        },
+    },
+    {
+        name: 'RPC Endpoint',
+        url: RPC_ENDPOINT,
+        tolerances: {
+            great: 100,
+            ok: 200,
+            bad: 300,
+        },
+    },
+];
 
 const MIN_SPIN_TIME = 0.5; // seconds
 
@@ -162,18 +198,12 @@ const JsonHighlight = ({ data }: { data: unknown }) => {
 };
 
 export default function Status() {
-    const [endpoints, setEndpoints] = useState<EndpointStatus[]>([
-        {
-            name: 'Polling API Info Endpoint',
-            url: POLLING_API_INFO_ENDPOINT,
-            status: 'checking',
-        },
-        {
-            name: 'RPC Endpoint',
-            url: RPC_ENDPOINT,
-            status: 'checking',
-        },
-    ]);
+    const [endpoints, setEndpoints] = useState<EndpointStatus[]>(
+        ENDPOINTS_TO_MONITOR.map((ep) => ({
+            ...ep,
+            status: 'checking' as const,
+        })),
+    );
 
     const [expandedAccordions, setExpandedAccordions] = useState<Set<string>>(
         new Set(),
@@ -359,6 +389,36 @@ export default function Status() {
         }
     };
 
+    const getStatusCodeColor = (statusCode: number) => {
+        if (statusCode >= 100 && statusCode < 200)
+            return styles.status_code_1xx;
+        if (statusCode >= 200 && statusCode < 300)
+            return styles.status_code_2xx;
+        if (statusCode >= 300 && statusCode < 400)
+            return styles.status_code_3xx;
+        if (statusCode >= 400 && statusCode < 500)
+            return styles.status_code_4xx;
+        if (statusCode >= 500 && statusCode < 600)
+            return styles.status_code_5xx;
+        return '';
+    };
+
+    const getResponseTimeQuality = (
+        responseTime: number,
+        tolerances: EndpointStatus['tolerances'],
+    ): { label: string; className: string } => {
+        if (responseTime <= tolerances.great) {
+            return { label: 'Great', className: styles.response_time_great };
+        }
+        if (responseTime <= tolerances.ok) {
+            return { label: 'OK', className: styles.response_time_ok };
+        }
+        if (responseTime <= tolerances.bad) {
+            return { label: 'Bad', className: styles.response_time_bad };
+        }
+        return { label: 'Very Bad', className: styles.response_time_very_bad };
+    };
+
     return (
         <div className={styles.status_page}>
             <header className={styles.page_header}>
@@ -443,6 +503,35 @@ export default function Status() {
                                         </button>
                                     </div>
 
+                                    {endpoint.responseDetails && (
+                                        <div className={styles.detail_row}>
+                                            <span
+                                                className={styles.detail_label}
+                                            >
+                                                Status Code:
+                                            </span>
+                                            <span
+                                                className={styles.detail_value}
+                                            >
+                                                <span
+                                                    className={getStatusCodeColor(
+                                                        endpoint.responseDetails
+                                                            .status,
+                                                    )}
+                                                >
+                                                    {
+                                                        endpoint.responseDetails
+                                                            .status
+                                                    }
+                                                </span>{' '}
+                                                {
+                                                    endpoint.responseDetails
+                                                        .statusText
+                                                }
+                                            </span>
+                                        </div>
+                                    )}
+
                                     {endpoint.responseTime !== undefined && (
                                         <div className={styles.detail_row}>
                                             <span
@@ -454,6 +543,32 @@ export default function Status() {
                                                 className={styles.detail_value}
                                             >
                                                 {endpoint.responseTime}ms
+                                                {endpoint.tolerances.great >
+                                                    0 &&
+                                                    endpoint.tolerances.ok >
+                                                        0 &&
+                                                    endpoint.tolerances.bad >
+                                                        0 && (
+                                                        <>
+                                                            {' ('}
+                                                            <span
+                                                                className={
+                                                                    getResponseTimeQuality(
+                                                                        endpoint.responseTime,
+                                                                        endpoint.tolerances,
+                                                                    ).className
+                                                                }
+                                                            >
+                                                                {
+                                                                    getResponseTimeQuality(
+                                                                        endpoint.responseTime,
+                                                                        endpoint.tolerances,
+                                                                    ).label
+                                                                }
+                                                            </span>
+                                                            {')'}
+                                                        </>
+                                                    )}
                                             </span>
                                         </div>
                                     )}
