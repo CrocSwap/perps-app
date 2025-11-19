@@ -187,6 +187,7 @@
 .copy_button:hover {
     color: var(--text-primary, #ffffff);
     background: var(--bg-tertiary, #2a2a2a);
+    border-color: var(--accent1);
 }
 
 .copy_button svg {
@@ -385,11 +386,41 @@
     position: relative;
 }
 
-.copy_json_button {
-    position: absolute;
+.json_actions {
+    position: sticky;
     top: 0.5rem;
-    right: 0.5rem;
-    background: transparent;
+    float: right;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+    margin-bottom: -2rem;
+}
+
+.log_json_button {
+    background: var(--bg-dark4, #27272c);
+    border: 1px solid var(--border-color, #333);
+    color: var(--text-secondary, #999);
+    padding: 0.375rem 0.625rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: 48px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.log_json_button:hover {
+    background: var(--bg-dark5, #323237);
+    color: var(--text-primary, #ffffff);
+    border-color: var(--accent1);
+}
+
+.copy_json_button {
+    background: var(--bg-dark4, #27272c);
     border: 1px solid var(--border-color, #333);
     color: var(--text-secondary, #999);
     padding: 0.375rem;
@@ -399,11 +430,10 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    z-index: 1;
 }
 
 .copy_json_button:hover {
-    background: var(--bg-secondary, #1a1a1a);
+    background: var(--bg-dark5, #323237);
     color: var(--text-primary, #ffffff);
     border-color: var(--accent1);
 }

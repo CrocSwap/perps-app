@@ -209,6 +209,7 @@ export default function Status(): ReactElement {
         new Set(),
     );
     const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+    const [loggedItem, setLoggedItem] = useState<string | null>(null);
 
     // Close all accordions on Escape key
     useKeydown(
@@ -255,6 +256,20 @@ export default function Status(): ReactElement {
         }
     };
 
+    const logJsonToConsole = (
+        data: unknown,
+        label: string,
+        key: string,
+    ): void => {
+        console.log(
+            `%c[Status] ${label}:`,
+            'color: #3b82f6; font-weight: bold',
+            data,
+        );
+        setLoggedItem(key);
+        setTimeout(() => setLoggedItem(null), 2000);
+    };
+
     const checkEndpoint = async (
         endpoint: EndpointStatus,
     ): Promise<EndpointStatus> => {
@@ -268,8 +283,6 @@ export default function Status(): ReactElement {
             headers: requestHeaders,
             body: requestBody,
         };
-
-        console.log(`[Status] Request to ${endpoint.name}:`, requestDetails);
 
         try {
             const response = await fetch(endpoint.url, {
@@ -295,11 +308,6 @@ export default function Status(): ReactElement {
                 headers: responseHeaders,
                 body: responseBody,
             };
-
-            console.log(
-                `[Status] Response from ${endpoint.name}:`,
-                responseDetails,
-            );
 
             if (response.ok) {
                 return {
@@ -784,29 +792,59 @@ export default function Status(): ReactElement {
                                                         <div
                                                             className={`${styles.accordion_content} ${styles.accordion_content_request}`}
                                                         >
-                                                            <button
-                                                                onClick={() =>
-                                                                    copyJsonToClipboard(
-                                                                        endpoint.requestDetails,
-                                                                        `${index}-request-json`,
-                                                                    )
-                                                                }
+                                                            <div
                                                                 className={
-                                                                    styles.copy_json_button
+                                                                    styles.json_actions
                                                                 }
-                                                                title='Copy JSON to clipboard'
                                                             >
-                                                                {copiedUrl ===
-                                                                `${index}-request-json` ? (
-                                                                    <LuCheck
-                                                                        className={
-                                                                            styles.copy_icon_success
-                                                                        }
-                                                                    />
-                                                                ) : (
-                                                                    <LuCopy />
-                                                                )}
-                                                            </button>
+                                                                <button
+                                                                    onClick={() =>
+                                                                        logJsonToConsole(
+                                                                            endpoint.requestDetails,
+                                                                            `Request from ${endpoint.name}`,
+                                                                            `${index}-request-log`,
+                                                                        )
+                                                                    }
+                                                                    className={
+                                                                        styles.log_json_button
+                                                                    }
+                                                                    title='Log JSON to console'
+                                                                >
+                                                                    {loggedItem ===
+                                                                    `${index}-request-log` ? (
+                                                                        <LuCheck
+                                                                            className={
+                                                                                styles.copy_icon_success
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        'Log'
+                                                                    )}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() =>
+                                                                        copyJsonToClipboard(
+                                                                            endpoint.requestDetails,
+                                                                            `${index}-request-json`,
+                                                                        )
+                                                                    }
+                                                                    className={
+                                                                        styles.copy_json_button
+                                                                    }
+                                                                    title='Copy JSON to clipboard'
+                                                                >
+                                                                    {copiedUrl ===
+                                                                    `${index}-request-json` ? (
+                                                                        <LuCheck
+                                                                            className={
+                                                                                styles.copy_icon_success
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        <LuCopy />
+                                                                    )}
+                                                                </button>
+                                                            </div>
                                                             <JsonHighlight
                                                                 data={
                                                                     endpoint.requestDetails
@@ -832,29 +870,59 @@ export default function Status(): ReactElement {
                                                         <div
                                                             className={`${styles.accordion_content} ${styles.accordion_content_response}`}
                                                         >
-                                                            <button
-                                                                onClick={() =>
-                                                                    copyJsonToClipboard(
-                                                                        endpoint.responseDetails,
-                                                                        `${index}-response-json`,
-                                                                    )
-                                                                }
+                                                            <div
                                                                 className={
-                                                                    styles.copy_json_button
+                                                                    styles.json_actions
                                                                 }
-                                                                title='Copy JSON to clipboard'
                                                             >
-                                                                {copiedUrl ===
-                                                                `${index}-response-json` ? (
-                                                                    <LuCheck
-                                                                        className={
-                                                                            styles.copy_icon_success
-                                                                        }
-                                                                    />
-                                                                ) : (
-                                                                    <LuCopy />
-                                                                )}
-                                                            </button>
+                                                                <button
+                                                                    onClick={() =>
+                                                                        logJsonToConsole(
+                                                                            endpoint.responseDetails,
+                                                                            `Response from ${endpoint.name}`,
+                                                                            `${index}-response-log`,
+                                                                        )
+                                                                    }
+                                                                    className={
+                                                                        styles.log_json_button
+                                                                    }
+                                                                    title='Log JSON to console'
+                                                                >
+                                                                    {loggedItem ===
+                                                                    `${index}-response-log` ? (
+                                                                        <LuCheck
+                                                                            className={
+                                                                                styles.copy_icon_success
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        'Log'
+                                                                    )}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() =>
+                                                                        copyJsonToClipboard(
+                                                                            endpoint.responseDetails,
+                                                                            `${index}-response-json`,
+                                                                        )
+                                                                    }
+                                                                    className={
+                                                                        styles.copy_json_button
+                                                                    }
+                                                                    title='Copy JSON to clipboard'
+                                                                >
+                                                                    {copiedUrl ===
+                                                                    `${index}-response-json` ? (
+                                                                        <LuCheck
+                                                                            className={
+                                                                                styles.copy_icon_success
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        <LuCopy />
+                                                                    )}
+                                                                </button>
+                                                            </div>
                                                             <JsonHighlight
                                                                 data={
                                                                     endpoint.responseDetails
