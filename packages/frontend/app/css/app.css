@@ -83,3 +83,23 @@ html.modal-open body {
 html.modal-open .root-container {
     overflow: visible !important;
 }
+
+/* FOGO SESSION MODAL OVERRIDE */
+div[class*='_modalOverlay_'],
+div[class*='_modalOverlay'] {
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: auto !important;
+}
+
+div[class*='_modal_'],
+div[class*='_modal'] {
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    padding-top: 10px !important;
+}
