@@ -4,7 +4,7 @@ import styles from './testpage.module.css';
 export default function testpage() {
     return (
         <div className={styles.testpage}>
-            <button>Open Limit Chase Modal</button>
+            <button>Test change</button>
         </div>
     );
 }

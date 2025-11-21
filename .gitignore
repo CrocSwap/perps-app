@@ -25,6 +25,7 @@ public/tv/charting_library
 public/tv/datafeeds
 public/tradingview/charting_library
 public/tradingview/datafeeds
+packages/frontend/scripts/.tv-copy-cache.json
 
 prompts/scratchpad*.md
 
