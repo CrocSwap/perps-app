@@ -47,3 +47,59 @@
     background: #0e0e14aa;
     border-radius: var(--radius-m);
 }
+
+.docContent::-webkit-scrollbar {
+    width: 8px;
+}
+
+.docContent::-webkit-scrollbar-track {
+    background: #050509;
+    border-radius: 4px;
+}
+
+.docContent::-webkit-scrollbar-thumb {
+    background: #7371fc;
+    border-radius: 4px;
+}
+@media (max-width: 768px) {
+    .container {
+        padding: var(--padding-l) 0 var(--padding-m);
+    }
+
+    .innerContainer {
+        --container-width: 100%;
+        max-width: none;
+        margin: 0;
+
+        display: grid;
+        grid-template-rows: 80px auto;
+    }
+
+    .titleSection {
+        padding: 0 18px;
+        text-align: center;
+    }
+
+    .innerContainer header {
+        font-size: 28px;
+        line-height: 1.2;
+    }
+
+    .innerContainer .lastUpdated {
+        font-size: 13px;
+    }
+
+    .docContent {
+        height: calc(70dvh - var(--footer-h, 56px));
+        padding: 18px 18px 24px;
+        border-radius: 0;
+        background: #0e0e14;
+
+        margin-top: var(--margin-m);
+    }
+}
+@media (max-width: 400px) {
+    .docContent {
+        height: calc(65dvh - var(--footer-h, 56px));
+    }
+}

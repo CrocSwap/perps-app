@@ -33,6 +33,18 @@ VITE_CONTEXT = "branch-deploy"
   to = "/index.html"
   status = 200
 
+# Prevent caching of main entry point to ensure updates are seen immediately
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Prevent caching of service worker
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 # Set immutable caching for static files, because they have fingerprinted filenames
 [[headers]]
   for = "/assets/*"
