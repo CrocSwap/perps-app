@@ -571,9 +571,10 @@ export const TradingViewProvider: React.FC<{
                 ((lastAwakeMs - lastSleepMs) / 60000).toFixed(2),
             );
 
-            if (intervalMinutes <= lastSleepDurationInMinutes) {
-                // Clear internal cache and trigger full data re-fetch
-                // resetData() will briefly show stale candles then update with fresh data
+            if (intervalMinutes <= lastSleepDurationInMinutes && symbol) {
+                // Clear our candle cache so getBars fetches fresh data
+                clearChartCachesForSymbol(symbol);
+                // Trigger TradingView to re-fetch from datafeed
                 chart?.chart().resetData();
             }
         }
