@@ -562,18 +562,26 @@ export const TradingViewProvider: React.FC<{
         };
     }, [chart]);
 
+    const lastAwakeMsRef = useRef<number>(0);
     useEffect(() => {
         // Refresh chart data when waking from sleep
-        if (lastAwakeMs > 0 && symbol && chart) {
+        // Skip initial mount by checking if lastAwakeMs actually changed
+        if (
+            lastAwakeMs > 0 &&
+            lastAwakeMs !== lastAwakeMsRef.current &&
+            symbol &&
+            chart
+        ) {
             console.log(
                 '>>> refreshing chart after wake',
                 new Date().toISOString(),
             );
             // Clear our candle cache so getBars fetches fresh data
             clearChartCachesForSymbol(symbol);
-            // Trigger TradingView to re-fetch from datafeed
-            chart.chart().resetData();
+            // Force full symbol reload to re-fetch all visible candles
+            chart.chart().setSymbol(symbol);
         }
+        lastAwakeMsRef.current = lastAwakeMs;
     }, [lastAwakeMs, chart, symbol]);
 
     useEffect(() => {
