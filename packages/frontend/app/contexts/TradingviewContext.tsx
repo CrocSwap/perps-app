@@ -364,7 +364,7 @@ export const TradingViewProvider: React.FC<{
         const tvWidget = new tradingviewLib.widget({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
-            timezone: 'Etc/UTC',
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as any,
             symbol: processedSymbol,
             fullscreen: false,
             autosize: true,
