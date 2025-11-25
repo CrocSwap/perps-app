@@ -1,3 +1,13 @@
+/**
+ * Synchronously get the cached TradingView library if already loaded.
+ * Returns null if not yet loaded.
+ */
+export function getCachedTradingViewLibrary() {
+    if (typeof window === 'undefined') return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (window as any).TradingView || null;
+}
+
 export async function loadTradingViewLibrary() {
     if (typeof window === 'undefined') {
         console.warn('[loadTradingView] TradingView not available in SSR.');
