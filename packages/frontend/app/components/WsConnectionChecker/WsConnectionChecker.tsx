@@ -40,6 +40,36 @@ export default function WsConnectionChecker() {
         }
     }, [page]);
 
+    // Detect computer sleep/wake via heartbeat timer gap
+    const lastHeartbeatRef = useRef<number>(Date.now());
+    const HEARTBEAT_INTERVAL = 2000; // Check every 2 seconds
+    const SLEEP_THRESHOLD = 5000; // If gap > 5 seconds, computer likely slept
+
+    useEffect(() => {
+        const heartbeatInterval = setInterval(() => {
+            const now = Date.now();
+            const elapsed = now - lastHeartbeatRef.current;
+
+            if (elapsed > SLEEP_THRESHOLD) {
+                // Computer woke from sleep - trigger sleep mode cycle to refresh data
+                console.log(
+                    `>>> detected wake from sleep (gap: ${elapsed}ms)`,
+                    new Date().toISOString(),
+                );
+                // Briefly set sleep mode then immediately wake to trigger refresh
+                setIsWsSleepMode(true);
+                setTimeout(() => {
+                    setIsWsSleepMode(false);
+                    setIsTabActiveDelayed(true);
+                }, 100);
+            }
+
+            lastHeartbeatRef.current = now;
+        }, HEARTBEAT_INTERVAL);
+
+        return () => clearInterval(heartbeatInterval);
+    }, [setIsWsSleepMode, setIsTabActiveDelayed]);
+
     useEffect(() => {
         const onlineListener = () => {
             setInternetConnected(true);

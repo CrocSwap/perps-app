@@ -93,7 +93,7 @@ export const TradingViewProvider: React.FC<{
 }> = ({ children, tradingviewLib, setChartLoadingStatus }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
-    const { info, lastSleepMs, lastAwakeMs } = useSdk();
+    const { info, lastAwakeMs } = useSdk();
 
     const { symbol, addToFetchedChannels } = useTradeDataStore();
 
@@ -563,22 +563,18 @@ export const TradingViewProvider: React.FC<{
     }, [chart]);
 
     useEffect(() => {
-        if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
-            const intervalMinutes = tvIntervalToMinutes(
-                chartInterval as ResolutionString,
+        // Refresh chart data when waking from sleep
+        if (lastAwakeMs > 0 && symbol && chart) {
+            console.log(
+                '>>> refreshing chart after wake',
+                new Date().toISOString(),
             );
-            const lastSleepDurationInMinutes = parseFloat(
-                ((lastAwakeMs - lastSleepMs) / 60000).toFixed(2),
-            );
-
-            if (intervalMinutes <= lastSleepDurationInMinutes && symbol) {
-                // Clear our candle cache so getBars fetches fresh data
-                clearChartCachesForSymbol(symbol);
-                // Trigger TradingView to re-fetch from datafeed
-                chart?.chart().resetData();
-            }
+            // Clear our candle cache so getBars fetches fresh data
+            clearChartCachesForSymbol(symbol);
+            // Trigger TradingView to re-fetch from datafeed
+            chart.chart().resetData();
         }
-    }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
+    }, [lastAwakeMs, chart, symbol]);
 
     useEffect(() => {
         if (!chart || !symbol) return;
