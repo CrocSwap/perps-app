@@ -572,25 +572,9 @@ export const TradingViewProvider: React.FC<{
             );
 
             if (intervalMinutes <= lastSleepDurationInMinutes) {
-                // Reset cache and refresh data without visual disruption
-                // Using resetData() causes a visible flash; instead just reset cache
-                // and let the datafeed fetch fresh data on next update
-                chart?.resetCache();
-                // Trigger a data refresh by briefly scrolling - this fetches new bars
-                // without clearing the visible chart
-                try {
-                    const activeChart = chart?.chart();
-                    if (activeChart) {
-                        const range = activeChart.getVisibleRange();
-                        if (range) {
-                            // Force datafeed to refetch by resetting and restoring range
-                            activeChart.setVisibleRange(range);
-                        }
-                    }
-                } catch {
-                    // Fallback: if the gentle refresh fails, do the full reset
-                    chart?.chart().resetData();
-                }
+                // Clear internal cache and trigger full data re-fetch
+                // resetData() will briefly show stale candles then update with fresh data
+                chart?.chart().resetData();
             }
         }
     }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
