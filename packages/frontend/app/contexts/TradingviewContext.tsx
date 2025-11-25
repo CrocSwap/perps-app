@@ -369,7 +369,7 @@ export const TradingViewProvider: React.FC<{
             fullscreen: false,
             autosize: true,
             datafeed: dataFeedRef.current as IBasicDataFeed,
-            interval: (chartState?.interval || '1D') as ResolutionString,
+            interval: (chartState?.interval || '1h') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
                 'header_symbol_search',
