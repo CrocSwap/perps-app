@@ -120,6 +120,13 @@ export const createDataFeed = (
             const { from, to } = periodParams;
             const symbol = symbolInfo.ticker;
 
+            console.log('>>> getBars called', {
+                symbol,
+                resolution,
+                from: new Date(from * 1000).toISOString(),
+                to: new Date(to * 1000).toISOString(),
+            });
+
             if (!symbol) {
                 onError('Symbol is not defined');
                 onResult([], { noData: true });
@@ -133,6 +140,17 @@ export const createDataFeed = (
                     from,
                     to,
                 );
+
+                console.log('>>> getBars result', {
+                    symbol,
+                    barsCount: bars?.length || 0,
+                    firstBar: bars?.[0]
+                        ? new Date(bars[0].time).toISOString()
+                        : null,
+                    lastBar: bars?.[bars.length - 1]
+                        ? new Date(bars[bars.length - 1].time).toISOString()
+                        : null,
+                });
 
                 if (!bars) {
                     onResult([], { noData: true });
