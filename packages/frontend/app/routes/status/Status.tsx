@@ -26,6 +26,10 @@ const ENDPOINTS = [
     { name: 'Market API', url: MARKET_INFO_ENDPOINT },
     { name: 'RPC Endpoint', url: RPC_ENDPOINT },
     { name: 'Block Explorer', url: blockExplorer },
+    {
+        name: 'Ember',
+        url: 'https://ember-leaderboard-v2.liquidity.tools/health',
+    },
 ];
 
 export default function Status(): ReactElement {
