@@ -160,6 +160,12 @@ export default function Tabs(props: TabsProps) {
             orderHistory.length > 0
         ) {
             label = `${t(tab)} (${orderHistory.length})`;
+        } else if (tab === 'Enter Code') {
+            label = t('referrals.enterCode');
+        } else if (tab === 'Claim') {
+            label = t('referrals.claim');
+        } else if (tab === 'Create Code') {
+            label = t('referrals.createCode');
         }
         return label;
     };

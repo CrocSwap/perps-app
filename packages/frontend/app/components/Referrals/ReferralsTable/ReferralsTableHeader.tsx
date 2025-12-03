@@ -32,12 +32,6 @@ function ReferralsTableHeader({
                 className: 'addressCell',
             },
             {
-                name: 'Date Joined',
-                key: 'dateJoined',
-                sortable: true,
-                className: 'dateJoinedCell',
-            },
-            {
                 name: 'Total Volume',
                 key: 'totalVolume',
                 sortable: true,

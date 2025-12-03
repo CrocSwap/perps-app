@@ -103,7 +103,7 @@ export function useNumFormatter() {
 
             if (precision && typeof precision === 'object') {
                 precisionVal = decimalPrecision(precision.val);
-            } else if (precision) {
+            } else if (precision !== null && precision !== undefined) {
                 precisionVal = precision;
             }
 

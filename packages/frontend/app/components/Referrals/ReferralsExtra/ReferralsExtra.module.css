@@ -1,0 +1,37 @@
+.referrals_extra {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: var(--radius-m, 16px);
+    background: var(--bg-dark2, #0e0e14);
+    padding: var(--padding-s);
+}
+
+.referrals_extra > h4 {
+    height: 16px;
+    text-align: center;
+    color: var(--text3, #f0f0f8);
+    font-size: var(--font-size-m, 18px);
+}
+
+.referrals_extra > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.referrals_extra > div button {
+    border: 1px solid var(--bg-dark4);
+    border-radius: var(--radius-s);
+    padding: var(--padding-s);
+    color: var(--text3);
+    background-color: var(--bg-dark3);
+    font-size: var(--font-size-s);
+}
+
+@media (max-width: 1080px) {
+    .referrals_extra {
+        display: none;
+    }
+}

@@ -1337,8 +1337,13 @@ packages:
   '@fractalwagmi/solana-wallet-adapter@0.1.1':
     resolution: {integrity: sha512-oTZLEuD+zLKXyhZC5tDRMPKPj8iaxKLxXiCjqRfOo4xmSbS2izGRWLJbKMYYsJysn/OI3UJ3P6CWP8WUWi0dZg==}
 
+<<<<<<< HEAD
+  '@fuul/sdk@7.3.2':
+    resolution: {integrity: sha512-EZMHw0cD4jLX2JfiIduzuxMY+LwFAjbw1IcZ9lFjvaTkY//4A/VEa4R21NV9aiQhyF2OI1HAnTHvcVDPysqvUQ==}
+=======
   '@fuul/sdk@7.4.1':
     resolution: {integrity: sha512-ly1GezxRzi8q+/iPwaMw56cbtTEOxiwcoAlm+X4z1BRcwX6GlfUOwXt6w6D4k2EcB07pmgN1eQjKR2s93XrgTw==}
+>>>>>>> c96b6ad6fc33e45acfa5c65540d2e8d239b3bde9
 
   '@gql.tada/cli-utils@1.7.2':
     resolution: {integrity: sha512-Qbc7hbLvCz6IliIJpJuKJa9p05b2Jona7ov7+qofCsMRxHRZE1kpAmZMvL8JCI4c0IagpIlWNaMizXEQUe8XjQ==}

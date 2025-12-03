@@ -1,29 +1,49 @@
-import type { ReferralData } from './data';
+import type {
+    PayoutByReferrerEarningsT,
+    PayoutByReferrerT,
+} from '~/routes/referrals/referrals';
 import styles from './ReferralsTable.module.css';
+import truncString from '~/utils/functions/truncString';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
-interface ReferralsTableRowProps {
-    referral: ReferralData;
+interface PropsIF {
+    referral: PayoutByReferrerT;
 }
 
-export default function ReferralsTableRow({
-    referral,
-}: ReferralsTableRowProps) {
+export default function ReferralsTableRow(props: PropsIF) {
+    const { referral } = props;
+
+    // logic to format a number for localized currency
+    const { formatNum } = useNumFormatter();
+
+    // prop `referral` is an object with a single key-value pair
+    // key → wallet address for user
+    // value → object with fee and rewards data
+    const [address, data] = Object.entries(referral)[0];
+
     return (
         <div className={styles.rowContainer}>
             <div className={`${styles.cell} ${styles.addressCell}`}>
-                {referral.address}
-            </div>
-            <div className={`${styles.cell} ${styles.dateJoinedCell}`}>
-                {referral.dateJoined}
+                {truncString(address, 5, 5)}
             </div>
             <div className={`${styles.cell} ${styles.volumeCell}`}>
-                {referral.totalVolume}
+                {formatNum(data.volume, 2, true, true)}
             </div>
             <div className={`${styles.cell} ${styles.feesCell}`}>
-                {referral.feesPaid}
+                {formatNum(0, 2, true, true)}
             </div>
             <div className={`${styles.cell} ${styles.rewardsCell}`}>
-                {referral.yourRewards}
+                {formatNum(
+                    // sum of all the 'amount' fields across chains
+                    data.earnings.reduce(
+                        (acc: number, current: PayoutByReferrerEarningsT) =>
+                            acc + current.amount,
+                        0,
+                    ),
+                    2,
+                    true,
+                    true,
+                )}
             </div>
         </div>
     );
