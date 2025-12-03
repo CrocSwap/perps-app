@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -72,8 +72,6 @@ export default function DepositsWithdrawalsTable(
     );
 
     const { userAddress } = useUserDataStore();
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
 
     const viewAllLink = userAddress
         ? `${EXTERNAL_PAGE_URL_PREFIX}/depositsandwithdrawals/${userAddress}`
@@ -81,7 +79,7 @@ export default function DepositsWithdrawalsTable(
 
     return (
         <GenericTable
-            storageKey={`DepositsWithdrawalsTable_${currentUserRef.current}`}
+            storageKey='DepositsWithdrawalsTable'
             data={sortedTxs}
             renderHeader={(dir, onSort, by) => (
                 <DepositsWithdrawalsTableHeader

@@ -31,6 +31,8 @@ interface GenericTableProps<
 > {
     data: T[];
     noDataMessage?: string;
+    noDataActionLabel?: string;
+    onNoDataAction?: () => void;
     renderHeader: (
         sortDirection: TableSortDirection,
         sortClickHandler: (key: S) => void,
@@ -72,6 +74,8 @@ export default function GenericTable<
     const {
         data,
         noDataMessage,
+        noDataActionLabel,
+        onNoDataAction,
         renderHeader,
         renderRow,
         sorterMethod,
@@ -206,23 +210,24 @@ export default function GenericTable<
         checkShadow();
         calculateRowCount();
 
-        let scrollEvent = null;
         const tableBody = document.getElementById(
             `${id}-tableBody`,
         ) as HTMLElement;
 
+        const scrollHandler = () => {
+            checkShadow();
+        };
+
         if (tableBody) {
-            scrollEvent = tableBody.addEventListener('scroll', () => {
-                checkShadow();
-            });
+            tableBody.addEventListener('scroll', scrollHandler);
         }
 
         return () => {
-            if (scrollEvent) {
-                tableBody.removeEventListener('scroll', scrollEvent);
+            if (tableBody) {
+                tableBody.removeEventListener('scroll', scrollHandler);
             }
         };
-    }, [tableState]);
+    }, [tableState, checkShadow, id]);
 
     useEffect(() => {
         if (!isClient) {
@@ -449,7 +454,11 @@ export default function GenericTable<
                     tableState === TableState.FILLED &&
                     dataToShow.map(renderRow)}
                 {isSessionEstablished && tableState === TableState.EMPTY && (
-                    <NoDataRow text={noDataMessage} />
+                    <NoDataRow
+                        text={noDataMessage}
+                        actionLabel={noDataActionLabel}
+                        onAction={onNoDataAction}
+                    />
                 )}
                 {!isSessionEstablished && (
                     <div

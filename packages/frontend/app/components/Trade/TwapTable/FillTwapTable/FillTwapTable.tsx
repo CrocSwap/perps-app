@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortTwapFillHistory } from '~/processors/processUserFills';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -22,11 +22,8 @@ export default function FillTwapTable(props: FillTwapTableProps) {
 
     const { userAddress } = useUserDataStore();
 
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
-
     const viewAllLink = useMemo(() => {
-        return `${EXTERNAL_PAGE_URL_PREFIX}/twapFillHistory/${currentUserRef.current}`;
+        return `${EXTERNAL_PAGE_URL_PREFIX}/twapFillHistory/${userAddress}`;
     }, [userAddress]);
 
     const filteredData = useMemo(() => {
@@ -46,7 +43,7 @@ export default function FillTwapTable(props: FillTwapTableProps) {
     return (
         <>
             <GenericTable
-                storageKey={`FillTwapTable_${currentUserRef.current}`}
+                storageKey='FillTwapTable'
                 data={filteredData as any}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <FillTwapTableHeader

@@ -40,7 +40,8 @@
         "reset": "Reset",
         "announcements": "Announcements",
         "leverage": "Leverage",
-        "comingSoon": "Coming Soon"
+        "comingSoon": "Coming Soon",
+        "clearFilter": "Clear filter"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -220,6 +221,9 @@
             "message": "Canceled {{successCount}} orders, {{failedCount}} failed"
         },
         "noOpenOrders": "No open orders",
+        "noOpenOrdersForMarket": "No open {{symbol}} orders",
+        "noOpenLongOrders": "No open long orders",
+        "noOpenShortOrders": "No open short orders",
         "transactionError": "Transaction Error",
         "invalidLimitPrice": {
             "title": "Invalid Price",
@@ -298,6 +302,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "No open positions",
+        "noOpenPositionsForMarket": "No open {{symbol}} positions",
+        "noOpenLongPositions": "No open long positions",
+        "noOpenShortPositions": "No open short positions",
         "markPrice": "Mark Price",
         "orderId": "Order ID",
         "totalBalance": "Total Balance",
@@ -315,8 +322,17 @@
         "originalSize": "Original Size",
         "cancelAll": "Cancel All",
         "noTradeHistory": "No trade history",
+        "noTradeHistoryForMarket": "No {{symbol}} trade history",
+        "noLongTradeHistory": "No long trade history",
+        "noShortTradeHistory": "No short trade history",
         "noOrderHistory": "No order history",
+        "noOrderHistoryForMarket": "No {{symbol}} order history",
+        "noLongOrderHistory": "No long order history",
+        "noShortOrderHistory": "No short order history",
         "noFundingHistory": "No funding history",
+        "noFundingHistoryForMarket": "No {{symbol}} funding history",
+        "noLongFundingHistory": "No long funding history",
+        "noShortFundingHistory": "No short funding history",
         "fundingHistory": "All-time: {{allTime}} Since change: {{sinceChange}}",
         "openLong": "Open Long",
         "openShort": "Open Short",
@@ -489,6 +505,10 @@
         },
         "updateButton": "Update Now",
         "version": "Version"
+    },
+    "offline": {
+        "title": "You are offline",
+        "message": "Trading is disabled. You can still view cached data."
     },
     "leverage": {
         "title": "Adjust Leverage",

@@ -40,7 +40,8 @@
         "reset": "Reiniciar",
         "announcements": "Anuncios",
         "leverage": "Apalancamiento",
-        "comingSoon": "Próximamente"
+        "comingSoon": "Próximamente",
+        "clearFilter": "Borrar filtro"
     },
     "transactions": {
         "orderTypes": "Tipos de orden",
@@ -220,6 +221,9 @@
             "message": "Canceladas {{successCount}} órdenes, {{failedCount}} fallaron"
         },
         "noOpenOrders": "No hay órdenes abiertas",
+        "noOpenOrdersForMarket": "No hay órdenes {{symbol}} abiertas",
+        "noOpenLongOrders": "No hay órdenes long abiertas",
+        "noOpenShortOrders": "No hay órdenes short abiertas",
         "transactionError": "Error de transacción",
         "invalidLimitPrice": {
             "title": "Precio inválido",
@@ -298,6 +302,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "No hay posiciones abiertas",
+        "noOpenPositionsForMarket": "No hay posiciones {{symbol}} abiertas",
+        "noOpenLongPositions": "No hay posiciones long abiertas",
+        "noOpenShortPositions": "No hay posiciones short abiertas",
         "markPrice": "Precio de referencia",
         "orderId": "ID de orden",
         "totalBalance": "Saldo total",
@@ -315,8 +322,17 @@
         "originalSize": "Cantidad original",
         "cancelAll": "Cancelar todas",
         "noTradeHistory": "Sin historial de operaciones",
+        "noTradeHistoryForMarket": "Sin historial de operaciones {{symbol}}",
+        "noLongTradeHistory": "Sin historial de operaciones long",
+        "noShortTradeHistory": "Sin historial de operaciones short",
         "noOrderHistory": "Sin historial de órdenes",
+        "noOrderHistoryForMarket": "Sin historial de órdenes {{symbol}}",
+        "noLongOrderHistory": "Sin historial de órdenes long",
+        "noShortOrderHistory": "Sin historial de órdenes short",
         "noFundingHistory": "Sin historial de financiamiento",
+        "noFundingHistoryForMarket": "Sin historial de financiamiento {{symbol}}",
+        "noLongFundingHistory": "Sin historial de financiamiento long",
+        "noShortFundingHistory": "Sin historial de financiamiento short",
         "fundingHistory": "Todos los tiempos: {{allTime}} Desde el cambio: {{sinceChange}}",
         "openLong": "Abrir Long",
         "openShort": "Abrir Short",
@@ -489,6 +505,10 @@
         },
         "updateButton": "Actualizar ahora",
         "version": "Versión"
+    },
+    "offline": {
+        "title": "Estás sin conexión",
+        "message": "El trading está deshabilitado. Aún puedes ver los datos en caché."
     },
     "leverage": {
         "title": "Ajustar apalancamiento",

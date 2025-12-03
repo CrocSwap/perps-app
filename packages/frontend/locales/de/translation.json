@@ -40,7 +40,8 @@
         "reset": "Zurücksetzen",
         "announcements": "Ankündigungen",
         "leverage": "Hebel",
-        "comingSoon": "Demnächst verfügbar"
+        "comingSoon": "Demnächst verfügbar",
+        "clearFilter": "Filter löschen"
     },
     "transactions": {
         "orderTypes": "Ordertypen",
@@ -218,6 +219,9 @@
             "message": "{{successCount}} Orders abgebrochen, {{failedCount}} fehlgeschlagen"
         },
         "noOpenOrders": "Keine offenen Orders",
+        "noOpenOrdersForMarket": "Keine offenen {{symbol}} Orders",
+        "noOpenLongOrders": "Keine offenen Long-Orders",
+        "noOpenShortOrders": "Keine offenen Short-Orders",
         "transactionError": "Transaktionsfehler",
         "invalidLimitPrice": {
             "title": "Ungültiger Preis",
@@ -296,6 +300,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "Keine offenen Positionen",
+        "noOpenPositionsForMarket": "Keine offenen {{symbol}} Positionen",
+        "noOpenLongPositions": "Keine offenen Long-Positionen",
+        "noOpenShortPositions": "Keine offenen Short-Positionen",
         "markPrice": "Markpreis",
         "orderId": "Order-ID",
         "totalBalance": "Gesamtsaldo",
@@ -313,8 +320,17 @@
         "originalSize": "Ursprüngliche Größe",
         "cancelAll": "Alle abbrechen",
         "noTradeHistory": "Keine Handelshistorie",
+        "noTradeHistoryForMarket": "Keine {{symbol}} Handelshistorie",
+        "noLongTradeHistory": "Keine Long-Handelshistorie",
+        "noShortTradeHistory": "Keine Short-Handelshistorie",
         "noOrderHistory": "Keine Orderhistorie",
+        "noOrderHistoryForMarket": "Keine {{symbol}} Orderhistorie",
+        "noLongOrderHistory": "Keine Long-Orderhistorie",
+        "noShortOrderHistory": "Keine Short-Orderhistorie",
         "noFundingHistory": "Keine Funding-Historie",
+        "noFundingHistoryForMarket": "Keine {{symbol}} Funding-Historie",
+        "noLongFundingHistory": "Keine Long-Funding-Historie",
+        "noShortFundingHistory": "Keine Short-Funding-Historie",
         "fundingHistory": "Gesamt: {{allTime}} Seit Änderung: {{sinceChange}}",
         "openLong": "Long eröffnen",
         "openShort": "Short eröffnen",
@@ -487,6 +503,10 @@
         },
         "updateButton": "Jetzt aktualisieren",
         "version": "Version"
+    },
+    "offline": {
+        "title": "Sie sind offline",
+        "message": "Handel ist deaktiviert. Sie können weiterhin zwischengespeicherte Daten anzeigen."
     },
     "leverage": {
         "title": "Hebel anpassen",

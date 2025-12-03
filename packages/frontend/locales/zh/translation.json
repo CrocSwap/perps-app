@@ -40,7 +40,8 @@
         "reset": "重置",
         "announcements": "公告",
         "leverage": "杠杆",
-        "comingSoon": "即将上线"
+        "comingSoon": "即将上线",
+        "clearFilter": "清除筛选"
     },
     "transactions": {
         "orderTypes": "订单类型",
@@ -220,6 +221,9 @@
             "message": "已取消{{successCount}}个订单，{{failedCount}}个失败"
         },
         "noOpenOrders": "暂无未成交订单",
+        "noOpenOrdersForMarket": "暂无{{symbol}}未成交订单",
+        "noOpenLongOrders": "暂无多头未成交订单",
+        "noOpenShortOrders": "暂无空头未成交订单",
         "transactionError": "交易错误",
         "invalidLimitPrice": {
             "title": "价格无效",
@@ -298,6 +302,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "无持仓",
+        "noOpenPositionsForMarket": "无{{symbol}}持仓",
+        "noOpenLongPositions": "无多头持仓",
+        "noOpenShortPositions": "无空头持仓",
         "markPrice": "标记价格",
         "orderId": "订单编号",
         "totalBalance": "总余额",
@@ -315,8 +322,17 @@
         "originalSize": "原始数量",
         "cancelAll": "全部取消",
         "noTradeHistory": "无交易历史",
+        "noTradeHistoryForMarket": "无{{symbol}}交易历史",
+        "noLongTradeHistory": "无多头交易历史",
+        "noShortTradeHistory": "无空头交易历史",
         "noOrderHistory": "无订单历史",
+        "noOrderHistoryForMarket": "无{{symbol}}订单历史",
+        "noLongOrderHistory": "无多头订单历史",
+        "noShortOrderHistory": "无空头订单历史",
         "noFundingHistory": "无资金费率历史",
+        "noFundingHistoryForMarket": "无{{symbol}}资金费率历史",
+        "noLongFundingHistory": "无多头资金费率历史",
+        "noShortFundingHistory": "无空头资金费率历史",
         "fundingHistory": "总计: {{allTime}} 变化后: {{sinceChange}}",
         "openLong": "开 Long",
         "openShort": "开 Short",
@@ -489,6 +505,10 @@
         },
         "updateButton": "立即更新",
         "version": "版本"
+    },
+    "offline": {
+        "title": "您已离线",
+        "message": "交易已禁用。您仍可查看缓存的数据。"
     },
     "leverage": {
         "title": "调整杠杆",

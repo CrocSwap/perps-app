@@ -3,6 +3,7 @@ import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
 import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradingview';
 import OverlayCanvas from '~/routes/chart/overlayCanvas/overlayCanvas';
+import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
 
 const TradingViewWrapper: React.FC = () => {
@@ -11,6 +12,10 @@ const TradingViewWrapper: React.FC = () => {
     const [chartLoadingStatus, setChartLoadingStatus] = useState<
         'loading' | 'error' | 'ready'
     >('loading');
+
+    // Use a key to force remount of TradingViewProvider when coming back online
+    const { lastOnlineAt } = useAppStateStore();
+    const [chartKey, setChartKey] = useState(0);
 
     useEffect(() => {
         let mounted = true;
@@ -28,6 +33,18 @@ const TradingViewWrapper: React.FC = () => {
             mounted = false;
         };
     }, []);
+
+    // When coming back online and chart is stuck loading, force a remount
+    useEffect(() => {
+        if (lastOnlineAt > 0 && chartLoadingStatus === 'loading' && tvLib) {
+            console.log('>>> Forcing chart remount after coming back online');
+            // Small delay to let network stabilize
+            const timeoutId = setTimeout(() => {
+                setChartKey((prev) => prev + 1);
+            }, 1500);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [lastOnlineAt, chartLoadingStatus, tvLib]);
 
     if (chartLoadingStatus === 'error')
         return (
@@ -52,6 +69,7 @@ const TradingViewWrapper: React.FC = () => {
 
             {tvLib && (
                 <TradingViewProvider
+                    key={chartKey}
                     tradingviewLib={tvLib}
                     setChartLoadingStatus={setChartLoadingStatus}
                 >

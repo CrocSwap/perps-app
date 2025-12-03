@@ -39,10 +39,10 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import {
-    blockExplorer,
     BTC_MAX_LEVERAGE,
     MIN_ORDER_VALUE,
     MIN_POSITION_USD_SIZE,
+    getTxLink,
 } from '~/utils/Constants';
 import {
     getDurationSegment,
@@ -1314,9 +1314,7 @@ function OrderInput({
                     }),
                     icon: 'check',
                     removeAfter: 5000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
                 setShouldUpdateAfterTrade(true);
             } else {
@@ -1353,9 +1351,7 @@ function OrderInput({
                         result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1499,9 +1495,7 @@ function OrderInput({
                     }),
                     icon: 'check',
                     removeAfter: 5000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
                 setShouldUpdateAfterTrade(true);
             } else {
@@ -1538,9 +1532,7 @@ function OrderInput({
                         result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1692,9 +1684,7 @@ function OrderInput({
                         limitPrice,
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
             } else {
@@ -1732,9 +1722,7 @@ function OrderInput({
                         t('transactions.failedToPlaceLimitOrder'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1885,9 +1873,7 @@ function OrderInput({
                         limitPrice,
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
             } else {
@@ -1921,9 +1907,7 @@ function OrderInput({
                         t('transactions.failedToPlaceLimitOrder'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {

@@ -1,9 +1,8 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useModal } from '~/hooks/useModal';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useUserDataStore } from '~/stores/UserDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import {
     EXTERNAL_PAGE_URL_PREFIX,
@@ -13,24 +12,20 @@ import type { PositionDataSortBy, PositionIF } from '~/utils/UserDataIFs';
 import { sortPositionData } from '~/utils/position/PositionUtils';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface PositionsTableProps {
     pageMode?: boolean;
     isFetched: boolean;
     selectedFilter?: string;
+    onClearFilter?: () => void;
 }
 
 export default function PositionsTable(props: PositionsTableProps) {
-    const { pageMode, isFetched, selectedFilter } = props;
+    const { pageMode, isFetched, selectedFilter, onClearFilter } = props;
     const { coinPriceMap, symbol, symbolInfo } = useTradeDataStore();
     const { positions } = useUnifiedMarginData();
     const appSettingsModal = useModal('closed');
-
-    const { userAddress } = useUserDataStore();
-
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
 
     const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
 
@@ -58,12 +53,34 @@ export default function PositionsTable(props: PositionsTableProps) {
         }
 
         return dataFilteredBySize;
-    }, [selectedFilter, dataFilteredBySize]);
+    }, [selectedFilter, dataFilteredBySize, symbol]);
+
+    const { t, i18n } = useTranslation();
+
+    const noDataMessage = useMemo(() => {
+        switch (selectedFilter) {
+            case 'active':
+                return t('tradeTable.noOpenPositionsForMarket', { symbol });
+            case 'long':
+                return t('tradeTable.noOpenLongPositions');
+            case 'short':
+                return t('tradeTable.noOpenShortPositions');
+            default:
+                return t('tradeTable.noOpenPositions');
+        }
+    }, [selectedFilter, symbol, i18n.language]);
+
+    const showClearFilter = selectedFilter && selectedFilter !== 'all';
+
     return (
         <>
             <GenericTable
-                noDataMessage={t('tradeTable.noOpenPositions')}
-                storageKey={`PositionsTable_${currentUserRef.current}`}
+                noDataMessage={noDataMessage}
+                noDataActionLabel={
+                    showClearFilter ? t('common.clearFilter') : undefined
+                }
+                onNoDataAction={showClearFilter ? onClearFilter : undefined}
+                storageKey='PositionsTable'
                 data={dataFilteredByType as PositionIF[]}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <>

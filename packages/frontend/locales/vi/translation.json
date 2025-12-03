@@ -40,7 +40,8 @@
         "reset": "Đặt lại",
         "announcements": "Thông báo",
         "leverage": "Đòn bẩy",
-        "comingSoon": "Sắp ra mắt"
+        "comingSoon": "Sắp ra mắt",
+        "clearFilter": "Xóa bộ lọc"
     },
     "transactions": {
         "orderTypes": "Loại lệnh",
@@ -218,6 +219,9 @@
             "message": "Đã hủy {{successCount}} lệnh, {{failedCount}} lệnh thất bại"
         },
         "noOpenOrders": "Không có lệnh mở",
+        "noOpenOrdersForMarket": "Không có lệnh {{symbol}} mở",
+        "noOpenLongOrders": "Không có lệnh long mở",
+        "noOpenShortOrders": "Không có lệnh short mở",
         "transactionError": "Lỗi giao dịch",
         "invalidLimitPrice": {
             "title": "Giá không hợp lệ",
@@ -296,6 +300,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "Không có vị thế mở",
+        "noOpenPositionsForMarket": "Không có vị thế {{symbol}} mở",
+        "noOpenLongPositions": "Không có vị thế long mở",
+        "noOpenShortPositions": "Không có vị thế short mở",
         "markPrice": "Giá đánh dấu",
         "orderId": "ID lệnh",
         "totalBalance": "Tổng số dư",
@@ -313,8 +320,17 @@
         "originalSize": "Khối lượng gốc",
         "cancelAll": "Hủy tất cả",
         "noTradeHistory": "Không có lịch sử giao dịch",
+        "noTradeHistoryForMarket": "Không có lịch sử giao dịch {{symbol}}",
+        "noLongTradeHistory": "Không có lịch sử giao dịch long",
+        "noShortTradeHistory": "Không có lịch sử giao dịch short",
         "noOrderHistory": "Không có lịch sử lệnh",
+        "noOrderHistoryForMarket": "Không có lịch sử lệnh {{symbol}}",
+        "noLongOrderHistory": "Không có lịch sử lệnh long",
+        "noShortOrderHistory": "Không có lịch sử lệnh short",
         "noFundingHistory": "Không có lịch sử phí cấp vốn",
+        "noFundingHistoryForMarket": "Không có lịch sử phí cấp vốn {{symbol}}",
+        "noLongFundingHistory": "Không có lịch sử phí cấp vốn long",
+        "noShortFundingHistory": "Không có lịch sử phí cấp vốn short",
         "fundingHistory": "Tất cả: {{allTime}} Kể từ khi thay đổi: {{sinceChange}}",
         "openLong": "Mở Long",
         "openShort": "Mở Short",
@@ -487,6 +503,10 @@
         },
         "updateButton": "Cập nhật ngay",
         "version": "Phiên bản"
+    },
+    "offline": {
+        "title": "Bạn đang ngoại tuyến",
+        "message": "Giao dịch bị vô hiệu hóa. Bạn vẫn có thể xem dữ liệu đã lưu trong bộ nhớ cache."
     },
     "leverage": {
         "title": "Điều chỉnh đòn bẩy",

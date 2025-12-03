@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -11,34 +11,59 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import { OrderHistoryTableHeader } from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface OrderHistoryTableProps {
     selectedFilter?: string;
     pageMode?: boolean;
     data: OrderDataIF[];
     isFetched: boolean;
+    onClearFilter?: () => void;
 }
 
 export function OrderHistoryTable(props: OrderHistoryTableProps) {
-    const { selectedFilter, pageMode, data, isFetched } = props;
+    const { selectedFilter, pageMode, data, isFetched, onClearFilter } = props;
 
-    const { symbol, filterOrderHistory } = useTradeDataStore();
+    const { symbol } = useTradeDataStore();
 
     const { fetchOrderHistory } = useInfoApi();
 
     const { userAddress } = useUserDataStore();
 
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
-
     const filteredOrderHistory = useMemo(() => {
-        return filterOrderHistory(data, selectedFilter);
+        switch (selectedFilter) {
+            case 'all':
+                return data;
+            case 'active':
+                return data.filter((order) => order.coin === symbol);
+            case 'long':
+                return data.filter((order) => order.side === 'buy');
+            case 'short':
+                return data.filter((order) => order.side === 'sell');
+        }
+        return data;
     }, [data, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
         return `${EXTERNAL_PAGE_URL_PREFIX}/orderHistory/${userAddress}`;
     }, [userAddress]);
+
+    const { t, i18n } = useTranslation();
+
+    const noDataMessage = useMemo(() => {
+        switch (selectedFilter) {
+            case 'active':
+                return t('tradeTable.noOrderHistoryForMarket', { symbol });
+            case 'long':
+                return t('tradeTable.noLongOrderHistory');
+            case 'short':
+                return t('tradeTable.noShortOrderHistory');
+            default:
+                return t('tradeTable.noOrderHistory');
+        }
+    }, [selectedFilter, symbol, i18n.language]);
+
+    const showClearFilter = selectedFilter && selectedFilter !== 'all';
 
     return (
         <>
@@ -47,7 +72,11 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
                 OrderDataSortBy,
                 (address: string) => Promise<OrderDataIF[]>
             >
-                storageKey={`OrderHistoryTable_${currentUserRef.current}`}
+                storageKey='OrderHistoryTable'
+                noDataActionLabel={
+                    showClearFilter ? t('common.clearFilter') : undefined
+                }
+                onNoDataAction={showClearFilter ? onClearFilter : undefined}
                 data={filteredOrderHistory}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <OrderHistoryTableHeader
@@ -70,7 +99,7 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
                 skeletonColRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
                 defaultSortBy={'timestamp'}
                 defaultSortDirection={'desc'}
-                noDataMessage={t('tradeTable.noOrderHistory')}
+                noDataMessage={noDataMessage}
                 csvDataFetcher={fetchOrderHistory}
                 csvDataFetcherArgs={[userAddress]}
             />

@@ -83,3 +83,53 @@ html.modal-open body {
 html.modal-open .root-container {
     overflow: visible !important;
 }
+
+/* Error fallback styles */
+.error-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    padding: var(--padding-l);
+    text-align: center;
+    color: var(--text1);
+}
+
+.error-fallback h2 {
+    font-size: var(--font-size-l);
+    margin-bottom: var(--margin-s);
+    color: var(--text1);
+}
+
+.error-fallback p {
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    max-width: 400px;
+    margin-bottom: var(--margin-m);
+    line-height: 1.5;
+}
+
+.error-fallback button {
+    padding: var(--padding-s) var(--padding-m);
+    border: none;
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-s);
+    cursor: pointer;
+    background: var(--accent1);
+    color: var(--text1);
+    transition: background-color 0.2s;
+}
+
+.error-fallback button:hover {
+    background: var(--accent1-dark);
+}
+
+.error-fallback__buttons {
+    display: flex;
+    gap: var(--gap-s);
+}
+
+.error-fallback--offline h2 {
+    color: var(--orange);
+}

@@ -6,6 +6,7 @@ import type {
     LibrarySymbolInfo,
     Mark,
     OnReadyCallback,
+    ResolutionString,
 } from '~/tv/charting_library';
 import {
     POLLING_API_URL,
@@ -31,6 +32,7 @@ const subscriptions = new Map<string, { unsubscribe: () => void }>();
 
 export type CustomDataFeedType = IDatafeedChartApi & {
     updateUserAddress: (address: string) => void;
+    destroy: () => void;
 } & { onReady(callback: OnReadyCallback): void };
 
 export const createDataFeed = (
@@ -38,14 +40,32 @@ export const createDataFeed = (
     addToFetchedChannels: (channel: string) => void,
 ): CustomDataFeedType => {
     let currentUserAddress = '';
+    // Keep track of user fills subscription separately since it's not tied to a listenerGuid
+    let userFillsSubscription: { unsubscribe: () => void } | null = null;
+
     const updateUserAddress = (newAddress: string) => {
         currentUserAddress = newAddress;
     };
     const datafeed: IDatafeedChartApi & {
         updateUserAddress: (address: string) => void;
+        destroy: () => void;
     } = {
-        searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
+        searchSymbols: (
+            userInput: string,
+            exchange: string,
+            symbolType: string,
+            onResult: (items: any[]) => void,
+        ) => {
             onResult([]);
+        },
+
+        destroy: () => {
+            subscriptions.forEach((sub) => sub.unsubscribe());
+            subscriptions.clear();
+            if (userFillsSubscription) {
+                userFillsSubscription.unsubscribe();
+                userFillsSubscription = null;
+            }
         },
 
         onReady: (cb: any) => {
@@ -63,13 +83,18 @@ export const createDataFeed = (
                 0);
         },
 
-        resolveSymbol: (symbolName, onResolve, onError) => {
+        resolveSymbol: (
+            symbolName: string,
+            onResolve: (symbolInfo: LibrarySymbolInfo) => void,
+            onError: (reason: string) => void,
+        ) => {
             const symbolInfo: LibrarySymbolInfo = {
                 ticker: symbolName,
                 name: symbolName,
                 minmov: 0.01,
                 pricescale: 1000,
-                timezone: 'Etc/UTC',
+                timezone: Intl.DateTimeFormat().resolvedOptions()
+                    .timeZone as any,
                 session: '24x7',
                 has_intraday: true,
                 supported_resolutions: supportedResolutions,
@@ -83,11 +108,11 @@ export const createDataFeed = (
         },
 
         getBars: async (
-            symbolInfo,
-            resolution,
-            periodParams,
-            onResult,
-            onError,
+            symbolInfo: LibrarySymbolInfo,
+            resolution: ResolutionString,
+            periodParams: any,
+            onResult: (bars: any[], meta?: any) => void,
+            onError: (reason: string) => void,
         ) => {
             /**
              * for fetching historical data
@@ -95,23 +120,39 @@ export const createDataFeed = (
             const { from, to } = periodParams;
             const symbol = symbolInfo.ticker;
 
-            if (symbol) {
-                try {
-                    const bars = await getHistoricalData(
-                        symbol,
-                        resolution,
-                        from,
-                        to,
-                    );
+            if (!symbol) {
+                onError('Symbol is not defined');
+                onResult([], { noData: true });
+                return;
+            }
 
-                    bars && onResult(bars, { noData: bars.length === 0 });
-                } catch (error) {
-                    console.error('Error loading historical data:', error);
+            try {
+                const bars = await getHistoricalData(
+                    symbol,
+                    resolution,
+                    from,
+                    to,
+                );
+
+                if (!bars) {
+                    onResult([], { noData: true });
+                    return;
                 }
+
+                onResult(bars, { noData: bars.length === 0 });
+            } catch (error) {
+                console.error('Error loading historical data:', error);
+                onError('Error loading historical data');
             }
         },
 
-        getMarks: async (symbolInfo, from, to, onDataCallback, resolution) => {
+        getMarks: async (
+            symbolInfo: LibrarySymbolInfo,
+            from: number,
+            to: number,
+            onDataCallback: (marks: Mark[]) => void,
+            resolution: ResolutionString,
+        ) => {
             const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
             const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
@@ -135,7 +176,7 @@ export const createDataFeed = (
                         color: {
                             border: markerColor,
                             background: markerColor,
-                        },
+                        } as any,
                         text: element.dir + ' at ' + element.px,
                         px: element.px,
                         label: isBuy ? 'B' : 'S',
@@ -153,12 +194,22 @@ export const createDataFeed = (
                 });
             };
 
-            const markRes = (await getMarkFillData(
-                symbolInfo.name,
-                currentUserAddress,
-            )) as any;
+            let markRes: any;
+            try {
+                markRes = (await getMarkFillData(
+                    symbolInfo.name || '',
+                    currentUserAddress,
+                )) as any;
+            } catch (error) {
+                console.error('Error loading marks data:', error);
+                onDataCallback([]);
+                return;
+            }
 
-            if (!markRes) return;
+            if (!markRes) {
+                onDataCallback([]);
+                return;
+            }
 
             const fillHistory = markRes.dataCache;
             const userWallet = markRes.user;
@@ -181,7 +232,12 @@ export const createDataFeed = (
 
             if (!info) return console.log('SDK is not ready');
             setTimeout(() => {
-                info.subscribe(
+                // Unsubscribe previous listener if it exists to avoid leaks
+                if (userFillsSubscription) {
+                    userFillsSubscription.unsubscribe();
+                }
+
+                userFillsSubscription = info.subscribe(
                     {
                         type: WsChannels.USER_FILLS,
                         user: userWallet,
@@ -189,6 +245,7 @@ export const createDataFeed = (
                     (payload: any) => {
                         addToFetchedChannels(WsChannels.USER_FILLS);
                         if (!payload || !payload.data) return;
+                        // ...
 
                         const fills = payload.data.fills;
                         if (!fills || fills.length === 0) return;
@@ -204,7 +261,7 @@ export const createDataFeed = (
                         fillMarks(poolFills);
 
                         updateMarkDataWithSubscription(
-                            symbolInfo.name,
+                            symbolInfo.name || '',
                             poolFills,
                             userWallet,
                         );
@@ -224,7 +281,12 @@ export const createDataFeed = (
             }, 500);
         },
 
-        subscribeBars: (symbolInfo, resolution, onTick, listenerGuid) => {
+        subscribeBars: (
+            symbolInfo: LibrarySymbolInfo,
+            resolution: ResolutionString,
+            onTick: (bar: any) => void,
+            listenerGuid: string,
+        ) => {
             console.log(
                 '>>> subscribeBars',
                 symbolInfo,
@@ -235,8 +297,14 @@ export const createDataFeed = (
             if (!info) return console.log('SDK is not ready');
 
             const intervalParam = convertResolutionToIntervalParam(resolution);
+            let isFetching = false;
+            let abortController: AbortController | null = null;
 
             const poller = setInterval(() => {
+                if (isFetching) return;
+
+                isFetching = true;
+                abortController = new AbortController();
                 const currentTime = new Date().getTime();
                 fetch(`${POLLING_API_URL}/info`, {
                     method: 'POST',
@@ -252,11 +320,14 @@ export const createDataFeed = (
                             startTime: currentTime - 1000 * 10,
                         },
                     }),
-                }).then((res) => {
-                    res.json().then((data) => {
+                    signal: abortController.signal,
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
                         const candleData = data[0];
                         if (
                             symbolInfo.ticker &&
+                            candleData &&
                             candleData.s === symbolInfo.ticker
                         ) {
                             const tick = processWSCandleMessage(candleData);
@@ -267,10 +338,23 @@ export const createDataFeed = (
                                 tick,
                             );
                         }
+                    })
+                    .catch((error) => {
+                        if (error.name !== 'AbortError') {
+                            console.error('Error polling candles:', error);
+                        }
+                    })
+                    .finally(() => {
+                        isFetching = false;
                     });
-                });
             }, TIMEOUT_CANDLE_POLLING);
-            const unsubscribe = () => clearInterval(poller);
+            const unsubscribe = () => {
+                clearInterval(poller);
+                if (abortController) {
+                    abortController.abort();
+                    abortController = null;
+                }
+            };
             subscriptions.set(listenerGuid, { unsubscribe });
         },
 

@@ -1,11 +1,84 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterProvider, createBrowserRouter } from 'react-router';
+import {
+    RouterProvider,
+    createBrowserRouter,
+    useRouteError,
+    isRouteErrorResponse,
+} from 'react-router';
 import Root from './root';
+
+// Check if error is a chunk/module loading failure (typically happens offline)
+function isChunkLoadError(error: unknown): boolean {
+    if (error instanceof Error) {
+        const message = error.message?.toLowerCase() || '';
+        const name = error.name?.toLowerCase() || '';
+        return (
+            message.includes('failed to fetch') ||
+            message.includes('loading chunk') ||
+            message.includes('loading css chunk') ||
+            message.includes('unable to preload') ||
+            message.includes('dynamically imported module') ||
+            name.includes('chunkloaderror')
+        );
+    }
+    return false;
+}
+
+// Route error boundary component
+function RouteErrorBoundary() {
+    const error = useRouteError();
+    const isOffline = isChunkLoadError(error);
+
+    if (isRouteErrorResponse(error)) {
+        return (
+            <div className='error-fallback'>
+                <h2>
+                    {error.status} {error.statusText}
+                </h2>
+                <p>{error.data}</p>
+                <button onClick={() => window.location.reload()}>
+                    Refresh Page
+                </button>
+            </div>
+        );
+    }
+
+    if (isOffline) {
+        return (
+            <div className='error-fallback error-fallback--offline'>
+                <h2>Unable to load page</h2>
+                <p>
+                    It looks like you're offline or have a slow connection.
+                    Please check your internet connection and try again.
+                </p>
+                <div className='error-fallback__buttons'>
+                    <button onClick={() => window.history.back()}>
+                        Go Back
+                    </button>
+                    <button onClick={() => window.location.reload()}>
+                        Refresh Page
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className='error-fallback'>
+            <h2>Something went wrong</h2>
+            <p>An unexpected error occurred.</p>
+            <button onClick={() => window.location.reload()}>
+                Refresh Page
+            </button>
+        </div>
+    );
+}
 
 const router = createBrowserRouter([
     {
         Component: Root,
+        errorElement: <RouteErrorBoundary />,
         children: [
             {
                 index: true,

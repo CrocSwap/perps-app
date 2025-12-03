@@ -9,7 +9,7 @@
 .symbolSearchContainer {
     display: flex;
     align-items: center;
-    justify-content: center;
+    /* justify-content: center; */
     gap: var(--gap-s);
 
     font-size: var(--font-size-l);
@@ -41,6 +41,7 @@
 
 .symbolName {
     white-space: nowrap;
+    display: flex;
 }
 
 .comboBoxIcon {
@@ -56,4 +57,16 @@
 
 .symbolIcon img {
     max-height: 100%;
+}
+
+@media (max-width: 480px) {
+    .symbolSearchContainer {
+        width: 100px;
+        min-width: 0;
+        display: flex;
+    }
+    .symbolName {
+        font-size: var(--font-size-s);
+        flex-direction: column;
+    }
 }
