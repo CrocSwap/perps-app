@@ -300,7 +300,11 @@ function Portfolio() {
                         </button>
                     </div>
 
-                    <section className={styles.mainContent} ref={mainRef}>
+                    <section
+                        id={'portfolioTablesMainContent'}
+                        className={styles.mainContent}
+                        ref={mainRef}
+                    >
                         {/* Desktop: Resizable split view */}
                         <div className={styles.desktopView}>
                             <Resizable
@@ -351,6 +355,7 @@ function Portfolio() {
                                         <MemoizedPerformancePanel
                                             userData={userData}
                                             panelHeight={panelHeight}
+                                            isMobile={false}
                                         />
                                     )}
                                 </section>
@@ -374,6 +379,7 @@ function Portfolio() {
                                         <MemoizedPerformancePanel
                                             userData={userData}
                                             panelHeight={panelHeight}
+                                            isMobile={true}
                                         />
                                     )}
                                 </section>

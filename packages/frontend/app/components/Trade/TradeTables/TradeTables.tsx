@@ -96,8 +96,19 @@ export default function TradeTable(props: TradeTableProps) {
             availableTabs.push('Depositors');
         }
 
-        // No blacklist needed anymore
-        const filteredTabs = availableTabs;
+        // Filter for different pages
+        let filteredTabs;
+        if (page === Pages.TRADE) {
+            filteredTabs = availableTabs.filter(
+                (tab) => !tradePageBlackListTabs.has(tab),
+            );
+        } else if (page === Pages.PORTFOLIO) {
+            filteredTabs = availableTabs.filter(
+                (tab) => !portfolioPageBlackListTabs.has(tab),
+            );
+        } else {
+            filteredTabs = availableTabs;
+        }
 
         if (isMobile && !props.mobileExternalSwitcher) {
             return filteredTabs.filter(

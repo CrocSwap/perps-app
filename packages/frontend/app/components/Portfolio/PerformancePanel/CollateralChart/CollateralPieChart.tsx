@@ -13,7 +13,7 @@ type PieChartProps = {
 const CollateralPieChart: React.FC<PieChartProps> = (props) => {
     const { height, width } = props;
 
-    const chartHeight = height || 250;
+    const chartHeight = height || 150;
 
     const pieData: PieData[] = [{ label: 'FUSD', value: 100 }];
 
@@ -42,7 +42,7 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
         const height = canvas?.height;
         const radius = Math.min(width, height) / 2;
 
-        const pie = d3.pie<PieData>().value((d) => d.value);
+        const pie = d3.pie<PieData>().value((d: any) => d.value);
         const arcs = pie(pieData);
 
         function drawArc(
@@ -61,7 +61,7 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
             ctx.fill();
         }
 
-        arcs.forEach((arc) => {
+        arcs.forEach((arc: any) => {
             drawArc(ctx, arc, color(arc.data.label));
         });
     }, [pieData]);
@@ -98,8 +98,8 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
                 <div className={styles.dataLabel}>
                     <canvas
                         id='pie-canvas'
-                        width={Math.max(Math.min(chartHeight, 250), 150)}
-                        height={Math.max(Math.min(chartHeight, 250), 150)}
+                        width={Math.max(Math.min(chartHeight, 250), 100)}
+                        height={Math.max(Math.min(chartHeight, 250), 100)}
                     ></canvas>
                 </div>
                 {legend}

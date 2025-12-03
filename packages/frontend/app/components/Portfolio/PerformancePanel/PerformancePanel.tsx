@@ -16,6 +16,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 interface PerformancePanelProps {
     userData: any;
     panelHeight?: number;
+    isMobile: boolean;
 }
 
 const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
@@ -30,6 +31,7 @@ const animationConfig = {
 export default function PerformancePanel({
     userData,
     panelHeight,
+    isMobile,
 }: PerformancePanelProps) {
     const [activeTab, setActiveTab] = useState('');
     const chartStageRef = useRef<HTMLDivElement>(null);
@@ -75,7 +77,7 @@ export default function PerformancePanel({
     ];
 
     const MetricsDisplay = React.memo(() => (
-        <div className={styles.metricsContainer}>
+        <div id={'metricsContainer'} className={styles.metricsContainer}>
             {PERFORMANCE_METRICS.map((metric) => (
                 <div className={styles.metricRow} key={metric.label}>
                     <span>{metric.label}</span>
@@ -163,6 +165,7 @@ export default function PerformancePanel({
                     userProfileLineData={userProfileLineData}
                     setUserProfileLineData={setUserProfileLineData}
                     panelHeight={panelHeight}
+                    isMobile={isMobile}
                 />
 
                 {/* {activeTab.toLowerCase()} */}

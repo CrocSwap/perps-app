@@ -45,6 +45,8 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
                             value={selectedVault.label}
                             options={vaultOptions}
                             fieldName='label'
+                            width='150px'
+                            centered={true}
                             onChange={(value) =>
                                 setSelectedVault({
                                     label: value,
@@ -64,6 +66,8 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
                             value={selectedPeriod.label}
                             options={periodOptions}
                             fieldName='label'
+                            width='150px'
+                            centered={true}
                             onChange={(value) =>
                                 setSelectedPeriod({
                                     label: value,

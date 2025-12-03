@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import LineChart from '~/components/LineChart/LineChart';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -23,6 +23,7 @@ export interface TabChartContext {
     userProfileLineData: any;
     setUserProfileLineData: React.Dispatch<React.SetStateAction<any>>;
     panelHeight?: number;
+    isMobile?: boolean;
 }
 
 const TabChartContext: React.FC<TabChartContext> = (props) => {
@@ -39,7 +40,14 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         userProfileLineData,
         setUserProfileLineData,
         panelHeight,
+        isMobile,
     } = props;
+
+    const panelHeightRef = useRef(panelHeight);
+
+    useEffect(() => {
+        panelHeightRef.current = panelHeight;
+    }, [panelHeight]);
 
     const { userAddress } = useUserDataStore();
 
@@ -125,67 +133,131 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         activeTab,
     ]);
 
-    // Initial dimension calculation using useLayoutEffect for synchronous measurement
-    useLayoutEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
+    // // Initial dimension calculation using useLayoutEffect for synchronous measurement
+    // useLayoutEffect(() => {
+    //     const container = containerRef.current;
+    //     if (!container) return;
 
-        const compute = () => {
-            const h = container.clientHeight;
-            const w = container.clientWidth;
-            const isMobile = window.innerWidth <= 768;
-            const minH = 100;
+    //     const compute = () => {
+    //         const h = container.clientHeight;
+    //         const w = container.clientWidth;
+    //         const isMobile = window.innerWidth <= 768;
+    //         const minH = 100;
 
-            if (w > 0 && h > 0) {
-                setChartWidth(Math.max(w - (isMobile ? 40 : 50), 250));
-                const available = h - (isMobile ? 60 : 80);
-                setChartHeight(Math.max(available, minH));
-                setIsChartReady(true);
-                return true;
-            }
-            return false;
-        };
+    //         if (w > 0 && h > 0) {
+    //             setChartWidth(Math.max(w - (isMobile ? 40 : 50), 250));
+    //             const available = h - (isMobile ? 60 : 80);
+    //             setChartHeight(Math.max(available, minH));
+    //             setIsChartReady(true);
+    //             return true;
+    //         }
+    //         return false;
+    //     };
 
-        // Try until container has non-zero size
-        let raf = 0;
-        const tick = () => {
-            if (!compute()) raf = requestAnimationFrame(tick);
-        };
-        tick();
+    //     // Try until container has non-zero size
+    //     let raf = 0;
+    //     const tick = () => {
+    //         if (!compute()) raf = requestAnimationFrame(tick);
+    //     };
+    //     tick();
 
-        return () => cancelAnimationFrame(raf);
-    }, [activeTab, panelHeight]); // re-evaluate on tab change and when splitter moves
+    //     return () => cancelAnimationFrame(raf);
+    // }, [activeTab, panelHeight]); // re-evaluate on tab change and when splitter moves
 
     // Track window and container resize separately
+    // useEffect(() => {
+    //     const container = containerRef.current;
+    //     if (!container) return;
+
+    //     const update = () => {
+    //         const h = container.clientHeight;
+    //         const w = container.clientWidth;
+    //         const isMobile = window.innerWidth <= 768;
+    //         const minH = 100;
+
+    //         if (w > 0 && h > 0) {
+    //             setChartWidth(Math.max(w - (isMobile ? 40 : 50), 250));
+    //             const available = h - (isMobile ? 60 : 80);
+
+    //             setChartHeight(Math.max(available, minH));
+    //             setIsChartReady(true);
+    //         }
+    //     };
+
+    //     const ro = new ResizeObserver(update);
+    //     ro.observe(container);
+    //     // window.addEventListener('resize', update);
+
+    //     // one immediate kick
+    //     update();
+
+    //     return () => {
+    //         ro.disconnect();
+    //         // window.removeEventListener('resize', update);
+    //     };
+    // }, []);
+
     useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-
-        const update = () => {
-            const h = container.clientHeight;
-            const w = container.clientWidth;
-            const isMobile = window.innerWidth <= 768;
-            const minH = 100;
-
-            if (w > 0 && h > 0) {
-                setChartWidth(Math.max(w - (isMobile ? 40 : 50), 250));
-                const available = h - (isMobile ? 60 : 80);
-                setChartHeight(Math.max(available, minH));
-                setIsChartReady(true);
-            }
-        };
-
-        const ro = new ResizeObserver(update);
-        ro.observe(container);
-        window.addEventListener('resize', update);
-
-        // one immediate kick
-        update();
+        window.addEventListener('resize', calculatePanelHeight);
 
         return () => {
-            ro.disconnect();
-            window.removeEventListener('resize', update);
+            window.removeEventListener('resize', calculatePanelHeight);
         };
+    }, []);
+
+    useEffect(() => {
+        calculatePanelHeight();
+    }, [panelHeight]);
+
+    const calculatePanelHeight = useCallback(() => {
+        if (panelHeightRef.current === undefined) return;
+
+        const header = document.getElementById('portfolio-header-container');
+
+        const performanceTabs = document.getElementById('performanceTabs');
+
+        const metricsContainer = document.getElementById('metricsContainer');
+
+        const headerHeight = header ? header.clientHeight : 30;
+
+        const headerWidth = header ? header.clientWidth : 0;
+
+        const metricsContainerWidth = metricsContainer
+            ? metricsContainer.clientWidth
+            : 0;
+
+        const performanceTabsWidth = performanceTabs
+            ? performanceTabs.clientWidth
+            : 0;
+
+        const performanceTabsHeight = performanceTabs
+            ? performanceTabs.clientHeight
+            : 25;
+
+        const calculatedChartHeight =
+            panelHeightRef.current - headerHeight - performanceTabsHeight - 10;
+
+        if (
+            window.innerWidth < 1280 + 50 &&
+            performanceTabsWidth + 50 > window.innerWidth
+        ) {
+            setChartWidth(
+                Math.min(
+                    950,
+                    Math.max(
+                        window.innerWidth - metricsContainerWidth - 50,
+                        250,
+                    ),
+                ),
+            );
+        } else if (window.innerWidth <= 768) {
+            setChartWidth(Math.max(window.innerWidth, 250));
+        } else {
+            setChartWidth(Math.min(950, Math.max(headerWidth, 250)));
+        }
+
+        setChartHeight(calculatedChartHeight);
+        setIsChartReady(true);
     }, []);
 
     return (
@@ -197,27 +269,29 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                 <>
                     {activeTab === 'Performance' && pnlHistory && (
                         <LineChart
-                            key={`performance-${chartWidth}-${chartHeight}`}
+                            // key={`performance-${chartWidth}-${chartHeight}`}
                             lineData={pnlHistory}
-                            curve={'step'}
+                            curve={'basic'}
                             chartName={
                                 selectedVault.value + selectedPeriod.value
                             }
                             height={chartHeight}
                             width={chartWidth}
+                            isMobile={isMobile}
                         />
                     )}
 
                     {activeTab === 'Account Value' && accountValueHistory && (
                         <LineChart
-                            key={`account-${chartWidth}-${chartHeight}`}
+                            // key={`account-${chartWidth}-${chartHeight}`}
                             lineData={accountValueHistory}
-                            curve={'step'}
+                            curve={'basic'}
                             chartName={
                                 selectedVault.value + selectedPeriod.value
                             }
                             height={chartHeight}
                             width={chartWidth}
+                            isMobile={isMobile}
                         />
                     )}
 
