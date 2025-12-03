@@ -25,9 +25,13 @@ public/tv/charting_library
 public/tv/datafeeds
 public/tradingview/charting_library
 public/tradingview/datafeeds
+packages/frontend/scripts/.tv-copy-cache.json
 
 prompts/scratchpad*.md
 
 # Generated frontend files
 packages/frontend/public/version.json
 packages/frontend/public/announcements.json
+
+# Vitest cache and results
+.vitest/

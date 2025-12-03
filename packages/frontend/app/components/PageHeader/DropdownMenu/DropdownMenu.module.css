@@ -6,7 +6,7 @@
     align-items: flex-start;
     position: absolute;
     gap: var(--gap-xs);
-    top: 30px;
+    top: 40px;
     right: 0;
     width: 210px;
     border-radius: var(--radius-m, 16px);

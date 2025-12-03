@@ -39,10 +39,10 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import {
-    blockExplorer,
     BTC_MAX_LEVERAGE,
     MIN_ORDER_VALUE,
     MIN_POSITION_USD_SIZE,
+    getTxLink,
 } from '~/utils/Constants';
 import {
     getDurationSegment,
@@ -186,7 +186,6 @@ function OrderInput({
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
-    const [tradeDirection, setTradeDirection] = useState<OrderSide>('buy');
 
     const [shouldUpdateAfterTrade, setShouldUpdateAfterTrade] = useState(false);
 
@@ -241,6 +240,19 @@ function OrderInput({
 
     const [isSizeSetAsPercentage, setIsSizeSetAsPercentage] = useState(false);
 
+    const {
+        obChosenPrice,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+        setOrderInputPriceValue,
+        tradeDirection,
+        setTradeDirection,
+        setIsMidModeActive,
+        isMidModeActive,
+    } = useTradeDataStore();
+
     useEffect(() => {
         if (!marginBucket) return;
         const maxRemainingOI = maxRemainingUserNotionalOI(
@@ -253,10 +265,7 @@ function OrderInput({
 
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
 
-    const { obChosenPrice, symbol, symbolInfo, marginMode, setMarginMode } =
-        useTradeDataStore();
-
-    const { buys, sells } = useOrderBookStore();
+    const { buys, sells, midPrice } = useOrderBookStore();
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
 
     // backup mark price for when symbolInfo not available
@@ -278,19 +287,30 @@ function OrderInput({
     };
 
     const setMidPriceAsPriceInput = () => {
+        if (!midPrice) return;
         if (
             marketOrderType === 'limit' &&
             buys.length > 0 &&
             sells.length > 0
         ) {
-            const resolution = buys[0].px - buys[1].px;
-            const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
-            if (!midOrMarkPrice) return;
+            // prev implementation
+
+            // const resolution = buys[0].px - buys[1].px;
+            // const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
+            // if (!midOrMarkPrice) return;
+            // const formattedMidPrice = formatNumWithOnlyDecimals(
+            //     midOrMarkPrice,
+            //     6,
+            //     true,
+            // );
+
+            // -------
             const formattedMidPrice = formatNumWithOnlyDecimals(
-                midOrMarkPrice,
+                midPrice,
                 6,
                 true,
             );
+
             setPrice(formattedMidPrice);
         }
     };
@@ -304,8 +324,8 @@ function OrderInput({
         // set mid price input as default price when market changes
         if (!obChosenPrice) {
             setMidPriceAsPriceInput();
+            setIsMidModeActive(true);
         }
-        setIsMidModeActive(false);
     }, [
         marketOrderType,
         !buys.length,
@@ -314,7 +334,6 @@ function OrderInput({
         obChosenPrice,
     ]);
 
-    const [isMidModeActive, setIsMidModeActive] = useState(false);
     const confirmOrderModal = useModal<modalContentT>('closed');
 
     useEffect(() => {
@@ -325,11 +344,7 @@ function OrderInput({
     }, [
         isMidModeActive,
         marketOrderType,
-        !buys.length,
-        !sells.length,
-        buys?.[0]?.px,
-        sells?.[0]?.px,
-        markPx,
+        midPrice,
         confirmOrderModal.isOpen, // Add dependency to re-run when modal state changes
     ]);
 
@@ -843,13 +858,24 @@ function OrderInput({
     const handlePriceChange = (
         event: React.ChangeEvent<HTMLInputElement> | string,
     ) => {
-        setIsMidModeActive(false);
         if (typeof event === 'string') {
             setPrice(event);
         } else {
             setPrice(event.target.value);
+            setIsMidModeActive(false);
         }
     };
+
+    useEffect(() => {
+        if (marketOrderType === 'market') {
+            setOrderInputPriceValue(0);
+        } else {
+            const parsed = parseFormattedNum(price);
+            if (!isNaN(parsed)) {
+                setOrderInputPriceValue(parsed);
+            }
+        }
+    }, [price, parseFormattedNum, setOrderInputPriceValue, marketOrderType]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');
@@ -1288,9 +1314,7 @@ function OrderInput({
                     }),
                     icon: 'check',
                     removeAfter: 5000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
                 setShouldUpdateAfterTrade(true);
             } else {
@@ -1327,9 +1351,7 @@ function OrderInput({
                         result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1473,9 +1495,7 @@ function OrderInput({
                     }),
                     icon: 'check',
                     removeAfter: 5000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
                 setShouldUpdateAfterTrade(true);
             } else {
@@ -1512,9 +1532,7 @@ function OrderInput({
                         result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1666,9 +1684,7 @@ function OrderInput({
                         limitPrice,
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
             } else {
@@ -1706,9 +1722,7 @@ function OrderInput({
                         t('transactions.failedToPlaceLimitOrder'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1859,9 +1873,7 @@ function OrderInput({
                         limitPrice,
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
             } else {
@@ -1895,9 +1907,7 @@ function OrderInput({
                         t('transactions.failedToPlaceLimitOrder'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {

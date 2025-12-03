@@ -36,29 +36,72 @@ import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 import { useModal } from './hooks/useModal';
 import Modal from './components/Modal/Modal';
 
+// Check if error is a chunk/module loading failure (typically happens offline)
+function isChunkLoadError(error: Error): boolean {
+    const message = error.message?.toLowerCase() || '';
+    const name = error.name?.toLowerCase() || '';
+    return (
+        message.includes('failed to fetch') ||
+        message.includes('loading chunk') ||
+        message.includes('loading css chunk') ||
+        message.includes('unable to preload') ||
+        message.includes('dynamically imported module') ||
+        name.includes('chunkloaderror')
+    );
+}
+
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
     { children: React.ReactNode },
-    { hasError: boolean }
+    { hasError: boolean; isOfflineError: boolean }
 > {
-    state = { hasError: false };
+    state = { hasError: false, isOfflineError: false };
 
-    static getDerivedStateFromError() {
-        return { hasError: true };
+    static getDerivedStateFromError(error: Error) {
+        return {
+            hasError: true,
+            isOfflineError: isChunkLoadError(error),
+        };
     }
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         console.error('Error caught by boundary:', error, errorInfo);
     }
 
+    handleRetry = () => {
+        this.setState({ hasError: false, isOfflineError: false });
+    };
+
+    handleRefresh = () => {
+        window.location.reload();
+    };
+
     render() {
         if (this.state.hasError) {
+            if (this.state.isOfflineError) {
+                return (
+                    <div className='error-fallback error-fallback--offline'>
+                        <h2>Unable to load page</h2>
+                        <p>
+                            It looks like you're offline or have a slow
+                            connection. Please check your internet connection
+                            and try again.
+                        </p>
+                        <div className='error-fallback__buttons'>
+                            <button onClick={this.handleRetry}>
+                                Try Again
+                            </button>
+                            <button onClick={this.handleRefresh}>
+                                Refresh Page
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
             return (
                 <div className='error-fallback'>
                     <h2>Something went wrong</h2>
-                    <button onClick={() => this.setState({ hasError: false })}>
-                        Try again
-                    </button>
+                    <button onClick={this.handleRetry}>Try again</button>
                 </div>
             );
         }

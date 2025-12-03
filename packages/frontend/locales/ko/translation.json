@@ -40,7 +40,8 @@
         "reset": "초기화",
         "announcements": "공지사항",
         "leverage": "레버리지",
-        "comingSoon": "출시 예정"
+        "comingSoon": "출시 예정",
+        "clearFilter": "필터 지우기"
     },
     "transactions": {
         "orderTypes": "주문 유형",
@@ -220,6 +221,9 @@
             "message": "{{successCount}}건 주문 취소 성공, {{failedCount}}건 주문 취소 실패"
         },
         "noOpenOrders": "미체결 주문 없음",
+        "noOpenOrdersForMarket": "{{symbol}} 미체결 주문 없음",
+        "noOpenLongOrders": "롱 미체결 주문 없음",
+        "noOpenShortOrders": "숏 미체결 주문 없음",
         "transactionError": "거래 오류",
         "invalidLimitPrice": {
             "title": "유효하지 않은 가격",
@@ -298,6 +302,9 @@
         "long": "롱",
         "short": "숏",
         "noOpenPositions": "오픈 포지션 없음",
+        "noOpenPositionsForMarket": "{{symbol}} 오픈 포지션 없음",
+        "noOpenLongPositions": "롱 오픈 포지션 없음",
+        "noOpenShortPositions": "숏 오픈 포지션 없음",
         "markPrice": "마크 가격",
         "orderId": "주문 ID",
         "totalBalance": "총 잔고",
@@ -315,8 +322,17 @@
         "originalSize": "원래 수량",
         "cancelAll": "전체 취소",
         "noTradeHistory": "거래 내역 없음",
+        "noTradeHistoryForMarket": "{{symbol}} 거래 내역 없음",
+        "noLongTradeHistory": "롱 거래 내역 없음",
+        "noShortTradeHistory": "숏 거래 내역 없음",
         "noOrderHistory": "주문 내역 없음",
+        "noOrderHistoryForMarket": "{{symbol}} 주문 내역 없음",
+        "noLongOrderHistory": "롱 주문 내역 없음",
+        "noShortOrderHistory": "숏 주문 내역 없음",
         "noFundingHistory": "펀딩 내역 없음",
+        "noFundingHistoryForMarket": "{{symbol}} 펀딩 내역 없음",
+        "noLongFundingHistory": "롱 펀딩 내역 없음",
+        "noShortFundingHistory": "숏 펀딩 내역 없음",
         "fundingHistory": "전체: {{allTime}} 변경 후: {{sinceChange}}",
         "openLong": "롱 오픈",
         "openShort": "숏 오픈",
@@ -479,6 +495,10 @@
         },
         "updateButton": "지금 업데이트",
         "version": "버전"
+    },
+    "offline": {
+        "title": "오프라인 상태입니다",
+        "message": "거래가 비활성화되었습니다. 캐시된 데이터는 계속 볼 수 있습니다."
     },
     "leverage": {
         "title": "레버리지 조정",

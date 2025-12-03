@@ -13,7 +13,7 @@
     justify-content: space-between;
     gap: var(--gap-l);
     position: relative;
-    padding: var(--padding-s) var(--padding-l);
+    /* padding: var(--padding-s) var(--padding-l); */
     max-width: 100%;
     margin: 0 auto;
 }
@@ -28,13 +28,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: var(--gap-l);
+    gap: var(--gap-s);
 }
 
 .container nav a,
 .moreButton {
-    color: var(--text1);
-    font-size: var(--font-size-m, 18px);
+    color: var(--text2);
+    font-size: var(--font-size-m);
     white-space: nowrap;
 }
 .logo {
@@ -71,7 +71,7 @@
     text-overflow: ellipsis;
 }
 
-.ambientmm {
+/* .ambientmm {
     display: flex;
     padding: var(--gap-xs) var(--gap-s);
     justify-content: center;
@@ -84,12 +84,12 @@
     cursor: pointer;
     font-size: var(--font-family-m, 18px);
     visibility: hidden;
-}
+} */
 
-.ambientmm:hover {
+/* .ambientmm:hover {
     color: color-mix(in srgb, var(--accent1) 90%, black) !important;
     border: 1px solid color-mix(in srgb, var(--accent1) 90%, black) !important;
-}
+} */
 
 .moreButton {
     outline: none;
@@ -343,15 +343,15 @@
 
 /* Desktop to Laptop Responsive Styles */
 @media (max-width: 1400px) {
-    .container {
+    /* .container {
         gap: var(--gap-m);
     }
 
     .container nav {
         gap: var(--gap-m);
-    }
+    } */
 
-    .container nav a,
+    /* .container nav a,
     .moreButton {
         font-size: var(--font-size-s, 14px);
     }
@@ -359,10 +359,10 @@
     .ambientmm {
         font-size: var(--font-size-s, 14px);
         padding: var(--gap-xs) var(--gap-xs);
-    }
+    } */
 }
 
-@media (max-width: 1200px) {
+/* @media (max-width: 1024px) {
     .container {
         gap: var(--gap-s);
         padding: 0px var(--padding-xs);
@@ -393,20 +393,7 @@
         padding: 0 8px;
         font-size: 12px;
     }
-}
-
-@media (max-width: 1024px) {
-    .container nav a,
-    .moreButton {
-        font-size: var(--font-size-s);
-    }
-
-    .ambientmm {
-        font-size: var(--font-size-s);
-        padding: 4px 6px;
-    }
-
-    .depositButton {
+      .depositButton {
         width: 80px;
         height: 20px;
         font-size: var(--font-size-s);
@@ -418,7 +405,7 @@
     .rpcButton span {
         display: none;
     }
-}
+} */
 
 @media (max-width: 900px) {
     .menuButtonMobile {
@@ -426,10 +413,6 @@
     }
 
     .nav a:nth-child(n + 4) {
-        display: none;
-    }
-
-    .ambientmm {
         display: none;
     }
 }
@@ -446,7 +429,7 @@
         flex-direction: column !important;
         align-items: flex-end !important;
         padding: var(--padding-s);
-        gap: var(--gap-l);
+        /* gap: var(--gap-l); */
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
         transition: right var(--ease-in-out-med);
         z-index: 1000;
@@ -479,6 +462,9 @@
     }
 
     .depositButtonPlaceholder {
+        display: none;
+    }
+    .ambientmm {
         display: none;
     }
 }

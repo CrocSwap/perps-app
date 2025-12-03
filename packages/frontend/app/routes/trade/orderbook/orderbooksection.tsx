@@ -24,6 +24,7 @@ export default function OrderBookSection(props: propsIF) {
     const { mobileView, mobileContent, switchTab, chartTopHeight } = props;
     const [orderCount, setOrderCount] = useState(9);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
+    const sectionContainerRef = useRef<HTMLDivElement>(null);
 
     const { t, i18n } = useTranslation();
 
@@ -87,11 +88,14 @@ export default function OrderBookSection(props: propsIF) {
 
     // Height calculation logic
     const calculateOrderCount = useCallback(() => {
-        let orderBookSection = document.getElementById('orderBookSection');
+        let orderBookSection =
+            sectionContainerRef.current ||
+            document.getElementById('orderBookSection');
+
         if (!orderBookSection) {
             orderBookSection = document.getElementById(
                 'orderBookContainerInner',
-            );
+            ) as HTMLElement;
         }
         const dummyOrderRow = document.getElementById('dummyOrderRow');
         const orderRowHeight =
@@ -103,6 +107,7 @@ export default function OrderBookSection(props: propsIF) {
 
         let availableHeight = orderBookSection.getBoundingClientRect().height;
 
+        // Skip calculation if height is too small (likely not fully rendered yet)
         if (availableHeight <= 0) return;
 
         let otherHeightOB = 0;
@@ -162,27 +167,56 @@ export default function OrderBookSection(props: propsIF) {
                 (orderRowHeightWithGaps * 2),
         );
 
-        if (orderCount !== calculatedOrderCount)
-            setOrderCount(calculatedOrderCount);
-    }, [orderCount, orderBookMode, activeTab]);
+        // Only update if we have a valid positive count
+        if (calculatedOrderCount > 0) {
+            setOrderCount((prev) => {
+                if (prev !== calculatedOrderCount) return calculatedOrderCount;
+                return prev;
+            });
+        }
+    }, [orderBookMode, activeTab]);
 
     // Resize effect
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
+        let rafId: number | null = null;
 
         const handleResize = () => {
             if (timeoutId) clearTimeout(timeoutId);
-            timeoutId = setTimeout(calculateOrderCount, 50);
+            timeoutId = setTimeout(() => {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(calculateOrderCount);
+            }, 50);
         };
 
         window.addEventListener('resize', handleResize);
+
+        const resizeObserver = new ResizeObserver(() => {
+            handleResize();
+        });
+
+        const target =
+            sectionContainerRef.current ||
+            document.getElementById('orderBookSection') ||
+            document.getElementById('orderBookContainerInner');
+
+        if (target) {
+            resizeObserver.observe(target);
+        }
+
+        const dummyRow = document.getElementById('dummyOrderRow');
+        if (dummyRow) resizeObserver.observe(dummyRow);
+
+        // Initial calculation
         calculateOrderCount();
 
         return () => {
             window.removeEventListener('resize', handleResize);
             if (timeoutId) clearTimeout(timeoutId);
+            if (rafId) cancelAnimationFrame(rafId);
+            resizeObserver.disconnect();
         };
-    }, [calculateOrderCount]);
+    }, [calculateOrderCount, orderBookMode]);
 
     useEffect(() => {
         if (chartTopHeight) {
@@ -202,7 +236,7 @@ export default function OrderBookSection(props: propsIF) {
 
     const stackedOrderBook = useMemo(
         () => (
-            <div className={styles.orderBookSection}>
+            <div className={styles.orderBookSection} ref={sectionContainerRef}>
                 <div className={styles.stackedContainer}>
                     <div
                         id='orderBookHeaderStackedMode'
@@ -238,7 +272,7 @@ export default function OrderBookSection(props: propsIF) {
 
     const largeOrderBook = useMemo(
         () => (
-            <div className={styles.orderBookSection}>
+            <div className={styles.orderBookSection} ref={sectionContainerRef}>
                 <div className={styles.largeContainer}>
                     <div className={styles.childOfLargeContainer}>
                         <div
@@ -282,6 +316,7 @@ export default function OrderBookSection(props: propsIF) {
                 ' ' +
                 styles.orderBookTabSectionContainer
             }
+            ref={sectionContainerRef}
         >
             <Tabs
                 wrapperId='orderBookTabs'

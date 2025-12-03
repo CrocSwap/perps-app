@@ -40,7 +40,8 @@
         "reset": "リセット",
         "announcements": "お知らせ",
         "leverage": "レバレッジ",
-        "comingSoon": "近日公開"
+        "comingSoon": "近日公開",
+        "clearFilter": "フィルターをクリア"
     },
     "transactions": {
         "orderTypes": "注文タイプ",
@@ -220,6 +221,9 @@
             "message": "{{successCount}}件キャンセル、{{failedCount}}件失敗"
         },
         "noOpenOrders": "未約定注文なし",
+        "noOpenOrdersForMarket": "{{symbol}}の未約定注文なし",
+        "noOpenLongOrders": "ロングの未約定注文なし",
+        "noOpenShortOrders": "ショートの未約定注文なし",
         "transactionError": "取引エラー",
         "invalidLimitPrice": {
             "title": "無効な価格",
@@ -298,6 +302,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "未決済ポジションなし",
+        "noOpenPositionsForMarket": "{{symbol}}の未決済ポジションなし",
+        "noOpenLongPositions": "ロングの未決済ポジションなし",
+        "noOpenShortPositions": "ショートの未決済ポジションなし",
         "markPrice": "参考価格",
         "orderId": "注文ID",
         "totalBalance": "合計残高",
@@ -315,8 +322,17 @@
         "originalSize": "元のサイズ",
         "cancelAll": "すべてキャンセル",
         "noTradeHistory": "取引履歴なし",
+        "noTradeHistoryForMarket": "{{symbol}}の取引履歴なし",
+        "noLongTradeHistory": "ロングの取引履歴なし",
+        "noShortTradeHistory": "ショートの取引履歴なし",
         "noOrderHistory": "注文履歴なし",
+        "noOrderHistoryForMarket": "{{symbol}}の注文履歴なし",
+        "noLongOrderHistory": "ロングの注文履歴なし",
+        "noShortOrderHistory": "ショートの注文履歴なし",
         "noFundingHistory": "資金調達履歴なし",
+        "noFundingHistoryForMarket": "{{symbol}}の資金調達履歴なし",
+        "noLongFundingHistory": "ロングの資金調達履歴なし",
+        "noShortFundingHistory": "ショートの資金調達履歴なし",
         "fundingHistory": "通算: {{allTime}} 変更後: {{sinceChange}}",
         "openLong": "Long新規",
         "openShort": "Short新規",
@@ -479,6 +495,10 @@
         },
         "updateButton": "今すぐアップデート",
         "version": "バージョン"
+    },
+    "offline": {
+        "title": "オフラインです",
+        "message": "取引は無効です。キャッシュされたデータは引き続き表示できます。"
     },
     "leverage": {
         "title": "レバレッジを調整",

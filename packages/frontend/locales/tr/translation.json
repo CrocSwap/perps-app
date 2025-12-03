@@ -40,7 +40,8 @@
         "reset": "Sıfırla",
         "announcements": "Duyurular",
         "leverage": "Kaldıraç",
-        "comingSoon": "Yakında"
+        "comingSoon": "Yakında",
+        "clearFilter": "Filtreyi temizle"
     },
     "transactions": {
         "orderTypes": "Emir Türleri",
@@ -220,6 +221,9 @@
             "message": "{{successCount}} emir iptal edildi, {{failedCount}} başarısız"
         },
         "noOpenOrders": "Açık emir yok",
+        "noOpenOrdersForMarket": "Açık {{symbol}} emri yok",
+        "noOpenLongOrders": "Açık long emri yok",
+        "noOpenShortOrders": "Açık short emri yok",
         "transactionError": "İşlem Hatası",
         "invalidLimitPrice": {
             "title": "Geçersiz Fiyat",
@@ -298,6 +302,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "Açık pozisyon yok",
+        "noOpenPositionsForMarket": "Açık {{symbol}} pozisyonu yok",
+        "noOpenLongPositions": "Açık long pozisyonu yok",
+        "noOpenShortPositions": "Açık short pozisyonu yok",
         "markPrice": "İşaret Fiyatı",
         "orderId": "Emir ID",
         "totalBalance": "Toplam Bakiye",
@@ -315,8 +322,17 @@
         "originalSize": "Orijinal Büyüklük",
         "cancelAll": "Hepsini İptal Et",
         "noTradeHistory": "İşlem geçmişiniz yok",
+        "noTradeHistoryForMarket": "{{symbol}} işlem geçmişi yok",
+        "noLongTradeHistory": "Long işlem geçmişi yok",
+        "noShortTradeHistory": "Short işlem geçmişi yok",
         "noOrderHistory": "Emir geçmişiniz yok",
+        "noOrderHistoryForMarket": "{{symbol}} emir geçmişi yok",
+        "noLongOrderHistory": "Long emir geçmişi yok",
+        "noShortOrderHistory": "Short emir geçmişi yok",
         "noFundingHistory": "Fonlama geçmişiniz yok",
+        "noFundingHistoryForMarket": "{{symbol}} fonlama geçmişi yok",
+        "noLongFundingHistory": "Long fonlama geçmişi yok",
+        "noShortFundingHistory": "Short fonlama geçmişi yok",
         "fundingHistory": "Tüm zamanlar: {{allTime}} Değişim sonrası: {{sinceChange}}",
         "openLong": "Long Aç",
         "openShort": "Short Aç",
@@ -479,6 +495,10 @@
         },
         "updateButton": "Şimdi güncelle",
         "version": "Sürüm"
+    },
+    "offline": {
+        "title": "Çevrimdışısınız",
+        "message": "İşlem yapma devre dışı. Önbelleğe alınmış verileri görüntüleyebilirsiniz."
     },
     "leverage": {
         "title": "Kaldıraç ayarla",

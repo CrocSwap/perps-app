@@ -9,7 +9,7 @@ import {
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { blockExplorer, MIN_ORDER_VALUE } from '~/utils/Constants';
+import { getTxLink, MIN_ORDER_VALUE } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
@@ -329,9 +329,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     title: `${side === 'buy' ? t('transactions.buyLongLimitOrderPlaced') : t('transactions.sellShortLimitOrderPlaced')}`,
                     message: `${side === 'buy' ? t('transactions.successfullyPlacedBuyOrderFor', { usdValueOfOrderStr, symbol: symbolInfo?.coin, limitPrice }) : t('transactions.successfullyPlacedSellOrderFor', { usdValueOfOrderStr, symbol: symbolInfo?.coin, limitPrice })}`,
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
             } else {
@@ -356,9 +354,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     message: result.error || t('transactions.limitOrderFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {

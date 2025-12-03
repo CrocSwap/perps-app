@@ -273,6 +273,11 @@ body {
 }
 
 /* Mobile styles */
+@media only screen and (max-width: 480px) {
+    .symbolInfoContainer {
+        border-radius: var(--radius-s) !important;
+    }
+}
 @media only screen and (max-width: 768px) {
     .symbolInfoContainer {
         position: fixed;
@@ -372,7 +377,6 @@ body {
     }
 
     .posMenu {
-        background-color: red;
         position: absolute;
         top: calc(100% + 8px);
         left: auto;

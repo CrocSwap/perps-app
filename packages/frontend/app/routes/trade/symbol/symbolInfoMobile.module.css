@@ -1,0 +1,113 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: var(--font-size-s);
+    padding-right: var(--padding-s);
+    padding-bottom: var(--padding-xs);
+    padding-top: var(--padding-xs);
+    gap: var(--gap-xs);
+}
+
+.InfoFieldContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--gap-s);
+    flex-wrap: nowrap;
+}
+
+.InfoField {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    text-align: center;
+}
+
+.fieldLabel {
+    color: var(--text2);
+    font-size: 0.75rem;
+    line-height: 1.1;
+    margin: 0;
+}
+
+.fieldValue {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ================================
+   MODAL — Market Details
+=================================== */
+
+.moreModal {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 4px;
+}
+
+.moreModalGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.moreCard {
+    background: var(--dark3);
+    border: 1px solid var(--dark4);
+    padding: 14px 16px;
+    border-radius: var(--radius-m);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.moreLabel {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text2);
+    margin: 0;
+}
+
+.moreValue {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text1);
+    white-space: nowrap;
+}
+
+.moreTooltipText {
+    margin-top: 4px;
+    font-size: 0.7rem;
+    color: var(--text2);
+    opacity: 0.75;
+    line-height: 1.2;
+}
+
+.moreValue,
+.moreTooltipText {
+    word-break: break-word;
+}
+
+@media (max-width: 390px) {
+    .moreCard {
+        padding: 12px 12px;
+    }
+
+    .moreValue {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 330px) {
+    .moreModalGrid {
+        grid-template-columns: 1fr;
+    }
+}

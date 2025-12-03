@@ -56,12 +56,20 @@ export const convertResolutionToIntervalParam = (
 };
 
 export function resolutionToSeconds(resolution: string): number {
-    if (resolution === '1D') return 86400;
-    if (resolution === '3D') return 3 * 86400;
-    if (resolution === 'W') return 604800;
-    if (resolution === 'M') return 2592000;
+    if (!resolution) return 60;
 
-    return Number(resolution);
+    if (resolution === '1D' || resolution === 'D') return 86400;
+    if (resolution === '3D') return 3 * 86400;
+    if (resolution === '1W' || resolution === 'W') return 604800;
+    if (resolution === '1M' || resolution === 'M') return 2592000;
+
+    const minutesVal = Number(resolution);
+
+    if (!Number.isFinite(minutesVal) || minutesVal <= 0) {
+        return 60;
+    }
+
+    return minutesVal * 60;
 }
 
 export function resolutionToSecondsMiliSeconds(resolution: string): number {

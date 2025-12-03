@@ -1,6 +1,4 @@
-import { useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
-import { useUserDataStore } from '~/stores/UserDataStore';
 import {
     sortVaultDepositors,
     type VaultDepositorSortBy,
@@ -17,15 +15,10 @@ interface VaultDepositorTableProps {
 export default function VaultDepositorsTable(props: VaultDepositorTableProps) {
     const { data, isFetched } = props;
 
-    const { userAddress } = useUserDataStore();
-
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
-
     return (
         <>
             <GenericTable
-                storageKey={`VaultDepositorsTable_${currentUserRef.current}`}
+                storageKey='VaultDepositorsTable'
                 data={data}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <VaultDepositorsTableHeader

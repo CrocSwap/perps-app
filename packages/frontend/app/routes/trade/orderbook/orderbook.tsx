@@ -43,6 +43,11 @@ interface OrderBookProps {
     switchTab?: (tab: TabType) => void;
 }
 
+interface ObFocusedSlot {
+    price: number;
+    side: 'buy' | 'sell';
+}
+
 const dummyOrder: OrderBookRowIF = {
     coin: 'BTC',
     px: 10000,
@@ -94,11 +99,23 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const { formatNum } = useNumFormatter();
     const lockOrderBook = useRef<boolean>(false);
     const { getBsColor } = useAppSettings();
-    const { buys, sells, setOrderBook, addToResolutionPair, resolutionPairs } =
-        useOrderBookStore();
+    const {
+        buys,
+        sells,
+        setOrderBook,
+        addToResolutionPair,
+        resolutionPairs,
+        midPrice,
+        setMidPrice,
+    } = useOrderBookStore();
+
+    const midPriceRef = useRef<number | null>(null);
+    midPriceRef.current = midPrice;
 
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
+
+    const [focusedSlot, setFocusedSlot] = useState<ObFocusedSlot | null>(null);
 
     const rowLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
@@ -117,26 +134,24 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setObChosenPrice,
         setObChosenAmount,
         symbol,
+        orderInputPriceValue,
+        tradeDirection,
+        isMidModeActive,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
     const needExtraPolling = useMemo(() => {
-        if (!selectedResolution) return false;
+        if (!selectedResolution || !resolutions.length) return false;
         if (selectedResolution.mantissa) return true;
-        if (
-            symbol === 'BTC' &&
-            selectedResolution.nsigfigs &&
-            selectedResolution.nsigfigs <= 5
-        )
-            return true;
-        if (
-            symbol !== 'BTC' &&
-            selectedResolution.nsigfigs &&
-            selectedResolution.nsigfigs <= 4
-        )
-            return true;
-        return false;
-    }, [selectedResolution, symbol]);
+        const lowestResolution = resolutions[0];
+        return !(
+            lowestResolution.nsigfigs === selectedResolution.nsigfigs &&
+            lowestResolution.val === selectedResolution.val
+        );
+    }, [selectedResolution, symbol, resolutions]);
+
+    const needExtraPollingRef = useRef(needExtraPolling);
+    needExtraPollingRef.current = needExtraPolling;
 
     useEffect(() => {
         return () => {
@@ -160,6 +175,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     const { buys, sells } = processOrderBookMessage(l2BookData);
                     setLwBuys(buys);
                     setLwSells(sells);
+                    setMidPrice((buys[0].px + sells[0].px) / 2);
                 },
                 3000,
                 true,
@@ -170,6 +186,12 @@ const OrderBook: React.FC<OrderBookProps> = ({
             unsubscribeFromPoller('info', subKey);
         };
     }, [needExtraPolling]);
+
+    useEffect(() => {
+        if (needExtraPollingRef.current && symbolInfo?.markPx) {
+            setMidPrice(symbolInfo.markPx);
+        }
+    }, [symbolInfo?.markPx]);
 
     // Use custom hook for stable slot arrays
     const buySlots = useOrderSlots(buys);
@@ -263,6 +285,70 @@ const OrderBook: React.FC<OrderBookProps> = ({
         return slots;
     }, [userSymbolOrders, sellSlots, findClosestSlot]);
 
+    useEffect(() => {
+        if (
+            !filledResolution.current ||
+            !symbolInfo ||
+            !orderInputPriceValue ||
+            !buys.length ||
+            !sells.length ||
+            !midPriceRef.current
+        ) {
+            setFocusedSlot(null);
+            return;
+        }
+
+        if (isMidModeActive) {
+            if (tradeDirection === 'buy') {
+                setFocusedSlot({
+                    price: buys[0].px,
+                    side: 'buy',
+                });
+            } else {
+                setFocusedSlot({
+                    price: sells[0].px,
+                    side: 'sell',
+                });
+            }
+            return;
+        }
+
+        let side;
+        let targetSlots;
+        const gapTreshold = filledResolution.current.val / 2;
+
+        if (orderInputPriceValue < midPriceRef.current) {
+            side = 'buy';
+            targetSlots = buys.map((buy) => buy.px);
+        } else {
+            side = 'sell';
+            targetSlots = sells.map((sell) => sell.px);
+        }
+
+        let closestSlot = findClosestSlot(
+            orderInputPriceValue,
+            targetSlots,
+            gapTreshold,
+        );
+
+        if (!closestSlot) {
+            closestSlot = findClosestSlot(
+                orderInputPriceValue,
+                targetSlots,
+                gapTreshold * 2,
+            );
+        }
+
+        if (closestSlot) {
+            setFocusedSlot({
+                price: closestSlot,
+                side: side as 'buy' | 'sell',
+            });
+        } else {
+            setFocusedSlot(null);
+        }
+    }, [orderInputPriceValue, buys, sells]);
+
     // code blocks were being used in sdk approach
 
     // const handleOrderBookWorkerResult = useCallback(
@@ -318,7 +404,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
         (payload: any) => {
             try {
                 const { buys, sells } = processOrderBookMessage(payload);
-                setOrderBook(buys, sells);
+                //set mid price if we are polling with lowest resolution
+                setOrderBook(buys, sells, !needExtraPollingRef.current);
                 setOrderBookState(TableState.FILLED);
                 filledResolution.current = selectedResolution;
                 lastMessageTimeRef.current = Date.now();
@@ -559,7 +646,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     }
                 />
             </div>
-
             <div id={'orderBookHeader2'} className={styles.orderBookHeader}>
                 <div>{t('transactions.price')}</div>
                 <div>
@@ -575,11 +661,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
                         : '(USD)'}
                 </div>
             </div>
-
             <BasicDivider />
-
             {wsError && <div className={styles.errorMessage}>{wsError}</div>}
-
             <div id='dummyOrderRow' className={styles.dummyOrderRow}>
                 <OrderRow
                     rowIndex={0}
@@ -592,7 +675,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     getBsColor={getBsColor}
                 />
             </div>
-
             {orderBookState === TableState.LOADING && (
                 <motion.div
                     className={
@@ -632,7 +714,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     </div>
                 </motion.div>
             )}
-
             {orderBookState === TableState.FILLED &&
                 buys.length > 0 &&
                 sells.length > 0 &&
@@ -753,6 +834,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                                 clickListener={rowClickHandler}
                                                 getBsColor={getBsColor}
                                                 formatNum={formatNum}
+                                                obFocusedSlotPrice={
+                                                    focusedSlot?.side === 'sell'
+                                                        ? focusedSlot?.price
+                                                        : undefined
+                                                }
                                             />
                                             <div
                                                 className={styles.ratioBar}
@@ -794,6 +880,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                                 clickListener={rowClickHandler}
                                                 getBsColor={getBsColor}
                                                 formatNum={formatNum}
+                                                obFocusedSlotPrice={
+                                                    focusedSlot?.side === 'buy'
+                                                        ? focusedSlot?.price
+                                                        : undefined
+                                                }
                                             />
                                             <div
                                                 className={styles.ratioBar}

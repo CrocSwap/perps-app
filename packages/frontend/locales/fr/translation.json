@@ -40,7 +40,8 @@
         "reset": "Réinitialiser",
         "announcements": "Annonces",
         "leverage": "Effet de levier",
-        "comingSoon": "Bientôt disponible"
+        "comingSoon": "Bientôt disponible",
+        "clearFilter": "Effacer le filtre"
     },
     "transactions": {
         "orderTypes": "Types d'ordre",
@@ -220,6 +221,9 @@
             "message": "{{successCount}} ordres annulés, {{failedCount}} échecs"
         },
         "noOpenOrders": "Aucun ordre ouvert",
+        "noOpenOrdersForMarket": "Aucun ordre {{symbol}} ouvert",
+        "noOpenLongOrders": "Aucun ordre long ouvert",
+        "noOpenShortOrders": "Aucun ordre short ouvert",
         "transactionError": "Erreur de transaction",
         "invalidLimitPrice": {
             "title": "Prix invalide",
@@ -298,6 +302,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "Aucune position ouverte",
+        "noOpenPositionsForMarket": "Aucune position {{symbol}} ouverte",
+        "noOpenLongPositions": "Aucune position long ouverte",
+        "noOpenShortPositions": "Aucune position short ouverte",
         "markPrice": "Prix indicatif",
         "orderId": "ID d'ordre",
         "totalBalance": "Solde total",
@@ -315,8 +322,17 @@
         "originalSize": "Taille d'origine",
         "cancelAll": "Tout annuler",
         "noTradeHistory": "Aucun historique de transactions",
+        "noTradeHistoryForMarket": "Aucun historique de transactions {{symbol}}",
+        "noLongTradeHistory": "Aucun historique de transactions long",
+        "noShortTradeHistory": "Aucun historique de transactions short",
         "noOrderHistory": "Aucun historique des ordres",
+        "noOrderHistoryForMarket": "Aucun historique des ordres {{symbol}}",
+        "noLongOrderHistory": "Aucun historique des ordres long",
+        "noShortOrderHistory": "Aucun historique des ordres short",
         "noFundingHistory": "Aucun historique de financement",
+        "noFundingHistoryForMarket": "Aucun historique de financement {{symbol}}",
+        "noLongFundingHistory": "Aucun historique de financement long",
+        "noShortFundingHistory": "Aucun historique de financement short",
         "fundingHistory": "Total : {{allTime}} Depuis le changement : {{sinceChange}}",
         "openLong": "Ouvrir Long",
         "openShort": "Ouvrir Short",
@@ -479,6 +495,10 @@
         },
         "updateButton": "Mettre à jour maintenant",
         "version": "Version"
+    },
+    "offline": {
+        "title": "Vous êtes hors ligne",
+        "message": "Le trading est désactivé. Vous pouvez toujours consulter les données en cache."
     },
     "leverage": {
         "title": "Ajuster l'effet de levier",

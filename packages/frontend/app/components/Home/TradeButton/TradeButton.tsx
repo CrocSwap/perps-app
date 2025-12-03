@@ -9,14 +9,12 @@ export default function TradeButton() {
     const isNavigating = navigation.state !== 'idle';
 
     return (
-        <>
-            <Link
-                to={`/v2/trade/${symbol}`}
-                className={styles.tradeButton}
-                viewTransition
-            >
-                {isNavigating ? t('common.loading') : t('home.tradeNow')}
-            </Link>
-        </>
+        <Link
+            to={`/v2/trade/${symbol}`}
+            className={styles.tradeButton}
+            viewTransition
+        >
+            {isNavigating ? t('common.loading') : t('home.tradeNow')}
+        </Link>
     );
 }

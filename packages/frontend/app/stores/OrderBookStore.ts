@@ -10,7 +10,11 @@ interface OrderBookStore {
     buys: OrderBookRowIF[];
     sells: OrderBookRowIF[];
     orderBook: OrderBookRowIF[];
-    setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) => void;
+    setOrderBook: (
+        buys: OrderBookRowIF[],
+        sells: OrderBookRowIF[],
+        setMid?: boolean,
+    ) => void;
     trades: OrderBookTradeIF[];
     setTrades: (trades: OrderBookTradeIF[]) => void;
     resolutionPairs: Record<string, OrderRowResolutionIF>;
@@ -18,6 +22,8 @@ interface OrderBookStore {
         symbol: string,
         resolutionPair: OrderRowResolutionIF,
     ) => void;
+    midPrice: number | null;
+    setMidPrice: (midPrice: number) => void;
 }
 
 export const useOrderBookStore = create<OrderBookStore>()(
@@ -27,8 +33,24 @@ export const useOrderBookStore = create<OrderBookStore>()(
             buys: [],
             sells: [],
             trades: [],
-            setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) =>
-                set({ buys, sells }),
+            setOrderBook: (
+                buys: OrderBookRowIF[],
+                sells: OrderBookRowIF[],
+                setMid?: boolean,
+            ) => {
+                if (setMid) {
+                    set({
+                        buys: buys,
+                        sells: sells,
+                        midPrice: (buys[0].px + sells[0].px) / 2,
+                    });
+                } else {
+                    set({
+                        buys,
+                        sells,
+                    });
+                }
+            },
             setTrades: (trades: OrderBookTradeIF[]) => set({ trades }),
             addToResolutionPair: (
                 symbol: string,
@@ -41,6 +63,8 @@ export const useOrderBookStore = create<OrderBookStore>()(
                     },
                 })),
             resolutionPairs: {},
+            midPrice: null,
+            setMidPrice: (midPrice: number) => set({ midPrice }),
         }),
         {
             name: 'ORDERBOOK',

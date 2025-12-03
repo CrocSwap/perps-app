@@ -2,7 +2,6 @@ import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 import { AnimatePresence, motion } from 'framer-motion'; // <-- Import Framer Motion
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MdClose } from 'react-icons/md';
-import { useLocation } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
 import { useVersionCheck } from '~/hooks/useVersionCheck';
 import { useViewed } from '~/stores/AlreadySeenStore';
@@ -241,12 +240,6 @@ export default function Notifications() {
 
     const [userClosedNews, setUserClosedNews] = useState<boolean>(false);
 
-    const { pathname } = useLocation();
-
-    if (pathname === '/') {
-        return <></>;
-    }
-
     return (
         <div className={styles.notifications}>
             <AnimatePresence>
@@ -299,7 +292,36 @@ export default function Notifications() {
                     </div>
                     <SimpleButton
                         onClick={() => {
-                            window.location.reload();
+                            if (
+                                'serviceWorker' in navigator &&
+                                navigator.serviceWorker.controller
+                            ) {
+                                navigator.serviceWorker
+                                    .getRegistration()
+                                    .then((registration) => {
+                                        const waitingSW =
+                                            registration &&
+                                            registration.waiting;
+                                        if (waitingSW) {
+                                            waitingSW.postMessage({
+                                                type: 'SKIP_WAITING',
+                                            });
+                                            navigator.serviceWorker.addEventListener(
+                                                'controllerchange',
+                                                () => {
+                                                    window.location.reload();
+                                                },
+                                            );
+                                            return;
+                                        }
+                                        window.location.reload();
+                                    })
+                                    .catch(() => {
+                                        window.location.reload();
+                                    });
+                            } else {
+                                window.location.reload();
+                            }
                             setShowReload(false);
                         }}
                     >
