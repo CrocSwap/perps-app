@@ -42,9 +42,3 @@
 .reverse {
     flex-direction: row-reverse;
 }
-
-@media (max-width: 480px) {
-    .toggleLabel {
-        display: none;
-    }
-}
