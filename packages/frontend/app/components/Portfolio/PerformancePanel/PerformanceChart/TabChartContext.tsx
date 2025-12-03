@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import LineChart from '~/components/LineChart/LineChart';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import type { UserPositionIF } from '~/utils/UserDataIFs';
 import CollateralPieChart from '../CollateralChart/CollateralPieChart';
+import { positionDataMap } from './LineChartData';
 
 export interface TabChartContext {
     activeTab: string;
@@ -21,6 +22,7 @@ export interface TabChartContext {
     >;
     userProfileLineData: any;
     setUserProfileLineData: React.Dispatch<React.SetStateAction<any>>;
+    panelHeight?: number;
 }
 
 const TabChartContext: React.FC<TabChartContext> = (props) => {
@@ -36,6 +38,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         setAccountValueHistory,
         userProfileLineData,
         setUserProfileLineData,
+        panelHeight,
     } = props;
 
     const { userAddress } = useUserDataStore();
@@ -43,14 +46,21 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     const { fetchUserPortfolio } = useInfoApi();
 
     const [parsedKey, setParsedKey] = useState<string>();
-    const [chartWidth, setChartWidth] = useState<number>(
-        window.innerWidth > 768
-            ? Math.min(850, window.innerWidth - 50)
-            : window.innerWidth - 50,
-    );
-    const [chartHeight, setChartHeight] = useState<number>(
-        Math.max(250 - (870 - window.innerHeight), 100),
-    );
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [chartWidth, setChartWidth] = useState<number | null>(null);
+    const [chartHeight, setChartHeight] = useState<number | null>(null);
+    const [isChartReady, setIsChartReady] = useState(false);
+
+    const parseFakeUserData = (key: string) => {
+        const userPositionData = positionDataMap.get(key);
+
+        if (userPositionData !== undefined) {
+            setAccountValueHistory(() => userPositionData.accountValueHistory);
+            setPnlHistory(() => userPositionData.pnlHistory);
+
+            setParsedKey(() => key);
+        }
+    };
 
     const parseUserProfileData = (data: any, key: string) => {
         const userPositionData = data.get(key) as UserPositionIF;
@@ -99,8 +109,14 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                   ? 'allTime'
                   : selectedPeriod.value?.toLowerCase();
 
-        if (key !== parsedKey && userProfileLineData) {
-            parseUserProfileData(userProfileLineData, key);
+        // if (key !== parsedKey && userProfileLineData) {
+        //     parseUserProfileData(userProfileLineData, key);
+        // }
+
+        // fake data parser
+
+        if (key !== parsedKey) {
+            parseFakeUserData(key);
         }
     }, [
         userProfileLineData,
@@ -109,51 +125,110 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         activeTab,
     ]);
 
-    window.addEventListener('resize', () => {
-        const height = window.innerHeight;
-        const width = window.innerWidth;
+    // Initial dimension calculation using useLayoutEffect for synchronous measurement
+    useLayoutEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
 
-        if (width > 768) {
-            if (width < 1250) {
-                setChartWidth(() => Math.max(850 - (1250 - width), 250));
-            } else {
-                setChartWidth(() => 900);
+        const compute = () => {
+            const h = container.clientHeight;
+            const w = container.clientWidth;
+            const isMobile = window.innerWidth <= 768;
+            const minH = 100;
+
+            if (w > 0 && h > 0) {
+                setChartWidth(Math.max(w - (isMobile ? 40 : 50), 250));
+                const available = h - (isMobile ? 60 : 80);
+                setChartHeight(Math.max(available, minH));
+                setIsChartReady(true);
+                return true;
             }
-        } else {
-            setChartWidth(() => width - 50);
-        }
+            return false;
+        };
 
-        if (height < 870) {
-            setChartHeight(() => Math.max(250 - (870 - height), 100));
-        } else {
-            setChartHeight(() => 250);
-        }
-    });
+        // Try until container has non-zero size
+        let raf = 0;
+        const tick = () => {
+            if (!compute()) raf = requestAnimationFrame(tick);
+        };
+        tick();
+
+        return () => cancelAnimationFrame(raf);
+    }, [activeTab, panelHeight]); // re-evaluate on tab change and when splitter moves
+
+    // Track window and container resize separately
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const update = () => {
+            const h = container.clientHeight;
+            const w = container.clientWidth;
+            const isMobile = window.innerWidth <= 768;
+            const minH = 100;
+
+            if (w > 0 && h > 0) {
+                setChartWidth(Math.max(w - (isMobile ? 40 : 50), 250));
+                const available = h - (isMobile ? 60 : 80);
+                setChartHeight(Math.max(available, minH));
+                setIsChartReady(true);
+            }
+        };
+
+        const ro = new ResizeObserver(update);
+        ro.observe(container);
+        window.addEventListener('resize', update);
+
+        // one immediate kick
+        update();
+
+        return () => {
+            ro.disconnect();
+            window.removeEventListener('resize', update);
+        };
+    }, []);
 
     return (
-        <div>
-            {activeTab === 'Performance' && pnlHistory && (
-                <LineChart
-                    lineData={pnlHistory}
-                    curve={'step'}
-                    chartName={selectedVault.value + selectedPeriod.value}
-                    height={chartHeight}
-                    width={chartWidth}
-                />
-            )}
+        <div
+            ref={containerRef}
+            style={{ width: '100%', height: '100%', overflow: 'visible' }}
+        >
+            {isChartReady && chartWidth && chartHeight && (
+                <>
+                    {activeTab === 'Performance' && pnlHistory && (
+                        <LineChart
+                            key={`performance-${chartWidth}-${chartHeight}`}
+                            lineData={pnlHistory}
+                            curve={'step'}
+                            chartName={
+                                selectedVault.value + selectedPeriod.value
+                            }
+                            height={chartHeight}
+                            width={chartWidth}
+                        />
+                    )}
 
-            {activeTab === 'Account Value' && accountValueHistory && (
-                <LineChart
-                    lineData={accountValueHistory}
-                    curve={'step'}
-                    chartName={selectedVault.value + selectedPeriod.value}
-                    height={chartHeight}
-                    width={chartWidth}
-                />
-            )}
+                    {activeTab === 'Account Value' && accountValueHistory && (
+                        <LineChart
+                            key={`account-${chartWidth}-${chartHeight}`}
+                            lineData={accountValueHistory}
+                            curve={'step'}
+                            chartName={
+                                selectedVault.value + selectedPeriod.value
+                            }
+                            height={chartHeight}
+                            width={chartWidth}
+                        />
+                    )}
 
-            {activeTab === 'Collateral' && (
-                <CollateralPieChart height={chartHeight} width={chartWidth} />
+                    {activeTab === 'Collateral' && (
+                        <CollateralPieChart
+                            key={`collateral-${chartWidth}-${chartHeight}`}
+                            height={chartHeight}
+                            width={chartWidth}
+                        />
+                    )}
+                </>
             )}
         </div>
     );

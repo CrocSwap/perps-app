@@ -10,7 +10,7 @@
 .container {
     --container-width: 1280px;
     --container-gap: 48px;
-    --table-height: 155px;
+    --table-height: 200px;
     --fee-modal-width: 500px;
 
     height: 100%;
@@ -31,7 +31,7 @@
 .column {
     height: 100%;
     display: grid;
-    grid-template-rows: 141px 1fr;
+    grid-template-rows: 90px 1fr;
     gap: var(--container-gap);
 }
 .detailsContainer {
@@ -100,24 +100,95 @@
     align-items: center;
     gap: var(--gap-s);
 }
+/* portfolio.module.css */
+.resizeHandle {
+    position: relative;
+    width: 100%;
+    height: 12px; /* drag zone height */
+    cursor: row-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent; /* keep invisible except for grip */
+}
+
+.resizeGrip {
+    width: 40px;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--bg-dark5, #2a2a2a); /* faint gray line */
+    transition: background 0.2s ease;
+}
+
+.resizeHandle:hover .resizeGrip {
+    background: var(--accent1, #7371fc); /* highlight on hover */
+}
 
 .table {
-    /* height: var(--table-height); */
-    height: auto;
-    overflow-y: hidden;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
 }
-
 .table > div {
-    /* height: var(--table-height); */
     height: 100%;
 }
-.mainContent {
+
+/* .mainContent {
     height: 100%;
 
     display: grid;
     grid-template-rows: auto var(--table-height);
     gap: var(--gap-s);
+} */
+.mainContent {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--gap-s);
+    min-height: 0;
 }
+
+/* Mobile toggle buttons - hidden on desktop */
+.mobileToggle {
+    display: none;
+    gap: var(--gap-xs);
+    width: 100%;
+}
+
+.toggleButton {
+    flex: 1;
+    padding: var(--padding-s);
+    background: var(--bg-dark3);
+    color: var(--text2);
+    border: 1px solid var(--bg-dark5);
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-s);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggleButton:hover {
+    background: var(--bg-dark4);
+}
+
+.toggleButton.active {
+    background: var(--accent1);
+    color: var(--text1);
+    border-color: var(--accent1);
+}
+
+/* Desktop view - shown by default */
+.desktopView {
+    display: contents; /* Pass through to maintain grid structure */
+}
+
+/* Mobile view - hidden by default */
+.mobileViewContainer {
+    display: none;
+    height: 100%;
+    overflow: visible;
+}
+
 .sendMobile,
 .netValueMobile {
     display: none !important;
@@ -265,6 +336,31 @@
         gap: var(--gap-s);
     }
 
+    .mainContent {
+        /* Full height on mobile for toggle view */
+        height: 100%;
+        display: block;
+        overflow: visible;
+    }
+
+    /* Show mobile toggle buttons */
+    .mobileToggle {
+        display: flex;
+        padding: var(--padding-m) 0;
+    }
+
+    /* Hide desktop resizable view */
+    .desktopView {
+        display: none !important;
+    }
+
+    /* Show mobile toggle view */
+    .mobileViewContainer {
+        display: block;
+        height: 100%;
+        overflow: visible;
+    }
+
     .sendDesktop,
     .totalNetDisplay h6 {
         display: none !important;
@@ -298,5 +394,11 @@
         text-align: center;
         display: flex;
         justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding-bottom: var(--footer-h, 56px);
     }
 }

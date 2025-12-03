@@ -15,13 +15,7 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
 
     const chartHeight = height || 250;
 
-    const pieData: PieData[] = [
-        { label: 'UPnL', value: 20 },
-        { label: 'USDC', value: 36 },
-        { label: 'BTC', value: 25 },
-        { label: 'SOL', value: 10 },
-        { label: 'FOGO', value: 9 },
-    ];
+    const pieData: PieData[] = [{ label: 'FUSD', value: 100 }];
 
     const dataColorSet = [
         '#7371fc',
@@ -90,9 +84,9 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
                             </span>
                         </div>
                     </div>
-                    <div>
+                    {/* <div>
                         <Button size='medium'>Convert</Button>
-                    </div>
+                    </div> */}
                 </div>
             ))}
         </div>

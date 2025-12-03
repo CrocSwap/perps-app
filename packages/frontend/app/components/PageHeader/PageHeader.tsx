@@ -111,7 +111,7 @@ export default function PageHeader() {
     const navLinks = [
         { name: t('navigation.trade'), path: `/v2/trade/${symbol}` },
         // { name: 'Vaults', path: '/v2/vaults' },
-        // { name: 'Portfolio', path: '/v2/portfolio' },
+        { name: 'Portfolio', path: '/v2/portfolio' },
         // { name: 'Referrals', path: '/v2/referrals' },
         // { name: 'Points', path: '/points' },
         // { name: 'Leaderboard', path: '/v2/leaderboard' },
@@ -280,6 +280,7 @@ export default function PageHeader() {
                         style={{
                             position: 'relative',
                         }}
+                        className={styles.moreSection}
                         ref={moreDropdownRef}
                     >
                         <button

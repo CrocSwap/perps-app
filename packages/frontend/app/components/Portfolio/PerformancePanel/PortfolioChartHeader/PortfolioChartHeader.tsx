@@ -34,7 +34,10 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
     ];
 
     return (
-        <div className={styles.headercontainer}>
+        <div
+            id={'portfolio-header-container'}
+            className={styles.headercontainer}
+        >
             <div className={styles.header}>
                 <div className={styles.filterContainer}>
                     <div className={styles.vaultFilter}>
