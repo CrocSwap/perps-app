@@ -1,5 +1,5 @@
 import styles from './AnimatedBackground.module.css';
-import AnimatedPath from '../Home/Hero/AnimatedPath';
+import AnimatedPath from './AnimatedPath';
 
 type Props = {
     /** absolute = contained by parent; fixed = spans the viewport across scroll */

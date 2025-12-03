@@ -14,7 +14,7 @@ export default function TradeButton() {
             className={styles.tradeButton}
             viewTransition
         >
-            {isNavigating ? t('common.loading') : t('home.startTrading')}
+            {isNavigating ? t('common.loading') : t('home.tradeNow')}
         </Link>
     );
 }
