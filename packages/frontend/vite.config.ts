@@ -6,6 +6,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 const appName = 'Ambient Perps';
 const appDescription = 'A modern, performant app for perpetual contracts.';
 
+const isDeployPreview =
+    process.env.NETLIFY === 'true' && process.env.CONTEXT === 'deploy-preview';
+
 export default defineConfig({
     // Optimize dependency pre-bundling
     optimizeDeps: {
@@ -39,9 +42,12 @@ export default defineConfig({
         minify: 'terser', // Use terser for better compression
         terserOptions: {
             compress: {
-                drop_console: true, // Remove console.logs in production
-                drop_debugger: true,
-                pure_funcs: ['console.log', 'console.debug'], // Remove specific console methods
+                // Keep logs on Netlify deploy previews, strip them elsewhere
+                drop_console: !isDeployPreview,
+                drop_debugger: !isDeployPreview,
+                pure_funcs: isDeployPreview
+                    ? []
+                    : ['console.log', 'console.debug'], // Remove specific console methods
             },
         },
         cssCodeSplit: true, // Enable CSS code splitting

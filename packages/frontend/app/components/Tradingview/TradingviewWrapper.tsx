@@ -1,23 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
-import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradingview';
+import {
+    getCachedTradingViewLibrary,
+    loadTradingViewLibrary,
+} from '~/routes/chart/lazyLoading/useLazyTradingview';
 import OverlayCanvas from '~/routes/chart/overlayCanvas/overlayCanvas';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
 
 const TradingViewWrapper: React.FC = () => {
+    // Check if library is already cached to avoid showing spinner on remount
+    const cachedLib = getCachedTradingViewLibrary();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [tvLib, setTvLib] = useState<any>(null);
+    const [tvLib, setTvLib] = useState<any>(cachedLib);
     const [chartLoadingStatus, setChartLoadingStatus] = useState<
         'loading' | 'error' | 'ready'
-    >('loading');
+    >(cachedLib ? 'ready' : 'loading');
 
     // Use a key to force remount of TradingViewProvider when coming back online
     const { lastOnlineAt } = useAppStateStore();
     const [chartKey, setChartKey] = useState(0);
 
     useEffect(() => {
+        // Skip loading if we already have the library cached
+        if (tvLib) return;
+
         let mounted = true;
         (async () => {
             const lib = await loadTradingViewLibrary();
@@ -32,7 +40,7 @@ const TradingViewWrapper: React.FC = () => {
         return () => {
             mounted = false;
         };
-    }, []);
+    }, [tvLib]);
 
     // When coming back online and chart is stuck loading, force a remount
     useEffect(() => {

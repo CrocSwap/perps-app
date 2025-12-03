@@ -240,11 +240,14 @@ export function getMarkColorData() {
 
 export function clearChartCachesForSymbol(symbol: string) {
     const candlePrefix = `${symbol}-`;
+    let clearedCount = 0;
     for (const key of dataCache.keys()) {
         if (key.startsWith(candlePrefix)) {
             dataCache.delete(key);
+            clearedCount++;
         }
     }
+    console.log(`>>> cleared ${clearedCount} cache entries for ${symbol}`);
 
     const fillsKey = `${symbol}-fillData`;
     dataCacheWithUser.delete(fillsKey);
