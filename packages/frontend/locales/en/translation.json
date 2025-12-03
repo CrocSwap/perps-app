@@ -506,6 +506,10 @@
         "updateButton": "Update Now",
         "version": "Version"
     },
+    "offline": {
+        "title": "You are offline",
+        "message": "Trading is disabled. You can still view cached data."
+    },
     "leverage": {
         "title": "Adjust Leverage",
         "closePositionPrompt": "Close position to reduce minimum leverage"

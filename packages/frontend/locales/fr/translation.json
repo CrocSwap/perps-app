@@ -506,6 +506,10 @@
         "updateButton": "Mettre à jour maintenant",
         "version": "Version"
     },
+    "offline": {
+        "title": "Vous êtes hors ligne",
+        "message": "Le trading est désactivé. Vous pouvez toujours consulter les données en cache."
+    },
     "leverage": {
         "title": "Ajuster l'effet de levier",
         "closePositionPrompt": "Clôturez la position pour réduire le levier"

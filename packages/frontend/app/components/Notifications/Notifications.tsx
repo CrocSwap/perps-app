@@ -292,7 +292,36 @@ export default function Notifications() {
                     </div>
                     <SimpleButton
                         onClick={() => {
-                            window.location.reload();
+                            if (
+                                'serviceWorker' in navigator &&
+                                navigator.serviceWorker.controller
+                            ) {
+                                navigator.serviceWorker
+                                    .getRegistration()
+                                    .then((registration) => {
+                                        const waitingSW =
+                                            registration &&
+                                            registration.waiting;
+                                        if (waitingSW) {
+                                            waitingSW.postMessage({
+                                                type: 'SKIP_WAITING',
+                                            });
+                                            navigator.serviceWorker.addEventListener(
+                                                'controllerchange',
+                                                () => {
+                                                    window.location.reload();
+                                                },
+                                            );
+                                            return;
+                                        }
+                                        window.location.reload();
+                                    })
+                                    .catch(() => {
+                                        window.location.reload();
+                                    });
+                            } else {
+                                window.location.reload();
+                            }
                             setShowReload(false);
                         }}
                     >

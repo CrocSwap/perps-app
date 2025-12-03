@@ -506,6 +506,10 @@
         "updateButton": "Şimdi güncelle",
         "version": "Sürüm"
     },
+    "offline": {
+        "title": "Çevrimdışısınız",
+        "message": "İşlem yapma devre dışı. Önbelleğe alınmış verileri görüntüleyebilirsiniz."
+    },
     "leverage": {
         "title": "Kaldıraç ayarla",
         "closePositionPrompt": "Minimum kaldıraç için pozisyonu kapat"

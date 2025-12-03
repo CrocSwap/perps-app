@@ -504,6 +504,10 @@
         "updateButton": "Jetzt aktualisieren",
         "version": "Version"
     },
+    "offline": {
+        "title": "Sie sind offline",
+        "message": "Handel ist deaktiviert. Sie können weiterhin zwischengespeicherte Daten anzeigen."
+    },
     "leverage": {
         "title": "Hebel anpassen",
         "closePositionPrompt": "Position schließen zur Hebel-Reduzierung"

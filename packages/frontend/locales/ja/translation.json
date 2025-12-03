@@ -506,6 +506,10 @@
         "updateButton": "今すぐアップデート",
         "version": "バージョン"
     },
+    "offline": {
+        "title": "オフラインです",
+        "message": "取引は無効です。キャッシュされたデータは引き続き表示できます。"
+    },
     "leverage": {
         "title": "レバレッジを調整",
         "closePositionPrompt": "レバレッジを下げるにはポジション終了"

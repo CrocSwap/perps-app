@@ -19,6 +19,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
+import SymbolInfoMobile from './trade/symbol/symbolInfoMobile';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
@@ -36,11 +37,13 @@ import useOutsideClick from '~/hooks/useOutsideClick';
 import ExpandableOrderBook from './trade/orderbook/ExpandableOrderBook';
 import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import useMediaQuery from '~/hooks/useMediaQuery';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
+const MemoizedSymbolInfoMobile = memo(SymbolInfoMobile);
 
 export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
@@ -145,6 +148,7 @@ export default function Trade() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('order');
     const [isMobile, setIsMobile] = useState<boolean>(false);
+    const useSymbolInfoMobile = useMediaQuery('(max-width: 480px)');
 
     const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
@@ -782,7 +786,11 @@ export default function Trade() {
                 <TradeRouteHandler />
                 <WebDataConsumer />
                 <div className={styles.symbolInfoContainer}>
-                    <MemoizedSymbolInfo />
+                    {useSymbolInfoMobile ? (
+                        <MemoizedSymbolInfoMobile />
+                    ) : (
+                        <MemoizedSymbolInfo />
+                    )}
                 </div>
                 {MobileTabNavigation}
                 <div

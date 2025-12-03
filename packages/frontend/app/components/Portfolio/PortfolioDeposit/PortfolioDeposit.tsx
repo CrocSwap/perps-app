@@ -12,7 +12,7 @@ import TokenDropdown, {
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
-import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
+import { getTxLink, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import { t } from 'i18next';
@@ -157,9 +157,7 @@ function PortfolioDeposit(props: propsIF) {
                         result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             } else {
                 setTransactionStatus('success');
@@ -190,9 +188,7 @@ function PortfolioDeposit(props: propsIF) {
                         unit: 'fUSD',
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
 

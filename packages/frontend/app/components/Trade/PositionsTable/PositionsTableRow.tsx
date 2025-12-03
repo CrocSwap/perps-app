@@ -13,7 +13,7 @@ import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { blockExplorer, BTC_MAX_LEVERAGE } from '~/utils/Constants';
+import { BTC_MAX_LEVERAGE, getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
@@ -220,9 +220,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                     Date.now(),
                                 ),
                                 txSignature: result.signature,
-                                explorerLink: result.signature
-                                    ? `${blockExplorer}/tx/${result.signature}`
-                                    : undefined,
+                                explorerLink: getTxLink(result.signature),
                             },
                         });
                     }
@@ -239,9 +237,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             symbol: position.coin,
                         }),
                         icon: 'check',
-                        txLink: result.signature
-                            ? `${blockExplorer}/tx/${result.signature}`
-                            : undefined,
+                        txLink: getTxLink(result.signature),
                     });
                 } else {
                     if (typeof plausible === 'function') {
@@ -260,9 +256,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                     Date.now(),
                                 ),
                                 txSignature: result.signature,
-                                explorerLink: result.signature
-                                    ? `${blockExplorer}/tx/${result.signature}`
-                                    : undefined,
+                                explorerLink: getTxLink(result.signature),
                             },
                         });
                     }
@@ -272,9 +266,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             result.error ||
                                 t('transactions.failedToClosePosition'),
                         ),
-                        txLink: result.signature
-                            ? `${blockExplorer}/tx/${result.signature}`
-                            : undefined,
+                        txLink: getTxLink(result.signature),
                         icon: 'error',
                     });
                 }

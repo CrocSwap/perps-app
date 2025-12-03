@@ -67,9 +67,10 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
         if (open) document.documentElement.classList.add('modal-open');
         else document.documentElement.classList.remove('modal-open');
     }, [open]);
+
     const backdropPointerDownOnSelf = useRef(false);
 
-    // ---- bottom sheet drag (simple & robust) ----
+    // ---- bottom sheet drag  ----
     const sheetRef = useRef<HTMLDivElement | null>(null);
     const drag = useRef({ startY: 0, y: 0, active: false });
 
@@ -77,12 +78,14 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
         drag.current = { startY: clientY, y: 0, active: true };
         if (sheetRef.current) sheetRef.current.style.transition = 'none';
     };
+
     const onDragMove = (clientY: number) => {
         if (!drag.current.active || !sheetRef.current) return;
         const dy = Math.max(0, clientY - drag.current.startY);
         drag.current.y = dy;
         sheetRef.current.style.transform = `translateY(${dy}px)`;
     };
+
     const onDragEnd = () => {
         if (!drag.current.active || !sheetRef.current) return;
         sheetRef.current.style.transition = 'transform 0.25s ease';
@@ -144,10 +147,19 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                     aria-modal='true'
                     aria-labelledby='global-modal-title'
                     onPointerDown={(e) => {
+                        e.stopPropagation();
                         backdropPointerDownOnSelf.current =
                             e.target === e.currentTarget;
                     }}
                     onPointerUp={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onPointerCancel={(e) => {
+                        e.stopPropagation();
+                        backdropPointerDownOnSelf.current = false;
+                    }}
+                    onClick={(e) => {
+                        e.stopPropagation();
                         if (
                             backdropPointerDownOnSelf.current &&
                             e.target === e.currentTarget
@@ -156,14 +168,12 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                         }
                         backdropPointerDownOnSelf.current = false;
                     }}
-                    onPointerCancel={() => {
-                        backdropPointerDownOnSelf.current = false;
-                    }}
                 >
                     {payload.position === 'bottomSheet' ? (
                         <div
                             ref={sheetRef}
                             className={`${styles.bottomSheet} ${styles.slideUp}`}
+                            onClick={(e) => e.stopPropagation()}
                             onMouseMove={
                                 drag.current.active
                                     ? handleMouseMove
@@ -199,7 +209,10 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                             </div>
                         </div>
                     ) : (
-                        <div className={styles.centerModal}>
+                        <div
+                            className={styles.centerModal}
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <header>
                                 <span />
                                 <h3 id='global-modal-title'>{payload.title}</h3>

@@ -5,7 +5,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
+import { EXTERNAL_PAGE_URL_PREFIX, getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import type {
     OrderDataIF,
@@ -188,9 +188,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 ),
                                 icon: 'check',
                                 removeAfter: 5000,
-                                txLink: successOrderSignature
-                                    ? `${blockExplorer}/tx/${successOrderSignature}`
-                                    : undefined,
+                                txLink: getTxLink(successOrderSignature),
                             });
                         }
                     });
@@ -216,9 +214,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         }),
                         icon: 'check',
                         removeAfter: 5000,
-                        txLink: successOrderSignature
-                            ? `${blockExplorer}/tx/${successOrderSignature}`
-                            : undefined,
+                        txLink: getTxLink(successOrderSignature),
                     });
                 }
             } else {
@@ -258,9 +254,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         ),
                         icon: 'error',
                         removeAfter: 8000,
-                        txLink: failedOrderSignature
-                            ? `${blockExplorer}/tx/${failedOrderSignature}`
-                            : undefined,
+                        txLink: getTxLink(failedOrderSignature),
                     });
                 } else {
                     notifications.remove(slug);
@@ -282,9 +276,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         message: `${t('transactions.cancelAllFailed.message')} ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
                         icon: 'error',
                         removeAfter: 8000,
-                        txLink: failedOrderSignature
-                            ? `${blockExplorer}/tx/${failedOrderSignature}`
-                            : undefined,
+                        txLink: getTxLink(failedOrderSignature),
                     });
                 }
             }

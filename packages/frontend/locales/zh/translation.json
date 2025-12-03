@@ -506,6 +506,10 @@
         "updateButton": "立即更新",
         "version": "版本"
     },
+    "offline": {
+        "title": "您已离线",
+        "message": "交易已禁用。您仍可查看缓存的数据。"
+    },
     "leverage": {
         "title": "调整杠杆",
         "closePositionPrompt": "关闭持仓以降低最低杠杆"
