@@ -150,7 +150,7 @@
         max-height: 100vh;
         width: min(80vw, 320px);
         border-radius: 0;
-        /* padding: var(--padding-m); */
+        padding: 0;
         box-shadow: none;
 
         display: flex;
@@ -158,6 +158,10 @@
         align-items: stretch;
         gap: var(--gap-xs);
         overflow: hidden;
+    }
+
+    .menuItems {
+        padding: var(--padding-m);
     }
 
     .menuItem {
@@ -177,5 +181,8 @@
     }
     .logoRow {
         display: flex;
+    }
+    .logoRow img {
+        margin-left: var(--margin-m);
     }
 }

@@ -198,19 +198,22 @@ const DropdownMenu = ({
                         className={styles.logoImage}
                     />
                 </div>
-
-                {menuItems.map((item, index) => (
-                    <button
-                        key={`${item.name}-${index}`}
-                        className={styles.menuItem}
-                        onClick={() => handleItemClick(item)}
-                    >
-                        <span className={styles.menuItemLabel}>
-                            {item.name}
-                        </span>
-                        <span className={styles.menuItemIcon}>{item.icon}</span>
-                    </button>
-                ))}
+                <section className={styles.menuItems}>
+                    {menuItems.map((item, index) => (
+                        <button
+                            key={`${item.name}-${index}`}
+                            className={styles.menuItem}
+                            onClick={() => handleItemClick(item)}
+                        >
+                            <span className={styles.menuItemLabel}>
+                                {item.name}
+                            </span>
+                            <span className={styles.menuItemIcon}>
+                                {item.icon}
+                            </span>
+                        </button>
+                    ))}
+                </section>
 
                 <div className={styles.version}>
                     {t('newVersion.version')}:{' '}
