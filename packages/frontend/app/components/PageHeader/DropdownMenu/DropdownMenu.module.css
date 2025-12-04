@@ -111,12 +111,14 @@
     align-items: center;
     justify-content: flex-start;
     margin-bottom: var(--margin-s);
+    background-color: var(--bg-dark2);
+    padding: var(--padding-xs) 0;
 }
 
-.logoImage {
+/* .logoImage {
     height: 28px;
     width: auto;
-}
+} */
 
 /* ------- MOBILE: slide-in sidebar from the right ------- */
 
@@ -148,7 +150,7 @@
         max-height: 100vh;
         width: min(80vw, 320px);
         border-radius: 0;
-        padding: var(--padding-m);
+        /* padding: var(--padding-m); */
         box-shadow: none;
 
         display: flex;

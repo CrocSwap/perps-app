@@ -193,8 +193,8 @@ const DropdownMenu = ({
             >
                 <div className={styles.logoRow}>
                     <img
-                        src='/logo.svg'
-                        alt='Ambient'
+                        src='/images/perpsLogo.svg'
+                        alt='Perps Logo'
                         className={styles.logoImage}
                     />
                 </div>
