@@ -467,6 +467,7 @@ export default function PageHeader() {
                     <section
                         style={{ position: 'relative' }}
                         ref={dropdownMenuRef}
+                        className={styles.menuButtonContainer}
                     >
                         <button
                             className={styles.menuButton}

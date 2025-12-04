@@ -1,11 +1,8 @@
 .footer {
     overflow: hidden;
     box-sizing: border-box;
-    display: none; /* Hidden by default */
-    height: 56px;
-    padding: 0 var(--padding-s);
-    align-items: center;
-    justify-content: space-between;
+    display: none;
+    padding: 6px var(--padding-s);
     width: 100%;
     position: fixed;
     bottom: 0;
@@ -19,9 +16,79 @@
 /* Show only on mobile devices */
 @media (max-width: 768px) {
     .footer {
-        display: flex;
+        display: block;
     }
 }
+
+/* ----------------------------- */
+/* EXPANDING MENU (RIGHT ALIGNED) */
+/* ----------------------------- */
+
+.footerMenu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 4px 0 10px;
+}
+
+.footerMenuItem {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 6px;
+    border: none;
+    background: transparent;
+    color: var(--text1, #f0f0f8);
+    font-size: 14px;
+    text-align: right;
+    cursor: pointer;
+}
+
+.footerMenuItem:hover {
+    background: var(--bg-dark3);
+}
+
+.footerMenuLabel {
+    flex: 1;
+    text-align: right;
+    font-size: 14px;
+}
+
+.footerMenuIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footerMenuIcon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ----------------------------- */
+/* BOTTOM FIXED FOOTER ROW       */
+/* ----------------------------- */
+
+.footerMainRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+}
+
+/* Nav items container (home, trade) */
+.navItemsRow {
+    display: flex;
+    flex: 1;
+    height: 56px;
+}
+
+/* ----------------------------- */
+/* NAVIGATION ITEM STYLE         */
+/* ----------------------------- */
 
 .navItem {
     display: flex;
@@ -55,6 +122,7 @@
     justify-content: center;
     align-items: center;
 }
+
 .icon svg {
     display: block;
     width: 24px;
@@ -72,12 +140,10 @@
 
 .navItem:hover .icon,
 .navItem:hover .label,
-/* .navItem:active .icon, */
 .navItem:active .label {
     color: var(--base-accent1, #7371fc);
 }
 
-/* For devices that support hover */
 @media (hover: hover) {
     .navItem:hover .icon,
     .navItem:hover .label {
@@ -85,8 +151,26 @@
     }
 }
 
-/* Active state for navigation items */
-/* .navItem[aria-current='page'] .icon,
-.navItem[aria-current='page'] .label {
-    color: var(--accent1, #7371fc);
-} */
+/* ----------------------------- */
+/* HAMBURGER BUTTON              */
+/* ----------------------------- */
+
+.menuToggle {
+    width: 44px;
+    height: 44px;
+    margin-left: 8px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: var(--text1, #f0f0f8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+}
+
+.menuToggleActive {
+    background: var(--bg-dark3); /* highlight when open */
+}

@@ -1,20 +1,67 @@
-import { motion } from 'framer-motion';
-import React from 'react';
-import { NavLink } from 'react-router';
+import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useCallback, useRef } from 'react';
+import { NavLink, useNavigate } from 'react-router';
 import styles from './MobileFooter.module.css';
 import { RiHome2Line } from 'react-icons/ri';
+import { RxHamburgerMenu } from 'react-icons/rx';
+import {
+    FaDiscord,
+    FaCommentAlt,
+    FaUserSecret,
+    FaFileAlt,
+} from 'react-icons/fa';
+import { RiTwitterXFill } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
+import { externalURLs } from '~/utils/Constants';
+import useOutsideClick from '~/hooks/useOutsideClick';
 
 interface NavItem {
     name: string;
     path: string;
     icon: React.ReactNode;
     end?: boolean;
-    // for exact matching like home
 }
 
-const MobileFooter: React.FC = () => {
+interface FooterMenuItem {
+    label: string;
+    icon: React.ReactNode;
+    type: 'external' | 'internal' | 'action';
+    url?: string;
+    path?: string;
+    onClick?: () => void;
+}
+
+interface MobileFooterProps {
+    onFeedbackClick: () => void;
+}
+
+const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
+
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    // Refs for outside click handling
+    const toggleRef = useRef<HTMLButtonElement>(null);
+
+    const closeMenu = useCallback(() => {
+        setIsMenuOpen(false);
+    }, []);
+
+    const menuRef = useOutsideClick<HTMLDivElement>((event) => {
+        if (
+            toggleRef.current &&
+            toggleRef.current.contains(event.target as Node)
+        ) {
+            return;
+        }
+        closeMenu();
+    }, isMenuOpen);
+
+    // -----------------------------
+    // NAVIGATION ITEMS (Bottom row)
+    // -----------------------------
+
     const navItems: NavItem[] = [
         {
             name: t('navigation.home'),
@@ -27,31 +74,132 @@ const MobileFooter: React.FC = () => {
             path: '/v2/trade',
             icon: tradeSvg,
         },
-        // {
-        //     name: 'Referrals',
-        //     path: '/v2/referrals',
-        //     icon: referralsSvg,
-        // },
-        // {
-        //     name: 'Account',
-        //     path: '/v2/portfolio',
-        //     icon: accountSvg,
-        // },
-        // {
-        //     name: 'Chat',
-        //     path: '/v2/chat',
-        //     icon: chatSvg,
-        // },
     ];
 
+    // -----------------------------
+    // MENU ITEMS (expand up)
+    // -----------------------------
+
+    const menuDisplay: FooterMenuItem[] = [
+        {
+            label: '𝕏 / Twitter',
+            icon: <RiTwitterXFill />,
+            type: 'external',
+            url: externalURLs.twitter,
+        },
+        {
+            label: 'Discord',
+            icon: <FaDiscord />,
+            type: 'external',
+            url: externalURLs.discord,
+        },
+        {
+            label: t('feedback.menuLabel'),
+            icon: <FaCommentAlt />,
+            type: 'action',
+            onClick: onFeedbackClick,
+        },
+        {
+            label: t('docs.menuPrivacy'),
+            icon: <FaUserSecret />,
+            type: 'internal',
+            path: '/v2/privacy',
+        },
+        {
+            label: t('docs.menuTerms'),
+            icon: <FaFileAlt />,
+            type: 'internal',
+            path: '/v2/terms',
+        },
+    ];
+
+    const handleMenuItemClick = (item: FooterMenuItem) => {
+        if (item.type === 'external' && item.url) {
+            window.open(item.url, '_blank');
+
+            if (typeof plausible === 'function') {
+                plausible('External Link Clicked', {
+                    props: {
+                        location: 'mobile-footer',
+                        linkType: item.label,
+                        url: item.url,
+                    },
+                });
+            }
+        } else if (item.type === 'internal' && item.path) {
+            navigate(item.path);
+        } else if (item.type === 'action' && item.onClick) {
+            item.onClick();
+        }
+
+        closeMenu();
+    };
+
+    // -----------------------------
+    // RENDER
+    // -----------------------------
+
     return (
-        <nav className={styles.footer}>
-            {navItems.map((item) => (
-                <NavItem key={item.name} item={item} />
-            ))}
-        </nav>
+        <motion.nav
+            className={styles.footer}
+            layout
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        >
+            {/* EXPANDING PANEL */}
+            <AnimatePresence initial={false}>
+                {isMenuOpen && (
+                    <motion.div
+                        ref={menuRef}
+                        className={styles.footerMenu}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        transition={{ duration: 0.18 }}
+                    >
+                        {menuDisplay.map((item) => (
+                            <button
+                                key={item.label}
+                                className={styles.footerMenuItem}
+                                onClick={() => handleMenuItemClick(item)}
+                            >
+                                <span className={styles.footerMenuLabel}>
+                                    {item.label}
+                                </span>
+                                <span className={styles.footerMenuIcon}>
+                                    {item.icon}
+                                </span>
+                            </button>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* BOTTOM ROW */}
+            <div className={styles.footerMainRow}>
+                <div className={styles.navItemsRow}>
+                    {navItems.map((item) => (
+                        <NavItem key={item.name} item={item} />
+                    ))}
+                </div>
+
+                <button
+                    ref={toggleRef}
+                    type='button'
+                    className={`${styles.menuToggle} ${
+                        isMenuOpen ? styles.menuToggleActive : ''
+                    }`}
+                    onClick={() => setIsMenuOpen((prev) => !prev)}
+                >
+                    <RxHamburgerMenu size={22} />
+                </button>
+            </div>
+        </motion.nav>
     );
 };
+
+// -----------------------------
+// NAV ITEM COMPONENT
+// -----------------------------
 
 const NavItem: React.FC<{ item: NavItem }> = React.memo(({ item }) => {
     const { name, path, icon, end } = item;
@@ -76,7 +224,12 @@ const NavItem: React.FC<{ item: NavItem }> = React.memo(({ item }) => {
     );
 });
 
-// SVG Components
+// -----------------------------
+// ICONS
+// -----------------------------
+
+const homeSvg = <RiHome2Line size={23} />;
+
 const tradeSvg = (
     <svg
         xmlns='http://www.w3.org/2000/svg'
@@ -94,78 +247,5 @@ const tradeSvg = (
         />
     </svg>
 );
-
-// const exploreSvg = (
-//     <svg
-//         xmlns='http://www.w3.org/2000/svg'
-//         width='25'
-//         height='25'
-//         viewBox='0 0 25 25'
-//         fill='none'
-//     >
-//         <path
-//             d='M12.25 22.5C17.7728 22.5 22.25 18.0228 22.25 12.5C22.25 6.97715 17.7728 2.5 12.25 2.5C6.72715 2.5 2.25 6.97715 2.25 12.5C2.25 18.0228 6.72715 22.5 12.25 22.5Z'
-//             stroke='currentColor'
-//             strokeLinecap='round'
-//             strokeLinejoin='round'
-//         />
-//         <path
-//             d='M16.49 8.26001L14.37 14.62L8.00999 16.74L10.13 10.38L16.49 8.26001Z'
-//             stroke='#6A6A6D'
-//             strokeLinecap='round'
-//             strokeLinejoin='round'
-//         />
-//     </svg>
-// );
-
-// const accountSvg = (
-//     <svg
-//         xmlns='http://www.w3.org/2000/svg'
-//         width='25'
-//         height='25'
-//         viewBox='0 0 25 25'
-//         fill='none'
-//     >
-//         <path
-//             d='M12.75 22.5C18.2728 22.5 22.75 18.0228 22.75 12.5C22.75 6.97715 18.2728 2.5 12.75 2.5C7.22715 2.5 2.75 6.97715 2.75 12.5C2.75 18.0228 7.22715 22.5 12.75 22.5Z'
-//             stroke='currentColor'
-//             strokeLinecap='round'
-//             strokeLinejoin='round'
-//         />
-//         <path
-//             d='M12.75 13.5C14.4069 13.5 15.75 12.1569 15.75 10.5C15.75 8.84315 14.4069 7.5 12.75 7.5C11.0931 7.5 9.75 8.84315 9.75 10.5C9.75 12.1569 11.0931 13.5 12.75 13.5Z'
-//             stroke='#6A6A6D'
-//             strokeLinecap='round'
-//             strokeLinejoin='round'
-//         />
-//         <path
-//             d='M7.75 21.162V19.5C7.75 18.9696 7.96071 18.4609 8.33579 18.0858C8.71086 17.7107 9.21957 17.5 9.75 17.5H15.75C16.2804 17.5 16.7891 17.7107 17.1642 18.0858C17.5393 18.4609 17.75 18.9696 17.75 19.5V21.162'
-//             stroke='#6A6A6D'
-//             strokeLinecap='round'
-//             strokeLinejoin='round'
-//         />
-//     </svg>
-// );
-
-// const chatSvg = (
-//     <svg
-//         xmlns='http://www.w3.org/2000/svg'
-//         width='25'
-//         height='25'
-//         viewBox='0 0 25 25'
-//         fill='none'
-//     >
-//         <path
-//             d='M3.25 21.5L5.15 15.8C4.24713 13.9948 4.01612 11.9272 4.4983 9.96722C4.98049 8.00725 6.1444 6.28282 7.78176 5.10254C9.41911 3.92226 11.423 3.36316 13.4349 3.52528C15.4468 3.6874 17.3354 4.56017 18.7626 5.98741C20.1898 7.41464 21.0626 9.30319 21.2247 11.3151C21.3869 13.327 20.8277 15.3309 19.6475 16.9683C18.4672 18.6056 16.7428 19.7695 14.7828 20.2517C12.8228 20.7339 10.7552 20.5029 8.95 19.6L3.25 21.5Z'
-//             stroke='currentColor'
-//             strokeLinecap='round'
-//             strokeLinejoin='round'
-//         />
-//     </svg>
-// );
-
-// const referralsSvg = <MdOutlinePeopleAlt size={23} />;
-
-const homeSvg = <RiHome2Line size={23} />;
 
 export default React.memo(MobileFooter);

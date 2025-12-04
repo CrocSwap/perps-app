@@ -467,6 +467,9 @@
     .ambientmm {
         display: none;
     }
+    .menuButtonContainer {
+        display: none;
+    }
 }
 
 .activeSessionWrap :global(button) {
