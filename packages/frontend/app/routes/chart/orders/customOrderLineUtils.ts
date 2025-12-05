@@ -26,6 +26,10 @@ export type LineLabel =
       }
     | { type: 'Liq'; text: string };
 
+export type CanvasSize = {
+    width: number;
+    height: number;
+};
 export const addCustomOrderLine = async (
     chart: IChartingLibraryWidget,
     orderPrice: number,
@@ -395,3 +399,19 @@ export function isInsideCancelTextBounds(
         clickY <= textY + estimatedHeight
     );
 }
+
+export const updateOverlayCanvasSize = (
+    canvas: HTMLCanvasElement,
+    canvasSize: CanvasSize,
+) => {
+    const dpr = window.devicePixelRatio || 1;
+
+    const width = canvasSize.width;
+    const height = canvasSize.height;
+
+    canvas.width = width;
+    canvas.style.width = `${width / dpr}px`;
+
+    canvas.height = height;
+    canvas.style.height = `${height / dpr}px`;
+};
