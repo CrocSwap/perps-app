@@ -36,8 +36,8 @@ importers:
         specifier: ^0.1.5
         version: 0.1.5(d806bed80f00fb0856747bc0f992c772)
       '@fuul/sdk':
-        specifier: ^7.5.0
-        version: 7.5.0
+        specifier: ^7.5.1
+        version: 7.5.1
       '@perps-app/sdk':
         specifier: workspace:*
         version: link:../sdk
@@ -1337,8 +1337,8 @@ packages:
   '@fractalwagmi/solana-wallet-adapter@0.1.1':
     resolution: {integrity: sha512-oTZLEuD+zLKXyhZC5tDRMPKPj8iaxKLxXiCjqRfOo4xmSbS2izGRWLJbKMYYsJysn/OI3UJ3P6CWP8WUWi0dZg==}
 
-  '@fuul/sdk@7.5.0':
-    resolution: {integrity: sha512-O3nOF5xuStfk2eD2B0o4Ux+xBMH1Tc1tdkWst/rBSeKy8CYUVYhITWwZ1VA7u5/UeZyxuONpFlpEUaBY5A7PlA==}
+  '@fuul/sdk@7.5.1':
+    resolution: {integrity: sha512-tutP95Tr64eee9KgFSxFSN3hiw6zzF3sfyuGPTIaWYXU8TurHau4ipzqN6wAE4hCqXAsLfAZtTlv/r478+XKzw==}
 
   '@gql.tada/cli-utils@1.7.2':
     resolution: {integrity: sha512-Qbc7hbLvCz6IliIJpJuKJa9p05b2Jona7ov7+qofCsMRxHRZE1kpAmZMvL8JCI4c0IagpIlWNaMizXEQUe8XjQ==}
@@ -10441,7 +10441,7 @@ snapshots:
       - react
       - react-dom
 
-  '@fuul/sdk@7.5.0':
+  '@fuul/sdk@7.5.1':
     dependencies:
       axios: 1.13.2
       nanoid: 5.1.6

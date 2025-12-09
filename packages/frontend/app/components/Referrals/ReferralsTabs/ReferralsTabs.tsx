@@ -4,15 +4,25 @@ import styles from './ReferralsTabs.module.css';
 import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import ReferralsTable from '../ReferralsTable/ReferralsTable';
+import type {
+    PayoutMovementIF,
+    PayoutByReferrerT,
+} from '~/routes/referrals/referrals';
 
 interface PropsIF {
     initialTab?: string;
+    payoutMovements: PayoutMovementIF[];
+    payoutsByReferrer: PayoutByReferrerT[];
 }
 
-const availableTabs = ['Referrals', 'Reward History'];
+const availableTabs = ['referrals.title', 'referrals.rewardHistory'];
 
-export default function RefferalsTabs(props: PropsIF) {
-    const { initialTab = 'Referrals' } = props;
+export default function ReferralsTabs(props: PropsIF) {
+    const {
+        initialTab = 'referrals.title',
+        payoutMovements,
+        payoutsByReferrer,
+    } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
 
     const handleTabChange = (tab: string) => {
@@ -21,9 +31,14 @@ export default function RefferalsTabs(props: PropsIF) {
 
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'Referrals':
-                return <ReferralsTable />;
-            case 'Reward History':
+            case 'referrals.title':
+                return (
+                    <ReferralsTable
+                        payoutMovements={payoutMovements}
+                        payoutsByReferrer={payoutsByReferrer}
+                    />
+                );
+            case 'referrals.rewardHistory':
                 return <div>enter code</div>;
             default:
                 return (

@@ -1,3 +1,12 @@
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .tableWrapper {
     width: 100%;
     height: 100%;
@@ -21,6 +30,22 @@
     gap: var(--gap-m, 16px);
 }
 
+.with_copy_clipboard {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--gap-s);
+    align-items: center;
+    border-radius: var(--radius-s, 12px);
+    cursor: pointer;
+    color: var(--text2);
+}
+
+.with_copy_clipboard > svg {
+    cursor: pointer;
+    color: var(--text3);
+}
+
 .sectionWithButton {
     height: 100%;
     display: flex;
@@ -30,7 +55,7 @@
     gap: var(--gap-m, 16px);
 }
 
-.sectionWithButton button {
+.sectionWithButton > button {
     width: 100%;
     height: var(--button-height, 44px);
     padding: var(--button-padding, 0 14px);
@@ -75,6 +100,10 @@
     margin: 0;
 }
 
+.enterCodeContent > p {
+    font-size: var(--font-size-xs);
+}
+
 .enterCodeContent input {
     height: 36px;
     padding: 0 var(--padding-s, 10px);
@@ -100,6 +129,21 @@
         color-mix(in oklab, var(--accent1, #7371fc) 55%, transparent);
 }
 
+.max_character_count {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-s, 10px);
+    align-items: center;
+    font-size: var(--font-size-xs);
+}
+
+/* wrapper around CONFIRM and EDIT buttons */
+.refferal_code_buttons {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-m);
+}
+
 .createCodeContent {
     width: 100%;
     height: 100%;
@@ -123,7 +167,7 @@
     text-decoration: underline;
 }
 
-.createCodeContent p span {
+.trackingLinkExplanation > span {
     color: var(--accent2, #75f0d3);
 }
 
@@ -136,8 +180,53 @@
     text-align: center;
 }
 
+.validation_item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+.validation_item > p {
+    font-size: var(--font-size-xs);
+    color: var(--text2);
+}
+
+.volume_progress_bar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+}
+
+.volume_progress_bar_labels {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.volume_progress_bar_body {
+    height: 16px;
+    outline: 1px solid var(--bg-dark5);
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.volume_progress_bar_body > div {
+    height: 100%;
+    background-color: var(--accent1, #7371fc);
+}
+
+.sessionButtonWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
 /* Tablet */
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
     .sectionWithButton {
         padding: clamp(12px, 2.8vw, 16px);
     }

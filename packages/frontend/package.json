@@ -30,7 +30,7 @@
         "@fogo/sessions-idls": "^0.0.11",
         "@fogo/sessions-sdk": "^0.0.25",
         "@fogo/sessions-sdk-react": "^0.1.5",
-        "@fuul/sdk": "^7.5.0",
+        "@fuul/sdk": "^7.5.1",
         "@perps-app/sdk": "workspace:*",
         "@pythnetwork/hermes-client": "^2.1.0",
         "@solana/web3.js": "^1.98.4",

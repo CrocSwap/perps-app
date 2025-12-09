@@ -5,8 +5,21 @@ import ReferralsTableRow from './ReferralsTableRow';
 import { useReferralsTable } from './useReferralsTable';
 import { referralData } from './data';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
+import type {
+    PayoutByReferrerT,
+    PayoutMovementIF,
+} from '~/routes/referrals/referrals';
 
-function ReferralsTable() {
+interface PropsIF {
+    payoutMovements: PayoutMovementIF[];
+    payoutsByReferrer: PayoutByReferrerT[];
+}
+
+function ReferralsTable(props: PropsIF) {
+    const { payoutMovements, payoutsByReferrer } = props;
+
+    console.log(payoutMovements);
+
     const {
         currentItems,
         currentPage,
@@ -31,20 +44,15 @@ function ReferralsTable() {
         <div className={styles.tableWrapper}>
             <ReferralsTableHeader sortConfig={sortConfig} onSort={handleSort} />
             <div className={styles.tableBody}>
-                {currentItems.map((referral, index) => (
+                {payoutsByReferrer.map((referral, index) => (
                     <ReferralsTableRow
                         key={`referral-${index}`}
                         referral={referral}
                     />
                 ))}
 
-                {currentItems.length === 0 && (
-                    <div
-                        className={styles.rowContainer}
-                        style={{ justifyContent: 'center', padding: '2rem 0' }}
-                    >
-                        No data to display
-                    </div>
+                {payoutsByReferrer.length === 0 && (
+                    <div className={styles.emptyState}>No data to display</div>
                 )}
             </div>
 

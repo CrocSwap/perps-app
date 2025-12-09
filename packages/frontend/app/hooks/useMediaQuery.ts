@@ -39,6 +39,10 @@ export function useShortScreen(breakpoint: number = 750): boolean {
     return useMediaQuery(`(max-height: ${breakpoint}px)`);
 }
 
+export function useNarrowScreen(breakpoint: number = 768): boolean {
+    return useMediaQuery(`(max-width: ${breakpoint}px)`);
+}
+
 /**
  * Predefined media query hook for mobile devices
  * @param breakpoint - Optional custom breakpoint in pixels (default: 768)

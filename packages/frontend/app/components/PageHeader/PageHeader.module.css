@@ -323,6 +323,26 @@
     text-align: center;
 }
 
+.invalid_ref_code_modal {
+    display: flex;
+    flex-direction: column;
+    margin: var(--margin-m);
+    gap: var(--gap-m);
+    align-items: center;
+    justify-content: center;
+}
+
+.invalid_ref_code_modal > p {
+    color: var(--text2);
+}
+
+.invalid_ref_code_modal a {
+    color: var(--accent1);
+    outline: 1px solid var(--accent1);
+    border-radius: var(--radius-s);
+    padding: var(--padding-xs) var(--padding-s);
+}
+
 @keyframes bounce {
     0% {
         transform: translateY(0);
