@@ -1,7 +1,7 @@
 import OrderLines from '../orders/OrderLines';
 import OverlayCanvasLayer from './overlayCanvasLayer';
 
-const OverlayCanvas: React.FC = () => {
+const OrderLinesOverlayCanvas: React.FC = () => {
     return (
         <OverlayCanvasLayer id='order-overlay' zIndex={5}>
             {({
@@ -10,9 +10,11 @@ const OverlayCanvas: React.FC = () => {
                 scaleData,
                 mousePositionRef,
                 zoomChanged,
+                canvasWrapperRef,
             }) => (
                 <OrderLines
                     overlayCanvasRef={canvasRef}
+                    canvasWrapperRef={canvasWrapperRef}
                     canvasSize={canvasSize}
                     scaleData={scaleData}
                     overlayCanvasMousePositionRef={mousePositionRef}
@@ -23,4 +25,4 @@ const OverlayCanvas: React.FC = () => {
     );
 };
 
-export default OverlayCanvas;
+export default OrderLinesOverlayCanvas;
