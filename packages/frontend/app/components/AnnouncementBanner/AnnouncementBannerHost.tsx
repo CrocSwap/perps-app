@@ -28,8 +28,8 @@ interface AnnouncementBannerHostProps {
  * The banner key maps to components registered in ./banners/index.ts
  */
 const AnnouncementBannerHost: React.FC<AnnouncementBannerHostProps> = ({
-    type = 'fogoPresale',
-    dismissible = false,
+    type = 'info',
+    dismissible = true,
     className = '',
     inPageHeader = false,
 }) => {
