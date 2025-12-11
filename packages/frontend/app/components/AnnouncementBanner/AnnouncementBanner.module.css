@@ -71,6 +71,7 @@
 
 .fogo_presale {
     background: var(--bg-dark1);
+    border-bottom: none;
 }
 
 /* Close button color adjustments for different types */
