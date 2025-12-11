@@ -26,6 +26,7 @@ import {
     MARKET_WS_ENDPOINT,
     USER_WS_ENDPOINT,
     IS_RESTRICTED_SITE,
+    ACTIVE_ANNOUNCEMENT_BANNER,
 } from './utils/Constants';
 import { useDebugStore } from './stores/DebugStore';
 
@@ -165,7 +166,11 @@ export default function App() {
                                             <WebSocketDebug />
                                             <div className='root-container'>
                                                 <div className='header-area'>
-                                                    <AnnouncementBannerHost />
+                                                    <AnnouncementBannerHost
+                                                        type={
+                                                            ACTIVE_ANNOUNCEMENT_BANNER
+                                                        }
+                                                    />
                                                     <PageHeader />
                                                 </div>
                                                 <main
