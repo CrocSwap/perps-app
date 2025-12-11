@@ -1,7 +1,7 @@
 .announcementBanner {
     width: 100%;
-    /* padding: var(--padding-m) var(--padding-l); */
-    /* border-bottom: 1px solid; */
+    padding: var(--padding-m) var(--padding-l);
+    border-bottom: 1px solid;
     display: flex;
     align-items: center;
     justify-content: space-between;
