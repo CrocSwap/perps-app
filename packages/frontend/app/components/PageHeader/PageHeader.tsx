@@ -315,6 +315,7 @@ export default function PageHeader() {
                     </Tooltip>
                     <AnnouncementBannerHost
                         type={ACTIVE_ANNOUNCEMENT_BANNER}
+                        dismissible={false}
                         inPageHeader
                     />
                 </nav>

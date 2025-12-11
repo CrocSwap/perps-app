@@ -170,6 +170,7 @@ export default function App() {
                                                         type={
                                                             ACTIVE_ANNOUNCEMENT_BANNER
                                                         }
+                                                        dismissible={false}
                                                     />
                                                     <PageHeader />
                                                 </div>
