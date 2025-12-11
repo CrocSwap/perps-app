@@ -1,0 +1,111 @@
+.announcementBanner {
+    width: 100%;
+    /* padding: var(--padding-m) var(--padding-l); */
+    /* border-bottom: 1px solid; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1000;
+}
+
+.announcementBanner:empty {
+    display: none;
+}
+
+.content {
+    flex: 1;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.closeButton {
+    position: absolute;
+    top: var(--padding-xs);
+    right: var(--padding-xs);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--padding-xs);
+    border-radius: var(--radius-xs);
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeButton:hover {
+    opacity: 0.7;
+}
+
+/* Type Classes */
+.info {
+    background: linear-gradient(135deg, var(--accent4) 0%, var(--accent1) 100%);
+    color: var(--white);
+    border-color: var(--accent4);
+}
+
+.success {
+    background: linear-gradient(135deg, var(--green) 0%, #1e8e82 100%);
+    color: var(--white);
+    border-color: var(--green);
+}
+
+.warning {
+    background: linear-gradient(135deg, var(--orange) 0%, #e67e22 100%);
+    color: var(--white);
+    border-color: var(--orange);
+}
+
+.error {
+    background: linear-gradient(135deg, var(--red) 0%, #c0392b 100%);
+    color: var(--white);
+    border-color: var(--red);
+}
+
+.update {
+    background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 100%);
+    color: var(--white);
+    border-color: var(--accent1);
+}
+
+.fogo_presale {
+    background: var(--bg-dark1);
+}
+
+/* Close button color adjustments for different types */
+.info .closeButton,
+.success .closeButton,
+.warning .closeButton,
+.error .closeButton,
+.update .closeButton {
+    color: var(--white);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .announcementBanner {
+        /* padding: var(--padding-s) var(--padding-m); */
+    }
+
+    .content {
+        font-size: var(--font-size-s);
+        line-height: 1.3;
+    }
+
+    .closeButton {
+        top: var(--padding-xs);
+        right: var(--padding-xs);
+    }
+}
+
+@media (max-width: 480px) {
+    .announcementBanner {
+        /* padding: var(--padding-xs) var(--padding-s); */
+    }
+
+    .content {
+        font-size: var(--font-size-xs);
+        /* padding-right: var(--padding-m); */
+    }
+}

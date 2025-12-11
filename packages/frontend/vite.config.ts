@@ -87,17 +87,72 @@ export default defineConfig({
         tsconfigPaths(),
         VitePWA({
             registerType: 'autoUpdate',
+            injectRegister: 'script',
             workbox: {
                 maximumFileSizeToCacheInBytes: 5_000_000,
-                // Don't cache HTML - always fetch fresh from network to ensure updates are seen
+                // Precache JS, CSS, images, and fonts for offline support
                 globPatterns: ['**/*.{js,css,png,svg,woff2,ttf}'],
-                // Don't cache service worker files
-                globIgnores: ['**/sw.js', '**/workbox-*.js'],
-                // Use network-first strategy for navigation requests (HTML pages)
-                navigateFallback: null,
+                // Don't cache service worker files or manifest
+                globIgnores: [
+                    '**/sw.js',
+                    '**/workbox-*.js',
+                    '**/registerSW.js',
+                    '**/manifest.webmanifest',
+                ],
+                // Enable offline navigation fallback to index.html
+                navigateFallback: '/index.html',
+                // Only use fallback for same-origin navigation requests (not API calls)
+                navigateFallbackDenylist: [/^\/api/, /^\/ws/, /\.json$/],
                 // Skip waiting and claim clients immediately on update
                 skipWaiting: true,
                 clientsClaim: true,
+                // Clean up old caches
+                cleanupOutdatedCaches: true,
+                runtimeCaching: [
+                    // Cache index.html with NetworkFirst for offline support
+                    {
+                        urlPattern: ({ request, url }) =>
+                            request.mode === 'navigate' &&
+                            url.origin === self.location.origin,
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'html-cache',
+                            networkTimeoutSeconds: 3,
+                            expiration: {
+                                maxEntries: 10,
+                                maxAgeSeconds: 24 * 60 * 60, // 1 day
+                            },
+                        },
+                    },
+                    // Cache images with StaleWhileRevalidate
+                    {
+                        urlPattern: ({ url }) =>
+                            url.origin === self.location.origin &&
+                            url.pathname.startsWith('/images/'),
+                        handler: 'StaleWhileRevalidate',
+                        options: {
+                            cacheName: 'image-cache',
+                            expiration: {
+                                maxEntries: 100,
+                                maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+                            },
+                        },
+                    },
+                    // Cache fonts with CacheFirst (they rarely change)
+                    {
+                        urlPattern: ({ url }) =>
+                            url.origin === self.location.origin &&
+                            url.pathname.startsWith('/fonts/'),
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'font-cache',
+                            expiration: {
+                                maxEntries: 20,
+                                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+                            },
+                        },
+                    },
+                ],
             },
             devOptions: {
                 enabled: process.env.NODE_ENV === 'development',

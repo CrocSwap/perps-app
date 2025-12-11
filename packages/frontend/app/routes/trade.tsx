@@ -48,6 +48,9 @@ const MemoizedSymbolInfoMobile = memo(SymbolInfoMobile);
 export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
 export default function Trade() {
+    const isFogoPresale =
+        import.meta.env.VITE_ACTIVE_ANNOUNCEMENT_BANNER === 'fogoPresale';
+    console.log({ isFogoPresale });
     const { symbol, selectedTradeTab, setSelectedTradeTab } =
         useTradeDataStore();
     // Mobile-only dropdown state
@@ -593,7 +596,7 @@ export default function Trade() {
 
     const MobileTabNavigation = useMemo(() => {
         return (
-            <div className={styles.mobileTabNav} id='mobileTradeTabs'>
+            <div className={`${styles.mobileTabNav} `} id='mobileTradeTabs'>
                 <div className={styles.mobileTabBtns}>
                     {tabList.map(({ key, label }) => {
                         if (key !== 'positions') {
@@ -782,6 +785,7 @@ export default function Trade() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.18 }}
+                className={styles.mobileOuterContainer}
             >
                 <TradeRouteHandler />
                 <WebDataConsumer />
@@ -794,7 +798,7 @@ export default function Trade() {
                 </div>
                 {MobileTabNavigation}
                 <div
-                    className={`${styles.mobileSection} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
+                    className={`${styles.mobileSection} ${isFogoPresale ? styles.mobileSectionMin : styles.mobileSectionMax} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
                     style={{
                         display: activeTab === 'order' ? 'block' : 'none',
                     }}

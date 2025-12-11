@@ -165,6 +165,19 @@ export const blockExplorer =
 export const RPC_ENDPOINT =
     import.meta.env.VITE_RPC_ENDPOINT || 'https://testnet.fogo.io';
 
+const NETWORK =
+    (import.meta.env.VITE_NETWORK || 'testnet').toLowerCase() === 'mainnet'
+        ? 'mainnet'
+        : 'testnet';
+
+export const IS_TESTNET = NETWORK === 'testnet';
+
+export const getTxLink = (signature?: string | null) => {
+    if (!signature) return undefined;
+    const clusterParam = IS_TESTNET ? '?cluster=testnet' : '';
+    return `${blockExplorer}/tx/${signature}${clusterParam}`;
+};
+
 // Market Order Constants
 /**
  * Price offset for market orders in USD.
@@ -221,3 +234,7 @@ export const languageOptions = {
 export const IS_RESTRICTED_SITE =
     import.meta.env.VITE_IS_RESTRICTED_SITE &&
     import.meta.env.VITE_IS_RESTRICTED_SITE.toLowerCase() === 'true';
+
+// Active announcement banner - set to the banner component key to display, or empty/undefined to hide
+export const ACTIVE_ANNOUNCEMENT_BANNER =
+    import.meta.env.VITE_ACTIVE_ANNOUNCEMENT_BANNER || '';

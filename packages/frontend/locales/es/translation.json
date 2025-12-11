@@ -506,6 +506,10 @@
         "updateButton": "Actualizar ahora",
         "version": "Versión"
     },
+    "offline": {
+        "title": "Estás sin conexión",
+        "message": "El trading está deshabilitado. Aún puedes ver los datos en caché."
+    },
     "leverage": {
         "title": "Ajustar apalancamiento",
         "closePositionPrompt": "Reduce apalancamiento cerrando"

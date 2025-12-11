@@ -279,6 +279,15 @@ body {
     }
 }
 @media only screen and (max-width: 768px) {
+    .mobileOuterContainer {
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-xs);
+        height: 100%;
+        width: 100%;
+        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+        box-sizing: border-box; /* Important! */
+    }
     .symbolInfoContainer {
         border-radius: var(--radius-m, 16px);
         background: var(--bg-dark2, #111117);
@@ -298,16 +307,15 @@ body {
 
     .mobileTabNav {
         display: flex;
-        position: fixed;
+        /* position: fixed;
         top: 105px;
         left: 0;
-        right: 0;
+        right: 0; */
         height: 40px;
         background: var(--bg-dark1);
         z-index: 200;
         justify-content: center;
         align-items: center;
-        padding: 0 var(--padding-s);
         overflow: visible;
     }
 
@@ -407,11 +415,12 @@ body {
     }
 
     .mobileSection {
-        position: fixed;
+        /* position: fixed;
         top: 150px;
         left: 0;
-        right: 0;
-        bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+        right: 0; */
+        flex: 1;
+
         height: auto;
         background: var(--bg-dark1);
         overflow: hidden !important;
@@ -429,7 +438,7 @@ body {
     .mobileOrder.active {
         display: block;
         background: var(--bg-dark1);
-        padding: 0 var(--padding-s);
+        /* padding: 0 var(--padding-s); */
         overflow-y: auto !important; /* only the content scrolls */
     }
 

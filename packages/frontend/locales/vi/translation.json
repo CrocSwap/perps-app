@@ -504,6 +504,10 @@
         "updateButton": "Cập nhật ngay",
         "version": "Phiên bản"
     },
+    "offline": {
+        "title": "Bạn đang ngoại tuyến",
+        "message": "Giao dịch bị vô hiệu hóa. Bạn vẫn có thể xem dữ liệu đã lưu trong bộ nhớ cache."
+    },
     "leverage": {
         "title": "Điều chỉnh đòn bẩy",
         "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu"

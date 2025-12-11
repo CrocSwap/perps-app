@@ -11,7 +11,7 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
-    blockExplorer,
+    getTxLink,
     MAX_BTC_NOTIONAL,
     MIN_ORDER_VALUE,
 } from '~/utils/Constants';
@@ -311,9 +311,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                             : t('marketLimitClose.positionClosed'),
                     message: `${t('transactions.successfullyClosedPosition', { usdValueOfOrderStr, symbol: symbolInfo?.coin })}`,
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
             } else {
@@ -342,9 +340,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     message: result.error || t('transactions.closeFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {

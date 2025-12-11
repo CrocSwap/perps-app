@@ -6,11 +6,3 @@
     justify-content: center;
     align-items: center;
 }
-
-.modal_inside {
-    width: 600px;
-    height: 400px;
-    display: flex;
-    flex-direction: column;
-    background-color: green;
-}

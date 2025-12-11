@@ -15,10 +15,13 @@ export type AnnouncementType =
     | 'success'
     | 'warning'
     | 'error'
-    | 'update';
+    | 'update'
+    | 'fogoPresale';
 
-export interface AnnouncementProps
-    extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface AnnouncementProps extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    'children'
+> {
     children: ReactNode;
     onClose?: () => void;
     position?: AnnouncementPosition;
@@ -74,6 +77,8 @@ const Announcement: React.FC<AnnouncementProps> = ({
                 return styles.error;
             case 'update':
                 return styles.update;
+            case 'fogoPresale':
+                return styles.fogo_presale;
             default:
                 return styles.info;
         }

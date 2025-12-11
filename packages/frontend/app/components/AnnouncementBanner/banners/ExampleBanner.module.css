@@ -1,0 +1,49 @@
+.exampleBanner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-m);
+    width: 100%;
+}
+
+.emoji {
+    font-size: var(--font-size-l);
+}
+
+.textContent {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+.body {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.ctaButton {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    padding: var(--padding-xs) var(--padding-m);
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: var(--font-size-s);
+    transition: background 0.2s ease;
+}
+
+.ctaButton:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+    .exampleBanner {
+        flex-direction: column;
+        gap: var(--gap-s);
+    }
+
+    .textContent {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--gap-xs);
+    }
+}

@@ -93,8 +93,7 @@ export const createDataFeed = (
                 name: symbolName,
                 minmov: 0.01,
                 pricescale: 1000,
-                timezone: Intl.DateTimeFormat().resolvedOptions()
-                    .timeZone as any,
+                timezone: 'Etc/UTC',
                 session: '24x7',
                 has_intraday: true,
                 supported_resolutions: supportedResolutions,

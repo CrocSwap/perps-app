@@ -32,3 +32,6 @@ prompts/scratchpad*.md
 # Generated frontend files
 packages/frontend/public/version.json
 packages/frontend/public/announcements.json
+
+# Vitest cache and results
+.vitest/
