@@ -16,11 +16,24 @@
 }
 
 .fogo_header_banner_wrapper img {
-    display: block;
-    height: 50px;
     width: auto;
     max-width: 100%;
     object-fit: contain;
+}
+.bannerWide {
+    display: none;
+}
+
+@media (min-width: 468px) {
+    .fogo_header_banner_wrapper img {
+        height: 50px;
+    }
+    .bannerWide {
+        display: block;
+    }
+    .bannerMedium {
+        display: none;
+    }
 }
 /* 
 @media (min-width: 768px) {

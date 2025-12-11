@@ -82,8 +82,14 @@
     color: var(--white);
 }
 
+.notInPageHeader {
+    display: none;
+}
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .inPageHeader {
+        display: none;
+    }
     .announcementBanner {
         /* padding: var(--padding-s) var(--padding-m); */
     }
@@ -96,6 +102,9 @@
     .closeButton {
         top: var(--padding-xs);
         right: var(--padding-xs);
+    }
+    .notInPageHeader {
+        display: flex;
     }
 }
 

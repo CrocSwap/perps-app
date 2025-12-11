@@ -35,6 +35,7 @@ import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 import { useTranslation } from 'react-i18next';
 import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
+import AnnouncementBannerHost from '../AnnouncementBanner/AnnouncementBannerHost';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -311,7 +312,9 @@ export default function PageHeader() {
                             Spot
                         </a>
                     </Tooltip>
+                    <AnnouncementBannerHost inPageHeader />
                 </nav>
+
                 <div className={styles.rightSide}>
                     {showDepositSlot && (
                         <span className={styles.depositSlot}>

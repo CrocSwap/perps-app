@@ -18,6 +18,7 @@ interface AnnouncementBannerHostProps {
     type?: AnnouncementBannerType;
     dismissible?: boolean;
     className?: string;
+    inPageHeader?: boolean;
 }
 
 /**
@@ -30,6 +31,7 @@ const AnnouncementBannerHost: React.FC<AnnouncementBannerHostProps> = ({
     type = 'fogoPresale',
     dismissible = false,
     className = '',
+    inPageHeader = false,
 }) => {
     const bannerKey = ACTIVE_ANNOUNCEMENT_BANNER;
     const alreadyViewed = useViewed();
@@ -84,7 +86,9 @@ const AnnouncementBannerHost: React.FC<AnnouncementBannerHostProps> = ({
         .join(' ');
 
     return (
-        <div className={combinedClassName}>
+        <div
+            className={`${combinedClassName} ${inPageHeader ? styles.inPageHeader : styles.notInPageHeader}`}
+        >
             <div className={styles.content}>
                 <BannerComponent />
             </div>
