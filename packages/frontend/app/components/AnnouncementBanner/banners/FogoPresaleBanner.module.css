@@ -3,12 +3,6 @@
     flex-direction: row;
     justify-content: center;
     width: 100%;
-    /* background: radial-gradient(
-        86% 1205.87% at 15.4% 50%,
-        rgb(255, 61, 0) 0%,
-        rgb(255, 61, 0) 46.91%,
-        rgb(195, 251, 165) 100%
-    ); */
 }
 
 .fogo_header_banner_wrapper a {
