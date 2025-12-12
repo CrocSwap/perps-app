@@ -411,7 +411,7 @@ export default function PageHeader() {
                             !isUserConnected ? 'Page Header' : undefined
                         }
                     >
-                        <SessionButton compact={shortB} />
+                        <SessionButton />
                     </span>
 
                     {/* {isUserConnected && (
@@ -475,6 +475,7 @@ export default function PageHeader() {
                     <section
                         style={{ position: 'relative' }}
                         ref={dropdownMenuRef}
+                        className={styles.menuButtonContainer}
                     >
                         <button
                             className={styles.menuButton}

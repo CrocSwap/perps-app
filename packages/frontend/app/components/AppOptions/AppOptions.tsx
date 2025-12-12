@@ -1,4 +1,5 @@
 import { FaCircle } from 'react-icons/fa';
+import { useState, useEffect, useRef } from 'react';
 import {
     useAppOptions,
     type appOptions,
@@ -26,8 +27,13 @@ export interface appOptionDataIF {
     slug: appOptions;
     text: string;
 }
+interface AppOptionsProps {
+    footer?: boolean;
+    closePanel?: () => void;
+}
 
-export default function AppOptions() {
+export default function AppOptions(props: AppOptionsProps) {
+    const { footer } = props;
     const activeOptions: useAppOptionsIF = useAppOptions();
 
     const isMobileVersion = useMediaQuery('(max-width: 768px)');
@@ -35,6 +41,39 @@ export default function AppOptions() {
     const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
         useAppSettings();
     const { i18n, t } = useTranslation();
+
+    const [showChangeApplied, setShowChangeApplied] = useState(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Check if current settings are defaults
+    const defaultLanguage = getDefaultLanguage();
+    const isDefaults =
+        activeOptions['skipOpenOrderConfirm'] === false &&
+        activeOptions['enableTxNotifications'] === true &&
+        activeOptions['enableBackgroundFillNotif'] === true &&
+        numFormat.label === NumFormatTypes[0].label &&
+        bsColor === 'colors.default' &&
+        (i18n?.language?.split('-')[0] || 'en') === defaultLanguage;
+
+    const showChangeAppliedMessage = () => {
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+        setShowChangeApplied(true);
+        timeoutRef.current = setTimeout(() => {
+            setShowChangeApplied(false);
+        }, 2000);
+    };
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     // !important:  this file instantiates children directly instead of using
     // !important:  ... .map() functions so we can easily mix different types
@@ -44,13 +83,16 @@ export default function AppOptions() {
     const CIRCLE_GAP = '1px';
 
     return (
-        <section className={styles.app_options}>
+        <section
+            className={`${styles.app_options} ${footer ? styles.footer_container : ''}`}
+        >
             <ul>
                 <OptionLine
                     text={t('appSettings.skipOpenOrderConfirm')}
                     isChecked={activeOptions['skipOpenOrderConfirm']}
                     toggle={() => {
                         activeOptions.toggle('skipOpenOrderConfirm');
+                        showChangeAppliedMessage();
                         if (typeof plausible === 'function') {
                             plausible('Settings Change', {
                                 props: {
@@ -63,40 +105,14 @@ export default function AppOptions() {
                         }
                     }}
                 />
-                {/* <OptionLine
-                    text='Skip Close Position Confirmations'
-                    isChecked={activeOptions['skipClosePositionConfirm']}
-                    toggle={() =>
-                        activeOptions.toggle('skipClosePositionConfirm')
-                        // activeOptions.enable('skipClosePositionConfirm')
-                    }
-                /> */}
-                {/* <OptionLine
-                    text='Opt Out of Spot Dusting'
-                    isChecked={activeOptions['optOutSpotDusting']}
-                    toggle={() => activeOptions.toggle('optOutSpotDusting')}
-                /> */}
-                {/* <OptionLine
-                    text='Persist Trading Connection'
-                    isChecked={activeOptions['persistTradingConnection']}
-                    toggle={() =>
-                        activeOptions.toggle('persistTradingConnection')
-                    }
-                /> */}
             </ul>
-            {/* divider */}
-            {/* <div className={styles.horizontal_divider} /> */}
             <ul>
-                {/* <OptionLine
-                    text={t('appSettings.displayVerboseErrors')}
-                    isChecked={activeOptions['displayVerboseErrors']}
-                    toggle={() => activeOptions.toggle('displayVerboseErrors')}
-                /> */}
                 <OptionLine
                     text={t('appSettings.enableTxNotifications')}
                     isChecked={activeOptions['enableTxNotifications']}
                     toggle={() => {
                         activeOptions.toggle('enableTxNotifications');
+                        showChangeAppliedMessage();
                         if (typeof plausible === 'function') {
                             plausible('Settings Change', {
                                 props: {
@@ -114,6 +130,7 @@ export default function AppOptions() {
                     isChecked={activeOptions['enableBackgroundFillNotif']}
                     toggle={() => {
                         activeOptions.toggle('enableBackgroundFillNotif');
+                        showChangeAppliedMessage();
                         if (typeof plausible === 'function') {
                             plausible('Settings Change', {
                                 props: {
@@ -126,38 +143,6 @@ export default function AppOptions() {
                         }
                     }}
                 />
-                {/* <OptionLine
-                    text='Play Sound for Fills'
-                    isChecked={activeOptions['playFillSound']}
-                    toggle={() => activeOptions.toggle('playFillSound')}
-                /> */}
-                {/* <OptionLine
-                    text='Animate Order Book'
-                    isChecked={activeOptions['animateOrderBook']}
-                    toggle={() => activeOptions.toggle('animateOrderBook')}
-                /> */}
-                {/* <OptionLine
-                    text='Order Book Set Size on Click'
-                    isChecked={activeOptions['clickToSetOrderBookSize']}
-                    toggle={() =>
-                        activeOptions.toggle('clickToSetOrderBookSize')
-                    }
-                /> */}
-                {/* <OptionLine
-                    text='Show Buys and Sells on Chart'
-                    isChecked={activeOptions['showBuysSellsOnChart']}
-                    toggle={() => activeOptions.toggle('showBuysSellsOnChart')}
-                /> */}
-                {/* <OptionLine
-                    text='Show PnL'
-                    isChecked={activeOptions['showPnL']}
-                    toggle={() => activeOptions.toggle('showPnL')}
-                /> */}
-                {/* <OptionLine
-                    text='Show All Warnings'
-                    isChecked={activeOptions['showAllWarnings']}
-                    toggle={() => activeOptions.toggle('showAllWarnings')}
-                /> */}
             </ul>
             <div className={styles.horizontal_divider} />
             <ul>
@@ -168,6 +153,7 @@ export default function AppOptions() {
                         readable: n.label,
                         set: () => {
                             setNumFormat(n);
+                            showChangeAppliedMessage();
                             if (typeof plausible === 'function') {
                                 plausible('Settings Change', {
                                     props: {
@@ -205,6 +191,7 @@ export default function AppOptions() {
                                 ),
                                 set: () => {
                                     setBsColor(text as colorSetNames);
+                                    showChangeAppliedMessage();
                                     if (typeof plausible === 'function') {
                                         plausible('Settings Change', {
                                             props: {
@@ -237,6 +224,7 @@ export default function AppOptions() {
                                 readable: <div>{lang[1]}</div>,
                                 set: () => {
                                     i18n.changeLanguage(lang[0]);
+                                    showChangeAppliedMessage();
                                     if (typeof plausible === 'function') {
                                         plausible('Settings Change', {
                                             props: {
@@ -251,42 +239,48 @@ export default function AppOptions() {
                     )}
                 />
             </ul>
-            <div
-                className={styles.apply_defaults}
-                onClick={() => {
-                    activeOptions.applyDefaults();
-                    setNumFormat(NumFormatTypes[0]);
-                    setBsColor('colors.default');
-                    useAppSettings.getState().resetLayoutHeights();
+            <div className={styles.actions_container}>
+                {!isDefaults && (
+                    <div
+                        className={styles.apply_defaults}
+                        style={{ color: 'var(--text2)' }}
+                        onClick={() => {
+                            activeOptions.applyDefaults();
+                            setNumFormat(NumFormatTypes[0]);
+                            setBsColor('colors.default');
+                            useAppSettings.getState().resetLayoutHeights();
 
-                    // reset language to browser default or English if unsupported
-                    const defaultLanguage = getDefaultLanguage();
-                    i18n.changeLanguage(defaultLanguage);
+                            // reset language to browser default or English if unsupported
+                            const defaultLanguage = getDefaultLanguage();
+                            i18n.changeLanguage(defaultLanguage);
 
-                    if (typeof plausible === 'function') {
-                        plausible('Settings Change', {
-                            props: {
-                                setting: 'applyDefaults',
-                                value: 'default',
-                            },
-                        });
-                    }
-                }}
-            >
-                {t('common.applyDefaults')}
+                            showChangeAppliedMessage();
+                            if (typeof plausible === 'function') {
+                                plausible('Settings Change', {
+                                    props: {
+                                        setting: 'applyDefaults',
+                                        value: 'default',
+                                    },
+                                });
+                            }
+                        }}
+                    >
+                        {t('common.applyDefaults')}
+                    </div>
+                )}
+
+                {showChangeApplied && (
+                    <div
+                        className={styles.change_applied}
+                        style={{
+                            color: '#22c55e',
+                            marginLeft: 'auto',
+                        }}
+                    >
+                        Change applied
+                    </div>
+                )}
             </div>
-
-            {/* <div
-                className={styles.apply_defaults}
-                onClick={() => {
-                    // Clear persisted split height
-                    localStorage.removeItem('chartTopHeight');
-                    // Tell the Trade page to recompute defaults immediately
-                    window.dispatchEvent(new CustomEvent('trade:resetLayout'));
-                }}
-            >
-                Reset Layout (Chart/Table)
-            </div> */}
         </section>
     );
 }

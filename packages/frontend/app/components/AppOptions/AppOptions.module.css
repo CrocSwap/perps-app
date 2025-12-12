@@ -20,6 +20,11 @@
     z-index: var(--base-z-idx-app-options);
 }
 
+.footer_container {
+    min-width: 0;
+    background: transparent;
+}
+
 /* <header> section of the options element */
 .app_options > header {
     display: flex;
@@ -42,18 +47,37 @@
     height: var(--divider-height);
     background-color: var(--bg-dark6);
 }
+.actions_container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+}
+.change_applied {
+    animation: fadeInOut 2s ease-in-out;
+}
 
-/* clickable to apply default settings at bottom of screen */
-.apply_defaults {
-    align-self: center;
-    cursor: pointer;
-    font-size: var(--font-size-m);
-    color: var(--accent1);
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }
 
 @media (max-width: 768px) {
     .app_options {
         width: auto;
         max-width: 100%;
+        padding: var(--padding-s) var(--padding-m) 0;
     }
 }

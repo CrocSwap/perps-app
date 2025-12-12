@@ -1,11 +1,8 @@
 .footer {
-    overflow: hidden;
     box-sizing: border-box;
-    display: none; /* Hidden by default */
-    height: 56px;
+    display: none;
+    flex-direction: column;
     padding: 0 var(--padding-s);
-    align-items: center;
-    justify-content: space-between;
     width: 100%;
     position: fixed;
     bottom: 0;
@@ -16,12 +13,153 @@
     border-top: 1px solid var(--bg-dark4);
 }
 
-/* Show only on mobile devices */
 @media (max-width: 768px) {
     .footer {
         display: flex;
     }
 }
+
+/* ----------------------------- */
+/* EXPANDING PANEL               */
+/* ----------------------------- */
+
+.footerPanel {
+    width: 100%;
+    overflow: hidden;
+    will-change: transform, height, opacity;
+}
+
+/* ----------------------------- */
+/* DRAG HANDLE                   */
+/* ----------------------------- */
+
+.dragHandle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 0 8px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+
+.dragHandle:active {
+    cursor: grabbing;
+}
+
+.dragBar {
+    width: 36px;
+    height: 4px;
+    background: var(--text2, #888);
+    border-radius: 2px;
+    opacity: 0.5;
+    transition:
+        opacity 0.2s ease,
+        background 0.2s ease;
+}
+
+.dragHandle:hover .dragBar,
+.dragHandle:active .dragBar {
+    opacity: 0.8;
+    background: var(--text1, #f0f0f8);
+}
+
+/* ----------------------------- */
+/* EXPANDING MENU                */
+/* ----------------------------- */
+
+.footerMenu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 0 0 6px;
+}
+
+.footerMenuItem {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 6px;
+    border: none;
+    background: transparent;
+    color: var(--text1, #f0f0f8);
+    font-size: 14px;
+    text-align: right;
+    cursor: pointer;
+}
+
+.version {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 6px;
+    text-align: right;
+    pointer-events: none;
+    color: var(--accent1);
+}
+.footerMenuItem:hover {
+    background: var(--bg-dark3);
+}
+
+.footerMenuLabel {
+    flex: 1;
+    text-align: right;
+    font-size: 14px;
+}
+
+.footerMenuIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footerMenuIcon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ----------------------------- */
+/* SETTINGS PANEL                */
+/* ----------------------------- */
+
+.footerSettings {
+    width: 100%;
+    max-height: 65vh;
+    overflow-y: auto;
+    padding-bottom: 6px;
+}
+
+.footerSettings > * {
+    padding-top: 4px;
+}
+
+/* ----------------------------- */
+/* BOTTOM FOOTER ROW             */
+/* ----------------------------- */
+
+.footerMainRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    flex-shrink: 0;
+    background: var(--bg-dark2, #111117);
+    position: relative;
+    z-index: 10;
+}
+
+.navItemsRow {
+    display: flex;
+    flex: 1;
+    height: 56px;
+}
+
+/* ----------------------------- */
+/* NAVIGATION ITEM               */
+/* ----------------------------- */
 
 .navItem {
     display: flex;
@@ -30,7 +168,6 @@
     justify-content: center;
     flex: 1;
     text-decoration: none;
-    transition: all 0.2s ease;
     height: 100%;
 }
 
@@ -55,6 +192,7 @@
     justify-content: center;
     align-items: center;
 }
+
 .icon svg {
     display: block;
     width: 24px;
@@ -71,22 +209,29 @@
 }
 
 .navItem:hover .icon,
-.navItem:hover .label,
-/* .navItem:active .icon, */
-.navItem:active .label {
-    color: var(--base-accent1, #7371fc);
-}
-
-/* For devices that support hover */
-@media (hover: hover) {
-    .navItem:hover .icon,
-    .navItem:hover .label {
-        color: var(--accent1, #7371fc);
-    }
-}
-
-/* Active state for navigation items */
-/* .navItem[aria-current='page'] .icon,
-.navItem[aria-current='page'] .label {
+.navItem:hover .label {
     color: var(--accent1, #7371fc);
-} */
+}
+
+/* ----------------------------- */
+/* TOGGLE BUTTONS                */
+/* ----------------------------- */
+
+.menuToggle {
+    width: 44px;
+    height: 44px;
+    margin-left: 8px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: var(--text1, #f0f0f8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+}
+
+.menuToggleActive {
+    background: var(--bg-dark3);
+}
