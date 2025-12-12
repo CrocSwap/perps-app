@@ -93,7 +93,7 @@ export const TradingViewProvider: React.FC<{
 }> = ({ children, tradingviewLib, setChartLoadingStatus }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
-    const { info, lastSleepMs, lastAwakeMs } = useSdk();
+    const { info, lastAwakeMs } = useSdk();
 
     const { symbol, addToFetchedChannels } = useTradeDataStore();
 
@@ -563,22 +563,27 @@ export const TradingViewProvider: React.FC<{
         };
     }, [chart]);
 
+    const lastAwakeMsRef = useRef<number>(0);
     useEffect(() => {
-        if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
-            const intervalMinutes = tvIntervalToMinutes(
-                chartInterval as ResolutionString,
+        // Refresh chart data when waking from sleep
+        // Skip initial mount by checking if lastAwakeMs actually changed
+        if (
+            lastAwakeMs > 0 &&
+            lastAwakeMs !== lastAwakeMsRef.current &&
+            symbol &&
+            chart
+        ) {
+            console.log(
+                '>>> refreshing chart after wake',
+                new Date().toISOString(),
             );
-            const lastSleepDurationInMinutes = parseFloat(
-                ((lastAwakeMs - lastSleepMs) / 60000).toFixed(2),
-            );
-
-            if (intervalMinutes <= lastSleepDurationInMinutes) {
-                chart?.resetCache();
-                chart?.chart().resetData();
-                chart?.chart().restoreChart();
-            }
+            // Clear our candle cache so getBars fetches fresh data
+            clearChartCachesForSymbol(symbol);
+            // Force full symbol reload to re-fetch all visible candles
+            chart.chart().setSymbol(symbol);
         }
-    }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
+        lastAwakeMsRef.current = lastAwakeMs;
+    }, [lastAwakeMs, chart, symbol]);
 
     // Refresh chart when coming back online
     const lastOnlineAtRef = useRef(lastOnlineAt);
