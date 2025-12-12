@@ -12,10 +12,6 @@
     height: calc(100% - var(--trade-tables-tabs-height));
 }
 
-.portfolioPage.tableContent {
-    height: calc(100% - 20px);
-}
-
 .tableControls {
     display: flex;
     align-items: center;
@@ -23,4 +19,10 @@
 }
 .tableContent.noTabs {
     height: 100%; /* when we hide the Tabs bar, give the content full height */
+}
+.emptyState {
+    height: 100%;
+    width: 100%;
+    background-color: red;
+    display: none !important;
 }

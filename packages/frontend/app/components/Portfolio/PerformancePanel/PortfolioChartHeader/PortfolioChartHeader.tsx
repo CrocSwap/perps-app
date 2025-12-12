@@ -34,7 +34,10 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
     ];
 
     return (
-        <div className={styles.headercontainer}>
+        <div
+            id={'portfolio-header-container'}
+            className={styles.headercontainer}
+        >
             <div className={styles.header}>
                 <div className={styles.filterContainer}>
                     <div className={styles.vaultFilter}>
@@ -42,6 +45,8 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
                             value={selectedVault.label}
                             options={vaultOptions}
                             fieldName='label'
+                            width='150px'
+                            centered={true}
                             onChange={(value) =>
                                 setSelectedVault({
                                     label: value,
@@ -61,6 +66,8 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
                             value={selectedPeriod.label}
                             options={periodOptions}
                             fieldName='label'
+                            width='150px'
+                            centered={true}
                             onChange={(value) =>
                                 setSelectedPeriod({
                                     label: value,

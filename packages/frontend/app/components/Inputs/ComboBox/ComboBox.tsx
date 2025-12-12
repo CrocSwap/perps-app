@@ -12,6 +12,8 @@ interface ComboBoxProps {
     modifyValue?: (value: any) => string;
     cssPositioning?: string;
     type?: 'big-val';
+    width?: string;
+    centered?: boolean;
 }
 
 const ComboBox: React.FC<ComboBoxProps> = ({
@@ -23,6 +25,8 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     modifyValue,
     type,
     cssPositioning,
+    width,
+    centered,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const comboBoxRef = useOutsideClick<HTMLDivElement>(() => {
@@ -44,6 +48,15 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                 return '';
         }
     };
+
+    useEffect(() => {
+        if (width && comboBoxRef.current) {
+            comboBoxRef.current.style.width = width;
+        }
+        if (centered && comboBoxValueRef.current) {
+            comboBoxValueRef.current.style.justifyContent = 'center';
+        }
+    }, [width, centered]);
 
     useEffect(() => {
         if (
