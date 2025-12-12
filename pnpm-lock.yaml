@@ -41,6 +41,9 @@ importers:
       '@perps-app/sdk':
         specifier: workspace:*
         version: link:../sdk
+      '@plausible-analytics/tracker':
+        specifier: 0.4.4
+        version: 0.4.4
       '@pythnetwork/hermes-client':
         specifier: ^2.1.0
         version: 2.1.0(axios@1.13.2)
@@ -1853,6 +1856,9 @@ packages:
     peerDependencies:
       react: '>= 16.8'
       react-dom: '>= 16.8'
+
+  '@plausible-analytics/tracker@0.4.4':
+    resolution: {integrity: sha512-fz0NOYUEYXtg1TBaPEEvtcBq3FfmLFuTe1VZw4M8sTWX129br5dguu3M15+plOQnc181ShYe67RfwhKgK89VnA==}
 
   '@project-serum/sol-wallet-adapter@0.2.6':
     resolution: {integrity: sha512-cpIb13aWPW8y4KzkZAPDgw+Kb+DXjCC6rZoH74MGm3I/6e/zKyGnfAuW5olb2zxonFqsYgnv7ev8MQnvSgJ3/g==}
@@ -11110,6 +11116,8 @@ snapshots:
     dependencies:
       react: 19.2.1
       react-dom: 19.2.1(react@19.2.1)
+
+  '@plausible-analytics/tracker@0.4.4': {}
 
   '@project-serum/sol-wallet-adapter@0.2.6(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))':
     dependencies:

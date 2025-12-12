@@ -2,6 +2,7 @@ import React, { Suspense, useEffect } from 'react';
 import './i18n'; // i18n MUST be imported before any components
 import { RestrictedSiteMessage } from '~/components/RestrictedSiteMessage/RestrictedSiteMessage';
 import { Outlet, useLocation } from 'react-router';
+import { init as initPlausible } from '@plausible-analytics/tracker';
 
 // Components
 import Notifications from '~/components/Notifications/Notifications';
@@ -26,7 +27,12 @@ import {
     MARKET_WS_ENDPOINT,
     USER_WS_ENDPOINT,
     IS_RESTRICTED_SITE,
+    SHOULD_LOG_ANALYTICS,
+    SPLIT_TEST_VERSION,
 } from './utils/Constants';
+import packageJson from '../package.json';
+import { getDefaultLanguage } from './utils/functions/getDefaultLanguage';
+import { getResolutionSegment } from './utils/functions/getSegment';
 import { useDebugStore } from './stores/DebugStore';
 
 // Styles
@@ -108,6 +114,22 @@ class ErrorBoundary extends React.Component<
         }
         return this.props.children;
     }
+}
+
+if (SHOULD_LOG_ANALYTICS) {
+    initPlausible({
+        domain: 'perps.ambient.finance',
+        endpoint: 'https://pls.embindexer.net/ev',
+        outboundLinks: true,
+        customProperties: {
+            version: packageJson.version,
+            splittestversion: SPLIT_TEST_VERSION,
+            windowheight: getResolutionSegment(innerHeight),
+            windowwidth: getResolutionSegment(innerWidth),
+            defaultlanguage: getDefaultLanguage(),
+            preferredlanguage: navigator.language,
+        },
+    });
 }
 
 // Main App Component (SPA mode)

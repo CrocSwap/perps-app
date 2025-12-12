@@ -32,6 +32,7 @@
         "@fogo/sessions-sdk-react": "^0.1.5",
         "@fuul/sdk": "^7.5.0",
         "@perps-app/sdk": "workspace:*",
+        "@plausible-analytics/tracker": "0.4.4",
         "@pythnetwork/hermes-client": "^2.1.0",
         "@solana/web3.js": "^1.98.4",
         "compression": "^1.8.1",
