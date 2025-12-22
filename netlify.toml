@@ -27,6 +27,17 @@ VITE_CONTEXT = "branch-deploy"
   publish = "build"
   autoLaunch = true
 
+# Serve well-known SEO files directly (avoid SPA rewrite)
+[[redirects]]
+  from = "/robots.txt"
+  to = "/robots.txt"
+  status = 200
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
+  status = 200
+
 # Handle client-side routing
 [[redirects]]
   from = "/*"
@@ -69,6 +80,16 @@ VITE_CONTEXT = "branch-deploy"
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
     Expires = "0"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Cache favicon aggressively
 [[headers]]

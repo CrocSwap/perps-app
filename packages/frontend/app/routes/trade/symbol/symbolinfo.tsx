@@ -1,5 +1,6 @@
 // SymbolInfo.tsx
 import React, { useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -104,22 +105,28 @@ const SymbolInfo: React.FC = React.memo(() => {
 
     return (
         <>
-            <title>{title}</title>
-            <meta property='og:type' content='website' />
-            <meta property='og:title' content={ogTitle} />
-            <meta property='og:description' content={ogDescription} />
-            <meta property='og:image' content={ogImageRectangle} />
-            <meta property='og:url' content={linkUrl} />
-            <meta property='og:image:alt' content={ogDescription} />
+            <Helmet>
+                <title>{title}</title>
+                <meta name='description' content={ogDescription} />
+                <link rel='canonical' href={linkUrl} />
 
-            <meta name='twitter:card' content='summary_large_image' />
-            <meta name='twitter:site' content='@ambient_finance' />
-            <meta name='twitter:creator' content='@ambient_finance' />
-            <meta name='twitter:title' content={ogTitle} />
-            <meta name='twitter:description' content={ogDescription} />
-            <meta name='twitter:image' content={ogImageRectangle} />
-            <meta name='twitter:image:alt' content={ogDescription} />
-            <meta name='twitter:url' content={linkUrl} />
+                <meta property='og:type' content='website' />
+                <meta property='og:site_name' content='Ambient Perps' />
+                <meta property='og:title' content={ogTitle} />
+                <meta property='og:description' content={ogDescription} />
+                <meta property='og:image' content={ogImageRectangle} />
+                <meta property='og:url' content={linkUrl} />
+                <meta property='og:image:alt' content={ogDescription} />
+
+                <meta name='twitter:card' content='summary_large_image' />
+                <meta name='twitter:site' content='@ambient_finance' />
+                <meta name='twitter:creator' content='@ambient_finance' />
+                <meta name='twitter:title' content={ogTitle} />
+                <meta name='twitter:description' content={ogDescription} />
+                <meta name='twitter:image' content={ogImageRectangle} />
+                <meta name='twitter:image:alt' content={ogDescription} />
+                <meta name='twitter:url' content={linkUrl} />
+            </Helmet>
 
             <div className={styles.symbolInfoContainer}>
                 <div

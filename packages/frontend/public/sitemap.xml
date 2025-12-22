@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://perps.ambient.finance/</loc>
+  </url>
+  <url>
+    <loc>https://perps.ambient.finance/v2/trade/BTC</loc>
+  </url>
+  <url>
+    <loc>https://perps.ambient.finance/v2/trade/ETH</loc>
+  </url>
+  <url>
+    <loc>https://perps.ambient.finance/v2/trade/SOL</loc>
+  </url>
+  <url>
+    <loc>https://perps.ambient.finance/v2/portfolio</loc>
+  </url>
+  <url>
+    <loc>https://perps.ambient.finance/v2/points</loc>
+  </url>
+  <url>
+    <loc>https://perps.ambient.finance/v2/terms</loc>
+  </url>
+  <url>
+    <loc>https://perps.ambient.finance/v2/privacy</loc>
+  </url>
+</urlset>

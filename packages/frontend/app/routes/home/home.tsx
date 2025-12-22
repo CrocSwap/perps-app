@@ -10,6 +10,7 @@ import daiImage from '../../assets/tokens/dai.svg';
 import ethImage from '../../assets/tokens/eth.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 import Hero from '~/components/Home/Hero/Hero';
+import Seo from '~/components/Seo/Seo';
 import { useTranslation } from 'react-i18next';
 
 interface FloatingTokenProps {
@@ -115,35 +116,6 @@ const tokenData: TokenData[] = [
     },
 ];
 
-export function meta() {
-    const { t } = useTranslation();
-
-    const ogImageRectangle = 'https://embindexer.net/ember/on-ambient/BTC';
-    const linkUrl = 'https://perps.ambient.finance';
-
-    const ogTitle = 'Trade BTC Futures with Ambient on Fogo';
-    const ogDescription = 'BTC Perpetual Futures | Trade with Ambient on Fogo';
-
-    return [
-        { title: t('meta.title') },
-        { property: 'og:type', content: 'website' },
-        { property: 'og:title', content: ogTitle },
-        { property: 'og:description', content: ogDescription },
-        { property: 'og:image', content: ogImageRectangle },
-        { property: 'og:url', content: linkUrl },
-        { property: 'og:image:alt', content: ogDescription },
-
-        { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:site', content: '@ambient_finance' },
-        { name: 'twitter:creator', content: '@ambient_finance' },
-        { name: 'twitter:title', content: ogTitle },
-        { name: 'twitter:description', content: ogDescription },
-        { name: 'twitter:image', content: ogImageRectangle },
-        { name: 'twitter:image:alt', content: ogDescription },
-        { name: 'twitter:url', content: linkUrl },
-    ];
-}
-
 export default function Home(): JSX.Element {
     // const [hasVisited, setHasVisited] = useState(false);
 
@@ -181,7 +153,19 @@ export default function Home(): JSX.Element {
     }
     const showOnlyHero = true;
 
-    if (showOnlyHero) return <Hero />;
+    if (showOnlyHero)
+        return (
+            <>
+                <Seo
+                    title='Ambient Perps on Fogo | Solana-Style Perpetual Futures'
+                    description='Trade perpetual futures (perps) on Fogo — a Solana/SVM chain — with Ambient. Fast, self-custodial perps trading for BTC, ETH and more.'
+                    canonicalUrl='https://perps.ambient.finance/'
+                    ogImageUrl='https://perps.ambient.finance/images/mockup.png'
+                    ogImageAlt='Ambient Perps on Fogo'
+                />
+                <Hero />
+            </>
+        );
 
     return (
         <section className={styles.hero}>
