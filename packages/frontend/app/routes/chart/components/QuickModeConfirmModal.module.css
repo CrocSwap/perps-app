@@ -1,0 +1,290 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    width: 340px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.header {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.iconWrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+    color: #fff;
+    font-size: 18px;
+}
+
+.title {
+    margin: 0;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.description {
+    margin: 0;
+    color: #888;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.tradeTypeWrapper {
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.tradeTypeButton {
+    width: 100%;
+    height: 36px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    color: #cbcaca;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.arrow {
+    font-size: 10px;
+}
+
+.dropdown {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 10001;
+}
+
+.dropdownItem {
+    padding: 8px 12px;
+    color: #cbcaca;
+    cursor: pointer;
+    background-color: rgb(45, 44, 44);
+    font-size: 13px;
+}
+
+.dropdownItem:hover {
+    background-color: rgb(30, 30, 30);
+}
+
+.sizeWrapper {
+    height: 36px;
+    padding: 0 12px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.sizeLabel {
+    font-size: 12px;
+    color: #b3b3b3;
+}
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.denomWrapper {
+    width: 60px;
+    position: relative;
+}
+
+.denomButton {
+    background: transparent;
+    border: none;
+    color: #cbcaca;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.denomArrow {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+.denomDropdown {
+    position: absolute;
+    top: 28px;
+    right: 0;
+    background-color: rgb(45, 44, 44);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    width: 80px;
+    padding: 4px 0;
+    z-index: 10001;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.denomDropdownItem {
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    background-color: rgb(45, 44, 44);
+    color: #cbcaca;
+}
+
+.denomDropdownItem:hover {
+    background-color: rgb(30, 30, 30);
+}
+
+.checkboxWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.checkbox.checked {
+    background-color: #fff;
+}
+
+.checkboxLabel {
+    font-size: 12px;
+    color: #b3b3b3;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 8px;
+}
+
+.cancelButton {
+    flex: 1;
+    height: 36px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    color: #fff;
+}
+
+.cancelButton:hover {
+    background-color: #2a2a2a;
+}
+
+.sessionButtonWrapper {
+    flex: 1;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.saveButton {
+    flex: 1;
+    height: 36px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background-color: #3a3a3a;
+    color: #fff;
+}
+
+.saveButton:hover {
+    background-color: #4a5060;
+}
+
+.saveButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.confirmButton {
+    flex: 1;
+    min-width: 110px;
+    height: 36px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--accent1, #4a8bd3);
+    color: #fff;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.confirmButton:hover:not(:disabled) {
+    background-color: var(--accent1, #5294e2);
+}
+
+.confirmButton:disabled {
+    cursor: not-allowed;
+    background-color: #3a3a3a;
+    color: #888;
+    opacity: 0.5;
+}
+
+/* NumFormattedInput custom styles */
+:global(.quick-mode-input .numFormattedInput) {
+    background: transparent !important;
+    border: none !important;
+    color: #cbcaca !important;
+    font-size: 13px !important;
+    outline: none !important;
+    text-align: right !important;
+    width: 100% !important;
+    cursor: text !important;
+}
+
+/* size input padding fix */
+:global(.size-input-padding .numFormattedInput) {
+    padding-right: 60px !important;
+}
