@@ -1,11 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { IoAdd, IoClose, IoAlertCircle } from 'react-icons/io5';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { notificationService } from '~/services/notificationService';
 import { useFormStatusStore } from '../hooks/useFormStatusStore';
-import { ApplicationPendingCard } from './ApplicationPendingCard';
+import type { ApplicationStatus } from '../hooks/useFormStatusStore';
 import styles from '../affiliates.module.css';
+import { ApplicationStatusCard } from './ApplicationStatusCard';
 
 interface SocialChannel {
     id: string;
@@ -131,8 +132,15 @@ const initialChannel: SocialChannel = {
 
 export function AffiliateApplicationForm() {
     const { userAddress } = useUserDataStore();
-    const { addCompletedWallet, completedWallets, _hasHydrated } =
-        useFormStatusStore();
+    const {
+        addCompletedWallet,
+        completedWallets,
+        _hasHydrated,
+        checkApplicationStatus,
+        applicationStatus,
+        isCheckingStatus,
+        clearStatus,
+    } = useFormStatusStore();
 
     const [values, setValues] = useState<FormValues>({
         firstName: '',
@@ -161,11 +169,25 @@ export function AffiliateApplicationForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const isCompleted = useMemo(() => {
+    const hasLocalRecord = useMemo(() => {
         return _hasHydrated && userAddress
             ? completedWallets.includes(userAddress)
             : false;
     }, [_hasHydrated, userAddress, completedWallets]);
+
+    // Check application status from HubSpot API when wallet changes
+    useEffect(() => {
+        if (_hasHydrated && userAddress) {
+            checkApplicationStatus(userAddress);
+        } else {
+            clearStatus();
+        }
+    }, [_hasHydrated, userAddress, checkApplicationStatus, clearStatus]);
+
+    // Determine if user has already applied (from API or local fallback)
+    const hasApplied = applicationStatus !== null || hasLocalRecord;
+    const currentStatus: ApplicationStatus =
+        applicationStatus?.status ?? (hasLocalRecord ? 'pending' : null);
 
     const showIMOther = values.im === 'Others';
 
@@ -484,8 +506,26 @@ export function AffiliateApplicationForm() {
         }
     };
 
-    if (isCompleted) {
-        return <ApplicationPendingCard />;
+    if (isCheckingStatus) {
+        return (
+            <div className={styles['glass-card']}>
+                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                    <p style={{ color: 'var(--aff-text-secondary)' }}>
+                        Checking application status...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (hasApplied && currentStatus) {
+        return (
+            <ApplicationStatusCard
+                status={currentStatus}
+                email={applicationStatus?.email}
+                createdAt={applicationStatus?.createdAt}
+            />
+        );
     }
 
     return (
