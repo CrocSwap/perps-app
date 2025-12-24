@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
-import type { AffiliateCodeParams } from 'node_modules/@fuul/sdk/dist/types/sdk';
 
 // union of all triggers defined in the FUUL system, these are specified by us
 // ... when creating a new trigger
