@@ -3,13 +3,17 @@ import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
 import type { AffiliateCodeParams } from 'node_modules/@fuul/sdk/dist/types/sdk';
 
+// union of all triggers defined in the FUUL system, these are specified by us
+// ... when creating a new trigger
+type fuulTriggersT = 'test1';
+
 interface FuulContextType {
     isInitialized: boolean;
     trackPageView: () => void;
     sendConversionEvent: (
         userIdentifier: string,
         identifierType: UserIdentifierType,
-        eventName: string,
+        eventName: fuulTriggersT,
     ) => Promise<void>;
     isAffiliateCodeFree: (code: string) => Promise<boolean>;
     getAffiliateCode: (
@@ -32,7 +36,7 @@ export interface FuulContextIF {
     sendConversionEvent: (
         userIdentifier: string,
         identifierType: UserIdentifierType,
-        eventName: string,
+        eventName: fuulTriggersT,
     ) => Promise<void>;
     isAffiliateCodeFree: (code: string) => Promise<boolean>;
     getAffiliateCode: (
@@ -86,10 +90,16 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }
 
+    /**
+     * fn to send a conversion event to FUUL
+     * @param userIdentifier - The user identifier (email, phone, etc.)
+     * @param identifierType - The type of identifier (email, phone, etc.)
+     * @param eventName - name of the conversion event
+     */
     async function sendConversionEvent(
         userIdentifier: string,
         identifierType: UserIdentifierType,
-        eventName: string,
+        eventName: fuulTriggersT,
     ): Promise<void> {
         if (!isInitialized) {
             console.warn(
