@@ -254,3 +254,28 @@ export function clearAllChartCaches() {
     dataCache.clear();
     dataCacheWithUser.clear();
 }
+
+/**
+ * Get the last candle's close price from the cache
+ * @param symbol - The trading symbol (e.g., 'BTC')
+ * @param resolution - The chart resolution (e.g., '1h', '5', 'D')
+ * @returns The close price of the most recent candle, or null if not available
+ */
+export function getLastCandleClosePrice(
+    symbol: string,
+    resolution: string,
+): number | null {
+    try {
+        const key = `${symbol}-${resolution}`;
+        const cachedData = dataCache.get(key);
+
+        if (cachedData && cachedData.length > 0) {
+            const sortedData = [...cachedData].sort((a, b) => b.time - a.time);
+            return sortedData[0]?.close || null;
+        }
+    } catch (error) {
+        console.error('Error getting last candle close price:', error);
+    }
+
+    return null;
+}

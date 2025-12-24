@@ -103,9 +103,10 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
     const handleMouseMove = (e: MouseEvent) => onDragMove(e.clientY);
     const handleMouseUp = () => onDragEnd();
 
-    const handleTouchStart = (e: TouchEvent) =>
+    const handleTouchStart = (e: React.TouchEvent) =>
         onDragStart(e.touches[0].clientY);
-    const handleTouchMove = (e: TouchEvent) => onDragMove(e.touches[0].clientY);
+    const handleTouchMove = (e: React.TouchEvent) =>
+        onDragMove(e.touches[0].clientY);
     const handleTouchEnd = () => onDragEnd();
 
     const ctxValue = useMemo<Ctx>(
@@ -198,10 +199,17 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                             <header>
                                 <span />
                                 <h3 id='global-modal-title'>{payload.title}</h3>
-                                <MdClose
+                                <button
+                                    type='button'
                                     onClick={() => dismiss('internal')}
-                                    color='var(--text2)'
-                                />
+                                    aria-label='Close modal'
+                                    className={styles.closeButton}
+                                >
+                                    <MdClose
+                                        color='var(--text2)'
+                                        aria-hidden='true'
+                                    />
+                                </button>
                             </header>
                             <div className={styles.modalContent}>
                                 {payload.content}
@@ -216,10 +224,17 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                             <header>
                                 <span />
                                 <h3 id='global-modal-title'>{payload.title}</h3>
-                                <MdClose
+                                <button
+                                    type='button'
                                     onClick={() => dismiss('internal')}
-                                    color='var(--text2)'
-                                />
+                                    aria-label='Close modal'
+                                    className={styles.closeButton}
+                                >
+                                    <MdClose
+                                        color='var(--text2)'
+                                        aria-hidden='true'
+                                    />
+                                </button>
                             </header>
                             <div className={styles.modalContent}>
                                 {payload.content}

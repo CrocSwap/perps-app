@@ -1,0 +1,35 @@
+.fogo_header_banner_wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    /* background: radial-gradient(
+        86% 1205.87% at 15.4% 50%,
+        rgb(255, 61, 0) 0%,
+        rgb(255, 61, 0) 46.91%,
+        rgb(195, 251, 165) 100%
+    ); */
+}
+
+.fogo_header_banner_wrapper a {
+    display: inline-block;
+}
+
+.fogo_header_banner_wrapper img {
+    display: block;
+    height: 50px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+/* 
+@media (min-width: 768px) {
+    .fogo_header_banner_wrapper {
+        background: radial-gradient(
+            140% 300% at 50% 50%,
+            rgb(255, 61, 0) 0%,
+            #1a3a24 55%,
+            var(--bg-dark1) 100%
+        );
+    }
+} */

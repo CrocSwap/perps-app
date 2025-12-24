@@ -13,6 +13,7 @@
         "error": "错误",
         "success": "成功",
         "applyDefaults": "应用默认值",
+        "changeApplied": "更改已应用",
         "learnMore": "了解更多",
         "deposit": "充值",
         "transfer": "转账",
@@ -402,9 +403,13 @@
     },
     "referrals": {
         "title": "邀请",
-        "description": "邀请用户赚奖励。合作伙伴获得更多奖励。",
-        "tradersReferred": "已邀请交易者",
-        "rewardsEarned": "已赚取奖励"
+        "description": "邀请用户以获得奖励。合作伙伴可获得更高的奖励。",
+        "tradersReferred": "已邀请的交易员",
+        "rewardsEarned": "已获得的奖励",
+        "rewardHistory": "奖励记录",
+        "enterCode": "输入代码",
+        "claim": "领取",
+        "createCode": "创建代码"
     },
     "deposit": {
         "prompt": "从Fogo充值{{token}}",
@@ -430,6 +435,9 @@
         "skipOpenOrderConfirm": "跳过未成交订单确认",
         "enableTxNotifications": "启用交易通知",
         "enableBackgroundFillNotif": "启用后台成交通知",
+        "navigationKeyboardShortcuts": "启用导航键盘快捷键",
+        "tradingKeyboardShortcuts": "启用交易键盘快捷键",
+        "viewKeyboardShortcuts": "查看键盘快捷键",
         "numberFormat": "数字格式",
         "color": "颜色",
         "language": "语言"
@@ -560,13 +568,170 @@
         "liqPrice": "强平价格"
     },
     "meta": {
-        "title": "首页 | Ambient",
+        "title": "Ambient Finance | Fogo永续合约",
+        "description": "在Ambient Finance上交易Fogo永续合约。零Taker费用，最高100倍杠杆，极速成交。",
         "content": "在Ambient进行永续合约交易"
+    },
+    "pageTitles": {
+        "portfolio": "投资组合",
+        "referrals": "推荐",
+        "points": "积分",
+        "leaderboard": "排行榜",
+        "newStrategy": "新建策略",
+        "editStrategy": "编辑策略",
+        "strategy": "策略",
+        "strategies": "策略列表",
+        "vault": "金库",
+        "vaults": "金库列表",
+        "subAccounts": "子账户",
+        "positions": "持仓",
+        "openOrders": "未成交订单",
+        "orderHistory": "订单历史",
+        "tradeHistory": "交易历史",
+        "twapFillHistory": "TWAP成交历史",
+        "twapHistory": "TWAP历史",
+        "depositsAndWithdrawals": "存取款",
+        "fundingHistory": "资金费率历史",
+        "more": "更多",
+        "termsOfService": "服务条款",
+        "privacyPolicy": "隐私政策",
+        "affiliates": "联盟人",
+        "pageNotFound": "页面未找到"
     },
     "docs": {
         "menuTerms": "服务条款",
-        "menuPrivacy": "隐私政策",
+        "menuPrivacy": "隐私",
         "terms": "CROCODILE Labs 服务条款",
         "privacy": "隐私政策"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "快捷键",
+        "title": "键盘快捷键",
+        "hintPress": "按",
+        "hintToClose": "关闭",
+        "aria": {
+            "close": "关闭键盘快捷键"
+        },
+        "categories": [
+            {
+                "title": "通用",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "显示快捷键"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "打开设置"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "关闭弹窗 / 取消"
+                    }
+                ]
+            },
+            {
+                "title": "交易",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "切换为买入"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "切换为卖出"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "开始市价单"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "开始限价单"
+                    }
+                ]
+            },
+            {
+                "title": "导航",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "前往交易页面"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "前往首页"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "前往资产页面"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "打开钱包连接"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "打开充值弹窗"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "打开提现弹窗"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "在区块浏览器中查看最新交易"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

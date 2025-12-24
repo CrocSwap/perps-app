@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useDepositService } from '~/hooks/useDepositService';
 import { useWithdrawService } from '~/hooks/useWithdrawService';
+import { useUserDataStore } from '~/stores/UserDataStore';
 
 interface PortfolioDataIF {
     id: string;
@@ -118,6 +119,9 @@ const OTHER_FORMATTER = new Intl.NumberFormat('en-US', {
 });
 
 export function usePortfolioManager() {
+    const userDataStore = useUserDataStore();
+    const userAddress = userDataStore.userAddress;
+
     const {
         balance: walletBalance,
         error: balanceError,
@@ -180,6 +184,42 @@ export function usePortfolioManager() {
         isLoading: false,
         error: null,
     });
+
+    const [userData, setUserData] = useState<any>();
+
+    const fetchUserData = useCallback(async () => {
+        if (!userAddress) {
+            setUserData(undefined);
+            return;
+        }
+
+        try {
+            const EMBER_ENDPOINT_ALL =
+                'https://ember-leaderboard.liquidity.tools/leaderboard';
+            const emberEndpointForUser =
+                EMBER_ENDPOINT_ALL + '/' + userAddress.toString();
+
+            const response = await fetch(emberEndpointForUser);
+            const data = await response.json();
+
+            if (data.error) {
+                console.log('error fetching user data');
+            } else if (data.leaderboard && data.leaderboard.length > 0) {
+                setUserData({ data });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, [userAddress]);
+
+    // fetch user data on mount and every 30 seconds
+    useEffect(() => {
+        fetchUserData();
+        const interval = setInterval(() => {
+            fetchUserData();
+        }, 30000);
+        return () => clearInterval(interval);
+    }, [fetchUserData]);
 
     // Memoized formatter function
     const formatCurrency = useCallback(
@@ -316,5 +356,7 @@ export function usePortfolioManager() {
         stopDepositAutoRefresh,
         startWithdrawAutoRefresh,
         stopWithdrawAutoRefresh,
+        // Ember leaderboard user data
+        userData,
     };
 }

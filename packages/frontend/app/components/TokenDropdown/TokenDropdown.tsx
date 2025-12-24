@@ -79,58 +79,81 @@ function TokenDropdown({
 
     return (
         <div className={`${styles.container} ${className}`} ref={dropdownRef}>
-            <div
+            <button
+                type='button'
                 className={`${styles.selector} ${disabled ? styles.disabled : ''}`}
                 onClick={toggleDropdown}
+                onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                        setIsOpen(false);
+                    } else if (e.key === 'ArrowDown' && !isOpen) {
+                        e.preventDefault();
+                        setIsOpen(true);
+                    }
+                }}
+                aria-haspopup='listbox'
+                aria-expanded={isOpen}
+                aria-label={`Select token, current: ${selected.symbol}`}
+                disabled={disabled}
             >
                 <div className={styles.selectedToken}>
                     {selected.logo && (
                         <img
                             src={selected.logo}
-                            alt={selected.symbol}
+                            alt=''
                             className={styles.tokenLogo}
                         />
                     )}
                     <span>{selected.symbol}</span>
                 </div>
                 {isOpen ? (
-                    <LuChevronUp size={22} />
+                    <LuChevronUp size={22} aria-hidden='true' />
                 ) : (
-                    <LuChevronDown size={22} />
+                    <LuChevronDown size={22} aria-hidden='true' />
                 )}
-            </div>
+            </button>
 
             {isOpen && (
-                <div className={styles.dropdown}>
-                    {AVAILABLE_TOKENS.map((token) => (
-                        <div
-                            key={token.symbol}
-                            className={`${styles.tokenItem} ${
-                                token.symbol === selectedToken
-                                    ? styles.selected
-                                    : ''
-                            }`}
-                            onClick={() => handleTokenSelect(token)}
-                        >
-                            <div className={styles.tokenLeft}>
-                                {token.logo && (
-                                    <img
-                                        src={token.logo}
-                                        alt={token.symbol}
-                                        className={styles.tokenLogo}
-                                    />
-                                )}
-                                <span className={styles.tokenSymbol}>
-                                    {token.symbol}
-                                </span>
+                <div className={styles.dropdown} role='listbox'>
+                    {AVAILABLE_TOKENS.map((token) => {
+                        const isSelected = token.symbol === selectedToken;
+                        return (
+                            <div
+                                key={token.symbol}
+                                className={`${styles.tokenItem} ${isSelected ? styles.selected : ''}`}
+                                onClick={() => handleTokenSelect(token)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleTokenSelect(token);
+                                    } else if (e.key === 'Escape') {
+                                        setIsOpen(false);
+                                    }
+                                }}
+                                role='option'
+                                aria-selected={isSelected}
+                                tabIndex={0}
+                            >
+                                <div className={styles.tokenLeft}>
+                                    {token.logo && (
+                                        <img
+                                            src={token.logo}
+                                            alt=''
+                                            className={styles.tokenLogo}
+                                        />
+                                    )}
+                                    <span className={styles.tokenSymbol}>
+                                        {token.symbol}
+                                    </span>
+                                </div>
+                                <div className={styles.tokenInfo}>
+                                    <span className={styles.tokenName}>
+                                        {token.name}
+                                    </span>
+                                </div>
                             </div>
-                            <div className={styles.tokenInfo}>
-                                <span className={styles.tokenName}>
-                                    {token.name}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>

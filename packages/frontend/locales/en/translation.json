@@ -13,6 +13,7 @@
         "error": "Error",
         "success": "Success",
         "applyDefaults": "Apply Defaults",
+        "changeApplied": "Change applied",
         "learnMore": "Learn More",
         "deposit": "Deposit",
         "transfer": "Transfer",
@@ -41,7 +42,11 @@
         "announcements": "Announcements",
         "leverage": "Leverage",
         "comingSoon": "Coming Soon",
-        "clearFilter": "Clear filter"
+        "enter": "Enter",
+        "claim": "Claim",
+        "seeDocsForMore": "See the docs for more.",
+        "clearFilter": "Clear filter",
+        "activate": "Activate"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -404,7 +409,29 @@
         "title": "Referrals",
         "description": "Refer users to earn rewards. Affiliates earn higher rewards.",
         "tradersReferred": "Traders Referred",
-        "rewardsEarned": "Rewards Earned"
+        "rewardsEarned": "Rewards Earned",
+        "rewardHistory": "Reward History",
+        "enterCode": "Enter Code",
+        "createCode": "Create Code",
+        "usingAffiliateCode": "Using Affiliate Code",
+        "overwriteCurrentReferralCode": "Overwrite current referral code",
+        "enterReferralCode": "Enter a referral code",
+        "referralCodeNotValidPleaseConfirm": "The code <0>{{invalidCode}}</0> is not claimed in the referral program. Please confirm the code is correct.",
+        "yourCodeIs": "Your code is <0>{{affiliateCode}}</0> based on the first six characters of your wallet address. Please click 'Activate' to register this code in the referral system.",
+        "createAnAffiliateCode": "Create an affiliate code",
+        "createAUniqueCodeToEarn": "Create a unique code to earn 10% of referred users' fees.",
+        "codeAlreadyInUse": "Code Already In Use",
+        "connectYourWallet": {
+            "affiliate": "Connect your wallet to create an affiliate code",
+            "claim": "Connect your wallet to claim rewards",
+            "enterCode": "Connect your wallet to enter a referral code"
+        },
+        "usersWithTradingVolume": "This code may be customized or updated by users after reaching $1M in trading volume.",
+        "doNotSelfRefer": "The code <0>{{affiliateCode}}</0> cannot be registered by the same address by which it was created. Please choose a different code.",
+        "toCustomizeAffiliateCode": "Affiliate codes default to the first six characters of your wallet address. Users with > $1M in trading volume can customize their affiliate code.",
+        "claimRewardsWithAmount": "Claim {{amount}} in rewards",
+        "selectATabToViewData": "Select a tab to view data",
+        "trackingLinkExplanation": "You will receive <0>{{affiliatePercent}}</0> of referred users fees and they will receive a <1>{{userPercent}}</1> discount."
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",
@@ -430,6 +457,9 @@
         "skipOpenOrderConfirm": "Skip Open Order Confirmation",
         "enableTxNotifications": "Enable Transaction Notifications",
         "enableBackgroundFillNotif": "Enable Background Fill Notifications",
+        "navigationKeyboardShortcuts": "Enable Navigation Keyboard Shortcuts",
+        "tradingKeyboardShortcuts": "Enable Trading Keyboard Shortcuts",
+        "viewKeyboardShortcuts": "View keyboard shortcuts",
         "numberFormat": "Number Format",
         "color": "Color",
         "language": "Language"
@@ -560,13 +590,170 @@
         "liqPrice": "Liq. Price"
     },
     "meta": {
-        "title": "Home | Ambient",
-        "content": "Trade Perps With Ambient"
+        "title": "Ambient Finance | Perpetual Futures on Fogo",
+        "description": "Trade perpetual futures on Fogo with Ambient Finance. Zero taker fees, up to 100x leverage, and lightning-fast execution.",
+        "content": "Trade Perps With Ambient on Fogo"
+    },
+    "pageTitles": {
+        "portfolio": "Portfolio",
+        "referrals": "Referrals",
+        "points": "Points",
+        "leaderboard": "Leaderboard",
+        "newStrategy": "New Strategy",
+        "editStrategy": "Edit Strategy",
+        "strategy": "Strategy",
+        "strategies": "Strategies",
+        "vault": "Vault",
+        "vaults": "Vaults",
+        "subAccounts": "Sub-Accounts",
+        "positions": "Positions",
+        "openOrders": "Open Orders",
+        "orderHistory": "Order History",
+        "tradeHistory": "Trade History",
+        "twapFillHistory": "TWAP Fill History",
+        "twapHistory": "TWAP History",
+        "depositsAndWithdrawals": "Deposits & Withdrawals",
+        "fundingHistory": "Funding History",
+        "more": "More",
+        "termsOfService": "Terms of Service",
+        "privacyPolicy": "Privacy Policy",
+        "affiliates": "Affiliates",
+        "pageNotFound": "Page Not Found"
     },
     "docs": {
         "menuTerms": "Terms of Service",
         "menuPrivacy": "Privacy",
         "terms": "CROCODILE Labs Terms of Service",
         "privacy": "Privacy Policy"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Shortcuts",
+        "title": "Keyboard Shortcuts",
+        "hintPress": "Press",
+        "hintToClose": "to close",
+        "aria": {
+            "close": "Close keyboard shortcuts"
+        },
+        "categories": [
+            {
+                "title": "General",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "Display shortcuts"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Open settings"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "Close modal / cancel"
+                    }
+                ]
+            },
+            {
+                "title": "Trading",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "Switch to buy"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "Switch to sell"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "Start market order"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "Start limit order"
+                    }
+                ]
+            },
+            {
+                "title": "Navigation",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "Go to trade page"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "Go to home page"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "Go to portfolio page"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "Open wallet connector"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Open deposit modal"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "Open withdraw modal"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "View latest transaction in block explorer"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

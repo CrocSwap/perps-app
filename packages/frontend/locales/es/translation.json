@@ -13,6 +13,7 @@
         "error": "Error",
         "success": "Éxito",
         "applyDefaults": "Aplicar predeterminados",
+        "changeApplied": "Cambio aplicado",
         "learnMore": "Más información",
         "deposit": "Depositar",
         "transfer": "Transferir",
@@ -402,9 +403,13 @@
     },
     "referrals": {
         "title": "Referidos",
-        "description": "Refiere usuarios y gana recompensas. Los afiliados ganan más.",
-        "tradersReferred": "Traders referidos",
-        "rewardsEarned": "Recompensas obtenidas"
+        "description": "Refiere usuarios para ganar recompensas. Los afiliados obtienen mayores recompensas.",
+        "tradersReferred": "Comerciantes referidos",
+        "rewardsEarned": "Recompensas obtenidas",
+        "rewardHistory": "Historial de recompensas",
+        "enterCode": "Ingresar código",
+        "claim": "Reclamar",
+        "createCode": "Crear código"
     },
     "deposit": {
         "prompt": "Deposita {{token}} desde Fogo",
@@ -430,6 +435,9 @@
         "skipOpenOrderConfirm": "Omitir confirmación de orden abierta",
         "enableTxNotifications": "Habilitar notificaciones de transacción",
         "enableBackgroundFillNotif": "Habilitar notificaciones de ejecución en segundo plano",
+        "navigationKeyboardShortcuts": "Habilitar atajos de teclado de navegación",
+        "tradingKeyboardShortcuts": "Habilitar atajos de teclado de trading",
+        "viewKeyboardShortcuts": "Ver atajos de teclado",
         "numberFormat": "Formato numérico",
         "color": "Color",
         "language": "Idioma"
@@ -560,13 +568,170 @@
         "liqPrice": "Precio de liq."
     },
     "meta": {
-        "title": "Inicio | Ambient",
+        "title": "Ambient Finance | Futuros perpetuos en Fogo",
+        "description": "Opera futuros perpetuos en Fogo con Ambient Finance. Sin comisiones taker, hasta 100x de apalancamiento y ejecución ultrarrápida.",
         "content": "Opera Perps con Ambient"
     },
+    "pageTitles": {
+        "portfolio": "Portafolio",
+        "referrals": "Referidos",
+        "points": "Puntos",
+        "leaderboard": "Clasificación",
+        "newStrategy": "Nueva Estrategia",
+        "editStrategy": "Editar Estrategia",
+        "strategy": "Estrategia",
+        "strategies": "Estrategias",
+        "vault": "Bóveda",
+        "vaults": "Bóvedas",
+        "subAccounts": "Subcuentas",
+        "positions": "Posiciones",
+        "openOrders": "Órdenes Abiertas",
+        "orderHistory": "Historial de Órdenes",
+        "tradeHistory": "Historial de Operaciones",
+        "twapFillHistory": "Historial de Ejecución TWAP",
+        "twapHistory": "Historial TWAP",
+        "depositsAndWithdrawals": "Depósitos y Retiros",
+        "fundingHistory": "Historial de Financiamiento",
+        "more": "Más",
+        "termsOfService": "Términos de Servicio",
+        "privacyPolicy": "Política de Privacidad",
+        "affiliates": "Afiliados",
+        "pageNotFound": "Página No Encontrada"
+    },
     "docs": {
-        "menuTerms": "Términos de servicio",
+        "menuTerms": "Términos de Servicio",
         "menuPrivacy": "Privacidad",
-        "terms": "Términos de servicio de CROCODILE Labs",
-        "privacy": "Política de privacidad"
+        "terms": "Términos de Servicio de CROCODILE Labs",
+        "privacy": "Política de Privacidad"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Atajos",
+        "title": "Atajos de teclado",
+        "hintPress": "Pulsa",
+        "hintToClose": "para cerrar",
+        "aria": {
+            "close": "Cerrar atajos de teclado"
+        },
+        "categories": [
+            {
+                "title": "General",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "Mostrar atajos"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Abrir configuración"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "Cerrar modal / cancelar"
+                    }
+                ]
+            },
+            {
+                "title": "Trading",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "Cambiar a compra"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "Cambiar a venta"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "Iniciar orden de mercado"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "Iniciar orden limitada"
+                    }
+                ]
+            },
+            {
+                "title": "Navegación",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "Ir a la página de trading"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "Ir a la página de inicio"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "Ir a la página de portfolio"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "Abrir conector de billetera"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Abrir modal de depósito"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "Abrir modal de retiro"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "Ver la última transacción en el explorador"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

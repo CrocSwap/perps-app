@@ -55,14 +55,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         initializePythPriceService();
     }, []);
 
-    const bindEmptyAddress = () => {
+    const bindEmptyAddress = useCallback(() => {
         if (isDebugWalletActive) {
             setUserAddress(debugWallets[2].address);
         } else {
             setUserAddress('');
         }
         resetUserData();
-    };
+    }, [isDebugWalletActive, resetUserData, setUserAddress]);
 
     const assignDefaultAddress = useCallback(() => {
         if (isDebugWalletActive) {
@@ -84,16 +84,28 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                 setUserAddress(fogoAddress);
             }
         }
-    }, [fogoAddress, isDebugWalletActive]);
+    }, [
+        bindEmptyAddress,
+        fogoAddress,
+        isDebugWalletActive,
+        setDebugWallet,
+        setManualAddress,
+        setManualAddressEnabled,
+        setUserAddress,
+    ]);
+
+    const sessionWalletAddress = isEstablished(sessionState)
+        ? sessionState.walletPublicKey.toString()
+        : '';
 
     useEffect(() => {
         if (isEstablished(sessionState)) {
-            setFogoAddress(sessionState.walletPublicKey.toString());
-            assignDefaultAddress();
+            setFogoAddress(sessionWalletAddress);
         } else {
+            setFogoAddress('');
             bindEmptyAddress();
         }
-    }, [isEstablished(sessionState)]);
+    }, [sessionWalletAddress, sessionState, bindEmptyAddress]);
 
     useEffect(() => {
         assignDefaultAddress();
@@ -118,7 +130,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                 setUserAddress(fogoAddress);
             }
         }
-    }, [manualAddressEnabled, manualAddress, isDebugWalletActive]);
+    }, [manualAddressEnabled, manualAddress, isDebugWalletActive, fogoAddress]);
 
     return (
         <AppContext.Provider

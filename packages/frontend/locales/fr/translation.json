@@ -13,6 +13,7 @@
         "error": "Erreur",
         "success": "Succès",
         "applyDefaults": "Appliquer les paramètres par défaut",
+        "changeApplied": "Modification appliquée",
         "learnMore": "En savoir plus",
         "deposit": "Déposer",
         "transfer": "Transférer",
@@ -402,9 +403,13 @@
     },
     "referrals": {
         "title": "Parrainages",
-        "description": "Parrainez des utilisateurs et gagnez des récompenses. Les affiliés gagnent plus.",
+        "description": "Parrainez des utilisateurs pour gagner des récompenses. Les affiliés obtiennent des récompenses plus élevées.",
         "tradersReferred": "Traders parrainés",
-        "rewardsEarned": "Récompenses gagnées"
+        "rewardsEarned": "Récompenses obtenues",
+        "rewardHistory": "Historique des récompenses",
+        "enterCode": "Saisir le code",
+        "claim": "Réclamer",
+        "createCode": "Créer un code"
     },
     "deposit": {
         "prompt": "Déposer {{token}} depuis Fogo",
@@ -430,6 +435,9 @@
         "skipOpenOrderConfirm": "Omettre la confirmation de l'ordre ouvert",
         "enableTxNotifications": "Activer les notifications de transaction",
         "enableBackgroundFillNotif": "Activer les notifications d'exécution en arrière-plan",
+        "navigationKeyboardShortcuts": "Activer les raccourcis clavier de navigation",
+        "tradingKeyboardShortcuts": "Activer les raccourcis clavier de trading",
+        "viewKeyboardShortcuts": "Voir les raccourcis clavier",
         "numberFormat": "Format de nombre",
         "color": "Couleur",
         "language": "Langue"
@@ -560,13 +568,170 @@
         "liqPrice": "Prix de liq."
     },
     "meta": {
-        "title": "Accueil | Ambient",
-        "content": "Tradez des Perps avec Ambient"
+        "title": "Ambient Finance | Contrats perpétuels sur Fogo",
+        "description": "Tradez des contrats perpétuels sur Fogo avec Ambient Finance. Zéro frais taker, jusqu'à 100x de levier et exécution ultra-rapide.",
+        "content": "Trader des Perps avec Ambient"
+    },
+    "pageTitles": {
+        "portfolio": "Portefeuille",
+        "referrals": "Parrainages",
+        "points": "Points",
+        "leaderboard": "Classement",
+        "newStrategy": "Nouvelle Stratégie",
+        "editStrategy": "Modifier la Stratégie",
+        "strategy": "Stratégie",
+        "strategies": "Stratégies",
+        "vault": "Coffre",
+        "vaults": "Coffres",
+        "subAccounts": "Sous-comptes",
+        "positions": "Positions",
+        "openOrders": "Ordres Ouverts",
+        "orderHistory": "Historique des Ordres",
+        "tradeHistory": "Historique des Transactions",
+        "twapFillHistory": "Historique d'Exécution TWAP",
+        "twapHistory": "Historique TWAP",
+        "depositsAndWithdrawals": "Dépôts et Retraits",
+        "fundingHistory": "Historique de Financement",
+        "more": "Plus",
+        "termsOfService": "Conditions d'Utilisation",
+        "privacyPolicy": "Politique de Confidentialité",
+        "affiliates": "Affiliés",
+        "pageNotFound": "Page Non Trouvée"
     },
     "docs": {
         "menuTerms": "Conditions d'utilisation",
         "menuPrivacy": "Confidentialité",
         "terms": "Conditions d'utilisation de CROCODILE Labs",
         "privacy": "Politique de confidentialité"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Raccourcis",
+        "title": "Raccourcis clavier",
+        "hintPress": "Appuyez sur",
+        "hintToClose": "pour fermer",
+        "aria": {
+            "close": "Fermer les raccourcis clavier"
+        },
+        "categories": [
+            {
+                "title": "Général",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "Afficher les raccourcis"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Ouvrir les paramètres"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "Fermer la fenêtre / annuler"
+                    }
+                ]
+            },
+            {
+                "title": "Trading",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "Passer en achat"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "Passer en vente"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "Démarrer un ordre au marché"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "Démarrer un ordre limite"
+                    }
+                ]
+            },
+            {
+                "title": "Navigation",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "Aller à la page trading"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "Aller à l'accueil"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "Aller au portfolio"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "Ouvrir le connecteur de wallet"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Ouvrir la fenêtre de dépôt"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "Ouvrir la fenêtre de retrait"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "Voir la dernière transaction dans l'explorateur"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

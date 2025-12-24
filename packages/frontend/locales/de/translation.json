@@ -13,6 +13,7 @@
         "error": "Fehler",
         "success": "Erfolg",
         "applyDefaults": "Standardwerte anwenden",
+        "changeApplied": "Änderung angewendet",
         "learnMore": "Mehr erfahren",
         "deposit": "Einzahlung",
         "transfer": "Überweisen",
@@ -201,7 +202,9 @@
         },
         "orderFilled": {
             "title": "{{side}} Order ausgeführt",
-            "message": "{{side}} Order über {{usdValueOfFillStr}} von {{symbol}} bei {{fillPrice}} erfolgreich ausgeführt"
+            "message": "{{side}} Order über {{usdValueOfFillStr}} von {{symbol}} bei {{fillPrice}} erfolgreich ausgeführt",
+            "buySide": "Kauf",
+            "sellSide": "Verkauf"
         },
         "errorUpdatingOrder": {
             "title": "Fehler bei der Aktualisierung der Order"
@@ -400,9 +403,13 @@
     },
     "referrals": {
         "title": "Empfehlungen",
-        "description": "Werben Sie Nutzer und verdienen Sie Belohnungen. Partner erhalten höhere Prämien.",
+        "description": "Empfehle Nutzer, um Belohnungen zu verdienen. Partner erhalten höhere Belohnungen.",
         "tradersReferred": "Empfohlene Trader",
-        "rewardsEarned": "Erhaltene Belohnungen"
+        "rewardsEarned": "Verdiente Belohnungen",
+        "rewardHistory": "Belohnungsverlauf",
+        "enterCode": "Code eingeben",
+        "claim": "Einlösen",
+        "createCode": "Code erstellen"
     },
     "deposit": {
         "prompt": "{{token}} von Fogo einzahlen",
@@ -428,6 +435,9 @@
         "skipOpenOrderConfirm": "Bestätigung für offene Aufträge überspringen",
         "enableTxNotifications": "Transaktionsbenachrichtigungen aktivieren",
         "enableBackgroundFillNotif": "Hintergrundausführungs-Benachrichtigung aktivieren",
+        "navigationKeyboardShortcuts": "Navigationstastenkürzel aktivieren",
+        "tradingKeyboardShortcuts": "Handelstastenkürzel aktivieren",
+        "viewKeyboardShortcuts": "Tastenkürzel anzeigen",
         "numberFormat": "Zahlenformat",
         "color": "Farbe",
         "language": "Sprache"
@@ -558,13 +568,170 @@
         "liqPrice": "Liquidationspreis"
     },
     "meta": {
-        "title": "Startseite | Ambient",
+        "title": "Ambient Finance | Perpetual Futures auf Fogo",
+        "description": "Handeln Sie Perpetual Futures auf Fogo mit Ambient Finance. Keine Taker-Gebühren, bis zu 100x Hebel und blitzschnelle Ausführung.",
         "content": "Handeln Sie Perps mit Ambient"
+    },
+    "pageTitles": {
+        "portfolio": "Portfolio",
+        "referrals": "Empfehlungen",
+        "points": "Punkte",
+        "leaderboard": "Rangliste",
+        "newStrategy": "Neue Strategie",
+        "editStrategy": "Strategie bearbeiten",
+        "strategy": "Strategie",
+        "strategies": "Strategien",
+        "vault": "Tresor",
+        "vaults": "Tresore",
+        "subAccounts": "Unterkonten",
+        "positions": "Positionen",
+        "openOrders": "Offene Aufträge",
+        "orderHistory": "Auftragshistorie",
+        "tradeHistory": "Handelshistorie",
+        "twapFillHistory": "TWAP-Ausführungshistorie",
+        "twapHistory": "TWAP-Historie",
+        "depositsAndWithdrawals": "Ein- & Auszahlungen",
+        "fundingHistory": "Finanzierungshistorie",
+        "more": "Mehr",
+        "termsOfService": "Nutzungsbedingungen",
+        "privacyPolicy": "Datenschutzrichtlinie",
+        "affiliates": "Affiliates",
+        "pageNotFound": "Seite nicht gefunden"
     },
     "docs": {
         "menuTerms": "Nutzungsbedingungen",
         "menuPrivacy": "Datenschutz",
         "terms": "CROCODILE Labs Nutzungsbedingungen",
-        "privacy": "Datenschutzerklärung"
+        "privacy": "Datenschutzrichtlinie"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Tastenkürzel",
+        "title": "Tastenkürzel",
+        "hintPress": "Drücke",
+        "hintToClose": "zum Schließen",
+        "aria": {
+            "close": "Tastenkürzel schließen"
+        },
+        "categories": [
+            {
+                "title": "Allgemein",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "Tastenkürzel anzeigen"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Einstellungen öffnen"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "Modal schließen / abbrechen"
+                    }
+                ]
+            },
+            {
+                "title": "Handel",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "Zu Kaufen wechseln"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "Zu Verkaufen wechseln"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "Market-Order starten"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "Limit-Order starten"
+                    }
+                ]
+            },
+            {
+                "title": "Navigation",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "Zur Handelsseite"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "Zur Startseite"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "Zur Portfolio-Seite"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "Wallet-Connector öffnen"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Einzahlungsmodal öffnen"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "Auszahlungsmodal öffnen"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "Letzte Transaktion im Block-Explorer ansehen"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

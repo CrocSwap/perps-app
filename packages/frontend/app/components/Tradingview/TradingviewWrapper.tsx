@@ -5,6 +5,7 @@ import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradin
 import OverlayCanvas from '~/routes/chart/overlayCanvas/overlayCanvas';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
+import YaxisOverlayCanvas from '~/routes/chart/overlayCanvas/yAxisOverlayCanvas';
 
 const TradingViewWrapper: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,6 +76,7 @@ const TradingViewWrapper: React.FC = () => {
                 >
                     <TradingViewChart />
                     <OverlayCanvas />
+                    <YaxisOverlayCanvas />
                 </TradingViewProvider>
             )}
         </div>

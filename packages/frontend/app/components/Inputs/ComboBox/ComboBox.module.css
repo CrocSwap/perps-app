@@ -14,8 +14,17 @@
     align-items: center;
     gap: var(--gap-xs);
     padding: var(--padding-xs);
-
     cursor: pointer;
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+}
+
+.comboBoxValueContainer:focus-visible {
+    outline: 2px solid var(--accent1);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
 }
 
 .comboBoxValueContainer svg {

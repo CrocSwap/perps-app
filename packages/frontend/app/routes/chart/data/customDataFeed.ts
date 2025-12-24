@@ -23,10 +23,10 @@ import {
 import { processWSCandleMessage } from './processChartData';
 import {
     convertResolutionToIntervalParam,
-    mapResolutionToInterval,
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
+import { useChartStore } from '~/stores/TradingviewChartStore';
 
 const subscriptions = new Map<string, { unsubscribe: () => void }>();
 
@@ -93,8 +93,7 @@ export const createDataFeed = (
                 name: symbolName,
                 minmov: 0.01,
                 pricescale: 1000,
-                timezone: Intl.DateTimeFormat().resolvedOptions()
-                    .timeZone as any,
+                timezone: 'Etc/UTC',
                 session: '24x7',
                 has_intraday: true,
                 supported_resolutions: supportedResolutions,
@@ -332,6 +331,7 @@ export const createDataFeed = (
                         ) {
                             const tick = processWSCandleMessage(candleData);
                             onTick(tick);
+                            useChartStore.getState().setLastCandle(tick);
                             updateCandleCache(
                                 symbolInfo.ticker,
                                 resolution,

@@ -83,270 +83,248 @@ const router = createBrowserRouter([
             {
                 index: true,
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/home/home'
-                    );
+                    const { default: Component } =
+                        await import('./routes/home/home');
                     return { Component };
                 },
             },
             {
                 path: 'v2/trade/:marketId?',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/trade'
-                    );
+                    const { default: Component } =
+                        await import('./routes/trade');
                     return { Component };
                 },
             },
             {
                 path: 'v2/strategies',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/strategies/strategies'
-                    );
+                    const { default: Component } =
+                        await import('./routes/strategies/strategies');
                     return { Component };
                 },
             },
             {
                 path: 'v2/strategies/new',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/strategies/newStrategy'
-                    );
+                    const { default: Component } =
+                        await import('./routes/strategies/newStrategy');
                     return { Component };
                 },
             },
             {
                 path: 'v2/strategies/:address?',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/strategies/StrategyDetail'
-                    );
+                    const { default: Component } =
+                        await import('./routes/strategies/StrategyDetail');
                     return { Component };
                 },
             },
             {
                 path: 'v2/strategies/:address/edit',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/strategies/editStrategy'
-                    );
+                    const { default: Component } =
+                        await import('./routes/strategies/editStrategy');
                     return { Component };
                 },
             },
             {
                 path: 'v2/vaults',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/vaults/vaultsNew'
-                    );
+                    const { default: Component } =
+                        await import('./routes/vaults/vaultsNew');
                     return { Component };
                 },
             },
             {
                 path: 'v2/vaults/:vaultAddress',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/vaults/vaultDetails'
-                    );
+                    const { default: Component } =
+                        await import('./routes/vaults/vaultDetails');
                     return { Component };
                 },
             },
             {
                 path: 'v2/leaderboard',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/leaderboard/leaderboard'
-                    );
+                    const { default: Component } =
+                        await import('./routes/leaderboard/leaderboard');
                     return { Component };
                 },
             },
             {
                 path: 'v2/points',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/points/points'
-                    );
+                    const { default: Component } =
+                        await import('./routes/points/points');
                     return { Component };
                 },
             },
             {
                 path: 'v2/portfolio',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/portfolio/portfolio'
-                    );
+                    const { default: Component } =
+                        await import('./routes/portfolio/portfolio');
                     return { Component };
                 },
             },
             {
                 path: 'v2/referrals',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/referrals/referrals'
-                    );
+                    const { default: Component } =
+                        await import('./routes/referrals/referrals');
+                    return { Component };
+                },
+            },
+            {
+                path: 'v2/affiliates',
+                lazy: async () => {
+                    const { default: Component } =
+                        await import('./routes/affiliates/affiliates');
                     return { Component };
                 },
             },
             {
                 path: 'v2/more',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/more/more'
-                    );
+                    const { default: Component } =
+                        await import('./routes/more/more');
                     return { Component };
                 },
             },
             {
                 path: 'v2/testpage',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/testpage/testpage'
-                    );
+                    const { default: Component } =
+                        await import('./routes/testpage/testpage');
                     return { Component };
                 },
             },
             {
                 path: 'v2/subaccounts',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/subaccounts/subaccounts'
-                    );
+                    const { default: Component } =
+                        await import('./routes/subaccounts/subaccounts');
                     return { Component };
                 },
             },
             {
                 path: 'v2/positions',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/positions/positions'
-                    );
+                    const { default: Component } =
+                        await import('./routes/positions/positions');
                     return { Component };
                 },
             },
             {
                 path: 'v2/orderHistory/:address?',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/orderHistory/orderHistory'
-                    );
+                    const { default: Component } =
+                        await import('./routes/orderHistory/orderHistory');
                     return { Component };
                 },
             },
             {
                 path: 'v2/tradeHistory/:address?',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/tradeHistory/tradeHistory'
-                    );
+                    const { default: Component } =
+                        await import('./routes/tradeHistory/tradeHistory');
                     return { Component };
                 },
             },
             {
                 path: 'v2/twapHistory/:address?',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/twapHistory/twapHistory'
-                    );
+                    const { default: Component } =
+                        await import('./routes/twapHistory/twapHistory');
                     return { Component };
                 },
             },
             {
                 path: 'v2/openOrders/:address?',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/openOrders/openOrders'
-                    );
+                    const { default: Component } =
+                        await import('./routes/openOrders/openOrders');
                     return { Component };
                 },
             },
             {
                 path: 'v2/twapFillHistory/:address?',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/twapFillHistory/twapFillHistory'
-                    );
+                    const { default: Component } =
+                        await import('./routes/twapFillHistory/twapFillHistory');
                     return { Component };
                 },
             },
             {
                 path: 'v2/depositsandwithdrawals/:address?',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/depositsandwithdrawals/depositsandwithdrawals'
-                    );
+                    const { default: Component } =
+                        await import('./routes/depositsandwithdrawals/depositsandwithdrawals');
                     return { Component };
                 },
             },
             {
                 path: 'v2/fundingHistory/:address?',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/fundingHistory/fundingHistory'
-                    );
+                    const { default: Component } =
+                        await import('./routes/fundingHistory/fundingHistory');
                     return { Component };
                 },
             },
             {
                 path: 'v2/showcase',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/showcase/showcase'
-                    );
+                    const { default: Component } =
+                        await import('./routes/showcase/showcase');
                     return { Component };
                 },
             },
             {
                 path: 'v2/showcase/buttons',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/showcase/buttonShowcase/buttonShowcase'
-                    );
+                    const { default: Component } =
+                        await import('./routes/showcase/buttonShowcase/buttonShowcase');
                     return { Component };
                 },
             },
             {
                 path: 'v2/showcase/modals',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/showcase/modalShowcase/modalShowcase'
-                    );
+                    const { default: Component } =
+                        await import('./routes/showcase/modalShowcase/modalShowcase');
                     return { Component };
                 },
             },
             {
                 path: 'v2/showcase/tabs',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/showcase/tabShowcase/tabShowcase'
-                    );
+                    const { default: Component } =
+                        await import('./routes/showcase/tabShowcase/tabShowcase');
                     return { Component };
                 },
             },
             {
                 path: 'v2/terms',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/terms/terms'
-                    );
+                    const { default: Component } =
+                        await import('./routes/terms/terms');
                     return { Component };
                 },
             },
             {
                 path: 'v2/privacy',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/privacy/privacy'
-                    );
+                    const { default: Component } =
+                        await import('./routes/privacy/privacy');
                     return { Component };
                 },
             },
             {
                 path: '*',
                 lazy: async () => {
-                    const { default: Component } = await import(
-                        './routes/notFound/notFound'
-                    );
+                    const { default: Component } =
+                        await import('./routes/notFound/notFound');
                     return { Component };
                 },
             },

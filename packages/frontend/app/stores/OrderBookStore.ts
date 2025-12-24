@@ -24,6 +24,8 @@ interface OrderBookStore {
     ) => void;
     midPrice: number | null;
     setMidPrice: (midPrice: number) => void;
+    usualResolution: OrderRowResolutionIF | null;
+    setUsualResolution: (resolution: OrderRowResolutionIF) => void;
 }
 
 export const useOrderBookStore = create<OrderBookStore>()(
@@ -65,6 +67,9 @@ export const useOrderBookStore = create<OrderBookStore>()(
             resolutionPairs: {},
             midPrice: null,
             setMidPrice: (midPrice: number) => set({ midPrice }),
+            usualResolution: null,
+            setUsualResolution: (resolution: OrderRowResolutionIF) =>
+                set({ usualResolution: resolution }),
         }),
         {
             name: 'ORDERBOOK',

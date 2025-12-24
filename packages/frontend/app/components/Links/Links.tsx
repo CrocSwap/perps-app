@@ -102,8 +102,10 @@ const Links: React.FC = () => {
                             className={styles.button}
                             target='_blank'
                             rel='noopener noreferrer'
+                            aria-label={`${item.linkText} (opens in new tab)`}
                         >
                             {item.linkText}
+                            <span className='sr-only'> (opens in new tab)</span>
                         </a>
                     </div>
                 ))}

@@ -13,6 +13,7 @@
         "error": "Lỗi",
         "success": "Thành công",
         "applyDefaults": "Áp dụng mặc định",
+        "changeApplied": "Đã áp dụng thay đổi",
         "learnMore": "Tìm hiểu thêm",
         "deposit": "Nạp tiền",
         "transfer": "Chuyển tiền",
@@ -201,7 +202,9 @@
         },
         "orderFilled": {
             "title": "{{side}} Lệnh đã khớp",
-            "message": "Đã khớp thành công lệnh {{side}} {{usdValueOfFillStr}} cho {{symbol}} tại {{fillPrice}}"
+            "message": "Đã khớp thành công lệnh {{side}} {{usdValueOfFillStr}} cho {{symbol}} tại {{fillPrice}}",
+            "buySide": "Mua",
+            "sellSide": "Bán"
         },
         "errorUpdatingOrder": {
             "title": "Lỗi khi cập nhật lệnh"
@@ -400,9 +403,13 @@
     },
     "referrals": {
         "title": "Giới thiệu",
-        "description": "Giới thiệu người dùng để nhận thưởng. Đối tác nhận thưởng cao hơn.",
-        "tradersReferred": "Nhà giao dịch đã giới thiệu",
-        "rewardsEarned": "Phần thưởng nhận được"
+        "description": "Giới thiệu người dùng để nhận phần thưởng. Đối tác nhận được phần thưởng cao hơn.",
+        "tradersReferred": "Người giao dịch đã giới thiệu",
+        "rewardsEarned": "Phần thưởng đã nhận",
+        "rewardHistory": "Lịch sử phần thưởng",
+        "enterCode": "Nhập mã",
+        "claim": "Nhận",
+        "createCode": "Tạo mã"
     },
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",
@@ -428,6 +435,9 @@
         "skipOpenOrderConfirm": "Bỏ qua xác nhận lệnh mở",
         "enableTxNotifications": "Bật thông báo giao dịch",
         "enableBackgroundFillNotif": "Bật thông báo khớp lệnh nền",
+        "navigationKeyboardShortcuts": "Bật phím tắt bàn phím điều hướng",
+        "tradingKeyboardShortcuts": "Bật phím tắt bàn phím giao dịch",
+        "viewKeyboardShortcuts": "Xem phím tắt bàn phím",
         "numberFormat": "Định dạng số",
         "color": "Màu sắc",
         "language": "Ngôn ngữ"
@@ -557,13 +567,170 @@
         "liqPrice": "Giá thanh lý"
     },
     "meta": {
-        "title": "Trang chủ | Ambient",
-        "content": "Giao dịch Hợp đồng Vĩnh viễn với Ambient"
+        "title": "Ambient Finance | Hợp đồng vĩnh viễn trên Fogo",
+        "description": "Giao dịch hợp đồng vĩnh viễn trên Fogo với Ambient Finance. Không phí taker, đòn bẩy lên đến 100x và khớp lệnh siêu nhanh.",
+        "content": "Giao dịch Perps với Ambient"
+    },
+    "pageTitles": {
+        "portfolio": "Danh mục",
+        "referrals": "Giới thiệu",
+        "points": "Điểm",
+        "leaderboard": "Bảng xếp hạng",
+        "newStrategy": "Chiến lược mới",
+        "editStrategy": "Chỉnh sửa chiến lược",
+        "strategy": "Chiến lược",
+        "strategies": "Danh sách chiến lược",
+        "vault": "Kho bạc",
+        "vaults": "Danh sách kho bạc",
+        "subAccounts": "Tài khoản phụ",
+        "positions": "Vị thế",
+        "openOrders": "Lệnh mở",
+        "orderHistory": "Lịch sử lệnh",
+        "tradeHistory": "Lịch sử giao dịch",
+        "twapFillHistory": "Lịch sử khớp TWAP",
+        "twapHistory": "Lịch sử TWAP",
+        "depositsAndWithdrawals": "Nạp và rút tiền",
+        "fundingHistory": "Lịch sử cấp vốn",
+        "more": "Thêm",
+        "termsOfService": "Điều khoản dịch vụ",
+        "privacyPolicy": "Chính sách bảo mật",
+        "affiliates": "Liên kết",
+        "pageNotFound": "Không Tìm Thấy Trang"
     },
     "docs": {
-        "menuTerms": "Điều khoản Dịch vụ",
-        "menuPrivacy": "Quyền riêng tư",
-        "terms": "Điều khoản Dịch vụ CROCODILE Labs",
-        "privacy": "Chính sách Quyền riêng tư"
+        "menuTerms": "Điều khoản dịch vụ",
+        "menuPrivacy": "Bảo mật",
+        "terms": "Điều khoản dịch vụ CROCODILE Labs",
+        "privacy": "Chính sách bảo mật"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Phím tắt",
+        "title": "Phím tắt bàn phím",
+        "hintPress": "Nhấn",
+        "hintToClose": "để đóng",
+        "aria": {
+            "close": "Đóng phím tắt bàn phím"
+        },
+        "categories": [
+            {
+                "title": "Chung",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "Hiển thị phím tắt"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Mở cài đặt"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "Đóng hộp thoại / hủy"
+                    }
+                ]
+            },
+            {
+                "title": "Giao dịch",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "Chuyển sang mua"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "Chuyển sang bán"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "Bắt đầu lệnh thị trường"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "Bắt đầu lệnh giới hạn"
+                    }
+                ]
+            },
+            {
+                "title": "Điều hướng",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "Đi tới trang giao dịch"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "Đi tới trang chủ"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "Đi tới trang danh mục"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "Mở kết nối ví"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Mở nạp tiền"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "Mở rút tiền"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "Xem giao dịch mới nhất trên trình khám phá"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

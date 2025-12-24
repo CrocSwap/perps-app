@@ -6,7 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 const appName = 'Ambient Perps';
 const appDescription = 'A modern, performant app for perpetual contracts.';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     // Optimize dependency pre-bundling
     optimizeDeps: {
         include: [
@@ -91,7 +91,10 @@ export default defineConfig({
             workbox: {
                 maximumFileSizeToCacheInBytes: 5_000_000,
                 // Precache JS, CSS, images, and fonts for offline support
-                globPatterns: ['**/*.{js,css,png,svg,woff2,ttf}'],
+                globPatterns:
+                    mode === 'development'
+                        ? []
+                        : ['**/*.{js,css,png,svg,woff2,ttf}'],
                 // Don't cache service worker files or manifest
                 globIgnores: [
                     '**/sw.js',
@@ -155,7 +158,9 @@ export default defineConfig({
                 ],
             },
             devOptions: {
-                enabled: process.env.NODE_ENV === 'development',
+                enabled:
+                    mode === 'development' &&
+                    process.env.VITE_PWA_DEV === 'true',
             },
             manifest: {
                 name: appName,
@@ -194,4 +199,4 @@ export default defineConfig({
             },
         }),
     ],
-});
+}));

@@ -43,6 +43,9 @@ export function Tab(props: TabProps) {
                 cursor: notInteractive ? 'auto' : 'cursor',
             }}
             onClick={() => notInteractive || onClick()}
+            role='tab'
+            aria-selected={isActive}
+            tabIndex={isActive ? 0 : -1}
         >
             {label}
             {isActive && (
@@ -160,6 +163,12 @@ export default function Tabs(props: TabsProps) {
             orderHistory.length > 0
         ) {
             label = `${t(tab)} (${orderHistory.length})`;
+        } else if (tab === 'Enter Code') {
+            label = t('referrals.enterCode');
+        } else if (tab === 'Claim') {
+            label = t('referrals.claim');
+        } else if (tab === 'Create Code') {
+            label = t('referrals.createCode');
         }
         return label;
     };
@@ -320,6 +329,7 @@ export default function Tabs(props: TabsProps) {
                     ref={tabsListRef}
                     onScroll={checkScroll}
                     data-tabs-list
+                    role='tablist'
                 >
                     {tabs.map((tab, idx) => {
                         const tabId = getTabId(tab);

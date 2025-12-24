@@ -53,6 +53,14 @@ const SymbolInfo: React.FC = React.memo(() => {
         return `${marketIdWithFallback} Perpetual Futures | Trade with Ambient on Fogo`;
     }, [marketIdWithFallback]);
 
+    const seoDescription = useMemo(() => {
+        return `Trade ${marketIdWithFallback} perpetual futures on Fogo with Ambient Finance. Zero taker fees, up to 100x leverage. The premier Solana perps DEX experience.`;
+    }, [marketIdWithFallback]);
+
+    const seoKeywords = useMemo(() => {
+        return `${marketIdWithFallback} perps, Solana perps, perpetual futures, Fogo, Ambient Finance, ${marketIdWithFallback} trading, crypto leverage trading, perps DEX`;
+    }, [marketIdWithFallback]);
+
     const hasData =
         !!symbolInfo &&
         symbolInfo.coin &&
@@ -105,6 +113,8 @@ const SymbolInfo: React.FC = React.memo(() => {
     return (
         <>
             <title>{title}</title>
+            <meta name='description' content={seoDescription} />
+            <meta name='keywords' content={seoKeywords} />
             <meta property='og:type' content='website' />
             <meta property='og:title' content={ogTitle} />
             <meta property='og:description' content={ogDescription} />

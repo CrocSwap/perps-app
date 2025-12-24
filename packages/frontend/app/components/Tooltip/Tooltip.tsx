@@ -33,8 +33,8 @@ const Tooltip: React.FC<TooltipProps> = ({
     const [tooltipPosition, setTooltipPosition] = useState({ left: 0, top: 0 });
     const triggerRef = useRef<HTMLDivElement>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
-    const timeoutRef = useRef<NodeJS.Timeout>();
-    const positionTimeoutRef = useRef<NodeJS.Timeout>();
+    const timeoutRef = useRef<NodeJS.Timeout>(null);
+    const positionTimeoutRef = useRef<NodeJS.Timeout>(null);
     const isMobile = useRef(false);
 
     // Detect if device is mobile
@@ -312,6 +312,8 @@ const Tooltip: React.FC<TooltipProps> = ({
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 onTouchStart={handleTouchStart}
+                onFocus={() => handleMouseEnter()}
+                onBlur={() => handleMouseLeave()}
             >
                 {children}
             </div>

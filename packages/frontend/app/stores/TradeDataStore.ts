@@ -8,7 +8,7 @@ import {
     createUserTradesSlice,
     type UserTradeDataStore,
 } from './UserTradeDataStore';
-import type { OrderSide } from '~/utils/CommonIFs';
+import type { OrderInputValue, OrderSide } from '~/utils/CommonIFs';
 
 export type marginModesT = 'margin.cross.title' | 'margin.isolated.title';
 
@@ -45,12 +45,16 @@ type TradeDataStore = UserTradeDataStore & {
     setIsTradeInfoExpanded: (shouldExpand: boolean) => void;
     updateSymbolInfo: (symbolInfo: TokenDetailsIF) => void; // used for updating symbol info from REST API while ws is sleeping
     addToFetchedChannels: (channel: string) => void;
-    orderInputPriceValue: number;
-    setOrderInputPriceValue: (price: number) => void;
+    orderInputPriceValue: OrderInputValue;
+    setOrderInputPriceValue: (value: OrderInputValue) => void;
     tradeDirection: OrderSide;
     setTradeDirection: (direction: OrderSide) => void;
+    marketOrderType: string;
+    setMarketOrderType: (marketOrderType: string) => void;
     setIsMidModeActive: (isActive: boolean) => void;
     isMidModeActive: boolean;
+    isPreviewOrderHovered: boolean;
+    setIsPreviewOrderHovered: (isHovered: boolean) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -152,15 +156,21 @@ const useTradeDataStore = create<TradeDataStore>()(
             addToFetchedChannels: (channel: string) => {
                 get().fetchedChannels.add(channel);
             },
-            orderInputPriceValue: 0,
-            setOrderInputPriceValue: (price: number) =>
-                set({ orderInputPriceValue: price }),
+            orderInputPriceValue: { value: 0, changeType: 'inputChange' },
+            setOrderInputPriceValue: (value: OrderInputValue) =>
+                set({ orderInputPriceValue: value }),
             tradeDirection: 'buy',
             setTradeDirection: (direction: OrderSide) =>
                 set({ tradeDirection: direction }),
+            marketOrderType: 'market',
+            setMarketOrderType: (marketOrderType: string) =>
+                set({ marketOrderType }),
             setIsMidModeActive: (isActive: boolean) =>
                 set({ isMidModeActive: isActive }),
             isMidModeActive: true,
+            isPreviewOrderHovered: false,
+            setIsPreviewOrderHovered: (isHovered: boolean) =>
+                set({ isPreviewOrderHovered: isHovered }),
         }),
         {
             name: 'TRADE_DATA',

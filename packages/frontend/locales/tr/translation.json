@@ -13,6 +13,7 @@
         "error": "Hata",
         "success": "Başarılı",
         "applyDefaults": "Varsayılanları uygula",
+        "changeApplied": "Değişiklik uygulandı",
         "learnMore": "Daha fazla bilgi",
         "deposit": "Yatır",
         "transfer": "Transfer",
@@ -402,9 +403,13 @@
     },
     "referrals": {
         "title": "Referanslar",
-        "description": "Kullanıcıları davet et, ödül kazanın. İş Ortakları daha fazla kazanır.",
-        "tradersReferred": "Referans Edilen Traderlar",
-        "rewardsEarned": "Kazanılan Ödüller"
+        "description": "Kullanıcıları davet ederek ödüller kazanın. İş ortakları daha yüksek ödüller kazanır.",
+        "tradersReferred": "Yönlendirilen traderlar",
+        "rewardsEarned": "Kazanılan ödüller",
+        "rewardHistory": "Ödül geçmişi",
+        "enterCode": "Kodu girin",
+        "claim": "Talep et",
+        "createCode": "Kod oluştur"
     },
     "deposit": {
         "prompt": "Fogo'dan {{token}} yatır",
@@ -430,6 +435,9 @@
         "skipOpenOrderConfirm": "Açık Emir Onayını Atla",
         "enableTxNotifications": "İşlem Bildirimlerini Aç",
         "enableBackgroundFillNotif": "Arkaplan Dolum Bildirimini Aç",
+        "navigationKeyboardShortcuts": "Gezinme klavye kısayollarını etkinleştir",
+        "tradingKeyboardShortcuts": "Alım-satım klavye kısayollarını etkinleştir",
+        "viewKeyboardShortcuts": "Klavye kısayollarını görüntüle",
         "numberFormat": "Sayı Formatı",
         "color": "Renk",
         "language": "Dil"
@@ -560,13 +568,170 @@
         "liqPrice": "Lik. fiyatı"
     },
     "meta": {
-        "title": "Ana Sayfa | Ambient",
-        "content": "Ambient ile Sürekli Vadeli İşlemler"
+        "title": "Ambient Finance | Fogo Süresiz Vadeli İşlemler",
+        "description": "Ambient Finance ile Fogo'da süresiz vadeli işlem yapın. Taker ücreti yok, 100x kaldıraç imkanı ve yıldırım hızında işlem.",
+        "content": "Ambient ile vadeli işlemleri alıp satın"
+    },
+    "pageTitles": {
+        "portfolio": "Portföy",
+        "referrals": "Referanslar",
+        "points": "Puanlar",
+        "leaderboard": "Sıralama",
+        "newStrategy": "Yeni Strateji",
+        "editStrategy": "Stratejiyi Düzenle",
+        "strategy": "Strateji",
+        "strategies": "Stratejiler",
+        "vault": "Kasa",
+        "vaults": "Kasalar",
+        "subAccounts": "Alt Hesaplar",
+        "positions": "Pozisyonlar",
+        "openOrders": "Açık Emirler",
+        "orderHistory": "Emir Geçmişi",
+        "tradeHistory": "İşlem Geçmişi",
+        "twapFillHistory": "TWAP Gerçekleşme Geçmişi",
+        "twapHistory": "TWAP Geçmişi",
+        "depositsAndWithdrawals": "Para Yatırma ve Çekme",
+        "fundingHistory": "Fonlama Geçmişi",
+        "more": "Daha Fazla",
+        "termsOfService": "Hizmet Şartları",
+        "privacyPolicy": "Gizlilik Politikası",
+        "affiliates": "Ortaklar",
+        "pageNotFound": "Sayfa Bulunamadı"
     },
     "docs": {
         "menuTerms": "Hizmet Şartları",
         "menuPrivacy": "Gizlilik",
         "terms": "CROCODILE Labs Hizmet Şartları",
         "privacy": "Gizlilik Politikası"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Kısayollar",
+        "title": "Klavye Kısayolları",
+        "hintPress": "",
+        "hintToClose": "ile kapat",
+        "aria": {
+            "close": "Klavye kısayollarını kapat"
+        },
+        "categories": [
+            {
+                "title": "Genel",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "Kısayolları göster"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Ayarları aç"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "Pencereyi kapat / iptal"
+                    }
+                ]
+            },
+            {
+                "title": "Trading",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "Alışa geç"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "Satışa geç"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "Piyasa emrini başlat"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "Limit emrini başlat"
+                    }
+                ]
+            },
+            {
+                "title": "Gezinme",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "Trading sayfasına git"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "Ana sayfaya git"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "Portföy sayfasına git"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "Cüzdan bağlayıcıyı aç"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Yatırma penceresini aç"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "Çekme penceresini aç"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "En son işlemi blok gezgininde görüntüle"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

@@ -4,6 +4,8 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useRef, useState } from 'react';
+import { Fuul } from '@fuul/sdk';
+import { useFuul } from '~/contexts/FuulContext';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
 // import {
 //     DFLT_EMBER_MARKET,
@@ -33,43 +35,83 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
+import {
+    URL_PARAMS,
+    useUrlParams,
+    type UrlParamMethodsIF,
+} from '~/hooks/useURLParams';
+import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
 import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
+import AnnouncementBannerHost from '../AnnouncementBanner/AnnouncementBannerHost';
+import { ACTIVE_ANNOUNCEMENT_BANNER } from '~/utils/Constants';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import {
+    getKeyboardShortcutById,
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 export default function PageHeader() {
     // Feedback modal state
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
+    // run the FUUL context
+    const { trackPageView } = useFuul();
+
     const handleFeedbackClose = () => {
         setIsFeedbackOpen(false);
     };
-    // logic to read a URL referral code and set in state + local storage
-    const [searchParams] = useSearchParams();
+
+    const referralCodeFromURL: UrlParamMethodsIF = useUrlParams(
+        URL_PARAMS.referralCode,
+    );
+
     const userDataStore = useUserDataStore();
+
+    const referralStore = useReferralStore();
     const { t } = useTranslation();
-    useEffect(() => {
-        const REFERRAL_CODE_URL_PARAM = 'referral';
-        const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
-        const referralCode =
-            searchParams.get(REFERRAL_CODE_URL_PARAM) ||
-            searchParams.get(ALTERNATE_REFERRAL_CODE_URL_PARAM);
-        if (referralCode) {
-            userDataStore.setReferralCode(referralCode);
-            const newSearchParams = new URLSearchParams(
-                searchParams.toString(),
-            );
-            newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
-            newSearchParams.delete(ALTERNATE_REFERRAL_CODE_URL_PARAM);
-            const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
-            window.history.replaceState({}, '', newUrl); // remove referral code from URL
-        }
-    }, [searchParams]);
 
     const sessionState = useSession();
 
     const isUserConnected = isEstablished(sessionState);
 
+    // Fetch user's total volume for FUUL tracking
+    useEffect(() => {
+        const affiliateAddress = userDataStore.userAddress;
+        if (!affiliateAddress) {
+            return;
+        }
+
+        (async () => {
+            try {
+                const EMBER_ENDPOINT_ALL =
+                    'https://ember-leaderboard.liquidity.tools/leaderboard';
+                const emberEndpointForUser =
+                    EMBER_ENDPOINT_ALL + '/' + affiliateAddress.toString();
+
+                const response = await fetch(emberEndpointForUser);
+                const data = await response.json();
+
+                if (data.error) {
+                    referralStore.setTotVolume(0);
+                } else if (data.leaderboard && data.leaderboard.length > 0) {
+                    const volume = data.leaderboard[0].volume;
+                    referralStore.setTotVolume(volume);
+                }
+            } catch (error) {
+                referralStore.setTotVolume(NaN);
+            }
+        })();
+    }, [userDataStore.userAddress]);
+
+    const { isInitialized: isFuulInitialized } = useFuul();
+
     const sessionButtonRef = useRef<HTMLSpanElement>(null);
+    const { notifications, latestTx } = useNotificationStore();
+    const { navigationKeyboardShortcutsEnabled } = useAppSettings();
 
     useEffect(() => {
         const button = sessionButtonRef.current;
@@ -144,8 +186,10 @@ export default function PageHeader() {
     //     setIsHelpDropdownOpen(false);
     // }, isHelpDropdownOpen);
 
-    // logic to open and close the app settings modal
+    // logic to open and close modals
     const appSettingsModal = useModal('closed');
+    const openAppSettingsModalRef = useRef(appSettingsModal.open);
+    openAppSettingsModalRef.current = appSettingsModal.open;
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -165,8 +209,146 @@ export default function PageHeader() {
     const shortB = useMediaQuery('(max-width: 600px)');
     const isShortScreen: boolean = shortA || shortB;
 
-    const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
-        usePortfolioModals();
+    const {
+        openDepositModal,
+        openWithdrawModal,
+        PortfolioModalsRenderer,
+        isAnyPortfolioModalOpen,
+    } = usePortfolioModals();
+
+    const { isOpen: isKeyboardShortcutsOpen } = useKeyboardShortcuts();
+
+    useEffect(() => {
+        if (isKeyboardShortcutsOpen || isAnyPortfolioModalOpen) return;
+
+        const clickSessionButton = () => {
+            const wrapper = sessionButtonRef.current;
+            const el = wrapper?.querySelector(
+                'button, [role="button"]',
+            ) as HTMLElement | null;
+            el?.click();
+        };
+
+        const shouldIgnoreDueToTyping = (target: HTMLElement | null) => {
+            if (!target) return false;
+
+            const isOptedInField = !!target.closest?.(
+                '[data-allow-keyboard-shortcuts="true"]',
+            );
+            if (isOptedInField) return false;
+
+            if (target.tagName === 'TEXTAREA' || target.isContentEditable) {
+                return true;
+            }
+
+            if (target.tagName === 'INPUT') {
+                const input = target as HTMLInputElement;
+                const isNumericInput = input.inputMode === 'numeric';
+                if (!isNumericInput) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement | null;
+            if (shouldIgnoreDueToTyping(target)) return;
+
+            if (
+                e.altKey &&
+                !e.shiftKey &&
+                !e.ctrlKey &&
+                !e.metaKey &&
+                e.code === 'Comma'
+            ) {
+                e.preventDefault();
+                openAppSettingsModalRef.current();
+                return;
+            }
+
+            const categories = getKeyboardShortcutCategories(t);
+            const connectWalletShortcut = getKeyboardShortcutById(
+                categories,
+                'wallet.connect',
+            );
+            const depositShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.deposit',
+            );
+            const withdrawShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.withdraw',
+            );
+            const latestTxShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.latestTx',
+            );
+
+            const isRelevantShortcut =
+                (!!connectWalletShortcut &&
+                    matchesShortcutEvent(e, connectWalletShortcut.keys)) ||
+                (!!depositShortcut &&
+                    matchesShortcutEvent(e, depositShortcut.keys)) ||
+                (!!withdrawShortcut &&
+                    matchesShortcutEvent(e, withdrawShortcut.keys)) ||
+                (!!latestTxShortcut &&
+                    matchesShortcutEvent(e, latestTxShortcut.keys));
+
+            if (!isRelevantShortcut) return;
+
+            if (!navigationKeyboardShortcutsEnabled) return;
+
+            if (
+                connectWalletShortcut &&
+                matchesShortcutEvent(e, connectWalletShortcut.keys)
+            ) {
+                e.preventDefault();
+                clickSessionButton();
+                return;
+            }
+
+            if (
+                latestTxShortcut &&
+                matchesShortcutEvent(e, latestTxShortcut.keys)
+            ) {
+                e.preventDefault();
+                const latest = latestTx;
+                if (latest?.txLink) {
+                    window.open(latest.txLink, '_blank', 'noopener,noreferrer');
+                }
+                return;
+            }
+
+            if (
+                depositShortcut &&
+                matchesShortcutEvent(e, depositShortcut.keys)
+            ) {
+                e.preventDefault();
+                openDepositModal();
+                return;
+            }
+
+            if (
+                withdrawShortcut &&
+                matchesShortcutEvent(e, withdrawShortcut.keys)
+            ) {
+                e.preventDefault();
+                openWithdrawModal();
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [
+        isAnyPortfolioModalOpen,
+        isKeyboardShortcutsOpen,
+        openDepositModal,
+        openWithdrawModal,
+        latestTx,
+        t,
+    ]);
 
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
@@ -203,8 +385,27 @@ export default function PageHeader() {
                 plausible('Session Ended');
             }
         }
+
         prevIsUserConnected.current = isUserConnected;
-    }, [isUserConnected]);
+    }, [isUserConnected, userDataStore.userAddress]);
+
+    const { totVolume } = useReferralStore();
+
+    // track page views with Fuul
+    useEffect(() => {
+        if (
+            isFuulInitialized &&
+            totVolume !== undefined &&
+            !Number.isNaN(totVolume) &&
+            // totVolume < 10000 &&
+            userDataStore.userAddress
+        ) {
+            console.log('sending pageview for: ', location.pathname);
+            trackPageView();
+        } else {
+            localStorage.removeItem('fuul.sent_pageview');
+        }
+    }, [location, isFuulInitialized, totVolume, userDataStore.userAddress]);
 
     const showDepositSlot = isUserConnected || !isShortScreen;
     const navigate = useNavigate();
@@ -229,6 +430,25 @@ export default function PageHeader() {
             navigate('/');
         }
     };
+
+    const invalidRefCodeModal = useModal('closed');
+
+    // run the FUUL context
+    const { isAffiliateCodeFree } = useFuul();
+
+    useEffect(() => {
+        const checkRefCode = async (): Promise<void> => {
+            if (referralCodeFromURL.value) {
+                const isCodeClaimed: boolean = await isAffiliateCodeFree(
+                    referralCodeFromURL.value,
+                );
+                isCodeClaimed
+                    ? referralStore.cache(referralCodeFromURL.value)
+                    : invalidRefCodeModal.open();
+            }
+        };
+        checkRefCode();
+    }, [referralCodeFromURL.value, isAffiliateCodeFree]);
 
     return (
         <>
@@ -280,6 +500,7 @@ export default function PageHeader() {
                         style={{
                             position: 'relative',
                         }}
+                        className={styles.moreSection}
                         ref={moreDropdownRef}
                     >
                         <button
@@ -311,7 +532,13 @@ export default function PageHeader() {
                             Spot
                         </a>
                     </Tooltip>
+                    <AnnouncementBannerHost
+                        type={ACTIVE_ANNOUNCEMENT_BANNER}
+                        dismissible={false}
+                        inPageHeader
+                    />
                 </nav>
+
                 <div className={styles.rightSide}>
                     {showDepositSlot && (
                         <span className={styles.depositSlot}>
@@ -351,7 +578,7 @@ export default function PageHeader() {
                             ) : (
                                 // desktop/tablet placeholder only (prevents layout shift on connect)
                                 <div
-                                    className={styles.depositButtonPlaceholder}
+                                    // className={styles.depositButtonPlaceholder}
                                     aria-hidden
                                 />
                             )}
@@ -467,6 +694,7 @@ export default function PageHeader() {
                     <section
                         style={{ position: 'relative' }}
                         ref={dropdownMenuRef}
+                        className={styles.menuButtonContainer}
                     >
                         <button
                             className={styles.menuButton}
@@ -493,7 +721,27 @@ export default function PageHeader() {
                     position={'center'}
                     title={t('appSettings.title')}
                 >
-                    <AppOptions />
+                    <AppOptions closePanel={() => appSettingsModal.close()} />
+                </Modal>
+            )}
+            {invalidRefCodeModal.isOpen && (
+                <Modal
+                    close={invalidRefCodeModal.close}
+                    position='center'
+                    title='Unknown Referral Code'
+                >
+                    <div className={styles.invalid_ref_code_modal}>
+                        <p>
+                            The referral code you entered is not recognized.
+                            Please check the code and try again.
+                        </p>
+                        <Link
+                            to='/v2/referrals'
+                            onClick={invalidRefCodeModal.close}
+                        >
+                            Go to Referrals
+                        </Link>
+                    </div>
                 </Modal>
             )}
             {PortfolioModalsRenderer}

@@ -13,6 +13,7 @@
         "error": "エラー",
         "success": "成功",
         "applyDefaults": "デフォルトを適用",
+        "changeApplied": "変更が適用されました",
         "learnMore": "詳細はこちら",
         "deposit": "入金",
         "transfer": "送金",
@@ -402,9 +403,13 @@
     },
     "referrals": {
         "title": "紹介",
-        "description": "ユーザーを紹介して報酬を獲得。アフィリエイトはより多く報酬を得られます。",
+        "description": "ユーザーを紹介して報酬を獲得しましょう。アフィリエイトはより多くの報酬を得られます。",
         "tradersReferred": "紹介されたトレーダー",
-        "rewardsEarned": "獲得報酬"
+        "rewardsEarned": "獲得した報酬",
+        "rewardHistory": "報酬履歴",
+        "enterCode": "コードを入力",
+        "claim": "請求する",
+        "createCode": "コードを作成"
     },
     "deposit": {
         "prompt": "Fogoから{{token}}を入金",
@@ -430,6 +435,9 @@
         "skipOpenOrderConfirm": "注文確認をスキップ",
         "enableTxNotifications": "取引通知を有効",
         "enableBackgroundFillNotif": "バックグラウンド約定通知を有効",
+        "navigationKeyboardShortcuts": "ナビゲーションのキーボードショートカットを有効",
+        "tradingKeyboardShortcuts": "取引のキーボードショートカットを有効",
+        "viewKeyboardShortcuts": "キーボードショートカットを表示",
         "numberFormat": "数字形式",
         "color": "色",
         "language": "言語"
@@ -560,13 +568,170 @@
         "liqPrice": "清算価格"
     },
     "meta": {
-        "title": "ホーム | Ambient",
+        "title": "Ambient Finance | Fogo上の無期限先物",
+        "description": "Ambient FinanceでFogo上の無期限先物を取引。テイカー手数料ゼロ、最大100倍レバレッジ、超高速約定。",
         "content": "Ambientでパーペチュアル取引"
+    },
+    "pageTitles": {
+        "portfolio": "ポートフォリオ",
+        "referrals": "紹介",
+        "points": "ポイント",
+        "leaderboard": "リーダーボード",
+        "newStrategy": "新規戦略",
+        "editStrategy": "戦略を編集",
+        "strategy": "戦略",
+        "strategies": "戦略一覧",
+        "vault": "ボールト",
+        "vaults": "ボールト一覧",
+        "subAccounts": "サブアカウント",
+        "positions": "ポジション",
+        "openOrders": "未約定注文",
+        "orderHistory": "注文履歴",
+        "tradeHistory": "取引履歴",
+        "twapFillHistory": "TWAP約定履歴",
+        "twapHistory": "TWAP履歴",
+        "depositsAndWithdrawals": "入出金",
+        "fundingHistory": "資金調達履歴",
+        "more": "その他",
+        "termsOfService": "利用規約",
+        "privacyPolicy": "プライバシーポリシー",
+        "affiliates": "アフィリエイト",
+        "pageNotFound": "ページが見つかりません"
     },
     "docs": {
         "menuTerms": "利用規約",
         "menuPrivacy": "プライバシー",
         "terms": "CROCODILE Labs 利用規約",
         "privacy": "プライバシーポリシー"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "ショートカット",
+        "title": "キーボードショートカット",
+        "hintPress": "",
+        "hintToClose": "で閉じる",
+        "aria": {
+            "close": "キーボードショートカットを閉じる"
+        },
+        "categories": [
+            {
+                "title": "一般",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "ショートカットを表示"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "設定を開く"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "モーダルを閉じる / キャンセル"
+                    }
+                ]
+            },
+            {
+                "title": "取引",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "買いに切り替え"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "売りに切り替え"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "成行注文を開始"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "指値注文を開始"
+                    }
+                ]
+            },
+            {
+                "title": "ナビゲーション",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "取引ページへ移動"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "ホームへ移動"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "ポートフォリオへ移動"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "ウォレット接続を開く"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "入金モーダルを開く"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "出金モーダルを開く"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "最新のトランザクションをエクスプローラーで表示"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

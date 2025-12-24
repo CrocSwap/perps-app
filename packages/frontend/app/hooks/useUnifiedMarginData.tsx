@@ -64,6 +64,9 @@ export const UnifiedMarginDataProvider: React.FC<
     );
 
     const isSessionEstablished = isEstablished(sessionState);
+    const sessionWalletAddress = isSessionEstablished
+        ? sessionState.walletPublicKey.toString()
+        : '';
     const { isDebugWalletActive, manualAddressEnabled, manualAddress } =
         useDebugStore();
     const isDebugWalletActiveRef = useRef(isDebugWalletActive);
@@ -195,7 +198,9 @@ export const UnifiedMarginDataProvider: React.FC<
         manualAddressEnabled,
         manualAddress,
         isSessionEstablished,
+        sessionWalletAddress,
         defaultConnection,
+        connection,
     ]);
 
     const forceRefresh = useCallback(async () => {

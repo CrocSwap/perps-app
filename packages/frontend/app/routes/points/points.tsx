@@ -1,7 +1,7 @@
 import Welcome from '~/components/Welcome/Welcome';
 export function meta() {
     return [
-        { title: 'Points | Ambient' },
+        { title: 'Points | Ambient Finance' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }

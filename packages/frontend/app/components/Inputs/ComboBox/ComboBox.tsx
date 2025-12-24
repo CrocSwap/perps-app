@@ -12,6 +12,8 @@ interface ComboBoxProps {
     modifyValue?: (value: any) => string;
     cssPositioning?: string;
     type?: 'big-val';
+    width?: string;
+    centered?: boolean;
 }
 
 const ComboBox: React.FC<ComboBoxProps> = ({
@@ -23,12 +25,14 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     modifyValue,
     type,
     cssPositioning,
+    width,
+    centered,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const comboBoxRef = useOutsideClick<HTMLDivElement>(() => {
         setIsOpen(false);
     }, isOpen);
-    const comboBoxValueRef = useRef<HTMLDivElement>(null);
+    const comboBoxValueRef = useRef<HTMLButtonElement>(null);
     const comboBoxOptionsRef = useRef<HTMLDivElement>(null);
 
     const optionOnClick = (option: any) => {
@@ -44,6 +48,15 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                 return '';
         }
     };
+
+    useEffect(() => {
+        if (width && comboBoxRef.current) {
+            comboBoxRef.current.style.width = width;
+        }
+        if (centered && comboBoxValueRef.current) {
+            comboBoxValueRef.current.style.justifyContent = 'center';
+        }
+    }, [width, centered]);
 
     useEffect(() => {
         if (
@@ -68,7 +81,8 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                 className={`${styles.comboBoxContainer} ${getClassName()}`}
                 ref={comboBoxRef}
             >
-                <div
+                <button
+                    type='button'
                     ref={comboBoxValueRef}
                     className={styles.comboBoxValueContainer}
                     onClick={(e) => {
@@ -76,43 +90,74 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                         e.nativeEvent.stopImmediatePropagation();
                         setIsOpen(!isOpen);
                     }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                            setIsOpen(false);
+                        } else if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setIsOpen(!isOpen);
+                        } else if (e.key === 'ArrowDown' && !isOpen) {
+                            e.preventDefault();
+                            setIsOpen(true);
+                        }
+                    }}
+                    aria-haspopup='listbox'
+                    aria-expanded={isOpen}
                 >
-                    <div className={styles.comboBoxValue}>
+                    <span className={styles.comboBoxValue}>
                         {modifyValue ? modifyValue(value) : value}{' '}
-                    </div>
+                    </span>
                     <FaChevronDown
                         className={`${styles.comboBoxIcon} ${isOpen ? styles.comboBoxIconOpen : ''}`}
+                        aria-hidden='true'
                     />
-                </div>
+                </button>
 
                 {isOpen && (
                     <div
                         ref={comboBoxOptionsRef}
                         className={styles.comboBoxOptionsWrapper}
+                        role='listbox'
                     >
-                        {options.map((option) => (
-                            <div
-                                key={fieldName ? option[fieldName] : option}
-                                className={
-                                    fieldName
-                                        ? option[fieldName] === value
+                        {options.map((option, index) => {
+                            const optionValue = fieldName
+                                ? option[fieldName]
+                                : option;
+                            const isSelected = optionValue === value;
+                            return (
+                                <div
+                                    key={optionValue}
+                                    className={
+                                        isSelected
                                             ? styles.comboBoxOptionSelected
                                             : ''
-                                        : option === value
-                                          ? styles.comboBoxOptionSelected
-                                          : ''
-                                }
-                                onClick={() => optionOnClick(option)}
-                            >
-                                {fieldName
-                                    ? modifyOptions
-                                        ? modifyOptions(option[fieldName])
-                                        : option[fieldName]
-                                    : modifyOptions
-                                      ? modifyOptions(option)
-                                      : option}
-                            </div>
-                        ))}
+                                    }
+                                    onClick={() => optionOnClick(option)}
+                                    onKeyDown={(e) => {
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault();
+                                            optionOnClick(option);
+                                        } else if (e.key === 'Escape') {
+                                            setIsOpen(false);
+                                        }
+                                    }}
+                                    role='option'
+                                    aria-selected={isSelected}
+                                    tabIndex={0}
+                                >
+                                    {fieldName
+                                        ? modifyOptions
+                                            ? modifyOptions(option[fieldName])
+                                            : option[fieldName]
+                                        : modifyOptions
+                                          ? modifyOptions(option)
+                                          : option}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

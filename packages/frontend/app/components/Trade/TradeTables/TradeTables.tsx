@@ -7,7 +7,6 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { WsChannels } from '~/utils/Constants';
 import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 import BalancesTable from '../BalancesTable/BalancesTable';
-import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
 import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
 import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
@@ -39,7 +38,6 @@ const portfolioPageBlackListTabs = new Set([
 ]);
 
 interface TradeTableProps {
-    portfolioPage?: boolean;
     vaultPage?: boolean;
     vaultFetched?: boolean;
     vaultDepositors?: VaultFollowerStateIF[];
@@ -47,7 +45,7 @@ interface TradeTableProps {
 }
 
 export default function TradeTable(props: TradeTableProps) {
-    const { portfolioPage, vaultPage, vaultFetched, vaultDepositors } = props;
+    const { vaultPage, vaultFetched, vaultDepositors } = props;
 
     const filterOptions: FilterOption[] = [
         { id: 'all', label: t('common.all') },
@@ -92,7 +90,6 @@ export default function TradeTable(props: TradeTableProps) {
             'common.tradeHistory',
             // 'common.fundingHistory',
             'common.orderHistory',
-            // 'common.depositsAndWithdrawals',
         ];
 
         if (vaultPage) {
@@ -237,10 +234,7 @@ export default function TradeTable(props: TradeTableProps) {
                         onClearFilter={handleClearFilter}
                     />
                 );
-            case 'common.depositsAndWithdrawals':
-                return (
-                    <DepositsWithdrawalsTable isFetched={tradeHistoryFetched} />
-                );
+
             case 'common.depositors':
                 return (
                     <VaultDepositorsTable
@@ -272,8 +266,7 @@ export default function TradeTable(props: TradeTableProps) {
                 />
             )}
             <motion.div
-                className={`${styles.tableContent} ${!showTabs ? styles.noTabs : ''} ${
-                    portfolioPage ? styles.portfolioPage : ''
+                className={`${styles.tableContent} ${!showTabs ? styles.noTabs : ''}
                 }`}
                 key={selectedTradeTab}
                 initial={{ opacity: 0 }}

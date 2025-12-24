@@ -69,11 +69,13 @@ import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
 import type {
     modalContentT,
+    OrderInputChangeType,
     OrderSide,
     OrderTypeOption,
 } from '~/utils/CommonIFs';
 import { useTranslation } from 'react-i18next';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 const useOnlyMarket = false;
 
@@ -177,15 +179,46 @@ function OrderInput({
     // Track if the OrderInput component is focused
     const [isFocused, setIsFocused] = useState(false);
     const orderInputRef = useRef<HTMLDivElement>(null);
-    const submitButtonRef = useRef<HTMLElement | null>(null);
+    const submitButtonRef = useRef<HTMLButtonElement | null>(null);
     const { getBsColor } = useAppSettings();
 
     const sessionState = useSession();
     const activeOptions: useAppOptionsIF = useAppOptions();
 
+    const {
+        obChosenPrice,
+        setObChosenPrice,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+        setOrderInputPriceValue,
+        orderInputPriceValue,
+        tradeDirection,
+        setTradeDirection,
+        setIsMidModeActive,
+        isMidModeActive,
+        marketOrderType,
+        setMarketOrderType,
+    } = useTradeDataStore();
+
+    const orderInputPriceValueRef = useRef<number | undefined>(undefined);
+    orderInputPriceValueRef.current = orderInputPriceValue.value;
+
+    // Track if direction change came from debounced price input (to prevent auto-focus)
+    const directionChangeFromInputRef = useRef(false);
+
+    // Debounce timer ref for price input changes
+    const priceInputDebounceRef = useRef<NodeJS.Timeout | null>(null);
+
+    const isMobileRef = useRef(false);
+    const isMobile = useMobile();
+    isMobileRef.current = isMobile;
+
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
-    const [marketOrderType, setMarketOrderType] = useState<string>('market');
+    const marketOrderTypeRef = useRef(marketOrderType);
+    marketOrderTypeRef.current = marketOrderType;
 
     const [shouldUpdateAfterTrade, setShouldUpdateAfterTrade] = useState(false);
 
@@ -216,13 +249,6 @@ function OrderInput({
 
     const [sizeDisplay, setSizeDisplay] = useState('');
 
-    const isPriceInvalid = useMemo(() => {
-        return (
-            marketOrderType === 'limit' &&
-            (price === '' || price === '0' || price === '0.0')
-        );
-    }, [price, marketOrderType]);
-
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -240,18 +266,15 @@ function OrderInput({
 
     const [isSizeSetAsPercentage, setIsSizeSetAsPercentage] = useState(false);
 
-    const {
-        obChosenPrice,
-        symbol,
-        symbolInfo,
-        marginMode,
-        setMarginMode,
-        setOrderInputPriceValue,
-        tradeDirection,
-        setTradeDirection,
-        setIsMidModeActive,
-        isMidModeActive,
-    } = useTradeDataStore();
+    const isMidModeActiveRef = useRef(isMidModeActive);
+    isMidModeActiveRef.current = isMidModeActive;
+
+    const isPriceInvalid = useMemo(() => {
+        return (
+            marketOrderType === 'limit' &&
+            (price === '' || price === '0' || price === '0.0')
+        );
+    }, [price, marketOrderType]);
 
     useEffect(() => {
         if (!marginBucket) return;
@@ -265,7 +288,9 @@ function OrderInput({
 
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
 
-    const { buys, sells, midPrice } = useOrderBookStore();
+    const { buys, sells, midPrice, usualResolution } = useOrderBookStore();
+    const midPriceRef = useRef(midPrice);
+    midPriceRef.current = midPrice;
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
 
     // backup mark price for when symbolInfo not available
@@ -286,32 +311,47 @@ function OrderInput({
         return midPrice;
     };
 
+    const assignPrice = (price: string, changeType: OrderInputChangeType) => {
+        // For inputChange, debounce the store update by 1000ms
+        // This delays chart line updates and trade direction changes until user stops typing
+        if (changeType === 'inputChange') {
+            // Clear any pending debounce
+            if (priceInputDebounceRef.current) {
+                clearTimeout(priceInputDebounceRef.current);
+            }
+            // Update local price display immediately (handled by handlePriceChange setting price state)
+            // But debounce the store update that triggers chart line and direction changes
+            priceInputDebounceRef.current = setTimeout(() => {
+                directionChangeFromInputRef.current = true;
+                if (price && price.length > 0) {
+                    const parsed = parseFormattedNum(price);
+                    setOrderInputPriceValue({ value: parsed, changeType });
+                } else {
+                    setOrderInputPriceValue({ value: undefined, changeType });
+                }
+            }, 1000);
+        } else {
+            // For other change types (obClick, dragEnd, midPriceChange, reset), update immediately
+            if (price && price.length > 0) {
+                const parsed = parseFormattedNum(price);
+                setOrderInputPriceValue({ value: parsed, changeType });
+            } else {
+                setOrderInputPriceValue({ value: undefined, changeType });
+            }
+        }
+    };
+
     const setMidPriceAsPriceInput = () => {
-        if (!midPrice) return;
-        if (
-            marketOrderType === 'limit' &&
-            buys.length > 0 &&
-            sells.length > 0
-        ) {
-            // prev implementation
-
-            // const resolution = buys[0].px - buys[1].px;
-            // const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
-            // if (!midOrMarkPrice) return;
-            // const formattedMidPrice = formatNumWithOnlyDecimals(
-            //     midOrMarkPrice,
-            //     6,
-            //     true,
-            // );
-
-            // -------
+        if (!midPriceRef.current) return;
+        if (marketOrderType === 'limit') {
             const formattedMidPrice = formatNumWithOnlyDecimals(
-                midPrice,
+                midPriceRef.current,
                 6,
                 true,
             );
 
-            setPrice(formattedMidPrice);
+            // setPrice(formattedMidPrice);
+            assignPrice(formattedMidPrice, 'midPriceChange');
         }
     };
 
@@ -319,20 +359,6 @@ function OrderInput({
         if (!marginBucket) return 0;
         return Number(marginBucket?.equity) / 1e6;
     }, [marginBucket]);
-
-    useEffect(() => {
-        // set mid price input as default price when market changes
-        if (!obChosenPrice) {
-            setMidPriceAsPriceInput();
-            setIsMidModeActive(true);
-        }
-    }, [
-        marketOrderType,
-        !buys.length,
-        !sells.length,
-        buys?.[0]?.coin,
-        obChosenPrice,
-    ]);
 
     const confirmOrderModal = useModal<modalContentT>('closed');
 
@@ -628,8 +654,11 @@ function OrderInput({
     );
 
     useEffect(() => {
-        setNotionalQtyNum(0);
-        setPrice('');
+        if (!isMobileRef.current) {
+            setNotionalQtyNum(0);
+            // setPrice('');
+            assignPrice('', 'reset');
+        }
 
         // Apply leverage validation when symbol changes
         // BUT only if we have the correct symbolInfo for the current symbol
@@ -674,9 +703,17 @@ function OrderInput({
 
     useEffect(() => {
         if (obChosenPrice > 0) {
-            setIsMidModeActive(false);
-            setPrice(formatNumWithOnlyDecimals(obChosenPrice));
-            handleTypeChange();
+            // timeout has been added to handle race condition useEffect [marketOrderType] on mobile
+            setTimeout(() => {
+                setIsMidModeActive(false);
+                // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
+                assignPrice(
+                    formatNumWithOnlyDecimals(obChosenPrice),
+                    'obClick',
+                );
+                handleTypeChange();
+                setObChosenPrice(0);
+            }, 20);
         }
     }, [obChosenPrice]);
 
@@ -859,23 +896,90 @@ function OrderInput({
         event: React.ChangeEvent<HTMLInputElement> | string,
     ) => {
         if (typeof event === 'string') {
-            setPrice(event);
+            setPrice(event); // Update local display immediately
+            assignPrice(event, 'inputChange'); // Debounced store update
         } else {
-            setPrice(event.target.value);
+            setPrice(event.target.value); // Update local display immediately
+            assignPrice(event.target.value, 'inputChange'); // Debounced store update
             setIsMidModeActive(false);
         }
     };
 
     useEffect(() => {
         if (marketOrderType === 'market') {
-            setOrderInputPriceValue(0);
-        } else {
-            const parsed = parseFormattedNum(price);
-            if (!isNaN(parsed)) {
-                setOrderInputPriceValue(parsed);
-            }
+            setOrderInputPriceValue({ value: 0, changeType: 'inputChange' });
+        } else if (
+            marketOrderType === 'limit' &&
+            !orderInputPriceValueRef.current
+        ) {
+            setIsMidModeActive(true);
         }
-    }, [price, parseFormattedNum, setOrderInputPriceValue, marketOrderType]);
+    }, [marketOrderType]);
+
+    // set input price when orderInputPriceValue changes
+    useEffect(() => {
+        if (orderInputPriceValue.value === undefined) {
+            setPrice('');
+        } else if (orderInputPriceValue.value === 0) {
+            setPrice('0');
+        } else {
+            const resVal = usualResolution?.val || 1;
+            const decimals = Math.floor(Math.log10(resVal)) * -1;
+            const priceToSet = formatNumWithOnlyDecimals(
+                orderInputPriceValue.value,
+                decimals > 0 ? decimals : 0,
+                true,
+            );
+            setPrice(priceToSet);
+
+            if (
+                midPriceRef.current &&
+                (orderInputPriceValue.changeType == 'dragEnd' ||
+                    orderInputPriceValue.changeType == 'obClick')
+            ) {
+                if (orderInputPriceValue.value > midPriceRef.current) {
+                    setTradeDirection('sell');
+                } else {
+                    setTradeDirection('buy');
+                }
+            }
+
+            if (
+                isMidModeActiveRef.current ||
+                orderInputPriceValue.changeType !== 'dragEnd'
+            )
+                return;
+            const orderElem = document.getElementById(
+                'trade-module-price-input-container',
+            );
+            if (orderElem?.classList.contains('pulsed')) return;
+            orderElem?.classList.add('divPulseNeon');
+            orderElem?.classList.add('pulsed');
+            setTimeout(() => {
+                orderElem?.classList.remove('divPulseNeon');
+            }, 800);
+        }
+    }, [orderInputPriceValue.value, usualResolution]);
+
+    // Set direction when price input value changes (already debounced via assignPrice)
+    useEffect(() => {
+        if (
+            !midPriceRef.current ||
+            orderInputPriceValue.changeType !== 'inputChange'
+        ) {
+            return;
+        }
+
+        // Direction change happens immediately since assignPrice already debounced the store update
+        if (
+            orderInputPriceValue.value &&
+            orderInputPriceValue.value > midPriceRef.current!
+        ) {
+            setTradeDirection('sell');
+        } else {
+            setTradeDirection('buy');
+        }
+    }, [orderInputPriceValue.value, orderInputPriceValue.changeType]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');
@@ -1160,10 +1264,18 @@ function OrderInput({
     );
 
     // After mount on client, focus the size input on desktop widths
+    // Skip auto-focus when direction change came from debounced price input typing
     useEffect(() => {
         if (typeof window === 'undefined' || typeof document === 'undefined')
             return;
         if (window.innerWidth <= 768) return; // do not autofocus on mobile
+
+        // Skip auto-focus if direction change came from debounced price input
+        if (directionChangeFromInputRef.current) {
+            directionChangeFromInputRef.current = false;
+            return;
+        }
+
         const el = document.getElementById(
             'trade-module-size-input',
         ) as HTMLInputElement | null;
@@ -2262,9 +2374,11 @@ function OrderInput({
 
     useEffect(() => {
         if (typeof document !== 'undefined') {
-            submitButtonRef.current = document.querySelector(
+            const el = document.querySelector(
                 '[data-testid="submit-order-button"]',
-            ) as HTMLElement | null;
+            );
+            submitButtonRef.current =
+                el instanceof HTMLButtonElement ? el : null;
         }
     }, []);
 
@@ -2532,6 +2646,7 @@ function OrderInput({
                                 disabled={!isDisabled}
                             >
                                 <button
+                                    ref={submitButtonRef}
                                     data-testid='submit-order-button'
                                     className={`${styles.submit_button}`}
                                     style={{

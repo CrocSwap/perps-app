@@ -56,3 +56,28 @@
     align-items: center;
     justify-content: center;
 }
+
+@media (max-width: 768px) {
+    .dataContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--gap-m);
+    }
+
+    .legendContainer {
+        width: auto;
+        align-items: center;
+    }
+
+    .legendItem {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .legendLabel {
+        justify-content: center;
+    }
+}

@@ -61,6 +61,7 @@ function TradeDirection(props: propsIF) {
                     }`}
                     onClick={handleBuyClick}
                     disabled={disableButtons}
+                    aria-pressed={tradeDirection === 'buy'}
                 >
                     {t('transactions.buyLong')}
                 </button>
@@ -72,6 +73,7 @@ function TradeDirection(props: propsIF) {
                     }`}
                     onClick={handleSellClick}
                     disabled={disableButtons}
+                    aria-pressed={tradeDirection === 'sell'}
                 >
                     {t('transactions.sellShort')}
                 </button>
