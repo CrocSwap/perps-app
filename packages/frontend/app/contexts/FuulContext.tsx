@@ -26,6 +26,21 @@ const FuulContext = createContext<FuulContextType>({
     getAffiliateCode: () => Promise.resolve(null),
 });
 
+export interface FuulContextIF {
+    isInitialized: boolean;
+    trackPageView: () => void;
+    sendConversionEvent: (
+        userIdentifier: string,
+        identifierType: UserIdentifierType,
+        eventName: string,
+    ) => Promise<void>;
+    isAffiliateCodeFree: (code: string) => Promise<boolean>;
+    getAffiliateCode: (
+        userIdentifier: string,
+        identifierType: UserIdentifierType,
+    ) => Promise<Affiliate | null>;
+}
+
 export const useFuul = () => {
     const context = useContext(FuulContext);
     if (!context) {
@@ -94,13 +109,15 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
 
     return (
         <FuulContext.Provider
-            value={{
-                isInitialized,
-                trackPageView,
-                sendConversionEvent,
-                isAffiliateCodeFree: Fuul.isAffiliateCodeFree,
-                getAffiliateCode: Fuul.getAffiliateCode,
-            }}
+            value={
+                {
+                    isInitialized,
+                    trackPageView,
+                    sendConversionEvent,
+                    isAffiliateCodeFree: Fuul.isAffiliateCodeFree,
+                    getAffiliateCode: Fuul.getAffiliateCode,
+                } satisfies FuulContextIF
+            }
         >
             {children}
         </FuulContext.Provider>
