@@ -368,7 +368,8 @@
         "chart": "图表",
         "book": "订单簿",
         "recent": "最近",
-        "positions": "持仓"
+        "positions": "持仓",
+        "portfolio": "资产"
     },
     "auth": {
         "login": "登录",

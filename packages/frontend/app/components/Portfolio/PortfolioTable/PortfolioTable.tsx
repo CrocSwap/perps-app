@@ -4,11 +4,10 @@ import Tabs from '~/components/Tabs/Tabs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { WsChannels } from '~/utils/Constants';
-import type { VaultFollowerStateIF } from '~/utils/VaultIFs'; // kept for parity, not used here
+import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 
-// import TwapTable from '../TwapTable/TwapTable';
 import { useApp } from '~/contexts/AppContext';
-import styles from './PortfolioTable.module.css'; // reuse same CSS module
+import styles from './PortfolioTable.module.css';
 import { useDebugStore } from '~/stores/DebugStore';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { t } from 'i18next';
@@ -29,15 +28,55 @@ export interface FilterOption {
 interface PortfolioTablesProps {
     /** If true, the parent renders an external tab switcher and we hide Tabs here */
     mobileExternalSwitcher?: boolean;
+
+    /** Layout mode: 'tabs' = current tabbed behavior, 'stacked' = all sections visible vertically */
+    layout?: 'tabs' | 'stacked';
+
+    /** Which sections to show in stacked mode. If not provided, shows all. */
+    visibleSections?: string[];
+
+    /** Max height for each table in stacked mode (default: 300) */
+    stackedTableHeight?: number;
 }
+
+// Section labels for stacked mode headers
+const SECTION_LABELS: Record<string, { title: string; emptyText: string }> = {
+    'common.balances': { title: 'Balances', emptyText: 'No balances' },
+    'common.positions': { title: 'Positions', emptyText: 'No open positions' },
+    'common.openOrders': { title: 'Open Orders', emptyText: 'No open orders' },
+    'common.tradeHistory': {
+        title: 'Trade History',
+        emptyText: 'No trades yet',
+    },
+    'common.fundingHistory': {
+        title: 'Funding History',
+        emptyText: 'No funding history',
+    },
+    'common.orderHistory': {
+        title: 'Order History',
+        emptyText: 'No order history',
+    },
+    'common.depositsAndWithdrawals': {
+        title: 'Deposits & Withdrawals',
+        emptyText: 'No deposits or withdrawals',
+    },
+};
 
 /**
  * PortfolioTables – a portfolio-only version of TradeTables
  * Tab set: Balances, Positions, Open Orders, Trade History, Order History, Deposits & Withdrawals
- * Excludes: Funding History, Depositors
+ *
+ * Supports two layout modes:
+ * - 'tabs' (default): Traditional tabbed interface
+ * - 'stacked': All sections visible vertically, each with its own scrollable table
  */
 export default function PortfolioTables(props: PortfolioTablesProps) {
-    const { mobileExternalSwitcher } = props;
+    const {
+        mobileExternalSwitcher,
+        layout = 'tabs',
+        visibleSections,
+        stackedTableHeight = 300,
+    } = props;
 
     const filterOptions: FilterOption[] = [
         { id: 'all', label: t('common.all') },
@@ -55,6 +94,8 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
         userFundings,
         userOrders,
     } = useTradeDataStore();
+
+    const { balance } = useUnifiedMarginData();
 
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const { isDebugWalletActive } = useDebugStore();
@@ -74,34 +115,39 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
             'common.balances',
             'common.positions',
             'common.openOrders',
-            // 'common.twap',
             'common.tradeHistory',
-            // 'common.fundingHistory', // intentionally excluded on portfolio
             'common.orderHistory',
             'common.depositsAndWithdrawals',
         ],
         [],
     );
 
+    // Sections to show in stacked mode
+    const stackedSections = useMemo(() => {
+        if (visibleSections && visibleSections.length > 0) {
+            return visibleSections;
+        }
+        return tabs;
+    }, [visibleSections, tabs]);
+
     const allowedTabSet = useMemo(() => new Set(tabs), [tabs]);
 
-    // Ensure default address is restored on portfolio (parity with prior behavior)
+    // Ensure default address is restored on portfolio
     useEffect(() => {
         assignDefaultAddress();
     }, [assignDefaultAddress]);
 
     // If the globally stored tab is not in the Portfolio set, coerce it to Positions
     useEffect(() => {
-        if (!allowedTabSet.has(selectedTradeTab)) {
+        if (layout === 'tabs' && !allowedTabSet.has(selectedTradeTab)) {
             handleTabChange('common.positions');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedTradeTab, allowedTabSet]);
+    }, [selectedTradeTab, allowedTabSet, layout]);
 
     const {
         orderHistoryFetched,
         tradeHistoryFetched,
-        fundingHistoryFetched, // kept for completeness
+        fundingHistoryFetched,
         webDataFetched,
     } = useMemo(() => {
         return {
@@ -114,7 +160,6 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
             ),
             webDataFetched: fetchedChannels.has(WsChannels.WEB_DATA2),
         };
-        // turning the Set into a string to get a stable dep
     }, [Array.from(fetchedChannels).join(',')]);
 
     const handleTabChange = (tab: string) => {
@@ -125,18 +170,9 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
         setSelectedFilter(selectedId);
     };
 
-    const rightAlignedContent = (
-        <div className={styles.tableControls}>
-            <FilterDropdown
-                options={filterOptions}
-                selectedOption={selectedFilter}
-                onChange={handleFilterChange}
-            />
-        </div>
-    );
-
-    const renderTabContent = () => {
-        switch (selectedTradeTab) {
+    // Render a specific table component by key
+    const renderTableByKey = (tabKey: string) => {
+        switch (tabKey) {
             case 'common.balances':
                 return <BalancesTable />;
 
@@ -161,9 +197,6 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
                     />
                 );
 
-            // case 'TWAP':
-            //   return <TwapTable selectedFilter={selectedFilter} />;
-
             case 'common.tradeHistory':
                 return (
                     <TradeHistoryTable
@@ -172,7 +205,6 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
                     />
                 );
 
-            // Funding History is intentionally not exposed on Portfolio, but leaving handler here in case you add it later
             case 'common.fundingHistory':
                 return (
                     <FundingHistoryTable
@@ -205,7 +237,110 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
         }
     };
 
-    // On Portfolio we generally keep tabs visible; still honor external mobile switcher if provided
+    const rightAlignedContent = (
+        <div className={styles.tableControls}>
+            <FilterDropdown
+                options={filterOptions}
+                selectedOption={selectedFilter}
+                onChange={handleFilterChange}
+            />
+        </div>
+    );
+
+    // Get item count for a section
+    const getItemCount = (sectionKey: string): number | null => {
+        switch (sectionKey) {
+            case 'common.balances':
+                return balance ? 1 : 0;
+
+            case 'common.positions':
+                return positions?.length ?? null;
+
+            case 'common.openOrders':
+                return userOrders?.length ?? null;
+
+            case 'common.tradeHistory':
+                return userFills?.length ?? null;
+
+            case 'common.fundingHistory':
+                return userFundings?.length ?? null;
+
+            case 'common.orderHistory':
+                return orderHistory?.length ?? null;
+
+            default:
+                return null;
+        }
+    };
+
+    // Format count text
+    const getCountText = (
+        sectionKey: string,
+        justCount?: boolean,
+    ): string | boolean | null => {
+        const count = getItemCount(sectionKey);
+        if (count === null) return null;
+
+        const labels: Record<string, string> = {
+            'common.positions': count === 1 ? 'position' : 'positions',
+            'common.openOrders': count === 1 ? 'open order' : 'open orders',
+            'common.tradeHistory': count === 1 ? 'trade' : 'trades',
+            'common.fundingHistory': count === 1 ? 'entry' : 'entries',
+            'common.orderHistory': count === 1 ? 'order' : 'orders',
+        };
+        if (justCount) return `${count}`;
+
+        return `${count} ${labels[sectionKey] || 'items'}`;
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // STACKED LAYOUT
+    // ═══════════════════════════════════════════════════════════════════════
+    if (layout === 'stacked') {
+        return (
+            <div className={styles.stackedWrapper}>
+                {stackedSections.map((sectionKey) => {
+                    const sectionInfo = SECTION_LABELS[sectionKey] || {
+                        title: sectionKey,
+                        emptyText: 'No data',
+                    };
+                    const countText = getCountText(sectionKey, true);
+
+                    return (
+                        <div key={sectionKey} className={styles.stackedSection}>
+                            <div className={styles.stackedSectionHeader}>
+                                <h3 className={styles.stackedSectionTitle}>
+                                    {sectionInfo.title}
+                                    {countText !== null
+                                        ? ` (${countText})`
+                                        : ''}
+                                    {/* ({' '}
+                                    <p
+                                        className={
+                                            styles.stackedSectionSubtitle
+                                        }
+                                    >
+                                        {countText}
+                                    </p>
+                                    ) */}
+                                </h3>
+                            </div>
+                            <div
+                                className={styles.stackedSectionContent}
+                                style={{ height: stackedTableHeight }}
+                            >
+                                {renderTableByKey(sectionKey)}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // TABS LAYOUT (default)
+    // ═══════════════════════════════════════════════════════════════════════
     const showTabs = !(isMobile && mobileExternalSwitcher);
 
     return (
@@ -236,7 +371,7 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
             >
-                {renderTabContent()}
+                {renderTableByKey(selectedTradeTab)}
             </motion.div>
         </div>
     );

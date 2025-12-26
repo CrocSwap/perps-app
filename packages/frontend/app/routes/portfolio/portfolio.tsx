@@ -1,4 +1,5 @@
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import { useModal } from '~/hooks/useModal';
@@ -8,13 +9,14 @@ import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
 import { usePortfolioModals } from './usePortfolioModals';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import useOutsideClick from '~/hooks/useOutsideClick';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import {
-    PiCaretCircleDoubleDownLight,
-    PiCaretCircleDoubleUpLight,
-} from 'react-icons/pi';
+    IoArrowUp,
+    IoArrowDown,
+    IoChevronForward,
+    IoChevronBack,
+} from 'react-icons/io5';
 import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTable';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 import { Resizable, type NumberSize } from 're-resizable';
@@ -38,7 +40,7 @@ function Portfolio() {
 
     const { portfolioPanelHeight, setPortfolioPanelHeight } = useAppSettings();
 
-    // Don't render until we've read from localStorage
+    // Hydration state
     const [isHydrated, setIsHydrated] = useState(false);
     const [isLayoutReady, setIsLayoutReady] = useState(false);
 
@@ -50,13 +52,11 @@ function Portfolio() {
             return;
         }
 
-        // If already hydrated
         if (persist.hasHydrated?.()) {
             setIsHydrated(true);
             return;
         }
 
-        // Wait for hydration
         const unsub = persist.onFinishHydration?.(() => {
             setIsHydrated(true);
         });
@@ -71,9 +71,8 @@ function Portfolio() {
     const startRef = useRef(panelHeight);
     const hasInitialized = useRef(false);
 
-    // Compute maxTop so the table never shrinks below TABLE_MIN
     useLayoutEffect(() => {
-        if (!isHydrated || hasInitialized.current) return; // Wait for hydration first, only run once
+        if (!isHydrated || hasInitialized.current) return;
         const el = mainRef.current;
         if (!el) return;
         const gap =
@@ -86,7 +85,6 @@ function Portfolio() {
         const computed = Math.max(PANEL_MIN, total - TABLE_MIN - gap);
         setMaxTop(computed);
 
-        // Set initial height from store, clamped to bounds
         hasInitialized.current = true;
         const storeValue = portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT;
         const clamped = Math.max(PANEL_MIN, Math.min(storeValue, computed));
@@ -94,7 +92,6 @@ function Portfolio() {
         setIsLayoutReady(true);
     }, [isHydrated, portfolioPanelHeight]);
 
-    // WHEN LAYOUT CHANGES (maxTop on window resize), clamp LOCAL state to respect bounds
     useEffect(() => {
         if (maxTop === null || !hasInitialized.current) return;
         setPanelHeight((prev) => {
@@ -104,11 +101,11 @@ function Portfolio() {
     }, [maxTop]);
 
     const { portfolio, formatCurrency, userData } = usePortfolioManager();
-    const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
-    const [mobileView, setMobileView] = useState<'performance' | 'table'>(
-        'performance',
-    );
-    const { currency } = useNumFormatter();
+    const { formatNum } = useNumFormatter();
+    const location = useLocation();
+
+    // Check if we're on the transactions sub-route (mobile only)
+    const isTransactionsView = location.pathname.includes('/transactions');
 
     const {
         openDepositModal,
@@ -118,83 +115,133 @@ function Portfolio() {
     } = usePortfolioModals();
 
     const feeScheduleModalCtrl = useModal('closed');
-    const mobileActionMenuButtonRef = useRef<HTMLButtonElement>(null);
-    const mobileActionMenuRef = useOutsideClick<HTMLDivElement>((event) => {
-        const target = event.target as HTMLElement;
-        if (mobileActionMenuButtonRef.current?.contains(target)) return;
-        setIsMobileActionMenuOpen(false);
-    }, isMobileActionMenuOpen);
 
-    // Don't render anything until store has hydrated
+    // Extract user stats from leaderboard data (same as PerformancePanel)
+    const userStats = userData?.data?.leaderboard?.[0];
+
+    // Format stats the same way as PerformancePanel
+    const pnlFormatted = userStats?.pnl
+        ? formatNum(userStats.pnl, 2, true, true)
+        : '$0.00';
+    const volumeFormatted = userStats?.volume
+        ? formatNum(userStats.volume, 2, true, true)
+        : '$0.00';
+    const maxDrawdownFormatted = userStats?.maxDrawdown
+        ? formatNum(userStats.maxDrawdown, 2)
+        : '0.00%';
+    const totalEquityFormatted = userStats?.account_value
+        ? formatNum(userStats.account_value, 2, true, true)
+        : '$0.00';
+    const accountEquityFormatted = userStats?.account_value
+        ? formatNum(userStats.account_value, 2, true, true)
+        : '$0.00';
+    const vaultEquityFormatted = userStats?.vaultEquity
+        ? formatNum(userStats.vaultEquity)
+        : '$0.00';
+
+    // Calculate PNL percentage for display
+    const totalValue = portfolio.balances.contract + portfolio.balances.wallet;
+    const pnlValue = userStats?.pnl ?? 0;
+    const pnlPercent = totalValue > 0 ? (pnlValue / totalValue) * 100 : 0;
+    const isPnlPositive = pnlValue >= 0;
+
     if (!isHydrated) {
         return null;
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // MOBILE TOP - HERO CARD ONLY
+    // ═══════════════════════════════════════════════════════════════════════
     const mobileTop = (
         <section className={styles.mobileTop}>
-            <div className={styles.detailsContent}>
-                <h6>Vol(14d)</h6>
-                <h3>{currency(portfolio.tradingVolume.biWeekly, true)}</h3>
+            {/* Hero Card - Net Value */}
+            <div className={styles.mobileHeroCard}>
+                <div className={styles.heroLabel}>Total Net Value</div>
+                <div className={styles.heroValue}>
+                    {formatCurrency(totalValue)}
+                </div>
                 <div
-                    className={styles.view_detail_clickable}
-                    onClick={() => console.log('viewing volume')}
+                    className={`${styles.heroPnl} ${isPnlPositive ? styles.positive : styles.negative}`}
                 >
-                    View volume
+                    <span className={styles.heroPnlIcon}>
+                        {isPnlPositive ? <IoArrowUp /> : <IoArrowDown />}
+                    </span>
+                    {formatCurrency(Math.abs(pnlValue))} (
+                    {isPnlPositive ? '+' : ''}
+                    {pnlPercent.toFixed(2)}%)
+                </div>
+
+                {/* Balance breakdown inside hero */}
+                <div className={styles.heroBalances}>
+                    <div className={styles.heroBalanceItem}>
+                        <span className={styles.heroBalanceLabel}>
+                            Contract
+                        </span>
+                        <span className={styles.heroBalanceValue}>
+                            {formatCurrency(portfolio.balances.contract)}
+                        </span>
+                    </div>
+                    <div className={styles.heroBalanceDivider} />
+                    <div className={styles.heroBalanceItem}>
+                        <span className={styles.heroBalanceLabel}>Wallet</span>
+                        <span className={styles.heroBalanceValue}>
+                            {formatCurrency(portfolio.balances.wallet)}
+                        </span>
+                    </div>
+                    <div className={styles.heroBalanceDivider} />
+                    <div className={styles.heroBalanceItem}>
+                        <span className={styles.heroBalanceLabel}>Fees</span>
+                        <span className={styles.heroBalanceValue}>0.00%</span>
+                    </div>
                 </div>
             </div>
-            <div className={styles.detailsContent}>
-                <h6>Fees (Taker / Maker)</h6>
-                <h3>
-                    {portfolio.fees.taker}% / {portfolio.fees.maker}%
-                </h3>
-                <div
-                    className={styles.view_detail_clickable}
-                    style={{ visibility: 'hidden' }}
-                    onClick={() => feeScheduleModalCtrl.open()}
-                >
-                    View fee schedule
-                </div>
-            </div>
-            <div
-                className={`${styles.detailsContent} ${styles.netValueMobile}`}
-            >
-                <h6>Total USD Val</h6>
-                <h3>
-                    {currency(
-                        portfolio.balances.contract + portfolio.balances.wallet,
-                        true,
-                    )}
-                </h3>
-            </div>
-            <button
-                ref={mobileActionMenuButtonRef}
-                onClick={() => setIsMobileActionMenuOpen((v) => !v)}
-                className={styles.actionMenuButton}
-            >
-                {!isMobileActionMenuOpen ? (
-                    <PiCaretCircleDoubleDownLight size={24} />
-                ) : (
-                    <PiCaretCircleDoubleUpLight size={24} />
-                )}
-            </button>
-            {isMobileActionMenuOpen && (
-                <div
-                    className={styles.mobileActionMenuContainer}
-                    ref={mobileActionMenuRef}
-                >
-                    <SimpleButton onClick={openDepositModal} bg='accent1'>
-                        Deposit
-                    </SimpleButton>
-                    <SimpleButton
-                        onClick={openWithdrawModal}
-                        bg='dark3'
-                        hoverBg='accent1'
-                    >
-                        Withdraw
-                    </SimpleButton>
-                </div>
-            )}
         </section>
+    );
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // MOBILE STATS - Rendered at bottom
+    // ═══════════════════════════════════════════════════════════════════════
+    const mobileStatsSection = (
+        <div className={styles.mobileStats}>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>PNL</span>
+                <span
+                    className={`${styles.mobileStatValue} ${pnlValue >= 0 ? styles.positive : styles.negative}`}
+                >
+                    {pnlFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Volume</span>
+                <span className={styles.mobileStatValue}>
+                    {volumeFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Max Drawdown</span>
+                <span className={styles.mobileStatValue}>
+                    {maxDrawdownFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Total Equity</span>
+                <span className={styles.mobileStatValue}>
+                    {totalEquityFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Account Equity</span>
+                <span className={styles.mobileStatValue}>
+                    {accountEquityFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Vault Equity</span>
+                <span className={styles.mobileStatValue}>
+                    {vaultEquityFormatted}
+                </span>
+            </div>
+        </div>
     );
 
     return (
@@ -216,11 +263,34 @@ function Portfolio() {
                     }}
                 />
                 <WebDataConsumer />
-                <header>Portfolio</header>
+
+                {/* Header - changes on mobile transactions view */}
+                {isTransactionsView ? (
+                    <header className={styles.mobileTransactionsHeader}>
+                        <Link to='/v2/portfolio' className={styles.backLink}>
+                            <IoChevronBack />
+                            <span className={styles.breadcrumb}>
+                                <span className={styles.breadcrumbParent}>
+                                    Portfolio
+                                </span>
+                                <span className={styles.breadcrumbSeparator}>
+                                    &gt;
+                                </span>
+                                <span className={styles.breadcrumbCurrent}>
+                                    Transactions
+                                </span>
+                            </span>
+                        </Link>
+                    </header>
+                ) : (
+                    <header>Portfolio</header>
+                )}
 
                 <div className={styles.column}>
+                    {/* Mobile Hero Section */}
                     {mobileTop}
 
+                    {/* Desktop Details Container */}
                     <div className={styles.detailsContainer}>
                         <div className={styles.detailsContent}>
                             <h6>Fees</h6>
@@ -240,21 +310,13 @@ function Portfolio() {
                             className={`${styles.detailsContent} ${styles.netValueMobile}`}
                         >
                             <h6>Total Net USD Value</h6>
-                            <h3>
-                                {formatCurrency(
-                                    portfolio.balances.contract +
-                                        portfolio.balances.wallet,
-                                )}
-                            </h3>
+                            <h3>{formatCurrency(totalValue)}</h3>
                         </div>
 
                         <div className={styles.totalNetDisplay}>
                             <h6>
                                 <span>Total Net USD Value:</span>{' '}
-                                {formatCurrency(
-                                    portfolio.balances.contract +
-                                        portfolio.balances.wallet,
-                                )}
+                                {formatCurrency(totalValue)}
                             </h6>
                             <div className={styles.buttonContainer}>
                                 <div className={styles.rowButton}>
@@ -282,22 +344,6 @@ function Portfolio() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Mobile toggle buttons */}
-                    <div className={styles.mobileToggle}>
-                        <button
-                            className={`${styles.toggleButton} ${mobileView === 'performance' ? styles.active : ''}`}
-                            onClick={() => setMobileView('performance')}
-                        >
-                            Performance
-                        </button>
-                        <button
-                            className={`${styles.toggleButton} ${mobileView === 'table' ? styles.active : ''}`}
-                            onClick={() => setMobileView('table')}
-                        >
-                            Positions
-                        </button>
                     </div>
 
                     <section
@@ -341,7 +387,6 @@ function Portfolio() {
                                     setPanelHeight(next);
                                 }}
                                 onResizeStop={() => {
-                                    // Persist only on user action
                                     setPortfolioPanelHeight(panelHeight);
                                 }}
                             >
@@ -366,27 +411,85 @@ function Portfolio() {
                             </section>
                         </div>
 
-                        {/* Mobile: Toggle between views */}
+                        {/* Mobile: Conditional content based on route */}
                         <div className={styles.mobileViewContainer}>
-                            {mobileView === 'performance' ? (
+                            {isTransactionsView ? (
+                                /* Transactions View - All stacked tables */
                                 <section
-                                    style={{
-                                        height: '100%',
-                                        overflow: 'visible',
-                                    }}
+                                    className={styles.mobileTransactionsContent}
                                 >
-                                    {isLayoutReady && (
-                                        <MemoizedPerformancePanel
-                                            userData={userData}
-                                            panelHeight={panelHeight}
-                                            isMobile={true}
-                                        />
-                                    )}
+                                    <PortfolioTables
+                                        layout='stacked'
+                                        visibleSections={[
+                                            'common.positions',
+                                            'common.openOrders',
+                                            'common.balances',
+                                            'common.tradeHistory',
+                                            'common.orderHistory',
+                                            'common.depositsAndWithdrawals',
+                                        ]}
+                                        stackedTableHeight={250}
+                                    />
                                 </section>
                             ) : (
-                                <section className={styles.table}>
-                                    <PortfolioTables />
-                                </section>
+                                /* Default Portfolio View */
+                                <>
+                                    <section
+                                        style={{
+                                            height: '100%',
+                                            overflow: 'visible',
+                                        }}
+                                    >
+                                        {isLayoutReady && (
+                                            <MemoizedPerformancePanel
+                                                userData={userData}
+                                                panelHeight={panelHeight}
+                                                isMobile={true}
+                                            />
+                                        )}
+                                    </section>
+                                    {/* Mobile Stats */}
+                                    {mobileStatsSection}
+                                    {/* Mobile Action Buttons */}
+                                    <div className={styles.mobileActions}>
+                                        <button
+                                            className={`${styles.mobileActionBtn} ${styles.primary}`}
+                                            onClick={openDepositModal}
+                                        >
+                                            Deposit
+                                        </button>
+                                        <button
+                                            className={`${styles.mobileActionBtn} ${styles.secondary}`}
+                                            onClick={openWithdrawModal}
+                                        >
+                                            Withdraw
+                                        </button>
+                                    </div>
+
+                                    {/* Stacked Tables - right under performance */}
+                                    <section
+                                        className={styles.mobileStackedTables}
+                                    >
+                                        <PortfolioTables
+                                            layout='stacked'
+                                            visibleSections={[
+                                                'common.positions',
+                                                'common.openOrders',
+                                                'common.balances',
+                                            ]}
+                                            stackedTableHeight={180}
+                                        />
+                                    </section>
+
+                                    {/* View All History - right under tables */}
+                                    <Link
+                                        to='/v2/portfolio/transactions'
+                                        className={styles.viewAllHistoryLink}
+                                    >
+                                        <span>View All History</span>
+                                        <IoChevronForward />
+                                    </Link>
+                                </>
                             )}
                         </div>
                     </section>

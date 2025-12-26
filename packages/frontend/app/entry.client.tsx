@@ -169,6 +169,14 @@ const router = createBrowserRouter([
                 },
             },
             {
+                path: 'v2/portfolio/transactions',
+                lazy: async () => {
+                    const { default: Component } =
+                        await import('./routes/portfolio/portfolio');
+                    return { Component };
+                },
+            },
+            {
                 path: 'v2/referrals',
                 lazy: async () => {
                     const { default: Component } =

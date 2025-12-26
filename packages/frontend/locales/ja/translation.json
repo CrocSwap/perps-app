@@ -368,7 +368,8 @@
         "chart": "チャート",
         "book": "注文板",
         "recent": "最新",
-        "positions": "ポジション"
+        "positions": "ポジション",
+        "portfolio": "ポートフォリオ"
     },
     "auth": {
         "login": "ログイン",

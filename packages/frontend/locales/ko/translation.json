@@ -368,7 +368,8 @@
         "chart": "차트",
         "book": "오더북",
         "recent": "최근",
-        "positions": "포지션"
+        "positions": "포지션",
+        "portfolio": "포트폴리오"
     },
     "auth": {
         "login": "로그인",

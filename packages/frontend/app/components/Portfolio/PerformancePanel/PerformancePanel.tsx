@@ -33,7 +33,7 @@ export default function PerformancePanel({
     panelHeight,
     isMobile,
 }: PerformancePanelProps) {
-    const [activeTab, setActiveTab] = useState('');
+    const [activeTab, setActiveTab] = useState('Performance');
     const chartStageRef = useRef<HTMLDivElement>(null);
 
     const { formatNum } = useNumFormatter();

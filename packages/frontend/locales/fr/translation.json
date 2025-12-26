@@ -368,7 +368,8 @@
         "chart": "Graphique",
         "book": "Carnet d'ordres",
         "recent": "Récent",
-        "positions": "Positions"
+        "positions": "Positions",
+        "portfolio": "Portefeuille"
     },
     "auth": {
         "login": "Connexion",

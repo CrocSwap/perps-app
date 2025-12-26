@@ -26,6 +26,10 @@ export interface TabChartContext {
     isMobile?: boolean;
 }
 
+// Increased mobile chart height to show full content including labels
+const MOBILE_CHART_HEIGHT = 280;
+const MOBILE_CHART_WIDTH_PADDING = 32;
+
 const TabChartContext: React.FC<TabChartContext> = (props) => {
     const {
         activeTab,
@@ -133,70 +137,6 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         activeTab,
     ]);
 
-    // // Initial dimension calculation using useLayoutEffect for synchronous measurement
-    // useLayoutEffect(() => {
-    //     const container = containerRef.current;
-    //     if (!container) return;
-
-    //     const compute = () => {
-    //         const h = container.clientHeight;
-    //         const w = container.clientWidth;
-    //         const isMobile = window.innerWidth <= 768;
-    //         const minH = 100;
-
-    //         if (w > 0 && h > 0) {
-    //             setChartWidth(Math.max(w - (isMobile ? 40 : 50), 250));
-    //             const available = h - (isMobile ? 60 : 80);
-    //             setChartHeight(Math.max(available, minH));
-    //             setIsChartReady(true);
-    //             return true;
-    //         }
-    //         return false;
-    //     };
-
-    //     // Try until container has non-zero size
-    //     let raf = 0;
-    //     const tick = () => {
-    //         if (!compute()) raf = requestAnimationFrame(tick);
-    //     };
-    //     tick();
-
-    //     return () => cancelAnimationFrame(raf);
-    // }, [activeTab, panelHeight]); // re-evaluate on tab change and when splitter moves
-
-    // Track window and container resize separately
-    // useEffect(() => {
-    //     const container = containerRef.current;
-    //     if (!container) return;
-
-    //     const update = () => {
-    //         const h = container.clientHeight;
-    //         const w = container.clientWidth;
-    //         const isMobile = window.innerWidth <= 768;
-    //         const minH = 100;
-
-    //         if (w > 0 && h > 0) {
-    //             setChartWidth(Math.max(w - (isMobile ? 40 : 50), 250));
-    //             const available = h - (isMobile ? 60 : 80);
-
-    //             setChartHeight(Math.max(available, minH));
-    //             setIsChartReady(true);
-    //         }
-    //     };
-
-    //     const ro = new ResizeObserver(update);
-    //     ro.observe(container);
-    //     // window.addEventListener('resize', update);
-
-    //     // one immediate kick
-    //     update();
-
-    //     return () => {
-    //         ro.disconnect();
-    //         // window.removeEventListener('resize', update);
-    //     };
-    // }, []);
-
     useEffect(() => {
         window.addEventListener('resize', calculatePanelHeight);
 
@@ -207,9 +147,20 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
 
     useEffect(() => {
         calculatePanelHeight();
-    }, [panelHeight]);
+    }, [panelHeight, isMobile]);
 
     const calculatePanelHeight = useCallback(() => {
+        const isMobileView = isMobile || window.innerWidth <= 768;
+
+        if (isMobileView) {
+            setChartWidth(
+                Math.max(window.innerWidth - MOBILE_CHART_WIDTH_PADDING, 250),
+            );
+            setChartHeight(MOBILE_CHART_HEIGHT);
+            setIsChartReady(true);
+            return;
+        }
+
         if (panelHeightRef.current === undefined) return;
 
         const header = document.getElementById('portfolio-header-container');
@@ -250,20 +201,23 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                     ),
                 ),
             );
-        } else if (window.innerWidth <= 768) {
-            setChartWidth(Math.max(window.innerWidth, 250));
         } else {
             setChartWidth(Math.min(950, Math.max(headerWidth, 250)));
         }
 
         setChartHeight(calculatedChartHeight);
         setIsChartReady(true);
-    }, []);
+    }, [isMobile]);
 
     return (
         <div
             ref={containerRef}
-            style={{ width: '100%', height: '100%', overflow: 'visible' }}
+            style={{
+                width: '100%',
+                height: isMobile ? 'auto' : '100%',
+                minHeight: isMobile ? `${MOBILE_CHART_HEIGHT}px` : undefined,
+                overflow: 'visible',
+            }}
         >
             {isChartReady && chartWidth && chartHeight && (
                 <>

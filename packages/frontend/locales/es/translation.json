@@ -368,7 +368,8 @@
         "chart": "Gráfico",
         "book": "Libro de órdenes",
         "recent": "Reciente",
-        "positions": "Posiciones"
+        "positions": "Posiciones",
+        "portfolio": "Cartera"
     },
     "auth": {
         "login": "Iniciar sesión",

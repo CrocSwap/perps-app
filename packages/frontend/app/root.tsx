@@ -269,6 +269,8 @@ export default function App() {
     const { wsEnvironment } = useDebugStore();
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
+    const isPortfolioPage = location.pathname.includes('portfolio');
+    const noPaddingPages = isHomePage || isPortfolioPage;
     const restrictedSiteModal = useModal('closed');
     const { t } = useTranslation();
 
