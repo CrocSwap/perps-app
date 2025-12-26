@@ -55,6 +55,8 @@ type TradeDataStore = UserTradeDataStore & {
     isMidModeActive: boolean;
     isPreviewOrderHovered: boolean;
     setIsPreviewOrderHovered: (isHovered: boolean) => void;
+    highlightedTradeOid: number | null;
+    setHighlightedTradeOid: (oid: number | null) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -171,6 +173,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             isPreviewOrderHovered: false,
             setIsPreviewOrderHovered: (isHovered: boolean) =>
                 set({ isPreviewOrderHovered: isHovered }),
+            highlightedTradeOid: null,
+            setHighlightedTradeOid: (oid: number | null) =>
+                set({ highlightedTradeOid: oid }),
         }),
         {
             name: 'TRADE_DATA',

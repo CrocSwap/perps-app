@@ -432,6 +432,13 @@ export const TradingViewProvider: React.FC<{
         // });
 
         tvWidget.onChartReady(() => {
+            tvWidget.subscribe('onMarkClick', (markId: number) => {
+                const { setSelectedTradeTab, setHighlightedTradeOid } =
+                    useTradeDataStore.getState();
+                setSelectedTradeTab('common.tradeHistory');
+                setHighlightedTradeOid(markId);
+            });
+
             /**
              * 0 -> main chart pane
              * 1 -> volume chart pane
