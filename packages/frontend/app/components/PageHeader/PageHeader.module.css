@@ -112,7 +112,7 @@
 }
 
 .activeNavLink {
-    color: var(--text1) !important;
+    color: var(--accent1) !important;
 }
 
 .rightSide {

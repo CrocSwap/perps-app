@@ -289,8 +289,14 @@ body {
         box-sizing: border-box; /* Important! */
     }
     .symbolInfoContainer {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        z-index: 150;
         border-radius: var(--radius-m, 16px);
         background: var(--bg-dark2, #111117);
+        padding: var(--padding-s);
     }
 
     .container {
