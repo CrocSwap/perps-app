@@ -25,6 +25,7 @@ export default function OptionLineSelect(props: propsIF) {
 
     const triggerRef = useRef<HTMLButtonElement>(null);
     const firstOptionRef = useRef<HTMLButtonElement>(null);
+    const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
     const prevIsOpenRef = useRef<boolean>(false);
     // logic to close the dropdown
     // using `isOpen` in gatekeeping and dependencies seem to speed it up
@@ -108,7 +109,10 @@ export default function OptionLineSelect(props: propsIF) {
                             <button
                                 type='button'
                                 key={i}
-                                ref={i === 0 ? firstOptionRef : undefined}
+                                ref={(el) => {
+                                    optionRefs.current[i] = el;
+                                    if (i === 0) firstOptionRef.current = el;
+                                }}
                                 onClick={() => {
                                     o.set();
                                     setIsOpen(false);
@@ -118,6 +122,21 @@ export default function OptionLineSelect(props: propsIF) {
                                         setIsOpen(false);
                                         e.preventDefault();
                                         e.stopPropagation();
+                                    }
+                                    if (e.key === 'ArrowDown') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const nextIndex =
+                                            (i + 1) % options.length;
+                                        optionRefs.current[nextIndex]?.focus();
+                                    }
+                                    if (e.key === 'ArrowUp') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const prevIndex =
+                                            (i - 1 + options.length) %
+                                            options.length;
+                                        optionRefs.current[prevIndex]?.focus();
                                     }
                                 }}
                                 role='option'

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, {
     useEffect,
     useMemo,
@@ -19,7 +20,11 @@ interface PerformancePanelProps {
     isMobile: boolean;
 }
 
-const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
+const AVAILABLE_TABS = [
+    'portfolio.performance',
+    'portfolio.accountValue',
+    'portfolio.collateral',
+];
 
 const animationConfig = {
     initial: { opacity: 0 },
@@ -33,6 +38,7 @@ export default function PerformancePanel({
     panelHeight,
     isMobile,
 }: PerformancePanelProps) {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('');
     const chartStageRef = useRef<HTMLDivElement>(null);
 
@@ -68,12 +74,12 @@ export default function PerformancePanel({
         : '$0.00';
 
     const PERFORMANCE_METRICS = [
-        { label: 'PNL', value: pnlFormatted },
-        { label: 'Volume', value: volumeFormatted },
-        { label: 'Max Drawdown', value: maxDrawdownFormatted },
-        { label: 'Total Equity', value: totalEquityFormatted },
-        { label: 'Account Equity', value: accountEquityFormatted },
-        { label: 'Vault Equity', value: vaultEquityFormatted },
+        { label: t('portfolio.pnl'), value: pnlFormatted },
+        { label: t('portfolio.volume'), value: volumeFormatted },
+        { label: t('portfolio.maxDrawdown'), value: maxDrawdownFormatted },
+        { label: t('portfolio.totalEquity'), value: totalEquityFormatted },
+        { label: t('portfolio.accountEquity'), value: accountEquityFormatted },
+        { label: t('portfolio.vaultEquity'), value: vaultEquityFormatted },
     ];
 
     const MetricsDisplay = React.memo(() => (
@@ -102,7 +108,7 @@ export default function PerformancePanel({
     useEffect(() => {
         // Initialize tab as empty, then change to Performance after 2 seconds
         const timer = setTimeout(() => {
-            setActiveTab('Performance');
+            setActiveTab('portfolio.performance');
         }, 2000);
 
         return () => clearTimeout(timer);
@@ -129,12 +135,12 @@ export default function PerformancePanel({
     const [selectedVault, setSelectedVault] = useState<{
         label: string;
         value: string;
-    }>({ label: 'Perps', value: 'perp' });
+    }>({ label: t('portfolio.perps'), value: 'perp' });
 
     const [selectedPeriod, setSelectedPeriod] = useState<{
         label: string;
         value: string;
-    }>({ label: 'All-time', value: 'AllTime' });
+    }>({ label: t('portfolio.allTime'), value: 'AllTime' });
 
     const TabContent_ = !activeTab ? (
         LoadingContent

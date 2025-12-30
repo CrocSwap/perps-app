@@ -21,6 +21,8 @@
         "submit": "제출",
         "quantity": "수량",
         "confirm": "확인",
+        "send": "보내기",
+        "address": "주소",
         "amount": "금액",
         "max": "최대",
         "min": "최소",
@@ -31,11 +33,12 @@
         "fundingHistory": "펀딩 내역",
         "orderHistory": "주문 내역",
         "depositsAndWithdrawals": "입출금",
+        "depositors": "입금자",
         "twap": "TWAP",
         "all": "전체",
         "active": "활성",
-        "long": "롱",
-        "short": "숏",
+        "long": "Long",
+        "short": "Short",
         "create": "생성",
         "update": "업데이트",
         "reset": "초기화",
@@ -147,6 +150,7 @@
         "midButton": "MID",
         "positionClosed": "포지션 종료됨",
         "successfullyClosedPosition": "{{usdValueOfOrderStr}}의 {{symbol}} 포지션 종료 성공",
+        "tpSlForPosition": "TP/SL for Position",
         "failedToClosePosition": "포지션 종료 실패",
         "transactionTimedOut": "{{timeInSeconds}}초 후 거래 시간 초과",
         "txFailedOrNotConfirmed": "거래 실패 또는 미확인",
@@ -295,13 +299,21 @@
         "tradeValue": "거래 금액",
         "fee": "수수료",
         "closedPnl": "종료된 PnL",
-        "reduceOnly": "Reduce Only",
+        "depositor": "예치자",
+        "vaultAmount": "볼트 금액",
+        "unrealizedPnl": "미실현 PnL",
+        "allTimePnl": "누적 PnL",
+        "daysFollowing": "팔로잉 일수",
+        "completed": "완료됨",
+        "withdrawal": "출금",
+        "spotTransfer": "스팟 이체",
+        "reduceOnly": "포지션 감소 전용",
         "triggerConditions": "트리거 조건",
         "tpsl": "TP/SL",
         "status": "상태",
         "order": "주문",
-        "long": "롱",
-        "short": "숏",
+        "long": "Long",
+        "short": "Short",
         "noOpenPositions": "오픈 포지션 없음",
         "noOpenPositionsForMarket": "{{symbol}} 오픈 포지션 없음",
         "noOpenLongPositions": "롱 오픈 포지션 없음",
@@ -335,10 +347,14 @@
         "noLongFundingHistory": "롱 펀딩 내역 없음",
         "noShortFundingHistory": "숏 펀딩 내역 없음",
         "fundingHistory": "전체: {{allTime}} 변경 후: {{sinceChange}}",
+        "positionSide": "포지션 방향",
+        "payment": "결제",
+        "rate": "비율",
         "openLong": "롱 오픈",
         "openShort": "숏 오픈",
         "closeLong": "롱 종료",
-        "closeShort": "숏 종료"
+        "closeShort": "숏 종료",
+        "goToMarket": "{{coin}} 마켓으로 이동"
     },
     "time": {
         "second": "초",
@@ -408,8 +424,27 @@
         "rewardsEarned": "획득한 보상",
         "rewardHistory": "보상 내역",
         "enterCode": "코드 입력",
-        "claim": "요청하기",
-        "createCode": "코드 생성"
+        "createCode": "코드 생성",
+        "usingAffiliateCode": "제휴 코드 사용 중",
+        "overwriteCurrentReferralCode": "현재 추천 코드 덮어쓰기",
+        "enterReferralCode": "추천 코드 입력",
+        "referralCodeNotValidPleaseConfirm": "코드 <0>{{invalidCode}}</0>는 추천 프로그램에 등록되지 않았습니다. 코드가 정확한지 확인해 주세요.",
+        "yourCodeIs": "귀하의 코드는 지갑 주소의 첫 6글자를 기반으로 한 <0>{{affiliateCode}}</0>입니다. 추천 시스템에 이 코드를 등록하려면 '활성화'를 클릭하세요.",
+        "createAnAffiliateCode": "제휴 코드 생성",
+        "createAUniqueCodeToEarn": "추천된 사용자의 수수료 10%를 적립하려면 고유 코드를 생성하세요.",
+        "codeAlreadyInUse": "이미 사용 중인 코드",
+        "connectYourWallet": {
+            "affiliate": "제휴 코드를 생성하려면 지갑을 연결하세요",
+            "claim": "보상을 청구하려면 지갑을 연결하세요",
+            "enterCode": "추천 코드를 입력하려면 지갑을 연결하세요"
+        },
+        "usersWithTradingVolume": "이 코드는 거래량이 100만 달러에 도달한 후 사용자가 맞춤 설정하거나 업데이트할 수 있습니다.",
+        "doNotSelfRefer": "코드 <0>{{affiliateCode}}</0>는 생성된 주소와 동일한 주소로 등록할 수 없습니다. 다른 코드를 선택해 주세요.",
+        "toCustomizeAffiliateCode": "제휴 코드는 기본적으로 지갑 주소의 첫 6글자로 설정됩니다. 거래량이 100만 달러 이상인 사용자는 제휴 코드를 맞춤 설정할 수 있습니다.",
+        "claimRewardsWithAmount": "{{amount}} 보상 청구",
+        "selectATabToViewData": "데이터를 보려면 탭을 선택하세요",
+        "trackingLinkExplanation": "추천된 사용자의 수수료 <0>{{affiliatePercent}}</0>를 받게 되며, 해당 사용자는 <1>{{userPercent}}</1> 할인을 받게 됩니다.",
+        "claim": "요청하기"
     },
     "deposit": {
         "prompt": "Fogo에서 {{token}} 입금하기",
@@ -510,13 +545,15 @@
     },
     "leverage": {
         "title": "레버리지 조정",
-        "closePositionPrompt": "최소 레버리지를 낮추려면 포지션을 먼저 종료해 주세요"
+        "closePositionPrompt": "최소 레버리지를 낮추려면 포지션을 먼저 종료해 주세요",
+        "adjustLeverage": "레버리지 조정, 현재 {{value}}배"
     },
     "share": {
         "prompt": "텍스트 편집",
         "xCTA": "𝕏에 공유",
         "copyLinkCTA": "링크 복사",
-        "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요"
+        "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요",
+        "sharePosition": "PnL {{pnl}} 포지션 공유"
     },
     "colors": {
         "default": "기본",
@@ -531,6 +568,11 @@
         "depositInput": "입금 입력란",
         "addressInput": "주소 입력란",
         "amountInput": "금액 입력란",
+        "expandWallet": "지갑 확장",
+        "collapseWallet": "지갑 축소",
+        "priceInput": "가격 입력란",
+        "sizeInput": "수량 입력란",
+        "stopPriceInput": "스톱 가격 입력란",
         "withdrawInput": "출금 입력란",
         "scrollTabsLeft": "탭 왼쪽으로 스크롤",
         "scrollTabsRight": "탭 오른쪽으로 스크롤",
@@ -562,7 +604,28 @@
         "toggleTPSL": "TP/SL 전환",
         "editTPSL": "TP/SL 편집",
         "toggleConfigureAmount": "금액 설정 전환",
-        "toggleLimitPrice": "지정가 전환"
+        "toggleLimitPrice": "지정가 전환",
+        "setMaxAmount": "최대 금액 설정",
+        "rowsPerPage": "페이지당 행 수",
+        "closeModal": "모달 닫기",
+        "goToHome": "홈으로 이동",
+        "spotTradingOpensNewTab": "Ambient v1 현물 거래 (새 탭에서 열기)",
+        "moreOptions": "더 보기",
+        "notifications": "알림",
+        "transferAmount": "송금 금액",
+        "viewOnExplorerNewTab": "탐색기에서 보기 (새 탭에서 열기)",
+        "externalLinkOpensNewTab": "{{linkText}} (새 탭에서 열기)",
+        "opensInNewTab": "(새 탭에서 열기)",
+        "selectTokenCurrent": "토큰 선택, 현재: {{symbol}}",
+        "mobileTradeNavigation": "거래 내비게이션",
+        "takeProfitPrice": "익절 가격",
+        "expectedGain": "예상 수익",
+        "toggleGainCurrency": "수익 통화를 달러와 퍼센트 간 전환",
+        "stopLossPrice": "손절 가격",
+        "expectedLoss": "예상 손실",
+        "toggleLossCurrency": "손실 통화를 달러와 퍼센트 간 전환",
+        "setMidPrice": "중간 가격 설정",
+        "selectSizeDenomination": "수량 단위 선택"
     },
     "chart": {
         "liqPrice": "청산 가격"
@@ -571,6 +634,59 @@
         "title": "Ambient Finance | Fogo 무기한 선물",
         "description": "Ambient Finance로 Fogo에서 무기한 선물을 거래하세요. 테이커 수수료 제로, 최대 100배 레버리지, 초고속 체결.",
         "content": "앰비언트에서 페페츄얼 거래"
+    },
+    "portfolio": {
+        "fees": "Fees",
+        "vol14d": "Vol(14d)",
+        "viewVolume": "View volume",
+        "feesTakerMaker": "Fees (Taker / Maker)",
+        "viewFeeSchedule": "View fee schedule",
+        "totalUsdVal": "Total USD Val",
+        "totalNetUsdValue": "Total Net USD Value",
+        "performance": "Performance",
+        "positions": "Positions",
+        "feeSchedule": "Fee Schedule",
+        "vipTiers": "VIP Tiers",
+        "marketMakerTiers": "Market Maker Tiers",
+        "tier": "Tier",
+        "vol14dVolume": "14일 거래량",
+        "taker": "테이커",
+        "maker": "메이커",
+        "negativeFeesRebate": "마이너스 수수료는 리베이트입니다",
+        "alwaysZero": "항상 0.00%",
+        "makerFeesPercent": "메이커 수수료 {{percent}}",
+        "availableToDepositTooltip": "잔액 기준 입금 가능한 최대 금액",
+        "availableToSend": "보내기 가능",
+        "availableToSendTooltip": "보낼 수 있는 총 금액",
+        "networkFee": "네트워크 수수료",
+        "networkFeeTooltip": "트랜잭션 처리에 부과되는 수수료",
+        "fogoChainLogo": "Fogo 체인 로고",
+        "accountValue": "계정 가치",
+        "collateral": "담보",
+        "pnl": "PnL",
+        "volume": "거래량",
+        "maxDrawdown": "최대 낙폭",
+        "totalEquity": "총 자본",
+        "accountEquity": "계정 자본",
+        "vaultEquity": "볼트 자본",
+        "perps": "무기한 선물",
+        "perpsAndVaults": "선물 + 볼트",
+        "allTime": "전체 기간",
+        "twentyFourHour": "24시간",
+        "sevenDay": "7일",
+        "thirtyDay": "30일",
+        "fusd": "fUSD",
+        "sendDescription": "Fogo의 다른 주소로 토큰을 보냅니다.",
+        "sendTitle": "Fogo에서 {{token}} 보내기",
+        "enterAddress": "주소 입력...",
+        "enterAmount": "금액 입력",
+        "invalidAddress": "유효하지 않은 주소",
+        "insufficientFunds": "잔액 부족",
+        "validAmountRequired": "유효한 금액을 입력하세요",
+        "amountGreaterThanZero": "금액은 0보다 커야 합니다",
+        "minDepositAmount": "최소 입금 금액은 {{amount}}입니다",
+        "exceedsAvailableBalance": "금액이 사용 가능 잔액 {{balance}}을 초과합니다",
+        "transactionTimedOut": "15초 후 트랜잭션 시간 초과"
     },
     "pageTitles": {
         "portfolio": "포트폴리오",
@@ -609,96 +725,48 @@
         "title": "키보드 단축키",
         "hintPress": "",
         "hintToClose": "로 닫기",
+        "applyDefaults": "기본값 적용",
+        "editShortcut": "단축키 편집",
+        "pressKeys": "키를 누르세요...",
         "aria": {
             "close": "키보드 단축키 닫기"
         },
-        "categories": [
-            {
-                "title": "일반",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "단축키 보기"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["alt", ","],
-                        "description": "설정 열기"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "모달 닫기 / 취소"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "일반",
+            "trading": "거래",
+            "navigation": "내비게이션"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "단축키 보기"
             },
-            {
-                "title": "거래",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "매수로 전환"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "매도로 전환"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "시장가 주문 시작"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "지정가 주문 시작"
-                    }
-                ]
+            "settings": {
+                "open": "설정 열기"
             },
-            {
-                "title": "내비게이션",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "거래 페이지로 이동"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "홈으로 이동"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "포트폴리오로 이동"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "지갑 연결 열기"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "입금 모달 열기"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "출금 모달 열기"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "최신 트랜잭션을 탐색기에서 보기"
-                    }
-                ]
+            "modal": {
+                "close": "모달 닫기 / 취소"
+            },
+            "trading": {
+                "buy": "매수로 전환",
+                "sell": "매도로 전환",
+                "market": "시장가 주문 시작",
+                "limit": "지정가 주문 시작",
+                "marketClose": "시장가로 포지션 청산"
+            },
+            "navigation": {
+                "trade": "거래 페이지로 이동",
+                "home": "홈으로 이동",
+                "portfolio": "포트폴리오로 이동"
+            },
+            "wallet": {
+                "connect": "지갑 연결 열기"
+            },
+            "portfolio": {
+                "deposit": "입금 모달 열기",
+                "withdraw": "출금 모달 열기",
+                "latestTx": "최신 트랜잭션을 탐색기에서 보기"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",

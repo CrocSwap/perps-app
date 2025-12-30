@@ -42,27 +42,6 @@ function PortfolioSend({
         ) || AVAILABLE_TOKENS[0],
     );
 
-    const validateAmount = useCallback(
-        (inputAmount: number, maxAmount: number) => {
-            if (isNaN(inputAmount) || inputAmount <= 0) {
-                return {
-                    isValid: false,
-                    message: 'Please enter a valid amount greater than 0',
-                };
-            }
-
-            if (inputAmount > maxAmount) {
-                return {
-                    isValid: false,
-                    message: `Amount exceeds available balance of ${formatCurrency(maxAmount)}`,
-                };
-            }
-
-            return { isValid: true, message: null };
-        },
-        [],
-    );
-
     const CURRENCY_FORMATTER = useMemo(
         () =>
             new Intl.NumberFormat('en-US', {
@@ -78,6 +57,29 @@ function PortfolioSend({
             return CURRENCY_FORMATTER.format(value);
         },
         [CURRENCY_FORMATTER, selectedToken],
+    );
+
+    const validateAmount = useCallback(
+        (inputAmount: number, maxAmount: number) => {
+            if (isNaN(inputAmount) || inputAmount <= 0) {
+                return {
+                    isValid: false,
+                    message: t('portfolio.amountGreaterThanZero'),
+                };
+            }
+
+            if (inputAmount > maxAmount) {
+                return {
+                    isValid: false,
+                    message: t('portfolio.exceedsAvailableBalance', {
+                        balance: formatCurrency(maxAmount),
+                    }),
+                };
+            }
+
+            return { isValid: true, message: null };
+        },
+        [formatCurrency],
     );
 
     const debouncedAmountChange = useDebouncedCallback((newValue: string) => {
@@ -124,7 +126,7 @@ function PortfolioSend({
         }
 
         if (!address.trim()) {
-            setError('Please enter a valid address');
+            setError(t('portfolio.invalidAddress'));
             return;
         }
 
@@ -139,14 +141,14 @@ function PortfolioSend({
     const infoItems = useMemo(
         () => [
             {
-                label: 'Available to send',
+                label: t('portfolio.availableToSend'),
                 value: formatCurrency(availableAmount),
-                tooltip: 'The total amount you have available to send',
+                tooltip: t('portfolio.availableToSendTooltip'),
             },
             {
-                label: 'Network Fee',
+                label: t('portfolio.networkFee'),
                 value: networkFee,
-                tooltip: 'Fee charged for processing the transaction',
+                tooltip: t('portfolio.networkFeeTooltip'),
             },
         ],
         [availableAmount, networkFee, formatCurrency],
@@ -166,8 +168,10 @@ function PortfolioSend({
     return (
         <div className={styles.container}>
             <div className={styles.textContent}>
-                <h4>Send {selectedToken.symbol} on Fogo</h4>
-                <p>Send tokens to another address on Fogo.</p>
+                <h4>
+                    {t('portfolio.sendTitle', { token: selectedToken.symbol })}
+                </h4>
+                <p>{t('portfolio.sendDescription')}</p>
             </div>
 
             <div className={styles.inputContainer}>
@@ -176,7 +180,7 @@ function PortfolioSend({
                     value={address}
                     onChange={handleAddressChange}
                     aria-label={t('aria.addressInput')}
-                    placeholder='Enter address...'
+                    placeholder={t('portfolio.enterAddress')}
                     disabled={isProcessing}
                 />
             </div>
@@ -198,7 +202,7 @@ function PortfolioSend({
                 className={styles.inputContainer}
                 style={{ position: 'relative' }}
             >
-                <h6>Amount</h6>
+                <h6>{t('common.amount')}</h6>
                 <input
                     type='text'
                     value={amount}
@@ -206,13 +210,13 @@ function PortfolioSend({
                     aria-label={t('aria.amountInput')}
                     inputMode='numeric'
                     pattern='[0-9]*'
-                    placeholder='Enter amount'
+                    placeholder={t('portfolio.enterAmount')}
                     min='0'
                     step='any'
                     disabled={isProcessing}
                 />
                 <button onClick={handleMaxClick} disabled={isProcessing}>
-                    Max
+                    {t('common.max')}
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
             </div>
@@ -241,7 +245,7 @@ function PortfolioSend({
                 onClick={handleSend}
                 disabled={isButtonDisabled}
             >
-                {isProcessing ? 'Processing...' : 'Send'}
+                {isProcessing ? t('common.processing') : t('common.send')}
             </SimpleButton>
         </div>
     );

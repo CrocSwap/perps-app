@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
 import styles from './TokenDropdown.module.css';
 
@@ -41,6 +42,7 @@ function TokenDropdown({
     disabled = false,
     className = '',
 }: TokenDropdownProps) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -93,7 +95,9 @@ function TokenDropdown({
                 }}
                 aria-haspopup='listbox'
                 aria-expanded={isOpen}
-                aria-label={`Select token, current: ${selected.symbol}`}
+                aria-label={t('aria.selectTokenCurrent', {
+                    symbol: selected.symbol,
+                })}
                 disabled={disabled}
             >
                 <div className={styles.selectedToken}>

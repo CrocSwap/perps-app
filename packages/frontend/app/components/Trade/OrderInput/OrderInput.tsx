@@ -653,6 +653,10 @@ function OrderInput({
         500,
     );
 
+    const isDepositRequired = useMemo(() => {
+        return !isReduceOnlyEnabled && normalizedEquity < MIN_POSITION_USD_SIZE;
+    }, [isReduceOnlyEnabled, normalizedEquity]);
+
     useEffect(() => {
         if (!isMobileRef.current) {
             setNotionalQtyNum(0);
@@ -1206,7 +1210,7 @@ function OrderInput({
             onBlur: handleStopPriceBlur,
             onKeyDown: handleStopPriceKeyDown,
             className: 'custom-input',
-            ariaLabel: 'stop price input',
+            ariaLabel: t('aria.stopPriceInput', 'Stop price input'),
         }),
         [stopPrice, handleStopPriceChange],
     );
@@ -1218,7 +1222,7 @@ function OrderInput({
             onBlur: handlePriceBlur,
             onKeyDown: handlePriceKeyDown,
             className: 'custom-input',
-            ariaLabel: 'Price input',
+            ariaLabel: t('aria.priceInput', 'Price input'),
             showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
             setMidPriceAsPriceInput,
             isMidModeActive,
@@ -1244,7 +1248,7 @@ function OrderInput({
             onUnfocus: () => setIsEditingSizeInput(false),
             onKeyDown: handleSizeKeyDown,
             className: 'custom-input',
-            ariaLabel: 'Size input',
+            ariaLabel: t('aria.sizeInput', 'Size input'),
             symbol,
             isEditing: isEditingSizeInput,
             selectedDenom,
@@ -2205,6 +2209,7 @@ function OrderInput({
 
     const isDisabled =
         userExceededOI ||
+        isDepositRequired ||
         isMarginInsufficientDebounced ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||

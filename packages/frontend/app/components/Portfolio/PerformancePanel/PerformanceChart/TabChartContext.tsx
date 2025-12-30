@@ -59,6 +59,57 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     const [chartHeight, setChartHeight] = useState<number | null>(null);
     const [isChartReady, setIsChartReady] = useState(false);
 
+    const calculatePanelHeight = useCallback(() => {
+        if (panelHeightRef.current === undefined) return;
+
+        const header = document.getElementById('portfolio-header-container');
+
+        const performanceTabs = document.getElementById('performanceTabs');
+
+        const metricsContainer = document.getElementById('metricsContainer');
+
+        const headerHeight = header ? header.clientHeight : 30;
+
+        const headerWidth = header ? header.clientWidth : 0;
+
+        const metricsContainerWidth = metricsContainer
+            ? metricsContainer.clientWidth
+            : 0;
+
+        const performanceTabsWidth = performanceTabs
+            ? performanceTabs.clientWidth
+            : 0;
+
+        const performanceTabsHeight = performanceTabs
+            ? performanceTabs.clientHeight
+            : 25;
+
+        const calculatedChartHeight =
+            panelHeightRef.current - headerHeight - performanceTabsHeight - 10;
+
+        if (
+            window.innerWidth < 1280 + 50 &&
+            performanceTabsWidth + 50 > window.innerWidth
+        ) {
+            setChartWidth(
+                Math.min(
+                    950,
+                    Math.max(
+                        window.innerWidth - metricsContainerWidth - 50,
+                        250,
+                    ),
+                ),
+            );
+        } else if (window.innerWidth <= 768) {
+            setChartWidth(Math.max(window.innerWidth, 250));
+        } else {
+            setChartWidth(Math.min(950, Math.max(headerWidth, 250)));
+        }
+
+        setChartHeight(calculatedChartHeight);
+        setIsChartReady(true);
+    }, []);
+
     const parseFakeUserData = (key: string) => {
         const userPositionData = positionDataMap.get(key);
 
@@ -203,62 +254,11 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         return () => {
             window.removeEventListener('resize', calculatePanelHeight);
         };
-    }, []);
+    }, [calculatePanelHeight]);
 
     useEffect(() => {
         calculatePanelHeight();
-    }, [panelHeight]);
-
-    const calculatePanelHeight = useCallback(() => {
-        if (panelHeightRef.current === undefined) return;
-
-        const header = document.getElementById('portfolio-header-container');
-
-        const performanceTabs = document.getElementById('performanceTabs');
-
-        const metricsContainer = document.getElementById('metricsContainer');
-
-        const headerHeight = header ? header.clientHeight : 30;
-
-        const headerWidth = header ? header.clientWidth : 0;
-
-        const metricsContainerWidth = metricsContainer
-            ? metricsContainer.clientWidth
-            : 0;
-
-        const performanceTabsWidth = performanceTabs
-            ? performanceTabs.clientWidth
-            : 0;
-
-        const performanceTabsHeight = performanceTabs
-            ? performanceTabs.clientHeight
-            : 25;
-
-        const calculatedChartHeight =
-            panelHeightRef.current - headerHeight - performanceTabsHeight - 10;
-
-        if (
-            window.innerWidth < 1280 + 50 &&
-            performanceTabsWidth + 50 > window.innerWidth
-        ) {
-            setChartWidth(
-                Math.min(
-                    950,
-                    Math.max(
-                        window.innerWidth - metricsContainerWidth - 50,
-                        250,
-                    ),
-                ),
-            );
-        } else if (window.innerWidth <= 768) {
-            setChartWidth(Math.max(window.innerWidth, 250));
-        } else {
-            setChartWidth(Math.min(950, Math.max(headerWidth, 250)));
-        }
-
-        setChartHeight(calculatedChartHeight);
-        setIsChartReady(true);
-    }, []);
+    }, [panelHeight, calculatePanelHeight]);
 
     return (
         <div
@@ -267,7 +267,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         >
             {isChartReady && chartWidth && chartHeight && (
                 <>
-                    {activeTab === 'Performance' && pnlHistory && (
+                    {activeTab === 'portfolio.performance' && pnlHistory && (
                         <LineChart
                             // key={`performance-${chartWidth}-${chartHeight}`}
                             lineData={pnlHistory}
@@ -281,21 +281,22 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                         />
                     )}
 
-                    {activeTab === 'Account Value' && accountValueHistory && (
-                        <LineChart
-                            // key={`account-${chartWidth}-${chartHeight}`}
-                            lineData={accountValueHistory}
-                            curve={'basic'}
-                            chartName={
-                                selectedVault.value + selectedPeriod.value
-                            }
-                            height={chartHeight}
-                            width={chartWidth}
-                            isMobile={isMobile}
-                        />
-                    )}
+                    {activeTab === 'portfolio.accountValue' &&
+                        accountValueHistory && (
+                            <LineChart
+                                // key={`account-${chartWidth}-${chartHeight}`}
+                                lineData={accountValueHistory}
+                                curve={'basic'}
+                                chartName={
+                                    selectedVault.value + selectedPeriod.value
+                                }
+                                height={chartHeight}
+                                width={chartWidth}
+                                isMobile={isMobile}
+                            />
+                        )}
 
-                    {activeTab === 'Collateral' && (
+                    {activeTab === 'portfolio.collateral' && (
                         <CollateralPieChart
                             key={`collateral-${chartWidth}-${chartHeight}`}
                             height={chartHeight}

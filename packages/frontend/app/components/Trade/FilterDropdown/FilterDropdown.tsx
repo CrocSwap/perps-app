@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useRef, useEffect } from 'react';
 import styles from './FilterDropdown.module.css';
 
@@ -14,7 +15,13 @@ export interface FilterDropdownProps {
 }
 
 export default function FilterDropdown(props: FilterDropdownProps) {
-    const { options, selectedOption, onChange, label = 'Filter' } = props;
+    const { t } = useTranslation();
+    const {
+        options,
+        selectedOption,
+        onChange,
+        label = t('common.filter'),
+    } = props;
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 

@@ -195,7 +195,7 @@ export async function updatePortfolioBalance(
     if (amount <= 0) {
         return {
             success: false,
-            message: 'Amount must be greater than 0',
+            message: 'portfolio.amountGreaterThanZero',
         };
     }
 
@@ -206,7 +206,7 @@ export async function updatePortfolioBalance(
     ) {
         return {
             success: false,
-            message: 'Insufficient balance',
+            message: 'portfolio.insufficientFunds',
         };
     }
 
@@ -214,7 +214,7 @@ export async function updatePortfolioBalance(
     if (action === 'send' && !address) {
         return {
             success: false,
-            message: 'Address is required for send operation',
+            message: 'portfolio.invalidAddress',
         };
     }
 

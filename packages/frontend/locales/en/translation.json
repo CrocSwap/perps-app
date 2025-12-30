@@ -21,6 +21,8 @@
         "submit": "Submit",
         "quantity": "Quantity",
         "confirm": "Confirm",
+        "send": "Send",
+        "address": "Address",
         "amount": "Amount",
         "max": "Max",
         "min": "Min",
@@ -31,6 +33,7 @@
         "fundingHistory": "Funding History",
         "orderHistory": "Order History",
         "depositsAndWithdrawals": "Deposits & Withdrawals",
+        "depositors": "Depositors",
         "twap": "TWAP",
         "all": "All",
         "active": "Active",
@@ -150,8 +153,8 @@
         "cancelling": "Cancelling...",
         "midButton": "MID",
         "positionClosed": "Position Closed",
-        "successfullyClosedPosition": "Successfully closed {{usdValueOfOrderStr}} of {{symbol}} position",
-        "failedToClosePosition": "Failed to close position",
+        "successfullyClosedPosition": "Successfully closed {{usdValueOfOrderStr}} {{symbol}} position",
+        "tpSlForPosition": "TP/SL for Position",
         "transactionTimedOut": "Transaction timed out after {{timeInSeconds}} seconds",
         "txFailedOrNotConfirmed": "Transaction failed or was not confirmed",
         "walletBalance": "Wallet balance",
@@ -299,10 +302,14 @@
         "tradeValue": "Trade Value",
         "fee": "Fee",
         "closedPnl": "Closed PnL",
-        "reduceOnly": "Reduce Only",
-        "triggerConditions": "Trigger Conditions",
-        "tpsl": "TP/SL",
-        "status": "Status",
+        "depositor": "Depositor",
+        "vaultAmount": "Vault Amount",
+        "unrealizedPnl": "Unrealized PnL",
+        "allTimePnl": "All Time PnL",
+        "daysFollowing": "Days Following",
+        "completed": "Completed",
+        "withdrawal": "Withdrawal",
+        "spotTransfer": "Spot Transfer",
         "order": "Order",
         "long": "Long",
         "short": "Short",
@@ -339,10 +346,14 @@
         "noLongFundingHistory": "No long funding history",
         "noShortFundingHistory": "No short funding history",
         "fundingHistory": "All-time: {{allTime}} Since change: {{sinceChange}}",
+        "positionSide": "Position Side",
+        "payment": "Payment",
+        "rate": "Rate",
         "openLong": "Open Long",
         "openShort": "Open Short",
         "closeLong": "Close Long",
-        "closeShort": "Close Short"
+        "closeShort": "Close Short",
+        "goToMarket": "Go to {{coin}} market"
     },
     "time": {
         "second": "second",
@@ -532,13 +543,15 @@
     },
     "leverage": {
         "title": "Adjust Leverage",
-        "closePositionPrompt": "Close position to reduce minimum leverage"
+        "closePositionPrompt": "Close position to reduce minimum leverage",
+        "adjustLeverage": "Adjust leverage, currently {{value}}x"
     },
     "share": {
         "prompt": "Customize your text",
         "xCTA": "Share on 𝕏",
         "copyLinkCTA": "Copy Link",
-        "textPlaceholder": "Trade {{coin}} perps on {{fogo}} Testnet at {{twitter}} now"
+        "textPlaceholder": "Trade {{coin}} perps at {{twitter}} on {{fogo}} Testnet now",
+        "sharePosition": "Share position with PnL {{pnl}}"
     },
     "colors": {
         "default": "Default",
@@ -553,9 +566,15 @@
         "depositInput": "Deposit input",
         "addressInput": "Address input",
         "amountInput": "Amount input",
+        "expandWallet": "Expand wallet",
+        "collapseWallet": "Collapse wallet",
+        "priceInput": "Price input",
+        "sizeInput": "Size input",
+        "stopPriceInput": "Stop price input",
         "withdrawInput": "Withdraw input",
         "scrollTabsLeft": "Scroll tabs left",
         "scrollTabsRight": "Scroll tabs right",
+        "mobileActionMenu": "Toggle mobile action menu",
         "leverageValue": "Leverage value",
         "leverageAmount": "Leverage amount",
         "setLeverageTo": "Set leverage to {{value}}x",
@@ -584,7 +603,28 @@
         "toggleTPSL": "Toggle Take Profit / Stop Loss",
         "editTPSL": "Edit Take Profit / Stop Loss",
         "toggleConfigureAmount": "Toggle Configure Amount",
-        "toggleLimitPrice": "Toggle Limit Price"
+        "toggleLimitPrice": "Toggle Limit Price",
+        "setMaxAmount": "Set maximum amount",
+        "rowsPerPage": "Rows per page",
+        "closeModal": "Close modal",
+        "goToHome": "Go to home",
+        "spotTradingOpensNewTab": "Spot trading on Ambient v1 (opens in new tab)",
+        "moreOptions": "More options",
+        "notifications": "Notifications",
+        "transferAmount": "Transfer amount",
+        "viewOnExplorerNewTab": "View on explorer (opens in new tab)",
+        "externalLinkOpensNewTab": "{{linkText}} (opens in new tab)",
+        "opensInNewTab": "(opens in new tab)",
+        "selectTokenCurrent": "Select token, current: {{symbol}}",
+        "mobileTradeNavigation": "Trade navigation",
+        "takeProfitPrice": "Take profit price",
+        "expectedGain": "Expected gain",
+        "toggleGainCurrency": "Toggle gain currency between dollars and percent",
+        "stopLossPrice": "Stop loss price",
+        "expectedLoss": "Expected loss",
+        "toggleLossCurrency": "Toggle loss currency between dollars and percent",
+        "setMidPrice": "Set mid price",
+        "selectSizeDenomination": "Select size denomination"
     },
     "chart": {
         "liqPrice": "Liq. Price"
@@ -593,6 +633,59 @@
         "title": "Ambient Finance | Perpetual Futures on Fogo",
         "description": "Trade perpetual futures on Fogo with Ambient Finance. Zero taker fees, up to 100x leverage, and lightning-fast execution.",
         "content": "Trade Perps With Ambient on Fogo"
+    },
+    "portfolio": {
+        "fees": "Fees",
+        "vol14d": "Vol(14d)",
+        "viewVolume": "View volume",
+        "feesTakerMaker": "Fees (Taker / Maker)",
+        "viewFeeSchedule": "View fee schedule",
+        "totalUsdVal": "Total USD Val",
+        "totalNetUsdValue": "Total Net USD Value",
+        "performance": "Performance",
+        "positions": "Positions",
+        "feeSchedule": "Fee Schedule",
+        "vipTiers": "VIP Tiers",
+        "marketMakerTiers": "Market Maker Tiers",
+        "tier": "Tier",
+        "vol14dVolume": "14D Volume",
+        "taker": "Taker",
+        "maker": "Maker",
+        "negativeFeesRebate": "Negative fees are rebates",
+        "alwaysZero": "Always 0.00%",
+        "makerFeesPercent": "Maker fees {{percent}}",
+        "availableToDepositTooltip": "The maximum amount you can deposit based on your balance",
+        "availableToSend": "Available to send",
+        "availableToSendTooltip": "The total amount you have available to send",
+        "networkFee": "Network Fee",
+        "networkFeeTooltip": "Fee charged for processing the transaction",
+        "fogoChainLogo": "Fogo Chain Logo",
+        "accountValue": "Account Value",
+        "collateral": "Collateral",
+        "pnl": "PNL",
+        "volume": "Volume",
+        "maxDrawdown": "Max Drawdown",
+        "totalEquity": "Total Equity",
+        "accountEquity": "Account Equity",
+        "vaultEquity": "Vault Equity",
+        "perps": "Perps",
+        "perpsAndVaults": "Perps + Vaults",
+        "allTime": "All-time",
+        "twentyFourHour": "24H",
+        "sevenDay": "7D",
+        "thirtyDay": "30D",
+        "fusd": "fUSD",
+        "sendDescription": "Send tokens to another address on Fogo.",
+        "sendTitle": "Send {{token}} on Fogo",
+        "enterAddress": "Enter address...",
+        "enterAmount": "Enter amount",
+        "invalidAddress": "Invalid address",
+        "insufficientFunds": "Insufficient funds",
+        "validAmountRequired": "Please enter a valid amount",
+        "amountGreaterThanZero": "Amount must be greater than 0",
+        "minDepositAmount": "Minimum deposit amount is {{amount}}",
+        "exceedsAvailableBalance": "Amount exceeds available balance of {{balance}}",
+        "transactionTimedOut": "Transaction timed out after 15 seconds"
     },
     "pageTitles": {
         "portfolio": "Portfolio",
@@ -631,96 +724,48 @@
         "title": "Keyboard Shortcuts",
         "hintPress": "Press",
         "hintToClose": "to close",
+        "applyDefaults": "Apply Defaults",
+        "editShortcut": "Edit shortcut",
+        "pressKeys": "Press keys...",
         "aria": {
             "close": "Close keyboard shortcuts"
         },
-        "categories": [
-            {
-                "title": "General",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "Display shortcuts"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["alt", ","],
-                        "description": "Open settings"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "Close modal / cancel"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "General",
+            "trading": "Trading",
+            "navigation": "Navigation"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Display shortcuts"
             },
-            {
-                "title": "Trading",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "Switch to buy"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "Switch to sell"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "Start market order"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "Start limit order"
-                    }
-                ]
+            "settings": {
+                "open": "Open settings"
             },
-            {
-                "title": "Navigation",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "Go to trade page"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "Go to home page"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "Go to portfolio page"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "Open wallet connector"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "Open deposit modal"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "Open withdraw modal"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "View latest transaction in block explorer"
-                    }
-                ]
+            "modal": {
+                "close": "Close modal / cancel"
+            },
+            "trading": {
+                "buy": "Switch to buy",
+                "sell": "Switch to sell",
+                "market": "Start market order",
+                "limit": "Start limit order",
+                "marketClose": "Close position at market price"
+            },
+            "navigation": {
+                "trade": "Go to trade page",
+                "home": "Go to home page",
+                "portfolio": "Go to portfolio page"
+            },
+            "wallet": {
+                "connect": "Open wallet connector"
+            },
+            "portfolio": {
+                "deposit": "Open deposit modal",
+                "withdraw": "Open withdraw modal",
+                "latestTx": "View latest transaction in block explorer"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",

@@ -371,14 +371,30 @@ const YAxisOverlayCanvas: React.FC = () => {
             return;
 
         const canvas = canvasRef.current;
-        const { orderLabel, allLabels } = labelAnalysis;
+        const { orderLabel, allLabels, closePrice } = labelAnalysis;
         const adjustedPixel = orderLabel.adjustedPixel;
+        const originalPixel = orderLabel.pixel;
+        const originalPrice = orderLabel.price;
         const tolerance = 10;
         const isNearOrderPrice = Math.abs(mouseY - adjustedPixel) <= tolerance;
 
         let isNearClosePrice = false;
-        if (isMidModeActive) {
-            const closePriceLabel = allLabels.find((l) => l.isClosePrice);
+        const closePriceLabel = allLabels.find((l) => l.isClosePrice);
+
+        const localIsMidModeActivePixel = closePriceLabel
+            ? Math.abs(originalPixel - closePriceLabel.adjustedPixel) <=
+              tolerance
+            : false;
+
+        const PRICE_TOLERANCE_RATIO = 0.001;
+        const localIsMidModeActive =
+            Math.abs(closePrice - originalPrice) / closePrice <=
+            PRICE_TOLERANCE_RATIO;
+
+        if (
+            isMidModeActive ||
+            (localIsMidModeActive && localIsMidModeActivePixel)
+        ) {
             if (closePriceLabel) {
                 isNearClosePrice =
                     Math.abs(mouseY - closePriceLabel.adjustedPixel) <=

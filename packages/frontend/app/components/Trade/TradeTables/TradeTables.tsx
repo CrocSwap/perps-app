@@ -26,15 +26,15 @@ export interface FilterOption {
 }
 
 const tradePageBlackListTabs = new Set([
-    'Funding History',
-    'Deposits and Withdrawals',
-    'Depositors',
+    'common.fundingHistory',
+    'common.depositsAndWithdrawals',
+    'common.depositors',
 ]);
 
 const portfolioPageBlackListTabs = new Set([
-    'Depositors',
-    'Funding History',
-    'Deposits and Withdrawals',
+    'common.depositors',
+    'common.fundingHistory',
+    'common.depositsAndWithdrawals',
 ]);
 
 interface TradeTableProps {
@@ -93,7 +93,7 @@ export default function TradeTable(props: TradeTableProps) {
         ];
 
         if (vaultPage) {
-            availableTabs.push('Depositors');
+            availableTabs.push('common.depositors');
         }
 
         // Filter for different pages

@@ -90,6 +90,8 @@ export default function PriceInput(props: PropsIF) {
                             setIsMidModeActive(false);
                         }
                     }}
+                    aria-pressed={isMidModeActive}
+                    aria-label={t('aria.setMidPrice', 'Set mid price')}
                 >
                     {t('transactions.midButton')}
                 </button>

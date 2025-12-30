@@ -219,11 +219,92 @@
     margin: 0 2px;
 }
 
+.keysWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.keysEditing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
+    padding: 4px 8px;
+    background: var(--bg-dark2, #12121a);
+    border: 1px solid var(--accent1, #7371fc);
+    border-radius: 6px;
+}
+
+.pressKeysHint {
+    color: var(--text2, #6a6a6d);
+    font-size: 12px;
+    font-style: italic;
+}
+
+.editButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--text2, #6a6a6d);
+    cursor: pointer;
+    opacity: 0;
+    transition:
+        opacity 0.15s ease,
+        background-color 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.shortcutItem:hover .editButton {
+    opacity: 1;
+}
+
+.editButton:hover {
+    background: var(--bg-dark4, #2a2a32);
+    color: var(--text1, #f0f0f8);
+}
+
+.editButton[data-editing='true'] {
+    opacity: 1;
+    background: var(--accent1, #7371fc);
+    color: var(--text1, #f0f0f8);
+    border-color: var(--accent1, #7371fc);
+}
+
+.applyDefaultsButton {
+    padding: 8px 16px;
+    background: var(--bg-dark4, #2a2a32);
+    border: 1px solid var(--bg-dark4, #2a2a32);
+    border-radius: 6px;
+    color: var(--text1, #f0f0f8);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.applyDefaultsButton:hover {
+    background: var(--bg-dark2, #12121a);
+    border-color: var(--accent1, #7371fc);
+}
+
 .footer {
     padding: var(--padding-s, 12px) var(--padding-l, 24px);
     border-top: 1px solid var(--bg-dark4, #2a2a32);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
 }
 
 .hint {

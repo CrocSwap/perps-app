@@ -213,10 +213,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
 
     const getWarningMessage = () => {
         if (Math.abs(notionalSymbolQtyNum) < 1e-8)
-            return t('marketClose.noZeroSize');
+            return t('marketLimitClose.noZeroSize');
         if (notionalSymbolQtyNum > originalSize)
-            return t('marketClose.sizeExceedsPosition');
-        if (notionalSymbolQtyNum < 0) return t('marketClose.invalidSize');
+            return t('marketLimitClose.sizeExceedsPosition');
+        if (notionalSymbolQtyNum < 0) return t('marketLimitClose.invalidSize');
         return '';
     };
 
@@ -448,7 +448,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         onBlur={handleSizeInputBlur}
                         onKeyDown={(e) => console.log('Size keydown', e.key)}
                         className=''
-                        ariaLabel='size-input'
+                        ariaLabel={t('aria.sizeInput', 'Size input')}
                         useTotalSize={false}
                         symbol={position.coin}
                         selectedDenom={selectedDenom}

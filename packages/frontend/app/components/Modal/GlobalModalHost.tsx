@@ -8,8 +8,10 @@ import React, {
     useState,
     type MouseEvent,
     type ReactNode,
+    type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import { MdClose } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
 import styles from './Modal.module.css';
 
 export type ModalPosition = 'center' | 'bottomRight' | 'bottomSheet';
@@ -42,6 +44,7 @@ export function useGlobalModal() {
 }
 
 export function GlobalModalHost({ children }: { children?: ReactNode }) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [payload, setPayload] = useState<Payload | null>(null);
 
@@ -69,6 +72,59 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
     }, [open]);
 
     const backdropPointerDownOnSelf = useRef(false);
+    const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+    const modalContainerRef = useRef<HTMLDivElement | null>(null);
+
+    // Focus management: save previous focus and restore on close
+    useEffect(() => {
+        if (open) {
+            previouslyFocusedElement.current =
+                document.activeElement as HTMLElement;
+            // Focus the modal container or first focusable element
+            setTimeout(() => {
+                const initialFocusEl =
+                    modalContainerRef.current?.querySelector<HTMLElement>(
+                        '[data-modal-initial-focus]',
+                    );
+
+                if (
+                    initialFocusEl &&
+                    !initialFocusEl.hasAttribute('disabled')
+                ) {
+                    initialFocusEl.focus();
+                    return;
+                }
+
+                // Focus the modal container itself (not the close button) to avoid
+                // showing a focus ring when opened via keyboard shortcut.
+                // The container is focusable via tabindex="-1" for accessibility.
+                modalContainerRef.current?.focus();
+            }, 0);
+        } else {
+            // Restore focus when modal closes
+            previouslyFocusedElement.current?.focus();
+        }
+    }, [open]);
+
+    // Focus trap handler
+    const handleFocusTrap = useCallback((e: ReactKeyboardEvent) => {
+        if (e.key !== 'Tab' || !modalContainerRef.current) return;
+
+        const focusableElements =
+            modalContainerRef.current.querySelectorAll<HTMLElement>(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+            );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement?.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement?.focus();
+        }
+    }, []);
 
     // ---- bottom sheet drag  ----
     const sheetRef = useRef<HTMLDivElement | null>(null);
@@ -137,6 +193,7 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
             {children}
             {open && payload && (
                 <div
+                    ref={modalContainerRef}
                     className={`${styles.outside_modal} ${
                         payload.position === 'bottomSheet'
                             ? styles.bottomSheetContainer
@@ -147,6 +204,8 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                     role='dialog'
                     aria-modal='true'
                     aria-labelledby='global-modal-title'
+                    tabIndex={-1}
+                    onKeyDown={handleFocusTrap}
                     onPointerDown={(e) => {
                         e.stopPropagation();
                         backdropPointerDownOnSelf.current =
@@ -202,8 +261,9 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                                 <button
                                     type='button'
                                     onClick={() => dismiss('internal')}
-                                    aria-label='Close modal'
+                                    aria-label={t('aria.closeModal')}
                                     className={styles.closeButton}
+                                    data-modal-close
                                 >
                                     <MdClose
                                         color='var(--text2)'
@@ -227,8 +287,9 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                                 <button
                                     type='button'
                                     onClick={() => dismiss('internal')}
-                                    aria-label='Close modal'
+                                    aria-label={t('aria.closeModal')}
                                     className={styles.closeButton}
+                                    data-modal-close
                                 >
                                     <MdClose
                                         color='var(--text2)'

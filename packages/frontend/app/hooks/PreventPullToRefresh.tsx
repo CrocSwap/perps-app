@@ -21,10 +21,10 @@ const PreventPullToRefresh: React.FC<Props> = ({
     const startY = useRef(0);
     const startX = useRef(0);
 
-    // Core protective styles to keep horizontal pans + contain overscroll
+    // Core protective styles to allow vertical pans + contain overscroll
     const protectiveStyle = useMemo<React.CSSProperties>(
         () => ({
-            touchAction: 'pan-x',
+            touchAction: 'pan-y',
             overscrollBehavior: 'contain',
         }),
         [],
@@ -59,13 +59,35 @@ const PreventPullToRefresh: React.FC<Props> = ({
             // vertical intent if vertical delta dominates
             const verticalIntent = Math.abs(dy) > Math.abs(dx);
 
-            // Only consider pull-to-refresh when root scroller is at top
-            const rootScrollTop =
-                (document.scrollingElement?.scrollTop ?? window.scrollY) || 0;
-            const atTop = rootScrollTop <= 0;
+            // If not a vertical gesture, don't interfere
+            if (!verticalIntent) return;
 
-            // Prevent ONLY the downward vertical pull at top (PTR gesture)
-            if (verticalIntent && atTop && dy > 0) {
+            // Only prevent pull-to-refresh if pulling down (dy > 0)
+            if (dy <= 0) return; // scrolling up, allow it
+
+            // Find the scrollable element that contains the touch target
+            let target = e.target as HTMLElement;
+            let scrollableElement: HTMLElement | null = null;
+
+            // Walk up the DOM to find a scrollable ancestor
+            while (target && target !== document.body) {
+                const overflowY = window.getComputedStyle(target).overflowY;
+                if (
+                    (overflowY === 'auto' || overflowY === 'scroll') &&
+                    target.scrollHeight > target.clientHeight
+                ) {
+                    scrollableElement = target;
+                    break;
+                }
+                target = target.parentElement!;
+            }
+
+            // Check if we're at the top of the scrollable element
+            const scrollTop = scrollableElement?.scrollTop ?? 0;
+            const atTop = scrollTop <= 0;
+
+            // Prevent ONLY the downward pull at top (PTR gesture)
+            if (atTop) {
                 e.preventDefault(); // requires passive:false on the listener
             }
         };

@@ -119,6 +119,10 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                     e.stopPropagation();
                     e.nativeEvent.stopImmediatePropagation();
                 }}
+                aria-label={t(
+                    'aria.selectSizeDenomination',
+                    'Select size denomination',
+                )}
             >
                 <ComboBox
                     key={selectedDenom}

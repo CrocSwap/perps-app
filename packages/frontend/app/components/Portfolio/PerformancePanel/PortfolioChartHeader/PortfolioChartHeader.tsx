@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import styles from './PortfolioChartHeader.module.css';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
@@ -14,6 +15,7 @@ type PortfolioHeaderIF = {
 };
 
 const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
+    const { t } = useTranslation();
     const {
         selectedVault,
         setSelectedVault,
@@ -22,15 +24,15 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
     } = props;
 
     const vaultOptions = [
-        { label: 'Perps', value: 'perp' },
-        { label: 'Perps + Vaults', value: 'all' },
+        { label: t('portfolio.perps'), value: 'perp' },
+        { label: t('portfolio.perpsAndVaults'), value: 'all' },
     ];
 
     const periodOptions = [
-        { label: '24H', value: 'Day' },
-        { label: '7D', value: 'Week' },
-        { label: '30D', value: 'Month' },
-        { label: 'All-time', value: 'AllTime' },
+        { label: t('portfolio.twentyFourHour'), value: 'Day' },
+        { label: t('portfolio.sevenDay'), value: 'Week' },
+        { label: t('portfolio.thirtyDay'), value: 'Month' },
+        { label: t('portfolio.allTime'), value: 'AllTime' },
     ];
 
     return (

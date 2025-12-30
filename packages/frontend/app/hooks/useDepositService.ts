@@ -10,6 +10,8 @@ interface DepositServiceResult {
     success: boolean;
     error?: string;
     signature?: string;
+    confirmed?: boolean;
+    timeOfSubmission?: number;
 }
 
 interface UserBalance {

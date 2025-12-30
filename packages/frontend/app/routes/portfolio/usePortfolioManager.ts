@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDepositService } from '~/hooks/useDepositService';
 import { useWithdrawService } from '~/hooks/useWithdrawService';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -119,6 +120,7 @@ const OTHER_FORMATTER = new Intl.NumberFormat('en-US', {
 });
 
 export function usePortfolioManager() {
+    const { t } = useTranslation();
     const userDataStore = useUserDataStore();
     const userAddress = userDataStore.userAddress;
 
@@ -252,7 +254,7 @@ export function usePortfolioManager() {
                 } else {
                     setStatus({
                         isLoading: false,
-                        error: result.error || 'Deposit transaction failed',
+                        error: result.error || t('transactions.depositFailed'),
                     });
                 }
                 return result;
@@ -286,7 +288,7 @@ export function usePortfolioManager() {
                 } else {
                     setStatus({
                         isLoading: false,
-                        error: result.error || 'Withdraw transaction failed',
+                        error: result.error || t('transactions.withdrawFailed'),
                     });
                 }
                 return result;
@@ -308,7 +310,9 @@ export function usePortfolioManager() {
             if (!address || amount > portfolio.balances.contract) {
                 setStatus({
                     isLoading: false,
-                    error: !address ? 'Invalid address' : 'Insufficient funds',
+                    error: !address
+                        ? t('portfolio.invalidAddress')
+                        : t('portfolio.insufficientFunds'),
                 });
                 return;
             }

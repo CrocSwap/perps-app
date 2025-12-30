@@ -56,12 +56,12 @@ export default function LeverageSliderModal({
 
     // Update local state if currentLeverage prop changes
     useEffect(() => {
-        setValue(Math.min(currentLeverage, 10));
+        setValue(currentLeverage);
     }, [currentLeverage]);
 
     const handleSliderChange = (newValue: number) => {
         // Update the leverage in the store immediately as the slider changes
-        setValue(Math.min(newValue, 10));
+        setValue(newValue);
     };
 
     const handleSliderClick = (newLeverage: number) => {

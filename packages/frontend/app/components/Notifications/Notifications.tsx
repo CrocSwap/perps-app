@@ -241,7 +241,12 @@ export default function Notifications() {
     const [userClosedNews, setUserClosedNews] = useState<boolean>(false);
 
     return (
-        <div className={styles.notifications}>
+        <div
+            className={styles.notifications}
+            role='region'
+            aria-label={t('aria.notifications')}
+            aria-live='polite'
+        >
             <AnimatePresence>
                 {enableTxNotifications &&
                     data.notifications.map((n: notificationIF) => (
@@ -273,12 +278,19 @@ export default function Notifications() {
                 <div className={styles.new_version_available}>
                     <header>
                         <div />
-                        <div>🚀</div>
-                        <MdClose
+                        <div aria-hidden='true'>🚀</div>
+                        <button
+                            type='button'
                             onClick={() => setShowReload(false)}
-                            color='var(--text2)'
-                            size={16}
-                        />
+                            aria-label={t('common.close')}
+                            className={styles.closeButton}
+                        >
+                            <MdClose
+                                color='var(--text2)'
+                                size={16}
+                                aria-hidden='true'
+                            />
+                        </button>
                     </header>
                     <div className={styles.text_content}>
                         <h3>{t('newVersion.title')}</h3>
@@ -333,14 +345,21 @@ export default function Notifications() {
                 <div className={styles.news}>
                     <header>
                         <h4>{t('common.announcements')}</h4>
-                        <MdClose
-                            color='var(--text2)'
-                            size={16}
+                        <button
+                            type='button'
                             onClick={() => {
                                 setUserClosedNews(true);
                                 alreadyViewed.markAsViewed(unseen.hashes);
                             }}
-                        />
+                            aria-label={t('aria.closeAnnouncement')}
+                            className={styles.closeButton}
+                        >
+                            <MdClose
+                                color='var(--text2)'
+                                size={16}
+                                aria-hidden='true'
+                            />
+                        </button>
                     </header>
                     <ul>
                         {unseen.messages.map(

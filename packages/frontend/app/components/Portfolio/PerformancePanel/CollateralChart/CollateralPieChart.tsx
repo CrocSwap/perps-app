@@ -1,5 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import * as d3 from 'd3';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Button from '~/components/Button/Button';
 import styles from './CollateralPieChart.module.css';
 
@@ -11,11 +12,15 @@ type PieChartProps = {
 };
 
 const CollateralPieChart: React.FC<PieChartProps> = (props) => {
+    const { t } = useTranslation();
     const { height, width } = props;
 
     const chartHeight = height || 150;
 
-    const pieData: PieData[] = [{ label: 'FUSD', value: 100 }];
+    const pieData: PieData[] = useMemo(
+        () => [{ label: t('portfolio.fusd'), value: 100 }],
+        [t],
+    );
 
     const dataColorSet = [
         '#7371fc',

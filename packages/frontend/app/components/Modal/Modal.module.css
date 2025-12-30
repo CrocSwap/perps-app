@@ -16,6 +16,8 @@
     /* Prevent swipe-up navigation gestures on iOS */
     overscroll-behavior: none;
     color: var(--text1);
+    /* Hide focus outline - container is focused programmatically for accessibility */
+    outline: none;
 }
 
 /* Special styling when keyboard is visible */

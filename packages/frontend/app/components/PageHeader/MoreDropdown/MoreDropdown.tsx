@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import styles from './MoreDropdown.module.css';
 
 interface propsIF {
@@ -6,6 +7,7 @@ interface propsIF {
 }
 
 export default function MoreDropdown(props: propsIF) {
+    const { t } = useTranslation();
     const { setIsMoreDropdownOpen } = props;
     const submenuData = [
         { name: 'Testnet', path: '/testnet' },
@@ -20,7 +22,11 @@ export default function MoreDropdown(props: propsIF) {
     ];
 
     return (
-        <div className={styles.container}>
+        <nav
+            className={styles.container}
+            role='menu'
+            aria-label={t('aria.moreOptions')}
+        >
             {submenuData.map((menu, idx) => (
                 <Link
                     to={menu.path}
@@ -28,10 +34,11 @@ export default function MoreDropdown(props: propsIF) {
                     className={styles.row}
                     viewTransition
                     onClick={() => setIsMoreDropdownOpen(false)}
+                    role='menuitem'
                 >
                     {menu.name}
                 </Link>
             ))}
-        </div>
+        </nav>
     );
 }

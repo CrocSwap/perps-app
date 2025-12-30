@@ -256,19 +256,20 @@ export default function PageHeader() {
             const target = e.target as HTMLElement | null;
             if (shouldIgnoreDueToTyping(target)) return;
 
+            const categories = getKeyboardShortcutCategories(t);
+            const settingsShortcut = getKeyboardShortcutById(
+                categories,
+                'settings.open',
+            );
+
             if (
-                e.altKey &&
-                !e.shiftKey &&
-                !e.ctrlKey &&
-                !e.metaKey &&
-                e.code === 'Comma'
+                settingsShortcut &&
+                matchesShortcutEvent(e, settingsShortcut.keys)
             ) {
                 e.preventDefault();
                 openAppSettingsModalRef.current();
                 return;
             }
-
-            const categories = getKeyboardShortcutCategories(t);
             const connectWalletShortcut = getKeyboardShortcutById(
                 categories,
                 'wallet.connect',
@@ -456,7 +457,7 @@ export default function PageHeader() {
                 <button
                     onClick={handleLogoClick}
                     className={styles.logo}
-                    aria-label='Go to home'
+                    aria-label={t('aria.goToHome')}
                 >
                     <img
                         src='/images/favicon.svg'
@@ -508,12 +509,14 @@ export default function PageHeader() {
                             onClick={() =>
                                 setIsMoreDropdownOpen(!isMoreDropdownOpen)
                             }
+                            aria-expanded={isMoreDropdownOpen}
+                            aria-haspopup='menu'
                         >
                             More
                             {isMoreDropdownOpen ? (
-                                <LuChevronUp size={15} />
+                                <LuChevronUp size={15} aria-hidden='true' />
                             ) : (
-                                <LuChevronDown size={15} />
+                                <LuChevronDown size={15} aria-hidden='true' />
                             )}
                         </button>
                         {isMoreDropdownOpen && (
@@ -528,6 +531,7 @@ export default function PageHeader() {
                             target='_blank'
                             rel='noopener noreferrer'
                             className={styles.ambientmm}
+                            aria-label={t('aria.spotTradingOpensNewTab')}
                         >
                             Spot
                         </a>

@@ -16,17 +16,188 @@ type TOptions = {
     defaultValue?: string;
 } & Record<string, unknown>;
 
-type TFunctionLike = (key: string, options?: TOptions) => unknown;
+export type TFunctionLike = (key: string, options?: TOptions) => unknown;
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null;
+const CUSTOM_SHORTCUTS_STORAGE_KEY = 'customKeyboardShortcuts';
+
+interface DefaultShortcut {
+    id: string;
+    keys: ShortcutKeyToken[];
+    descriptionKey: string;
+}
+
+interface DefaultCategory {
+    titleKey: string;
+    shortcuts: DefaultShortcut[];
+}
+
+const DEFAULT_SHORTCUT_CATEGORIES: DefaultCategory[] = [
+    {
+        titleKey: 'keyboardShortcuts.categoryTitles.general',
+        shortcuts: [
+            {
+                id: 'shortcuts.open',
+                keys: ['shift', '?'],
+                descriptionKey: 'keyboardShortcuts.descriptions.shortcuts.open',
+            },
+            {
+                id: 'settings.open',
+                keys: ['mod', ','],
+                descriptionKey: 'keyboardShortcuts.descriptions.settings.open',
+            },
+            {
+                id: 'modal.close',
+                keys: ['esc'],
+                descriptionKey: 'keyboardShortcuts.descriptions.modal.close',
+            },
+        ],
+    },
+    {
+        titleKey: 'keyboardShortcuts.categoryTitles.trading',
+        shortcuts: [
+            {
+                id: 'trading.buy',
+                keys: ['b'],
+                descriptionKey: 'keyboardShortcuts.descriptions.trading.buy',
+            },
+            {
+                id: 'trading.sell',
+                keys: ['s'],
+                descriptionKey: 'keyboardShortcuts.descriptions.trading.sell',
+            },
+            {
+                id: 'trading.market',
+                keys: ['m'],
+                descriptionKey: 'keyboardShortcuts.descriptions.trading.market',
+            },
+            {
+                id: 'trading.limit',
+                keys: ['l'],
+                descriptionKey: 'keyboardShortcuts.descriptions.trading.limit',
+            },
+            {
+                id: 'trading.marketClose',
+                keys: ['alt', 'm'],
+                descriptionKey:
+                    'keyboardShortcuts.descriptions.trading.marketClose',
+            },
+        ],
+    },
+    {
+        titleKey: 'keyboardShortcuts.categoryTitles.navigation',
+        shortcuts: [
+            {
+                id: 'navigation.trade',
+                keys: ['t'],
+                descriptionKey:
+                    'keyboardShortcuts.descriptions.navigation.trade',
+            },
+            {
+                id: 'navigation.home',
+                keys: ['h'],
+                descriptionKey:
+                    'keyboardShortcuts.descriptions.navigation.home',
+            },
+            {
+                id: 'navigation.portfolio',
+                keys: ['p'],
+                descriptionKey:
+                    'keyboardShortcuts.descriptions.navigation.portfolio',
+            },
+            {
+                id: 'wallet.connect',
+                keys: ['c'],
+                descriptionKey: 'keyboardShortcuts.descriptions.wallet.connect',
+            },
+            {
+                id: 'portfolio.deposit',
+                keys: ['d'],
+                descriptionKey:
+                    'keyboardShortcuts.descriptions.portfolio.deposit',
+            },
+            {
+                id: 'portfolio.withdraw',
+                keys: ['w'],
+                descriptionKey:
+                    'keyboardShortcuts.descriptions.portfolio.withdraw',
+            },
+            {
+                id: 'portfolio.latestTx',
+                keys: ['e'],
+                descriptionKey:
+                    'keyboardShortcuts.descriptions.portfolio.latestTx',
+            },
+        ],
+    },
+];
+
+export function getDefaultShortcutKeys(id: string): ShortcutKeyToken[] {
+    for (const category of DEFAULT_SHORTCUT_CATEGORIES) {
+        const shortcut = category.shortcuts.find((s) => s.id === id);
+        if (shortcut) return shortcut.keys;
+    }
+    return [];
+}
+
+export function getCustomShortcuts(): Record<string, ShortcutKeyToken[]> {
+    if (typeof window === 'undefined') return {};
+    try {
+        const stored = localStorage.getItem(CUSTOM_SHORTCUTS_STORAGE_KEY);
+        if (!stored) return {};
+        const parsed = JSON.parse(stored);
+        if (typeof parsed === 'object' && parsed !== null) {
+            return parsed as Record<string, ShortcutKeyToken[]>;
+        }
+    } catch {
+        // ignore
+    }
+    return {};
+}
+
+export function setCustomShortcut(id: string, keys: ShortcutKeyToken[]): void {
+    if (typeof window === 'undefined') return;
+    const current = getCustomShortcuts();
+    const defaultKeys = getDefaultShortcutKeys(id);
+
+    if (
+        keys.length === defaultKeys.length &&
+        keys.every((k, i) => k === defaultKeys[i])
+    ) {
+        delete current[id];
+    } else {
+        current[id] = keys;
+    }
+
+    if (Object.keys(current).length === 0) {
+        localStorage.removeItem(CUSTOM_SHORTCUTS_STORAGE_KEY);
+    } else {
+        localStorage.setItem(
+            CUSTOM_SHORTCUTS_STORAGE_KEY,
+            JSON.stringify(current),
+        );
+    }
+}
+
+export function resetAllCustomShortcuts(): void {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(CUSTOM_SHORTCUTS_STORAGE_KEY);
+}
+
+export function hasCustomShortcuts(): boolean {
+    return Object.keys(getCustomShortcuts()).length > 0;
+}
+
+function getEffectiveKeys(id: string): ShortcutKeyToken[] {
+    const custom = getCustomShortcuts();
+    if (custom[id]) return custom[id];
+    return getDefaultShortcutKeys(id);
 }
 
 function normalizeToken(token: string): string {
     return token.trim().toLowerCase();
 }
 
-function isMacPlatform(): boolean {
+export function isMacPlatform(): boolean {
     if (typeof navigator === 'undefined') return false;
     return /mac/i.test(navigator.platform);
 }
@@ -83,6 +254,10 @@ function eventMatchesMainKey(e: KeyboardEvent, token: string): boolean {
     if (t === 'esc' || t === 'escape') return e.key === 'Escape';
     if (t === 'enter' || t === 'return') return e.key === 'Enter';
 
+    if (t === ',' || t === 'comma') {
+        return e.code === 'Comma' || e.key === ',';
+    }
+
     if (t === 'slash' || t === '/') {
         return e.code === 'Slash' || e.key === '/';
     }
@@ -92,7 +267,16 @@ function eventMatchesMainKey(e: KeyboardEvent, token: string): boolean {
     }
 
     if (t.length === 1) {
-        return e.key.toLowerCase() === t;
+        if (e.key.toLowerCase() === t) return true;
+
+        // If the user has a key remapping, `e.code` refers to the physical key.
+        // Only fall back to `e.code` when a modifier is held (e.g. Option/Alt),
+        // because some layouts/platforms can produce non-letter `e.key` values.
+        // For unmodified letter shortcuts, prefer `e.key` to respect remaps.
+        const hasModifier = e.altKey || e.ctrlKey || e.metaKey;
+        if (!hasModifier) return false;
+
+        return e.code.toLowerCase() === `key${t}`.toLowerCase();
     }
 
     return e.key.toLowerCase() === t;
@@ -118,48 +302,22 @@ export function matchesShortcutEvent(
 export function getKeyboardShortcutCategories(
     t: TFunctionLike,
 ): KeyboardShortcutCategory[] {
-    const raw = t('keyboardShortcuts.categories', { returnObjects: true });
-
-    if (!Array.isArray(raw)) return [];
-
-    return raw
-        .map((cat: unknown) => {
-            const catRec = isRecord(cat) ? cat : null;
-            const title =
-                catRec && typeof catRec.title === 'string' ? catRec.title : '';
-
-            const shortcutsRaw =
-                catRec && Array.isArray(catRec.shortcuts)
-                    ? (catRec.shortcuts as unknown[])
-                    : [];
-
-            const shortcuts: KeyboardShortcutItem[] = shortcutsRaw
-                .map((s: unknown) => {
-                    const sRec = isRecord(s) ? s : null;
-                    const id =
-                        sRec && typeof sRec.id === 'string' ? sRec.id : '';
-                    const description =
-                        sRec && typeof sRec.description === 'string'
-                            ? sRec.description
-                            : '';
-                    const keys =
-                        sRec && Array.isArray(sRec.keys)
-                            ? (sRec.keys as unknown[]).filter(
-                                  (k): k is string => typeof k === 'string',
-                              )
-                            : [];
-
-                    return { id, description, keys };
-                })
-                .filter((s: KeyboardShortcutItem) =>
-                    Boolean(s.id && s.description && s.keys.length > 0),
-                );
-
-            return { title, shortcuts };
-        })
-        .filter((c: KeyboardShortcutCategory) =>
-            Boolean(c.title && c.shortcuts.length > 0),
+    return DEFAULT_SHORTCUT_CATEGORIES.map((cat) => {
+        const title = String(
+            t(cat.titleKey, { defaultValue: cat.titleKey }) ?? cat.titleKey,
         );
+
+        const shortcuts: KeyboardShortcutItem[] = cat.shortcuts.map((s) => {
+            const description = String(
+                t(s.descriptionKey, { defaultValue: s.descriptionKey }) ??
+                    s.descriptionKey,
+            );
+            const keys = getEffectiveKeys(s.id);
+            return { id: s.id, description, keys };
+        });
+
+        return { title, shortcuts };
+    });
 }
 
 export function getKeyboardShortcutById(
@@ -179,6 +337,23 @@ export function formatKeyboardShortcutKey(
 ): string {
     const normalized = normalizeToken(token);
     const mac = isMacPlatform();
+
+    if (normalized === 'mod') {
+        const fallback = mac ? 'Cmd' : 'Ctrl';
+        const resolvedToken = mac ? 'cmd' : 'ctrl';
+        const osSpecificKey = mac
+            ? `keyboardShortcuts.keyLabelsMac.${resolvedToken}`
+            : `keyboardShortcuts.keyLabelsWin.${resolvedToken}`;
+        const baseKey = `keyboardShortcuts.keyLabels.${resolvedToken}`;
+
+        const osValue = t(osSpecificKey, { defaultValue: '' });
+        if (typeof osValue === 'string' && osValue) return osValue;
+
+        const baseValue = t(baseKey, { defaultValue: '' });
+        if (typeof baseValue === 'string' && baseValue) return baseValue;
+
+        return fallback;
+    }
 
     const baseKey = `keyboardShortcuts.keyLabels.${normalized}`;
     const osKey = mac

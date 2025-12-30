@@ -472,7 +472,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         onBlur={(e) => console.log('Price blur', e)}
                         onKeyDown={(e) => console.log('Price keydown', e.key)}
                         className=''
-                        ariaLabel='price-input'
+                        ariaLabel={t('aria.priceInput', 'Price input')}
                         showMidButton={true}
                         setMidPriceAsPriceInput={setMidPriceAsPriceInput}
                         isMidModeActive={isMidModeActive}
@@ -488,7 +488,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         onBlur={handleSizeInputBlur}
                         onKeyDown={(e) => console.log('Size keydown', e.key)}
                         className=''
-                        ariaLabel='size-input'
+                        ariaLabel={t('aria.sizeInput', 'Size input')}
                         useTotalSize={false}
                         symbol={position.coin}
                         selectedDenom={selectedDenom}

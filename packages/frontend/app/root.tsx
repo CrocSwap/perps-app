@@ -60,6 +60,7 @@ import {
 function KeyboardShortcutsModalWrapper() {
     const { isOpen, close, toggle } = useKeyboardShortcuts();
     const navigate = useNavigate();
+    const location = useLocation();
     const { t } = useTranslation();
     const { navigationKeyboardShortcutsEnabled } = useAppSettings();
 
@@ -133,6 +134,15 @@ function KeyboardShortcutsModalWrapper() {
                 navTradeShortcut &&
                 matchesShortcutEvent(e, navTradeShortcut.keys)
             ) {
+                if (location.pathname.startsWith('/v2/trade')) {
+                    const el = document.getElementById(
+                        'trade-module-size-input',
+                    ) as HTMLInputElement | null;
+                    el?.focus();
+                    el?.select?.();
+                    return;
+                }
+
                 navigate('/v2/trade');
                 return;
             }
@@ -153,7 +163,14 @@ function KeyboardShortcutsModalWrapper() {
 
         window.addEventListener('keydown', handleGlobalKeyDown);
         return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-    }, [toggle, navigate, isOpen, t, navigationKeyboardShortcutsEnabled]);
+    }, [
+        toggle,
+        navigate,
+        isOpen,
+        t,
+        navigationKeyboardShortcutsEnabled,
+        location.pathname,
+    ]);
 
     return <KeyboardShortcutsModal isOpen={isOpen} onClose={close} />;
 }

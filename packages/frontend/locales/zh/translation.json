@@ -21,6 +21,8 @@
         "submit": "提交",
         "quantity": "数量",
         "confirm": "确认",
+        "send": "发送",
+        "address": "地址",
         "amount": "金额",
         "max": "最大",
         "min": "最小",
@@ -31,6 +33,7 @@
         "fundingHistory": "资金记录",
         "orderHistory": "订单历史",
         "depositsAndWithdrawals": "充值与提现",
+        "depositors": "存款人",
         "twap": "TWAP",
         "all": "全部",
         "active": "活跃",
@@ -147,6 +150,7 @@
         "midButton": "MID",
         "positionClosed": "持仓已平仓",
         "successfullyClosedPosition": "成功平仓{{symbol}}持仓{{usdValueOfOrderStr}}",
+        "tpSlForPosition": "TP/SL for Position",
         "failedToClosePosition": "平仓失败",
         "transactionTimedOut": "交易{{timeInSeconds}}秒后超时",
         "txFailedOrNotConfirmed": "交易失败或未确认",
@@ -295,9 +299,17 @@
         "tradeValue": "交易价值",
         "fee": "手续费",
         "closedPnl": "已实现盈亏",
+        "depositor": "Depositor",
+        "vaultAmount": "Vault Amount",
+        "unrealizedPnl": "Unrealized PnL",
+        "allTimePnl": "All Time PnL",
+        "daysFollowing": "Days Following",
+        "completed": "Completed",
+        "withdrawal": "Withdrawal",
+        "spotTransfer": "Spot Transfer",
         "reduceOnly": "只减仓",
         "triggerConditions": "触发条件",
-        "tpsl": "止盈/止损",
+        "tpsl": "TP/SL",
         "status": "状态",
         "order": "订单",
         "long": "Long",
@@ -335,10 +347,14 @@
         "noLongFundingHistory": "无多头资金费率历史",
         "noShortFundingHistory": "无空头资金费率历史",
         "fundingHistory": "总计: {{allTime}} 变化后: {{sinceChange}}",
+        "positionSide": "Position Side",
+        "payment": "Payment",
+        "rate": "Rate",
         "openLong": "开 Long",
         "openShort": "开 Short",
         "closeLong": "平 Long",
-        "closeShort": "平 Short"
+        "closeShort": "平 Short",
+        "goToMarket": "前往{{coin}}市场"
     },
     "time": {
         "second": "秒",
@@ -510,13 +526,15 @@
     },
     "leverage": {
         "title": "调整杠杆",
-        "closePositionPrompt": "平仓以降低最小杠杆倍数"
+        "closePositionPrompt": "关闭持仓以降低最低杠杆",
+        "adjustLeverage": "调整杠杆，当前{{value}}倍"
     },
     "share": {
         "prompt": "自定义您的文本",
         "xCTA": "在𝕏分享",
         "copyLinkCTA": "复制链接",
-        "textPlaceholder": "立即在{{fogo}} Testnet通过{{twitter}}交易{{coin}}合约"
+        "textPlaceholder": "立即在{{fogo}} Testnet通过{{twitter}}交易{{coin}}合约",
+        "sharePosition": "分享PnL {{pnl}}的持仓"
     },
     "colors": {
         "default": "默认",
@@ -531,6 +549,11 @@
         "depositInput": "充值输入框",
         "addressInput": "地址输入框",
         "amountInput": "金额输入框",
+        "expandWallet": "展开钱包",
+        "collapseWallet": "收起钱包",
+        "priceInput": "价格输入框",
+        "sizeInput": "数量输入框",
+        "stopPriceInput": "止损价输入框",
         "withdrawInput": "提现输入框",
         "scrollTabsLeft": "标签左移",
         "scrollTabsRight": "标签右移",
@@ -562,7 +585,28 @@
         "toggleTPSL": "切换止盈止损",
         "editTPSL": "编辑止盈止损",
         "toggleConfigureAmount": "切换金额设置",
-        "toggleLimitPrice": "切换限价"
+        "toggleLimitPrice": "切换限价",
+        "setMaxAmount": "设置最大金额",
+        "rowsPerPage": "每页行数",
+        "closeModal": "关闭窗口",
+        "goToHome": "返回首页",
+        "spotTradingOpensNewTab": "Ambient v1现货交易（在新标签页打开）",
+        "moreOptions": "更多选项",
+        "notifications": "通知",
+        "transferAmount": "转账金额",
+        "viewOnExplorerNewTab": "在浏览器中查看（在新标签页打开）",
+        "externalLinkOpensNewTab": "{{linkText}}（在新标签页打开）",
+        "opensInNewTab": "（在新标签页打开）",
+        "selectTokenCurrent": "选择代币，当前: {{symbol}}",
+        "mobileTradeNavigation": "交易导航",
+        "takeProfitPrice": "止盈价格",
+        "expectedGain": "预期收益",
+        "toggleGainCurrency": "在美元和百分比之间切换收益显示方式",
+        "stopLossPrice": "止损价格",
+        "expectedLoss": "预期亏损",
+        "toggleLossCurrency": "在美元和百分比之间切换亏损显示方式",
+        "setMidPrice": "设置中间价",
+        "selectSizeDenomination": "选择数量单位"
     },
     "chart": {
         "liqPrice": "强平价格"
@@ -571,6 +615,59 @@
         "title": "Ambient Finance | Fogo永续合约",
         "description": "在Ambient Finance上交易Fogo永续合约。零Taker费用，最高100倍杠杆，极速成交。",
         "content": "在Ambient进行永续合约交易"
+    },
+    "portfolio": {
+        "fees": "Fees",
+        "vol14d": "Vol(14d)",
+        "viewVolume": "View volume",
+        "feesTakerMaker": "Fees (Taker / Maker)",
+        "viewFeeSchedule": "View fee schedule",
+        "totalUsdVal": "Total USD Val",
+        "totalNetUsdValue": "Total Net USD Value",
+        "performance": "Performance",
+        "positions": "Positions",
+        "feeSchedule": "Fee Schedule",
+        "vipTiers": "VIP Tiers",
+        "marketMakerTiers": "Market Maker Tiers",
+        "tier": "Tier",
+        "vol14dVolume": "14天交易量",
+        "taker": "Taker",
+        "maker": "Maker",
+        "negativeFeesRebate": "负费用即返佣",
+        "alwaysZero": "始终为 0.00%",
+        "makerFeesPercent": "Maker 费用 {{percent}}",
+        "availableToDepositTooltip": "根据您的余额，您可以存入的最大金额",
+        "availableToSend": "可发送",
+        "availableToSendTooltip": "您可以发送的总金额",
+        "networkFee": "网络费用",
+        "networkFeeTooltip": "处理交易收取的费用",
+        "fogoChainLogo": "Fogo 链标志",
+        "accountValue": "账户价值",
+        "collateral": "保证金",
+        "pnl": "盈亏 (PNL)",
+        "volume": "交易量",
+        "maxDrawdown": "最大回撤",
+        "totalEquity": "总权益",
+        "accountEquity": "账户权益",
+        "vaultEquity": "金库权益",
+        "perps": "合约 (Perps)",
+        "perpsAndVaults": "合约 + 金库",
+        "allTime": "历史总计",
+        "twentyFourHour": "24小时",
+        "sevenDay": "7天",
+        "thirtyDay": "30天",
+        "fusd": "fUSD",
+        "sendDescription": "发送代币到 Fogo 上的另一个地址。",
+        "sendTitle": "在 Fogo 上发送 {{token}}",
+        "enterAddress": "输入地址...",
+        "enterAmount": "输入金额",
+        "invalidAddress": "无效地址",
+        "insufficientFunds": "资金不足",
+        "validAmountRequired": "请输入有效的金额",
+        "amountGreaterThanZero": "金额必须大于 0",
+        "minDepositAmount": "最小存入金额为 {{amount}}",
+        "exceedsAvailableBalance": "金额超出可用余额 {{balance}}",
+        "transactionTimedOut": "交易在 15 秒后超时"
     },
     "pageTitles": {
         "portfolio": "投资组合",
@@ -609,96 +706,48 @@
         "title": "键盘快捷键",
         "hintPress": "按",
         "hintToClose": "关闭",
+        "applyDefaults": "应用默认值",
+        "editShortcut": "编辑快捷键",
+        "pressKeys": "请按键...",
         "aria": {
             "close": "关闭键盘快捷键"
         },
-        "categories": [
-            {
-                "title": "通用",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "显示快捷键"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["alt", ","],
-                        "description": "打开设置"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "关闭弹窗 / 取消"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "通用",
+            "trading": "交易",
+            "navigation": "导航"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "显示快捷键"
             },
-            {
-                "title": "交易",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "切换为买入"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "切换为卖出"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "开始市价单"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "开始限价单"
-                    }
-                ]
+            "settings": {
+                "open": "打开设置"
             },
-            {
-                "title": "导航",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "前往交易页面"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "前往首页"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "前往资产页面"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "打开钱包连接"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "打开充值弹窗"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "打开提现弹窗"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "在区块浏览器中查看最新交易"
-                    }
-                ]
+            "modal": {
+                "close": "关闭弹窗 / 取消"
+            },
+            "trading": {
+                "buy": "切换为买入",
+                "sell": "切换为卖出",
+                "market": "开始市价单",
+                "limit": "开始限价单",
+                "marketClose": "以市价平仓"
+            },
+            "navigation": {
+                "trade": "前往交易页面",
+                "home": "前往首页",
+                "portfolio": "前往资产页面"
+            },
+            "wallet": {
+                "connect": "打开钱包连接"
+            },
+            "portfolio": {
+                "deposit": "打开充值弹窗",
+                "withdraw": "打开提现弹窗",
+                "latestTx": "在区块浏览器中查看最新交易"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",

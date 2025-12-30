@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { externalURLs } from '~/utils/Constants';
 import styles from './Links.module.css';
 import {
@@ -86,6 +87,7 @@ const linksData = [
 ];
 
 const Links: React.FC = () => {
+    const { t } = useTranslation();
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>Links</h1>
@@ -102,10 +104,15 @@ const Links: React.FC = () => {
                             className={styles.button}
                             target='_blank'
                             rel='noopener noreferrer'
-                            aria-label={`${item.linkText} (opens in new tab)`}
+                            aria-label={t('aria.externalLinkOpensNewTab', {
+                                linkText: item.linkText,
+                            })}
                         >
                             {item.linkText}
-                            <span className='sr-only'> (opens in new tab)</span>
+                            <span className='sr-only'>
+                                {' '}
+                                {t('aria.opensInNewTab')}
+                            </span>
                         </a>
                     </div>
                 ))}
