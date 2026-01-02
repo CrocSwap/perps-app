@@ -12,6 +12,7 @@ import {
 import { getPricetoPixel } from './customOrderLineUtils';
 import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
 import { usePreviewOrderLines } from './usePreviewOrderLines';
+import { ChartElementControlPanel } from './component/ChartElementControlPanel';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -48,7 +49,7 @@ export default function OrderLines({
     const isZoomingRef = useRef(false);
     const [localChartReady, setLocalChartReady] = useState(true);
     const drawnLabelsRef = useRef<LineData[]>([]);
-    const [selectedLine, setSelectedLine] = useState<
+    const [activeDragLine, setActiveDragLine] = useState<
         undefined | LabelLocationData
     >(undefined);
 
@@ -109,21 +110,21 @@ export default function OrderLines({
             if (!line.oid) return line;
             if (
                 line.type !== 'PNL' &&
-                selectedLine &&
-                line.oid === selectedLine.parentLine.oid
+                activeDragLine &&
+                line.oid === activeDragLine.parentLine.oid
             ) {
                 matchFound = true;
-                return selectedLine.parentLine;
+                return activeDragLine.parentLine;
             }
             return line;
         });
 
-        if (selectedLine && !matchFound) {
-            setSelectedLine(undefined);
+        if (activeDragLine && !matchFound) {
+            setActiveDragLine(undefined);
         }
 
         setLines(updatedLines);
-    }, [openLines, positionLines, obPreviewLine, selectedLine]);
+    }, [openLines, positionLines, obPreviewLine, activeDragLine]);
 
     useEffect(() => {
         if (!chart || !scaleData) return;
@@ -222,9 +223,9 @@ export default function OrderLines({
             const min = Math.min(minY, maxY);
             return (
                 (line.yPrice >= min && line.yPrice <= max && isVisibleEnough) ||
-                (selectedLine &&
+                (activeDragLine &&
                     line.oid &&
-                    line.oid === selectedLine?.parentLine.oid)
+                    line.oid === activeDragLine?.parentLine.oid)
             );
         });
 
@@ -232,7 +233,7 @@ export default function OrderLines({
     }, [
         lines,
         canvasSize,
-        selectedLine,
+        activeDragLine,
         JSON.stringify(scaleData?.yScale.domain()),
     ]);
 
@@ -253,13 +254,19 @@ export default function OrderLines({
                     canvasSize={canvasSize}
                     drawnLabelsRef={drawnLabelsRef}
                     scaleData={scaleData}
-                    selectedLine={selectedLine}
-                    setSelectedLine={setSelectedLine}
+                    activeDragLine={activeDragLine}
+                    setActiveDragLine={setActiveDragLine}
                     overlayCanvasMousePositionRef={
                         overlayCanvasMousePositionRef
                     }
                 />
             )}
+
+            <ChartElementControlPanel
+                chart={chart}
+                canvasHeight={canvasSize?.height || 0}
+                canvasWidth={canvasSize?.width || 0}
+            />
         </>
     );
 }
