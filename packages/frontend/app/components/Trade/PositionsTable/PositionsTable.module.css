@@ -89,7 +89,53 @@
 .actionContainer {
     display: flex;
 }
+.closeOptionsContainer {
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-m);
+}
 
+.positionInfo {
+    color: var(--text2);
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: var(--margin-m);
+}
+
+.closeOptions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: var(--gap-m);
+}
+
+.closeOption {
+    background: var(--bg-dark4);
+    flex: 1;
+    padding: var(--padding-m);
+    border: none;
+    border-radius: var(--radius-s, 8px);
+    cursor: pointer;
+    color: var(--text1, #f0f0f8);
+    min-height: 80px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+.optionTitle {
+    font-size: var(--font-size-m, 18px);
+}
+
+.optionDescription {
+    color: var(--text2);
+    font-size: 12px;
+}
 /* Specific cell classes */
 .coinCell {
     display: flex;

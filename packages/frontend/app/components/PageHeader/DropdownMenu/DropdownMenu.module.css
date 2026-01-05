@@ -6,22 +6,30 @@
     align-items: flex-start;
     position: absolute;
     gap: var(--gap-xs);
-    top: 30px;
+    top: 10px;
     right: 0;
     width: 210px;
     border-radius: var(--radius-m, 16px);
     padding: var(--padding-s);
     background: var(--bg-dark3, #16161c);
     box-shadow: var(--dropdown-box-shadow);
-
     height: auto;
 
     transition:
-        max-height var(--ease-in-out-med),
+        transform var(--ease-in-out-med),
         opacity var(--ease-in-out-med);
     z-index: var(--z-index-navbar-dropdown, 999);
 }
 
+/* Wrapper for overlay mode on mobile */
+.backdrop {
+    position: absolute;
+    inset: auto;
+    background: transparent;
+    z-index: var(--z-index-navbar-dropdown, 999);
+}
+
+/* Menu items */
 .menuItem {
     height: var(--menu-item-height);
     display: flex;
@@ -33,11 +41,24 @@
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-m, 18px);
     cursor: pointer;
-    transition: all var(--ease-in-out-med);
+    transition: background var(--ease-in-out-med);
     user-select: none;
+    background: transparent;
+    border: none;
 }
+
 .menuItem:hover {
     background: var(--bg-dark4);
+}
+
+.menuItemLabel {
+    text-align: left;
+}
+
+.menuItemIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .version {
@@ -45,6 +66,7 @@
     font-size: var(--font-size-s, 12px);
     margin-top: var(--margin-s);
     height: 19px;
+    padding-left: var(--padding-xs);
 }
 
 .logoutButton {
@@ -61,7 +83,7 @@
     background: var(--accent1, #7371fc);
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-m, 18px);
-    transition: all 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out;
 }
 
 .logoutButton:hover {
@@ -71,6 +93,7 @@
 .toggleButton {
     display: none;
 }
+
 .tutorialButton {
     width: 100%;
     outline: none;
@@ -83,4 +106,93 @@
     justify-content: space-between;
     padding-right: 2px;
     padding-left: var(--padding-xs);
+}
+.logoRow {
+    display: none;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: var(--margin-s);
+    background-color: var(--bg-dark2);
+    padding: var(--padding-xs) 0;
+}
+
+/* .logoImage {
+    height: 28px;
+    width: auto;
+} */
+
+/* ------- MOBILE: slide-in sidebar from the right ------- */
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        justify-content: flex-end;
+        align-items: stretch;
+        overflow: hidden;
+    }
+
+    .container {
+        position: relative;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        max-height: 100vh;
+        width: min(80vw, 320px);
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--gap-xs);
+        overflow: hidden;
+    }
+
+    .menuItems {
+        padding: var(--padding-m);
+    }
+
+    .menuItem {
+        height: auto;
+        padding: 10px var(--padding-xs);
+        font-size: 16px;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+
+    .version {
+        margin-top: auto;
+    }
+    .logoutButtonContainer {
+        padding: var(--padding-s) 0;
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logoutButton {
+        min-width: 80%;
+    }
+    .logoRow {
+        display: flex;
+    }
+    .logoRow img {
+        margin-left: var(--margin-m);
+    }
 }

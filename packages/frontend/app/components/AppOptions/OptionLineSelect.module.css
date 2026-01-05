@@ -42,13 +42,17 @@
 
 /* elem showing the active selection, opens or closes dropdown on click */
 .active_option {
+    border: none;
+    padding: 0 var(--padding-s);
+    font: inherit;
+    color: inherit;
+
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
     min-height: 100%;
-    padding: 0 var(--padding-s);
     background-color: var(--bg-dark4);
     border-radius: var(--radius-s);
     cursor: pointer;
@@ -66,6 +70,11 @@
 
 /* individual items in the dropdown menu */
 .options_dropdown > * {
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+
     padding: 0 var(--padding-s);
     border-radius: var(--radius-xs);
 }

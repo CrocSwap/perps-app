@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import type { UserFundingSortBy } from '~/utils/UserDataIFs';
 import styles from './FundingHistoryTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
@@ -23,37 +24,37 @@ export default function FundingHistoryTableHeader(
 
     const tableHeaders: HeaderCell[] = [
         {
-            name: 'Time',
+            name: t('tradeTable.time'),
             key: 'time',
             sortable: true,
             className: 'timeCell',
         },
         {
-            name: 'Coin',
+            name: t('tradeTable.coin'),
             key: 'coin',
             sortable: true,
             className: 'coinCell',
         },
         {
-            name: 'Size',
+            name: t('tradeTable.size'),
             key: 'szi',
             sortable: true,
             className: 'sizeCell',
         },
         {
-            name: 'Position Side',
+            name: t('tradeTable.positionSide'),
             key: 'positionSide',
             sortable: false,
             className: 'positionSideCell',
         },
         {
-            name: 'Payment',
+            name: t('tradeTable.payment'),
             key: 'usdc',
             sortable: true,
             className: 'paymentCell',
         },
         {
-            name: 'Rate',
+            name: t('tradeTable.rate'),
             key: 'fundingRate',
             sortable: true,
             className: 'rateCell',

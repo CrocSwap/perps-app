@@ -1,4 +1,9 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { DFLT_EMBER_MARKET } from '@crocswap-libs/ambient-ember';
+import {
+    isEstablished,
+    useConnection,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { WithdrawService } from '~/services/withdrawService';
 
@@ -31,6 +36,7 @@ export interface UseWithdrawServiceReturn {
  */
 export function useWithdrawService(): UseWithdrawServiceReturn {
     const sessionState = useSession();
+    const connection = useConnection();
     const [availableBalance, setAvailableBalance] =
         useState<AvailableWithdrawBalance | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -42,12 +48,12 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
     // Initialize withdraw service when session is established
     useEffect(() => {
         if (isEstablished(sessionState)) {
-            const service = new WithdrawService(sessionState.connection);
+            const service = new WithdrawService(connection);
             setWithdrawService(service);
         } else {
             setWithdrawService(null);
         }
-    }, [sessionState]);
+    }, [sessionState, connection]);
 
     // Fetch available withdraw balance
     const refreshBalance = useCallback(async () => {
@@ -64,7 +70,7 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
                 sessionState.walletPublicKey || sessionState.sessionPublicKey;
 
             // Get marketId from TradeDataStore (default to BTC market if not available)
-            const marketId = BigInt(64); // TODO: Get from TradeDataStore when available
+            const marketId = BigInt(DFLT_EMBER_MARKET.mktId); // TODO: Get from TradeDataStore when available
 
             // Try session key first (as that's what's used for transactions)
             let balance = await withdrawService.getAvailableWithdrawBalance(
@@ -170,7 +176,9 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
                         )
                             .filter(
                                 (key) =>
-                                    typeof sessionState[key] === 'function',
+                                    typeof sessionState[
+                                        key as keyof typeof sessionState
+                                    ] === 'function',
                             )
                             .join(', ')}`,
                     );

@@ -1,5 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import * as d3 from 'd3';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Button from '~/components/Button/Button';
 import styles from './CollateralPieChart.module.css';
 
@@ -11,17 +12,15 @@ type PieChartProps = {
 };
 
 const CollateralPieChart: React.FC<PieChartProps> = (props) => {
+    const { t } = useTranslation();
     const { height, width } = props;
 
-    const chartHeight = height || 250;
+    const chartHeight = height || 150;
 
-    const pieData: PieData[] = [
-        { label: 'UPnL', value: 20 },
-        { label: 'USDC', value: 36 },
-        { label: 'BTC', value: 25 },
-        { label: 'SOL', value: 10 },
-        { label: 'FOGO', value: 9 },
-    ];
+    const pieData: PieData[] = useMemo(
+        () => [{ label: t('portfolio.fusd'), value: 100 }],
+        [t],
+    );
 
     const dataColorSet = [
         '#7371fc',
@@ -48,7 +47,7 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
         const height = canvas?.height;
         const radius = Math.min(width, height) / 2;
 
-        const pie = d3.pie<PieData>().value((d) => d.value);
+        const pie = d3.pie<PieData>().value((d: any) => d.value);
         const arcs = pie(pieData);
 
         function drawArc(
@@ -67,7 +66,7 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
             ctx.fill();
         }
 
-        arcs.forEach((arc) => {
+        arcs.forEach((arc: any) => {
             drawArc(ctx, arc, color(arc.data.label));
         });
     }, [pieData]);
@@ -90,9 +89,9 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
                             </span>
                         </div>
                     </div>
-                    <div>
+                    {/* <div>
                         <Button size='medium'>Convert</Button>
-                    </div>
+                    </div> */}
                 </div>
             ))}
         </div>
@@ -104,8 +103,8 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
                 <div className={styles.dataLabel}>
                     <canvas
                         id='pie-canvas'
-                        width={Math.max(Math.min(chartHeight, 250), 150)}
-                        height={Math.max(Math.min(chartHeight, 250), 150)}
+                        width={Math.max(Math.min(chartHeight, 250), 100)}
+                        height={Math.max(Math.min(chartHeight, 250), 100)}
                     ></canvas>
                 </div>
                 {legend}

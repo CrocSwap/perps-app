@@ -39,10 +39,10 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import {
-    blockExplorer,
     BTC_MAX_LEVERAGE,
     MIN_ORDER_VALUE,
     MIN_POSITION_USD_SIZE,
+    getTxLink,
 } from '~/utils/Constants';
 import {
     getDurationSegment,
@@ -69,11 +69,13 @@ import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
 import type {
     modalContentT,
+    OrderInputChangeType,
     OrderSide,
     OrderTypeOption,
 } from '~/utils/CommonIFs';
 import { useTranslation } from 'react-i18next';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 const useOnlyMarket = false;
 
@@ -82,6 +84,26 @@ const useOnlyMarket = false;
 //     { value: 'bid1ask1', label: 'Bid1/Ask1' },
 //     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
 // ];
+
+// Custom hook for debouncing boolean values (only debounces true values)
+function useDebounceOnTrue(value: boolean, delay: number): boolean {
+    const [debouncedValue, setDebouncedValue] = useState<boolean>(value);
+
+    useEffect(() => {
+        // Only set the debounced value if value is true
+        if (value) {
+            const timer = setTimeout(() => {
+                setDebouncedValue(true);
+            }, delay);
+            return () => clearTimeout(timer);
+        } else {
+            setDebouncedValue(false);
+            return () => {};
+        }
+    }, [value, delay]);
+
+    return debouncedValue;
+}
 
 function OrderInput({
     marginBucket,
@@ -157,16 +179,46 @@ function OrderInput({
     // Track if the OrderInput component is focused
     const [isFocused, setIsFocused] = useState(false);
     const orderInputRef = useRef<HTMLDivElement>(null);
-    const submitButtonRef = useRef<HTMLElement | null>(null);
+    const submitButtonRef = useRef<HTMLButtonElement | null>(null);
     const { getBsColor } = useAppSettings();
 
     const sessionState = useSession();
     const activeOptions: useAppOptionsIF = useAppOptions();
 
+    const {
+        obChosenPrice,
+        setObChosenPrice,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+        setOrderInputPriceValue,
+        orderInputPriceValue,
+        tradeDirection,
+        setTradeDirection,
+        setIsMidModeActive,
+        isMidModeActive,
+        marketOrderType,
+        setMarketOrderType,
+    } = useTradeDataStore();
+
+    const orderInputPriceValueRef = useRef<number | undefined>(undefined);
+    orderInputPriceValueRef.current = orderInputPriceValue.value;
+
+    // Track if direction change came from debounced price input (to prevent auto-focus)
+    const directionChangeFromInputRef = useRef(false);
+
+    // Debounce timer ref for price input changes
+    const priceInputDebounceRef = useRef<NodeJS.Timeout | null>(null);
+
+    const isMobileRef = useRef(false);
+    const isMobile = useMobile();
+    isMobileRef.current = isMobile;
+
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
-    const [marketOrderType, setMarketOrderType] = useState<string>('market');
-    const [tradeDirection, setTradeDirection] = useState<OrderSide>('buy');
+    const marketOrderTypeRef = useRef(marketOrderType);
+    marketOrderTypeRef.current = marketOrderType;
 
     const [shouldUpdateAfterTrade, setShouldUpdateAfterTrade] = useState(false);
 
@@ -197,13 +249,6 @@ function OrderInput({
 
     const [sizeDisplay, setSizeDisplay] = useState('');
 
-    const isPriceInvalid = useMemo(() => {
-        return (
-            marketOrderType === 'limit' &&
-            (price === '' || price === '0' || price === '0.0')
-        );
-    }, [price, marketOrderType]);
-
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -221,6 +266,16 @@ function OrderInput({
 
     const [isSizeSetAsPercentage, setIsSizeSetAsPercentage] = useState(false);
 
+    const isMidModeActiveRef = useRef(isMidModeActive);
+    isMidModeActiveRef.current = isMidModeActive;
+
+    const isPriceInvalid = useMemo(() => {
+        return (
+            marketOrderType === 'limit' &&
+            (price === '' || price === '0' || price === '0.0')
+        );
+    }, [price, marketOrderType]);
+
     useEffect(() => {
         if (!marginBucket) return;
         const maxRemainingOI = maxRemainingUserNotionalOI(
@@ -233,10 +288,9 @@ function OrderInput({
 
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
 
-    const { obChosenPrice, symbol, symbolInfo, marginMode, setMarginMode } =
-        useTradeDataStore();
-
-    const { buys, sells } = useOrderBookStore();
+    const { buys, sells, midPrice, usualResolution } = useOrderBookStore();
+    const midPriceRef = useRef(midPrice);
+    midPriceRef.current = midPrice;
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
 
     // backup mark price for when symbolInfo not available
@@ -257,21 +311,47 @@ function OrderInput({
         return midPrice;
     };
 
+    const assignPrice = (price: string, changeType: OrderInputChangeType) => {
+        // For inputChange, debounce the store update by 1000ms
+        // This delays chart line updates and trade direction changes until user stops typing
+        if (changeType === 'inputChange') {
+            // Clear any pending debounce
+            if (priceInputDebounceRef.current) {
+                clearTimeout(priceInputDebounceRef.current);
+            }
+            // Update local price display immediately (handled by handlePriceChange setting price state)
+            // But debounce the store update that triggers chart line and direction changes
+            priceInputDebounceRef.current = setTimeout(() => {
+                directionChangeFromInputRef.current = true;
+                if (price && price.length > 0) {
+                    const parsed = parseFormattedNum(price);
+                    setOrderInputPriceValue({ value: parsed, changeType });
+                } else {
+                    setOrderInputPriceValue({ value: undefined, changeType });
+                }
+            }, 1000);
+        } else {
+            // For other change types (obClick, dragEnd, midPriceChange, reset), update immediately
+            if (price && price.length > 0) {
+                const parsed = parseFormattedNum(price);
+                setOrderInputPriceValue({ value: parsed, changeType });
+            } else {
+                setOrderInputPriceValue({ value: undefined, changeType });
+            }
+        }
+    };
+
     const setMidPriceAsPriceInput = () => {
-        if (
-            marketOrderType === 'limit' &&
-            buys.length > 0 &&
-            sells.length > 0
-        ) {
-            const resolution = buys[0].px - buys[1].px;
-            const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
-            if (!midOrMarkPrice) return;
+        if (!midPriceRef.current) return;
+        if (marketOrderType === 'limit') {
             const formattedMidPrice = formatNumWithOnlyDecimals(
-                midOrMarkPrice,
+                midPriceRef.current,
                 6,
                 true,
             );
-            setPrice(formattedMidPrice);
+
+            // setPrice(formattedMidPrice);
+            assignPrice(formattedMidPrice, 'midPriceChange');
         }
     };
 
@@ -280,21 +360,6 @@ function OrderInput({
         return Number(marginBucket?.equity) / 1e6;
     }, [marginBucket]);
 
-    useEffect(() => {
-        // set mid price input as default price when market changes
-        if (!obChosenPrice) {
-            setMidPriceAsPriceInput();
-        }
-        setIsMidModeActive(false);
-    }, [
-        marketOrderType,
-        !buys.length,
-        !sells.length,
-        buys?.[0]?.coin,
-        obChosenPrice,
-    ]);
-
-    const [isMidModeActive, setIsMidModeActive] = useState(false);
     const confirmOrderModal = useModal<modalContentT>('closed');
 
     useEffect(() => {
@@ -305,11 +370,7 @@ function OrderInput({
     }, [
         isMidModeActive,
         marketOrderType,
-        !buys.length,
-        !sells.length,
-        buys?.[0]?.px,
-        sells?.[0]?.px,
-        markPx,
+        midPrice,
         confirmOrderModal.isOpen, // Add dependency to re-run when modal state changes
     ]);
 
@@ -587,33 +648,21 @@ function OrderInput({
               );
     }, [currentPositionNotionalSize, activeGroupSeparator]);
 
-    function useDebounceOnTrue(value: boolean, delay: number): boolean {
-        const [debouncedValue, setDebouncedValue] = useState<boolean>(value);
-
-        useEffect(() => {
-            // Only set the debounced value if value is true
-            if (value) {
-                const timer = setTimeout(() => {
-                    setDebouncedValue(true);
-                }, delay);
-                return () => clearTimeout(timer);
-            } else {
-                setDebouncedValue(false);
-                return () => {};
-            }
-        }, [value, delay]);
-
-        return debouncedValue;
-    }
-
     const isMarginInsufficientDebounced = useDebounceOnTrue(
         isMarginInsufficient,
         500,
     );
 
+    const isDepositRequired = useMemo(() => {
+        return !isReduceOnlyEnabled && normalizedEquity < MIN_POSITION_USD_SIZE;
+    }, [isReduceOnlyEnabled, normalizedEquity]);
+
     useEffect(() => {
-        setNotionalQtyNum(0);
-        setPrice('');
+        if (!isMobileRef.current) {
+            setNotionalQtyNum(0);
+            // setPrice('');
+            assignPrice('', 'reset');
+        }
 
         // Apply leverage validation when symbol changes
         // BUT only if we have the correct symbolInfo for the current symbol
@@ -658,9 +707,17 @@ function OrderInput({
 
     useEffect(() => {
         if (obChosenPrice > 0) {
-            setIsMidModeActive(false);
-            setPrice(formatNumWithOnlyDecimals(obChosenPrice));
-            handleTypeChange();
+            // timeout has been added to handle race condition useEffect [marketOrderType] on mobile
+            setTimeout(() => {
+                setIsMidModeActive(false);
+                // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
+                assignPrice(
+                    formatNumWithOnlyDecimals(obChosenPrice),
+                    'obClick',
+                );
+                handleTypeChange();
+                setObChosenPrice(0);
+            }, 20);
         }
     }, [obChosenPrice]);
 
@@ -842,13 +899,91 @@ function OrderInput({
     const handlePriceChange = (
         event: React.ChangeEvent<HTMLInputElement> | string,
     ) => {
-        setIsMidModeActive(false);
         if (typeof event === 'string') {
-            setPrice(event);
+            setPrice(event); // Update local display immediately
+            assignPrice(event, 'inputChange'); // Debounced store update
         } else {
-            setPrice(event.target.value);
+            setPrice(event.target.value); // Update local display immediately
+            assignPrice(event.target.value, 'inputChange'); // Debounced store update
+            setIsMidModeActive(false);
         }
     };
+
+    useEffect(() => {
+        if (marketOrderType === 'market') {
+            setOrderInputPriceValue({ value: 0, changeType: 'inputChange' });
+        } else if (
+            marketOrderType === 'limit' &&
+            !orderInputPriceValueRef.current
+        ) {
+            setIsMidModeActive(true);
+        }
+    }, [marketOrderType]);
+
+    // set input price when orderInputPriceValue changes
+    useEffect(() => {
+        if (orderInputPriceValue.value === undefined) {
+            setPrice('');
+        } else if (orderInputPriceValue.value === 0) {
+            setPrice('0');
+        } else {
+            const resVal = usualResolution?.val || 1;
+            const decimals = Math.floor(Math.log10(resVal)) * -1;
+            const priceToSet = formatNumWithOnlyDecimals(
+                orderInputPriceValue.value,
+                decimals > 0 ? decimals : 0,
+                true,
+            );
+            setPrice(priceToSet);
+
+            if (
+                midPriceRef.current &&
+                (orderInputPriceValue.changeType == 'dragEnd' ||
+                    orderInputPriceValue.changeType == 'obClick')
+            ) {
+                if (orderInputPriceValue.value > midPriceRef.current) {
+                    setTradeDirection('sell');
+                } else {
+                    setTradeDirection('buy');
+                }
+            }
+
+            if (
+                isMidModeActiveRef.current ||
+                orderInputPriceValue.changeType !== 'dragEnd'
+            )
+                return;
+            const orderElem = document.getElementById(
+                'trade-module-price-input-container',
+            );
+            if (orderElem?.classList.contains('pulsed')) return;
+            orderElem?.classList.add('divPulseNeon');
+            orderElem?.classList.add('pulsed');
+            setTimeout(() => {
+                orderElem?.classList.remove('divPulseNeon');
+            }, 800);
+        }
+    }, [orderInputPriceValue.value, usualResolution]);
+
+    // Set direction when price input value changes (already debounced via assignPrice)
+    useEffect(() => {
+        if (
+            !midPriceRef.current ||
+            orderInputPriceValue.changeType !== 'inputChange'
+        ) {
+            return;
+        }
+
+        // Direction change happens immediately since assignPrice already debounced the store update
+        if (
+            orderInputPriceValue.value &&
+            orderInputPriceValue.value > midPriceRef.current!
+        ) {
+            setTradeDirection('sell');
+        } else {
+            setTradeDirection('buy');
+        }
+    }, [orderInputPriceValue.value, orderInputPriceValue.changeType]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');
@@ -1006,7 +1141,13 @@ function OrderInput({
                 </div>
             </div>
         ),
-        [styles.priceDistributionContainer],
+        [
+            styles.priceDistributionContainer,
+            styles.inputDetailsLabel,
+            styles.actionButtonsContainer,
+            confirmOrderModal,
+            t,
+        ],
     );
 
     // -----------------------------PROPS----------------------------------------
@@ -1069,7 +1210,7 @@ function OrderInput({
             onBlur: handleStopPriceBlur,
             onKeyDown: handleStopPriceKeyDown,
             className: 'custom-input',
-            ariaLabel: 'stop price input',
+            ariaLabel: t('aria.stopPriceInput', 'Stop price input'),
         }),
         [stopPrice, handleStopPriceChange],
     );
@@ -1081,7 +1222,7 @@ function OrderInput({
             onBlur: handlePriceBlur,
             onKeyDown: handlePriceKeyDown,
             className: 'custom-input',
-            ariaLabel: 'Price input',
+            ariaLabel: t('aria.priceInput', 'Price input'),
             showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
             setMidPriceAsPriceInput,
             isMidModeActive,
@@ -1107,7 +1248,7 @@ function OrderInput({
             onUnfocus: () => setIsEditingSizeInput(false),
             onKeyDown: handleSizeKeyDown,
             className: 'custom-input',
-            ariaLabel: 'Size input',
+            ariaLabel: t('aria.sizeInput', 'Size input'),
             symbol,
             isEditing: isEditingSizeInput,
             selectedDenom,
@@ -1127,19 +1268,29 @@ function OrderInput({
     );
 
     // After mount on client, focus the size input on desktop widths
+    // Skip auto-focus when direction change came from debounced price input typing
     useEffect(() => {
         if (typeof window === 'undefined' || typeof document === 'undefined')
             return;
         if (window.innerWidth <= 768) return; // do not autofocus on mobile
+
+        // Skip auto-focus if direction change came from debounced price input
+        if (directionChangeFromInputRef.current) {
+            directionChangeFromInputRef.current = false;
+            return;
+        }
+
         const el = document.getElementById(
             'trade-module-size-input',
         ) as HTMLInputElement | null;
 
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             if (!notionalQtyNum) {
                 el?.focus();
             }
-        }, 850);
+        }, 700);
+
+        return () => clearTimeout(timeoutId);
     }, [tradeDirection, marketOrderType]);
 
     const sizeSliderPercentageValueProps = useMemo(
@@ -1188,8 +1339,12 @@ function OrderInput({
         () => MIN_ORDER_VALUE / (markPx || 1),
         [markPx],
     );
+
+    // logic to dispatch a notification on demand
+    const notifications: NotificationStoreIF = useNotificationStore();
+
     // fn to submit a 'Buy' market order
-    async function submitMarketBuy(): Promise<void> {
+    const submitMarketBuy = useCallback(async (): Promise<void> => {
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
@@ -1275,9 +1430,7 @@ function OrderInput({
                     }),
                     icon: 'check',
                     removeAfter: 5000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
                 setShouldUpdateAfterTrade(true);
             } else {
@@ -1314,9 +1467,7 @@ function OrderInput({
                         result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1354,10 +1505,27 @@ function OrderInput({
             setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
-    }
+    }, [
+        notionalQtyNum,
+        sells,
+        markPx,
+        activeOptions.skipOpenOrderConfirm,
+        symbol,
+        executeMarketOrder,
+        isSubminimumClose,
+        subminimumCloseQty,
+        leverage,
+        isReduceOnlyEnabled,
+        notifications,
+        confirmOrderModal,
+        t,
+        formatNum,
+        maxActive,
+        sizePercentageValue,
+    ]);
 
     // fn to submit a 'Sell' market order
-    async function submitMarketSell(): Promise<void> {
+    const submitMarketSell = useCallback(async (): Promise<void> => {
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
@@ -1443,9 +1611,7 @@ function OrderInput({
                     }),
                     icon: 'check',
                     removeAfter: 5000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
                 setShouldUpdateAfterTrade(true);
             } else {
@@ -1482,9 +1648,7 @@ function OrderInput({
                         result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1522,10 +1686,27 @@ function OrderInput({
             setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
-    }
+    }, [
+        notionalQtyNum,
+        buys,
+        markPx,
+        activeOptions.skipOpenOrderConfirm,
+        symbol,
+        executeMarketOrder,
+        isSubminimumClose,
+        subminimumCloseQty,
+        leverage,
+        isReduceOnlyEnabled,
+        notifications,
+        confirmOrderModal,
+        t,
+        formatNum,
+        maxActive,
+        sizePercentageValue,
+    ]);
 
     // fn to submit a 'Buy' limit order
-    async function submitLimitBuy(): Promise<void> {
+    const submitLimitBuy = useCallback(async (): Promise<void> => {
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
@@ -1619,9 +1800,7 @@ function OrderInput({
                         limitPrice,
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
             } else {
@@ -1659,9 +1838,7 @@ function OrderInput({
                         t('transactions.failedToPlaceLimitOrder'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1699,10 +1876,26 @@ function OrderInput({
             setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
-    }
+    }, [
+        notionalQtyNum,
+        price,
+        parseFormattedNum,
+        activeOptions.skipOpenOrderConfirm,
+        symbol,
+        markPx,
+        executeLimitOrder,
+        leverage,
+        isReduceOnlyEnabled,
+        notifications,
+        confirmOrderModal,
+        t,
+        formatNum,
+        maxActive,
+        sizePercentageValue,
+    ]);
 
     // fn to submit a 'Sell' limit order
-    async function submitLimitSell(): Promise<void> {
+    const submitLimitSell = useCallback(async (): Promise<void> => {
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
@@ -1796,9 +1989,7 @@ function OrderInput({
                         limitPrice,
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
             } else {
@@ -1832,9 +2023,7 @@ function OrderInput({
                         t('transactions.failedToPlaceLimitOrder'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -1872,10 +2061,23 @@ function OrderInput({
             setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
-    }
-
-    // logic to dispatch a notification on demand
-    const notifications: NotificationStoreIF = useNotificationStore();
+    }, [
+        notionalQtyNum,
+        price,
+        parseFormattedNum,
+        activeOptions.skipOpenOrderConfirm,
+        symbol,
+        markPx,
+        executeLimitOrder,
+        leverage,
+        isReduceOnlyEnabled,
+        notifications,
+        confirmOrderModal,
+        t,
+        formatNum,
+        maxActive,
+        sizePercentageValue,
+    ]);
 
     // bool to handle toggle of order type launchpad mode
     const [showLaunchpad, setShowLaunchpad] = useState<boolean>(false);
@@ -2007,6 +2209,7 @@ function OrderInput({
 
     const isDisabled =
         userExceededOI ||
+        isDepositRequired ||
         isMarginInsufficientDebounced ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||
@@ -2176,9 +2379,11 @@ function OrderInput({
 
     useEffect(() => {
         if (typeof document !== 'undefined') {
-            submitButtonRef.current = document.querySelector(
+            const el = document.querySelector(
                 '[data-testid="submit-order-button"]',
-            ) as HTMLElement | null;
+            );
+            submitButtonRef.current =
+                el instanceof HTMLButtonElement ? el : null;
         }
     }, []);
 
@@ -2273,237 +2478,208 @@ function OrderInput({
 
     return (
         <div ref={orderInputRef} className={styles.order_input}>
-            <AnimatePresence mode='wait'>
-                {showLaunchpad ? (
-                    <motion.div
-                        key='launchpad'
-                        className={styles.launchpad}
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 50 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    >
-                        <header>
-                            <div
-                                className={styles.exit_launchpad}
-                                onClick={() => setShowLaunchpad(false)}
+            {showLaunchpad ? (
+                <div className={styles.launchpad}>
+                    <header>
+                        <div
+                            className={styles.exit_launchpad}
+                            onClick={() => setShowLaunchpad(false)}
+                        >
+                            <MdKeyboardArrowLeft
+                                aria-label={t('aria.closeTradeTypeMenu')}
+                            />
+                        </div>
+                        <h3>{t('transactions.orderTypes')}</h3>
+                        <button
+                            className={styles.trade_type_toggle}
+                            aria-label={t('aria.tradeType')}
+                            onClick={() => setShowLaunchpad(false)}
+                        >
+                            <PiSquaresFour
+                                aria-label={t('aria.closeTradeTypeMenu')}
+                            />
+                        </button>
+                    </header>
+                    <ul className={styles.launchpad_clickables}>
+                        {marketOrderTypes.map((mo: OrderTypeOption) => (
+                            <li
+                                key={JSON.stringify(mo.value)}
+                                onClick={() => {
+                                    handleMarketOrderTypeChange(mo.value);
+                                    setShowLaunchpad(false);
+                                }}
                             >
-                                <MdKeyboardArrowLeft
-                                    aria-label={t('aria.closeTradeTypeMenu')}
-                                />
-                            </div>
-                            <h3>{t('transactions.orderTypes')}</h3>
+                                <div className={styles.name_and_icon}>
+                                    {mo.icon}
+                                    <h4>{mo.label}</h4>
+                                </div>
+                                <div>
+                                    <p>{mo.blurb}</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ) : (
+                <>
+                    <div className={styles.mainContent}>
+                        <div
+                            className={styles.orderTypeDropdownContainer}
+                            id='tutorial-order-type'
+                        >
+                            <OrderDropdown
+                                options={marketOrderTypes}
+                                value={marketOrderType}
+                                onChange={handleMarketOrderTypeChange}
+                            />
+                            <SimpleButton
+                                className={styles.margin_type_btn}
+                                onClick={() => confirmOrderModal.open('margin')}
+                                bg='dark3'
+                                hoverBg='accent1'
+                            >
+                                {t(marginMode)}
+                            </SimpleButton>
                             <button
                                 className={styles.trade_type_toggle}
                                 aria-label={t('aria.tradeType')}
-                                onClick={() => setShowLaunchpad(false)}
+                                onClick={() => setShowLaunchpad(true)}
                             >
-                                <PiSquaresFour
-                                    aria-label={t('aria.closeTradeTypeMenu')}
-                                />
+                                <PiSquaresFour />
                             </button>
-                        </header>
-                        <ul className={styles.launchpad_clickables}>
-                            {marketOrderTypes.map((mo: OrderTypeOption) => (
-                                <li
-                                    key={JSON.stringify(mo.value)}
-                                    onClick={() => {
-                                        handleMarketOrderTypeChange(mo.value);
-                                        setShowLaunchpad(false);
-                                    }}
+                        </div>
+                        <TradeDirection
+                            tradeDirection={tradeDirection}
+                            setTradeDirection={setTradeDirection}
+                        />
+
+                        <LeverageSlider {...leverageSliderProps} />
+
+                        <div className={styles.inputDetailsDataContainer}>
+                            {inputDetailsData.map((data, idx) => (
+                                <div
+                                    key={idx}
+                                    className={styles.inputDetailsDataContent}
                                 >
-                                    <div className={styles.name_and_icon}>
-                                        {mo.icon}
-                                        <h4>{mo.label}</h4>
+                                    <div className={styles.inputDetailsLabel}>
+                                        <span>{data.label}</span>
+                                        <Tooltip
+                                            content={data?.tooltipLabel}
+                                            position='right'
+                                        >
+                                            <LuCircleHelp size={12} />
+                                        </Tooltip>
                                     </div>
-                                    <div>
-                                        <p>{mo.blurb}</p>
-                                    </div>
-                                </li>
+                                    <span className={styles.inputDetailValue}>
+                                        {data.value}
+                                    </span>
+                                </div>
                             ))}
-                        </ul>
-                    </motion.div>
-                ) : (
-                    <>
-                        <motion.div
-                            key='orderinput'
-                            className={styles.mainContent}
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -50 }}
-                            transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        >
-                            <div
-                                className={styles.orderTypeDropdownContainer}
-                                id='tutorial-order-type'
-                            >
-                                <OrderDropdown
-                                    options={marketOrderTypes}
-                                    value={marketOrderType}
-                                    onChange={handleMarketOrderTypeChange}
-                                />
-                                <SimpleButton
-                                    className={styles.margin_type_btn}
-                                    onClick={() =>
-                                        confirmOrderModal.open('margin')
-                                    }
-                                    bg='dark3'
-                                    hoverBg='accent1'
-                                >
-                                    {t(marginMode)}
-                                </SimpleButton>
-                                <button
-                                    className={styles.trade_type_toggle}
-                                    aria-label={t('aria.tradeType')}
-                                    onClick={() => setShowLaunchpad(true)}
-                                >
-                                    <PiSquaresFour />
-                                </button>
-                            </div>
-                            <TradeDirection
-                                tradeDirection={tradeDirection}
-                                setTradeDirection={setTradeDirection}
-                            />
-
-                            <LeverageSlider {...leverageSliderProps} />
-
-                            <div className={styles.inputDetailsDataContainer}>
-                                {inputDetailsData.map((data, idx) => (
+                            {!isReduceOnlyEnabled &&
+                                maxOrderSizeWouldExceedRemainingOIDebounced &&
+                                (!!sizePercentageValue || !!sizeDisplay) && (
                                     <div
-                                        key={idx}
-                                        className={
-                                            styles.inputDetailsDataContent
-                                        }
+                                        style={{
+                                            width: '100%',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                        }}
                                     >
                                         <div
-                                            className={styles.inputDetailsLabel}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px',
+                                                color: 'var(--orange)',
+                                                justifyContent: 'center',
+                                                width: '100%',
+                                                fontSize: 'var(--font-size-s)',
+                                            }}
                                         >
-                                            <span>{data.label}</span>
+                                            <span
+                                                style={{
+                                                    cursor: 'default',
+                                                }}
+                                            >
+                                                {maxTradeSizeWarningShort}
+                                            </span>
                                             <Tooltip
-                                                content={data?.tooltipLabel}
-                                                position='right'
+                                                content={
+                                                    maxTradeSizeWarningLong
+                                                }
+                                                position='bottom'
                                             >
                                                 <LuCircleHelp size={12} />
                                             </Tooltip>
                                         </div>
-                                        <span
-                                            className={styles.inputDetailValue}
-                                        >
-                                            {data.value}
-                                        </span>
                                     </div>
-                                ))}
-                                {!isReduceOnlyEnabled &&
-                                    maxOrderSizeWouldExceedRemainingOIDebounced &&
-                                    (!!sizePercentageValue ||
-                                        !!sizeDisplay) && (
-                                        <div
-                                            style={{
-                                                width: '100%',
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                            }}
-                                        >
-                                            <div
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '4px',
-                                                    color: 'var(--orange)',
-                                                    justifyContent: 'center',
-                                                    width: '100%',
-                                                    fontSize:
-                                                        'var(--font-size-s)',
-                                                }}
-                                            >
-                                                <span
-                                                    style={{
-                                                        cursor: 'default',
-                                                    }}
-                                                >
-                                                    {maxTradeSizeWarningShort}
-                                                </span>
-                                                <Tooltip
-                                                    content={
-                                                        maxTradeSizeWarningLong
-                                                    }
-                                                    position='bottom'
-                                                >
-                                                    <LuCircleHelp size={12} />
-                                                </Tooltip>
-                                            </div>
-                                        </div>
-                                    )}
-                            </div>
+                                )}
+                        </div>
 
-                            {/* {marketOrderType === 'chase_limit' && (
+                        {/* {marketOrderType === 'chase_limit' && (
                                 <ChasePrice {...chasePriceProps} / predu>
                             )} */}
 
-                            {showStopPriceComponent && (
-                                <StopPrice {...stopPriceProps} />
-                            )}
-                            {showPriceInputComponent && (
-                                <PriceInput {...priceInputProps} />
-                            )}
-                            <SizeInput {...sizeInputProps} />
-                            <PositionSize {...sizeSliderPercentageValueProps} />
+                        {showStopPriceComponent && (
+                            <StopPrice {...stopPriceProps} />
+                        )}
+                        {showPriceInputComponent && (
+                            <PriceInput {...priceInputProps} />
+                        )}
+                        <SizeInput {...sizeInputProps} />
+                        <PositionSize {...sizeSliderPercentageValueProps} />
 
-                            {showPriceRangeComponent && (
-                                <PriceRange {...priceRangeProps} />
-                            )}
-                            {marketOrderType === 'scale' &&
-                                priceDistributionButtons}
-                            {marketOrderType === 'twap' && <RunningTime />}
+                        {showPriceRangeComponent && (
+                            <PriceRange {...priceRangeProps} />
+                        )}
+                        {marketOrderType === 'scale' &&
+                            priceDistributionButtons}
+                        {marketOrderType === 'twap' && <RunningTime />}
 
-                            <ReduceAndProfitToggle
-                                {...reduceAndProfitToggleProps}
-                            />
-                        </motion.div>
-                        <motion.div
-                            key='buttondetails'
-                            className={styles.button_details_container}
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -50 }}
-                            transition={{ duration: 0.25, ease: 'easeInOut' }}
-                        >
-                            {isUserLoggedIn && (
-                                <Tooltip
-                                    content={disabledReason}
-                                    position='top'
-                                    disabled={!isDisabled}
+                        <ReduceAndProfitToggle
+                            {...reduceAndProfitToggleProps}
+                        />
+                    </div>
+                    <div
+                        key='buttondetails'
+                        className={styles.button_details_container}
+                    >
+                        {isUserLoggedIn && (
+                            <Tooltip
+                                content={disabledReason}
+                                position='top'
+                                disabled={!isDisabled}
+                            >
+                                <button
+                                    ref={submitButtonRef}
+                                    data-testid='submit-order-button'
+                                    className={`${styles.submit_button}`}
+                                    style={{
+                                        backgroundColor:
+                                            tradeDirection === 'buy'
+                                                ? buyColor
+                                                : sellColor,
+                                        fontSize:
+                                            submitButtonText.length > 20
+                                                ? 'var(--font-size-s)'
+                                                : 'var(--font-size-m)',
+                                    }}
+                                    onClick={handleSubmitOrder}
+                                    disabled={isDisabled}
                                 >
-                                    <button
-                                        data-testid='submit-order-button'
-                                        className={`${styles.submit_button}`}
-                                        style={{
-                                            backgroundColor:
-                                                tradeDirection === 'buy'
-                                                    ? buyColor
-                                                    : sellColor,
-                                            fontSize:
-                                                submitButtonText.length > 20
-                                                    ? 'var(--font-size-s)'
-                                                    : 'var(--font-size-m)',
-                                        }}
-                                        onClick={handleSubmitOrder}
-                                        disabled={isDisabled}
-                                    >
-                                        {submitButtonText}
-                                    </button>
-                                </Tooltip>
-                            )}
-                            <OrderDetails
-                                orderMarketPrice={marketOrderType}
-                                usdOrderValue={usdOrderValue}
-                                marginRequired={marginRequired}
-                                liquidationPrice={liquidationPrice}
-                            />
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+                                    {submitButtonText}
+                                </button>
+                            </Tooltip>
+                        )}
+                        <OrderDetails
+                            orderMarketPrice={marketOrderType}
+                            usdOrderValue={usdOrderValue}
+                            marginRequired={marginRequired}
+                            liquidationPrice={liquidationPrice}
+                        />
+                    </div>
+                </>
+            )}
             {confirmOrderModal.isOpen && (
                 <Modal
                     close={confirmOrderModal.close}

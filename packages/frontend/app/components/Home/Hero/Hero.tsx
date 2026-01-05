@@ -1,3 +1,4 @@
+import DebugLimitCloseModal from '~/routes/testpage/DebugLimitCloseModal';
 import TradeButton from '../TradeButton/TradeButton';
 import AnimatedPath from './AnimatedPath';
 import styles from './Hero.module.css';
@@ -115,6 +116,7 @@ export default function Hero() {
                     </div> */}
                 </div>
             </div>
+            {/* <DebugLimitCloseModal /> */}
         </div>
     );
 }

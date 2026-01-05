@@ -6,7 +6,7 @@ import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './positions.module.css';
 export function meta() {
     return [
-        { title: 'Positions | Ambient' },
+        { title: 'Positions | Ambient Finance' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }

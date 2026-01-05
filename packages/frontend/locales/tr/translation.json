@@ -13,6 +13,7 @@
         "error": "Hata",
         "success": "Başarılı",
         "applyDefaults": "Varsayılanları uygula",
+        "changeApplied": "Değişiklik uygulandı",
         "learnMore": "Daha fazla bilgi",
         "deposit": "Yatır",
         "transfer": "Transfer",
@@ -20,6 +21,8 @@
         "submit": "Gönder",
         "quantity": "Miktar",
         "confirm": "Onayla",
+        "send": "Gönder",
+        "address": "Adres",
         "amount": "Tutar",
         "max": "Maks",
         "min": "Min",
@@ -30,6 +33,7 @@
         "fundingHistory": "Finansman Geçmişi",
         "orderHistory": "Emir Geçmişi",
         "depositsAndWithdrawals": "Yatırma ve Çekme",
+        "depositors": "Yatırımcılar",
         "twap": "TWAP",
         "all": "Hepsi",
         "active": "Aktif",
@@ -40,7 +44,12 @@
         "reset": "Sıfırla",
         "announcements": "Duyurular",
         "leverage": "Kaldıraç",
-        "comingSoon": "Yakında"
+        "comingSoon": "Yakında",
+        "enter": "Giriş",
+        "claim": "Talep Et",
+        "seeDocsForMore": "Daha fazlası için dokümanlara bakın.",
+        "clearFilter": "Filtreyi temizle",
+        "activate": "Etkinleştir"
     },
     "transactions": {
         "orderTypes": "Emir Türleri",
@@ -88,6 +97,10 @@
         "evenPriceDistribution": "Eşit Fiyat Dağılımı",
         "market": "Piyasa",
         "limit": "Limit",
+        "closePosition": "Pozisyonu kapat",
+        "closeAtCurrentPrice": "Mevcut fiyattan kapat",
+        "closeAtAPriceYouSet": "Belirlediğin fiyattan kapat",
+
         "price": "Fiyat",
         "size": "Büyüklük",
         "time": "Zaman",
@@ -145,6 +158,7 @@
         "midButton": "MID",
         "positionClosed": "Pozisyon Kapandı",
         "successfullyClosedPosition": "{{usdValueOfOrderStr}} {{symbol}} pozisyonu başarılı şekilde kapandı",
+        "tpSlForPosition": "Pozisyon için TP/SL",
         "failedToClosePosition": "Pozisyon kapatma başarısız",
         "transactionTimedOut": "İşlem {{timeInSeconds}} saniye sonra zaman aşımına uğradı",
         "txFailedOrNotConfirmed": "İşlem başarısız oldu veya onaylanmadı",
@@ -220,6 +234,9 @@
             "message": "{{successCount}} emir iptal edildi, {{failedCount}} başarısız"
         },
         "noOpenOrders": "Açık emir yok",
+        "noOpenOrdersForMarket": "Açık {{symbol}} emri yok",
+        "noOpenLongOrders": "Açık long emir yok",
+        "noOpenShortOrders": "Açık short emir yok",
         "transactionError": "İşlem Hatası",
         "invalidLimitPrice": {
             "title": "Geçersiz Fiyat",
@@ -290,14 +307,24 @@
         "tradeValue": "İşlem Değeri",
         "fee": "Komisyon",
         "closedPnl": "Kapanan PnL",
-        "reduceOnly": "Sadece Kapat",
+        "depositor": "Yatırımcı",
+        "vaultAmount": "Kasa Tutarı",
+        "unrealizedPnl": "Gerçekleşmemiş PnL",
+        "allTimePnl": "Tüm Zamanlar PnL",
+        "daysFollowing": "Takip Edilen Gün",
+        "completed": "Tamamlandı",
+        "withdrawal": "Çekim",
+        "spotTransfer": "Spot Transfer",
+        "reduceOnly": "Sadece Azalt",
         "triggerConditions": "Tetikleme Koşulları",
-        "tpsl": "TP/SL",
         "status": "Durum",
         "order": "Emir",
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "Açık pozisyon yok",
+        "noOpenPositionsForMarket": "Açık {{symbol}} pozisyonu yok",
+        "noOpenLongPositions": "Açık long pozisyonu yok",
+        "noOpenShortPositions": "Açık short pozisyonu yok",
         "markPrice": "İşaret Fiyatı",
         "orderId": "Emir ID",
         "totalBalance": "Toplam Bakiye",
@@ -315,13 +342,26 @@
         "originalSize": "Orijinal Büyüklük",
         "cancelAll": "Hepsini İptal Et",
         "noTradeHistory": "İşlem geçmişiniz yok",
+        "noTradeHistoryForMarket": "{{symbol}} işlem geçmişi yok",
+        "noLongTradeHistory": "Long işlem geçmişi yok",
+        "noShortTradeHistory": "Short işlem geçmişi yok",
         "noOrderHistory": "Emir geçmişiniz yok",
+        "noOrderHistoryForMarket": "{{symbol}} emir geçmişi yok",
+        "noLongOrderHistory": "Long emir geçmişi yok",
+        "noShortOrderHistory": "Short emir geçmişi yok",
         "noFundingHistory": "Fonlama geçmişiniz yok",
+        "noFundingHistoryForMarket": "{{symbol}} fonlama geçmişi yok",
+        "noLongFundingHistory": "Long fonlama geçmişi yok",
+        "noShortFundingHistory": "Short fonlama geçmişi yok",
         "fundingHistory": "Tüm zamanlar: {{allTime}} Değişim sonrası: {{sinceChange}}",
+        "positionSide": "Pozisyon Yönü",
+        "payment": "Ödeme",
+        "rate": "Oran",
         "openLong": "Long Aç",
         "openShort": "Short Aç",
         "closeLong": "Long Kapat",
-        "closeShort": "Short Kapat"
+        "closeShort": "Short Kapat",
+        "goToMarket": "{{coin}} piyasasına git"
     },
     "time": {
         "second": "saniye",
@@ -350,7 +390,8 @@
         "chart": "Grafik",
         "book": "Emir Defteri",
         "recent": "Son",
-        "positions": "Pozisyonlar"
+        "positions": "Pozisyonlar",
+        "portfolio": "Portföy"
     },
     "auth": {
         "login": "Giriş",
@@ -396,9 +437,32 @@
     },
     "referrals": {
         "title": "Referanslar",
-        "description": "Kullanıcıları davet et, ödül kazanın. İş Ortakları daha fazla kazanır.",
-        "tradersReferred": "Referans Edilen Traderlar",
-        "rewardsEarned": "Kazanılan Ödüller"
+        "description": "Kullanıcıları davet ederek ödüller kazanın. İş ortakları daha yüksek ödüller kazanır.",
+        "tradersReferred": "Yönlendirilen traderlar",
+        "rewardsEarned": "Kazanılan ödüller",
+        "rewardHistory": "Ödül geçmişi",
+        "enterCode": "Kodu girin",
+        "createCode": "Kod oluştur",
+        "usingAffiliateCode": "Ortaklık Kodu Kullanılıyor",
+        "overwriteCurrentReferralCode": "Mevcut referans kodunun üzerine yaz",
+        "enterReferralCode": "Bir referans kodu girin",
+        "referralCodeNotValidPleaseConfirm": "Kod <0>{{invalidCode}}</0> referans programında talep edilmemiş. Lütfen kodun doğru olduğunu onaylayın.",
+        "yourCodeIs": "Kodunuz, cüzdan adresinizin ilk altı karakterine dayalı olarak <0>{{affiliateCode}}</0>. Lütfen bu kodu referans sistemine kaydetmek için 'Etkinleştir'e tıklayın.",
+        "createAnAffiliateCode": "Bir ortaklık kodu oluşturun",
+        "createAUniqueCodeToEarn": "Yönlendirilen kullanıcıların ücretlerinin %10'unu kazanmak için benzersiz bir kod oluşturun.",
+        "codeAlreadyInUse": "Kod Zaten Kullanımda",
+        "connectYourWallet": {
+            "affiliate": "Bir ortaklık kodu oluşturmak için cüzdanınızı bağlayın",
+            "claim": "Ödülleri talep etmek için cüzdanınızı bağlayın",
+            "enterCode": "Bir referans kodu girmek için cüzdanınızı bağlayın"
+        },
+        "usersWithTradingVolume": "Bu kod, 1 milyon ABD doları işlem hacmine ulaştıktan sonra kullanıcılar tarafından özelleştirilebilir veya güncellenebilir.",
+        "doNotSelfRefer": "<0>{{affiliateCode}}</0> kodu, oluşturulduğu adresle aynı adres tarafından kaydedilemez. Lütfen farklı bir kod seçin.",
+        "toCustomizeAffiliateCode": "Ortaklık kodları varsayılan olarak cüzdan adresinizin ilk altı karakteridir. 1 milyon dolardan fazla işlem hacmine sahip kullanıcılar ortaklık kodlarını özelleştirebilir.",
+        "claimRewardsWithAmount": "{{amount}} tutarında ödül talep et",
+        "selectATabToViewData": "Verileri görüntülemek için bir sekme seçin",
+        "trackingLinkExplanation": "Yönlendirilen kullanıcı ücretlerinin <0>{{affiliatePercent}}</0> kadarını alacaksınız ve onlar <1>{{userPercent}}</1> indirim alacaklar.",
+        "claim": "Talep et"
     },
     "deposit": {
         "prompt": "Fogo'dan {{token}} yatır",
@@ -424,6 +488,9 @@
         "skipOpenOrderConfirm": "Açık Emir Onayını Atla",
         "enableTxNotifications": "İşlem Bildirimlerini Aç",
         "enableBackgroundFillNotif": "Arkaplan Dolum Bildirimini Aç",
+        "navigationKeyboardShortcuts": "Gezinme klavye kısayollarını etkinleştir",
+        "tradingKeyboardShortcuts": "Alım-satım klavye kısayollarını etkinleştir",
+        "viewKeyboardShortcuts": "Klavye kısayollarını görüntüle",
         "numberFormat": "Sayı Formatı",
         "color": "Renk",
         "language": "Dil"
@@ -490,15 +557,21 @@
         "updateButton": "Şimdi güncelle",
         "version": "Sürüm"
     },
+    "offline": {
+        "title": "Çevrimdışısınız",
+        "message": "İşlem yapma devre dışı. Önbelleğe alınmış verileri görüntüleyebilirsiniz."
+    },
     "leverage": {
         "title": "Kaldıraç ayarla",
-        "closePositionPrompt": "Minimum kaldıraç için pozisyonu kapat"
+        "closePositionPrompt": "Minimum kaldıraç için pozisyonu kapat",
+        "adjustLeverage": "Kaldıraç ayarla, şu an {{value}}x"
     },
     "share": {
         "prompt": "Metninizi özelleştirin",
         "xCTA": "𝕏'te paylaş",
         "copyLinkCTA": "Bağlantıyı kopyala",
-        "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap"
+        "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap",
+        "sharePosition": "PnL {{pnl}} pozisyonunu paylaş"
     },
     "colors": {
         "default": "Varsayılan",
@@ -513,9 +586,15 @@
         "depositInput": "Yatırma girişi",
         "addressInput": "Adres girişi",
         "amountInput": "Tutar girişi",
+        "expandWallet": "Cüzdanı genişlet",
+        "collapseWallet": "Cüzdanı daralt",
+        "priceInput": "Fiyat girişi",
+        "sizeInput": "Büyüklük girişi",
+        "stopPriceInput": "Durdurma fiyatı girişi",
         "withdrawInput": "Çekim girişi",
         "scrollTabsLeft": "Sekmeleri sola kaydır",
         "scrollTabsRight": "Sekmeleri sağa kaydır",
+        "mobileActionMenu": "Mobil aksiyon menüsünü aç/kapat",
         "leverageValue": "Kaldıraç değeri",
         "leverageAmount": "Kaldıraç tutarı",
         "setLeverageTo": "{{value}}x kaldıraç ayarla",
@@ -544,13 +623,204 @@
         "toggleTPSL": "Kâr Al / Zarar Durdur'u değiştir",
         "editTPSL": "Kâr Al / Zarar Durdur'u düzenle",
         "toggleConfigureAmount": "Tutarı yapılandırmayı değiştir",
-        "toggleLimitPrice": "Limit fiyatı değiştir"
+        "toggleLimitPrice": "Limit fiyatı değiştir",
+        "setMaxAmount": "Maksimum tutarı ayarla",
+        "rowsPerPage": "Sayfa başına satır",
+        "closeModal": "Pencereyi kapat",
+        "goToHome": "Ana sayfaya git",
+        "spotTradingOpensNewTab": "Ambient v1'de spot işlem (yeni sekmede açılır)",
+        "moreOptions": "Daha fazla seçenek",
+        "notifications": "Bildirimler",
+        "transferAmount": "Transfer tutarı",
+        "viewOnExplorerNewTab": "Gezginde görüntüle (yeni sekmede açılır)",
+        "externalLinkOpensNewTab": "{{linkText}} (yeni sekmede açılır)",
+        "opensInNewTab": "(yeni sekmede açılır)",
+        "selectTokenCurrent": "Token seç, mevcut: {{symbol}}",
+        "mobileTradeNavigation": "İşlem navigasyonu",
+        "takeProfitPrice": "Kâr al fiyatı",
+        "expectedGain": "Beklenen kazanç",
+        "toggleGainCurrency": "Kazanç para birimini dolar ve yüzde arasında değiştir",
+        "stopLossPrice": "Zarar durdur fiyatı",
+        "expectedLoss": "Beklenen kayıp",
+        "toggleLossCurrency": "Kayıp para birimini dolar ve yüzde arasında değiştir",
+        "setMidPrice": "Orta fiyatı ayarla",
+        "selectSizeDenomination": "Boyut birimini seç"
     },
     "chart": {
         "liqPrice": "Lik. fiyatı"
     },
     "meta": {
-        "title": "Ana Sayfa | Ambient",
+        "title": "Ambient Finance | Fogo Süresiz Vadeli İşlemler",
+        "description": "Ambient Finance ile Fogo'da süresiz vadeli işlem yapın. Taker ücreti yok, 100x kaldıraç imkanı ve yıldırım hızında işlem.",
         "content": "Ambient ile vadeli işlemleri alıp satın"
+    },
+    "portfolio": {
+        "fees": "Ücretler",
+        "vol14d": "Hacim(14g)",
+        "viewVolume": "Hacmi görüntüle",
+        "feesTakerMaker": "Ücretler (Taker / Maker)",
+        "viewFeeSchedule": "Ücret çizelgesini görüntüle",
+        "totalUsdVal": "Toplam USD Değeri",
+        "totalNetUsdValue": "Toplam Net USD Değeri",
+        "performance": "Performans",
+        "positions": "Pozisyonlar",
+        "feeSchedule": "Ücret Çizelgesi",
+        "vipTiers": "VIP Seviyeleri",
+        "marketMakerTiers": "Piyasa Yapıcı Seviyeleri",
+        "tier": "Seviye",
+        "vol14dVolume": "14G Hacim",
+        "taker": "Taker",
+        "maker": "Maker",
+        "negativeFeesRebate": "Negatif ücretler iadedir",
+        "alwaysZero": "Her zaman %0.00",
+        "makerFeesPercent": "Maker ücretleri {{percent}}",
+        "availableToDepositTooltip": "Bakiyenize göre yatırabileceğiniz maksimum tutar",
+        "availableToSend": "Gönderilebilir",
+        "availableToSendTooltip": "Göndermek için mevcut olan toplam tutar",
+        "networkFee": "Ağ Ücreti",
+        "networkFeeTooltip": "İşlemin işlenmesi için alınan ücret",
+        "fogoChainLogo": "Fogo Zinciri Logosu",
+        "accountValue": "Hesap Değeri",
+        "collateral": "Teminat",
+        "pnl": "PNL",
+        "volume": "Hacim",
+        "maxDrawdown": "Maksimum Düşüş",
+        "totalEquity": "Toplam Varlık",
+        "accountEquity": "Hesap Varlığı",
+        "vaultEquity": "Kasa Varlığı",
+        "perps": "Perps",
+        "perpsAndVaults": "Perps + Kasalar",
+        "allTime": "Tüm zamanlar",
+        "twentyFourHour": "24S",
+        "sevenDay": "7G",
+        "thirtyDay": "30G",
+        "fusd": "fUSD",
+        "sendDescription": "Fogo'daki başka bir adrese token gönderin.",
+        "sendTitle": "Fogo'da {{token}} gönder",
+        "enterAddress": "Adres girin...",
+        "enterAmount": "Tutar girin",
+        "invalidAddress": "Geçersiz adres",
+        "insufficientFunds": "Yetersiz bakiye",
+        "validAmountRequired": "Lütfen geçerli bir tutar girin",
+        "amountGreaterThanZero": "Tutar sıfırdan büyük olmalıdır",
+        "minDepositAmount": "Minimum yatırma tutarı {{amount}}",
+        "exceedsAvailableBalance": "Tutar mevcut bakiyenizi aşmaktadır",
+        "transactionTimedOut": "İşlem 15 saniye sonra zaman aşımına uğradı",
+        "connectToViewPortfolio": "Portföyünüzü Görüntülemek için Bağlanın",
+        "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın."
+    },
+    "pageTitles": {
+        "portfolio": "Portföy",
+        "referrals": "Referanslar",
+        "points": "Puanlar",
+        "leaderboard": "Sıralama",
+        "newStrategy": "Yeni Strateji",
+        "editStrategy": "Stratejiyi Düzenle",
+        "strategy": "Strateji",
+        "strategies": "Stratejiler",
+        "vault": "Kasa",
+        "vaults": "Kasalar",
+        "subAccounts": "Alt Hesaplar",
+        "positions": "Pozisyonlar",
+        "openOrders": "Açık Emirler",
+        "orderHistory": "Emir Geçmişi",
+        "tradeHistory": "İşlem Geçmişi",
+        "twapFillHistory": "TWAP Gerçekleşme Geçmişi",
+        "twapHistory": "TWAP Geçmişi",
+        "depositsAndWithdrawals": "Para Yatırma ve Çekme",
+        "fundingHistory": "Fonlama Geçmişi",
+        "more": "Daha Fazla",
+        "termsOfService": "Hizmet Şartları",
+        "privacyPolicy": "Gizlilik Politikası",
+        "affiliates": "Ortaklar",
+        "pageNotFound": "Sayfa Bulunamadı"
+    },
+    "docs": {
+        "menuTerms": "Hizmet Şartları",
+        "menuPrivacy": "Gizlilik",
+        "terms": "CROCODILE Labs Hizmet Şartları",
+        "privacy": "Gizlilik Politikası"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Kısayollar",
+        "title": "Klavye Kısayolları",
+        "hintPress": "",
+        "hintToClose": "ile kapat",
+        "applyDefaults": "Varsayılanları Uygula",
+        "editShortcut": "Kısayolu düzenle",
+        "pressKeys": "Tuşlara basın...",
+        "aria": {
+            "close": "Klavye kısayollarını kapat"
+        },
+        "categoryTitles": {
+            "general": "Genel",
+            "trading": "Trading",
+            "navigation": "Gezinme"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Kısayolları göster"
+            },
+            "settings": {
+                "open": "Ayarları aç"
+            },
+            "modal": {
+                "close": "Pencereyi kapat / iptal"
+            },
+            "trading": {
+                "buy": "Alışa geç",
+                "sell": "Satışa geç",
+                "market": "Piyasa emrini başlat",
+                "limit": "Limit emrini başlat",
+                "marketClose": "Pozisyonu piyasa fiyatından kapat"
+            },
+            "navigation": {
+                "trade": "Trading sayfasına git",
+                "home": "Ana sayfaya git",
+                "portfolio": "Portföy sayfasına git"
+            },
+            "wallet": {
+                "connect": "Cüzdan bağlayıcıyı aç"
+            },
+            "portfolio": {
+                "deposit": "Yatırma penceresini aç",
+                "withdraw": "Çekme penceresini aç",
+                "latestTx": "En son işlemi blok gezgininde görüntüle"
+            }
+        },
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

@@ -8,7 +8,7 @@ import { useSetUserMarginService } from '~/hooks/useSetUserMarginService';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
-import { blockExplorer, BTC_MAX_LEVERAGE } from '~/utils/Constants';
+import { getTxLink } from '~/utils/Constants';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
 import { t } from 'i18next';
@@ -49,19 +49,19 @@ export default function LeverageSliderModal({
         }
         const leverageFloor = calcLeverageFloor(marginBucket, 10_000_000n);
         const newLeverageFloor = 10_000 / Number(leverageFloor);
-        setLeverageFloor(Math.min(newLeverageFloor, BTC_MAX_LEVERAGE));
+        setLeverageFloor(Math.min(newLeverageFloor, 10));
     }, [marginBucket]);
 
     // const currentMarket = useLeverageStore((state) => state.currentMarket);
 
     // Update local state if currentLeverage prop changes
     useEffect(() => {
-        setValue(Math.min(currentLeverage, BTC_MAX_LEVERAGE));
+        setValue(currentLeverage);
     }, [currentLeverage]);
 
     const handleSliderChange = (newValue: number) => {
         // Update the leverage in the store immediately as the slider changes
-        setValue(Math.min(newValue, BTC_MAX_LEVERAGE));
+        setValue(newValue);
     };
 
     const handleSliderClick = (newLeverage: number) => {
@@ -118,9 +118,7 @@ export default function LeverageSliderModal({
                         leverage: value.toFixed(1),
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
 
                 // Close modal on success
@@ -136,7 +134,7 @@ export default function LeverageSliderModal({
                         t('transactions.leverageUpdateFailed.message'),
                     icon: 'error',
                     txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
+                        ? getTxLink(result.signature)
                         : undefined,
                 });
                 onClose();

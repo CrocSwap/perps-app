@@ -37,6 +37,7 @@ export function makeSlug(digits: number): number {
 // shape of the return obj produced by this store
 export interface NotificationStoreIF {
     notifications: notificationIF[];
+    latestTx: notificationIF | null;
     add: (data: notificatioSlugOptionalT) => void;
     remove: (id: number) => void;
     clearAll: () => void;
@@ -49,16 +50,20 @@ const MAX_NOTIFICATIONS = 3;
 export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
     // raw data consumed by the app
     notifications: [],
+    latestTx: null,
     // fn to add a new population to state
-    add: (data: notificatioSlugOptionalT): void =>
+    add: (data: notificatioSlugOptionalT): void => {
+        const newNotification = data.slug
+            ? (data as notificationIF)
+            : { ...data, slug: makeSlug(14) };
         set({
-            notifications: [
-                ...get().notifications,
-                data.slug
-                    ? (data as notificationIF)
-                    : { ...data, slug: makeSlug(14) },
-            ].slice(-MAX_NOTIFICATIONS),
-        }),
+            notifications: [...get().notifications, newNotification].slice(
+                -MAX_NOTIFICATIONS,
+            ),
+            // Update latestTx only if this notification has a txLink
+            ...(newNotification.txLink && { latestTx: newNotification }),
+        });
+    },
     // fn to remove an existing element from the data array
     remove: (id: number): void =>
         set({

@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { sortUserFills } from '~/processors/processUserFills';
@@ -8,7 +8,7 @@ import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import type { UserFillIF, UserFillSortBy } from '~/utils/UserDataIFs';
 import TradeHistoryTableHeader from './TradeHistoryTableHeader';
 import TradeHistoryTableRow from './TradeHistoryTableRow';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 interface TradeHistoryTableProps {
     data: UserFillIF[];
     isFetched: boolean;
@@ -16,20 +16,24 @@ interface TradeHistoryTableProps {
     onViewOrderDetails?: (time: string, coin: string) => void;
     onViewAll?: () => void;
     pageMode?: boolean;
+    onClearFilter?: () => void;
 }
 
 export default function TradeHistoryTable(props: TradeHistoryTableProps) {
-    const { data, isFetched, selectedFilter, onViewOrderDetails, pageMode } =
-        props;
+    const {
+        data,
+        isFetched,
+        selectedFilter,
+        onViewOrderDetails,
+        pageMode,
+        onClearFilter,
+    } = props;
 
     const { symbol } = useTradeDataStore();
 
     const { fetchUserFills } = useInfoApi();
 
     const { userAddress } = useUserDataStore();
-
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
 
     const handleViewOrderDetails = (time: string, coin: string) => {
         if (onViewOrderDetails) {
@@ -50,11 +54,28 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
         }
 
         return data;
-    }, [data, selectedFilter]);
+    }, [data, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
         return `${EXTERNAL_PAGE_URL_PREFIX}/tradeHistory/${userAddress}`;
     }, [userAddress]);
+
+    const { t, i18n } = useTranslation();
+
+    const noDataMessage = useMemo(() => {
+        switch (selectedFilter) {
+            case 'active':
+                return t('tradeTable.noTradeHistoryForMarket', { symbol });
+            case 'long':
+                return t('tradeTable.noLongTradeHistory');
+            case 'short':
+                return t('tradeTable.noShortTradeHistory');
+            default:
+                return t('tradeTable.noTradeHistory');
+        }
+    }, [selectedFilter, symbol, i18n.language]);
+
+    const showClearFilter = selectedFilter && selectedFilter !== 'all';
 
     return (
         <>
@@ -66,7 +87,11 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
                     aggregateByTime: boolean,
                 ) => Promise<UserFillIF[]>
             >
-                storageKey={`TradeHistoryTable_${currentUserRef.current}`}
+                storageKey='TradeHistoryTable'
+                noDataActionLabel={
+                    showClearFilter ? t('common.clearFilter') : undefined
+                }
+                onNoDataAction={showClearFilter ? onClearFilter : undefined}
                 data={filteredData}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <TradeHistoryTableHeader
@@ -90,7 +115,7 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
                 skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
                 defaultSortBy={'time'}
                 defaultSortDirection={'desc'}
-                noDataMessage={t('tradeTable.noTradeHistory')}
+                noDataMessage={noDataMessage}
                 csvDataFetcher={fetchUserFills}
                 csvDataFetcherArgs={[userAddress, true]}
             />

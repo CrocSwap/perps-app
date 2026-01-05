@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, type ReactNode } from 'react';
+import React, {
+    useState,
+    useRef,
+    useEffect,
+    useId,
+    type ReactNode,
+} from 'react';
 import styles from './Tooltip.module.css';
 
 type TooltipPosition =
@@ -33,9 +39,10 @@ const Tooltip: React.FC<TooltipProps> = ({
     const [tooltipPosition, setTooltipPosition] = useState({ left: 0, top: 0 });
     const triggerRef = useRef<HTMLDivElement>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
-    const timeoutRef = useRef<NodeJS.Timeout>();
-    const positionTimeoutRef = useRef<NodeJS.Timeout>();
+    const timeoutRef = useRef<NodeJS.Timeout>(null);
+    const positionTimeoutRef = useRef<NodeJS.Timeout>(null);
     const isMobile = useRef(false);
+    const tooltipId = useId();
 
     // Detect if device is mobile
     useEffect(() => {
@@ -312,6 +319,9 @@ const Tooltip: React.FC<TooltipProps> = ({
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 onTouchStart={handleTouchStart}
+                onFocus={() => handleMouseEnter()}
+                onBlur={() => handleMouseLeave()}
+                aria-describedby={isVisible && content ? tooltipId : undefined}
             >
                 {children}
             </div>
@@ -320,6 +330,8 @@ const Tooltip: React.FC<TooltipProps> = ({
             {isVisible && content && (
                 <div
                     ref={tooltipRef}
+                    id={tooltipId}
+                    role='tooltip'
                     className={`${styles.tooltip} ${isPositioned ? styles.visible : styles.positioning} ${
                         isMobile.current ? styles.mobileTooltip : ''
                     }`}

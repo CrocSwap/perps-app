@@ -1,11 +1,8 @@
 .footer {
-    overflow: hidden;
     box-sizing: border-box;
-    display: none; /* Hidden by default */
-    height: 56px;
+    display: none;
+    flex-direction: column;
     padding: 0 var(--padding-s);
-    align-items: center;
-    justify-content: space-between;
     width: 100%;
     position: fixed;
     bottom: 0;
@@ -14,29 +11,92 @@
     background: var(--bg-dark2, #111117);
     border-radius: var(--radius-m, 16px) var(--radius-m, 16px) 0 0;
     border-top: 1px solid var(--bg-dark4);
+    will-change: transform;
+    touch-action: pan-y;
 }
 
-/* Show only on mobile devices */
 @media (max-width: 768px) {
     .footer {
         display: flex;
     }
 }
 
-.navItem {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    height: 100%;
+.footerPanel {
+    width: 100%;
+    overflow: hidden;
 }
 
-.active .icon,
-.active .label {
-    color: var(--accent1, #7371fc);
+.dragHandle {
+    display: flex;
+    justify-content: center;
+    padding: 12px 0 8px;
+    cursor: grab;
+    touch-action: none;
+}
+
+.dragBar {
+    width: 36px;
+    height: 4px;
+    background: var(--text2, #888);
+    border-radius: 2px;
+    opacity: 0.5;
+}
+
+.footerMenu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-bottom: 6px;
+}
+
+.footerMenuItem {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 6px;
+    background: transparent;
+    border: none;
+    color: var(--text1);
+}
+
+.footerMenuLabel {
+    flex: 1;
+    text-align: right;
+}
+
+.footerMenuIcon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.version {
+    padding: 8px 6px;
+    color: var(--accent1);
+    text-align: right;
+}
+
+.footerSettings {
+    max-height: 65vh;
+    overflow-y: auto;
+}
+
+.footerMainRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+}
+
+.navItemsRow {
+    display: flex;
+    flex: 1;
+}
+
+.navItem {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
 }
 
 .iconWrapper {
@@ -44,49 +104,16 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--gap-xs);
-    width: 100%;
-    padding-block: 6px;
+    gap: 2px;
 }
-
 .icon {
-    color: var(--text1, #f0f0f8);
     display: flex;
-    justify-content: center;
     align-items: center;
-}
-.icon svg {
-    display: block;
-    width: 24px;
-    height: 24px;
+    justify-content: center;
+    color: var(--text1);
 }
 
 .label {
-    color: var(--text1, #f0f0f8);
-    text-align: center;
-    font-size: var(--font-size-s, 12px);
-    line-height: 1;
-    margin: 0;
-    padding: 0;
+    font-size: 12px;
+    color: var(--text1);
 }
-
-.navItem:hover .icon,
-.navItem:hover .label,
-/* .navItem:active .icon, */
-.navItem:active .label {
-    color: var(--base-accent1, #7371fc);
-}
-
-/* For devices that support hover */
-@media (hover: hover) {
-    .navItem:hover .icon,
-    .navItem:hover .label {
-        color: var(--accent1, #7371fc);
-    }
-}
-
-/* Active state for navigation items */
-/* .navItem[aria-current='page'] .icon,
-.navItem[aria-current='page'] .label {
-    color: var(--accent1, #7371fc);
-} */

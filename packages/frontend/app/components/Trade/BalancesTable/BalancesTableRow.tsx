@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import type { UserBalanceIF } from '~/utils/UserDataIFs';
 import { formatSolanaAddress, getExplorerUrl } from '~/utils/solanaUtils';
@@ -8,6 +9,7 @@ interface BalancesTableRowProps {
 }
 
 export default function BalancesTableRow(props: BalancesTableRowProps) {
+    const { t } = useTranslation();
     const { balance } = props;
 
     const { formatNum } = useNumFormatter();
@@ -49,7 +51,9 @@ export default function BalancesTableRow(props: BalancesTableRowProps) {
             </div>
             {showSendButton && (
                 <div className={`${styles.cell} ${styles.actionCell}`}>
-                    <button className={styles.sendButton}>Send</button>
+                    <button className={styles.sendButton}>
+                        {t('common.send')}
+                    </button>
                 </div>
             )}
         </div>

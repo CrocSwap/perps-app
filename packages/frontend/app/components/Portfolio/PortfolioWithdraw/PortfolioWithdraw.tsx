@@ -6,7 +6,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
-import { blockExplorer } from '~/utils/Constants';
+import { getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
@@ -102,21 +102,23 @@ function PortfolioWithdraw({
             if (!amount || isNaN(amount)) {
                 return {
                     isValid: false,
-                    message: 'Please enter a valid amount',
+                    message: t('portfolio.validAmountRequired'),
                 };
             }
 
             if (amount <= 0) {
                 return {
                     isValid: false,
-                    message: 'Amount must be greater than 0',
+                    message: t('portfolio.amountGreaterThanZero'),
                 };
             }
 
             if (amount > maxAmount && !maxModeActive && !userAtTheirMax) {
                 return {
                     isValid: false,
-                    message: `Amount exceeds available balance of ${formatNum(maxAmount, 2, true, true)}`,
+                    message: t('portfolio.exceedsAvailableBalance', {
+                        balance: formatNum(maxAmount, 2, true, true),
+                    }),
                 };
             }
 
@@ -173,10 +175,7 @@ function PortfolioWithdraw({
             // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) => {
                 setTimeout(
-                    () =>
-                        reject(
-                            new Error('Transaction timed out after 15 seconds'),
-                        ),
+                    () => reject(new Error(t('portfolio.transactionTimedOut'))),
                     15000,
                 );
             });
@@ -197,7 +196,9 @@ function PortfolioWithdraw({
                             actionType: 'Withdrawal Fail',
                             success: false,
                             maxActive: maxModeActive,
-                            errorMessage: result.error || 'Transaction failed',
+                            errorMessage:
+                                result.error ||
+                                t('transactions.transactionFailed'),
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -211,16 +212,14 @@ function PortfolioWithdraw({
                     });
                 }
                 setTransactionStatus('failed');
-                setError(result.error || 'Transaction failed');
+                setError(result.error || t('transactions.transactionFailed'));
                 notificationStore.add({
                     title: t('transactions.withdrawFailed'),
                     message:
                         result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             } else {
                 setTransactionStatus('success');
@@ -251,9 +250,7 @@ function PortfolioWithdraw({
                         unit: 'fUSD',
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
 
@@ -265,7 +262,9 @@ function PortfolioWithdraw({
         } catch (error) {
             setTransactionStatus('failed');
             setError(
-                error instanceof Error ? error.message : 'Withdrawal failed',
+                error instanceof Error
+                    ? error.message
+                    : t('transactions.withdrawFailed'),
             );
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
@@ -276,7 +275,7 @@ function PortfolioWithdraw({
                         errorMessage:
                             error instanceof Error
                                 ? error.message
-                                : 'Unknown error occurred',
+                                : t('transactions.unknownErrorOccurred'),
                     },
                 });
             }
@@ -307,7 +306,11 @@ function PortfolioWithdraw({
     return (
         <div className={styles.container}>
             <div className={styles.textContent}>
-                <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
+                <img
+                    src={FogoLogo}
+                    alt={t('portfolio.fogoChainLogo')}
+                    width='64px'
+                />
                 {/* <h4>Withdraw {unitValue} to Fogo</h4> */}
                 <h4>{t('withdraw.prompt', { token: 'fUSD' })}</h4>
                 <div>
@@ -344,7 +347,7 @@ function PortfolioWithdraw({
                             setMaxModeActive(false);
                         }
                     }}
-                    autoFocus
+                    dataModalInitialFocus
                     aria-label={t('aria.withdrawInput')}
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                         if (e.key === 'Enter' && !isButtonDisabled) {
@@ -359,6 +362,8 @@ function PortfolioWithdraw({
                     onClick={handleMaxClick}
                     disabled={isProcessing}
                     className={maxModeActive ? styles.active : ''}
+                    aria-label={t('aria.setMaxAmount')}
+                    aria-pressed={maxModeActive}
                 >
                     {t('common.max')}
                 </button>

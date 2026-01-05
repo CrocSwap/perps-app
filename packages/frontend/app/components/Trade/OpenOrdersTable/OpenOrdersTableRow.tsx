@@ -5,7 +5,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { blockExplorer } from '~/utils/Constants';
+import { getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
@@ -112,9 +112,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         symbol: order.coin,
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
 
@@ -150,9 +148,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         result.error || t('transactions.cancelFailed.message2'),
                     ),
                     icon: 'error',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
             }

@@ -8,6 +8,7 @@ export interface ToggleSwitchProps {
     label?: string;
     hideLabel?: boolean;
     reverse?: boolean;
+    ariaLabel?: string;
 }
 
 export default function ToggleSwitch(props: ToggleSwitchProps) {
@@ -17,6 +18,7 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
         label = t('transactions.hideSmallBalances'),
         hideLabel = false,
         reverse,
+        ariaLabel,
     } = props;
 
     const handleToggle = () => {
@@ -35,6 +37,7 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
                 onClick={handleToggle}
                 role='switch'
                 aria-checked={isOn}
+                aria-label={ariaLabel || (hideLabel ? label : undefined)}
                 tabIndex={0}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {

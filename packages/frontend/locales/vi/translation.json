@@ -13,6 +13,7 @@
         "error": "Lỗi",
         "success": "Thành công",
         "applyDefaults": "Áp dụng mặc định",
+        "changeApplied": "Đã áp dụng thay đổi",
         "learnMore": "Tìm hiểu thêm",
         "deposit": "Nạp tiền",
         "transfer": "Chuyển tiền",
@@ -20,6 +21,8 @@
         "submit": "Gửi",
         "quantity": "Số lượng",
         "confirm": "Xác nhận",
+        "send": "Gửi",
+        "address": "Địa chỉ",
         "amount": "Số tiền",
         "max": "Tối đa",
         "min": "Tối thiểu",
@@ -30,17 +33,23 @@
         "fundingHistory": "Lịch sử cấp vốn",
         "orderHistory": "Lịch sử lệnh",
         "depositsAndWithdrawals": "Nạp và rút tiền",
+        "depositors": "Người nạp tiền",
         "twap": "TWAP",
         "all": "Tất cả",
         "active": "Hoạt động",
-        "long": "Mua (Long)",
-        "short": "Bán (Short)",
+        "long": "Long",
+        "short": "Short",
         "create": "Tạo",
         "update": "Cập nhật",
         "reset": "Đặt lại",
         "announcements": "Thông báo",
         "leverage": "Đòn bẩy",
-        "comingSoon": "Sắp ra mắt"
+        "comingSoon": "Sắp ra mắt",
+        "enter": "Nhập",
+        "claim": "Nhận",
+        "seeDocsForMore": "Xem tài liệu để biết thêm chi tiết.",
+        "clearFilter": "Xóa bộ lọc",
+        "activate": "Kích hoạt"
     },
     "transactions": {
         "orderTypes": "Loại lệnh",
@@ -88,6 +97,10 @@
         "evenPriceDistribution": "Phân phối giá đều",
         "market": "Thị trường",
         "limit": "Giới hạn",
+        "closePosition": "Đóng vị thế",
+        "closeAtCurrentPrice": "Đóng tại giá hiện tại",
+        "closeAtAPriceYouSet": "Đóng tại mức giá bạn đặt",
+
         "price": "Giá",
         "size": "Kích thước",
         "time": "Thời gian",
@@ -145,6 +158,7 @@
         "midButton": "MID",
         "positionClosed": "Vị thế đã đóng",
         "successfullyClosedPosition": "Đã đóng thành công {{usdValueOfOrderStr}} vị thế {{symbol}}",
+        "tpSlForPosition": "TP/SL cho Vị thế",
         "failedToClosePosition": "Đóng vị thế thất bại",
         "transactionTimedOut": "Giao dịch bị hết thời gian sau {{timeInSeconds}} giây",
         "txFailedOrNotConfirmed": "Giao dịch thất bại hoặc chưa xác nhận",
@@ -200,7 +214,9 @@
         },
         "orderFilled": {
             "title": "{{side}} Lệnh đã khớp",
-            "message": "Đã khớp thành công lệnh {{side}} {{usdValueOfFillStr}} cho {{symbol}} tại {{fillPrice}}"
+            "message": "Đã khớp thành công lệnh {{side}} {{usdValueOfFillStr}} cho {{symbol}} tại {{fillPrice}}",
+            "buySide": "Mua",
+            "sellSide": "Bán"
         },
         "errorUpdatingOrder": {
             "title": "Lỗi khi cập nhật lệnh"
@@ -218,6 +234,9 @@
             "message": "Đã hủy {{successCount}} lệnh, {{failedCount}} lệnh thất bại"
         },
         "noOpenOrders": "Không có lệnh mở",
+        "noOpenOrdersForMarket": "Không có lệnh {{symbol}} mở",
+        "noOpenLongOrders": "Không có lệnh long mở",
+        "noOpenShortOrders": "Không có lệnh short mở",
         "transactionError": "Lỗi giao dịch",
         "invalidLimitPrice": {
             "title": "Giá không hợp lệ",
@@ -288,6 +307,14 @@
         "tradeValue": "Giá trị giao dịch",
         "fee": "Phí",
         "closedPnl": "Lãi/lỗ đã chốt",
+        "depositor": "Người nạp tiền",
+        "vaultAmount": "Số tiền trong Vault",
+        "unrealizedPnl": "Lợi nhuận chưa chốt",
+        "allTimePnl": "Lợi nhuận tổng cộng",
+        "daysFollowing": "Số ngày theo dõi",
+        "completed": "Đã hoàn thành",
+        "withdrawal": "Rút tiền",
+        "spotTransfer": "Chuyển khoản Spot",
         "reduceOnly": "Chỉ giảm",
         "triggerConditions": "Điều kiện kích hoạt",
         "tpsl": "TP/SL",
@@ -296,6 +323,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "Không có vị thế mở",
+        "noOpenPositionsForMarket": "Không có vị thế {{symbol}} mở",
+        "noOpenLongPositions": "Không có vị thế long mở",
+        "noOpenShortPositions": "Không có vị thế short mở",
         "markPrice": "Giá đánh dấu",
         "orderId": "ID lệnh",
         "totalBalance": "Tổng số dư",
@@ -313,13 +343,26 @@
         "originalSize": "Khối lượng gốc",
         "cancelAll": "Hủy tất cả",
         "noTradeHistory": "Không có lịch sử giao dịch",
+        "noTradeHistoryForMarket": "Không có lịch sử giao dịch {{symbol}}",
+        "noLongTradeHistory": "Không có lịch sử giao dịch long",
+        "noShortTradeHistory": "Không có lịch sử giao dịch short",
         "noOrderHistory": "Không có lịch sử lệnh",
+        "noOrderHistoryForMarket": "Không có lịch sử lệnh {{symbol}}",
+        "noLongOrderHistory": "Không có lịch sử lệnh long",
+        "noShortOrderHistory": "Không có lịch sử lệnh short",
         "noFundingHistory": "Không có lịch sử phí cấp vốn",
+        "noFundingHistoryForMarket": "Không có lịch sử phí cấp vốn {{symbol}}",
+        "noLongFundingHistory": "Không có lịch sử phí cấp vốn long",
+        "noShortFundingHistory": "Không có lịch sử phí cấp vốn short",
         "fundingHistory": "Tất cả: {{allTime}} Kể từ khi thay đổi: {{sinceChange}}",
+        "positionSide": "Chiều vị thế",
+        "payment": "Thanh toán",
+        "rate": "Tỷ lệ",
         "openLong": "Mở Long",
         "openShort": "Mở Short",
         "closeLong": "Đóng Long",
-        "closeShort": "Đóng Short"
+        "closeShort": "Đóng Short",
+        "goToMarket": "Đi đến thị trường {{coin}}"
     },
     "time": {
         "second": "giây",
@@ -348,7 +391,8 @@
         "chart": "Biểu đồ",
         "book": "Sổ lệnh",
         "recent": "Gần đây",
-        "positions": "Vị thế"
+        "positions": "Vị thế",
+        "portfolio": "Danh mục"
     },
     "auth": {
         "login": "Đăng nhập",
@@ -374,7 +418,7 @@
         "goodbye": "Tạm biệt",
         "thankYou": "Cảm ơn bạn",
         "pleaseWait": "Vui lòng chờ...",
-        "connectWalletForTrading": "Kết nối ví để giao dịch miễn phí phí gas."
+        "connectWalletForTrading": "Kết nối ví để giao dịch miễn phí gas."
     },
     "home": {
         "title": "Giao dịch Perps cùng Ambient",
@@ -394,9 +438,13 @@
     },
     "referrals": {
         "title": "Giới thiệu",
-        "description": "Giới thiệu người dùng để nhận thưởng. Đối tác nhận thưởng cao hơn.",
-        "tradersReferred": "Nhà giao dịch đã giới thiệu",
-        "rewardsEarned": "Phần thưởng nhận được"
+        "description": "Giới thiệu người dùng để nhận phần thưởng. Đối tác nhận được phần thưởng cao hơn.",
+        "tradersReferred": "Người giao dịch đã giới thiệu",
+        "rewardsEarned": "Phần thưởng đã nhận",
+        "rewardHistory": "Lịch sử phần thưởng",
+        "enterCode": "Nhập mã",
+        "claim": "Nhận",
+        "createCode": "Tạo mã"
     },
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",
@@ -422,6 +470,9 @@
         "skipOpenOrderConfirm": "Bỏ qua xác nhận lệnh mở",
         "enableTxNotifications": "Bật thông báo giao dịch",
         "enableBackgroundFillNotif": "Bật thông báo khớp lệnh nền",
+        "navigationKeyboardShortcuts": "Bật phím tắt bàn phím điều hướng",
+        "tradingKeyboardShortcuts": "Bật phím tắt bàn phím giao dịch",
+        "viewKeyboardShortcuts": "Xem phím tắt bàn phím",
         "numberFormat": "Định dạng số",
         "color": "Màu sắc",
         "language": "Ngôn ngữ"
@@ -440,7 +491,7 @@
         "openInterest": "Vị thế mở",
         "openInterestTooltip": "Tổng vị thế mở trên thị trường",
         "fundingRate": "Tỷ lệ funding",
-        "fundingRateTooltip": "Tỷ lệ mỗi giờ mà Long trả cho Short (hoặc ngược lại nếu âm). Không phí bổ sung; funding là khoản thanh toán P2P để giữ giá sát thị trường giao ngay.",
+        "fundingRateTooltip": "Tỷ lệ mỗi giờ mà Long trả cho Short (hoặc ngược lại nếu âm). Không phí bổ sung; funding là khoản thanh toán P2P để giữ giá sát thị trường.",
         "fundingCountdown": "Đếm ngược funding",
         "fundingCountdownTooltip": "Thời gian còn lại đến funding tiếp theo"
     },
@@ -488,15 +539,21 @@
         "updateButton": "Cập nhật ngay",
         "version": "Phiên bản"
     },
+    "offline": {
+        "title": "Bạn đang ngoại tuyến",
+        "message": "Giao dịch bị vô hiệu hóa. Bạn vẫn có thể xem dữ liệu đã lưu trong bộ nhớ cache."
+    },
     "leverage": {
         "title": "Điều chỉnh đòn bẩy",
-        "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu"
+        "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu",
+        "adjustLeverage": "Điều chỉnh đòn bẩy, hiện tại {{value}}x"
     },
     "share": {
         "prompt": "Tùy chỉnh văn bản của bạn",
         "xCTA": "Chia sẻ lên 𝕏",
         "copyLinkCTA": "Sao chép liên kết",
-        "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay"
+        "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay",
+        "sharePosition": "Chia sẻ vị thế với PnL {{pnl}}"
     },
     "colors": {
         "default": "Mặc định",
@@ -511,6 +568,11 @@
         "depositInput": "Trường nhập số tiền nạp",
         "addressInput": "Trường nhập địa chỉ",
         "amountInput": "Trường nhập số tiền",
+        "expandWallet": "Mở rộng ví",
+        "collapseWallet": "Thu gọn ví",
+        "priceInput": "Trường nhập giá",
+        "sizeInput": "Trường nhập khối lượng",
+        "stopPriceInput": "Trường nhập giá dừng",
         "withdrawInput": "Trường nhập số tiền rút",
         "scrollTabsLeft": "Cuộn tab sang trái",
         "scrollTabsRight": "Cuộn tab sang phải",
@@ -542,13 +604,189 @@
         "toggleTPSL": "Chuyển Chốt lời/Dừng lỗ",
         "editTPSL": "Chỉnh sửa Chốt lời/Dừng lỗ",
         "toggleConfigureAmount": "Chuyển nhập số tiền",
-        "toggleLimitPrice": "Chuyển nhập giá giới hạn"
+        "toggleLimitPrice": "Chuyển nhập giá giới hạn",
+        "setMaxAmount": "Đặt số tiền tối đa",
+        "rowsPerPage": "Số hàng mỗi trang",
+        "closeModal": "Đóng cửa sổ",
+        "goToHome": "Đi đến trang chủ",
+        "spotTradingOpensNewTab": "Giao dịch spot trên Ambient v1 (mở trong tab mới)",
+        "moreOptions": "Tùy chọn khác",
+        "notifications": "Thông báo",
+        "transferAmount": "Số tiền chuyển",
+        "viewOnExplorerNewTab": "Xem trên trình duyệt (mở trong tab mới)",
+        "externalLinkOpensNewTab": "{{linkText}} (mở trong tab mới)",
+        "opensInNewTab": "(mở trong tab mới)",
+        "selectTokenCurrent": "Chọn token, hiện tại: {{symbol}}",
+        "mobileTradeNavigation": "Điều hướng giao dịch",
+        "takeProfitPrice": "Giá chốt lời",
+        "expectedGain": "Lợi nhuận dự kiến",
+        "toggleGainCurrency": "Chuyển đổi đơn vị lợi nhuận giữa đô la và phần trăm",
+        "stopLossPrice": "Giá dừng lỗ",
+        "expectedLoss": "Thua lỗ dự kiến",
+        "toggleLossCurrency": "Chuyển đổi đơn vị thua lỗ giữa đô la và phần trăm",
+        "setMidPrice": "Đặt giá trung bình",
+        "selectSizeDenomination": "Chọn đơn vị kích thước"
     },
     "chart": {
         "liqPrice": "Giá thanh lý"
     },
     "meta": {
-        "title": "Trang chủ | Ambient",
+        "title": "Ambient Finance | Hợp đồng vĩnh viễn trên Fogo",
+        "description": "Giao dịch hợp đồng vĩnh viễn trên Fogo với Ambient Finance. Không phí taker, đòn bẩy lên đến 100x và khớp lệnh siêu nhanh.",
         "content": "Giao dịch Perps với Ambient"
+    },
+    "portfolio": {
+        "fees": "Phí",
+        "vol14d": "Khối lượng(14 ngày)",
+        "viewVolume": "Xem khối lượng",
+        "feesTakerMaker": "Phí (Taker / Maker)",
+        "viewFeeSchedule": "Xem biểu phí",
+        "totalUsdVal": "Tổng giá trị USD",
+        "totalNetUsdValue": "Tổng giá trị USD ròng",
+        "performance": "Hiệu suất",
+        "positions": "Vị thế",
+        "feeSchedule": "Biểu phí",
+        "vipTiers": "Cấp độ VIP",
+        "marketMakerTiers": "Cấp độ Market Maker",
+        "tier": "Cấp độ",
+        "vol14dVolume": "Khối lượng 14 ngày",
+        "taker": "Taker",
+        "maker": "Maker",
+        "negativeFeesRebate": "Phí âm là tiền hoàn lại",
+        "alwaysZero": "Luôn là 0.00%",
+        "makerFeesPercent": "Phí Maker {{percent}}",
+        "availableToDepositTooltip": "Số tiền tối đa bạn có thể nạp dựa trên số dư của bạn",
+        "availableToSend": "Có thể gửi",
+        "availableToSendTooltip": "Tổng số tiền bạn có thể gửi",
+        "networkFee": "Phí mạng",
+        "networkFeeTooltip": "Phí tính cho việc xử lý giao dịch",
+        "fogoChainLogo": "Logo Fogo Chain",
+        "accountValue": "Giá trị tài khoản",
+        "collateral": "Ký quỹ",
+        "pnl": "PNL",
+        "volume": "Khối lượng",
+        "maxDrawdown": "Mức sụt giảm tối đa",
+        "totalEquity": "Tổng tài sản",
+        "accountEquity": "Tài sản tài khoản",
+        "vaultEquity": "Tài sản Vault",
+        "perps": "Perps",
+        "perpsAndVaults": "Perps + Vaults",
+        "allTime": "Tất cả thời gian",
+        "twentyFourHour": "24H",
+        "sevenDay": "7D",
+        "thirtyDay": "30D",
+        "fusd": "fUSD",
+        "sendDescription": "Gửi token đến địa chỉ khác trên Fogo.",
+        "sendTitle": "Gửi {{token}} trên Fogo",
+        "enterAddress": "Nhập địa chỉ...",
+        "enterAmount": "Nhập số tiền",
+        "invalidAddress": "Địa chỉ không hợp lệ",
+        "strategies": "Danh sách chiến lược",
+        "vault": "Kho bạc",
+        "vaults": "Danh sách kho bạc",
+        "subAccounts": "Tài khoản phụ",
+        "openOrders": "Lệnh mở",
+        "orderHistory": "Lịch sử lệnh",
+        "tradeHistory": "Lịch sử giao dịch",
+        "twapFillHistory": "Lịch sử khớp TWAP",
+        "twapHistory": "Lịch sử TWAP",
+        "depositsAndWithdrawals": "Nạp và rút tiền",
+        "fundingHistory": "Lịch sử cấp vốn",
+        "more": "Thêm",
+        "termsOfService": "Điều khoản dịch vụ",
+        "privacyPolicy": "Chính sách bảo mật",
+        "affiliates": "Liên kết",
+        "pageNotFound": "Không Tìm Thấy Trang",
+        "transactionTimedOut": "Giao dịch bị hết thời gian sau 15 giây",
+        "connectToViewPortfolio": "Kết nối để Xem Danh Mục Đầu Tư",
+        "connectDescription": "Đăng nhập bằng ví của bạn để xem danh mục đầu tư, vị thế và lịch sử giao dịch."
+    },
+    "docs": {
+        "menuTerms": "Điều khoản dịch vụ",
+        "menuPrivacy": "Bảo mật",
+        "terms": "Điều khoản dịch vụ CROCODILE Labs",
+        "privacy": "Chính sách bảo mật"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Phím tắt",
+        "title": "Phím tắt bàn phím",
+        "hintPress": "Nhấn",
+        "hintToClose": "để đóng",
+        "applyDefaults": "Áp dụng mặc định",
+        "editShortcut": "Chỉnh sửa phím tắt",
+        "pressKeys": "Nhấn phím...",
+        "aria": {
+            "close": "Đóng phím tắt bàn phím"
+        },
+        "categoryTitles": {
+            "general": "Chung",
+            "trading": "Giao dịch",
+            "navigation": "Điều hướng"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Hiển thị phím tắt"
+            },
+            "settings": {
+                "open": "Mở cài đặt"
+            },
+            "modal": {
+                "close": "Đóng hộp thoại / hủy"
+            },
+            "trading": {
+                "buy": "Chuyển sang mua",
+                "sell": "Chuyển sang bán",
+                "market": "Bắt đầu lệnh thị trường",
+                "limit": "Bắt đầu lệnh giới hạn",
+                "marketClose": "Đóng vị thế theo giá thị trường"
+            },
+            "navigation": {
+                "trade": "Đi tới trang giao dịch",
+                "home": "Đi tới trang chủ",
+                "portfolio": "Đi tới trang danh mục"
+            },
+            "wallet": {
+                "connect": "Mở kết nối ví"
+            },
+            "portfolio": {
+                "deposit": "Mở nạp tiền",
+                "withdraw": "Mở rút tiền",
+                "latestTx": "Xem giao dịch mới nhất trên trình khám phá"
+            }
+        },
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

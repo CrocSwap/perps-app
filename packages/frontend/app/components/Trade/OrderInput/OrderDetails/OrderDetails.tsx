@@ -154,39 +154,20 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     const hasMoreItems = useMemo(() => dataToUse.length > 2, [dataToUse]);
 
     return (
-        <motion.div
+        <div
             className={`${styles.order_details} ${
                 isTradeInfoExpanded ? styles.expanded : ''
             }`}
-            layout
-            transition={{
-                duration: 0.3,
-                ease: [0.4, 0.0, 0.2, 1],
-            }}
         >
             <div className={styles.details_viewport}>
-                <motion.div className={styles.details_container} layout>
+                <div className={styles.details_container}>
                     {dataToUse.map((data: MarketInfoItem, idx: number) => {
                         const isVisible = idx < 2 || isTradeInfoExpanded;
 
                         if (!isVisible) return null;
 
                         return (
-                            <motion.div
-                                key={data.label + idx}
-                                className={styles.detail_item}
-                                layout
-                                initial={
-                                    idx >= 2 ? { opacity: 0, y: 10 } : false
-                                }
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{
-                                    duration: 0.2,
-                                    delay: idx >= 2 ? (idx - 2) * 0.05 : 0,
-                                    ease: [0.4, 0.0, 0.2, 1],
-                                }}
-                            >
+                            <div key={idx} className={styles.detail_item}>
                                 <div className={styles.detail_label}>
                                     <span>{data.label}</span>
                                     <Tooltip
@@ -199,10 +180,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                                 <span className={styles.detail_value}>
                                     {data.value}
                                 </span>
-                            </motion.div>
+                            </div>
                         );
                     })}
-                </motion.div>
+                </div>
             </div>
 
             {hasMoreItems && (
@@ -231,7 +212,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                     </motion.div>
                 </motion.button>
             )}
-        </motion.div>
+        </div>
     );
 };
 

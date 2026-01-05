@@ -13,6 +13,7 @@
         "error": "Error",
         "success": "Éxito",
         "applyDefaults": "Aplicar predeterminados",
+        "changeApplied": "Cambio aplicado",
         "learnMore": "Más información",
         "deposit": "Depositar",
         "transfer": "Transferir",
@@ -20,6 +21,8 @@
         "submit": "Enviar",
         "quantity": "Cantidad",
         "confirm": "Confirmar",
+        "send": "Enviar",
+        "address": "Dirección",
         "amount": "Monto",
         "max": "Máx",
         "min": "Mín",
@@ -30,6 +33,7 @@
         "fundingHistory": "Historial de fondeo",
         "orderHistory": "Historial de órdenes",
         "depositsAndWithdrawals": "Depósitos y retiros",
+        "depositors": "Depositantes",
         "twap": "TWAP",
         "all": "Todos",
         "active": "Activo",
@@ -40,7 +44,8 @@
         "reset": "Reiniciar",
         "announcements": "Anuncios",
         "leverage": "Apalancamiento",
-        "comingSoon": "Próximamente"
+        "comingSoon": "Próximamente",
+        "clearFilter": "Borrar filtro"
     },
     "transactions": {
         "orderTypes": "Tipos de orden",
@@ -88,6 +93,10 @@
         "evenPriceDistribution": "Distribución equitativa de precios",
         "market": "Mercado",
         "limit": "Límite",
+        "closePosition": "Cerrar posición",
+        "closeAtCurrentPrice": "Cerrar al precio actual",
+        "closeAtAPriceYouSet": "Cerrar a un precio que establezcas",
+
         "price": "Precio",
         "size": "Cantidad",
         "time": "Hora",
@@ -145,6 +154,7 @@
         "midButton": "MID",
         "positionClosed": "Posición cerrada",
         "successfullyClosedPosition": "Posición {{symbol}} cerrada exitosamente por {{usdValueOfOrderStr}}",
+        "tpSlForPosition": "TP/SL for Position",
         "failedToClosePosition": "No se pudo cerrar la posición",
         "transactionTimedOut": "Transacción agotó el tiempo tras {{timeInSeconds}} segundos",
         "txFailedOrNotConfirmed": "La transacción falló o no fue confirmada",
@@ -220,6 +230,9 @@
             "message": "Canceladas {{successCount}} órdenes, {{failedCount}} fallaron"
         },
         "noOpenOrders": "No hay órdenes abiertas",
+        "noOpenOrdersForMarket": "No hay órdenes {{symbol}} abiertas",
+        "noOpenLongOrders": "No hay órdenes long abiertas",
+        "noOpenShortOrders": "No hay órdenes short abiertas",
         "transactionError": "Error de transacción",
         "invalidLimitPrice": {
             "title": "Precio inválido",
@@ -290,6 +303,14 @@
         "tradeValue": "Valor de la operación",
         "fee": "Comisión",
         "closedPnl": "PnL realizado",
+        "depositor": "Depositante",
+        "vaultAmount": "Cantidad del Vault",
+        "unrealizedPnl": "PnL no realizado",
+        "allTimePnl": "PnL total",
+        "daysFollowing": "Días siguiendo",
+        "completed": "Completado",
+        "withdrawal": "Retiro",
+        "spotTransfer": "Transferencia Spot",
         "reduceOnly": "Solo reducir",
         "triggerConditions": "Condiciones de activación",
         "tpsl": "TP/SL",
@@ -298,6 +319,9 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "No hay posiciones abiertas",
+        "noOpenPositionsForMarket": "No hay posiciones {{symbol}} abiertas",
+        "noOpenLongPositions": "No hay posiciones long abiertas",
+        "noOpenShortPositions": "No hay posiciones short abiertas",
         "markPrice": "Precio de referencia",
         "orderId": "ID de orden",
         "totalBalance": "Saldo total",
@@ -315,13 +339,26 @@
         "originalSize": "Cantidad original",
         "cancelAll": "Cancelar todas",
         "noTradeHistory": "Sin historial de operaciones",
+        "noTradeHistoryForMarket": "Sin historial de operaciones {{symbol}}",
+        "noLongTradeHistory": "Sin historial de operaciones long",
+        "noShortTradeHistory": "Sin historial de operaciones short",
         "noOrderHistory": "Sin historial de órdenes",
+        "noOrderHistoryForMarket": "Sin historial de órdenes {{symbol}}",
+        "noLongOrderHistory": "Sin historial de órdenes long",
+        "noShortOrderHistory": "Sin historial de órdenes short",
         "noFundingHistory": "Sin historial de financiamiento",
+        "noFundingHistoryForMarket": "Sin historial de financiamiento {{symbol}}",
+        "noLongFundingHistory": "Sin historial de financiamiento long",
+        "noShortFundingHistory": "Sin historial de financiamiento short",
         "fundingHistory": "Todos los tiempos: {{allTime}} Desde el cambio: {{sinceChange}}",
+        "positionSide": "Lado de posición",
+        "payment": "Pago",
+        "rate": "Tasa",
         "openLong": "Abrir Long",
         "openShort": "Abrir Short",
         "closeLong": "Cerrar Long",
-        "closeShort": "Cerrar Short"
+        "closeShort": "Cerrar Short",
+        "goToMarket": "Ir al mercado de {{coin}}"
     },
     "time": {
         "second": "segundo",
@@ -350,7 +387,8 @@
         "chart": "Gráfico",
         "book": "Libro de órdenes",
         "recent": "Reciente",
-        "positions": "Posiciones"
+        "positions": "Posiciones",
+        "portfolio": "Cartera"
     },
     "auth": {
         "login": "Iniciar sesión",
@@ -396,9 +434,32 @@
     },
     "referrals": {
         "title": "Referidos",
-        "description": "Refiere usuarios y gana recompensas. Los afiliados ganan más.",
-        "tradersReferred": "Traders referidos",
-        "rewardsEarned": "Recompensas obtenidas"
+        "description": "Refiere usuarios para ganar recompensas. Los afiliados obtienen mayores recompensas.",
+        "tradersReferred": "Comerciantes referidos",
+        "rewardsEarned": "Recompensas obtenidas",
+        "rewardHistory": "Historial de recompensas",
+        "enterCode": "Ingresar código",
+        "createCode": "Crear código",
+        "usingAffiliateCode": "Usando código de afiliado",
+        "overwriteCurrentReferralCode": "Sobrescribir código de referido actual",
+        "enterReferralCode": "Ingresar un código de referido",
+        "referralCodeNotValidPleaseConfirm": "El código <0>{{invalidCode}}</0> no está registrado en el programa de referidos. Por favor, confirme que el código es correcto.",
+        "yourCodeIs": "Tu código es <0>{{affiliateCode}}</0> basado en los primeros seis caracteres de tu dirección de wallet. Haz clic en 'Activar' para registrar este código en el sistema de referidos.",
+        "createAnAffiliateCode": "Crear un código de afiliado",
+        "createAUniqueCodeToEarn": "Crea un código único para ganar el 10% de las comisiones de usuarios referidos.",
+        "codeAlreadyInUse": "Código ya en uso",
+        "connectYourWallet": {
+            "affiliate": "Conecta tu wallet para crear un código de afiliado",
+            "claim": "Conecta tu wallet para reclamar recompensas",
+            "enterCode": "Conecta tu wallet para ingresar un código de referido"
+        },
+        "usersWithTradingVolume": "Este código puede ser personalizado o actualizado por usuarios después de alcanzar $1M en volumen de trading.",
+        "doNotSelfRefer": "El código <0>{{affiliateCode}}</0> no puede ser registrado por la misma dirección que lo creó. Por favor, elige un código diferente.",
+        "toCustomizeAffiliateCode": "Los códigos de afiliado por defecto son los primeros seis caracteres de tu dirección de wallet. Usuarios con > $1M en volumen de trading pueden personalizar su código.",
+        "claimRewardsWithAmount": "Reclamar {{amount}} en recompensas",
+        "selectATabToViewData": "Selecciona una pestaña para ver datos",
+        "trackingLinkExplanation": "Recibirás <0>{{affiliatePercent}}</0> de las comisiones de usuarios referidos y ellos recibirán un descuento de <1>{{userPercent}}</1>.",
+        "claim": "Reclamar"
     },
     "deposit": {
         "prompt": "Deposita {{token}} desde Fogo",
@@ -424,6 +485,9 @@
         "skipOpenOrderConfirm": "Omitir confirmación de orden abierta",
         "enableTxNotifications": "Habilitar notificaciones de transacción",
         "enableBackgroundFillNotif": "Habilitar notificaciones de ejecución en segundo plano",
+        "navigationKeyboardShortcuts": "Habilitar atajos de teclado de navegación",
+        "tradingKeyboardShortcuts": "Habilitar atajos de teclado de trading",
+        "viewKeyboardShortcuts": "Ver atajos de teclado",
         "numberFormat": "Formato numérico",
         "color": "Color",
         "language": "Idioma"
@@ -490,15 +554,21 @@
         "updateButton": "Actualizar ahora",
         "version": "Versión"
     },
+    "offline": {
+        "title": "Estás sin conexión",
+        "message": "El trading está deshabilitado. Aún puedes ver los datos en caché."
+    },
     "leverage": {
         "title": "Ajustar apalancamiento",
-        "closePositionPrompt": "Reduce apalancamiento cerrando"
+        "closePositionPrompt": "Reduce apalancamiento cerrando",
+        "adjustLeverage": "Ajustar apalancamiento, actualmente {{value}}x"
     },
     "share": {
         "prompt": "Personaliza tu texto",
         "xCTA": "Compartir en 𝕏",
         "copyLinkCTA": "Copiar enlace",
-        "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora"
+        "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora",
+        "sharePosition": "Compartir posición con PnL {{pnl}}"
     },
     "colors": {
         "default": "Predeterminado",
@@ -513,6 +583,11 @@
         "depositInput": "Campo de entrada de depósito",
         "addressInput": "Campo de entrada de dirección",
         "amountInput": "Campo de entrada de cantidad",
+        "expandWallet": "Expandir wallet",
+        "collapseWallet": "Contraer wallet",
+        "priceInput": "Campo de entrada de precio",
+        "sizeInput": "Campo de entrada de tamaño",
+        "stopPriceInput": "Campo de entrada de precio stop",
         "withdrawInput": "Campo de entrada de retiro",
         "scrollTabsLeft": "Desplazar pestañas a la izquierda",
         "scrollTabsRight": "Desplazar pestañas a la derecha",
@@ -544,13 +619,204 @@
         "toggleTPSL": "Alternar Take Profit / Stop Loss",
         "editTPSL": "Editar Take Profit / Stop Loss",
         "toggleConfigureAmount": "Alternar configuración de cantidad",
-        "toggleLimitPrice": "Alternar precio límite"
+        "toggleLimitPrice": "Alternar precio límite",
+        "setMaxAmount": "Establecer cantidad máxima",
+        "rowsPerPage": "Filas por página",
+        "closeModal": "Cerrar modal",
+        "goToHome": "Ir al inicio",
+        "spotTradingOpensNewTab": "Trading spot en Ambient v1 (abre en nueva pestaña)",
+        "moreOptions": "Más opciones",
+        "notifications": "Notificaciones",
+        "transferAmount": "Monto de transferencia",
+        "viewOnExplorerNewTab": "Ver en explorador (abre en nueva pestaña)",
+        "externalLinkOpensNewTab": "{{linkText}} (abre en nueva pestaña)",
+        "opensInNewTab": "(abre en nueva pestaña)",
+        "selectTokenCurrent": "Seleccionar token, actual: {{symbol}}",
+        "mobileTradeNavigation": "Navegación de trading",
+        "takeProfitPrice": "Precio Take Profit",
+        "expectedGain": "Ganancia esperada",
+        "toggleGainCurrency": "Alternar moneda de ganancia entre dólares y porcentaje",
+        "stopLossPrice": "Precio Stop Loss",
+        "expectedLoss": "Pérdida esperada",
+        "toggleLossCurrency": "Alternar moneda de pérdida entre dólares y porcentaje",
+        "setMidPrice": "Establecer precio medio",
+        "selectSizeDenomination": "Seleccionar denominación de tamaño"
     },
     "chart": {
         "liqPrice": "Precio liq."
     },
     "meta": {
-        "title": "Inicio | Ambient",
+        "title": "Ambient Finance | Futuros perpetuos en Fogo",
+        "description": "Opera futuros perpetuos en Fogo con Ambient Finance. Sin comisiones taker, hasta 100x de apalancamiento y ejecución ultrarrápida.",
         "content": "Opera Perps con Ambient"
+    },
+    "portfolio": {
+        "fees": "Comisiones",
+        "vol14d": "Vol(14d)",
+        "viewVolume": "Ver volumen",
+        "feesTakerMaker": "Comisiones (Taker / Maker)",
+        "viewFeeSchedule": "Ver programa de comisiones",
+        "totalUsdVal": "Valor total USD",
+        "totalNetUsdValue": "Valor neto total en USD",
+        "performance": "Rendimiento",
+        "positions": "Posiciones",
+        "feeSchedule": "Programa de comisiones",
+        "vipTiers": "Niveles VIP",
+        "marketMakerTiers": "Niveles de Market Maker",
+        "tier": "Nivel",
+        "vol14dVolume": "Volumen 14D",
+        "taker": "Taker",
+        "maker": "Maker",
+        "negativeFeesRebate": "Las comisiones negativas son reembolsos",
+        "alwaysZero": "Siempre 0.00%",
+        "makerFeesPercent": "Comisiones maker {{percent}}",
+        "availableToDepositTooltip": "El monto máximo que puedes depositar según tu saldo",
+        "availableToSend": "Disponible para enviar",
+        "availableToSendTooltip": "El monto total disponible para enviar",
+        "networkFee": "Comisión de red",
+        "networkFeeTooltip": "Comisión cobrada por procesar la transacción",
+        "fogoChainLogo": "Logo de Fogo Chain",
+        "accountValue": "Valor de cuenta",
+        "collateral": "Colateral",
+        "pnl": "PnL",
+        "volume": "Volumen",
+        "maxDrawdown": "Máx. Drawdown",
+        "totalEquity": "Capital total",
+        "accountEquity": "Capital de cuenta",
+        "vaultEquity": "Capital del Vault",
+        "perps": "Perps",
+        "perpsAndVaults": "Perps + Vaults",
+        "allTime": "Todo el tiempo",
+        "twentyFourHour": "24H",
+        "sevenDay": "7D",
+        "thirtyDay": "30D",
+        "fusd": "fUSD",
+        "sendDescription": "Enviar tokens a otra dirección en Fogo.",
+        "sendTitle": "Enviar {{token}} en Fogo",
+        "enterAddress": "Ingresar dirección...",
+        "enterAmount": "Ingresar monto",
+        "invalidAddress": "Dirección inválida",
+        "insufficientFunds": "Fondos insuficientes",
+        "validAmountRequired": "Por favor, ingresa un monto válido",
+        "amountGreaterThanZero": "El monto debe ser mayor a 0",
+        "minDepositAmount": "El monto mínimo de depósito es {{amount}}",
+        "exceedsAvailableBalance": "El monto excede el saldo disponible de {{balance}}",
+        "transactionTimedOut": "La transacción expiró después de 15 segundos",
+        "connectToViewPortfolio": "Conectar para Ver Tu Portafolio",
+        "connectDescription": "Inicia sesión con tu billetera para ver tu portafolio, posiciones e historial de operaciones."
+    },
+    "pageTitles": {
+        "portfolio": "Portafolio",
+        "referrals": "Referidos",
+        "points": "Puntos",
+        "leaderboard": "Clasificación",
+        "newStrategy": "Nueva Estrategia",
+        "editStrategy": "Editar Estrategia",
+        "strategy": "Estrategia",
+        "strategies": "Estrategias",
+        "vault": "Bóveda",
+        "vaults": "Bóvedas",
+        "subAccounts": "Subcuentas",
+        "positions": "Posiciones",
+        "openOrders": "Órdenes Abiertas",
+        "orderHistory": "Historial de Órdenes",
+        "tradeHistory": "Historial de Operaciones",
+        "twapFillHistory": "Historial de Ejecución TWAP",
+        "twapHistory": "Historial TWAP",
+        "depositsAndWithdrawals": "Depósitos y Retiros",
+        "fundingHistory": "Historial de Financiamiento",
+        "more": "Más",
+        "termsOfService": "Términos de Servicio",
+        "privacyPolicy": "Política de Privacidad",
+        "affiliates": "Afiliados",
+        "pageNotFound": "Página No Encontrada"
+    },
+    "docs": {
+        "menuTerms": "Términos",
+        "menuPrivacy": "Privacidad",
+        "terms": "Términos de Servicio de CROCODILE Labs",
+        "privacy": "Política de Privacidad"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Atajos",
+        "title": "Atajos de teclado",
+        "hintPress": "Pulsa",
+        "hintToClose": "para cerrar",
+        "applyDefaults": "Aplicar valores predeterminados",
+        "editShortcut": "Editar atajo",
+        "pressKeys": "Pulsa las teclas...",
+        "aria": {
+            "close": "Cerrar atajos de teclado"
+        },
+        "categoryTitles": {
+            "general": "General",
+            "trading": "Trading",
+            "navigation": "Navegación"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Mostrar atajos"
+            },
+            "settings": {
+                "open": "Abrir configuración"
+            },
+            "modal": {
+                "close": "Cerrar modal / cancelar"
+            },
+            "trading": {
+                "buy": "Cambiar a compra",
+                "sell": "Cambiar a venta",
+                "market": "Iniciar orden de mercado",
+                "limit": "Iniciar orden limitada",
+                "marketClose": "Cerrar posición al precio de mercado"
+            },
+            "navigation": {
+                "trade": "Ir a la página de trading",
+                "home": "Ir a la página de inicio",
+                "portfolio": "Ir a la página de portfolio"
+            },
+            "wallet": {
+                "connect": "Abrir conector de billetera"
+            },
+            "portfolio": {
+                "deposit": "Abrir modal de depósito",
+                "withdraw": "Abrir modal de retiro",
+                "latestTx": "Ver la última transacción en el explorador"
+            }
+        },
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

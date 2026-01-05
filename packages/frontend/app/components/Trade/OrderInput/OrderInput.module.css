@@ -26,7 +26,8 @@
     overflow-y: scroll;
 }
 
-.mainContent::-webkit-scrollbar {
+.mainContent::-webkit-scrollbar,
+.order_input::-webkit-scrollbar {
     display: none;
 }
 
@@ -242,6 +243,7 @@
     flex-direction: column;
     gap: var(--gap-s);
     transition: all 0.3s ease-in-out;
+    /* transform: translateX(-50); */
 }
 
 .submit_button {

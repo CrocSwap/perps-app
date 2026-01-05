@@ -162,7 +162,11 @@ export default function Notification(props: propsIF) {
 
     return (
         <section
-            className={styles.notification}
+            className={`${styles.notification} ${
+                data.txLink && data.message.length > 50
+                    ? styles.tallNotification
+                    : ''
+            }`}
             onMouseEnter={() => {
                 setIsHovered(true);
                 onMouseEnter?.(data.slug);
@@ -194,13 +198,23 @@ export default function Notification(props: propsIF) {
                             color='var(--red)'
                         />
                     )}
-                    <h2 style={{ userSelect: 'text' }}>{data.title}</h2>
+                    <h2
+                        style={{ userSelect: 'text' }}
+                        className={
+                            data.title.length > 25 ? styles.smallTitle : ''
+                        }
+                    >
+                        {data.title}
+                    </h2>
                 </div>
-                <IoClose
+                <button
+                    type='button'
                     className={styles.close}
-                    size={ICON_SIZE}
                     onClick={() => dismiss(data.slug)}
-                />
+                    aria-label={t('common.close')}
+                >
+                    <IoClose size={ICON_SIZE} aria-hidden='true' />
+                </button>
             </header>
             <p style={{ userSelect: 'text' }}>{formatMessage(data.message)}</p>
             {data.txLink && (
@@ -209,6 +223,7 @@ export default function Notification(props: propsIF) {
                     target='_blank'
                     rel='noopener noreferrer'
                     className={styles.txLink}
+                    aria-label={t('aria.viewOnExplorerNewTab')}
                     onClick={() => {
                         if (typeof plausible === 'function') {
                             plausible('External Link Clicked', {

@@ -26,6 +26,8 @@ export default function MarginModal(props: propsIF) {
                         ]
                     }
                     onClick={() => setIntermediate('margin.cross.title')}
+                    aria-pressed={intermediate === 'margin.cross.title'}
+                    aria-label={t('margin.cross.heading')}
                 >
                     <h3>{t('margin.cross.heading')}</h3>
                     <p>{t('margin.cross.blurb')}</p>
@@ -39,12 +41,17 @@ export default function MarginModal(props: propsIF) {
                         ]
                     }
                     onClick={() => setIntermediate('margin.isolated.title')}
+                    aria-pressed={intermediate === 'margin.isolated.title'}
+                    aria-label={t('margin.isolated.heading')}
                 >
                     <h3>{t('margin.isolated.heading')}</h3>
                     <p>{t('margin.isolated.blurb')}</p>
                 </button>
             </div>
-            <button onClick={() => handleConfirm(intermediate)}>
+            <button
+                onClick={() => handleConfirm(intermediate)}
+                aria-label={t('common.confirm')}
+            >
                 {t('common.confirm')}
             </button>
         </section>

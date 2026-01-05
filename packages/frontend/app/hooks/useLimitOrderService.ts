@@ -6,10 +6,12 @@ import {
 } from '~/services/limitOrderService';
 import { PublicKey } from '@solana/web3.js';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useConnection } from '@fogo/sessions-sdk-react';
 
 export function useLimitOrderService() {
     const sessionState = useSession();
     const { symbolInfo } = useTradeDataStore();
+    const connection = useConnection();
 
     const executeLimitOrder = useCallback(
         async (params: LimitOrderParams) => {
@@ -30,9 +32,7 @@ export function useLimitOrderService() {
             }
 
             try {
-                const limitOrderService = new LimitOrderService(
-                    sessionState.connection,
-                );
+                const limitOrderService = new LimitOrderService(connection);
 
                 // Convert public key strings to PublicKey objects
                 const sessionPublicKey = new PublicKey(
@@ -65,7 +65,7 @@ export function useLimitOrderService() {
                 };
             }
         },
-        [sessionState, symbolInfo],
+        [sessionState, symbolInfo, connection],
     );
 
     return { executeLimitOrder };

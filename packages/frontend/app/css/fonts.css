@@ -1,0 +1,52 @@
+/* Lexend Deca */
+@font-face {
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 200;
+    font-display: block;
+    src: url('/fonts/LexendDeca-ExtraLight.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 300;
+    font-display: block;
+    src: url('/fonts/LexendDeca-Light.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url('/fonts/LexendDeca-Regular.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 500;
+    font-display: block;
+    src: url('/fonts/LexendDeca-Medium.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 600;
+    font-display: block;
+    src: url('/fonts/LexendDeca-SemiBold.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 700;
+    font-display: block;
+    src: url('/fonts/LexendDeca-Bold.ttf') format('truetype');
+}
+
+/* Roboto Mono Normal */
+@font-face {
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url('/fonts/RobotoMono-Regular.ttf') format('truetype');
+}

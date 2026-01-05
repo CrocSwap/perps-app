@@ -14,11 +14,13 @@ import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDrop
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
+import MarketCloseModal from '~/components/Trade/MarketCloseModal/MarketCloseModal';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
+import SymbolInfoMobile from './trade/symbol/symbolInfoMobile';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
@@ -34,17 +36,39 @@ import { getSizePercentageSegment } from '~/utils/functions/getSegment';
 import { useTranslation } from 'react-i18next';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import ExpandableOrderBook from './trade/orderbook/ExpandableOrderBook';
+import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import useMediaQuery from '~/hooks/useMediaQuery';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
+import {
+    getKeyboardShortcutById,
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
+import { ObTradeDataSyncProvider } from '~/contexts/ObTradeDataSyncContext';
+import { useModal } from '~/hooks/useModal';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
+const MemoizedSymbolInfoMobile = memo(SymbolInfoMobile);
 
 export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
 export default function Trade() {
-    const { symbol, selectedTradeTab, setSelectedTradeTab } =
-        useTradeDataStore();
+    const isFogoPresale =
+        import.meta.env.VITE_ACTIVE_ANNOUNCEMENT_BANNER === 'fogoPresale';
+    const {
+        symbol,
+        positions,
+        selectedTradeTab,
+        setSelectedTradeTab,
+        setTradeDirection,
+        setMarketOrderType,
+    } = useTradeDataStore();
+
+    const { isOpen: isKeyboardShortcutsOpen } = useKeyboardShortcuts();
     // Mobile-only dropdown state
     type PortfolioViewKey =
         | 'common.positions'
@@ -55,6 +79,31 @@ export default function Trade() {
 
     // mobile Positions tab dropdown
     const [positionsMenuOpen, setPositionsMenuOpen] = useState(false);
+    const [settingsHydrated, setSettingsHydrated] = useState(() => {
+        const p = (useAppSettings as any).persist;
+        return p?.hasHydrated?.() ?? false;
+    });
+
+    useEffect(() => {
+        const p = (useAppSettings as any).persist;
+        if (!p) {
+            setSettingsHydrated(true);
+            return;
+        }
+
+        // If already hydrated (e.g., navigated within SPA)
+        if (p.hasHydrated?.()) {
+            setSettingsHydrated(true);
+            return;
+        }
+
+        // Wait until persist finishes hydration
+        const unsub = p.onFinishHydration?.(() => setSettingsHydrated(true));
+        return () => {
+            unsub && unsub();
+        };
+    }, []);
+    // --- end HYDRATION GATE ---
 
     // close when clicking outside Positions tab + menu
     const posWrapRef = useOutsideClick<HTMLDivElement>(
@@ -69,19 +118,6 @@ export default function Trade() {
         return () => window.removeEventListener('keydown', onKey);
     }, [positionsMenuOpen]);
 
-    // Label map (swap to i18n if you want)
-    const MOBILE_VIEW_LABELS: Record<PortfolioViewKey, string> = {
-        'common.positions': 'Positions',
-        'common.balances': 'Balances',
-        'common.openOrders': ' Orders',
-        'common.tradeHistory': 'Transactions',
-        'common.orderHistory': 'History',
-    };
-
-    // In case selectedTradeTab is something not in our mobile list, default the button label:
-    const currentMobileLabel =
-        MOBILE_VIEW_LABELS[selectedTradeTab as PortfolioViewKey] ?? 'Positions';
-
     // The list of mobile options (order = how the menu shows)
     const MOBILE_OPTIONS: PortfolioViewKey[] = [
         'common.positions',
@@ -90,27 +126,59 @@ export default function Trade() {
         'common.tradeHistory',
         'common.orderHistory',
     ];
+
+    const sessionState = useSession();
+    const isUserConnected = isEstablished(sessionState);
     const { marginBucket } = useUnifiedMarginData();
     const { t } = useTranslation();
+
+    const currentMobileLabel = MOBILE_OPTIONS.includes(
+        selectedTradeTab as PortfolioViewKey,
+    )
+        ? t(selectedTradeTab as PortfolioViewKey)
+        : t('common.positions');
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
-    // add refs near the other refs
-    const lastColHeightRef = useRef<number | null>(null);
-    const lastWinInnerHeightRef = useRef<number>(
-        typeof window !== 'undefined' ? window.innerHeight : 0,
-    );
+
+    const marketCloseModalCtrl = useModal('closed');
+
+    const currentMarketPosition = useMemo(() => {
+        const currentSymbol = symbol?.toLowerCase?.() ?? '';
+        if (!currentSymbol) return null;
+        return (
+            positions.find(
+                (p) =>
+                    p?.coin?.toLowerCase?.() === currentSymbol &&
+                    Math.abs(p.szi) > 0,
+            ) ?? null
+        );
+    }, [positions, symbol]);
+
+    const setHeightLocalOnly = (h: number) => {
+        setChartTopHeightLocal(h);
+        chartTopHeightRef.current = h;
+    };
+    const didInitRef = useRef(false);
 
     const {
         orderBookMode,
         chartTopHeight: storedHeight,
         setChartTopHeight,
         resetLayoutHeights,
+        isWalletCollapsed,
+        setIsWalletCollapsed,
+        tradingKeyboardShortcutsEnabled,
     } = useAppSettings();
 
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('order');
     const [isMobile, setIsMobile] = useState<boolean>(false);
+    const useSymbolInfoMobile = useMediaQuery('(max-width: 480px)');
+
+    // after your hydrated state
+    const [layoutMeasured, setLayoutMeasured] = useState(false);
+    const [panelReady, setPanelReady] = useState(false);
 
     const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
@@ -148,6 +216,16 @@ export default function Trade() {
         },
         [activeTab],
     );
+
+    useEffect(() => {
+        const handler = () => switchTab('order');
+        window.addEventListener('trade:nav:trade', handler as EventListener);
+        return () =>
+            window.removeEventListener(
+                'trade:nav:trade',
+                handler as EventListener,
+            );
+    }, [switchTab]);
 
     useEffect(() => {
         const keydownHandler = (e: KeyboardEvent) => {
@@ -193,19 +271,40 @@ export default function Trade() {
 
     const leftColRef = useRef<HTMLDivElement | null>(null);
     const tableSectionRef = useRef<HTMLElement | null>(null);
-    const HEADER_HIT_HEIGHT = 10;
 
     // local state used while dragging for immediate feedback
     const [chartTopHeight, setChartTopHeightLocal] = useState<number>(
         storedHeight ?? 570,
     );
     const startHeightRef = useRef(chartTopHeight);
-    // Using a large but finite number instead of Infinity for CSS compatibility
     const [maxTop, setMaxTop] = useState<number>(10000);
     const userRatioRef = useRef<number | null>(null);
     const hasUserOverrideRef = useRef<boolean>(false);
 
     const chartTopHeightRef = useRef<number>(chartTopHeight);
+    const wasDraggingRef = useRef(false);
+    const wasDraggingRightRef = useRef(false);
+
+    const orderInputStartHeightRef = useRef<number>(450);
+    const orderInputHeightRef = useRef<number>(450);
+    const rightColRef = useRef<HTMLDivElement | null>(null);
+    const isWalletCollapsedRef = useRef(isWalletCollapsed);
+    useEffect(() => {
+        isWalletCollapsedRef.current = isWalletCollapsed;
+    }, [isWalletCollapsed]);
+
+    // Constants for order input resize
+    const ORDER_INPUT_DEFAULT = 450;
+    const ORDER_INPUT_MIN = 300;
+    const WALLET_MIN = 30;
+    const WALLET_DEFAULT = 195;
+    const WALLET_COLLAPSED = 40; // Just shows header
+    const WALLET_COLLAPSE_THRESHOLD = 50; // When wallet gets below this, snap to collapsed
+    const WALLET_MAX = 187; // Maximum height for wallet section
+    const WALLET_EXPAND_HYSTERESIS = 20;
+    const [orderInputHeight, setOrderInputHeight] =
+        useState<number>(ORDER_INPUT_DEFAULT);
+
     useEffect(() => {
         chartTopHeightRef.current = chartTopHeight;
     }, [chartTopHeight]);
@@ -260,7 +359,115 @@ export default function Trade() {
         setMaxTop(max);
     }, [setChartTopHeightLocal]);
 
-    // On mount / when store changes:
+    const getRightColAvailable = () => {
+        const col = rightColRef.current;
+        if (!col) return null;
+        const gap = getGap();
+        const total = col.clientHeight;
+        return Math.max(0, total - gap);
+    };
+    const getMaxOrderInputHeight = () => {
+        const available = getRightColAvailable();
+        if (!available || available <= 0) return ORDER_INPUT_DEFAULT;
+        const minWalletHeight = isWalletCollapsed
+            ? WALLET_COLLAPSED
+            : WALLET_MIN;
+        return Math.max(
+            ORDER_INPUT_MIN,
+            available - minWalletHeight - getGap(),
+        );
+    };
+    const getMinOrderInputHeight = () => {
+        const available = getRightColAvailable();
+        if (!available || available <= 0) return ORDER_INPUT_MIN;
+        // Minimum order input = total - max wallet - gap
+        // This prevents wallet from expanding beyond WALLET_MAX
+        return Math.max(ORDER_INPUT_MIN, available - WALLET_MAX - getGap());
+    };
+
+    const clampOrderInputHeight = (h: number) => {
+        const max = getMaxOrderInputHeight();
+        const min = getMinOrderInputHeight();
+        return Math.max(min, Math.min(h, max));
+    };
+    const setOrderInputHeightBoth = (h: number) => {
+        const clamped = clampOrderInputHeight(h);
+        setOrderInputHeight(clamped);
+        orderInputHeightRef.current = clamped;
+    };
+    const expandWalletToDefault = () => {
+        const available = getRightColAvailable();
+        if (!available || available <= 0) return;
+
+        const targetOrderInputHeight = Math.max(
+            ORDER_INPUT_MIN,
+            available - WALLET_DEFAULT - getGap(),
+        );
+
+        setIsWalletCollapsed(false);
+        setOrderInputHeightBoth(targetOrderInputHeight);
+    };
+
+    const collapseWallet = () => {
+        const available = getRightColAvailable();
+        if (!available || available <= 0) return;
+
+        const targetOrderInputHeight = Math.max(
+            ORDER_INPUT_MIN,
+            available - WALLET_COLLAPSED - getGap(),
+        );
+
+        setIsWalletCollapsed(true);
+        setOrderInputHeightBoth(targetOrderInputHeight);
+    };
+    // Initialize order input height based on layout
+    useLayoutEffect(() => {
+        const col = rightColRef.current;
+        if (!col) return;
+
+        const gap = getGap();
+        const total = col.clientHeight;
+        const available = Math.max(0, total - gap);
+
+        // Calculate initial height based on whether wallet is collapsed
+        const initialWalletHeight = isWalletCollapsed
+            ? WALLET_COLLAPSED
+            : WALLET_DEFAULT;
+
+        const initial = Math.max(
+            ORDER_INPUT_MIN,
+            available - initialWalletHeight - gap,
+        );
+
+        setOrderInputHeight(initial);
+        orderInputHeightRef.current = initial;
+    }, []);
+
+    // Recalculate when wallet collapsed state changes (important for initial load from storage)
+    useEffect(() => {
+        const col = rightColRef.current;
+        if (!col) return;
+
+        const gap = getGap();
+        const total = col.clientHeight;
+        const available = Math.max(0, total - gap);
+
+        const targetWalletHeight = isWalletCollapsed
+            ? WALLET_COLLAPSED
+            : WALLET_DEFAULT;
+
+        const targetOrderInputHeight = Math.max(
+            ORDER_INPUT_MIN,
+            available - targetWalletHeight - gap,
+        );
+
+        // Only update if there's a significant difference
+        if (Math.abs(targetOrderInputHeight - orderInputHeight) > 5) {
+            setOrderInputHeightBoth(targetOrderInputHeight);
+        }
+    }, [isWalletCollapsed]);
+
+    // MOST IMPORTANT EFFECT IN HANDLING TRADE LAYOUT
     // This effect sets up the chart/table split whenever the component mounts or when storedHeight changes. If there’s no saved height, it falls back to the default layout. If there is one, it restores the user’s preferred height (clamped if needed) and remembers their ratio.
     useEffect(() => {
         const col = leftColRef.current;
@@ -271,30 +478,53 @@ export default function Trade() {
         const available = Math.max(0, total - gap);
         const max = Math.max(CHART_MIN, total - TABLE_COLLAPSED - gap);
         setMaxTop(max);
-
         if (storedHeight == null) {
-            // DEFAULT MODE: no user override, no persistence, no ratio
-            hasUserOverrideRef.current = false;
-            userRatioRef.current = null;
-            requestAnimationFrame(setDefaultFromLayout);
+            if (isUserConnected) {
+                // Connected + no saved preference → open to default table height (195px)
+                const desiredTable = Math.max(TABLE_MIN, TABLE_DEFAULT); // 195
+                const targetTop = Math.min(
+                    Math.max(CHART_MIN, available - desiredTable),
+                    max,
+                );
+                // set default height as preference in local storage so we initialize with it and not session
+                setHeightLocalOnly(targetTop);
+                setChartTopHeight(targetTop);
+
+                // remember ratio so future resizes keep intent
+                hasUserOverrideRef.current = true;
+                userRatioRef.current =
+                    available > 0 ? targetTop / available : null;
+            } else {
+                //  Not connected + no saved preference → keep your current collapsed behavior
+                const snapTo = Math.min(
+                    Math.max(CHART_MIN, available - TABLE_COLLAPSED),
+                    max,
+                );
+                setHeightLocalOnly(snapTo);
+
+                hasUserOverrideRef.current = true;
+                userRatioRef.current =
+                    available > 0 ? snapTo / available : null;
+            }
         } else {
+            // Return user to their saved preference (collapsed or not)
             const clamped = Math.min(Math.max(storedHeight, CHART_MIN), max);
             setChartTopHeightLocal(clamped);
             if (clamped !== storedHeight) setChartTopHeight(clamped);
-
             hasUserOverrideRef.current = true;
             userRatioRef.current = available > 0 ? clamped / available : null;
         }
-    }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
+
+        didInitRef.current = true;
+    }, [storedHeight, setChartTopHeight, isUserConnected]);
 
     // Recompute (or clamp) when the left column resizes
-    // Recompute (or clamp) only when HEIGHT changes
-    // Recompute (or clamp) when the left column (re)mounts or resizes.
-    // We rebind when mobile/desktop toggles so we never hold a stale node.
     useEffect(() => {
         let raf = 0;
 
         const apply = () => {
+            if (!didInitRef.current) return;
+
             const col = leftColRef.current;
             if (!col) return;
 
@@ -403,13 +633,21 @@ export default function Trade() {
 
     const MobileTabNavigation = useMemo(() => {
         return (
-            <div className={styles.mobileTabNav} id='mobileTradeTabs'>
-                <div className={styles.mobileTabBtns}>
+            <nav
+                className={`${styles.mobileTabNav} `}
+                id='mobileTradeTabs'
+                aria-label={t('aria.mobileTradeNavigation', 'Trade navigation')}
+            >
+                <div className={styles.mobileTabBtns} role='tablist'>
                     {tabList.map(({ key, label }) => {
                         if (key !== 'positions') {
                             return (
                                 <button
                                     key={key}
+                                    id={`mobile-${key}-tab`}
+                                    role='tab'
+                                    aria-selected={activeTab === key}
+                                    aria-controls={`mobile-${key}-panel`}
                                     className={`${styles.mobileTabBtn} ${activeTab === key ? styles.active : ''}`}
                                     onClick={handleTabClick(key)}
                                 >
@@ -426,6 +664,10 @@ export default function Trade() {
                                 className={styles.posTabWrap}
                             >
                                 <button
+                                    id='mobile-positions-tab'
+                                    role='tab'
+                                    aria-selected={activeTab === 'positions'}
+                                    aria-controls='mobile-positions-panel'
                                     aria-haspopup='listbox'
                                     aria-expanded={positionsMenuOpen}
                                     className={`${styles.mobileTabBtn} ${activeTab === 'positions' ? styles.active : ''} ${styles.posTabBtn}`}
@@ -441,6 +683,7 @@ export default function Trade() {
                                         width='14'
                                         height='14'
                                         viewBox='0 0 24 24'
+                                        aria-hidden='true'
                                     >
                                         <path
                                             d='M7 10l5 5 5-5'
@@ -474,7 +717,7 @@ export default function Trade() {
                                                         switchTab('positions');
                                                 }}
                                             >
-                                                {MOBILE_VIEW_LABELS[opt]}
+                                                {t(opt)}
                                             </button>
                                         ))}
                                     </div>
@@ -483,9 +726,10 @@ export default function Trade() {
                         );
                     })}
                 </div>
-            </div>
+            </nav>
         );
     }, [
+        t,
         activeTab,
         handleTabClick,
         tabList,
@@ -534,6 +778,134 @@ export default function Trade() {
         isAnyPortfolioModalOpen,
     } = usePortfolioModals();
 
+    useEffect(() => {
+        if (
+            isAnyPortfolioModalOpen ||
+            isKeyboardShortcutsOpen ||
+            !tradingKeyboardShortcutsEnabled
+        )
+            return;
+
+        const shouldIgnoreDueToTyping = (target: HTMLElement | null) => {
+            if (!target) return false;
+
+            const isOptedInField = !!target.closest?.(
+                '[data-allow-keyboard-shortcuts="true"]',
+            );
+            if (isOptedInField) return false;
+
+            if (target.tagName === 'TEXTAREA' || target.isContentEditable) {
+                return true;
+            }
+
+            if (target.tagName === 'INPUT') {
+                const input = target as HTMLInputElement;
+                const isNumericInput = input.inputMode === 'numeric';
+                return !isNumericInput;
+            }
+
+            return false;
+        };
+
+        const focusById = (id: string) => {
+            const el = document.getElementById(id) as HTMLInputElement | null;
+            el?.focus();
+            el?.select?.();
+        };
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement | null;
+            if (shouldIgnoreDueToTyping(target)) return;
+
+            const categories = getKeyboardShortcutCategories(t);
+            const buyShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.buy',
+            );
+            const sellShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.sell',
+            );
+            const marketShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.market',
+            );
+            const limitShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.limit',
+            );
+            const marketCloseShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.marketClose',
+            );
+
+            const isRelevantShortcut =
+                (!!buyShortcut && matchesShortcutEvent(e, buyShortcut.keys)) ||
+                (!!sellShortcut &&
+                    matchesShortcutEvent(e, sellShortcut.keys)) ||
+                (!!marketShortcut &&
+                    matchesShortcutEvent(e, marketShortcut.keys)) ||
+                (!!limitShortcut &&
+                    matchesShortcutEvent(e, limitShortcut.keys)) ||
+                (!!marketCloseShortcut &&
+                    matchesShortcutEvent(e, marketCloseShortcut.keys));
+
+            if (!isRelevantShortcut) return;
+
+            if (buyShortcut && matchesShortcutEvent(e, buyShortcut.keys)) {
+                e.preventDefault();
+                setTradeDirection('buy');
+                focusById('trade-module-size-input');
+                return;
+            }
+
+            if (sellShortcut && matchesShortcutEvent(e, sellShortcut.keys)) {
+                e.preventDefault();
+                setTradeDirection('sell');
+                focusById('trade-module-size-input');
+                return;
+            }
+
+            if (limitShortcut && matchesShortcutEvent(e, limitShortcut.keys)) {
+                e.preventDefault();
+                setMarketOrderType('limit');
+                return;
+            }
+
+            if (
+                marketShortcut &&
+                matchesShortcutEvent(e, marketShortcut.keys)
+            ) {
+                e.preventDefault();
+                setMarketOrderType('market');
+                setTimeout(() => focusById('trade-module-size-input'), 0);
+                return;
+            }
+
+            if (
+                marketCloseShortcut &&
+                matchesShortcutEvent(e, marketCloseShortcut.keys)
+            ) {
+                if (!currentMarketPosition) return;
+                e.preventDefault();
+                marketCloseModalCtrl.open();
+                return;
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [
+        isAnyPortfolioModalOpen,
+        isKeyboardShortcutsOpen,
+        tradingKeyboardShortcutsEnabled,
+        setMarketOrderType,
+        setTradeDirection,
+        t,
+        currentMarketPosition,
+        marketCloseModalCtrl,
+    ]);
+
     const isTableCollapsed = () => {
         const available = getAvailable();
         if (!available || available <= 0) return false;
@@ -580,131 +952,125 @@ export default function Trade() {
             'button, [role="tab"], [data-tab], [data-action], a, input, select, textarea, [contenteditable="true"], [data-ensure-open]',
         );
 
+    // Early return while settings are hydrating to avoid first-paint jump
+    if (!settingsHydrated)
+        return <div style={{ height: '100%', minHeight: '100%' }} />;
+
     // Mobile view
     if (isMobile && symbol) {
         return (
-            <>
-                <TradeRouteHandler />
-                <WebDataConsumer />
-                <div className={styles.symbolInfoContainer}>
-                    <MemoizedSymbolInfo />
-                </div>
-                {MobileTabNavigation}
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'order' ? 'block' : 'none',
-                    }}
-                >
-                    {(activeTab === 'order' ||
-                        visibilityRefs.current.order) && (
-                        <OrderInput
-                            marginBucket={marginBucket}
-                            isAnyPortfolioModalOpen={isAnyPortfolioModalOpen}
-                        />
-                    )}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'chart' ? 'block' : 'none',
-                    }}
-                >
-                    {(activeTab === 'chart' ||
-                        visibilityRefs.current.chart) && (
-                        <MemoizedTradingViewWrapper />
-                    )}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
-                    style={{ display: activeTab === 'book' ? 'block' : 'none' }}
-                >
-                    {activeTab === 'book' && mobileOrderBookView}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'recent' ? 'block' : 'none',
-                    }}
-                >
-                    {activeTab === 'recent' && mobileRecentTradesView}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobilePositions} ${activeTab === 'positions' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'positions' ? 'block' : 'none',
-                    }}
-                >
-                    {/* Sticky dropdown header inside the scrollable section */}
-                    {/* <div className={styles.mobilePositionsSwitcher}>
-                        <button
-                            type='button'
-                            aria-haspopup='listbox'
-                            aria-expanded={mobilePortfolioMenuOpen}
-                            className={styles.mobilePositionsSwitcherBtn}
-                            onClick={() =>
-                                setMobilePortfolioMenuOpen((v) => !v)
-                            }
-                        >
-                            <span
-                                className={styles.mobilePositionsSwitcherDot}
-                                aria-hidden
-                            />
-                            {currentMobileLabel}
-                            <svg
-                                className={styles.mobilePositionsSwitcherChev}
-                                width='14'
-                                height='14'
-                                viewBox='0 0 24 24'
-                            >
-                                <path
-                                    d='M7 10l5 5 5-5'
-                                    fill='none'
-                                    stroke='currentColor'
-                                    strokeWidth='2'
-                                />
-                            </svg>
-                        </button>
-
-                        {mobilePortfolioMenuOpen && (
-                            <div
-                                role='listbox'
-                                className={styles.mobilePositionsSwitcherMenu}
-                            >
-                                {MOBILE_OPTIONS.map((opt) => (
-                                    <button
-                                        key={opt}
-                                        role='option'
-                                        aria-selected={selectedTradeTab === opt}
-                                        className={`${styles.mobilePositionsSwitcherItem} ${selectedTradeTab === opt ? styles.active : ''}`}
-                                        onClick={() => {
-                                            setSelectedTradeTab(opt); // 👈 drive the same store TradeTable uses
-                                            setMobilePortfolioMenuOpen(false);
-                                        }}
-                                    >
-                                        {MOBILE_VIEW_LABELS[opt]}
-                                    </button>
-                                ))}
-                            </div>
+            <motion.div
+                key='trade-hydrated-mobile'
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.18 }}
+                className={styles.mobileOuterContainer}
+            >
+                <ObTradeDataSyncProvider>
+                    <TradeRouteHandler />
+                    <WebDataConsumer />
+                    <div className={styles.symbolInfoContainer}>
+                        {useSymbolInfoMobile ? (
+                            <MemoizedSymbolInfoMobile />
+                        ) : (
+                            <MemoizedSymbolInfo />
                         )}
-                    </div> */}
-
-                    {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
-                    {(activeTab === 'positions' ||
-                        visibilityRefs.current.positions) && (
-                        <MemoizedTradeTable mobileExternalSwitcher />
-                    )}
-                </div>
-            </>
+                    </div>
+                    {MobileTabNavigation}
+                    <div
+                        id='mobile-order-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-order-tab'
+                        className={`${styles.mobileSection} ${isFogoPresale ? styles.mobileSectionMin : styles.mobileSectionMax} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'order' ? 'block' : 'none',
+                        }}
+                    >
+                        {(activeTab === 'order' ||
+                            visibilityRefs.current.order) && (
+                            <OrderInput
+                                marginBucket={marginBucket}
+                                isAnyPortfolioModalOpen={
+                                    isAnyPortfolioModalOpen
+                                }
+                            />
+                        )}
+                    </div>
+                    <div
+                        id='mobile-chart-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-chart-tab'
+                        className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'chart' ? 'block' : 'none',
+                        }}
+                    >
+                        {(activeTab === 'chart' ||
+                            visibilityRefs.current.chart) && (
+                            <MemoizedTradingViewWrapper />
+                        )}
+                    </div>
+                    <div
+                        id='mobile-book-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-book-tab'
+                        className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'book' ? 'block' : 'none',
+                        }}
+                    >
+                        {activeTab === 'book' && mobileOrderBookView}
+                    </div>
+                    <div
+                        id='mobile-recent-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-recent-tab'
+                        className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'recent' ? 'block' : 'none',
+                        }}
+                    >
+                        {activeTab === 'recent' && mobileRecentTradesView}
+                    </div>
+                    <div
+                        id='mobile-positions-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-positions-tab'
+                        className={`${styles.mobileSection} ${styles.mobilePositions} ${activeTab === 'positions' ? styles.active : ''}`}
+                        style={{
+                            display:
+                                activeTab === 'positions' ? 'block' : 'none',
+                        }}
+                    >
+                        {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
+                        {(activeTab === 'positions' ||
+                            visibilityRefs.current.positions) && (
+                            <MemoizedTradeTable mobileExternalSwitcher />
+                        )}
+                    </div>
+                </ObTradeDataSyncProvider>
+            </motion.div>
         );
     }
-
     return (
         <>
             <TradeRouteHandler />
             <WebDataConsumer />
+            {marketCloseModalCtrl.isOpen && currentMarketPosition && (
+                <MarketCloseModal
+                    close={marketCloseModalCtrl.close}
+                    position={currentMarketPosition}
+                />
+            )}
             {symbol && (
-                <div className={styles.containerNew} id='tradePageRoot'>
+                <motion.div
+                    key='trade-hydrated'
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.18 }}
+                    className={styles.containerNew}
+                    id='tradePageRoot'
+                >
                     {/* LEFT COLUMN */}
                     <div
                         className={styles.leftCol}
@@ -721,12 +1087,16 @@ export default function Trade() {
                             }}
                             onResizeStart={() => {
                                 startHeightRef.current = chartTopHeight;
+                                wasDraggingRef.current = false;
                             }}
                             onResize={(e, dir, ref, d: NumberSize) => {
                                 const tentative = clamp(
                                     startHeightRef.current + d.height,
                                 );
                                 setChartTopHeightLocal(tentative);
+                                // mark as dragging after a tiny threshold to filter out clicks
+                                if (Math.abs(d.height) >= 2)
+                                    wasDraggingRef.current = true;
 
                                 const available = getAvailable();
                                 if (available && available > 0) {
@@ -735,6 +1105,12 @@ export default function Trade() {
                                 }
                             }}
                             onResizeStop={(e, dir, ref, d: NumberSize) => {
+                                if (
+                                    !wasDraggingRef.current ||
+                                    Math.abs(d.height) < 2
+                                )
+                                    return;
+
                                 const next = clamp(
                                     startHeightRef.current + d.height,
                                 );
@@ -898,25 +1274,198 @@ export default function Trade() {
                     </div>
 
                     {/* RIGHT COLUMN */}
-                    <div className={styles.rightCol}>
-                        <section className={styles.order_input}>
-                            <OrderInput
-                                marginBucket={marginBucket}
-                                isAnyPortfolioModalOpen={
-                                    isAnyPortfolioModalOpen
+                    <div className={styles.rightCol} ref={rightColRef}>
+                        <Resizable
+                            size={{
+                                width: '100%',
+                                height: orderInputHeight ?? ORDER_INPUT_DEFAULT,
+                            }}
+                            minHeight={getMinOrderInputHeight()}
+                            maxHeight={getMaxOrderInputHeight()}
+                            enable={{ bottom: true }}
+                            handleStyles={{
+                                bottom: {
+                                    height: '8px',
+                                    cursor: 'row-resize',
+                                    background: 'transparent',
+                                    zIndex: 10,
+                                },
+                            }}
+                            onResizeStart={() => {
+                                orderInputStartHeightRef.current =
+                                    orderInputHeight;
+                                wasDraggingRightRef.current = false;
+                            }}
+                            onResize={(e, dir, ref, d: NumberSize) => {
+                                const tentative =
+                                    orderInputStartHeightRef.current + d.height;
+                                const clamped =
+                                    clampOrderInputHeight(tentative);
+
+                                // live height update while dragging
+                                setOrderInputHeight(clamped);
+                                if (Math.abs(d.height) >= 2)
+                                    wasDraggingRightRef.current = true;
+
+                                const available = getRightColAvailable();
+                                if (available && available > 0) {
+                                    const walletHeight =
+                                        available - clamped - getGap();
+
+                                    // collapse immediately when below threshold
+                                    if (
+                                        walletHeight <=
+                                            WALLET_COLLAPSE_THRESHOLD &&
+                                        !isWalletCollapsedRef.current
+                                    ) {
+                                        isWalletCollapsedRef.current = true;
+                                        setIsWalletCollapsed(true);
+                                    }
+
+                                    // re-expand only after we're clearly above collapsed height
+                                    if (
+                                        walletHeight >=
+                                            WALLET_COLLAPSED +
+                                                WALLET_EXPAND_HYSTERESIS &&
+                                        isWalletCollapsedRef.current
+                                    ) {
+                                        isWalletCollapsedRef.current = false;
+                                        setIsWalletCollapsed(false);
+                                    }
                                 }
-                            />
+                            }}
+                            onResizeStop={(e, dir, ref, d: NumberSize) => {
+                                // ⛔️ ignore click / micro move
+                                if (
+                                    !wasDraggingRightRef.current ||
+                                    Math.abs(d.height) < 2
+                                )
+                                    return;
+                                const next =
+                                    orderInputStartHeightRef.current + d.height;
+                                const available = getRightColAvailable();
+
+                                if (!available || available <= 0) {
+                                    setOrderInputHeightBoth(next);
+                                    return;
+                                }
+
+                                const walletHeight =
+                                    available - next - getGap();
+
+                                // Check if we should snap to collapsed
+                                if (
+                                    walletHeight <= WALLET_COLLAPSE_THRESHOLD &&
+                                    !isWalletCollapsed
+                                ) {
+                                    collapseWallet();
+                                }
+                                // Check if we should expand from collapsed
+                                else if (
+                                    walletHeight > WALLET_COLLAPSED + 20 &&
+                                    isWalletCollapsed
+                                ) {
+                                    setIsWalletCollapsed(false);
+                                    setOrderInputHeightBoth(next);
+                                }
+                                // Normal resize
+                                else {
+                                    setOrderInputHeightBoth(next);
+                                }
+                            }}
+                        >
+                            <section
+                                className={styles.order_input}
+                                style={{ height: '100%' }}
+                            >
+                                <OrderInput
+                                    marginBucket={marginBucket}
+                                    isAnyPortfolioModalOpen={
+                                        isAnyPortfolioModalOpen
+                                    }
+                                />
+                            </section>
+                        </Resizable>
+
+                        <section
+                            className={`${styles.wallet} ${isWalletCollapsed ? styles.walletCollapsed : ''}`}
+                            onClick={(e) => {
+                                if (isWalletCollapsed) {
+                                    e.stopPropagation();
+                                    expandWalletToDefault();
+                                }
+                            }}
+                        >
+                            {isWalletCollapsed ? (
+                                <button
+                                    className={styles.walletCollapsedHeader}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        expandWalletToDefault();
+                                    }}
+                                    aria-label={t(
+                                        'aria.expandWallet',
+                                        'Expand wallet',
+                                    )}
+                                    aria-expanded={false}
+                                >
+                                    <span>
+                                        {t(
+                                            'accountOverview.heading',
+                                            'Account Overview',
+                                        )}
+                                    </span>
+                                </button>
+                            ) : (
+                                <DepositDropdown
+                                    marginBucket={marginBucket}
+                                    openDepositModal={openDepositModal}
+                                    openWithdrawModal={openWithdrawModal}
+                                />
+                            )}
                         </section>
-                        <section className={styles.wallet}>
-                            <DepositDropdown
-                                marginBucket={marginBucket}
-                                openDepositModal={openDepositModal}
-                                openWithdrawModal={openWithdrawModal}
-                            />
-                        </section>
+                        {/* Toggle under the wallet (inline like OrderDetails) */}
+                        <motion.button
+                            type='button'
+                            className={styles.scroll_button}
+                            onClick={() => {
+                                if (isWalletCollapsed) {
+                                    expandWalletToDefault();
+                                } else {
+                                    collapseWallet();
+                                }
+                            }}
+                            aria-label={
+                                isWalletCollapsed
+                                    ? t?.('aria.expandWallet', 'Expand wallet')
+                                    : t?.(
+                                          'aria.collapseWallet',
+                                          'Collapse wallet',
+                                      )
+                            }
+                            whileHover={{ scale: 1.06 }}
+                            whileTap={{ scale: 0.96 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <motion.div
+                                animate={{
+                                    rotate: isWalletCollapsed ? 180 : 0,
+                                }}
+                                transition={{
+                                    duration: 0.2,
+                                    ease: [0.4, 0.0, 0.2, 1],
+                                }}
+                            >
+                                {!isWalletCollapsed && isUserConnected && (
+                                    <HiOutlineChevronDoubleDown
+                                        className={styles.scroll_icon}
+                                    />
+                                )}
+                            </motion.div>
+                        </motion.button>
                     </div>
                     {PortfolioModalsRenderer}
-                </div>
+                </motion.div>
             )}
             <AdvancedTutorialController
                 isEnabled={showTutorial}

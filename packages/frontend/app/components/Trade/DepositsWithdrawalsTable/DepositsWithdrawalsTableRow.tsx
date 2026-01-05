@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './DepositsWithdrawalsTable.module.css';
 
@@ -56,9 +57,11 @@ interface DepositsWithdrawalsTableRowProps {
 export default function DepositsWithdrawalsTableRow(
     props: DepositsWithdrawalsTableRowProps,
 ) {
+    const { t } = useTranslation();
     const { transaction } = props;
 
-    const getStatusFromDelta = (type: string): string => 'Completed';
+    const getStatusFromDelta = (type: string): string =>
+        t('tradeTable.completed');
 
     const TOKEN_TO_NETWORK: Record<string, string> = {
         HYPE: 'Hyperliquid',
@@ -79,7 +82,7 @@ export default function DepositsWithdrawalsTableRow(
             | SpotTransferDelta
             | WithdrawDelta;
         if (d.type === 'spotTransfer') {
-            return TOKEN_TO_NETWORK[d.token] || 'Unknown';
+            return TOKEN_TO_NETWORK[d.token] || t('common.unknown');
         }
         return 'FOGO';
     }
@@ -95,13 +98,13 @@ export default function DepositsWithdrawalsTableRow(
             case 'deposit':
             case 'accountClassTransfer':
             case 'vaultDeposit':
-                return 'Deposit';
+                return t('common.deposit');
             case 'withdraw':
-                return 'Withdrawal';
+                return t('tradeTable.withdrawal');
             case 'spotTransfer':
-                return 'Spot Transfer';
+                return t('tradeTable.spotTransfer');
             default:
-                return 'Unknown';
+                return t('common.unknown');
         }
     }
 

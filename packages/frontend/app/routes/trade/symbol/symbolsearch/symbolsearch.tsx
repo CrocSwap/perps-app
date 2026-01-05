@@ -11,7 +11,7 @@ import useMediaQuery from '~/hooks/useMediaQuery';
 const SymbolSearch: React.FunctionComponent = () => {
     const { symbol } = useTradeDataStore();
     const [isOpen, setIsOpen] = useState(false);
-    const isSymbolSearchClickable = false;
+    const isSymbolSearchClickable = true;
     const isMobile = useMediaQuery('(max-width: 1000px)');
 
     const symbolSearchBackdropRef = useOutsideClick<HTMLDivElement>(() => {
@@ -94,7 +94,9 @@ const SymbolSearch: React.FunctionComponent = () => {
                         />
                     </div>
 
-                    <div className={styles.symbolName}>{symbol}-USD</div>
+                    <div className={styles.symbolName}>
+                        {symbol}-<p>USD</p>
+                    </div>
 
                     {isSymbolSearchClickable && (
                         <FaChevronDown

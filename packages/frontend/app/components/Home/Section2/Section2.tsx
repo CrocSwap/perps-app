@@ -109,15 +109,15 @@ export default function Section2() {
         {
             label: 'Terms of Service',
             text: 'Our rules for using the platform',
-            link: TERMS_OF_SERVICE_LINK,
-            linkLabel: 'ambient.finance/terms',
+            link: 'v2/terms',
+            linkLabel: 'perps.ambient.finance/terms',
             icon: <IoDocumentTextSharp />,
         },
         {
             label: 'Privacy Policy',
             text: 'View our policies around data',
-            link: PRIVACY_POLICY_LINK,
-            linkLabel: 'ambient.finance/privacy',
+            link: '/v2/privacy',
+            linkLabel: 'perps.ambient.finance/privacy',
             icon: <IoDocumentTextSharp />,
         },
         // {

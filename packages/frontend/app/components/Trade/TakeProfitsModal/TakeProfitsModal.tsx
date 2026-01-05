@@ -97,6 +97,10 @@ export default function TakeProfitsModal(props: PropIF) {
                                 handleInputChange('tpPrice', e.target.value)
                             }
                             placeholder='0.00'
+                            aria-label={t(
+                                'aria.takeProfitPrice',
+                                'Take profit price',
+                            )}
                         />
                     </div>
                     <div className={styles.inputWithDropdown}>
@@ -107,12 +111,17 @@ export default function TakeProfitsModal(props: PropIF) {
                                 handleInputChange('gain', e.target.value)
                             }
                             placeholder='0.00'
+                            aria-label={t('aria.expectedGain', 'Expected gain')}
                         />
                         <button
                             onClick={() => handleCurrencyToggle('gainCurrency')}
+                            aria-label={t(
+                                'aria.toggleGainCurrency',
+                                'Toggle gain currency between dollars and percent',
+                            )}
                         >
                             <span>{formData.gainCurrency}</span>
-                            <BsChevronDown size={16} />
+                            <BsChevronDown size={16} aria-hidden='true' />
                         </button>
                     </div>
                 </div>
@@ -131,6 +140,10 @@ export default function TakeProfitsModal(props: PropIF) {
                                 handleInputChange('slPrice', e.target.value)
                             }
                             placeholder='0.00'
+                            aria-label={t(
+                                'aria.stopLossPrice',
+                                'Stop loss price',
+                            )}
                         />
                     </div>
                     <div className={styles.inputWithDropdown}>
@@ -141,12 +154,17 @@ export default function TakeProfitsModal(props: PropIF) {
                                 handleInputChange('loss', e.target.value)
                             }
                             placeholder='0.00'
+                            aria-label={t('aria.expectedLoss', 'Expected loss')}
                         />
                         <button
                             onClick={() => handleCurrencyToggle('lossCurrency')}
+                            aria-label={t(
+                                'aria.toggleLossCurrency',
+                                'Toggle loss currency between dollars and percent',
+                            )}
                         >
                             <span>{formData.lossCurrency}</span>
-                            <BsChevronDown size={16} />
+                            <BsChevronDown size={16} aria-hidden='true' />
                         </button>
                     </div>
                 </div>

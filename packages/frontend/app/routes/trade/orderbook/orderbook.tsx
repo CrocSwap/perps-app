@@ -16,6 +16,7 @@ import { useRestPoller } from '~/hooks/useRestPoller';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
 import { TableState } from '~/utils/CommonIFs';
 import type {
     OrderBookMode,
@@ -36,11 +37,17 @@ import { t } from 'i18next';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
 import { useWs, type WsSubscriptionConfig } from '~/contexts/WsContext';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 interface OrderBookProps {
     orderCount: number;
     heightOverride?: string;
     switchTab?: (tab: TabType) => void;
+}
+
+interface ObFocusedSlot {
+    price: number;
+    side: 'buy' | 'sell';
 }
 
 const dummyOrder: OrderBookRowIF = {
@@ -68,11 +75,13 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     const { subscribe, unsubscribe, forceReconnect } = useWs();
 
+    const isMobile = useMobile();
+
     const orderClickDisabled = false;
     const forceReconnectInterval = useRef<ReturnType<
         typeof setInterval
     > | null>(null);
-    const forceReconnectRef = useRef(false);
+    const lastMessageTimeRef = useRef<number>(Date.now());
 
     const [orderRowHeight, setOrderRowHeight] = useState<number>(16);
     useEffect(() => {
@@ -87,17 +96,34 @@ const OrderBook: React.FC<OrderBookProps> = ({
         useState<OrderRowResolutionIF | null>(null);
 
     const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
+    const [wsError, setWsError] = useState<string | null>(null);
 
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
     const { formatNum } = useNumFormatter();
     const lockOrderBook = useRef<boolean>(false);
     const { getBsColor } = useAppSettings();
-    const { buys, sells, setOrderBook, addToResolutionPair, resolutionPairs } =
-        useOrderBookStore();
+    const {
+        buys,
+        sells,
+        setOrderBook,
+        addToResolutionPair,
+        resolutionPairs,
+        midPrice,
+        setMidPrice,
+        setUsualResolution,
+    } = useOrderBookStore();
+
+    const midPriceRef = useRef<number | null>(null);
+    midPriceRef.current = midPrice;
 
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
+
+    const [focusedSlot, setFocusedSlot] = useState<ObFocusedSlot | null>(null);
+    const [focusedSlotOutOfBounds, setFocusedSlotOutOfBounds] = useState<
+        'buy' | 'sell' | null
+    >(null);
 
     const rowLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
@@ -116,26 +142,28 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setObChosenPrice,
         setObChosenAmount,
         symbol,
+        orderInputPriceValue,
+        tradeDirection,
+        isMidModeActive,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
+    const { obPreviewLine } = useChartLinesStore();
+
     const needExtraPolling = useMemo(() => {
-        if (!selectedResolution) return false;
+        if (!selectedResolution || !resolutions.length) return false;
         if (selectedResolution.mantissa) return true;
-        if (
-            symbol === 'BTC' &&
-            selectedResolution.nsigfigs &&
-            selectedResolution.nsigfigs <= 5
-        )
-            return true;
-        if (
-            symbol !== 'BTC' &&
-            selectedResolution.nsigfigs &&
-            selectedResolution.nsigfigs <= 4
-        )
-            return true;
-        return false;
-    }, [selectedResolution, symbol]);
+        const lowestResolution = resolutions[0];
+        return !(
+            lowestResolution.nsigfigs === selectedResolution.nsigfigs &&
+            lowestResolution.val === selectedResolution.val
+        );
+    }, [selectedResolution, symbol, resolutions]);
+
+    const needExtraPollingRef = useRef(needExtraPolling);
+    needExtraPollingRef.current = needExtraPolling;
+
+    const foundClosestSlotForFocusedPriceRef = useRef(false);
 
     useEffect(() => {
         return () => {
@@ -159,6 +187,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     const { buys, sells } = processOrderBookMessage(l2BookData);
                     setLwBuys(buys);
                     setLwSells(sells);
+                    setMidPrice((buys[0].px + sells[0].px) / 2);
                 },
                 3000,
                 true,
@@ -169,6 +198,16 @@ const OrderBook: React.FC<OrderBookProps> = ({
             unsubscribeFromPoller('info', subKey);
         };
     }, [needExtraPolling]);
+
+    useEffect(() => {
+        if (
+            needExtraPollingRef.current &&
+            symbolInfo?.markPx &&
+            !midPriceRef.current
+        ) {
+            setMidPrice(symbolInfo.markPx);
+        }
+    }, [symbolInfo?.markPx]);
 
     // Use custom hook for stable slot arrays
     const buySlots = useOrderSlots(buys);
@@ -191,6 +230,26 @@ const OrderBook: React.FC<OrderBookProps> = ({
         [],
     );
 
+    const findClosestByFlooring = useCallback(
+        (orderPriceRounded: number, slots: number[]) => {
+            if (!filledResolution.current) return null;
+            const resolutionValue = filledResolution.current.val;
+
+            const floored =
+                orderPriceRounded - (orderPriceRounded % resolutionValue);
+
+            let closestSlot = null;
+            for (const slot of slots) {
+                if (slot === floored) {
+                    closestSlot = slot;
+                    break;
+                }
+            }
+            return closestSlot;
+        },
+        [],
+    );
+
     useEffect(() => {
         if (userOrdersRef.current.length === 0) {
             userOrdersRef.current = userOrders;
@@ -203,63 +262,218 @@ const OrderBook: React.FC<OrderBookProps> = ({
         const precision = getPrecisionForResolution(filledResolution.current);
         const gapTreshold = filledResolution.current.val / 2;
         const slots = new Set<string>();
-        userSymbolOrders
-            .filter((order) => order.side === 'buy')
-            .forEach((order) => {
-                const orderPriceRounded = Number(
-                    Number(order.limitPx).toFixed(precision),
-                );
-                let closestSlot = findClosestSlot(
+        const buyOrders = userSymbolOrders.filter(
+            (order) => order.side === 'buy',
+        );
+
+        for (const order of buyOrders) {
+            const orderPriceRounded = Number(
+                Number(order.limitPx).toFixed(precision),
+            );
+            let closestSlot = findClosestSlot(
+                orderPriceRounded,
+                buySlots,
+                gapTreshold,
+            );
+            if (!closestSlot) {
+                closestSlot = findClosestSlot(
                     orderPriceRounded,
                     buySlots,
-                    gapTreshold,
+                    gapTreshold * 2,
                 );
-                if (!closestSlot) {
-                    closestSlot = findClosestSlot(
-                        orderPriceRounded,
-                        buySlots,
-                        gapTreshold * 2,
-                    );
-                }
-                if (closestSlot) {
-                    slots.add(formatNum(closestSlot, filledResolution.current));
-                }
-            });
+            }
+            if (closestSlot) {
+                slots.add(formatNum(closestSlot, filledResolution.current));
+            }
+        }
         return slots;
-    }, [userSymbolOrders, buySlots, findClosestSlot, formatNum]);
+    }, [userSymbolOrders, buySlots, findClosestSlot]);
 
     const userSellSlots: Set<string> = useMemo(() => {
         if (!filledResolution.current) return new Set<string>();
         const precision = getPrecisionForResolution(filledResolution.current);
         const gapTreshold = filledResolution.current.val / 2;
         const slots = new Set<string>();
-        userSymbolOrders
-            .filter((order) => order.side === 'sell')
-            .forEach((order) => {
-                const orderPriceRounded = Number(
-                    Number(order.limitPx).toFixed(precision),
-                );
-                let closestSlot = findClosestSlot(
+        const sellOrders = userSymbolOrders.filter(
+            (order) => order.side === 'sell',
+        );
+
+        for (const order of sellOrders) {
+            const orderPriceRounded = Number(
+                Number(order.limitPx).toFixed(precision),
+            );
+            let closestSlot = findClosestSlot(
+                orderPriceRounded,
+                sellSlots,
+                gapTreshold,
+            );
+            if (!closestSlot) {
+                closestSlot = findClosestSlot(
                     orderPriceRounded,
                     sellSlots,
-                    gapTreshold,
+                    gapTreshold * 2,
                 );
-                if (!closestSlot) {
-                    closestSlot = findClosestSlot(
-                        orderPriceRounded,
-                        sellSlots,
-                        gapTreshold * 2,
-                    );
-                }
-                if (closestSlot) {
-                    slots.add(formatNum(closestSlot, filledResolution.current));
-                }
-            });
+            }
+            if (closestSlot) {
+                slots.add(formatNum(closestSlot, filledResolution.current));
+            }
+        }
         return slots;
-    }, [userSymbolOrders, sellSlots, findClosestSlot, formatNum]);
+    }, [userSymbolOrders, sellSlots, findClosestSlot]);
 
-    // code blocks were being used in sdk approach
+    const focusedPriceRef = useRef<number | null>(null);
 
+    useEffect(() => {
+        if (obPreviewLine?.yPrice) {
+            focusedPriceRef.current = obPreviewLine.yPrice;
+        }
+    }, [obPreviewLine?.yPrice]);
+
+    useEffect(() => {
+        if (orderInputPriceValue.value) {
+            focusedPriceRef.current = orderInputPriceValue.value;
+
+            // COMMENTED OUT >> CODE BLOCK FOR FINDING PROPER RESOLUTION
+            // if (
+            //     orderInputPriceValue.changeType === 'dragEnd' &&
+            //     !foundClosestSlotForFocusedPriceRef.current
+            // ) {
+            //     findProperResolution(focusedPriceRef.current);
+            //     lockOrderBook.current = true;
+            // }
+        } else {
+            focusedPriceRef.current = null;
+            setFocusedSlotOutOfBounds(null);
+        }
+    }, [orderInputPriceValue.value]);
+
+    useEffect(() => {
+        if (
+            !filledResolution.current ||
+            !symbolInfo ||
+            !focusedPriceRef.current ||
+            !buys.length ||
+            !sells.length ||
+            !midPriceRef.current ||
+            isMobile
+        ) {
+            setFocusedSlot(null);
+            return;
+        }
+
+        if (isMidModeActive) {
+            if (tradeDirection === 'buy') {
+                setFocusedSlot({
+                    price: buys[0].px,
+                    side: 'buy',
+                });
+            } else {
+                setFocusedSlot({
+                    price: sells[0].px,
+                    side: 'sell',
+                });
+            }
+            return;
+        }
+
+        let side;
+        let targetSlots;
+
+        if (focusedPriceRef.current < midPriceRef.current) {
+            side = 'buy';
+            targetSlots = buys.slice(0, orderCount).map((buy) => buy.px);
+        } else {
+            side = 'sell';
+            targetSlots = sells.slice(0, orderCount).map((sell) => sell.px);
+        }
+
+        let closestSlot = findClosestByFlooring(
+            focusedPriceRef.current,
+            targetSlots,
+        );
+
+        setFocusedSlotOutOfBounds(null);
+        if (closestSlot) {
+            setFocusedSlot({
+                price: closestSlot,
+                side: side as 'buy' | 'sell',
+            });
+            foundClosestSlotForFocusedPriceRef.current = true;
+        } else if (side === 'sell' && focusedPriceRef.current < sells[0].px) {
+            setFocusedSlot({
+                price: sells[0].px,
+                side: 'sell',
+            });
+            foundClosestSlotForFocusedPriceRef.current = true;
+        } else {
+            foundClosestSlotForFocusedPriceRef.current = false;
+            setFocusedSlot(null);
+            if (side === 'buy') {
+                setFocusedSlotOutOfBounds('buy');
+            } else {
+                setFocusedSlotOutOfBounds('sell');
+            }
+        }
+    }, [
+        orderInputPriceValue.value,
+        buys,
+        sells,
+        obPreviewLine?.yPrice,
+        isMidModeActive,
+        orderCount,
+        isMobile,
+    ]);
+
+    // COMMENTED OUT >> CODE BLOCK FOR FINDING PROPER RESOLUTION
+
+    // const findProperResolution = useCallback(
+    //     (focusedPrice: number) => {
+    //         if (!midPriceRef.current) return;
+    //         if (!filledResolution.current) return;
+
+    //         const currentResolution = filledResolution.current;
+    //         const side = focusedPrice < midPriceRef.current ? 'buy' : 'sell';
+
+    //         const thresholdRatioForPickingResolution = 1;
+    //         let found = false;
+
+    //         for (let i = 0; i < resolutions.length; i++) {
+    //             const res = resolutions[i];
+    //             if (res.val >= currentResolution.val) {
+    //                 const remaining = midPriceRef.current % res.val;
+    //                 const startPrice =
+    //                     midPriceRef.current -
+    //                     remaining +
+    //                     (side === 'buy' ? 0 : res.val);
+    //                 const endPrice =
+    //                     startPrice +
+    //                     (orderCount - 1) * res.val * (side === 'buy' ? -1 : 1);
+
+    //                 const distFocusedPrice = Math.abs(
+    //                     focusedPrice - startPrice,
+    //                 );
+    //                 const distRange = Math.abs(endPrice - startPrice);
+
+    //                 if (
+    //                     distFocusedPrice / distRange <
+    //                     thresholdRatioForPickingResolution
+    //                 ) {
+    //                     setSelectedResolution(res);
+    //                     lockOrderBook.current = false;
+    //                     found = true;
+    //                     break;
+    //                 }
+    //             }
+    //         }
+
+    //         if (!found) {
+    //             setSelectedResolution(resolutions[resolutions.length - 1]);
+    //         }
+    //     },
+    //     [orderCount, resolutions],
+    // );
+
+    // COMMENTED OUT >> CODE BLOCK WAS USED IN SDK APPROACH
     // const handleOrderBookWorkerResult = useCallback(
     //     ({ data }: { data: OrderBookOutput }) => {
     //         setOrderBook(data.buys, data.sells);
@@ -279,12 +493,25 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [symbol, resolutions, resolutionPairs]);
 
     useEffect(() => {
+        setUsualResolution(usualResolution);
+    }, [usualResolution]);
+
+    // Memoize usualResolution to avoid unnecessary re-renders
+    const usualResolutionKey = useMemo(
+        () =>
+            usualResolution
+                ? `${usualResolution.val}_${usualResolution.nsigfigs || ''}_${usualResolution.mantissa || ''}`
+                : '',
+        [usualResolution],
+    );
+
+    useEffect(() => {
         if (symbol === symbolInfo?.coin) {
             const resolutionList = getResolutionListForSymbol(symbolInfo);
             setResolutions(resolutionList);
             setSelectedResolution(usualResolution);
         }
-    }, [symbol, symbolInfo?.coin, JSON.stringify(usualResolution)]);
+    }, [symbol, symbolInfo?.coin, usualResolutionKey]);
 
     const subKey = useMemo(() => {
         if (!selectedResolution) return undefined;
@@ -302,11 +529,18 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     const handleOrderBookResult = useCallback(
         (payload: any) => {
-            const { buys, sells } = processOrderBookMessage(payload);
-            setOrderBook(buys, sells);
-            setOrderBookState(TableState.FILLED);
-            filledResolution.current = selectedResolution;
-            forceReconnectRef.current = false;
+            try {
+                const { buys, sells } = processOrderBookMessage(payload);
+                //set mid price if we are polling with lowest resolution
+                setOrderBook(buys, sells, !needExtraPollingRef.current);
+                setOrderBookState(TableState.FILLED);
+                filledResolution.current = selectedResolution;
+                lastMessageTimeRef.current = Date.now();
+                setWsError(null);
+            } catch (error) {
+                console.error('Error processing orderbook message:', error);
+                setWsError('Failed to process orderbook data');
+            }
         },
         [selectedResolution, setOrderBook, setOrderBookState],
     );
@@ -331,13 +565,18 @@ const OrderBook: React.FC<OrderBookProps> = ({
                 single: true,
             });
 
+            // Only force reconnect if no messages received for 5 seconds
             forceReconnectInterval.current = setInterval(() => {
-                if (forceReconnectRef.current) {
+                const timeSinceLastMessage =
+                    Date.now() - lastMessageTimeRef.current;
+                if (timeSinceLastMessage > 5000) {
+                    console.warn(
+                        'No orderbook updates for 5s, reconnecting...',
+                    );
                     forceReconnect();
+                    lastMessageTimeRef.current = Date.now();
                 }
-
-                forceReconnectRef.current = true;
-            }, 2000);
+            }, 6000);
 
             return () => {
                 // unsubscribeFromPoller('info', subKey);
@@ -425,21 +664,27 @@ const OrderBook: React.FC<OrderBookProps> = ({
             }, 1000);
 
             if (switchTab) {
+                // Simplified animation without nested setTimeout chains
                 const obRow = document.getElementById('order-row-' + order.px);
                 obRow?.classList.add('divPulse');
-                setTimeout(() => {
-                    obRow?.classList.remove('divPulse');
-                    switchTab('order' as TabType);
+
+                requestAnimationFrame(() => {
                     setTimeout(() => {
-                        const orderElem = document.getElementById(
-                            'trade-module-price-input-container',
-                        );
-                        orderElem?.classList.add('divPulse');
-                        setTimeout(() => {
-                            orderElem?.classList.remove('divPulse');
-                        }, 800);
+                        obRow?.classList.remove('divPulse');
+                        switchTab('order' as TabType);
+
+                        // Focus the input after switching tabs
+                        requestAnimationFrame(() => {
+                            const orderElem = document.getElementById(
+                                'trade-module-price-input-container',
+                            );
+                            orderElem?.classList.add('divPulse');
+                            setTimeout(() => {
+                                orderElem?.classList.remove('divPulse');
+                            }, 800);
+                        });
                     }, 400);
-                }, 400);
+                });
             }
         },
         [
@@ -528,7 +773,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     }
                 />
             </div>
-
             <div id={'orderBookHeader2'} className={styles.orderBookHeader}>
                 <div>{t('transactions.price')}</div>
                 <div>
@@ -544,9 +788,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
                         : '(USD)'}
                 </div>
             </div>
-
             <BasicDivider />
-
+            {wsError && <div className={styles.errorMessage}>{wsError}</div>}
             <div id='dummyOrderRow' className={styles.dummyOrderRow}>
                 <OrderRow
                     rowIndex={0}
@@ -559,7 +802,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     getBsColor={getBsColor}
                 />
             </div>
-
             {orderBookState === TableState.LOADING && (
                 <motion.div
                     className={
@@ -599,7 +841,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     </div>
                 </motion.div>
             )}
-
             {orderBookState === TableState.FILLED &&
                 buys.length > 0 &&
                 sells.length > 0 &&
@@ -613,6 +854,27 @@ const OrderBook: React.FC<OrderBookProps> = ({
                             transition={{ duration: 0.2 }}
                             className={styles.orderSlotsWrapper}
                         >
+                            {focusedSlotOutOfBounds && (
+                                <>
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.4 }}
+                                    >
+                                        <div
+                                            className={`${styles.obGradientForFocusedSlot} ${styles.smaller} ${focusedSlotOutOfBounds === 'buy' ? styles.buy : ''}`}
+                                        ></div>
+                                        <div
+                                            className={`${styles.obGradientForFocusedSlot} ${focusedSlotOutOfBounds === 'buy' ? styles.buy : ''}`}
+                                        ></div>
+                                        <div
+                                            className={`${styles.obGradientForFocusedSlot} ${styles.wider} ${focusedSlotOutOfBounds === 'buy' ? styles.buy : ''}`}
+                                        ></div>
+                                    </motion.div>
+                                </>
+                            )}
+
                             <div
                                 className={styles.obGradientEffect}
                                 style={{
@@ -701,12 +963,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     .reverse()
                                     .map((order, index) => (
                                         <div
-                                            key={index}
+                                            key={order.px}
                                             className={styles.orderRowWrapper}
                                         >
                                             <OrderRow
                                                 rowIndex={index}
-                                                key={order.px}
                                                 order={order}
                                                 coef={
                                                     selectedMode === 'symbol'
@@ -721,6 +982,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                                 clickListener={rowClickHandler}
                                                 getBsColor={getBsColor}
                                                 formatNum={formatNum}
+                                                obFocusedSlotPrice={
+                                                    focusedSlot?.side === 'sell'
+                                                        ? focusedSlot?.price
+                                                        : undefined
+                                                }
                                             />
                                             <div
                                                 className={styles.ratioBar}
@@ -743,12 +1009,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     .slice(0, orderCount)
                                     .map((order, index) => (
                                         <div
-                                            key={index}
+                                            key={order.px}
                                             className={styles.orderRowWrapper}
                                         >
                                             <OrderRow
                                                 rowIndex={index}
-                                                key={order.px}
                                                 order={order}
                                                 coef={
                                                     selectedMode === 'symbol'
@@ -763,6 +1028,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                                 clickListener={rowClickHandler}
                                                 getBsColor={getBsColor}
                                                 formatNum={formatNum}
+                                                obFocusedSlotPrice={
+                                                    focusedSlot?.side === 'buy'
+                                                        ? focusedSlot?.price
+                                                        : undefined
+                                                }
                                             />
                                             <div
                                                 className={styles.ratioBar}

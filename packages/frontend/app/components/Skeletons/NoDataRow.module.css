@@ -3,8 +3,8 @@
     flex-direction: column;
     align-items: center;
     gap: var(--gap-s);
-    margin-top: var(--margin-l);
-    margin-bottom: var(--margin-l);
+    margin-top: var(--margin-m);
+    margin-bottom: var(--margin-m);
     color: var(--text2);
 }
 
@@ -16,4 +16,23 @@
 .noDataText {
     font-size: 0.8rem;
     color: var(--text2);
+}
+
+.actionButton {
+    margin-top: var(--margin-xs);
+    /* padding: var(--padding-xs) var(--padding-m); */
+    font-size: var(--font-size-s);
+    color: var(--accent1);
+    background: transparent;
+    /* border: 1px solid var(--accent1); */
+    /* border-radius: var(--border-radius-s); */
+    cursor: pointer;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+}
+
+.actionButton:hover {
+    /* background: var(--accent1); */
+    color: var(--dark1);
 }

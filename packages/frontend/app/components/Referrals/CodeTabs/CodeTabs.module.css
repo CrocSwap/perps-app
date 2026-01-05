@@ -1,3 +1,12 @@
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .tableWrapper {
     width: 100%;
     height: 100%;
@@ -30,7 +39,7 @@
     gap: var(--gap-m, 16px);
 }
 
-.sectionWithButton button {
+.sectionWithButton > button {
     width: 100%;
     height: var(--button-height, 44px);
     padding: var(--button-padding, 0 14px);
@@ -69,10 +78,30 @@
     align-items: flex-start;
 }
 
-.enterCodeContent h6 {
+.current_ref_code {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--gap-s, 10px);
+    font-family: var(--font-size-s);
+    color: var(--accent3);
+}
+
+.current_ref_code h6 {
     color: var(--base-text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     margin: 0;
+}
+
+.current_ref_code > p {
+    font-size: var(--font-size-s);
+}
+
+.ref_code_blurb {
+    font-size: var(--font-size-s);
+    color: var(--text2);
 }
 
 .enterCodeContent input {
@@ -100,31 +129,17 @@
         color-mix(in oklab, var(--accent1, #7371fc) 55%, transparent);
 }
 
-.createCodeContent {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-m, 16px);
-    font-size: var(--font-size-s, 12px);
+.enterCodeContent > p {
+    font-size: var(--font-size-s);
+    color: var(--text2);
 }
 
-.createCodeContent .walletLink {
+.max_character_count {
     display: flex;
+    flex-direction: row;
+    gap: var(--gap-s, 10px);
     align-items: center;
-    gap: var(--gap-m, 16px);
-}
-
-.createCodeContent a {
-    color: var(--accent1, #7371fc);
-    text-decoration: none;
-}
-.createCodeContent a:hover {
-    text-decoration: underline;
-}
-
-.createCodeContent p span {
-    color: var(--accent2, #75f0d3);
+    font-size: var(--font-size-xs);
 }
 
 .claimContent {
@@ -136,8 +151,16 @@
     text-align: center;
 }
 
+.sessionButtonWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
 /* Tablet */
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
     .sectionWithButton {
         padding: clamp(12px, 2.8vw, 16px);
     }

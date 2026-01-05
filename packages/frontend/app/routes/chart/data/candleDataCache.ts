@@ -12,6 +12,24 @@ const dataCache = new Map<string, any[]>();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
 
+const MAX_CANDLES_PER_SERIES = 50000;
+const MAX_MARKS_PER_SYMBOL = 5000;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function trimCandleCache(cachedData: any[]) {
+    if (cachedData.length > MAX_CANDLES_PER_SERIES) {
+        cachedData.splice(0, cachedData.length - MAX_CANDLES_PER_SERIES);
+    }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function trimMarkCache(marks: any[]) {
+    if (marks.length > MAX_MARKS_PER_SYMBOL) {
+        marks.sort((a, b) => a.time - b.time);
+        marks.splice(0, marks.length - MAX_MARKS_PER_SYMBOL);
+    }
+}
+
 export async function getHistoricalData(
     symbol: string,
     resolution: string,
@@ -58,11 +76,18 @@ export async function getHistoricalData(
                     }
                 }
 
-                dataCache.set(key, cachedData);
                 const filteredCandle = cachedData.filter(
                     (bar) => bar.time >= from * 1000 && bar.time <= to * 1000,
                 );
-                return filteredCandle.sort((a, b) => a.time - b.time);
+                const sortedFiltered = filteredCandle.sort(
+                    (a, b) => a.time - b.time,
+                );
+
+                trimCandleCache(cachedData);
+
+                dataCache.set(key, cachedData);
+
+                return sortedFiltered;
             }
         },
     );
@@ -86,6 +111,8 @@ export function updateCandleCache(
     } else {
         cachedData.push(tick);
     }
+
+    trimCandleCache(cachedData);
 
     dataCache.set(key, cachedData);
 }
@@ -113,6 +140,8 @@ export async function getMarkFillData(coin: string, user?: string) {
                         poolFillData.push(element);
                     }
                 });
+
+                trimMarkCache(poolFillData);
 
                 const fetchedDataWithUser = {
                     user: user,
@@ -150,6 +179,8 @@ export function updateMarkDataWithSubscription(
                 existingMarks.push(newMark);
             }
         });
+
+        trimMarkCache(existingMarks);
 
         const fetchedDataWithUser = {
             user: user,
@@ -205,4 +236,46 @@ export function getMarkColorData() {
     }
 
     return bsColorSets['default'];
+}
+
+export function clearChartCachesForSymbol(symbol: string) {
+    const candlePrefix = `${symbol}-`;
+    for (const key of dataCache.keys()) {
+        if (key.startsWith(candlePrefix)) {
+            dataCache.delete(key);
+        }
+    }
+
+    const fillsKey = `${symbol}-fillData`;
+    dataCacheWithUser.delete(fillsKey);
+}
+
+export function clearAllChartCaches() {
+    dataCache.clear();
+    dataCacheWithUser.clear();
+}
+
+/**
+ * Get the last candle's close price from the cache
+ * @param symbol - The trading symbol (e.g., 'BTC')
+ * @param resolution - The chart resolution (e.g., '1h', '5', 'D')
+ * @returns The close price of the most recent candle, or null if not available
+ */
+export function getLastCandleClosePrice(
+    symbol: string,
+    resolution: string,
+): number | null {
+    try {
+        const key = `${symbol}-${resolution}`;
+        const cachedData = dataCache.get(key);
+
+        if (cachedData && cachedData.length > 0) {
+            const sortedData = [...cachedData].sort((a, b) => b.time - a.time);
+            return sortedData[0]?.close || null;
+        }
+    } catch (error) {
+        console.error('Error getting last candle close price:', error);
+    }
+
+    return null;
 }

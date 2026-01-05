@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import type { DepositAndWithDrawalSortBy } from '~/utils/UserDataIFs';
 import styles from './DepositsWithdrawalsTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
@@ -23,37 +24,37 @@ export default function DepositsWithdrawalsTableHeader({
 }: DepositsWithdrawalsTableHeaderProps) {
     const tableHeaders: HeaderCell[] = [
         {
-            name: 'Time',
+            name: t('tradeTable.time'),
             key: 'time',
             sortable: true,
             className: 'timeCell',
         },
         {
-            name: 'Status',
+            name: t('tradeTable.status'),
             key: 'status',
             sortable: true,
             className: 'statusCell',
         },
         {
-            name: 'Network',
+            name: t('tradeTable.network'),
             key: 'network',
             sortable: true,
             className: 'networkCell',
         },
         {
-            name: 'Action',
+            name: t('tradeTable.action'),
             key: 'action',
             sortable: true,
             className: 'actionCell',
         },
         {
-            name: 'Account Value Change',
+            name: t('tradeTable.accountValueChange'),
             key: 'valueChange',
             sortable: true,
             className: 'valueChangeCell',
         },
         {
-            name: 'Fee',
+            name: t('tradeTable.fee'),
             key: 'fee',
             sortable: true,
             className: 'feeCell',

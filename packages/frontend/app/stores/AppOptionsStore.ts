@@ -33,14 +33,6 @@ export interface useAppOptionsIF extends Record<appOptions, boolean> {
 const LS_KEY = 'APP_OPTIONS';
 
 // hook to manage global state and local storage
-const ssrSafeStorage = () =>
-    (typeof window !== 'undefined'
-        ? window.localStorage
-        : {
-              getItem: () => null,
-              setItem: () => {},
-              removeItem: () => {},
-          }) as Storage;
 export const useAppOptions = create<useAppOptionsIF>()(
     // persist data in local storage (only values, not reducers)
     persist(
@@ -68,7 +60,7 @@ export const useAppOptions = create<useAppOptionsIF>()(
             // key for local storage
             name: LS_KEY,
             // format and destination of data
-            storage: createJSONStorage(ssrSafeStorage),
+            storage: createJSONStorage(() => localStorage),
         },
     ),
 );

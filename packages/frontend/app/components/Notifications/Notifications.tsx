@@ -2,7 +2,6 @@ import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 import { AnimatePresence, motion } from 'framer-motion'; // <-- Import Framer Motion
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MdClose } from 'react-icons/md';
-import { useLocation } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
 import { useVersionCheck } from '~/hooks/useVersionCheck';
 import { useViewed } from '~/stores/AlreadySeenStore';
@@ -241,14 +240,13 @@ export default function Notifications() {
 
     const [userClosedNews, setUserClosedNews] = useState<boolean>(false);
 
-    const { pathname } = useLocation();
-
-    if (pathname === '/') {
-        return <></>;
-    }
-
     return (
-        <div className={styles.notifications}>
+        <div
+            className={styles.notifications}
+            role='region'
+            aria-label={t('aria.notifications')}
+            aria-live='polite'
+        >
             <AnimatePresence>
                 {enableTxNotifications &&
                     data.notifications.map((n: notificationIF) => (
@@ -280,12 +278,19 @@ export default function Notifications() {
                 <div className={styles.new_version_available}>
                     <header>
                         <div />
-                        <div>🚀</div>
-                        <MdClose
+                        <div aria-hidden='true'>🚀</div>
+                        <button
+                            type='button'
                             onClick={() => setShowReload(false)}
-                            color='var(--text2)'
-                            size={16}
-                        />
+                            aria-label={t('common.close')}
+                            className={styles.closeButton}
+                        >
+                            <MdClose
+                                color='var(--text2)'
+                                size={16}
+                                aria-hidden='true'
+                            />
+                        </button>
                     </header>
                     <div className={styles.text_content}>
                         <h3>{t('newVersion.title')}</h3>
@@ -299,7 +304,36 @@ export default function Notifications() {
                     </div>
                     <SimpleButton
                         onClick={() => {
-                            window.location.reload();
+                            if (
+                                'serviceWorker' in navigator &&
+                                navigator.serviceWorker.controller
+                            ) {
+                                navigator.serviceWorker
+                                    .getRegistration()
+                                    .then((registration) => {
+                                        const waitingSW =
+                                            registration &&
+                                            registration.waiting;
+                                        if (waitingSW) {
+                                            waitingSW.postMessage({
+                                                type: 'SKIP_WAITING',
+                                            });
+                                            navigator.serviceWorker.addEventListener(
+                                                'controllerchange',
+                                                () => {
+                                                    window.location.reload();
+                                                },
+                                            );
+                                            return;
+                                        }
+                                        window.location.reload();
+                                    })
+                                    .catch(() => {
+                                        window.location.reload();
+                                    });
+                            } else {
+                                window.location.reload();
+                            }
                             setShowReload(false);
                         }}
                     >
@@ -311,14 +345,21 @@ export default function Notifications() {
                 <div className={styles.news}>
                     <header>
                         <h4>{t('common.announcements')}</h4>
-                        <MdClose
-                            color='var(--text2)'
-                            size={16}
+                        <button
+                            type='button'
                             onClick={() => {
                                 setUserClosedNews(true);
                                 alreadyViewed.markAsViewed(unseen.hashes);
                             }}
-                        />
+                            aria-label={t('aria.closeAnnouncement')}
+                            className={styles.closeButton}
+                        >
+                            <MdClose
+                                color='var(--text2)'
+                                size={16}
+                                aria-hidden='true'
+                            />
+                        </button>
                     </header>
                     <ul>
                         {unseen.messages.map(

@@ -13,6 +13,7 @@
         "error": "错误",
         "success": "成功",
         "applyDefaults": "应用默认值",
+        "changeApplied": "更改已应用",
         "learnMore": "了解更多",
         "deposit": "充值",
         "transfer": "转账",
@@ -20,6 +21,8 @@
         "submit": "提交",
         "quantity": "数量",
         "confirm": "确认",
+        "send": "发送",
+        "address": "地址",
         "amount": "金额",
         "max": "最大",
         "min": "最小",
@@ -30,6 +33,7 @@
         "fundingHistory": "资金记录",
         "orderHistory": "订单历史",
         "depositsAndWithdrawals": "充值与提现",
+        "depositors": "存款人",
         "twap": "TWAP",
         "all": "全部",
         "active": "活跃",
@@ -40,7 +44,8 @@
         "reset": "重置",
         "announcements": "公告",
         "leverage": "杠杆",
-        "comingSoon": "即将上线"
+        "comingSoon": "即将上线",
+        "clearFilter": "清除筛选"
     },
     "transactions": {
         "orderTypes": "订单类型",
@@ -88,6 +93,10 @@
         "evenPriceDistribution": "平均价格分布",
         "market": "市价",
         "limit": "限价",
+        "closePosition": "平仓",
+        "closeAtCurrentPrice": "按当前价格平仓",
+        "closeAtAPriceYouSet": "按你设定的价格平仓",
+
         "price": "价格",
         "size": "数量",
         "time": "时间",
@@ -145,6 +154,7 @@
         "midButton": "MID",
         "positionClosed": "持仓已平仓",
         "successfullyClosedPosition": "成功平仓{{usdValueOfOrderStr}} {{symbol}}持仓",
+        "tpSlForPosition": "TP/SL for Position",
         "failedToClosePosition": "平仓失败",
         "transactionTimedOut": "交易{{timeInSeconds}}秒后超时",
         "txFailedOrNotConfirmed": "交易失败或未确认",
@@ -220,6 +230,9 @@
             "message": "已取消{{successCount}}个订单，{{failedCount}}个失败"
         },
         "noOpenOrders": "暂无未成交订单",
+        "noOpenOrdersForMarket": "暂无{{symbol}}未成交订单",
+        "noOpenLongOrders": "暂无多头未成交订单",
+        "noOpenShortOrders": "暂无空头未成交订单",
         "transactionError": "交易错误",
         "invalidLimitPrice": {
             "title": "价格无效",
@@ -290,14 +303,25 @@
         "tradeValue": "交易价值",
         "fee": "手续费",
         "closedPnl": "已实现盈亏",
+        "depositor": "Depositor",
+        "vaultAmount": "Vault Amount",
+        "unrealizedPnl": "Unrealized PnL",
+        "allTimePnl": "All Time PnL",
+        "daysFollowing": "Days Following",
+        "completed": "Completed",
+        "withdrawal": "Withdrawal",
+        "spotTransfer": "Spot Transfer",
         "reduceOnly": "只减仓",
         "triggerConditions": "触发条件",
-        "tpsl": "止盈/止损",
+        "tpsl": "TP/SL",
         "status": "状态",
         "order": "订单",
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "无持仓",
+        "noOpenPositionsForMarket": "无{{symbol}}持仓",
+        "noOpenLongPositions": "无多头持仓",
+        "noOpenShortPositions": "无空头持仓",
         "markPrice": "标记价格",
         "orderId": "订单编号",
         "totalBalance": "总余额",
@@ -315,13 +339,26 @@
         "originalSize": "原始数量",
         "cancelAll": "全部取消",
         "noTradeHistory": "无交易历史",
+        "noTradeHistoryForMarket": "无{{symbol}}交易历史",
+        "noLongTradeHistory": "无多头交易历史",
+        "noShortTradeHistory": "无空头交易历史",
         "noOrderHistory": "无订单历史",
+        "noOrderHistoryForMarket": "无{{symbol}}订单历史",
+        "noLongOrderHistory": "无多头订单历史",
+        "noShortOrderHistory": "无空头订单历史",
         "noFundingHistory": "无资金费率历史",
+        "noFundingHistoryForMarket": "无{{symbol}}资金费率历史",
+        "noLongFundingHistory": "无多头资金费率历史",
+        "noShortFundingHistory": "无空头资金费率历史",
         "fundingHistory": "总计: {{allTime}} 变化后: {{sinceChange}}",
+        "positionSide": "Position Side",
+        "payment": "Payment",
+        "rate": "Rate",
         "openLong": "开 Long",
         "openShort": "开 Short",
         "closeLong": "平 Long",
-        "closeShort": "平 Short"
+        "closeShort": "平 Short",
+        "goToMarket": "前往{{coin}}市场"
     },
     "time": {
         "second": "秒",
@@ -350,7 +387,8 @@
         "chart": "图表",
         "book": "订单簿",
         "recent": "最近",
-        "positions": "持仓"
+        "positions": "持仓",
+        "portfolio": "资产"
     },
     "auth": {
         "login": "登录",
@@ -396,9 +434,13 @@
     },
     "referrals": {
         "title": "邀请",
-        "description": "邀请用户赚奖励。合作伙伴获得更多奖励。",
-        "tradersReferred": "已邀请交易者",
-        "rewardsEarned": "已赚取奖励"
+        "description": "邀请用户以获得奖励。合作伙伴可获得更高的奖励。",
+        "tradersReferred": "已邀请的交易员",
+        "rewardsEarned": "已获得的奖励",
+        "rewardHistory": "奖励记录",
+        "enterCode": "输入代码",
+        "claim": "领取",
+        "createCode": "创建代码"
     },
     "deposit": {
         "prompt": "从Fogo充值{{token}}",
@@ -424,6 +466,9 @@
         "skipOpenOrderConfirm": "跳过未成交订单确认",
         "enableTxNotifications": "启用交易通知",
         "enableBackgroundFillNotif": "启用后台成交通知",
+        "navigationKeyboardShortcuts": "启用导航键盘快捷键",
+        "tradingKeyboardShortcuts": "启用交易键盘快捷键",
+        "viewKeyboardShortcuts": "查看键盘快捷键",
         "numberFormat": "数字格式",
         "color": "颜色",
         "language": "语言"
@@ -490,15 +535,21 @@
         "updateButton": "立即更新",
         "version": "版本"
     },
+    "offline": {
+        "title": "您已离线",
+        "message": "交易已禁用。您仍可查看缓存的数据。"
+    },
     "leverage": {
         "title": "调整杠杆",
-        "closePositionPrompt": "关闭持仓以降低最低杠杆"
+        "closePositionPrompt": "关闭持仓以降低最低杠杆",
+        "adjustLeverage": "调整杠杆，当前{{value}}倍"
     },
     "share": {
         "prompt": "自定义您的文本",
         "xCTA": "在𝕏分享",
         "copyLinkCTA": "复制链接",
-        "textPlaceholder": "立即在{{fogo}} Testnet通过{{twitter}}交易{{coin}}合约"
+        "textPlaceholder": "立即在{{fogo}} Testnet通过{{twitter}}交易{{coin}}合约",
+        "sharePosition": "分享PnL {{pnl}}的持仓"
     },
     "colors": {
         "default": "默认",
@@ -513,6 +564,11 @@
         "depositInput": "充值输入框",
         "addressInput": "地址输入框",
         "amountInput": "金额输入框",
+        "expandWallet": "展开钱包",
+        "collapseWallet": "收起钱包",
+        "priceInput": "价格输入框",
+        "sizeInput": "数量输入框",
+        "stopPriceInput": "止损价输入框",
         "withdrawInput": "提现输入框",
         "scrollTabsLeft": "标签左移",
         "scrollTabsRight": "标签右移",
@@ -544,13 +600,204 @@
         "toggleTPSL": "切换止盈止损",
         "editTPSL": "编辑止盈止损",
         "toggleConfigureAmount": "切换金额设置",
-        "toggleLimitPrice": "切换限价"
+        "toggleLimitPrice": "切换限价",
+        "setMaxAmount": "设置最大金额",
+        "rowsPerPage": "每页行数",
+        "closeModal": "关闭窗口",
+        "goToHome": "返回首页",
+        "spotTradingOpensNewTab": "Ambient v1现货交易（在新标签页打开）",
+        "moreOptions": "更多选项",
+        "notifications": "通知",
+        "transferAmount": "转账金额",
+        "viewOnExplorerNewTab": "在浏览器中查看（在新标签页打开）",
+        "externalLinkOpensNewTab": "{{linkText}}（在新标签页打开）",
+        "opensInNewTab": "（在新标签页打开）",
+        "selectTokenCurrent": "选择代币，当前: {{symbol}}",
+        "mobileTradeNavigation": "交易导航",
+        "takeProfitPrice": "止盈价格",
+        "expectedGain": "预期收益",
+        "toggleGainCurrency": "在美元和百分比之间切换收益显示方式",
+        "stopLossPrice": "止损价格",
+        "expectedLoss": "预期亏损",
+        "toggleLossCurrency": "在美元和百分比之间切换亏损显示方式",
+        "setMidPrice": "设置中间价",
+        "selectSizeDenomination": "选择数量单位"
     },
     "chart": {
         "liqPrice": "清算价格"
     },
     "meta": {
-        "title": "首页 | Ambient",
+        "title": "Ambient Finance | Fogo永续合约",
+        "description": "在Ambient Finance上交易Fogo永续合约。零Taker费用，最高100倍杠杆，极速成交。",
         "content": "在Ambient进行永续合约交易"
+    },
+    "portfolio": {
+        "fees": "Fees",
+        "vol14d": "Vol(14d)",
+        "viewVolume": "View volume",
+        "feesTakerMaker": "Fees (Taker / Maker)",
+        "viewFeeSchedule": "View fee schedule",
+        "totalUsdVal": "Total USD Val",
+        "totalNetUsdValue": "Total Net USD Value",
+        "performance": "Performance",
+        "positions": "Positions",
+        "feeSchedule": "Fee Schedule",
+        "vipTiers": "VIP Tiers",
+        "marketMakerTiers": "Market Maker Tiers",
+        "tier": "Tier",
+        "vol14dVolume": "14天交易量",
+        "taker": "Taker",
+        "maker": "Maker",
+        "negativeFeesRebate": "负费用即返佣",
+        "alwaysZero": "始终为 0.00%",
+        "makerFeesPercent": "Maker 费用 {{percent}}",
+        "availableToDepositTooltip": "根据您的余额，您可以存入的最大金额",
+        "availableToSend": "可发送",
+        "availableToSendTooltip": "您可以发送的总金额",
+        "networkFee": "网络费用",
+        "networkFeeTooltip": "处理交易收取的费用",
+        "fogoChainLogo": "Fogo 链标志",
+        "accountValue": "账户价值",
+        "collateral": "保证金",
+        "pnl": "盈亏 (PNL)",
+        "volume": "交易量",
+        "maxDrawdown": "最大回撤",
+        "totalEquity": "总权益",
+        "accountEquity": "账户权益",
+        "vaultEquity": "金库权益",
+        "perps": "合约 (Perps)",
+        "perpsAndVaults": "合约 + 金库",
+        "allTime": "历史总计",
+        "twentyFourHour": "24小时",
+        "sevenDay": "7天",
+        "thirtyDay": "30天",
+        "fusd": "fUSD",
+        "sendDescription": "发送代币到 Fogo 上的另一个地址。",
+        "sendTitle": "在 Fogo 上发送 {{token}}",
+        "enterAddress": "输入地址...",
+        "enterAmount": "输入金额",
+        "invalidAddress": "无效地址",
+        "insufficientFunds": "资金不足",
+        "validAmountRequired": "请输入有效的金额",
+        "amountGreaterThanZero": "金额必须大于 0",
+        "minDepositAmount": "最小存入金额为 {{amount}}",
+        "exceedsAvailableBalance": "金额超出可用余额 {{balance}}",
+        "transactionTimedOut": "交易在 15 秒后超时",
+        "connectToViewPortfolio": "连接以查看您的投资组合",
+        "connectDescription": "使用您的钱包登录以查看您的投资组合、持仓和交易历史。"
+    },
+    "pageTitles": {
+        "portfolio": "投资组合",
+        "referrals": "推荐",
+        "points": "积分",
+        "leaderboard": "排行榜",
+        "newStrategy": "新建策略",
+        "editStrategy": "编辑策略",
+        "strategy": "策略",
+        "strategies": "策略列表",
+        "vault": "金库",
+        "vaults": "金库列表",
+        "subAccounts": "子账户",
+        "positions": "持仓",
+        "openOrders": "未成交订单",
+        "orderHistory": "订单历史",
+        "tradeHistory": "交易历史",
+        "twapFillHistory": "TWAP成交历史",
+        "twapHistory": "TWAP历史",
+        "depositsAndWithdrawals": "存取款",
+        "fundingHistory": "资金费率历史",
+        "more": "更多",
+        "termsOfService": "服务条款",
+        "privacyPolicy": "隐私政策",
+        "affiliates": "联盟人",
+        "pageNotFound": "页面未找到"
+    },
+    "docs": {
+        "menuTerms": "服务条款",
+        "menuPrivacy": "隐私",
+        "terms": "CROCODILE Labs 服务条款",
+        "privacy": "隐私政策"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "快捷键",
+        "title": "键盘快捷键",
+        "hintPress": "按",
+        "hintToClose": "关闭",
+        "applyDefaults": "应用默认值",
+        "editShortcut": "编辑快捷键",
+        "pressKeys": "请按键...",
+        "aria": {
+            "close": "关闭键盘快捷键"
+        },
+        "categoryTitles": {
+            "general": "通用",
+            "trading": "交易",
+            "navigation": "导航"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "显示快捷键"
+            },
+            "settings": {
+                "open": "打开设置"
+            },
+            "modal": {
+                "close": "关闭弹窗 / 取消"
+            },
+            "trading": {
+                "buy": "切换为买入",
+                "sell": "切换为卖出",
+                "market": "开始市价单",
+                "limit": "开始限价单",
+                "marketClose": "以市价平仓"
+            },
+            "navigation": {
+                "trade": "前往交易页面",
+                "home": "前往首页",
+                "portfolio": "前往资产页面"
+            },
+            "wallet": {
+                "connect": "打开钱包连接"
+            },
+            "portfolio": {
+                "deposit": "打开充值弹窗",
+                "withdraw": "打开提现弹窗",
+                "latestTx": "在区块浏览器中查看最新交易"
+            }
+        },
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

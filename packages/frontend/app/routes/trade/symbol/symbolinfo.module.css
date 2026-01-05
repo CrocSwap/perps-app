@@ -5,13 +5,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    /* justify-content: center; */
     border-radius: var(--radius-m);
-}
-
-/* no need to override anymore */
-
-.symbolInfoContainer div {
-    /* height: auto !important; */
 }
 
 .symbolInfoFieldsWrapper {
@@ -28,9 +23,9 @@
     text-align: start;
 }
 
-@media only screen and (max-width: 768px) {
-    .symbolSelector {
-        margin-left: 0 !important;
+@media (max-width: 480px) {
+    .symbolInfoContainer {
+        border-radius: var(--radius-s) !important;
     }
 }
 
@@ -48,5 +43,8 @@
         flex: 1 1 auto;
         min-width: 0;
         overflow: hidden;
+    }
+    .symbolSelector {
+        margin-left: 0 !important;
     }
 }

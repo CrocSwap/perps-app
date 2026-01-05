@@ -49,6 +49,11 @@
     min-width: 40px;
 }
 
+.midButton:focus-visible {
+    outline: 2px solid var(--accent1, #7371fc);
+    outline-offset: 2px;
+}
+
 .midButtonActive {
     background-color: rgba(115, 113, 252, 0.15);
     color: var(--accent1, #7371fc);

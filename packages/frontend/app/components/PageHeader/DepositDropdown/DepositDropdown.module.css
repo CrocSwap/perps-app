@@ -141,6 +141,6 @@
 
 @media (max-width: 600px) {
     .dropdownContainer {
-        left: -50px;
+        left: -100px;
     }
 }

@@ -8,19 +8,10 @@ import { useEffect, useState } from 'react';
 export function useMediaQuery(query: string): boolean {
     // Initialize with the current match state
     const [matches, setMatches] = useState<boolean>(() => {
-        // Check if window is defined (for SSR compatibility)
-        if (typeof window !== 'undefined') {
-            return window.matchMedia(query).matches;
-        }
-        return false;
+        return window.matchMedia(query).matches;
     });
 
     useEffect(() => {
-        // Return early if window is not defined (SSR)
-        if (typeof window === 'undefined') {
-            return undefined;
-        }
-
         // Create a media query list
         const mediaQueryList = window.matchMedia(query);
 
@@ -46,6 +37,10 @@ export function useMediaQuery(query: string): boolean {
 
 export function useShortScreen(breakpoint: number = 750): boolean {
     return useMediaQuery(`(max-height: ${breakpoint}px)`);
+}
+
+export function useNarrowScreen(breakpoint: number = 768): boolean {
+    return useMediaQuery(`(max-width: ${breakpoint}px)`);
 }
 
 /**
