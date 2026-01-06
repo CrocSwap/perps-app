@@ -82,7 +82,7 @@
 }
 
 .notPage.tableBody {
-    padding-bottom: 0;
+    padding-bottom: var(--padding-xl);
 }
 
 .tableBody::-webkit-scrollbar {
