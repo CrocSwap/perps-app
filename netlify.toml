@@ -52,6 +52,34 @@ VITE_CONTEXT = "branch-deploy"
   ]}
 
  [[redirects]]
+   from = "/v2/referrals*"
+   to = "/"
+   status = 302
+   force = true
+   conditions = { Country = ["KR"] }
+
+ [[redirects]]
+   from = "/v2/affiliates*"
+   to = "/"
+   status = 302
+   force = true
+   conditions = { Country = ["KR"] }
+
+ [[redirects]]
+   from = "/referrals*"
+   to = "/"
+   status = 302
+   force = true
+   conditions = { Country = ["KR"] }
+
+ [[redirects]]
+   from = "/affiliates*"
+   to = "/"
+   status = 302
+   force = true
+   conditions = { Country = ["KR"] }
+
+ [[redirects]]
    from = "/api/hubspot"
    to = "/.netlify/functions/hubspot"
    status = 200
