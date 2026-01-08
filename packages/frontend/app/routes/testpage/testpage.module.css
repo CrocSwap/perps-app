@@ -6,6 +6,13 @@
     box-sizing: border-box;
 }
 
+.connect_wallet_section {
+    max-width: 1400px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
 .header {
     max-width: 1400px;
     margin: 0 auto 2rem;
