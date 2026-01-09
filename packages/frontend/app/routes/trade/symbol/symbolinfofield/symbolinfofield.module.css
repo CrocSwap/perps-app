@@ -30,7 +30,7 @@
     animation: fadeIn 0.1s ease-in-out;
 }
 .tooltip > div {
-    z-index: 9999 !important;
+    z-index: 0 !important;
 }
 .tooltip svg {
     display: none;
@@ -50,7 +50,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 9998;
+    z-index: 0;
     backdrop-filter: blur(0.3px);
 }
 
@@ -64,7 +64,7 @@
     color: var(--text2);
     padding: 20px;
     border-top: 1px solid var(--border-color);
-    z-index: 9999;
+    z-index: 0;
     animation: slideUp 0.2s ease-out;
 }
 

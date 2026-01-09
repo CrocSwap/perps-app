@@ -35,7 +35,7 @@
     flex-direction: row;
     align-items: center;
     gap: var(--gap-s);
-    z-index: 5;
+    z-index: 0;
 }
 .tokenButton svg {
     fill: var(--text2);

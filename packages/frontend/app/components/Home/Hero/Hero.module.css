@@ -24,7 +24,7 @@
     justify-content: center;
     gap: 3rem;
     height: 100%;
-    z-index: 1;
+    /* z-index removed to prevent creating a stacking context that traps content above modals */
 }
 
 /* Animated background container */
@@ -77,7 +77,7 @@
 .hero_container h3,
 .hero_container p,
 .hero_container span {
-    z-index: 2;
+    /* z-index removed - use natural stacking order within the hero */
     position: relative;
 }
 
@@ -254,7 +254,7 @@
     /* FIXED: Mobile hero content styling - properly centered */
     .mobile_hero_content {
         position: relative;
-        z-index: 2;
+        /* z-index removed to prevent stacking above modals */
         flex-direction: column;
         align-items: center;
         justify-content: center;

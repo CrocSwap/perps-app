@@ -201,7 +201,7 @@ body {
     border-radius: var(--radius-xs, 4px);
     cursor: pointer;
     color: var(--text2);
-    z-index: 999;
+    z-index: 0;
     flex-shrink: 0;
 }
 
@@ -313,7 +313,7 @@ body {
         right: 0; */
         height: 40px;
         background: var(--bg-dark1);
-        z-index: 200;
+        z-index: 0;
         justify-content: center;
         align-items: center;
         overflow: visible;
@@ -385,7 +385,7 @@ body {
         right: 0;
         width: 280px;
         max-width: 92vw;
-        z-index: 600;
+        z-index: 0;
 
         background: var(--bg-dark2, #111117);
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -424,6 +424,7 @@ body {
         height: auto;
         background: var(--bg-dark1);
         overflow: hidden !important;
+        z-index: 0;
         display: none;
         border-radius: 0;
         padding-bottom: 20px !important;
@@ -440,6 +441,7 @@ body {
         background: var(--bg-dark1);
         /* padding: 0 var(--padding-s); */
         overflow-y: auto !important; /* only the content scrolls */
+        z-index: 0;
     }
 
     /* Book & Recent */
