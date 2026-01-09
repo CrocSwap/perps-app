@@ -1,4 +1,4 @@
-export type LabelType = 'Main' | 'Quantity' | 'Cancel';
+export type LabelType = 'Main' | 'Quantity' | 'Cancel' | 'Confirm';
 
 export const LIQ_PRICE_LINE_COLOR = '#DC5E1E';
 export const LIQ_PRICE_WARNING_COLOR = '#FFC107';
@@ -94,6 +94,135 @@ export function drawLabel(
     ctx.restore();
 
     return labelLocations;
+}
+
+export function drawLabelMobile(
+    ctx: CanvasRenderingContext2D,
+    { x, y, color, labelOptions }: DrawSegmentedRectOptions,
+    isDragable: boolean,
+) {
+    const dpr = window.devicePixelRatio || 1;
+    const height = 15 * dpr;
+
+    const verticalLineWidth = 2 * dpr;
+    const verticalLineHeight = height / 1.3;
+
+    ctx.save();
+    ctx.font = `bold ${10 * dpr}px sans-serif`;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+
+    const padding = 4 * dpr;
+    const yPadding = padding / 2;
+
+    const labelLocations: LabelLocation[] = [];
+
+    const top = y - yPadding;
+
+    const cancelOption = labelOptions.find((o) => o.type === 'Cancel');
+
+    if (cancelOption) {
+        const size = height + yPadding;
+
+        drawTrashIcon(ctx, 0, top, size, cancelOption);
+
+        labelLocations.push({
+            type: cancelOption.type,
+            x: 0,
+            y: top,
+            width: size,
+            height: size,
+        });
+    }
+
+    /**
+     * LABELS
+     */
+    let cursorX = x;
+
+    for (const option of labelOptions) {
+        if (option.type === 'Cancel') continue;
+
+        const isMain = option.type === 'Main';
+        const isConfirm = option.type === 'Confirm';
+
+        const text = isConfirm ? '✓' : option.text;
+        const textMetrics = ctx.measureText(text);
+
+        const segmentWidth = isConfirm
+            ? height + padding
+            : textMetrics.width + padding * 3;
+
+        const labelCenterY = top + (height + yPadding) / 2;
+
+        ctx.fillStyle = option.backgroundColor;
+        ctx.fillRect(cursorX, top, segmentWidth, height + yPadding);
+
+        ctx.strokeStyle = option.borderColor;
+        ctx.strokeRect(cursorX, top, segmentWidth, height + yPadding);
+
+        if (isMain && isDragable) {
+            ctx.fillStyle = color;
+            ctx.fillRect(
+                cursorX + padding,
+                labelCenterY - verticalLineHeight / 2,
+                verticalLineWidth,
+                verticalLineHeight,
+            );
+        }
+
+        ctx.fillStyle = option.textColor;
+        ctx.fillText(text, cursorX + segmentWidth / 2, labelCenterY);
+
+        labelLocations.push({
+            type: option.type,
+            x: cursorX,
+            y: top,
+            width: segmentWidth,
+            height: height + yPadding,
+        });
+
+        cursorX += segmentWidth;
+    }
+
+    ctx.restore();
+    return labelLocations;
+}
+
+function drawTrashIcon(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    size: number,
+    cancelOption: LabelOptions,
+) {
+    const TRASH_ICON_PATH = new Path2D(
+        'M4 7h16M9 7V5h6v2m-1 4v7m-4-7v7M6 7l1 13h10l1-13',
+    );
+
+    const padding = size * 0.1;
+    const iconSize = size - padding * 2;
+
+    ctx.save();
+
+    ctx.fillStyle = cancelOption.backgroundColor;
+    ctx.fillRect(x, y, size, size);
+
+    ctx.strokeStyle = cancelOption.borderColor;
+    ctx.strokeRect(x, y, size, size);
+
+    // 🗑 icon
+    ctx.translate(x + padding, y + padding);
+    ctx.scale(iconSize / 24, iconSize / 24);
+
+    ctx.strokeStyle = cancelOption.textColor;
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.stroke(TRASH_ICON_PATH);
+
+    ctx.restore();
 }
 
 export function drawLiqLabel(

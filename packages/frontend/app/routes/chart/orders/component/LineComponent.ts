@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
 
 import type { EntityId, IChartingLibraryWidget } from '~/tv/charting_library';
 import { addCustomOrderLine, type LineLabel } from '../customOrderLineUtils';
@@ -15,7 +16,7 @@ export type LineData = {
     color: string;
     type: ChartLineType;
     labelLocations?: LabelLocation[];
-    oid?: number;
+    oid?: number | string;
     lineStyle: number;
     lineWidth: number;
     side?: 'buy' | 'sell';
@@ -37,6 +38,7 @@ const LineComponent = ({
     setLocalChartReady,
 }: LineProps) => {
     const { chart, isChartReady } = useTradingView();
+    const { selectedOrderLine } = useChartLinesStore();
 
     const orderLineItemsRef = useRef<ChartShapeRefs[]>([]);
 
@@ -199,6 +201,7 @@ const LineComponent = ({
         JSON.stringify(lines),
         localChartReady,
         isChartReady,
+        selectedOrderLine,
     ]);
 
     return null;

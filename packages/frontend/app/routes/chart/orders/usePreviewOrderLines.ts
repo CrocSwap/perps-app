@@ -21,6 +21,7 @@ export const usePreviewOrderLines = (): {
             type: 'PREVIEW_ORDER',
             lineStyle: 2,
             lineWidth: 1,
+            oid: 'previewOrder',
         });
     };
 
@@ -36,6 +37,7 @@ export const usePreviewOrderLines = (): {
                 type: 'PREVIEW_ORDER',
                 lineStyle: 2,
                 lineWidth: 1,
+                oid: 'previewOrder',
             });
         }
     }, [orderInputPriceValue.value]);

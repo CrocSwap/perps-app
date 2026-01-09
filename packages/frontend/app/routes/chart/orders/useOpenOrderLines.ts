@@ -8,12 +8,14 @@ import {
 } from './customOrderLineUtils';
 import type { LineData } from './component/LineComponent';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 export const useOpenOrderLines = (): LineData[] => {
     const { bsColor, getBsColor } = useAppSettings();
     const { chart } = useTradingView();
     const { userSymbolOrders, positions, symbol } = useTradeDataStore();
     const { debugWallet } = useDebugStore();
+    const isMobile = useMobile();
 
     const [lines, setLines] = useState<LineData[]>([]);
 
@@ -51,7 +53,7 @@ export const useOpenOrderLines = (): LineData[] => {
 
                 const color =
                     side === 'buy' ? getBsColor().buy : getBsColor().sell;
-                const xLoc = 0.4;
+                const xLoc = isMobile ? 0.2 : 0.4;
                 const tempTriggerCondition =
                     triggerCondition && triggerCondition !== 'N/A'
                         ? triggerCondition

@@ -2,16 +2,9 @@ import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
 import type { LineData } from '../orders/component/LineComponent';
 import type { LabelLocation } from '../orders/orderLineUtils';
 
-export type LabelLocationData = { label: LabelLocation; parentLine: LineData };
-
-type ScaleData = {
-    yScale: d3.ScaleLinear<number, number>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    scaleSymlog: any;
-};
-
-export const scaleDataRef: { current: ScaleData | null } = {
-    current: null,
+export type LabelLocationData = {
+    label: LabelLocation | undefined;
+    parentLine: LineData;
 };
 
 export const mousePositionRef = { current: { x: 0, y: 0 } };
@@ -21,7 +14,7 @@ export function findLimitLabelAtPosition(
     y: number,
     drawnLabels: LineData[],
 ): {
-    label: LabelLocation;
+    label: LabelLocation | undefined;
     parentLine: LineData;
     matchType: 'onLabel' | 'onLine';
 } | null {
@@ -54,14 +47,13 @@ export function findLimitLabelAtPosition(
     }
     if (yMathcLineLoc && yMathcParentLine) {
         return {
-            label: yMathcLineLoc,
+            label: undefined,
             parentLine: yMathcParentLine,
             matchType: 'onLine',
         };
     }
     return null;
 }
-
 export function getXandYLocationForChartDrag(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event: any,
@@ -70,11 +62,8 @@ export function getXandYLocationForChartDrag(
     let offsetY = event.sourceEvent.clientY - rect?.top;
     let offsetX = event.sourceEvent.clientX - rect?.left;
 
-    if (
-        typeof TouchEvent !== 'undefined' &&
-        event.sourceEvent instanceof TouchEvent
-    ) {
-        offsetY = event.sourceEvent.touches[0].clientY;
+    if (event.sourceEvent.touches && event.sourceEvent.touches.length > 0) {
+        offsetY = event.sourceEvent.touches[0].clientY - rect.top;
         offsetX = event.sourceEvent.touches[0].clientX - rect?.left;
     }
 
