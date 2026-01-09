@@ -452,7 +452,7 @@
         "overwriteCurrentReferralCode": "Ghi đè mã giới thiệu hiện tại",
         "enterReferralCode": "Nhập mã giới thiệu",
         "referralCodeNotValidPleaseConfirm": "Mã <0>{{invalidCode}}</0> chưa được đăng ký trong chương trình giới thiệu. Vui lòng kiểm tra lại mã.",
-        "yourCodeIs": "Mã của bạn là <0>{{affiliateCode}}</0> (dựa trên 6 ký tự đầu của địa chỉ ví). Vui lòng nhấn 'Kích hoạt' để đăng ký mã này trong hệ thống giới thiệu.",
+        "yourCodeIs": "Mã của bạn là <0>{{referrerCode}}</0> (dựa trên 6 ký tự đầu của địa chỉ ví). Vui lòng nhấn 'Kích hoạt' để đăng ký mã này trong hệ thống giới thiệu.",
         "createAnAffiliateCode": "Tạo mã giới thiệu",
         "createAUniqueCodeToEarn": "Tạo mã riêng để nhận 10% phí từ người dùng được giới thiệu.",
         "codeAlreadyInUse": "Mã đã được sử dụng",
@@ -462,7 +462,7 @@
             "enterCode": "Kết nối ví để nhập mã giới thiệu"
         },
         "usersWithTradingVolume": "Mã này có thể được tuỳ chỉnh/cập nhật sau khi người dùng đạt $1M khối lượng giao dịch.",
-        "doNotSelfRefer": "Mã <0>{{affiliateCode}}</0> không thể được đăng ký bởi cùng địa chỉ đã tạo ra nó. Vui lòng chọn mã khác.",
+        "doNotSelfRefer": "Mã <0>{{refCode}}</0> không thể được đăng ký bởi cùng địa chỉ đã tạo ra nó. Vui lòng chọn mã khác.",
         "toCustomizeAffiliateCode": "Mã giới thiệu mặc định là 6 ký tự đầu của địa chỉ ví. Người dùng có khối lượng giao dịch > $1M có thể tuỳ chỉnh mã giới thiệu.",
         "claimRewardsWithAmount": "Nhận {{amount}} phần thưởng",
         "selectATabToViewData": "Chọn một tab để xem dữ liệu",

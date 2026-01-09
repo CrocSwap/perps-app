@@ -451,7 +451,7 @@
         "overwriteCurrentReferralCode": "Remplacer le code de parrainage actuel",
         "enterReferralCode": "Entrer un code de parrainage",
         "referralCodeNotValidPleaseConfirm": "Le code <0>{{invalidCode}}</0> n'est pas enregistré dans le programme de parrainage. Veuillez confirmer que le code est correct.",
-        "yourCodeIs": "Votre code est <0>{{affiliateCode}}</0> basé sur les six premiers caractères de votre adresse de wallet. Cliquez sur 'Activer' pour enregistrer ce code dans le système de parrainage.",
+        "yourCodeIs": "Votre code est <0>{{referrerCode}}</0> basé sur les six premiers caractères de votre adresse de wallet. Cliquez sur 'Activer' pour enregistrer ce code dans le système de parrainage.",
         "createAnAffiliateCode": "Créer un code d'affiliation",
         "createAUniqueCodeToEarn": "Créez un code unique pour gagner 10% des frais des utilisateurs parrainés.",
         "codeAlreadyInUse": "Code déjà utilisé",
@@ -461,7 +461,7 @@
             "enterCode": "Connectez votre wallet pour entrer un code de parrainage"
         },
         "usersWithTradingVolume": "Ce code peut être personnalisé ou mis à jour par les utilisateurs après avoir atteint 1M$ de volume de trading.",
-        "doNotSelfRefer": "Le code <0>{{affiliateCode}}</0> ne peut pas être enregistré par la même adresse qui l'a créé. Veuillez choisir un autre code.",
+        "doNotSelfRefer": "Le code <0>{{refCode}}</0> ne peut pas être enregistré par la même adresse qui l'a créé. Veuillez choisir un autre code.",
         "toCustomizeAffiliateCode": "Les codes d'affiliation correspondent par défaut aux six premiers caractères de votre adresse de wallet. Les utilisateurs avec > 1M$ de volume de trading peuvent personnaliser leur code.",
         "claimRewardsWithAmount": "Réclamer {{amount}} de récompenses",
         "selectATabToViewData": "Sélectionner un onglet pour afficher les données",

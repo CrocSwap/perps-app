@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
-import type { AffiliateCodeParams } from 'node_modules/@fuul/sdk/dist/types/sdk';
 
 interface FuulContextType {
     isInitialized: boolean;
@@ -11,8 +10,8 @@ interface FuulContextType {
         identifierType: UserIdentifierType,
         eventName: string,
     ) => Promise<void>;
-    isAffiliateCodeFree: (code: string) => Promise<boolean>;
-    getAffiliateCode: (
+    isRefCodeFree: (code: string) => Promise<boolean>;
+    getRefCode: (
         userIdentifier: string,
         identifierType: UserIdentifierType,
     ) => Promise<Affiliate | null>;
@@ -22,8 +21,8 @@ const FuulContext = createContext<FuulContextType>({
     isInitialized: false,
     trackPageView: () => {},
     sendConversionEvent: () => Promise.resolve(),
-    isAffiliateCodeFree: () => Promise.resolve(false),
-    getAffiliateCode: () => Promise.resolve(null),
+    isRefCodeFree: () => Promise.resolve(false),
+    getRefCode: () => Promise.resolve(null),
 });
 
 export const useFuul = () => {
@@ -98,8 +97,8 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
                 isInitialized,
                 trackPageView,
                 sendConversionEvent,
-                isAffiliateCodeFree: Fuul.isAffiliateCodeFree,
-                getAffiliateCode: Fuul.getAffiliateCode,
+                isRefCodeFree: Fuul.isAffiliateCodeFree,
+                getRefCode: Fuul.getAffiliateCode,
             }}
         >
             {children}
