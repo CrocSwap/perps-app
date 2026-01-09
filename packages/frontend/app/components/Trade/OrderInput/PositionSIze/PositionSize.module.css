@@ -6,8 +6,7 @@
 
     padding-left: var(--padding-xs);
 }
-.modalContainer {
-}
+
 .containerTitle {
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-s, 12px);
@@ -71,7 +70,7 @@
     top: 50%;
     transform: translate(-50%, -50%);
     border: 2px solid var(--accent1);
-    z-index: 2;
+    z-index: 0;
     background: var(--accent1);
 }
 
@@ -97,7 +96,7 @@
     transform: translate(-50%, -50%);
     border: 2px solid var(--accent1);
     background-color: var(--bg-dark1);
-    z-index: 3;
+    z-index: 0;
     cursor: grab;
     outline: none;
 }

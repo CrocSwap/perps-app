@@ -27,9 +27,9 @@
     },
     "dependencies": {
         "@crocswap-libs/ambient-ember": "^0.1.59",
-        "@fogo/sessions-idls": "^0.0.12",
-        "@fogo/sessions-sdk": "^0.0.28",
-        "@fogo/sessions-sdk-react": "^0.1.8",
+        "@fogo/sessions-idls": "^0.0.13",
+        "@fogo/sessions-sdk": "^0.0.32",
+        "@fogo/sessions-sdk-react": "^0.1.10",
         "@fuul/sdk": "^7.7.1",
         "@perps-app/sdk": "workspace:*",
         "@plausible-analytics/tracker": "0.4.4",

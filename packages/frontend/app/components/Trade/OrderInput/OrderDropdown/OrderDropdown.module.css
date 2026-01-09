@@ -65,7 +65,7 @@
     background: var(--bg-dark3, #1c1c22);
     border-radius: var(--radius-xs);
     list-style: none;
-    z-index: 1000;
+    z-index: 0;
     max-height: 200px;
     overflow-y: auto;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);

@@ -52,7 +52,7 @@
 .orderRowSize,
 .orderRowTotal {
     flex: 1 1;
-    z-index: 2;
+    z-index: 0;
     cursor: pointer;
     user-select: none;
 }

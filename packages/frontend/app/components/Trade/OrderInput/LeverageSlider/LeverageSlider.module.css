@@ -6,8 +6,6 @@
 }
 
 /* Modal-specific container styles */
-.leverageSliderContainer.modalContainer {
-}
 
 .containerTitle {
     color: var(--text2, #bcbcc4);
@@ -19,8 +17,6 @@
 }
 
 /* Modal-specific title styles */
-.titleWithWarning.modalTitle {
-}
 
 .minimumWarning {
     position: absolute;
@@ -30,7 +26,7 @@
     color: var(--red);
     font-size: var(--font-size-s, 12px);
     white-space: nowrap;
-    z-index: 10;
+    z-index: 0;
     animation: fadeIn 0.2s ease-in-out;
 }
 
@@ -43,7 +39,7 @@
     padding: 0 var(--padding-s);
     font-size: var(--font-size-s, 12px);
     white-space: nowrap;
-    z-index: 10;
+    z-index: 0;
     border-radius: var(--radius-xs);
 }
 
@@ -124,7 +120,7 @@
     left: 0;
     height: 100%;
     background-color: #2b2a2f !important;
-    z-index: 5 !important;
+    z-index: 0 !important;
     pointer-events: none;
     border-radius: 2px;
 }
@@ -145,7 +141,7 @@
     bottom: -2px;
     width: 2px;
     background-color: rgba(255, 255, 255, 0.9);
-    z-index: 5;
+    z-index: 0;
     transform: translateX(-50%);
     pointer-events: none;
 }
@@ -159,7 +155,7 @@
     font-size: var(--font-size-xs);
     padding: 2px 6px;
     border-radius: 3px;
-    z-index: 2;
+    z-index: 0;
     white-space: nowrap;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     cursor: default;
@@ -170,7 +166,7 @@
     top: 0;
     left: 0;
     height: 100%;
-    z-index: 2;
+    z-index: 0;
 }
 
 .sliderMarker {
@@ -181,7 +177,7 @@
     top: 50%;
     transform: translate(-50%, -50%);
     border: 2px solid;
-    z-index: 3;
+    z-index: 0;
 }
 
 .sliderMarkerCurrent {
@@ -197,7 +193,7 @@
     transform: translate(-50%, -50%);
     border: 2px solid;
     background-color: var(--bg-dark2) !important;
-    z-index: 15;
+    z-index: 0;
     cursor: grab;
     outline: none;
 }
