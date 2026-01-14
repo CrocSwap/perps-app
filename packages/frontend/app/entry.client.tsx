@@ -313,6 +313,15 @@ const router = createBrowserRouter([
                 },
             },
             {
+                path: 'v2/status',
+                lazy: async () => {
+                    const { default: Component } = await import(
+                        './routes/status/Status'
+                    );
+                    return { Component };
+                },
+            },
+            {
                 path: 'v2/terms',
                 lazy: async () => {
                     const { default: Component } =
