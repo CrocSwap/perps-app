@@ -44,7 +44,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const { resetUserData } = useTradeDataStore();
 
     const sessionState = useSession();
-    const isSessionEstablished = isEstablished(sessionState);
     const location = useLocation();
 
     // Drive userAddress from URL parameter, session, or debug settings
@@ -113,16 +112,22 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // may be restored with a cached wallet address that differs from the currently
     // selected address in the wallet extension. This effect detects the mismatch
     // by checking the wallet's connection state and triggers session end if needed.
+    const sessionStateRef = React.useRef(sessionState);
     useEffect(() => {
-        if (!isSessionEstablished) {
-            return;
-        }
+        sessionStateRef.current = sessionState;
+    }, [sessionState]);
 
-        const sessionAddress = sessionState.walletPublicKey.toString();
-        const wallet = sessionState.solanaWallet;
+    useEffect(() => {
+        const checkSessionHealth = () => {
+            const currentSessionState = sessionStateRef.current;
+            if (!isEstablished(currentSessionState)) {
+                return;
+            }
 
-        // Check for wallet connection issues
-        const checkWalletMismatch = () => {
+            const sessionAddress =
+                currentSessionState.walletPublicKey.toString();
+            const wallet = currentSessionState.solanaWallet;
+
             try {
                 const isWalletConnected = wallet?.connected;
                 const walletPublicKey = wallet?.publicKey?.toBase58?.();
@@ -139,18 +144,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                             walletPublicKey,
                         },
                     );
-                    sessionState.endSession();
+                    currentSessionState.endSession();
                 }
             } catch {
                 // Best-effort only
             }
         };
 
-        const timeoutId = setTimeout(checkWalletMismatch, 500);
-        const intervalId = setInterval(checkWalletMismatch, 1000);
+        const timeoutId = setTimeout(checkSessionHealth, 500);
+        const intervalId = setInterval(checkSessionHealth, 1000);
 
         const handleVisibilityOrFocus = () => {
-            checkWalletMismatch();
+            checkSessionHealth();
         };
 
         window.addEventListener('focus', handleVisibilityOrFocus);
@@ -165,7 +170,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                 handleVisibilityOrFocus,
             );
         };
-    }, [isSessionEstablished, sessionState]);
+    }, []);
 
     return (
         <AppContext.Provider
