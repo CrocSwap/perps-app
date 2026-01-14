@@ -4,7 +4,6 @@ import React, {
     useContext,
     useEffect,
     useState,
-    useRef,
     type Dispatch,
     type SetStateAction,
 } from 'react';
@@ -128,90 +127,34 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
         // Check for wallet connection issues
         const checkWalletMismatch = () => {
-            // Check if wallet is disconnected
-            const isWalletConnected = wallet?.connected;
-            console.log('[AppContext] Checking wallet state:', {
-                isWalletConnected,
-                walletPublicKey: wallet?.publicKey?.toBase58?.(),
-                sessionAddress,
-            });
+            try {
+                const isWalletConnected = wallet?.connected;
+                const walletPublicKey = wallet?.publicKey?.toBase58?.();
 
-            // If wallet is not connected, end the session
-            if (isWalletConnected === false) {
-                console.warn(
-                    '[AppContext] Wallet not connected. Ending session.',
-                );
-                sessionState.endSession();
-                return;
-            }
-
-            // Check if wallet has no publicKey
-            const walletPublicKey = wallet?.publicKey?.toBase58?.();
-            if (!walletPublicKey) {
-                console.warn(
-                    '[AppContext] Wallet has no publicKey. Ending session.',
-                );
-                sessionState.endSession();
-                return;
-            }
-
-            // Check if wallet's current address differs from session
-            if (walletPublicKey !== sessionAddress) {
-                console.warn(
-                    '[AppContext] Wallet address mismatch. ' +
-                        `Session: ${sessionAddress}, Wallet: ${walletPublicKey}. Ending session.`,
-                );
-                sessionState.endSession();
-                return;
-            }
-
-            // Also check wallet standard accounts array
-            // @ts-expect-error wallet.wallet types are not fully typed
-            const accounts = wallet?.wallet?.accounts;
-            if (Array.isArray(accounts) && accounts.length > 0) {
-                const currentAddress = accounts[0]?.address;
-                if (currentAddress && currentAddress !== sessionAddress) {
+                // Only treat it as an error if the underlying wallet is actually
+                // disconnected / has no active public key while the session claims
+                // to be established (the "stuck" state after Cmd-R).
+                if (isWalletConnected === false || !walletPublicKey) {
                     console.warn(
-                        '[AppContext] Wallet standard address mismatch. ' +
-                            `Session: ${sessionAddress}, Wallet: ${currentAddress}. Ending session.`,
+                        '[AppContext] Session established but wallet is disconnected or missing publicKey. Ending session.',
+                        {
+                            sessionAddress,
+                            isWalletConnected,
+                            walletPublicKey,
+                        },
                     );
                     sessionState.endSession();
                 }
+            } catch {
+                // Best-effort only
             }
         };
 
         // Check after a short delay to allow wallet extension to update
         const timeoutId = setTimeout(checkWalletMismatch, 500);
 
-        // Also listen for wallet standard "change" events
-        let removeListener: (() => void) | undefined;
-        try {
-            // @ts-expect-error wallet.wallet types are not fully typed
-            const eventsFeature = wallet?.wallet?.features?.['standard:events'];
-            if (eventsFeature?.on) {
-                removeListener = eventsFeature.on(
-                    'change',
-                    (event: { accounts?: Array<{ address: string }> }) => {
-                        if (event.accounts && event.accounts.length > 0) {
-                            const newAddress = event.accounts[0]?.address;
-                            if (newAddress && newAddress !== sessionAddress) {
-                                console.warn(
-                                    '[AppContext] Wallet address changed. ' +
-                                        `Session: ${sessionAddress}, New: ${newAddress}. Ending session.`,
-                                );
-                                sessionState.endSession();
-                            }
-                        }
-                    },
-                );
-            }
-        } catch {
-            // Wallet doesn't support standard:events
-        }
-
         return () => {
             clearTimeout(timeoutId);
-            removeListener?.();
         };
     }, [sessionState]);
 
