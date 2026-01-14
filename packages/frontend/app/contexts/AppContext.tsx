@@ -3,17 +3,14 @@ import React, {
     createContext,
     useContext,
     useEffect,
-    useState,
     type Dispatch,
     type SetStateAction,
 } from 'react';
-import { useCallback } from 'react';
 import { useLocation } from 'react-router';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { initializePythPriceService } from '~/stores/PythPriceStore';
-import { debugWallets } from '~/utils/Constants';
 
 interface AppContextType {
     isUserConnected: boolean;
@@ -32,8 +29,6 @@ export interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-    const [isUserConnected, setIsUserConnected] = useState(false);
-
     const {
         isDebugWalletActive,
         debugWallet,
@@ -49,6 +44,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const { resetUserData } = useTradeDataStore();
 
     const sessionState = useSession();
+    const isSessionEstablished = isEstablished(sessionState);
     const location = useLocation();
 
     // Drive userAddress from URL parameter, session, or debug settings
@@ -118,7 +114,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // selected address in the wallet extension. This effect detects the mismatch
     // by checking the wallet's connection state and triggers session end if needed.
     useEffect(() => {
-        if (!isEstablished(sessionState)) {
+        if (!isSessionEstablished) {
             return;
         }
 
@@ -150,13 +146,26 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             }
         };
 
-        // Check after a short delay to allow wallet extension to update
         const timeoutId = setTimeout(checkWalletMismatch, 500);
+        const intervalId = setInterval(checkWalletMismatch, 1000);
+
+        const handleVisibilityOrFocus = () => {
+            checkWalletMismatch();
+        };
+
+        window.addEventListener('focus', handleVisibilityOrFocus);
+        document.addEventListener('visibilitychange', handleVisibilityOrFocus);
 
         return () => {
             clearTimeout(timeoutId);
+            clearInterval(intervalId);
+            window.removeEventListener('focus', handleVisibilityOrFocus);
+            document.removeEventListener(
+                'visibilitychange',
+                handleVisibilityOrFocus,
+            );
         };
-    }, [sessionState]);
+    }, [isSessionEstablished, sessionState]);
 
     return (
         <AppContext.Provider
