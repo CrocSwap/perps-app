@@ -28,13 +28,13 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
     return (
         <div
             className={`${styles.toggleContainer} ${reverse ? styles.reverse : ''}`}
+            onClick={handleToggle}
         >
             {!hideLabel && label && (
                 <span className={styles.toggleLabel}>{label}</span>
             )}
             <div
                 className={`${styles.toggleSwitch} ${isOn ? styles.toggleSwitchOn : ''}`}
-                onClick={handleToggle}
                 role='switch'
                 aria-checked={isOn}
                 aria-label={ariaLabel || (hideLabel ? label : undefined)}

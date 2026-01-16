@@ -127,10 +127,11 @@ export default function VaultCharts({ info }: VaultChartsProps) {
                     fieldName='label'
                     onChange={(value) =>
                         setSelectedPeriod({
-                            label: value,
+                            label: value as string,
                             value:
-                                periodOptions.find((opt) => opt.label === value)
-                                    ?.value ?? 3,
+                                periodOptions.find(
+                                    (opt) => opt.label === (value as string),
+                                )?.value ?? 3,
                         })
                     }
                 />

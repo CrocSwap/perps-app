@@ -24,6 +24,7 @@
     text-align: right;
     color: var(--text1);
     cursor: text;
+    padding-right: 4px;
 }
 .tokenButton {
     background-color: transparent;

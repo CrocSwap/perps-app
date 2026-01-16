@@ -266,6 +266,7 @@
         "partiallyFilled": "일부 체결됨",
         "canceled": "취소됨",
         "pending": "대기중",
+        "tpslToggleLabel": "TP/SL (익절/손절)",
         "limitTxFailedFallbackMessage": "지정가 주문 거래 실패",
         "marketTxFailedFallbackMessage": "시장가 주문 거래 실패",
         "depositTxFailedFallbackMessage": "입금 거래 실패",

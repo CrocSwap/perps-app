@@ -266,6 +266,7 @@
         "partiallyFilled": "Parcialmente completada",
         "canceled": "Cancelada",
         "pending": "Pendiente",
+        "tpslToggleLabel": "Take Profit / Stop Loss",
         "limitTxFailedFallbackMessage": "La transacción de orden limitada falló",
         "marketTxFailedFallbackMessage": "La transacción de orden de mercado falló",
         "depositTxFailedFallbackMessage": "La transacción de depósito falló",

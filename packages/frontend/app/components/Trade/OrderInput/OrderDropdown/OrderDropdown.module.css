@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    width: auto;
 }
 
 .dropdownToggle {
@@ -21,6 +22,7 @@
     gap: var(--gap-s);
     transition: all 0.2s ease;
     outline: none;
+    min-width: max-content;
 }
 
 .dropdownToggle:hover {
@@ -38,11 +40,9 @@
 }
 
 .selectedText {
-    flex: 1;
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
 }
 
 .dropdownToggle svg {

@@ -266,6 +266,7 @@
         "partiallyFilled": "一部約定",
         "canceled": "取消済み",
         "pending": "保留中",
+        "tpslToggleLabel": "TP/SL (利確/損切)",
         "limitTxFailedFallbackMessage": "指値注文の取引は失敗しました",
         "marketTxFailedFallbackMessage": "成行注文の取引は失敗しました",
         "depositTxFailedFallbackMessage": "入金取引は失敗しました",

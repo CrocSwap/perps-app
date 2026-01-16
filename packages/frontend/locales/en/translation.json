@@ -266,6 +266,7 @@
         "partiallyFilled": "Partially Filled",
         "canceled": "Canceled",
         "pending": "Pending",
+        "tpslToggleLabel": "Take Profit / Stop Loss",
         "limitTxFailedFallbackMessage": "Limit order transaction failed",
         "marketTxFailedFallbackMessage": "Market order transaction failed",
         "depositTxFailedFallbackMessage": "Deposit transaction failed",

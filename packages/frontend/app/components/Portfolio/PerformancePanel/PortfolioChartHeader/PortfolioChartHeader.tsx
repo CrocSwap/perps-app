@@ -51,7 +51,7 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
                             centered={true}
                             onChange={(value) =>
                                 setSelectedVault({
-                                    label: value,
+                                    label: value as string,
                                     value:
                                         vaultOptions.find(
                                             (opt) => opt.label === value,
@@ -72,7 +72,7 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
                             centered={true}
                             onChange={(value) =>
                                 setSelectedPeriod({
-                                    label: value,
+                                    label: value as string,
                                     value:
                                         periodOptions.find(
                                             (opt) => opt.label === value,

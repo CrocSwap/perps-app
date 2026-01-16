@@ -52,8 +52,9 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
 
     // Memoized ComboBox onChange handler
     const handleComboBoxChange = useCallback(
-        (val: string) => {
-            setSelectedDenom(val === symbol.toUpperCase() ? 'symbol' : 'usd');
+        (val: string | number) => {
+            const s = String(val);
+            setSelectedDenom(s === symbol.toUpperCase() ? 'symbol' : 'usd');
         },
         [setSelectedDenom, symbol],
     );
@@ -108,7 +109,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 onKeyDown={onKeyDown}
                 className={className}
                 aria-label={ariaLabel}
-                placeholder={t('transactions.enterSize')}
+                // placeholder={t('transactions.enterSize')}
                 onFocus={onFocus}
                 autoFocus={props.autoFocus}
             />

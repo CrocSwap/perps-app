@@ -38,7 +38,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { t, i18n } = useTranslation();
 
         const { position } = props;
-        const { coinPriceMap } = useTradeDataStore();
+        const { coinPriceMap, symbol, symbolInfo } = useTradeDataStore();
         const { buys, sells } = useOrderBookStore();
         const { formatNum } = useNumFormatter();
         const { getBsColor } = useAppSettings();
@@ -46,7 +46,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { executeMarketOrder } = useMarketOrderService();
         const [isClosing, setIsClosing] = useState(false);
 
-        const showTpSl = false;
+        const showTpSl = true;
 
         const modalCtrl = useModal('closed');
         const [modalContent, setModalContent] = useState<string>('share');
@@ -75,7 +75,6 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             (state) => state.setPreferredLeverage,
         );
 
-        const { symbol } = useTradeDataStore();
         useEffect(() => {
             if (symbol.toLowerCase() === position.coin.toLowerCase()) {
                 setLeverage(
@@ -126,6 +125,20 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             modalCtrl.open();
         }, [modalCtrl]);
 
+        // for take profit sltop loss modal
+        const rowMarkPx = coinPriceMap.get(position.coin) ?? 0;
+
+        const isActiveSymbolForRow =
+            symbolInfo?.coin?.toLowerCase?.() === position.coin.toLowerCase();
+
+        // display label for this row
+        const baseSymbolForRow = position.coin;
+
+        // lot size / qty step for this row (fallback if we don't have it for the row)
+        const qtyStepForRow = isActiveSymbolForRow
+            ? ((symbolInfo as any)?.qtyStep ?? 1e-8)
+            : 1e-8;
+
         // Memoize modal content
         const renderModalContent = useCallback(() => {
             if (modalContent === 'share') {
@@ -155,6 +168,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         <TakeProfitsModal
                             closeTPModal={modalCtrl.close}
                             position={position}
+                            markPrice={rowMarkPx}
+                            baseSymbol={baseSymbolForRow}
+                            qtyStep={qtyStepForRow}
                         />
                     </Modal>
                 );
@@ -226,7 +242,14 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             }
 
             return null;
-        }, [modalContent, modalCtrl.close, position, isMobile, t]);
+        }, [
+            modalContent,
+            modalCtrl.close,
+            position,
+            coinPriceMap,
+            isMobile,
+            t,
+        ]);
 
         // Memoize navigation handler
         const handleCoinClick = useCallback(() => {
@@ -517,11 +540,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 </div>
                 {showTpSl && (
                     <div className={`${styles.cell} ${styles.tpslCell}`}>
-                        {getTpSl()}
                         <button
                             onClick={openTpSlModal}
-                            aria-label={t('editTPSL')}
+                            aria-label={t('aria.editTPSL')}
                         >
+                            {getTpSl()}
                             <LuPen
                                 color='var(--text1)'
                                 size={10}

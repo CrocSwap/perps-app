@@ -8,7 +8,6 @@ function JsonHighlighter({ data }: { data: any }) {
     const jsonString = JSON.stringify(data, null, 2);
 
     const highlightJson = (str: string) => {
-        // Replace different JSON elements with highlighted spans
         return str.replace(
             /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
             (match) => {
@@ -37,7 +36,7 @@ function JsonHighlighter({ data }: { data: any }) {
     );
 }
 
-export default function testpage() {
+export default function TestPage() {
     const WALLETS: [string, string][] = [
         ['emily 1', '74yqP7Me1Se7sKMEg6rQ5xovggkJ91GcM5LE2pGQzekm'],
         ['emily 2', 'G8KG3KA37gcuyJtCAxbt1hbPDedvQUuKr9KcE2c7JbxM'],
@@ -54,14 +53,12 @@ export default function testpage() {
     const userDataStore = useUserDataStore();
     const userAddress = userDataStore.userAddress;
 
-    // Manual wallet input state
     const [manualWalletName, setManualWalletName] = useState('');
     const [manualWalletAddress, setManualWalletAddress] = useState('');
     const [manualWallet, setManualWallet] = useState<[string, string] | null>(
         null,
     );
 
-    // Check if connected wallet is already in the list
     const isConnectedWalletInList = useMemo(() => {
         if (!userAddress) return false;
         return WALLETS.some(
@@ -69,11 +66,9 @@ export default function testpage() {
         );
     }, [userAddress]);
 
-    // Create combined wallets list with manual wallet first, then connected wallet, then hardcoded list
     const allWallets: [string, string][] = useMemo(() => {
         const wallets = [...WALLETS];
 
-        // Add connected wallet if not in hardcoded list
         if (userAddress && !isConnectedWalletInList) {
             wallets.unshift([
                 '<<active connected wallet>>',
@@ -81,7 +76,6 @@ export default function testpage() {
             ]);
         }
 
-        // Add manual wallet first if it exists
         if (manualWallet) {
             wallets.unshift(manualWallet);
         }
@@ -101,96 +95,53 @@ export default function testpage() {
     >({});
 
     async function fetchWallet(name: string, address: string) {
-        const EMBER_ENDPOINT_BASE =
-            'https://ember-leaderboard-v2.liquidity.tools/user';
-        const endpoint = `${EMBER_ENDPOINT_BASE}/${address}`;
+        const endpoint = `https://ember-leaderboard-v2.liquidity.tools/user/${address}`;
 
-        console.log(`Fetching for ${name}:`, endpoint);
-
-        // Set loading state
         setWalletDataMap((prev) => ({
             ...prev,
             [address]: { data: null, loading: true, error: null },
         }));
 
         try {
-            console.time(`Fetch ${name}`);
             const response = await fetch(endpoint);
-            console.timeEnd(`Fetch ${name}`);
-
-            const statusCode = response.status;
-            console.log(`${name} status code:`, statusCode);
-
-            console.time(`Parse ${name}`);
             const data = await response.json();
-            console.timeEnd(`Parse ${name}`);
-
-            console.log(`${name} data:`, data);
 
             setWalletDataMap((prev) => ({
                 ...prev,
-                [address]: { data, loading: false, error: null, statusCode },
+                [address]: {
+                    data,
+                    loading: false,
+                    error: null,
+                    statusCode: response.status,
+                },
             }));
         } catch (err) {
-            const errorMessage =
-                err instanceof Error ? err.message : 'Unknown error';
-            console.error(`Error fetching ${name}:`, err);
-
             setWalletDataMap((prev) => ({
                 ...prev,
-                [address]: { data: null, loading: false, error: errorMessage },
+                [address]: {
+                    data: null,
+                    loading: false,
+                    error: err instanceof Error ? err.message : 'Unknown error',
+                },
             }));
         }
     }
 
     async function fetchAllWallets() {
-        // Fetch data for each wallet
-        const fetchPromises = allWallets.map(([name, address]) =>
-            fetchWallet(name, address),
+        await Promise.all(
+            allWallets.map(([name, address]) => fetchWallet(name, address)),
         );
-
-        await Promise.all(fetchPromises);
     }
 
     function handleManualSubmit() {
-        if (!manualWalletAddress.trim() || !manualWalletName.trim()) {
-            alert('Please enter both name and address');
-            return;
-        }
-
-        // Check if name already exists in WALLETS
-        const nameExists = WALLETS.some(
-            ([name]) =>
-                name.toLowerCase() === manualWalletName.trim().toLowerCase(),
-        );
-        if (nameExists) {
-            alert(
-                `Name "${manualWalletName}" already exists in the wallet list`,
-            );
-            return;
-        }
-
-        // Check if address already exists in WALLETS
-        const addressExists = WALLETS.some(
-            ([_, address]) => address === manualWalletAddress.trim(),
-        );
-        if (addressExists) {
-            alert(
-                `Address "${manualWalletAddress}" already exists in the wallet list`,
-            );
-            return;
-        }
+        if (!manualWalletName || !manualWalletAddress) return;
 
         const wallet: [string, string] = [
             manualWalletName.trim(),
             manualWalletAddress.trim(),
         ];
         setManualWallet(wallet);
-
-        // Fetch data for this wallet
-        fetchWallet(manualWalletName.trim(), manualWalletAddress.trim());
-
-        // Clear inputs
+        fetchWallet(wallet[0], wallet[1]);
         setManualWalletName('');
         setManualWalletAddress('');
     }
@@ -199,120 +150,21 @@ export default function testpage() {
         <div className={styles.testpage}>
             <div className={styles.header}>
                 <h2>Ember Leaderboard Test</h2>
-                <SimpleButton
-                    bg='dark2'
-                    hoverBg='accent1'
-                    onClick={fetchAllWallets}
-                >
+                <SimpleButton onClick={fetchAllWallets}>
                     Fetch All Wallets
-                </SimpleButton>
-            </div>
-
-            <div className={styles.manual_input}>
-                <h3>Manual Wallet Lookup</h3>
-                <div className={styles.input_row}>
-                    <div className={styles.input_field}>
-                        <label htmlFor='wallet-name'>Name</label>
-                        <input
-                            id='wallet-name'
-                            type='text'
-                            value={manualWalletName}
-                            onChange={(e) =>
-                                setManualWalletName(e.target.value)
-                            }
-                            placeholder='Enter wallet name'
-                        />
-                    </div>
-                    <div className={styles.input_field}>
-                        <label htmlFor='wallet-address'>Address</label>
-                        <input
-                            id='wallet-address'
-                            type='text'
-                            value={manualWalletAddress}
-                            onChange={(e) =>
-                                setManualWalletAddress(e.target.value)
-                            }
-                            placeholder='Enter wallet address'
-                        />
-                    </div>
-                </div>
-                <SimpleButton
-                    bg='dark2'
-                    hoverBg='accent1'
-                    onClick={handleManualSubmit}
-                >
-                    Submit
                 </SimpleButton>
             </div>
 
             <div className={styles.wallets_grid}>
                 {allWallets.map(([name, address]) => {
                     const walletData = walletDataMap[address];
-                    const isConnected =
-                        userAddress && address === userAddress.toString();
-
                     return (
                         <div key={address} className={styles.wallet_card}>
-                            <div className={styles.wallet_header}>
-                                <div className={styles.wallet_header_left}>
-                                    <h3 style={{ margin: 0 }}>{name}</h3>
-                                    {isConnected && (
-                                        <span className={styles.connected_tag}>
-                                            CONNECTED
-                                        </span>
-                                    )}
-                                </div>
-                                <button
-                                    className={styles.refresh_button}
-                                    onClick={() => fetchWallet(name, address)}
-                                    disabled={walletData?.loading}
-                                    aria-label={`Refresh ${name}`}
-                                >
-                                    {walletData?.loading ? '↻' : '↻ Refresh'}
-                                </button>
-                            </div>
-                            <p className={styles.wallet_address}>{address}</p>
-
-                            {walletData?.statusCode && (
-                                <div className={styles.status_code}>
-                                    <strong>Status:</strong>
-                                    <span
-                                        className={
-                                            walletData.statusCode >= 200 &&
-                                            walletData.statusCode < 300
-                                                ? styles.status_success
-                                                : styles.status_error
-                                        }
-                                    >
-                                        {walletData.statusCode}
-                                    </span>
-                                </div>
-                            )}
-
-                            {walletData?.data?.description && (
-                                <div className={styles.description}>
-                                    <strong>Description:</strong>{' '}
-                                    {walletData.data.description}
-                                </div>
-                            )}
-
-                            {walletData?.loading && <p>Loading...</p>}
-
-                            {walletData?.error && (
-                                <div
-                                    style={{
-                                        color: 'red',
-                                        marginTop: '0.5rem',
-                                    }}
-                                >
-                                    <strong>Error:</strong> {walletData.error}
-                                </div>
-                            )}
-
+                            <h3>{name}</h3>
+                            <p>{address}</p>
+                            {walletData?.loading && <p>Loading…</p>}
                             {walletData?.data && (
-                                <div className={styles.wallet_data}>
-                                    <JsonHighlighter data={walletData.data} />
-                                </div>
+                                <JsonHighlighter data={walletData.data} />
                             )}
                         </div>
                     );

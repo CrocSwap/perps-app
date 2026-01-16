@@ -136,7 +136,7 @@ export default function OrderDropdown({
                     variants={chevronVariants}
                     animate={isOpen ? 'open' : 'closed'}
                 >
-                    <FiChevronDown size={24} />
+                    <FiChevronDown size={20} />
                 </motion.div>
             </motion.button>
 

@@ -206,6 +206,11 @@
     outline: none;
     border: none;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 .closeCell {

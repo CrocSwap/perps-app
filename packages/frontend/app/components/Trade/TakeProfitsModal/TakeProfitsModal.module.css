@@ -1,6 +1,6 @@
 .container {
     --container-width: 439px;
-    --input-height: 32px;
+    --input-height: 36px;
 
     width: var(--container-width);
     padding: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
@@ -54,6 +54,29 @@
     height: var(--input-height);
     padding: var(--padding-xs) var(--padding-s);
     border-radius: var(--radius-s);
+}
+.inputWithoutDropdown {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+    justify-content: flex-start;
+    background: var(--bg-dark4);
+}
+
+.formRow label {
+    margin: 0;
+    white-space: nowrap;
+    color: var(--text2);
+    /* font-size: var(--font-size-m); */
+}
+
+.inputWithoutDropdown input,
+.inputWithDropdown input {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    background: transparent;
+    text-align: right;
 }
 .formRow input {
     width: 100%;
@@ -121,11 +144,69 @@
     color: var(--text2);
     font-size: var(--font-size-s);
 }
-
+.expectedProfitContainer {
+    height: 15px;
+}
 .expectedProfitText {
     width: 100%;
     display: flex;
     justify-content: flex-end;
-    color: var(--green);
+    color: var(--text2);
     font-size: var(--font-size-s);
+    min-height: 16px;
+    align-items: center;
+}
+.formContainer input[type='number']::-webkit-outer-spin-button,
+.formContainer input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.formContainer input[type='number'] {
+    -moz-appearance: textfield;
+}
+.validationError {
+    color: var(--red);
+    margin-left: 6px;
+    font-size: var(--font-size-s);
+}
+
+/* .fieldError {
+    outline: 1px solid var(--sell);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--sell) 20%, transparent);
+    border-radius: var(--radius-s);
+} */
+
+/* .fieldWarning {
+    outline: 1px solid var(--red);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 20%, transparent);
+    border-radius: var(--radius-s);
+} */
+
+.warningText {
+    color: var(--red,);
+
+    font-size: var(--font-size-s);
+}
+
+.expectedLossText {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    min-height: 16px;
+    align-items: center;
+}
+.warningContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--gap-xs);
+}
+.amountReadout {
+    width: 100%;
+    font-size: var(--font-size-s);
+    text-align: right;
+    color: var(--green);
 }

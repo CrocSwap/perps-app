@@ -266,6 +266,7 @@
         "partiallyFilled": "部分成交",
         "canceled": "已取消",
         "pending": "待处理",
+        "tpslToggleLabel": "TP/SL (止盈/止损)",
         "limitTxFailedFallbackMessage": "限价单交易失败",
         "marketTxFailedFallbackMessage": "市价单交易失败",
         "depositTxFailedFallbackMessage": "存款交易失败",
