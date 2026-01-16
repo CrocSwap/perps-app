@@ -1,0 +1,27 @@
+.volume_progress_bar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    color: var(--text2);
+    font-size: var(--font-size-xs);
+}
+
+.volume_progress_bar_labels {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.volume_progress_bar_body {
+    height: 16px;
+    outline: 1px solid var(--bg-dark5);
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.volume_progress_bar_body > div {
+    height: 100%;
+    background-color: var(--accent1, #7371fc);
+}

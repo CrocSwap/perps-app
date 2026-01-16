@@ -2,6 +2,10 @@
     --checkbox-width: 18px;
     --checkbox-height: 18px;
 
+    background: transparent;
+    border: none;
+    padding: 0;
+
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

@@ -29,15 +29,69 @@ VITE_CONTEXT = "branch-deploy"
 
 # Handle client-side routing
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/blocked.html"
+  to = "/blocked.html"
   status = 200
+  conditions = {Country = [
+    "AF", "BY", "MM", "CF", "CU", "CD", "ET", "IR", "IQ", "LB", "LY", "ML", "NI", "KP", "RU", "SO", "SS", "SD", "VE", "YE", "ZW"
+  ]}
 
-# Set immutable caching for static files, because they have fingerprinted filenames
+[[redirects]]
+  from = "/blocked*"
+  to = "/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/blocked.html"
+  status = 302
+  force = true
+  conditions = {Country = [
+    "AF", "BY", "MM", "CF", "CU", "CD", "ET", "IR", "IQ", "LB", "LY", "ML", "NI", "KP", "RU", "SO", "SS", "SD", "VE", "YE", "ZW"
+  ]}
+
+ [[redirects]]
+   from = "/api/hubspot"
+   to = "/.netlify/functions/hubspot"
+   status = 200
+
+# Set immutable caching for static files FIRST (more specific rules should come first)
+# These files have fingerprinted filenames so they can be cached forever
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31560000, immutable"
+
+# Prevent caching of service worker and registration script
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/registerSW.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# Prevent caching of main entry point and manifest
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
 
 # Cache favicon aggressively
 [[headers]]
@@ -54,72 +108,6 @@ VITE_CONTEXT = "branch-deploy"
   for = "/announcements.json"
   [headers.values]
     Cache-Control = "no-store"
-
-# Allow blocked countries to access /blocked.html
-[[redirects]]
-  from = "/blocked.html"
-  to = "/blocked.html"
-  status = 200
-  conditions = {Country = [
-    "AF", # Afghanistan
-    "BY", # Belarus
-    "MM", # Burma
-    "CF", # Central Africa Republic
-    "CU", # Cuba
-    "CD", # Democratic Republic of Congo
-    "ET", # Ethiopia
-    "IR", # Iran
-    "IQ", # Iraq
-    "LB", # Lebanon
-    "LY", # Libya
-    "ML", # Mali
-    "NI", # Nicaragua
-    "KP", # North Korea
-    "RU", # Russia
-    "SO", # Somalia
-    "SS", # South Sudan
-    "SD", # Sudan
-    "VE", # Venezuela
-    "YE", # Yemen
-    "ZW"  # Zimbabwe
-  ]}
-
-# Redirect all other users away from /blocked and /blocked.html
-[[redirects]]
-  from = "/blocked*"
-  to = "/"
-  status = 302
-  force = true
-
-# Block all pages for specified countries
-[[redirects]]
-  from = "/*"
-  to = "/blocked.html"
-  status = 302
-  force = true
-  conditions = {Country = [
-    "AF", # Afghanistan
-    "BY", # Belarus
-    "MM", # Burma
-    "CF", # Central Africa Republic
-    "CU", # Cuba
-    "CD", # Democratic Republic of Congo
-    "ET", # Ethiopia
-    "IR", # Iran
-    "IQ", # Iraq
-    "LB", # Lebanon
-    "LY", # Libya
-    "ML", # Mali
-    "NI", # Nicaragua
-    "KP", # North Korea
-    "RU", # Russia
-    "SO", # Somalia
-    "SS", # South Sudan
-    "SD", # Sudan
-    "VE", # Venezuela
-    "YE", # Yemen
-    "ZW"  # Zimbabwe
-  ]}
 
 # Redirect US traffic from primary domain to US domain, preserving the path 
 [[redirects]]
@@ -159,7 +147,7 @@ VITE_CONTEXT = "branch-deploy"
   from = "/v2/*"
   to = "/index.html"
   status = 200
-
+  
 [[redirects]]
   from = "/*"
   to = "http://ambient-finance-testnet.netlify.app/:splat" # TODO: update to http://ambient-finance.netlify.app/:splat

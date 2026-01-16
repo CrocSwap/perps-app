@@ -8,6 +8,7 @@ import React, {
     type SetStateAction,
 } from 'react';
 import { useCallback } from 'react';
+import { useLocation } from 'react-router';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -48,84 +49,76 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const { resetUserData } = useTradeDataStore();
 
     const sessionState = useSession();
-    const [fogoAddress, setFogoAddress] = useState('');
+    const location = useLocation();
+
+    // Drive userAddress from URL parameter, session, or debug settings
+    useEffect(() => {
+        const { isDebugWalletActive, manualAddressEnabled, manualAddress } =
+            useDebugStore.getState();
+
+        // 1. Manual Debug Address takes highest priority
+        if (
+            !isDebugWalletActive &&
+            manualAddressEnabled &&
+            manualAddress &&
+            manualAddress.length > 0
+        ) {
+            setUserAddress(manualAddress);
+            return;
+        }
+
+        // 2. URL Address takes second priority
+        const pathParts = location.pathname.split('/');
+        const portfolioIdx = pathParts.indexOf('portfolio');
+        const tradeHistoryIdx = pathParts.indexOf('tradeHistory');
+
+        let urlAddr = '';
+        if (portfolioIdx !== -1 && pathParts[portfolioIdx + 1]) {
+            urlAddr = pathParts[portfolioIdx + 1];
+        } else if (tradeHistoryIdx !== -1 && pathParts[tradeHistoryIdx + 1]) {
+            urlAddr = pathParts[tradeHistoryIdx + 1];
+        }
+
+        if (urlAddr && urlAddr.length >= 32 && urlAddr.length <= 44) {
+            setUserAddress(urlAddr);
+            return;
+        }
+
+        // 3. Established Session takes third priority
+        if (isEstablished(sessionState) && !isDebugWalletActive) {
+            setUserAddress(sessionState.walletPublicKey.toString());
+            return;
+        }
+
+        // 4. Fallback to Debug Wallet or Empty
+        if (isDebugWalletActive) {
+            setUserAddress(debugWallet.address);
+        } else {
+            setUserAddress('');
+            resetUserData();
+        }
+    }, [
+        location.pathname,
+        sessionState,
+        setUserAddress,
+        resetUserData,
+        isDebugWalletActive,
+        debugWallet,
+        manualAddressEnabled,
+        manualAddress,
+    ]);
 
     // Initialize Pyth price service on mount
     useEffect(() => {
         initializePythPriceService();
     }, []);
 
-    const bindEmptyAddress = () => {
-        if (isDebugWalletActive) {
-            setUserAddress(debugWallets[2].address);
-        } else {
-            setUserAddress('');
-        }
-        resetUserData();
-    };
-
-    const assignDefaultAddress = useCallback(() => {
-        if (isDebugWalletActive) {
-            if (fogoAddress === '') {
-                bindEmptyAddress();
-            } else {
-                const walletToSet = fogoAddress.match(/^[a-zA-Z]/)
-                    ? debugWallets[0]
-                    : debugWallets[1];
-                setUserAddress(walletToSet.address);
-                setDebugWallet(walletToSet);
-            }
-            setManualAddressEnabled(false);
-            setManualAddress('');
-        } else {
-            if (fogoAddress === '') {
-                bindEmptyAddress();
-            } else {
-                setUserAddress(fogoAddress);
-            }
-        }
-    }, [fogoAddress, isDebugWalletActive]);
-
-    useEffect(() => {
-        if (isEstablished(sessionState)) {
-            setFogoAddress(sessionState.walletPublicKey.toString());
-            assignDefaultAddress();
-        } else {
-            bindEmptyAddress();
-        }
-    }, [isEstablished(sessionState)]);
-
-    useEffect(() => {
-        assignDefaultAddress();
-    }, [isDebugWalletActive, fogoAddress]);
-
-    useEffect(() => {
-        if (debugWallet && isDebugWalletActive) {
-            setUserAddress(debugWallet.address);
-        }
-    }, [debugWallet, isDebugWalletActive]);
-
-    useEffect(() => {
-        if (
-            manualAddressEnabled &&
-            manualAddress !== '' &&
-            manualAddress !== undefined
-        ) {
-            setUserAddress(manualAddress);
-        } else {
-            if (isDebugWalletActive) {
-            } else {
-                setUserAddress(fogoAddress);
-            }
-        }
-    }, [manualAddressEnabled, manualAddress, isDebugWalletActive]);
-
     return (
         <AppContext.Provider
             value={{
-                isUserConnected,
-                setIsUserConnected,
-                assignDefaultAddress,
+                isUserConnected: isEstablished(sessionState),
+                setIsUserConnected: () => {}, // Handled by session sdk now
+                assignDefaultAddress: () => {}, // Driven by effect above
             }}
         >
             {children}

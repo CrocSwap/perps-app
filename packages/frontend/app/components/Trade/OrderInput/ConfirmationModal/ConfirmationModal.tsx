@@ -144,8 +144,8 @@ export default function ConfirmationModal(props: propsIF) {
     return (
         <div className={styles.container}>
             <div className={styles.contentContainer}>
-                {dataInfo.map((info) => (
-                    <div className={styles.infoRow}>
+                {dataInfo.map((info, idx) => (
+                    <div className={styles.infoRow} key={idx}>
                         <div className={styles.infoLabel}>
                             {info.label}
                             {info?.tooltip && (
@@ -187,6 +187,13 @@ export default function ConfirmationModal(props: propsIF) {
                     backgroundColor: tx.includes('buy') ? buyColor : sellColor,
                 }}
                 disabled={isProcessing}
+                aria-label={
+                    isProcessing
+                        ? t('transactions.confirmingTransaction')
+                        : tx.includes('buy')
+                          ? t('transactions.buyLong')
+                          : t('transactions.sellShort')
+                }
             >
                 {isProcessing
                     ? t('transactions.confirmingTransaction')

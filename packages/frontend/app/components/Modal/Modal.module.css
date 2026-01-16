@@ -16,6 +16,8 @@
     /* Prevent swipe-up navigation gestures on iOS */
     overscroll-behavior: none;
     color: var(--text1);
+    /* Hide focus outline - container is focused programmatically for accessibility */
+    outline: none;
 }
 
 /* Special styling when keyboard is visible */
@@ -62,13 +64,13 @@
     width: 100%;
 
     /* Key fixes for mobile browsers */
-    max-height: 85dvh; /* Dynamic viewport height - adapts to browser UI */
+    max-height: 85dvh;
 
     /* This is important: extend the background color all the way to the bottom */
     padding-bottom: env(safe-area-inset-bottom, 16px);
 
     /* Ensure content is scrollable but modal itself doesn't scroll with page */
-    overflow-y: auto;
+    overflow-y: hidden;
     transform: translateY(100%);
     transition: transform 0.3s ease-out;
 
@@ -182,6 +184,16 @@
 }
 
 @media (max-width: 768px) {
+    .modalContent {
+        overflow-y: auto;
+        /* height: 90%; */
+        min-height: 150px;
+    }
+    .bottomSheet,
+    .modalContent {
+        user-select: none;
+    }
+
     /* Add a spacer at the bottom to ensure content isn't hidden */
     .safeAreaSpacer {
         height: env(safe-area-inset-bottom, 16px);
@@ -217,4 +229,26 @@
     align-items: flex-end !important;
     /* Add some padding so modal isn't flush against edges */
     padding: var(--padding-m) !important;
+}
+
+/* Close button styling */
+.closeButton {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.closeButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.closeButton:focus-visible {
+    outline: 2px solid var(--accent1);
+    outline-offset: 2px;
 }

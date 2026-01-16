@@ -14,11 +14,13 @@ import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDrop
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
+import MarketCloseModal from '~/components/Trade/MarketCloseModal/MarketCloseModal';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
+import SymbolInfoMobile from './trade/symbol/symbolInfoMobile';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
@@ -36,17 +38,37 @@ import useOutsideClick from '~/hooks/useOutsideClick';
 import ExpandableOrderBook from './trade/orderbook/ExpandableOrderBook';
 import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import useMediaQuery from '~/hooks/useMediaQuery';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
+import {
+    getKeyboardShortcutById,
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
+import { ObTradeDataSyncProvider } from '~/contexts/ObTradeDataSyncContext';
+import { useModal } from '~/hooks/useModal';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
+const MemoizedSymbolInfoMobile = memo(SymbolInfoMobile);
 
 export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
 export default function Trade() {
-    const { symbol, selectedTradeTab, setSelectedTradeTab } =
-        useTradeDataStore();
+    const isFogoPresale =
+        import.meta.env.VITE_ACTIVE_ANNOUNCEMENT_BANNER === 'fogoPresale';
+    const {
+        symbol,
+        positions,
+        selectedTradeTab,
+        setSelectedTradeTab,
+        setTradeDirection,
+        setMarketOrderType,
+    } = useTradeDataStore();
+
+    const { isOpen: isKeyboardShortcutsOpen } = useKeyboardShortcuts();
     // Mobile-only dropdown state
     type PortfolioViewKey =
         | 'common.positions'
@@ -57,7 +79,6 @@ export default function Trade() {
 
     // mobile Positions tab dropdown
     const [positionsMenuOpen, setPositionsMenuOpen] = useState(false);
-    // --- HYDRATION GATE (add after your other useState hooks) ---
     const [settingsHydrated, setSettingsHydrated] = useState(() => {
         const p = (useAppSettings as any).persist;
         return p?.hasHydrated?.() ?? false;
@@ -97,19 +118,6 @@ export default function Trade() {
         return () => window.removeEventListener('keydown', onKey);
     }, [positionsMenuOpen]);
 
-    // Label map (swap to i18n if you want)
-    const MOBILE_VIEW_LABELS: Record<PortfolioViewKey, string> = {
-        'common.positions': 'Positions',
-        'common.balances': 'Balances',
-        'common.openOrders': ' Orders',
-        'common.tradeHistory': 'Transactions',
-        'common.orderHistory': 'History',
-    };
-
-    // In case selectedTradeTab is something not in our mobile list, default the button label:
-    const currentMobileLabel =
-        MOBILE_VIEW_LABELS[selectedTradeTab as PortfolioViewKey] ?? 'Positions';
-
     // The list of mobile options (order = how the menu shows)
     const MOBILE_OPTIONS: PortfolioViewKey[] = [
         'common.positions',
@@ -123,8 +131,28 @@ export default function Trade() {
     const isUserConnected = isEstablished(sessionState);
     const { marginBucket } = useUnifiedMarginData();
     const { t } = useTranslation();
+
+    const currentMobileLabel = MOBILE_OPTIONS.includes(
+        selectedTradeTab as PortfolioViewKey,
+    )
+        ? t(selectedTradeTab as PortfolioViewKey)
+        : t('common.positions');
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
+
+    const marketCloseModalCtrl = useModal('closed');
+
+    const currentMarketPosition = useMemo(() => {
+        const currentSymbol = symbol?.toLowerCase?.() ?? '';
+        if (!currentSymbol) return null;
+        return (
+            positions.find(
+                (p) =>
+                    p?.coin?.toLowerCase?.() === currentSymbol &&
+                    Math.abs(p.szi) > 0,
+            ) ?? null
+        );
+    }, [positions, symbol]);
 
     const setHeightLocalOnly = (h: number) => {
         setChartTopHeightLocal(h);
@@ -139,12 +167,18 @@ export default function Trade() {
         resetLayoutHeights,
         isWalletCollapsed,
         setIsWalletCollapsed,
+        tradingKeyboardShortcutsEnabled,
     } = useAppSettings();
 
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('order');
     const [isMobile, setIsMobile] = useState<boolean>(false);
+    const useSymbolInfoMobile = useMediaQuery('(max-width: 480px)');
+
+    // after your hydrated state
+    const [layoutMeasured, setLayoutMeasured] = useState(false);
+    const [panelReady, setPanelReady] = useState(false);
 
     const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
@@ -182,6 +216,16 @@ export default function Trade() {
         },
         [activeTab],
     );
+
+    useEffect(() => {
+        const handler = () => switchTab('order');
+        window.addEventListener('trade:nav:trade', handler as EventListener);
+        return () =>
+            window.removeEventListener(
+                'trade:nav:trade',
+                handler as EventListener,
+            );
+    }, [switchTab]);
 
     useEffect(() => {
         const keydownHandler = (e: KeyboardEvent) => {
@@ -589,13 +633,21 @@ export default function Trade() {
 
     const MobileTabNavigation = useMemo(() => {
         return (
-            <div className={styles.mobileTabNav} id='mobileTradeTabs'>
-                <div className={styles.mobileTabBtns}>
+            <nav
+                className={`${styles.mobileTabNav} `}
+                id='mobileTradeTabs'
+                aria-label={t('aria.mobileTradeNavigation', 'Trade navigation')}
+            >
+                <div className={styles.mobileTabBtns} role='tablist'>
                     {tabList.map(({ key, label }) => {
                         if (key !== 'positions') {
                             return (
                                 <button
                                     key={key}
+                                    id={`mobile-${key}-tab`}
+                                    role='tab'
+                                    aria-selected={activeTab === key}
+                                    aria-controls={`mobile-${key}-panel`}
                                     className={`${styles.mobileTabBtn} ${activeTab === key ? styles.active : ''}`}
                                     onClick={handleTabClick(key)}
                                 >
@@ -612,6 +664,10 @@ export default function Trade() {
                                 className={styles.posTabWrap}
                             >
                                 <button
+                                    id='mobile-positions-tab'
+                                    role='tab'
+                                    aria-selected={activeTab === 'positions'}
+                                    aria-controls='mobile-positions-panel'
                                     aria-haspopup='listbox'
                                     aria-expanded={positionsMenuOpen}
                                     className={`${styles.mobileTabBtn} ${activeTab === 'positions' ? styles.active : ''} ${styles.posTabBtn}`}
@@ -627,6 +683,7 @@ export default function Trade() {
                                         width='14'
                                         height='14'
                                         viewBox='0 0 24 24'
+                                        aria-hidden='true'
                                     >
                                         <path
                                             d='M7 10l5 5 5-5'
@@ -660,7 +717,7 @@ export default function Trade() {
                                                         switchTab('positions');
                                                 }}
                                             >
-                                                {MOBILE_VIEW_LABELS[opt]}
+                                                {t(opt)}
                                             </button>
                                         ))}
                                     </div>
@@ -669,9 +726,10 @@ export default function Trade() {
                         );
                     })}
                 </div>
-            </div>
+            </nav>
         );
     }, [
+        t,
         activeTab,
         handleTabClick,
         tabList,
@@ -719,6 +777,134 @@ export default function Trade() {
         PortfolioModalsRenderer,
         isAnyPortfolioModalOpen,
     } = usePortfolioModals();
+
+    useEffect(() => {
+        if (
+            isAnyPortfolioModalOpen ||
+            isKeyboardShortcutsOpen ||
+            !tradingKeyboardShortcutsEnabled
+        )
+            return;
+
+        const shouldIgnoreDueToTyping = (target: HTMLElement | null) => {
+            if (!target) return false;
+
+            const isOptedInField = !!target.closest?.(
+                '[data-allow-keyboard-shortcuts="true"]',
+            );
+            if (isOptedInField) return false;
+
+            if (target.tagName === 'TEXTAREA' || target.isContentEditable) {
+                return true;
+            }
+
+            if (target.tagName === 'INPUT') {
+                const input = target as HTMLInputElement;
+                const isNumericInput = input.inputMode === 'numeric';
+                return !isNumericInput;
+            }
+
+            return false;
+        };
+
+        const focusById = (id: string) => {
+            const el = document.getElementById(id) as HTMLInputElement | null;
+            el?.focus();
+            el?.select?.();
+        };
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement | null;
+            if (shouldIgnoreDueToTyping(target)) return;
+
+            const categories = getKeyboardShortcutCategories(t);
+            const buyShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.buy',
+            );
+            const sellShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.sell',
+            );
+            const marketShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.market',
+            );
+            const limitShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.limit',
+            );
+            const marketCloseShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.marketClose',
+            );
+
+            const isRelevantShortcut =
+                (!!buyShortcut && matchesShortcutEvent(e, buyShortcut.keys)) ||
+                (!!sellShortcut &&
+                    matchesShortcutEvent(e, sellShortcut.keys)) ||
+                (!!marketShortcut &&
+                    matchesShortcutEvent(e, marketShortcut.keys)) ||
+                (!!limitShortcut &&
+                    matchesShortcutEvent(e, limitShortcut.keys)) ||
+                (!!marketCloseShortcut &&
+                    matchesShortcutEvent(e, marketCloseShortcut.keys));
+
+            if (!isRelevantShortcut) return;
+
+            if (buyShortcut && matchesShortcutEvent(e, buyShortcut.keys)) {
+                e.preventDefault();
+                setTradeDirection('buy');
+                focusById('trade-module-size-input');
+                return;
+            }
+
+            if (sellShortcut && matchesShortcutEvent(e, sellShortcut.keys)) {
+                e.preventDefault();
+                setTradeDirection('sell');
+                focusById('trade-module-size-input');
+                return;
+            }
+
+            if (limitShortcut && matchesShortcutEvent(e, limitShortcut.keys)) {
+                e.preventDefault();
+                setMarketOrderType('limit');
+                return;
+            }
+
+            if (
+                marketShortcut &&
+                matchesShortcutEvent(e, marketShortcut.keys)
+            ) {
+                e.preventDefault();
+                setMarketOrderType('market');
+                setTimeout(() => focusById('trade-module-size-input'), 0);
+                return;
+            }
+
+            if (
+                marketCloseShortcut &&
+                matchesShortcutEvent(e, marketCloseShortcut.keys)
+            ) {
+                if (!currentMarketPosition) return;
+                e.preventDefault();
+                marketCloseModalCtrl.open();
+                return;
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [
+        isAnyPortfolioModalOpen,
+        isKeyboardShortcutsOpen,
+        tradingKeyboardShortcutsEnabled,
+        setMarketOrderType,
+        setTradeDirection,
+        t,
+        currentMarketPosition,
+        marketCloseModalCtrl,
+    ]);
 
     const isTableCollapsed = () => {
         const available = getAvailable();
@@ -778,64 +964,91 @@ export default function Trade() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.18 }}
+                className={styles.mobileOuterContainer}
             >
-                <TradeRouteHandler />
-                <WebDataConsumer />
-                <div className={styles.symbolInfoContainer}>
-                    <MemoizedSymbolInfo />
-                </div>
-                {MobileTabNavigation}
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'order' ? 'block' : 'none',
-                    }}
-                >
-                    {(activeTab === 'order' ||
-                        visibilityRefs.current.order) && (
-                        <OrderInput
-                            marginBucket={marginBucket}
-                            isAnyPortfolioModalOpen={isAnyPortfolioModalOpen}
-                        />
-                    )}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'chart' ? 'block' : 'none',
-                    }}
-                >
-                    {(activeTab === 'chart' ||
-                        visibilityRefs.current.chart) && (
-                        <MemoizedTradingViewWrapper />
-                    )}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
-                    style={{ display: activeTab === 'book' ? 'block' : 'none' }}
-                >
-                    {activeTab === 'book' && mobileOrderBookView}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'recent' ? 'block' : 'none',
-                    }}
-                >
-                    {activeTab === 'recent' && mobileRecentTradesView}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobilePositions} ${activeTab === 'positions' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'positions' ? 'block' : 'none',
-                    }}
-                >
-                    {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
-                    {(activeTab === 'positions' ||
-                        visibilityRefs.current.positions) && (
-                        <MemoizedTradeTable mobileExternalSwitcher />
-                    )}
-                </div>
+                <ObTradeDataSyncProvider>
+                    <TradeRouteHandler />
+                    <WebDataConsumer />
+                    <div className={styles.symbolInfoContainer}>
+                        {useSymbolInfoMobile ? (
+                            <MemoizedSymbolInfoMobile />
+                        ) : (
+                            <MemoizedSymbolInfo />
+                        )}
+                    </div>
+                    {MobileTabNavigation}
+                    <div
+                        id='mobile-order-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-order-tab'
+                        className={`${styles.mobileSection} ${isFogoPresale ? styles.mobileSectionMin : styles.mobileSectionMax} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'order' ? 'block' : 'none',
+                        }}
+                    >
+                        {(activeTab === 'order' ||
+                            visibilityRefs.current.order) && (
+                            <OrderInput
+                                marginBucket={marginBucket}
+                                isAnyPortfolioModalOpen={
+                                    isAnyPortfolioModalOpen
+                                }
+                            />
+                        )}
+                    </div>
+                    <div
+                        id='mobile-chart-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-chart-tab'
+                        className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'chart' ? 'block' : 'none',
+                        }}
+                    >
+                        {(activeTab === 'chart' ||
+                            visibilityRefs.current.chart) && (
+                            <MemoizedTradingViewWrapper />
+                        )}
+                    </div>
+                    <div
+                        id='mobile-book-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-book-tab'
+                        className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'book' ? 'block' : 'none',
+                        }}
+                    >
+                        {activeTab === 'book' && mobileOrderBookView}
+                    </div>
+                    <div
+                        id='mobile-recent-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-recent-tab'
+                        className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'recent' ? 'block' : 'none',
+                        }}
+                    >
+                        {activeTab === 'recent' && mobileRecentTradesView}
+                    </div>
+                    <div
+                        id='mobile-positions-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-positions-tab'
+                        className={`${styles.mobileSection} ${styles.mobilePositions} ${activeTab === 'positions' ? styles.active : ''}`}
+                        style={{
+                            display:
+                                activeTab === 'positions' ? 'block' : 'none',
+                        }}
+                    >
+                        {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
+                        {(activeTab === 'positions' ||
+                            visibilityRefs.current.positions) && (
+                            <MemoizedTradeTable mobileExternalSwitcher />
+                        )}
+                    </div>
+                </ObTradeDataSyncProvider>
             </motion.div>
         );
     }
@@ -843,6 +1056,12 @@ export default function Trade() {
         <>
             <TradeRouteHandler />
             <WebDataConsumer />
+            {marketCloseModalCtrl.isOpen && currentMarketPosition && (
+                <MarketCloseModal
+                    close={marketCloseModalCtrl.close}
+                    position={currentMarketPosition}
+                />
+            )}
             {symbol && (
                 <motion.div
                     key='trade-hydrated'
@@ -1178,9 +1397,25 @@ export default function Trade() {
                             }}
                         >
                             {isWalletCollapsed ? (
-                                <div className={styles.walletCollapsedHeader}>
-                                    <span>Account Overview</span>
-                                </div>
+                                <button
+                                    className={styles.walletCollapsedHeader}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        expandWalletToDefault();
+                                    }}
+                                    aria-label={t(
+                                        'aria.expandWallet',
+                                        'Expand wallet',
+                                    )}
+                                    aria-expanded={false}
+                                >
+                                    <span>
+                                        {t(
+                                            'accountOverview.heading',
+                                            'Account Overview',
+                                        )}
+                                    </span>
+                                </button>
                             ) : (
                                 <DepositDropdown
                                     marginBucket={marginBucket}
@@ -1202,12 +1437,9 @@ export default function Trade() {
                             }}
                             aria-label={
                                 isWalletCollapsed
-                                    ? t?.(
-                                          'portfolio.expandWallet',
-                                          'Expand wallet',
-                                      )
+                                    ? t?.('aria.expandWallet', 'Expand wallet')
                                     : t?.(
-                                          'portfolio.collapseWallet',
+                                          'aria.collapseWallet',
                                           'Collapse wallet',
                                       )
                             }

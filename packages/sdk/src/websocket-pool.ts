@@ -125,7 +125,13 @@ export class WebSocketPool {
         subscription: Subscription,
     ): WebSocketInstance | undefined {
         if (this.useMarketOnly) {
-            return this.sockets.get('market');
+            // Try market socket first, fall back to user socket if market doesn't exist
+            const marketSocket = this.sockets.get('market');
+            if (marketSocket) {
+                return marketSocket;
+            }
+            // Fallback to user socket when market socket is not available
+            return this.sockets.get('user');
         }
 
         const channelType = subscription.type;
@@ -141,8 +147,8 @@ export class WebSocketPool {
             return this.sockets.get(socketType);
         }
 
-        // If no mapping found, default to market socket if available
-        return this.sockets.get('market');
+        // If no mapping found, try market socket first, then user socket
+        return this.sockets.get('market') || this.sockets.get('user');
     }
 
     /**

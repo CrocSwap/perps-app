@@ -12,8 +12,24 @@
 }
 
 .container header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-xl, 36px);
+}
+
+.container header > button {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    border: 1px solid var(--bg-dark3);
+    align-self: center;
+    padding: var(--padding-xs);
 }
 
 .container header p {
@@ -53,7 +69,7 @@
 .tableContainer {
     /* grid, but no fixed height; let it grow */
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 2fr 3fr 1fr;
     gap: var(--gap-s);
     /* removed fixed heights */
     min-height: 0; /* critical for scrollable children */
@@ -66,7 +82,7 @@
 }
 
 /* ========= Tablet (<=1024px) ========= */
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
     .container {
         padding-left: clamp(16px, 4vw, 28px);
         padding-right: clamp(16px, 4vw, 28px);
@@ -85,14 +101,19 @@
         letter-spacing: -0.01em;
     }
 
+    .container header > button {
+        display: flex;
+    }
+
     .container header p {
         font-size: clamp(13px, 2.6vw, 16px);
         line-height: 1.5;
     }
 
     .detailsContainer {
-        gap: clamp(16px, 4vw, 24px);
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 2fr 3fr;
+        gap: clamp(16px, 4vw, var(--gap-m));
         min-height: 0;
     }
 
@@ -100,10 +121,10 @@
         padding: clamp(10px, 2.8vw, 14px) clamp(12px, 3.2vw, 16px);
         border: 1px solid color-mix(in oklab, #ffffff 12%, transparent);
         border-radius: 16px;
-        background: color-mix(in oklab, #141420 88%, #1c1c2a 12%);
+        background-color: var(--bg-dark2);
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-        min-width: min(46%, 340px);
-        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
         min-height: 0;
     }
 
@@ -122,17 +143,17 @@
     }
 
     .tableContainer {
-        grid-template-columns: 1fr 2fr;
+        grid-template-columns: 2fr 3fr;
         gap: clamp(10px, 2.8vw, 16px);
-        /* no height/max-height here */
         min-height: 0;
     }
 
     /* Panels behave and can scroll inside */
     .tableContainer > div {
+        grid: 2fr 3fr 1fr;
         border: 1px solid color-mix(in oklab, #ffffff 12%, transparent);
         border-radius: 16px;
-        background: color-mix(in oklab, #0f0f18 90%, #161622 10%);
+        background-color: var(--bg-dark2);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -237,7 +258,6 @@
         padding: 8px 10px;
         border-radius: 12px;
         border: 1px solid color-mix(in oklab, #ffffff 10%, transparent);
-        background: color-mix(in oklab, #0f0f18 92%, #161622 8%);
         box-shadow: none;
         gap: 4px;
         min-height: auto;

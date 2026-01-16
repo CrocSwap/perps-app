@@ -11,7 +11,7 @@ import {
     type NotificationStoreIF,
     useNotificationStore,
 } from '~/stores/NotificationStore';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FaChevronLeft } from 'react-icons/fa';
 import { t } from 'i18next';
 
@@ -81,9 +81,6 @@ export default function CreateStrategy(props: propsT) {
 
     const params = useParams();
 
-    // TODO:    write a function to validate inputs on change and
-    // TODO:    ... and enable disable the CTA accordingly
-
     // logic to dispatch a notification for sub-account creation
     const notifications: NotificationStoreIF = useNotificationStore();
     // state data for subaccounts
@@ -101,6 +98,18 @@ export default function CreateStrategy(props: propsT) {
     const [side, setSide] = useState(strategy.side);
     const [totalSize, setTotalSize] = useState(strategy.totalSize);
     const [orderSize, setOrderSize] = useState(strategy.orderSize);
+
+    const isValid = useMemo(() => {
+        if (!name || name.trim() === '') return false;
+        if (!market || market.trim() === '') return false;
+        if (!distance || isNaN(Number(distance)) || Number(distance) <= 0)
+            return false;
+        if (!totalSize || isNaN(Number(totalSize)) || Number(totalSize) <= 0)
+            return false;
+        if (!orderSize || isNaN(Number(orderSize)) || Number(orderSize) <= 0)
+            return false;
+        return true;
+    }, [name, market, distance, totalSize, orderSize]);
 
     return (
         <div className={styles.create_strategy_page}>
@@ -232,6 +241,7 @@ export default function CreateStrategy(props: propsT) {
                                 }}
                                 size={100}
                                 selected
+                                disabled={!isValid}
                             >
                                 {page === 'new' && t('common.create')}
                                 {page === 'edit' && t('common.update')}

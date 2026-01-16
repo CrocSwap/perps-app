@@ -90,6 +90,10 @@
     border-color: var(--accent1);
 }
 
+.fogo_presale {
+    background: #c3fba5 !important;
+}
+
 /* Full width banner styles */
 .bottomFull.update {
     background: linear-gradient(

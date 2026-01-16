@@ -6,7 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 const appName = 'Ambient Perps';
 const appDescription = 'A modern, performant app for perpetual contracts.';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     // Optimize dependency pre-bundling
     optimizeDeps: {
         include: [
@@ -87,45 +87,80 @@ export default defineConfig({
         tsconfigPaths(),
         VitePWA({
             registerType: 'autoUpdate',
+            injectRegister: 'script',
             workbox: {
                 maximumFileSizeToCacheInBytes: 5_000_000,
-                globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
-                // Don't cache large chunks or service worker itself
-                globIgnores: ['**/sw.js', '**/workbox-*.js'],
-                // Runtime caching strategies
+                // Precache JS, CSS, images, and fonts for offline support
+                globPatterns:
+                    mode === 'development'
+                        ? []
+                        : ['**/*.{js,css,png,svg,woff2,ttf}'],
+                // Don't cache service worker files or manifest
+                globIgnores: [
+                    '**/sw.js',
+                    '**/workbox-*.js',
+                    '**/registerSW.js',
+                    '**/manifest.webmanifest',
+                ],
+                // Enable offline navigation fallback to index.html
+                navigateFallback: '/index.html',
+                // Only use fallback for same-origin navigation requests (not API calls)
+                navigateFallbackDenylist: [/^\/api/, /^\/ws/, /\.json$/],
+                // Skip waiting and claim clients immediately on update
+                skipWaiting: true,
+                clientsClaim: true,
+                // Clean up old caches
+                cleanupOutdatedCaches: true,
                 runtimeCaching: [
+                    // Cache index.html with NetworkFirst for offline support
                     {
-                        urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-                        handler: 'CacheFirst',
+                        urlPattern: ({ request, url }) =>
+                            request.mode === 'navigate' &&
+                            url.origin === self.location.origin,
+                        handler: 'NetworkFirst',
                         options: {
-                            cacheName: 'google-fonts-cache',
+                            cacheName: 'html-cache',
+                            networkTimeoutSeconds: 3,
                             expiration: {
                                 maxEntries: 10,
-                                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-                            },
-                            cacheableResponse: {
-                                statuses: [0, 200],
+                                maxAgeSeconds: 24 * 60 * 60, // 1 day
                             },
                         },
                     },
+                    // Cache images with StaleWhileRevalidate
                     {
-                        urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+                        urlPattern: ({ url }) =>
+                            url.origin === self.location.origin &&
+                            url.pathname.startsWith('/images/'),
+                        handler: 'StaleWhileRevalidate',
+                        options: {
+                            cacheName: 'image-cache',
+                            expiration: {
+                                maxEntries: 100,
+                                maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+                            },
+                        },
+                    },
+                    // Cache fonts with CacheFirst (they rarely change)
+                    {
+                        urlPattern: ({ url }) =>
+                            url.origin === self.location.origin &&
+                            url.pathname.startsWith('/fonts/'),
                         handler: 'CacheFirst',
                         options: {
-                            cacheName: 'gstatic-fonts-cache',
+                            cacheName: 'font-cache',
                             expiration: {
-                                maxEntries: 10,
-                                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-                            },
-                            cacheableResponse: {
-                                statuses: [0, 200],
+                                maxEntries: 20,
+                                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
                             },
                         },
                     },
                 ],
             },
             devOptions: {
-                enabled: process.env.NODE_ENV === 'development',
+                enabled:
+                    mode === 'development' &&
+                    process.env.VITE_PWA_DEV === 'true',
             },
             manifest: {
                 name: appName,
@@ -164,4 +199,4 @@ export default defineConfig({
             },
         }),
     ],
-});
+}));

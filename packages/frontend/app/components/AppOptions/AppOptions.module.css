@@ -20,6 +20,11 @@
     z-index: var(--base-z-idx-app-options);
 }
 
+.footer_container {
+    min-width: 0;
+    background: transparent;
+}
+
 /* <header> section of the options element */
 .app_options > header {
     display: flex;
@@ -42,18 +47,62 @@
     height: var(--divider-height);
     background-color: var(--bg-dark6);
 }
+.actions_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 2rem; /* prevents layout shift */
+}
+.change_applied {
+    animation: fadeInOut 2s ease-in-out;
+}
+.actions_container button {
+    background: var(--accent-1);
+    border-radius: 0.375rem !important;
+    cursor: pointer !important;
+}
+.actions_container button:hover {
+    background-color: color-mix(in srgb, var(--accent1) 90%, black);
+}
 
-/* clickable to apply default settings at bottom of screen */
-.apply_defaults {
-    align-self: center;
+.shortcutsLinkRow {
+    display: flex;
+    justify-content: center;
+}
+
+.shortcutsLink {
+    background: transparent;
+    border: none;
+    padding: 0;
     cursor: pointer;
-    font-size: var(--font-size-m);
-    color: var(--accent1);
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    text-decoration: underline;
+}
+
+.shortcutsLink:hover {
+    color: var(--text1);
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }
 
 @media (max-width: 768px) {
     .app_options {
         width: auto;
         max-width: 100%;
+        padding: var(--padding-s) var(--padding-m) 0;
     }
 }

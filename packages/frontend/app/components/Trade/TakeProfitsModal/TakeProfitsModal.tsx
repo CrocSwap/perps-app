@@ -411,6 +411,7 @@ export default function TakeProfitsModal(props: PropIF) {
                             }}
                         />
                     </div>
+
                     <div className={styles.inputWithDropdown}>
                         <label htmlFor='takeProfitGainInput'>Gain</label>
                         <input
@@ -478,6 +479,7 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
+
                 <span className={styles.expectedProfitText}>
                     {takeProfitGain ? (
                         <>
@@ -491,7 +493,11 @@ export default function TakeProfitsModal(props: PropIF) {
                                 ? '...'
                                 : tpGainCurrency === '%'
                                   ? `$${Math.abs(expectedProfit).toFixed(2)}`
-                                  : `${pctFromDollars(Math.abs(expectedProfit), markPrice, effectivePositionQuantity).toFixed(3)}%`}
+                                  : `${pctFromDollars(
+                                        Math.abs(expectedProfit),
+                                        markPrice,
+                                        effectivePositionQuantity,
+                                    ).toFixed(3)}%`}
                         </>
                     ) : (
                         ''
@@ -586,17 +592,27 @@ export default function TakeProfitsModal(props: PropIF) {
                         />
                     </div>
                 </div>
+
                 <span className={styles.expectedProfitText}>
                     {stopLossLoss ? (
                         <>
-                            {`${expectedLoss && expectedLoss < 0 ? 'Expected Profit' : 'Expected Loss'}: `}
+                            {`${
+                                expectedLoss && expectedLoss < 0
+                                    ? 'Expected Profit'
+                                    : 'Expected Loss'
+                            }: `}
                             {expectedLoss == null ||
                             !markPrice ||
                             !effectivePositionQuantity
                                 ? '...'
                                 : slLossCurrency === '%'
                                   ? `$${Math.abs(expectedLoss).toFixed(2)}`
-                                  : `${((Math.abs(expectedLoss) / (markPrice * effectivePositionQuantity)) * 100).toFixed(3)}%`}
+                                  : `${(
+                                        (Math.abs(expectedLoss) /
+                                            (markPrice *
+                                                effectivePositionQuantity)) *
+                                        100
+                                    ).toFixed(3)}%`}
                         </>
                     ) : (
                         ''
@@ -709,7 +725,9 @@ export default function TakeProfitsModal(props: PropIF) {
 
             {/* Confirm */}
             <button
-                className={`${styles.confirmButton} ${!isFormValid ? styles.disabled : ''}`}
+                className={`${styles.confirmButton} ${
+                    !isFormValid ? styles.disabled : ''
+                }`}
                 onClick={handleConfirm}
                 disabled={!isFormValid}
             >

@@ -1,3 +1,4 @@
+import { DFLT_EMBER_MARKET } from '@crocswap-libs/ambient-ember';
 import {
     isEstablished,
     useConnection,
@@ -69,7 +70,7 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
                 sessionState.walletPublicKey || sessionState.sessionPublicKey;
 
             // Get marketId from TradeDataStore (default to BTC market if not available)
-            const marketId = BigInt(64); // TODO: Get from TradeDataStore when available
+            const marketId = BigInt(DFLT_EMBER_MARKET.mktId); // TODO: Get from TradeDataStore when available
 
             // Try session key first (as that's what's used for transactions)
             let balance = await withdrawService.getAvailableWithdrawBalance(

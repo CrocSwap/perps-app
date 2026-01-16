@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import type { VaultDepositorSortBy } from '~/utils/VaultIFs';
@@ -23,31 +24,31 @@ export default function OpenOrdersTableHeader({
 }: VaultDepositorsTableHeaderProps) {
     const tableHeaders: HeaderCell[] = [
         {
-            name: 'Depositor',
+            name: t('tradeTable.depositor'),
             key: 'user',
             sortable: true,
             className: styles.timeCell,
         },
         {
-            name: 'Vault Amount',
+            name: t('tradeTable.vaultAmount'),
             key: 'vaultEquity',
             sortable: true,
             className: styles.typeCell,
         },
         {
-            name: 'Unrealized PnL',
+            name: t('tradeTable.unrealizedPnl'),
             key: 'pnl',
             sortable: true,
             className: styles.coinCell,
         },
         {
-            name: 'All Time PnL',
+            name: t('tradeTable.allTimePnl'),
             key: 'allTimePnl',
             sortable: true,
             className: styles.directionCell,
         },
         {
-            name: 'Days Following',
+            name: t('tradeTable.daysFollowing'),
             key: 'daysFollowing',
             sortable: true,
             className: styles.sizeCell,

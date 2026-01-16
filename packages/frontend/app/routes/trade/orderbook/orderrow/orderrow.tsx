@@ -26,6 +26,7 @@ interface OrderRowProps {
         addPlusSignIfPositive?: boolean,
     ) => string;
     getBsColor: () => colorSetIF;
+    obFocusedSlotPrice?: number;
 }
 
 export enum OrderRowClickTypes {
@@ -42,6 +43,7 @@ const OrderRow: React.FC<OrderRowProps> = ({
     clickListener,
     formatNum,
     getBsColor,
+    obFocusedSlotPrice,
 }) => {
     const { setTradeSlot } = useTradeModuleStore();
 
@@ -88,7 +90,7 @@ const OrderRow: React.FC<OrderRowProps> = ({
     return (
         <div
             id={`order-row-${order.px}`}
-            className={`${styles.orderRow} ${userSlots.has(formattedPrice) ? styles.userOrder : ''}`}
+            className={`${styles.orderRow} ${userSlots.has(formattedPrice) ? styles.userOrder : ''} ${obFocusedSlotPrice === order.px ? styles.focused : ''}`}
             onClick={handleRowClick}
         >
             {userSlots.has(formattedPrice) && (

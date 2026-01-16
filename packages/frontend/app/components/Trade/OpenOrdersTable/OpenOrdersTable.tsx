@@ -1,11 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
+import { EXTERNAL_PAGE_URL_PREFIX, getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import type {
     OrderDataIF,
@@ -14,7 +14,7 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 interface OpenOrdersTableProps {
     data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
@@ -22,14 +22,22 @@ interface OpenOrdersTableProps {
     selectedFilter?: string;
     isFetched: boolean;
     pageMode?: boolean;
+    onClearFilter?: () => void;
 }
 
 export default function OpenOrdersTable(props: OpenOrdersTableProps) {
-    const { onCancel, selectedFilter, isFetched, pageMode, data } = props;
+    const {
+        onCancel,
+        selectedFilter,
+        isFetched,
+        pageMode,
+        data,
+        onClearFilter,
+    } = props;
     const [isCancellingAll, setIsCancellingAll] = useState(false);
     const { executeCancelOrder } = useCancelOrderService();
     const { formatNum } = useNumFormatter();
-
+    const { t, i18n } = useTranslation();
     const notifications = useNotificationStore();
 
     const handleCancel = (time: number, coin: string) => {
@@ -180,9 +188,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 ),
                                 icon: 'check',
                                 removeAfter: 5000,
-                                txLink: successOrderSignature
-                                    ? `${blockExplorer}/tx/${successOrderSignature}`
-                                    : undefined,
+                                txLink: getTxLink(successOrderSignature),
                             });
                         }
                     });
@@ -208,9 +214,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         }),
                         icon: 'check',
                         removeAfter: 5000,
-                        txLink: successOrderSignature
-                            ? `${blockExplorer}/tx/${successOrderSignature}`
-                            : undefined,
+                        txLink: getTxLink(successOrderSignature),
                     });
                 }
             } else {
@@ -250,9 +254,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         ),
                         icon: 'error',
                         removeAfter: 8000,
-                        txLink: failedOrderSignature
-                            ? `${blockExplorer}/tx/${failedOrderSignature}`
-                            : undefined,
+                        txLink: getTxLink(failedOrderSignature),
                     });
                 } else {
                     notifications.remove(slug);
@@ -274,9 +276,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         message: `${t('transactions.cancelAllFailed.message')} ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
                         icon: 'error',
                         removeAfter: 8000,
-                        txLink: failedOrderSignature
-                            ? `${blockExplorer}/tx/${failedOrderSignature}`
-                            : undefined,
+                        txLink: getTxLink(failedOrderSignature),
                     });
                 }
             }
@@ -297,12 +297,8 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         }
     };
 
-    const { userAddress } = useUserDataStore();
-
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
-
     const { symbol } = useTradeDataStore();
+    const { userAddress } = useUserDataStore();
 
     const filteredOrders = useMemo(() => {
         if (!selectedFilter) {
@@ -327,11 +323,30 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         return `${EXTERNAL_PAGE_URL_PREFIX}/openOrders/${userAddress}`;
     }, [userAddress]);
 
+    const noDataMessage = useMemo(() => {
+        switch (selectedFilter) {
+            case 'active':
+                return t('transactions.noOpenOrdersForMarket', { symbol });
+            case 'long':
+                return t('transactions.noOpenLongOrders');
+            case 'short':
+                return t('transactions.noOpenShortOrders');
+            default:
+                return t('transactions.noOpenOrders');
+        }
+    }, [selectedFilter, symbol, i18n.language]);
+
+    const showClearFilter = selectedFilter && selectedFilter !== 'all';
+
     return (
         <>
             <GenericTable
-                noDataMessage={t('transactions.noOpenOrders')}
-                storageKey={`OpenOrdersTable_${currentUserRef.current}`}
+                noDataMessage={noDataMessage}
+                noDataActionLabel={
+                    showClearFilter ? t('common.clearFilter') : undefined
+                }
+                onNoDataAction={showClearFilter ? onClearFilter : undefined}
+                storageKey='OpenOrdersTable'
                 data={filteredOrders}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <OpenOrdersTableHeader

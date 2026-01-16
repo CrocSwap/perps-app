@@ -99,12 +99,6 @@ export const SdkProvider: React.FC<{
     }, [isClient, environment, marketEndpoint, userEndpoint]);
 
     useEffect(() => {
-        if (info) {
-            info.setUseMarketOnly(isDebugWalletActive);
-        }
-    }, [isDebugWalletActive]);
-
-    useEffect(() => {
         if (SHOULD_LOG_ANALYTICS) return;
         console.log('>>> useSdk | marketEndpoint', marketEndpoint);
         console.log('>>> useSdk | userEndpoint', userEndpoint);
@@ -169,6 +163,12 @@ export const SdkProvider: React.FC<{
             info?.wsManager?.reInit(stashedSubs.current);
         }
     }, [isClient, info]);
+
+    useEffect(() => {
+        if (info) {
+            info.setUseMarketOnly(isDebugWalletActive);
+        }
+    }, [isDebugWalletActive]);
 
     useEffect(() => {
         if (!isClient) return;

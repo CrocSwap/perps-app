@@ -1,6 +1,6 @@
 export function meta() {
     return [
-        { title: 'Pro | Ambient' },
+        { title: 'Pro | Ambient Finance' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }

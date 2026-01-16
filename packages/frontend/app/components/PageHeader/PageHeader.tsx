@@ -4,6 +4,8 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useRef, useState } from 'react';
+import { Fuul } from '@fuul/sdk';
+import { useFuul } from '~/contexts/FuulContext';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
 // import {
 //     DFLT_EMBER_MARKET,
@@ -12,7 +14,7 @@ import { useEffect, useRef, useState } from 'react';
 // } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation, useSearchParams } from 'react-router';
+import { Link, useLocation, useSearchParams, useNavigate } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import useMediaQuery, { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -24,7 +26,7 @@ import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
-import HelpDropdown from './HelpDropdown/HelpDropdown';
+// import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
@@ -33,42 +35,82 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
+import {
+    URL_PARAMS,
+    useUrlParams,
+    type UrlParamMethodsIF,
+} from '~/hooks/useURLParams';
+import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
+import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
+import AnnouncementBannerHost from '../AnnouncementBanner/AnnouncementBannerHost';
+import { ACTIVE_ANNOUNCEMENT_BANNER } from '~/utils/Constants';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import {
+    getKeyboardShortcutById,
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 export default function PageHeader() {
     // Feedback modal state
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
+    // run the FUUL context
+    const { trackPageView } = useFuul();
+
     const handleFeedbackClose = () => {
         setIsFeedbackOpen(false);
     };
-    // logic to read a URL referral code and set in state + local storage
-    const [searchParams] = useSearchParams();
+
+    const referralCodeFromURL: UrlParamMethodsIF = useUrlParams(
+        URL_PARAMS.referralCode,
+    );
+
     const userDataStore = useUserDataStore();
+
+    const referralStore = useReferralStore();
     const { t } = useTranslation();
-    useEffect(() => {
-        const REFERRAL_CODE_URL_PARAM = 'referral';
-        const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
-        const referralCode =
-            searchParams.get(REFERRAL_CODE_URL_PARAM) ||
-            searchParams.get(ALTERNATE_REFERRAL_CODE_URL_PARAM);
-        if (referralCode) {
-            userDataStore.setReferralCode(referralCode);
-            const newSearchParams = new URLSearchParams(
-                searchParams.toString(),
-            );
-            newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
-            newSearchParams.delete(ALTERNATE_REFERRAL_CODE_URL_PARAM);
-            const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
-            window.history.replaceState({}, '', newUrl); // remove referral code from URL
-        }
-    }, [searchParams]);
 
     const sessionState = useSession();
 
     const isUserConnected = isEstablished(sessionState);
 
+    // Fetch user's total volume for FUUL tracking
+    useEffect(() => {
+        const affiliateAddress = userDataStore.userAddress;
+        if (!affiliateAddress) {
+            return;
+        }
+
+        (async () => {
+            try {
+                const EMBER_ENDPOINT_ALL =
+                    'https://ember-leaderboard-v2.liquidity.tools/user';
+                const emberEndpointForUser =
+                    EMBER_ENDPOINT_ALL + '/' + affiliateAddress.toString();
+
+                const response = await fetch(emberEndpointForUser);
+                const data = await response.json();
+                if (data.error) {
+                    referralStore.setTotVolume(0);
+                } else if (data.stats) {
+                    const volume = data.stats.total_volume;
+                    referralStore.setTotVolume(volume);
+                }
+            } catch (error) {
+                referralStore.setTotVolume(NaN);
+            }
+        })();
+    }, [userDataStore.userAddress]);
+
+    const { isInitialized: isFuulInitialized } = useFuul();
+
     const sessionButtonRef = useRef<HTMLSpanElement>(null);
+    const { notifications, latestTx } = useNotificationStore();
+    const { navigationKeyboardShortcutsEnabled } = useAppSettings();
 
     useEffect(() => {
         const button = sessionButtonRef.current;
@@ -90,11 +132,11 @@ export default function PageHeader() {
     // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
-    const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
+    // const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
     const [isRpcDropdownOpen, setIsRpcDropdownOpen] = useState(false);
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
-    const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
+    // const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
     const showRPCButton = false;
     const location = useLocation();
 
@@ -125,9 +167,9 @@ export default function PageHeader() {
     const mobileNavbarRef = useOutsideClick<HTMLDivElement>(() => {
         setIsMenuOpen(false);
     }, isMenuOpen);
-    const walletMenuRef = useOutsideClick<HTMLDivElement>(() => {
-        setIsWalletMenuOpen(false);
-    }, isWalletMenuOpen);
+    // const walletMenuRef = useOutsideClick<HTMLDivElement>(() => {
+    //     setIsWalletMenuOpen(false);
+    // }, isWalletMenuOpen);
     const rpcMenuRef = useOutsideClick<HTMLDivElement>(() => {
         setIsRpcDropdownOpen(false);
     }, isRpcDropdownOpen);
@@ -139,12 +181,14 @@ export default function PageHeader() {
         setIsMoreDropdownOpen(false);
     }, isMoreDropdownOpen);
 
-    const helpDropdownRef = useOutsideClick<HTMLDivElement>(() => {
-        setIsHelpDropdownOpen(false);
-    }, isHelpDropdownOpen);
+    // const helpDropdownRef = useOutsideClick<HTMLDivElement>(() => {
+    //     setIsHelpDropdownOpen(false);
+    // }, isHelpDropdownOpen);
 
-    // logic to open and close the app settings modal
+    // logic to open and close modals
     const appSettingsModal = useModal('closed');
+    const openAppSettingsModalRef = useRef(appSettingsModal.open);
+    openAppSettingsModalRef.current = appSettingsModal.open;
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -152,8 +196,8 @@ export default function PageHeader() {
         () => {
             setIsDepositDropdownOpen(false);
             setIsRpcDropdownOpen(false);
-            setIsWalletMenuOpen(false);
-            setIsHelpDropdownOpen(false);
+            // setIsWalletMenuOpen(false);
+            // setIsHelpDropdownOpen(false);
             setIsMoreDropdownOpen(false);
             setIsDropdownMenuOpen(false);
         },
@@ -164,8 +208,147 @@ export default function PageHeader() {
     const shortB = useMediaQuery('(max-width: 600px)');
     const isShortScreen: boolean = shortA || shortB;
 
-    const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
-        usePortfolioModals();
+    const {
+        openDepositModal,
+        openWithdrawModal,
+        PortfolioModalsRenderer,
+        isAnyPortfolioModalOpen,
+    } = usePortfolioModals();
+
+    const { isOpen: isKeyboardShortcutsOpen } = useKeyboardShortcuts();
+
+    useEffect(() => {
+        if (isKeyboardShortcutsOpen || isAnyPortfolioModalOpen) return;
+
+        const clickSessionButton = () => {
+            const wrapper = sessionButtonRef.current;
+            const el = wrapper?.querySelector(
+                'button, [role="button"]',
+            ) as HTMLElement | null;
+            el?.click();
+        };
+
+        const shouldIgnoreDueToTyping = (target: HTMLElement | null) => {
+            if (!target) return false;
+
+            const isOptedInField = !!target.closest?.(
+                '[data-allow-keyboard-shortcuts="true"]',
+            );
+            if (isOptedInField) return false;
+
+            if (target.tagName === 'TEXTAREA' || target.isContentEditable) {
+                return true;
+            }
+
+            if (target.tagName === 'INPUT') {
+                const input = target as HTMLInputElement;
+                const isNumericInput = input.inputMode === 'numeric';
+                if (!isNumericInput) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement | null;
+            if (shouldIgnoreDueToTyping(target)) return;
+
+            const categories = getKeyboardShortcutCategories(t);
+            const settingsShortcut = getKeyboardShortcutById(
+                categories,
+                'settings.open',
+            );
+
+            if (
+                settingsShortcut &&
+                matchesShortcutEvent(e, settingsShortcut.keys)
+            ) {
+                e.preventDefault();
+                openAppSettingsModalRef.current();
+                return;
+            }
+            const connectWalletShortcut = getKeyboardShortcutById(
+                categories,
+                'wallet.connect',
+            );
+            const depositShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.deposit',
+            );
+            const withdrawShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.withdraw',
+            );
+            const latestTxShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.latestTx',
+            );
+
+            const isRelevantShortcut =
+                (!!connectWalletShortcut &&
+                    matchesShortcutEvent(e, connectWalletShortcut.keys)) ||
+                (!!depositShortcut &&
+                    matchesShortcutEvent(e, depositShortcut.keys)) ||
+                (!!withdrawShortcut &&
+                    matchesShortcutEvent(e, withdrawShortcut.keys)) ||
+                (!!latestTxShortcut &&
+                    matchesShortcutEvent(e, latestTxShortcut.keys));
+
+            if (!isRelevantShortcut) return;
+
+            if (!navigationKeyboardShortcutsEnabled) return;
+
+            if (
+                connectWalletShortcut &&
+                matchesShortcutEvent(e, connectWalletShortcut.keys)
+            ) {
+                e.preventDefault();
+                clickSessionButton();
+                return;
+            }
+
+            if (
+                latestTxShortcut &&
+                matchesShortcutEvent(e, latestTxShortcut.keys)
+            ) {
+                e.preventDefault();
+                const latest = latestTx;
+                if (latest?.txLink) {
+                    window.open(latest.txLink, '_blank', 'noopener,noreferrer');
+                }
+                return;
+            }
+
+            if (
+                depositShortcut &&
+                matchesShortcutEvent(e, depositShortcut.keys)
+            ) {
+                e.preventDefault();
+                openDepositModal();
+                return;
+            }
+
+            if (
+                withdrawShortcut &&
+                matchesShortcutEvent(e, withdrawShortcut.keys)
+            ) {
+                e.preventDefault();
+                openWithdrawModal();
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [
+        isAnyPortfolioModalOpen,
+        isKeyboardShortcutsOpen,
+        openDepositModal,
+        openWithdrawModal,
+        latestTx,
+        t,
+    ]);
 
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
@@ -202,15 +385,79 @@ export default function PageHeader() {
                 plausible('Session Ended');
             }
         }
+
         prevIsUserConnected.current = isUserConnected;
-    }, [isUserConnected]);
+    }, [isUserConnected, userDataStore.userAddress]);
+
+    const { totVolume } = useReferralStore();
+
+    // track page views with Fuul
+    useEffect(() => {
+        if (
+            isFuulInitialized &&
+            totVolume !== undefined &&
+            !Number.isNaN(totVolume) &&
+            // totVolume < 10000 &&
+            userDataStore.userAddress
+        ) {
+            console.log('sending pageview for: ', location.pathname);
+            trackPageView();
+        } else {
+            localStorage.removeItem('fuul.sent_pageview');
+        }
+    }, [location, isFuulInitialized, totVolume, userDataStore.userAddress]);
 
     const showDepositSlot = isUserConnected || !isShortScreen;
+    const navigate = useNavigate();
+    const isHomePage = location.pathname === '/';
+
+    const handleLogoClick = () => {
+        if (isHomePage) {
+            // Scroll to hero section if already on homepage
+            const snapContainer = document.querySelector(
+                '[class*="snapContainer"]',
+            ) as HTMLElement;
+            if (snapContainer) {
+                const heroSection = snapContainer.querySelector(
+                    '[data-preset="hero"]',
+                ) as HTMLElement;
+                if (heroSection) {
+                    heroSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        } else {
+            // Navigate to homepage if not already there
+            navigate('/');
+        }
+    };
+
+    const invalidRefCodeModal = useModal('closed');
+
+    // run the FUUL context
+    const { isAffiliateCodeFree } = useFuul();
+
+    useEffect(() => {
+        const checkRefCode = async (): Promise<void> => {
+            if (referralCodeFromURL.value) {
+                const isCodeClaimed: boolean = await isAffiliateCodeFree(
+                    referralCodeFromURL.value,
+                );
+                isCodeClaimed
+                    ? referralStore.cache(referralCodeFromURL.value)
+                    : invalidRefCodeModal.open();
+            }
+        };
+        checkRefCode();
+    }, [referralCodeFromURL.value, isAffiliateCodeFree]);
 
     return (
         <>
             <header id={'pageHeader'} className={styles.container}>
-                <Link to='/' className={styles.logo} viewTransition>
+                <button
+                    onClick={handleLogoClick}
+                    className={styles.logo}
+                    aria-label={t('aria.goToHome')}
+                >
                     <img
                         src='/images/favicon.svg'
                         alt='Perps Logo'
@@ -218,7 +465,7 @@ export default function PageHeader() {
                         height='70px'
                         loading='eager'
                     />
-                </Link>
+                </button>
                 <nav
                     className={`${styles.nav} ${
                         isMenuOpen ? styles.showMenu : ''
@@ -253,6 +500,7 @@ export default function PageHeader() {
                         style={{
                             position: 'relative',
                         }}
+                        className={styles.moreSection}
                         ref={moreDropdownRef}
                     >
                         <button
@@ -260,12 +508,14 @@ export default function PageHeader() {
                             onClick={() =>
                                 setIsMoreDropdownOpen(!isMoreDropdownOpen)
                             }
+                            aria-expanded={isMoreDropdownOpen}
+                            aria-haspopup='menu'
                         >
                             More
                             {isMoreDropdownOpen ? (
-                                <LuChevronUp size={15} />
+                                <LuChevronUp size={15} aria-hidden='true' />
                             ) : (
-                                <LuChevronDown size={15} />
+                                <LuChevronDown size={15} aria-hidden='true' />
                             )}
                         </button>
                         {isMoreDropdownOpen && (
@@ -276,15 +526,22 @@ export default function PageHeader() {
                     </section>
                     <Tooltip content='Ambient v1 Spot DEX' position='bottom'>
                         <a
-                            href='/trade'
-                            // target='_blank'
-                            // rel='noopener noreferrer'
+                            href={getAmbientSpotUrl(symbol)}
+                            target='_blank'
+                            rel='noopener noreferrer'
                             className={styles.ambientmm}
+                            aria-label={t('aria.spotTradingOpensNewTab')}
                         >
-                            Ambient AMM
+                            Spot
                         </a>
                     </Tooltip>
+                    <AnnouncementBannerHost
+                        type={ACTIVE_ANNOUNCEMENT_BANNER}
+                        dismissible={false}
+                        inPageHeader
+                    />
                 </nav>
+
                 <div className={styles.rightSide}>
                     {showDepositSlot && (
                         <span className={styles.depositSlot}>
@@ -324,7 +581,7 @@ export default function PageHeader() {
                             ) : (
                                 // desktop/tablet placeholder only (prevents layout shift on connect)
                                 <div
-                                    className={styles.depositButtonPlaceholder}
+                                    // className={styles.depositButtonPlaceholder}
                                     aria-hidden
                                 />
                             )}
@@ -379,12 +636,12 @@ export default function PageHeader() {
                         <SessionButton compact={shortB} />
                     </span>
 
-                    {isUserConnected && (
+                    {/* {isUserConnected && (
                         <section
                             style={{ position: 'relative' }}
                             ref={walletMenuRef}
                         >
-                            {/* {isUserConnected && (
+                            {isUserConnected && (
                                 <button
                                     className={styles.walletButton}
                                     onClick={() =>
@@ -393,25 +650,25 @@ export default function PageHeader() {
                                 >
                                     <LuWallet size={18} /> Miyuki.eth
                                 </button>
-                            )} */}
+                            )}
 
-                            {/* {isWalletMenuOpen && isUserConnected && (
+                            {isWalletMenuOpen && isUserConnected && (
                                 <WalletDropdown
                                     isWalletMenuOpen={isWalletMenuOpen}
                                     setIsWalletMenuOpen={setIsWalletMenuOpen}
                                     setIsUserConnected={setIsUserConnected}
                                     isDropdown
                                 />
-                            )} */}
+                            )}
                         </section>
-                    )}
-                    <section
+                    )} */}
+                    {/* <section
                         style={{
                             position: 'relative',
                         }}
                         ref={helpDropdownRef}
                     >
-                        {/* <button
+                        <button
                             className={styles.helpButton}
                             onClick={() =>
                                 setIsHelpDropdownOpen(!isHelpDropdownOpen)
@@ -421,14 +678,14 @@ export default function PageHeader() {
                                 size={18}
                                 color='var(--text2)'
                             />
-                        </button> */}
+                        </button>
 
                         {isHelpDropdownOpen && (
                             <HelpDropdown
                                 setIsHelpDropdownOpen={setIsHelpDropdownOpen}
                             />
                         )}
-                    </section>
+                    </section> */}
 
                     <button
                         className={styles.internationalButton}
@@ -440,6 +697,7 @@ export default function PageHeader() {
                     <section
                         style={{ position: 'relative' }}
                         ref={dropdownMenuRef}
+                        className={styles.menuButtonContainer}
                     >
                         <button
                             className={styles.menuButton}
@@ -466,7 +724,27 @@ export default function PageHeader() {
                     position={'center'}
                     title={t('appSettings.title')}
                 >
-                    <AppOptions />
+                    <AppOptions closePanel={() => appSettingsModal.close()} />
+                </Modal>
+            )}
+            {invalidRefCodeModal.isOpen && (
+                <Modal
+                    close={invalidRefCodeModal.close}
+                    position='center'
+                    title='Unknown Referral Code'
+                >
+                    <div className={styles.invalid_ref_code_modal}>
+                        <p>
+                            The referral code you entered is not recognized.
+                            Please check the code and try again.
+                        </p>
+                        <Link
+                            to='/v2/referrals'
+                            onClick={invalidRefCodeModal.close}
+                        >
+                            Go to Referrals
+                        </Link>
+                    </div>
                 </Modal>
             )}
             {PortfolioModalsRenderer}

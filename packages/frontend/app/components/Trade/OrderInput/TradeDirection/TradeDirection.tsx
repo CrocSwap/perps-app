@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 interface propsIF {
     tradeDirection: OrderSide;
-    setTradeDirection: React.Dispatch<React.SetStateAction<OrderSide>>;
+    setTradeDirection: (direction: OrderSide) => void;
 }
 
 // In case of any bugs or issues with this component, please reach out to Jr.
@@ -61,6 +61,7 @@ function TradeDirection(props: propsIF) {
                     }`}
                     onClick={handleBuyClick}
                     disabled={disableButtons}
+                    aria-pressed={tradeDirection === 'buy'}
                 >
                     {t('transactions.buyLong')}
                 </button>
@@ -72,6 +73,7 @@ function TradeDirection(props: propsIF) {
                     }`}
                     onClick={handleSellClick}
                     disabled={disableButtons}
+                    aria-pressed={tradeDirection === 'sell'}
                 >
                     {t('transactions.sellShort')}
                 </button>

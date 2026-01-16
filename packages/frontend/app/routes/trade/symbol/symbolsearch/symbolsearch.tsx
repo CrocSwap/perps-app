@@ -57,7 +57,9 @@ const SymbolSearch: React.FunctionComponent = () => {
                         />
                     </div>
 
-                    <div className={styles.symbolName}>{symbol}-USD</div>
+                    <div className={styles.symbolName}>
+                        {symbol}-<p>USD</p>
+                    </div>
 
                     {isSymbolSearchClickable && (
                         <FaChevronDown

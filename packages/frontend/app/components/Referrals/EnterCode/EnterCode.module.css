@@ -1,0 +1,152 @@
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.sectionWithButton {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--padding-m, 16px);
+    gap: var(--gap-m, 16px);
+}
+
+.sectionWithButton > button {
+    width: 100%;
+    height: var(--button-height, 44px);
+    padding: var(--button-padding, 0 14px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--radius-s, 12px);
+    background: var(--accent1, #7371fc);
+    color: var(--text1, #f0f0f8);
+    font-size: var(--font-size-m, 16px);
+    border: none;
+    outline: none;
+    transition:
+        transform 120ms ease,
+        opacity 120ms ease,
+        box-shadow 120ms ease;
+    box-shadow: 0 0 0 0 transparent;
+    cursor: pointer;
+}
+
+.sectionWithButton button:hover {
+    opacity: 0.9;
+}
+.sectionWithButton button:active {
+    transform: translateY(1px) scale(0.99);
+}
+.sectionWithButton button:focus-visible {
+    box-shadow: 0 0 0 2px
+        color-mix(in oklab, var(--accent1, #7371fc) 70%, #ffffff 30%);
+}
+
+.enterCodeContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s, 10px);
+    align-items: flex-start;
+}
+
+.current_ref_code {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--gap-s, 10px);
+    font-family: var(--font-size-s);
+    color: var(--accent3);
+}
+
+.current_ref_code h6 {
+    color: var(--base-text1, #f0f0f8);
+    font-size: var(--font-size-s, 12px);
+    margin: 0;
+}
+
+.current_ref_code > p {
+    font-size: var(--font-size-s);
+}
+
+.ref_code_blurb {
+    font-size: var(--font-size-s);
+    color: var(--text2);
+}
+
+.enterCodeContent input {
+    height: 36px;
+    padding: 0 var(--padding-s, 10px);
+    align-self: stretch;
+    border-radius: var(--radius-s, 12px);
+    background: var(--bg-dark4, #27272c);
+    color: var(--text1, #f0f0f8);
+    font-size: var(--font-size-s, 12px);
+    border: 1px solid transparent;
+    outline: none;
+    transition:
+        border-color 120ms ease,
+        background 120ms ease,
+        box-shadow 120ms ease;
+}
+
+.enterCodeContent input::placeholder {
+    color: color-mix(in oklab, #ffffff 60%, transparent);
+}
+.enterCodeContent input:focus {
+    border-color: color-mix(in oklab, var(--accent1, #7371fc) 70%, #ffffff 30%);
+    box-shadow: 0 0 0 2px
+        color-mix(in oklab, var(--accent1, #7371fc) 55%, transparent);
+}
+
+/* wrapper around CONFIRM and EDIT buttons */
+.refferal_code_buttons {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-m);
+}
+
+.sessionButtonWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Tablet */
+@media (max-width: 1080px) {
+    .sectionWithButton {
+        padding: clamp(12px, 2.8vw, 16px);
+    }
+    .sectionWithButton button {
+        height: clamp(40px, 5vw, 44px);
+    }
+}
+
+/* Phone */
+@media (max-width: 768px) {
+    .sectionWithButton {
+        gap: var(--gap-s, 10px);
+    }
+    .enterCodeContent input {
+        height: 34px;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .sectionWithButton button {
+        transition: none;
+    }
+    .enterCodeContent input {
+        transition: none;
+    }
+}

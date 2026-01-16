@@ -1,17 +1,26 @@
 @import './index.css';
-@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+@import './fonts.css';
 :root {
     --footer-h: 56px;
 }
 
-/* --- Root grid: header + content --- */
+/* --- Root grid: header area + content --- */
 .root-container {
     display: grid;
-    grid-template-rows: 56px 1fr; /* header + content only */
+    grid-template-rows: auto 1fr; /* header area (auto) + content (1fr) */
     height: 100vh;
     height: 100svh; /* mobile browsers */
     color: white;
+}
+
+/* Header area: contains banner + header */
+.header-area {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-area > header {
+    min-height: 56px;
 }
 
 /* Footer is hidden on desktop */
@@ -51,7 +60,7 @@
 /* ------------------- Mobile ------------------- */
 @media (max-width: 768px) {
     .root-container {
-        grid-template-rows: 56px 1fr;
+        grid-template-rows: auto 1fr; /* header area + content */
         overflow-x: hidden;
     }
 
@@ -76,11 +85,65 @@
     }
 }
 
-html.modal-open,
-html.modal-open body {
-    overflow: hidden !important;
+/* Error fallback styles */
+.error-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    padding: var(--padding-l);
+    text-align: center;
+    color: var(--text1);
 }
-/* Prevent backdrop-filter from being clipped by ancestor overflow/transform */
-html.modal-open .root-container {
-    overflow: visible !important;
+
+.error-fallback h2 {
+    font-size: var(--font-size-l);
+    margin-bottom: var(--margin-s);
+    color: var(--text1);
+}
+
+.error-fallback p {
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    max-width: 400px;
+    margin-bottom: var(--margin-m);
+    line-height: 1.5;
+}
+
+.error-fallback button {
+    padding: var(--padding-s) var(--padding-m);
+    border: none;
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-s);
+    cursor: pointer;
+    background: var(--accent1);
+    color: var(--text1);
+    transition: background-color 0.2s;
+}
+
+.error-fallback button:hover {
+    background: var(--accent1-dark);
+}
+
+.error-fallback__buttons {
+    display: flex;
+    gap: var(--gap-s);
+}
+
+.error-fallback--offline h2 {
+    color: var(--orange);
+}
+
+/* Screen reader only - visually hidden but accessible to assistive technology */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }

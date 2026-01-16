@@ -1,39 +1,52 @@
-.noConnectionIndicator {
+/* Non-blocking offline banner - positioned below header */
+.offlineBanner {
     display: flex;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100vw;
-    backdrop-filter: grayscale(70%) blur(var(--blur-s));
+    gap: var(--gap-s);
+    padding: var(--padding-xs) var(--padding-m);
+    background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--orange) 25%, var(--bg-dark2)),
+        color-mix(in srgb, var(--orange) 15%, var(--bg-dark2))
+    );
+    border-bottom: 1px solid var(--orange);
     position: fixed;
-    top: 0;
+    top: var(--header-height-desktop, 56px); /* Below the header */
     left: 0;
-    z-index: 1000;
+    right: 0;
+    z-index: 100; /* Below header (typically 1000+) but above content */
     color: var(--text1);
-    background-color: color-mix(in srgb, var(--bg-dark1) 20%, transparent);
 }
 
-.noConnectionIndicatorContent {
+.offlineIcon {
+    color: var(--orange);
+    flex-shrink: 0;
+}
+
+.offlineText {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    gap: 2px;
 }
 
-.noConnectionIndicatorIcon {
-    margin-bottom: var(--margin-m);
+.offlineTitle {
+    font-size: var(--font-size-s);
+    font-weight: 600;
+    color: var(--orange);
 }
 
-.noConnectionIndicatorText {
-    text-align: center;
+.offlineMessage {
+    font-size: calc(var(--font-size-s) * 0.9);
+    opacity: 0.8;
 }
 
-.noConnectionIndicator h1 {
-    margin-bottom: var(--margin-s);
-    font-size: var(--font-size-l);
-}
+/* Responsive: stack on very small screens */
+@media (max-width: 480px) {
+    .offlineBanner {
+        padding: var(--padding-xs) var(--padding-s);
+    }
 
-.noConnectionIndicator p {
-    opacity: 0.5;
-    font-size: calc(var(--font-size-m) * 0.8);
+    .offlineText {
+        flex-direction: column;
+    }
 }

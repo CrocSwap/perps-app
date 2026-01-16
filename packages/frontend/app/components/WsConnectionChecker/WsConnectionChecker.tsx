@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import NoConnectionIndicator from '../NoConnectionIndicator/NoConnectionIndicator';
@@ -122,11 +123,12 @@ export default function WsConnectionChecker() {
 
     return (
         <>
-            {!internetConnected && <NoConnectionIndicator />}
+            <AnimatePresence>
+                {!internetConnected && <NoConnectionIndicator />}
+            </AnimatePresence>
             {wsReconnecting && !hideReconnectIndicator && (
                 <WsReconnectingIndicator />
             )}
         </>
     );
 }
-('');

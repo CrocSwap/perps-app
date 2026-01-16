@@ -12,7 +12,7 @@ import TokenDropdown, {
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
-import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
+import { getTxLink, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import { t } from 'i18next';
@@ -82,13 +82,13 @@ function PortfolioDeposit(props: propsIF) {
         setTransactionStatus('pending');
 
         if (!depositInputNum || isNaN(depositInputNum)) {
-            setError('Please enter a valid amount');
+            setError(t('portfolio.validAmountRequired'));
             setTransactionStatus('idle');
             return;
         }
 
         if (depositInputNum <= 0) {
-            setError('Amount must be greater than 0');
+            setError(t('portfolio.amountGreaterThanZero'));
             setTransactionStatus('idle');
             return;
         }
@@ -96,14 +96,20 @@ function PortfolioDeposit(props: propsIF) {
         // Check minimum deposit amount
         if (depositInputNum < MIN_DEPOSIT_AMOUNT) {
             setError(
-                `Minimum deposit amount is ${formatNum(MIN_DEPOSIT_AMOUNT, 2, true, true)}`,
+                t('portfolio.minDepositAmount', {
+                    amount: formatNum(MIN_DEPOSIT_AMOUNT, 2, true, true),
+                }),
             );
             setTransactionStatus('idle');
             return;
         }
 
         if (!maxActive && depositInputNum > availableBalance) {
-            setError(`Amount exceeds available balance of ${availableBalance}`);
+            setError(
+                t('portfolio.exceedsAvailableBalance', {
+                    balance: availableBalance,
+                }),
+            );
             setTransactionStatus('idle');
             return;
         }
@@ -114,10 +120,7 @@ function PortfolioDeposit(props: propsIF) {
             // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) => {
                 setTimeout(
-                    () =>
-                        reject(
-                            new Error('Transaction timed out after 15 seconds'),
-                        ),
+                    () => reject(new Error(t('portfolio.transactionTimedOut'))),
                     15000,
                 );
             });
@@ -136,7 +139,9 @@ function PortfolioDeposit(props: propsIF) {
                             actionType: 'Deposit Fail',
                             success: false,
                             maxActive: maxActive,
-                            errorMessage: result.error || 'Transaction failed',
+                            errorMessage:
+                                result.error ||
+                                t('transactions.transactionFailed'),
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -150,16 +155,14 @@ function PortfolioDeposit(props: propsIF) {
                     });
                 }
                 setTransactionStatus('failed');
-                setError(result.error || 'Transaction failed');
+                setError(result.error || t('transactions.transactionFailed'));
                 notificationStore.add({
                     title: t('transactions.depositFailed'),
                     message:
                         result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             } else {
                 setTransactionStatus('success');
@@ -190,9 +193,7 @@ function PortfolioDeposit(props: propsIF) {
                         unit: 'fUSD',
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                     removeAfter: 5000,
                 });
 
@@ -203,7 +204,11 @@ function PortfolioDeposit(props: propsIF) {
             }
         } catch (error) {
             setTransactionStatus('failed');
-            setError(error instanceof Error ? error.message : 'Deposit failed');
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : t('transactions.depositFailed'),
+            );
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
@@ -213,7 +218,7 @@ function PortfolioDeposit(props: propsIF) {
                         errorMessage:
                             error instanceof Error
                                 ? error.message
-                                : 'Unknown error occurred',
+                                : t('transactions.unknownErrorOccurred'),
                     },
                 });
             }
@@ -244,8 +249,7 @@ function PortfolioDeposit(props: propsIF) {
                           isUSDToken,
                       )
                     : '-',
-                tooltip:
-                    'The maximum amount you can deposit based on your balance',
+                tooltip: t('portfolio.availableToDepositTooltip'),
             },
         ];
     }, [availableBalance, selectedToken.symbol, portfolio.unit, formatNum]);
@@ -275,7 +279,11 @@ function PortfolioDeposit(props: propsIF) {
     return (
         <div className={styles.container}>
             <div className={styles.textContent}>
-                <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
+                <img
+                    src={FogoLogo}
+                    alt={t('portfolio.fogoChainLogo')}
+                    width='64px'
+                />
                 <h4>{t('deposit.prompt', { token: selectedToken.symbol })}</h4>
             </div>
 
@@ -298,7 +306,7 @@ function PortfolioDeposit(props: propsIF) {
                     value={rawInputString}
                     onChange={handleDepositChange}
                     aria-label={t('aria.depositInput')}
-                    autoFocus
+                    dataModalInitialFocus
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                         if (
                             e.key === 'Enter' &&
@@ -312,13 +320,17 @@ function PortfolioDeposit(props: propsIF) {
                         `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
                     )}
                 />
-                <button onClick={handleMaxClick} disabled={isProcessing}>
+                <button
+                    onClick={handleMaxClick}
+                    disabled={isProcessing}
+                    aria-label={t('aria.setMaxAmount')}
+                >
                     {t('common.max')}
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
                 {transactionStatus === 'failed' && !error && (
                     <div className={styles.error}>
-                        Transaction failed. Please try again.
+                        {t('transactions.transactionFailed')}
                     </div>
                 )}
             </div>

@@ -4,15 +4,16 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 import type { EntityId, IChartingLibraryWidget } from '~/tv/charting_library';
 import { addCustomOrderLine, type LineLabel } from '../customOrderLineUtils';
 import type { LabelLocation } from '../orderLineUtils';
+import type { ChartLineType } from '../../data/utils/utils';
 
 export type LineData = {
     xLoc: number;
     yPrice: number;
-    textValue: LineLabel;
+    textValue?: LineLabel;
     quantityTextValue?: number;
     quantityText?: string;
     color: string;
-    type: 'PNL' | 'LIMIT' | 'LIQ';
+    type: ChartLineType;
     labelLocations?: LabelLocation[];
     oid?: number;
     lineStyle: number;

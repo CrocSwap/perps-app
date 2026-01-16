@@ -9,7 +9,7 @@ import TransferModal from '~/components/TransferModal/TransferModal';
 
 export function meta() {
     return [
-        { title: 'Sub-Accounts | Ambient' },
+        { title: 'Sub-Accounts | Ambient Finance' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }

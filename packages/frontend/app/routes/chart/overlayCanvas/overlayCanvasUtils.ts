@@ -182,3 +182,63 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
         paneCanvas: paneCanvases[paneIndex] ?? null,
     };
 }
+
+export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
+    iframeDoc: Document | null;
+    yAxisCanvas: HTMLCanvasElement | null;
+    priceAxisContainers: HTMLElement[] | null;
+} {
+    const chartDiv = document.getElementById('tv_chart');
+    const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
+    const iframeDoc =
+        iframe?.contentDocument || iframe?.contentWindow?.document;
+
+    if (!iframeDoc) {
+        return {
+            iframeDoc: null,
+            yAxisCanvas: null,
+            priceAxisContainers: null,
+        };
+    }
+
+    const priceAxisContainers = Array.from(
+        iframeDoc.querySelectorAll<HTMLElement>(
+            '.chart-markup-table.price-axis-container',
+        ),
+    );
+
+    const paneIndex = getMainSeriesPaneIndex(chart);
+    if (paneIndex === null || paneIndex === undefined) {
+        return {
+            iframeDoc,
+            yAxisCanvas: null,
+            priceAxisContainers: null,
+        };
+    }
+
+    // Find the container that has width > 0 (active price scale position)
+    const activeContainer = priceAxisContainers.find((container) => {
+        const rect = container.getBoundingClientRect();
+        return rect.width > 0;
+    });
+
+    let yAxisCanvas: HTMLCanvasElement | null = null;
+
+    if (activeContainer) {
+        // Find the price-axis div within the active container
+        const priceAxisDiv =
+            activeContainer.querySelector<HTMLDivElement>('div.price-axis');
+        if (priceAxisDiv) {
+            const canvases =
+                priceAxisDiv.querySelectorAll<HTMLCanvasElement>('canvas');
+            yAxisCanvas = canvases.length > 1 ? canvases[1] : null;
+        }
+    }
+
+    return {
+        iframeDoc,
+        yAxisCanvas: yAxisCanvas ?? null,
+        priceAxisContainers:
+            priceAxisContainers.length > 0 ? priceAxisContainers : null,
+    };
+}

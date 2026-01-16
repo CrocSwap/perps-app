@@ -40,3 +40,16 @@ export type modalContentT =
     | 'market_sell'
     | 'limit_buy'
     | 'limit_sell';
+
+export type OrderInputValue = {
+    value: number | undefined;
+    changeType: OrderInputChangeType;
+};
+
+export type OrderInputChangeType =
+    | 'dragging'
+    | 'dragEnd'
+    | 'obClick'
+    | 'inputChange'
+    | 'midPriceChange'
+    | 'reset';

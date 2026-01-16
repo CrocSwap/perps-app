@@ -16,7 +16,9 @@ import {
 import { unifiedMarginPollingManager } from '~/services/UnifiedMarginPollingManager';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { RPC_ENDPOINT } from '~/utils/Constants';
+import { isValidBase58 } from '~/utils/functions/makeAddress';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { UserBalanceIF } from '~/utils/UserDataIFs';
 
@@ -64,8 +66,12 @@ export const UnifiedMarginDataProvider: React.FC<
     );
 
     const isSessionEstablished = isEstablished(sessionState);
+    const sessionWalletAddress = isSessionEstablished
+        ? sessionState.walletPublicKey.toString()
+        : '';
     const { isDebugWalletActive, manualAddressEnabled, manualAddress } =
         useDebugStore();
+    const { userAddress } = useUserDataStore();
     const isDebugWalletActiveRef = useRef(isDebugWalletActive);
     isDebugWalletActiveRef.current = isDebugWalletActive;
     const forceRestart = useRef(false);
@@ -79,11 +85,16 @@ export const UnifiedMarginDataProvider: React.FC<
 
     // backup side effect to clear margin bucket if set after logout
     useEffect(() => {
-        if (!isSessionEstablished && !isDebugWalletActive && !!marginBucket) {
+        if (
+            !isSessionEstablished &&
+            !isDebugWalletActive &&
+            !userAddress &&
+            !!marginBucket
+        ) {
             const store = useUnifiedMarginStore.getState();
             store.setMarginBucket(null);
         }
-    }, [isSessionEstablished, isDebugWalletActive, marginBucket]);
+    }, [isSessionEstablished, isDebugWalletActive, userAddress, marginBucket]);
 
     useEffect(() => {
         // Track session state changes
@@ -91,7 +102,13 @@ export const UnifiedMarginDataProvider: React.FC<
             lastSessionStateRef.current !== isSessionEstablished;
         lastSessionStateRef.current = isSessionEstablished;
 
-        if (!isSessionEstablished || isDebugWalletActive) {
+        // Subscribe if we have a userAddress (from URL or session or debug)
+        const targetAddress =
+            manualAddressEnabled && manualAddress && manualAddress.length > 0
+                ? manualAddress
+                : userAddress;
+
+        if (!targetAddress || isDebugWalletActiveRef.current) {
             const store = useUnifiedMarginStore.getState();
             store.setMarginBucket(null);
             // Only unsubscribe if we were actually subscribed
@@ -112,99 +129,50 @@ export const UnifiedMarginDataProvider: React.FC<
             return;
         }
 
-        // Subscribe only if not already subscribed and session just became established
+        // Subscribe only if not already subscribed or address changed
         if (
-            (!hasSubscribedRef.current && sessionChanged) ||
+            !hasSubscribedRef.current ||
+            lastSubscribedAddressRef.current !== targetAddress ||
             forceRestart.current
         ) {
+            if (isDebugWalletActiveRef.current) {
+                const store = useUnifiedMarginStore.getState();
+                store.setBalance(null);
+                store.setPositions([]);
+                store.setError(null);
+                store.setIsLoading(true);
+                unifiedMarginPollingManager.unsubscribe();
+
+                // we are subscribing to debug wallet address in another component, so we are marking it with that ref..
+                lastSubscribedAddressRef.current = targetAddress;
+                return;
+            }
+            // Skip if targetAddress is not a valid base58 address (case triggered if debug address has been saved to userDataStore)
+            if (!isValidBase58(targetAddress)) return;
+
             hasSubscribedRef.current = true;
+            unifiedMarginPollingManager.unsubscribe(); // Clean up previous if any
             unifiedMarginPollingManager.subscribe(
                 connection,
-                sessionState.walletPublicKey,
+                new PublicKey(targetAddress),
             );
-            lastSubscribedAddressRef.current =
-                sessionState.walletPublicKey.toString();
+            lastSubscribedAddressRef.current = targetAddress;
             forceRestart.current = false;
         }
 
         // Cleanup function - runs on unmount and when dependencies change
         return () => {
-            if (hasSubscribedRef.current) {
-                hasSubscribedRef.current = false;
-                // Clear the store first
-                const store = useUnifiedMarginStore.getState();
-                store.setMarginBucket(null);
-                store.setBalance(null);
-                store.setPositions([]);
-                store.setError(null);
-                store.setIsLoading(true);
-                store.setLastUpdateTime(0);
-                if (isDebugWalletActiveRef.current) {
-                    forceRestart.current = true;
-                }
-                // Then unsubscribe
-                unifiedMarginPollingManager.unsubscribe();
-            }
+            // Only cleanup if the entire provider is unmounting or we explicitly want to stop
         };
-    }, [isSessionEstablished, isDebugWalletActive]); // Only depend on session established state
-
-    useEffect(() => {
-        if (isDebugWalletActiveRef.current) {
-            return;
-        }
-
-        if (manualAddressEnabled && manualAddress && manualAddress.length > 0) {
-            if (
-                lastSubscribedAddressRef.current !== manualAddress &&
-                isSessionEstablished
-            ) {
-                unifiedMarginPollingManager.unsubscribe();
-                unifiedMarginPollingManager.subscribe(
-                    connection,
-                    new PublicKey(manualAddress),
-                );
-                lastSubscribedAddressRef.current = manualAddress;
-                hasSubscribedRef.current = true;
-            } else {
-                unifiedMarginPollingManager.unsubscribe();
-                unifiedMarginPollingManager.subscribe(
-                    defaultConnection,
-                    new PublicKey(manualAddress),
-                );
-                lastSubscribedAddressRef.current = manualAddress;
-                hasSubscribedRef.current = true;
-            }
-        } else {
-            if (isSessionEstablished) {
-                if (
-                    lastSubscribedAddressRef.current !==
-                    sessionState.walletPublicKey.toString()
-                ) {
-                    unifiedMarginPollingManager.unsubscribe();
-                    unifiedMarginPollingManager.subscribe(
-                        connection,
-                        sessionState.walletPublicKey,
-                    );
-                    lastSubscribedAddressRef.current =
-                        sessionState.walletPublicKey.toString();
-                    hasSubscribedRef.current = true;
-                }
-            }
-        }
-    }, [
-        manualAddressEnabled,
-        manualAddress,
-        isSessionEstablished,
-        defaultConnection,
-    ]);
+    }, [isSessionEstablished, userAddress, manualAddress]);
 
     const forceRefresh = useCallback(async () => {
-        if (!isSessionEstablished) {
-            throw new Error('Cannot refresh: session not established');
+        if (!isSessionEstablished && !userAddress) {
+            throw new Error('Cannot refresh: no address or session');
         }
 
         return unifiedMarginPollingManager.forceRefresh();
-    }, [isSessionEstablished]);
+    }, [isSessionEstablished, userAddress]);
 
     return (
         <UnifiedMarginDataContext.Provider

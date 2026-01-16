@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
@@ -11,6 +12,7 @@ interface FundingHistoryTableRowProps {
 export default function FundingHistoryTableRow(
     props: FundingHistoryTableRowProps,
 ) {
+    const { t } = useTranslation();
     const { fundingHistory } = props;
     const { formatNum } = useNumFormatter();
     const { getBsColor } = useAppSettings();
@@ -37,7 +39,7 @@ export default function FundingHistoryTableRow(
                               : 'var(--text-default)',
                 }}
             >
-                {fundingHistory.szi > 0 ? 'Long' : 'Short'}
+                {fundingHistory.szi > 0 ? t('common.long') : t('common.short')}
             </div>
             <div
                 className={`${styles.cell} ${styles.paymentCell}`}

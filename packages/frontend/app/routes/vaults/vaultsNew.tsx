@@ -9,7 +9,7 @@ import { useVaultManager } from './useVaultManager';
 
 export function meta() {
     return [
-        { title: 'Vaults | Ambient' },
+        { title: 'Vaults | Ambient Finance' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }

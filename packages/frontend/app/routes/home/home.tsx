@@ -121,11 +121,18 @@ export function meta() {
     const ogImageRectangle = 'https://embindexer.net/ember/on-ambient/BTC';
     const linkUrl = 'https://perps.ambient.finance';
 
-    const ogTitle = 'Trade BTC Futures with Ambient on Fogo';
-    const ogDescription = 'BTC Perpetual Futures | Trade with Ambient on Fogo';
+    const ogTitle = 'Ambient Finance | Perpetual Futures on Fogo';
+    const ogDescription =
+        'Trade perpetual futures on Fogo with Ambient Finance. Zero taker fees, up to 100x leverage, and lightning-fast execution.';
+    const seoDescription =
+        'Trade perpetual futures on Fogo with Ambient Finance. Zero taker fees, up to 100x leverage, and lightning-fast execution. The premier Solana perps DEX experience.';
+    const seoKeywords =
+        'Solana perps, perpetual futures, Fogo, Ambient Finance, decentralized exchange, DEX, crypto trading, leverage trading, Solana trading, perps DEX';
 
     return [
         { title: t('meta.title') },
+        { name: 'description', content: seoDescription },
+        { name: 'keywords', content: seoKeywords },
         { property: 'og:type', content: 'website' },
         { property: 'og:title', content: ogTitle },
         { property: 'og:description', content: ogDescription },

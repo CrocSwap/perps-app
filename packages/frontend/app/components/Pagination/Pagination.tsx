@@ -33,38 +33,59 @@ const Pagination: React.FC<PaginationProps> = ({
 
     const rowsItems = useCallback(() => {
         return rowsOptions.map((value) => (
-            <div
+            <button
                 key={value}
+                type='button'
                 className={styles.dropdownItem}
-                onClick={() => setRowsPerPageState(value)}
+                onClick={() => {
+                    setRowsPerPageState(value);
+                    setIsRowsDropdownOpen(false);
+                }}
+                role='option'
+                aria-selected={value === rowsPerPageState}
             >
                 {value}
-            </div>
+            </button>
         ));
-    }, []);
+    }, [rowsPerPageState]);
 
     return (
         <>
             <div className={styles.paginationContainer}>
                 <div className={styles.rowsPerPage}>
-                    Rows per page:
-                    <div
+                    <span id='rows-per-page-label'>Rows per page:</span>
+                    <button
+                        type='button'
                         className={styles.rowSelector}
                         onClick={() =>
                             setIsRowsDropdownOpen(!isRowsDropdownOpen)
                         }
+                        aria-haspopup='listbox'
+                        aria-expanded={isRowsDropdownOpen}
+                        aria-labelledby='rows-per-page-label'
                     >
                         {rowsPerPageState}
-                        <FaChevronUp className={styles.chvrUp} />
-                        {isRowsDropdownOpen && (
-                            <div className={` ${styles.dropupMenu}`}>
-                                {rowsItems()}
-                            </div>
-                        )}
-                    </div>
+                        <FaChevronUp
+                            className={styles.chvrUp}
+                            aria-hidden='true'
+                        />
+                    </button>
+                    {isRowsDropdownOpen && (
+                        <div
+                            className={styles.dropupMenu}
+                            role='listbox'
+                            aria-labelledby='rows-per-page-label'
+                        >
+                            {rowsItems()}
+                        </div>
+                    )}
                 </div>
 
-                <div className={styles.pageInfo}>
+                <div
+                    className={styles.pageInfo}
+                    aria-live='polite'
+                    aria-atomic='true'
+                >
                     {page * rowsPerPageState + 1}-
                     {page * rowsPerPageState + rowsPerPageState > totalCount
                         ? totalCount

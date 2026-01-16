@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     useAccounts,
     type accountIF,
@@ -14,6 +15,7 @@ interface propsIF {
 }
 
 export default function TransferModal(props: propsIF) {
+    const { t } = useTranslation();
     const { closeModal } = props;
 
     // list of active subaccounts data
@@ -68,16 +70,29 @@ export default function TransferModal(props: propsIF) {
                     handleChange={setAsset}
                 />
                 <div className={styles.asset_qty_input_wrapper}>
+                    <label
+                        htmlFor='transfer_asset_qty_input'
+                        className='sr-only'
+                    >
+                        {t('aria.transferAmount')}
+                    </label>
                     <input
                         id='transfer_asset_qty_input'
                         type='text'
                         placeholder='Amount'
                         value={qty}
                         onChange={(e) => setQty(e.currentTarget.value)}
+                        aria-describedby='transfer_available_balance'
                     />
-                    <div onClick={() => setQty('1000')}>Max</div>
+                    <button
+                        type='button'
+                        onClick={() => setQty('1000')}
+                        aria-label={t('aria.setMaxAmount')}
+                    >
+                        Max
+                    </button>
                 </div>
-                <div className={styles.info}>
+                <div className={styles.info} id='transfer_available_balance'>
                     <div>
                         <p>Available to Deposit</p>
                         <p>1,000.00</p>

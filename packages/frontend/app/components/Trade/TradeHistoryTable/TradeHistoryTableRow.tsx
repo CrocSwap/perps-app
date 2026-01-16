@@ -1,9 +1,10 @@
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import type { UserFillIF } from '~/utils/UserDataIFs';
 import styles from './TradeHistoryTable.module.css';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, type AnimationEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface TradeHistoryTableRowProps {
@@ -13,6 +14,26 @@ interface TradeHistoryTableRowProps {
 
 export default function TradeHistoryTableRow(props: TradeHistoryTableRowProps) {
     const { trade } = props;
+    const rowRef = useRef<HTMLDivElement>(null);
+    const { highlightedTradeOid, setHighlightedTradeOid } = useTradeDataStore();
+    const isHighlighted = highlightedTradeOid === trade.oid;
+
+    useEffect(() => {
+        if (isHighlighted && rowRef.current) {
+            rowRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }
+    }, [isHighlighted, setHighlightedTradeOid]);
+
+    const handleHighlightAnimationEnd = (e: AnimationEvent<HTMLDivElement>) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.animationName !== 'highlightPulse') return;
+        if (isHighlighted) {
+            setHighlightedTradeOid(null);
+        }
+    };
 
     const { formatNum } = useNumFormatter();
 
@@ -42,7 +63,11 @@ export default function TradeHistoryTableRow(props: TradeHistoryTableRowProps) {
     }, [trade.dir, i18n.language]);
 
     return (
-        <div className={styles.rowContainer}>
+        <div
+            ref={rowRef}
+            className={`${styles.rowContainer} ${isHighlighted ? styles.highlighted : ''}`}
+            onAnimationEnd={handleHighlightAnimationEnd}
+        >
             <div className={`${styles.cell} ${styles.timeCell}`}>
                 {formatTimestamp(trade.time)}
                 {/* {trade.hasOrderDetails && (

@@ -96,6 +96,40 @@
     bottom: 0;
 }
 
+.obGradientForFocusedSlot {
+    position: absolute;
+    top: auto;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1rem;
+    opacity: 0.2;
+    background: linear-gradient(
+        to bottom,
+        var(--neon-yellow) 0%,
+        var(--bg-dark2) 100%
+    );
+}
+.obGradientForFocusedSlot.wider {
+    height: 3rem;
+    opacity: 0.04;
+}
+
+.obGradientForFocusedSlot.smaller {
+    height: 0.4rem;
+    opacity: 0.3;
+}
+
+.obGradientForFocusedSlot.buy {
+    top: auto;
+    bottom: 0;
+    background: linear-gradient(
+        to top,
+        var(--neon-yellow) 0%,
+        var(--bg-dark2) 100%
+    );
+}
+
 .errorMessage {
     padding: var(--padding-xs) var(--padding-m);
     background-color: rgba(255, 59, 48, 0.1);

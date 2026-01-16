@@ -14,6 +14,7 @@ interface NumFormattedInputProps {
     placeholder?: string;
     inputRegexOverride?: RegExp;
     autoFocus?: boolean;
+    dataModalInitialFocus?: boolean;
 }
 
 const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
@@ -28,6 +29,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     placeholder,
     inputRegexOverride,
     autoFocus,
+    dataModalInitialFocus,
 }) => {
     const {
         inputRegex,
@@ -85,6 +87,9 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
                 onKeyDown={onKeyDown}
                 className={styles.numFormattedInput + ' ' + className}
                 aria-label={ariaLabel}
+                {...(dataModalInitialFocus
+                    ? { 'data-modal-initial-focus': true }
+                    : {})}
                 inputMode='numeric'
                 placeholder={placeholder}
                 autoComplete='off'

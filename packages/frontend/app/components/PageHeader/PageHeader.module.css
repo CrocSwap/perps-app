@@ -13,26 +13,32 @@
     justify-content: space-between;
     gap: var(--gap-l);
     position: relative;
+    /* padding: var(--padding-s) var(--padding-l); */
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .container > * {
     transition: all 0.3s ease-in-out;
 }
-
+/* TODO: TURN ON WIDTH 100% WITHOUT BANNER */
 .container nav {
-    width: 100%;
+    /* width: 100%; */
     height: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: var(--gap-l);
+    gap: var(--gap-m);
 }
 
 .container nav a,
 .moreButton {
-    color: var(--text2, #6a6a6d);
-    font-size: var(--font-size-m, 18px);
+    color: var(--text2);
+    font-size: var(--font-size-m);
     white-space: nowrap;
+}
+.moreSection {
+    display: none;
 }
 .logo {
     flex: 0 0 auto;
@@ -41,7 +47,10 @@
     flex: 1 1 auto;
     min-width: 0;
 }
-
+.logo img {
+    height: 40px;
+    width: auto;
+}
 .sessionWrap {
     flex: 0 0 auto;
     min-width: 0;
@@ -65,7 +74,7 @@
     text-overflow: ellipsis;
 }
 
-.ambientmm {
+/* .ambientmm {
     display: flex;
     padding: var(--gap-xs) var(--gap-s);
     justify-content: center;
@@ -78,12 +87,12 @@
     cursor: pointer;
     font-size: var(--font-family-m, 18px);
     visibility: hidden;
-}
+} */
 
-.ambientmm:hover {
+/* .ambientmm:hover {
     color: color-mix(in srgb, var(--accent1) 90%, black) !important;
     border: 1px solid color-mix(in srgb, var(--accent1) 90%, black) !important;
-}
+} */
 
 .moreButton {
     outline: none;
@@ -98,7 +107,7 @@
 
 .container nav a:hover,
 .moreButton:hover {
-    color: var(--text1);
+    color: var(--accent1);
     transition: all var(--ease-in-out-med);
 }
 
@@ -317,6 +326,26 @@
     text-align: center;
 }
 
+.invalid_ref_code_modal {
+    display: flex;
+    flex-direction: column;
+    margin: var(--margin-m);
+    gap: var(--gap-m);
+    align-items: center;
+    justify-content: center;
+}
+
+.invalid_ref_code_modal > p {
+    color: var(--text2);
+}
+
+.invalid_ref_code_modal a {
+    color: var(--accent1);
+    outline: 1px solid var(--accent1);
+    border-radius: var(--radius-s);
+    padding: var(--padding-xs) var(--padding-s);
+}
+
 @keyframes bounce {
     0% {
         transform: translateY(0);
@@ -337,15 +366,15 @@
 
 /* Desktop to Laptop Responsive Styles */
 @media (max-width: 1400px) {
-    .container {
+    /* .container {
         gap: var(--gap-m);
     }
 
     .container nav {
         gap: var(--gap-m);
-    }
+    } */
 
-    .container nav a,
+    /* .container nav a,
     .moreButton {
         font-size: var(--font-size-s, 14px);
     }
@@ -353,10 +382,10 @@
     .ambientmm {
         font-size: var(--font-size-s, 14px);
         padding: var(--gap-xs) var(--gap-xs);
-    }
+    } */
 }
 
-@media (max-width: 1200px) {
+/* @media (max-width: 1024px) {
     .container {
         gap: var(--gap-s);
         padding: 0px var(--padding-xs);
@@ -387,20 +416,7 @@
         padding: 0 8px;
         font-size: 12px;
     }
-}
-
-@media (max-width: 1024px) {
-    .container nav a,
-    .moreButton {
-        font-size: var(--font-size-s);
-    }
-
-    .ambientmm {
-        font-size: var(--font-size-s);
-        padding: 4px 6px;
-    }
-
-    .depositButton {
+      .depositButton {
         width: 80px;
         height: 20px;
         font-size: var(--font-size-s);
@@ -412,7 +428,7 @@
     .rpcButton span {
         display: none;
     }
-}
+} */
 
 @media (max-width: 900px) {
     .menuButtonMobile {
@@ -420,10 +436,6 @@
     }
 
     .nav a:nth-child(n + 4) {
-        display: none;
-    }
-
-    .ambientmm {
         display: none;
     }
 }
@@ -440,7 +452,7 @@
         flex-direction: column !important;
         align-items: flex-end !important;
         padding: var(--padding-s);
-        gap: var(--gap-l);
+        /* gap: var(--gap-l); */
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
         transition: right var(--ease-in-out-med);
         z-index: 1000;
@@ -472,7 +484,9 @@
         display: flex !important;
     }
 
-    .depositButtonPlaceholder {
+    .depositButtonPlaceholder,
+    .ambientmm,
+    .internationalButton {
         display: none;
     }
 }
@@ -482,7 +496,6 @@
     font-size: 12px !important;
     width: 160px !important;
     padding: 0 8px !important;
-    background-color: red;
 }
 
 .depositSlot {
@@ -495,7 +508,6 @@
     /* width: 120px !important; */
     font-size: 12px !important;
 }
-
 @media (max-width: 600px) {
     .activeSessionWrap :global(button) {
         width: 70px !important;

@@ -179,6 +179,11 @@
 
     .tabsList {
         width: 100%;
+        display: flex;
+    }
+    .tab {
+        padding: 2px var(--padding-s);
+        flex: 0 0 auto;
     }
 
     .rightContent {
@@ -197,16 +202,10 @@
 }
 
 @media (max-width: 480px) {
-    .tab {
-        padding: 2px var(--padding-s);
-        flex: 1;
-    }
-    .tabsList {
-        display: flex;
-        width: 100%;
-    }
-
     .scrollArrow {
         width: var(--scroll-arrow-svg-width-height-mobile);
+    }
+    .tabsContainer {
+        gap: 0;
     }
 }

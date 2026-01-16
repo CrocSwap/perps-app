@@ -22,6 +22,11 @@ export default function OptionLineSelect(props: propsIF) {
 
     // clicks outside the elem with the ref will close the dropdown
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const firstOptionRef = useRef<HTMLButtonElement>(null);
+    const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+    const prevIsOpenRef = useRef<boolean>(false);
     // logic to close the dropdown
     // using `isOpen` in gatekeeping and dependencies seem to speed it up
     useEffect(() => {
@@ -47,14 +52,41 @@ export default function OptionLineSelect(props: propsIF) {
         return () => document.removeEventListener(TRIGGER, handleClickOutside);
     }, [isOpen]);
 
+    useEffect(() => {
+        // Only manage focus on state transitions, not on initial mount.
+        // Otherwise, each closed dropdown will "steal" focus when the modal opens.
+        const wasOpen = prevIsOpenRef.current;
+        if (!wasOpen && isOpen) {
+            firstOptionRef.current?.focus();
+        } else if (wasOpen && !isOpen) {
+            triggerRef.current?.focus();
+        }
+        prevIsOpenRef.current = isOpen;
+    }, [isOpen]);
+
     return (
         <li className={styles.option_line}>
             {text}
 
             <div className={styles.dropdown_container} ref={dropdownRef}>
-                <div
+                <button
+                    type='button'
+                    ref={triggerRef}
                     className={styles.active_option}
                     onClick={() => setIsOpen((o) => !o)}
+                    aria-haspopup='listbox'
+                    aria-expanded={isOpen}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Escape' && isOpen) {
+                            setIsOpen(false);
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        if (e.key === 'ArrowDown') {
+                            setIsOpen(true);
+                            e.preventDefault();
+                        }
+                    }}
                 >
                     {active}
                     <SlArrowDown
@@ -62,7 +94,7 @@ export default function OptionLineSelect(props: propsIF) {
                             dropDirection === 'up' ? styles.caret_up : ''
                         }`}
                     />
-                </div>
+                </button>
 
                 {isOpen && (
                     <div
@@ -71,17 +103,46 @@ export default function OptionLineSelect(props: propsIF) {
                                 ? styles.drop_up
                                 : styles.drop_down
                         }`}
+                        role='listbox'
                     >
                         {options.map((o: dropdownOptionsIF, i) => (
-                            <div
+                            <button
+                                type='button'
                                 key={i}
+                                ref={(el) => {
+                                    optionRefs.current[i] = el;
+                                    if (i === 0) firstOptionRef.current = el;
+                                }}
                                 onClick={() => {
                                     o.set();
                                     setIsOpen(false);
                                 }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Escape') {
+                                        setIsOpen(false);
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    }
+                                    if (e.key === 'ArrowDown') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const nextIndex =
+                                            (i + 1) % options.length;
+                                        optionRefs.current[nextIndex]?.focus();
+                                    }
+                                    if (e.key === 'ArrowUp') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const prevIndex =
+                                            (i - 1 + options.length) %
+                                            options.length;
+                                        optionRefs.current[prevIndex]?.focus();
+                                    }
+                                }}
+                                role='option'
                             >
                                 {o.readable}
-                            </div>
+                            </button>
                         ))}
                     </div>
                 )}

@@ -223,11 +223,21 @@ export type ActiveTwapSortBy =
     | 'user'
     | undefined;
 
-interface PositionValueIF {
+export interface PositionValueIF {
     [0]: number;
     [1]: string;
 }
 
+export interface TempPositionValueIF {
+    time: number;
+    value: number;
+}
+
+export interface TempUserPositionIF {
+    accountValueHistory: TempPositionValueIF[];
+    pnlHistory: TempPositionValueIF[];
+    vlm: string;
+}
 export interface UserPositionIF {
     accountValueHistory: PositionValueIF[];
     pnlHistory: PositionValueIF[];

@@ -94,6 +94,15 @@
     opacity: 1;
 }
 
+.focused {
+    background-color: color-mix(in srgb, var(--neon-yellow) 13%, transparent);
+    color: var(--neon-yellow) !important;
+}
+
+.focused .orderRowPrice {
+    color: var(--neon-yellow) !important;
+}
+
 /* .userOrder .orderRowPrice,
 .userOrder .orderRowSize,
 .userOrder .orderRowTotal {

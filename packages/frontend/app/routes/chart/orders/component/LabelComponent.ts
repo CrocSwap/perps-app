@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
@@ -8,7 +8,7 @@ import type { LimitOrderParams } from '~/services/limitOrderService';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { IPaneApi } from '~/tv/charting_library';
-import { blockExplorer } from '~/utils/Constants';
+import { getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import {
     findLimitLabelAtPosition,
@@ -18,9 +18,15 @@ import {
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
 import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
-import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
+import {
+    drawLabel,
+    drawLiqLabel,
+    type LabelLocation,
+    type LabelType,
+} from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import { t } from 'i18next';
+import { usePreviewOrderLines } from '../usePreviewOrderLines';
 
 interface LabelProps {
     lines: LineData[];
@@ -64,9 +70,23 @@ const LabelComponent = ({
 
     const { executeCancelOrder } = useCancelOrderService();
     const { executeLimitOrder } = useLimitOrderService();
+    const { updateYPosition } = usePreviewOrderLines();
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const [isDrag, setIsDrag] = useState(false);
+    const dragStateRef = useRef<{
+        tempSelectedLine: LabelLocationData | undefined;
+        originalPrice: number | undefined;
+        isDragging: boolean;
+        isOutsideArea: boolean;
+        frozenPrice: number | undefined;
+    }>({
+        tempSelectedLine: undefined,
+        originalPrice: undefined,
+        isDragging: false,
+        isOutsideArea: false,
+        frozenPrice: undefined,
+    });
 
     const isLiqPriceLineDraggable = false;
 
@@ -123,7 +143,9 @@ const LabelComponent = ({
                 const labelOptions = [
                     {
                         type: 'Main' as LabelType,
-                        text: formatLineLabel(line.textValue),
+                        text: line.textValue
+                            ? formatLineLabel(line.textValue)
+                            : '',
                         backgroundColor: '#D1D1D1',
                         textColor: '#3C91FF',
                         borderColor: line.color,
@@ -152,31 +174,46 @@ const LabelComponent = ({
                         : []),
                 ];
 
-                let labelLocations = [];
+                let labelLocations: LabelLocation[] = [];
 
-                if (line.type !== 'LIQ') {
-                    labelLocations = drawLabel(
-                        ctx,
-                        {
-                            x: xPixel,
-                            y: yPricePixel,
-                            labelOptions,
-                            color: line.color,
-                        },
-                        line.type === 'LIMIT',
-                    );
-                } else {
-                    labelLocations = drawLiqLabel(
-                        ctx,
-                        {
-                            x: xPixel,
-                            y: yPricePixel,
-                            labelOptions,
-                            color: line.color,
-                        },
-                        canvasSize.width,
-                        isLiqPriceLineDraggable,
-                    );
+                if (line.textValue) {
+                    if (line.type !== 'LIQ') {
+                        labelLocations = drawLabel(
+                            ctx,
+                            {
+                                x: xPixel,
+                                y: yPricePixel,
+                                labelOptions,
+                                color: line.color,
+                            },
+                            line.type === 'LIMIT',
+                        );
+                    } else {
+                        labelLocations = drawLiqLabel(
+                            ctx,
+                            {
+                                x: xPixel,
+                                y: yPricePixel,
+                                labelOptions,
+                                color: line.color,
+                            },
+                            canvasSize.width,
+                            isLiqPriceLineDraggable,
+                        );
+                    }
+                }
+
+                // Add full-width clickable area for PREVIEW_ORDER lines
+                if (line.type === 'PREVIEW_ORDER') {
+                    const dpr = window.devicePixelRatio || 1;
+                    const height = 15 * dpr;
+                    labelLocations.push({
+                        type: 'Main',
+                        x: 0,
+                        y: yPricePixel,
+                        width: widthAttr,
+                        height,
+                    });
                 }
 
                 return {
@@ -230,15 +267,19 @@ const LabelComponent = ({
                 isLabel &&
                 isLabel.matchType === 'onLabel' &&
                 (isLabel.parentLine.type === 'LIMIT' ||
+                    isLabel.parentLine.type === 'PREVIEW_ORDER' ||
                     (isLabel.parentLine.type === 'LIQ' &&
                         isLiqPriceLineDraggable)) &&
                 isLabel.label.type !== 'Cancel'
             ) {
-                if (overlayCanvasRef.current)
+                if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
+                }
             } else {
-                if (overlayCanvasRef.current)
+                if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'pointer';
                     overlayCanvasRef.current.style.pointerEvents = 'none';
+                }
             }
         }
     }, [
@@ -284,11 +325,10 @@ const LabelComponent = ({
                                     y: overlayOffsetY,
                                 };
 
+                                const pane = iframeDoc?.querySelector(
+                                    '.chart-markup-table.pane',
+                                );
                                 if (isLabel) {
-                                    const pane = iframeDoc?.querySelector(
-                                        '.chart-markup-table.pane',
-                                    );
-
                                     if (overlayCanvasRef.current) {
                                         if (isLabel.matchType === 'onLabel') {
                                             if (
@@ -313,6 +353,18 @@ const LabelComponent = ({
                                                         'crosshair';
                                                 }
                                             } else {
+                                                if (
+                                                    isLabel.parentLine.type ===
+                                                    'PREVIEW_ORDER'
+                                                ) {
+                                                    (
+                                                        pane as HTMLElement
+                                                    ).style.cursor =
+                                                        'row-resize';
+                                                    overlayCanvasRef.current.style.cursor =
+                                                        'row-resize';
+                                                }
+
                                                 overlayCanvasRef.current.style.pointerEvents =
                                                     'auto';
                                             }
@@ -325,6 +377,11 @@ const LabelComponent = ({
                                                 ).style.cursor = 'crosshair';
                                             }
                                         }
+                                    }
+                                } else {
+                                    if (pane) {
+                                        (pane as HTMLElement).style.cursor =
+                                            'crosshair';
                                     }
                                 }
                             }
@@ -402,9 +459,7 @@ const LabelComponent = ({
                         symbol: symbolInfo?.coin,
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             } else {
                 notifications.remove(slug);
@@ -432,9 +487,7 @@ const LabelComponent = ({
                     title: t('transactions.cancelFailed.title'),
                     message: t('transactions.cancelFailed.message2'),
                     icon: 'error',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -534,9 +587,7 @@ const LabelComponent = ({
 
     useEffect(() => {
         if (!overlayCanvasRef.current) return;
-        let tempSelectedLine: LabelLocationData | undefined = undefined;
         const canvas = overlayCanvasRef.current;
-        let originalPrice: number | undefined = undefined;
         const dpr = window.devicePixelRatio || 1;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -553,21 +604,55 @@ const LabelComponent = ({
 
             if (
                 isLabel &&
-                isLabel.matchType === 'onLabel' &&
                 isLabel.label.type !== 'Cancel' &&
+                isLabel.matchType === 'onLabel' &&
                 (isLabel.parentLine.type === 'LIMIT' ||
                     (isLabel.parentLine.type === 'LIQ' &&
                         isLiqPriceLineDraggable))
             ) {
                 canvas.style.cursor = 'grabbing';
-                tempSelectedLine = isLabel;
-                originalPrice = isLabel.parentLine.yPrice;
+                dragStateRef.current.tempSelectedLine = isLabel;
+                dragStateRef.current.originalPrice = isLabel.parentLine.yPrice;
+                dragStateRef.current.isDragging = true;
                 setSelectedLine(isLabel);
                 setIsDrag(true);
+            }
+
+            if (
+                isLabel &&
+                isLabel.parentLine.type === 'PREVIEW_ORDER' &&
+                (isLabel.matchType === 'onLabel' ||
+                    isLabel.matchType === 'onLine')
+            ) {
+                canvas.style.cursor = 'grabbing';
+                dragStateRef.current.tempSelectedLine = isLabel;
+                dragStateRef.current.originalPrice = isLabel.parentLine.yPrice;
+                dragStateRef.current.isDragging = true;
+                setIsDrag(true);
+                useTradeDataStore.getState().setIsMidModeActive(false);
             }
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
+            const { isOutsideArea, frozenPrice } = dragStateRef.current;
+
+            if (isOutsideArea && frozenPrice !== undefined) {
+                dragStateRef.current.tempSelectedLine = dragStateRef.current
+                    .tempSelectedLine
+                    ? {
+                          ...dragStateRef.current.tempSelectedLine,
+                          parentLine: {
+                              ...dragStateRef.current.tempSelectedLine
+                                  .parentLine,
+                              yPrice: frozenPrice,
+                          },
+                      }
+                    : undefined;
+
+                setSelectedLine(dragStateRef.current.tempSelectedLine);
+                return;
+            }
+
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
                 canvas.getBoundingClientRect(),
@@ -591,17 +676,27 @@ const LabelComponent = ({
                 }
             }
 
-            tempSelectedLine = tempSelectedLine
+            dragStateRef.current.tempSelectedLine = dragStateRef.current
+                .tempSelectedLine
                 ? {
-                      ...tempSelectedLine,
+                      ...dragStateRef.current.tempSelectedLine,
                       parentLine: {
-                          ...tempSelectedLine.parentLine,
+                          ...dragStateRef.current.tempSelectedLine.parentLine,
                           yPrice: advancedValue,
                       },
                   }
                 : undefined;
 
-            setSelectedLine(tempSelectedLine);
+            if (
+                dragStateRef.current.tempSelectedLine?.parentLine.type ===
+                'PREVIEW_ORDER'
+            ) {
+                updateYPosition(
+                    dragStateRef.current.tempSelectedLine.parentLine.yPrice,
+                );
+            } else {
+                setSelectedLine(dragStateRef.current.tempSelectedLine);
+            }
         };
 
         async function limitOrderDragEnd(tempSelectedLine: LabelLocationData) {
@@ -691,9 +786,7 @@ const LabelComponent = ({
                             t('transactions.unknownErrorOccurred'),
                         icon: 'error',
                         removeAfter: 10000,
-                        txLink: limitOrderResult.signature
-                            ? `${blockExplorer}/tx/${limitOrderResult.signature}`
-                            : undefined,
+                        txLink: getTxLink(limitOrderResult.signature),
                     });
                 } else {
                     // Show success notification
@@ -731,9 +824,7 @@ const LabelComponent = ({
                         }),
                         icon: 'check',
                         removeAfter: 10000,
-                        txLink: limitOrderResult.signature
-                            ? `${blockExplorer}/tx/${limitOrderResult.signature}`
-                            : undefined,
+                        txLink: getTxLink(limitOrderResult.signature),
                     });
                 }
             } catch (error) {
@@ -773,11 +864,107 @@ const LabelComponent = ({
             setSelectedLine(undefined);
         }
 
+        function updatePreviewOrderPrice(tempSelectedLine: LabelLocationData) {
+            const newPrice = tempSelectedLine.parentLine.yPrice;
+            useTradeDataStore.getState().setOrderInputPriceValue({
+                value: newPrice,
+                changeType: 'dragEnd',
+            });
+            setSelectedLine(undefined);
+        }
+
         const handleDragEnd = async () => {
+            const { tempSelectedLine, originalPrice, isOutsideArea } =
+                dragStateRef.current;
+
             if (!tempSelectedLine || originalPrice === undefined) {
                 return;
             }
 
+            const currentPrice = tempSelectedLine.parentLine.yPrice;
+            if (currentPrice < 0) {
+                const restoredLine = {
+                    ...tempSelectedLine,
+                    parentLine: {
+                        ...tempSelectedLine.parentLine,
+                        yPrice: originalPrice,
+                    },
+                };
+                setSelectedLine(restoredLine);
+
+                if (restoredLine.parentLine.type === 'PREVIEW_ORDER') {
+                    updateYPosition(originalPrice);
+                }
+
+                dragStateRef.current.tempSelectedLine = undefined;
+                dragStateRef.current.originalPrice = undefined;
+                dragStateRef.current.isDragging = false;
+                dragStateRef.current.isOutsideArea = false;
+                dragStateRef.current.frozenPrice = undefined;
+                setIsDrag(false);
+                setSelectedLine(undefined);
+
+                if (chart) {
+                    const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                    if (iframeDoc?.body) {
+                        iframeDoc.body.style.removeProperty('cursor');
+                    }
+                    if (iframeDoc?.documentElement) {
+                        iframeDoc.documentElement.style.removeProperty(
+                            'cursor',
+                        );
+                    }
+                }
+
+                if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'pointer';
+                    overlayCanvasRef.current.style.pointerEvents = 'none';
+                }
+                return;
+            }
+
+            if (isOutsideArea) {
+                const restoredLine = {
+                    ...tempSelectedLine,
+                    parentLine: {
+                        ...tempSelectedLine.parentLine,
+                        yPrice: originalPrice,
+                    },
+                };
+                setSelectedLine(restoredLine);
+
+                if (restoredLine.parentLine.type === 'PREVIEW_ORDER') {
+                    updateYPosition(originalPrice);
+                }
+
+                dragStateRef.current.tempSelectedLine = undefined;
+                dragStateRef.current.originalPrice = undefined;
+                dragStateRef.current.isDragging = false;
+                dragStateRef.current.isOutsideArea = false;
+                dragStateRef.current.frozenPrice = undefined;
+                setIsDrag(false);
+                setSelectedLine(undefined);
+
+                if (chart) {
+                    const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                    if (iframeDoc?.body) {
+                        iframeDoc.body.style.removeProperty('cursor');
+                    }
+                    if (iframeDoc?.documentElement) {
+                        iframeDoc.documentElement.style.removeProperty(
+                            'cursor',
+                        );
+                    }
+                }
+
+                if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'pointer';
+                    overlayCanvasRef.current.style.pointerEvents = 'none';
+                }
+                return;
+            }
+
+            let cursorText = 'pointer';
             if (tempSelectedLine.parentLine.type === 'LIMIT') {
                 limitOrderDragEnd(tempSelectedLine);
             }
@@ -785,11 +972,31 @@ const LabelComponent = ({
             if (tempSelectedLine.parentLine.type === 'LIQ') {
                 liqPriceDragEnd(tempSelectedLine);
             }
-            tempSelectedLine = undefined;
+            if (tempSelectedLine.parentLine.type === 'PREVIEW_ORDER') {
+                updatePreviewOrderPrice(tempSelectedLine);
+                cursorText = 'row-resize';
+            }
+
+            dragStateRef.current.tempSelectedLine = undefined;
+            dragStateRef.current.originalPrice = undefined;
+            dragStateRef.current.isDragging = false;
+            dragStateRef.current.isOutsideArea = false;
+            dragStateRef.current.frozenPrice = undefined;
             setIsDrag(false);
+
+            if (chart) {
+                const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                if (iframeDoc?.body) {
+                    iframeDoc.body.style.removeProperty('cursor');
+                }
+                if (iframeDoc?.documentElement) {
+                    iframeDoc.documentElement.style.removeProperty('cursor');
+                }
+            }
+
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
-                    overlayCanvasRef.current.style.cursor = 'pointer';
+                    overlayCanvasRef.current.style.cursor = cursorText;
                 }
             }, 300);
         };
@@ -809,6 +1016,134 @@ const LabelComponent = ({
             d3.select(canvas).on('.drag', null);
         };
     }, [overlayCanvasRef.current, chart, selectedLine, drawnLabelsRef.current]);
+
+    // Handle ESC key press to cancel drag
+    useEffect(() => {
+        if (!chart) return;
+
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && dragStateRef.current.isDragging) {
+                const { tempSelectedLine, originalPrice } =
+                    dragStateRef.current;
+
+                if (tempSelectedLine && originalPrice !== undefined) {
+                    const restoredLine = {
+                        ...tempSelectedLine,
+                        parentLine: {
+                            ...tempSelectedLine.parentLine,
+                            yPrice: originalPrice,
+                        },
+                    };
+                    setSelectedLine(restoredLine);
+
+                    if (restoredLine.parentLine.type === 'PREVIEW_ORDER') {
+                        updateYPosition(originalPrice);
+                    }
+
+                    dragStateRef.current.tempSelectedLine = undefined;
+                    dragStateRef.current.originalPrice = undefined;
+                    dragStateRef.current.isDragging = false;
+                    dragStateRef.current.isOutsideArea = false;
+                    dragStateRef.current.frozenPrice = undefined;
+                    setIsDrag(false);
+                    setSelectedLine(undefined);
+
+                    if (chart) {
+                        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                        if (iframeDoc?.body) {
+                            iframeDoc.body.style.removeProperty('cursor');
+                        }
+                        if (iframeDoc?.documentElement) {
+                            iframeDoc.documentElement.style.removeProperty(
+                                'cursor',
+                            );
+                        }
+                    }
+
+                    if (overlayCanvasRef.current) {
+                        overlayCanvasRef.current.style.cursor = 'pointer';
+                        overlayCanvasRef.current.style.pointerEvents = 'none';
+                    }
+                }
+            }
+        };
+
+        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        const iframeBody = iframeDoc?.body;
+
+        if (iframeBody) {
+            iframeBody.addEventListener('keydown', handleEscapeKey);
+
+            return () => {
+                iframeBody.removeEventListener('keydown', handleEscapeKey);
+            };
+        }
+    }, [chart, overlayCanvasRef.current]);
+
+    // Handle mouse leaving and entering chart during drag
+    useEffect(() => {
+        if (!chart) return;
+
+        const handleMouseLeave = () => {
+            const { isDragging, tempSelectedLine } = dragStateRef.current;
+
+            if (isDragging && tempSelectedLine) {
+                dragStateRef.current.frozenPrice =
+                    tempSelectedLine.parentLine.yPrice;
+                dragStateRef.current.isOutsideArea = true;
+
+                const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                if (iframeDoc?.body) {
+                    iframeDoc.body.style.setProperty(
+                        'cursor',
+                        'not-allowed',
+                        'important',
+                    );
+                }
+                if (iframeDoc?.documentElement) {
+                    iframeDoc.documentElement.style.setProperty(
+                        'cursor',
+                        'not-allowed',
+                        'important',
+                    );
+                }
+            }
+        };
+
+        const handleMouseEnter = () => {
+            const { isDragging } = dragStateRef.current;
+
+            if (isDragging) {
+                dragStateRef.current.isOutsideArea = false;
+                dragStateRef.current.frozenPrice = undefined;
+
+                const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                if (iframeDoc?.body) {
+                    iframeDoc.body.style.removeProperty('cursor');
+                }
+                if (iframeDoc?.documentElement) {
+                    iframeDoc.documentElement.style.removeProperty('cursor');
+                }
+
+                if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'grabbing';
+                }
+            }
+        };
+
+        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        const iframeBody = iframeDoc?.body;
+
+        if (iframeBody) {
+            iframeBody.addEventListener('mouseleave', handleMouseLeave);
+            iframeBody.addEventListener('mouseenter', handleMouseEnter);
+
+            return () => {
+                iframeBody.removeEventListener('mouseleave', handleMouseLeave);
+                iframeBody.removeEventListener('mouseenter', handleMouseEnter);
+            };
+        }
+    }, [chart]);
 
     return null;
 };

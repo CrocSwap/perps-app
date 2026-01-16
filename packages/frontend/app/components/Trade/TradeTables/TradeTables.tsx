@@ -7,7 +7,6 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { WsChannels } from '~/utils/Constants';
 import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 import BalancesTable from '../BalancesTable/BalancesTable';
-import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
 import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
 import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
@@ -27,19 +26,18 @@ export interface FilterOption {
 }
 
 const tradePageBlackListTabs = new Set([
-    'Funding History',
-    'Deposits and Withdrawals',
-    'Depositors',
+    'common.fundingHistory',
+    'common.depositsAndWithdrawals',
+    'common.depositors',
 ]);
 
 const portfolioPageBlackListTabs = new Set([
-    'Depositors',
-    'Funding History',
-    'Deposits and Withdrawals',
+    'common.depositors',
+    'common.fundingHistory',
+    'common.depositsAndWithdrawals',
 ]);
 
 interface TradeTableProps {
-    portfolioPage?: boolean;
     vaultPage?: boolean;
     vaultFetched?: boolean;
     vaultDepositors?: VaultFollowerStateIF[];
@@ -47,7 +45,7 @@ interface TradeTableProps {
 }
 
 export default function TradeTable(props: TradeTableProps) {
-    const { portfolioPage, vaultPage, vaultFetched, vaultDepositors } = props;
+    const { vaultPage, vaultFetched, vaultDepositors } = props;
 
     const filterOptions: FilterOption[] = [
         { id: 'all', label: t('common.all') },
@@ -92,11 +90,10 @@ export default function TradeTable(props: TradeTableProps) {
             'common.tradeHistory',
             // 'common.fundingHistory',
             'common.orderHistory',
-            // 'common.depositsAndWithdrawals',
         ];
 
         if (vaultPage) {
-            availableTabs.push('Depositors');
+            availableTabs.push('common.depositors');
         }
 
         // Filter for different pages
@@ -153,23 +150,13 @@ export default function TradeTable(props: TradeTableProps) {
         }
     }, [page]);
 
-    const {
-        orderHistoryFetched,
-        tradeHistoryFetched,
-        fundingHistoryFetched,
-        webDataFetched,
-    } = useMemo(() => {
-        return {
-            orderHistoryFetched: fetchedChannels.has(
-                WsChannels.USER_HISTORICAL_ORDERS,
-            ),
-            tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
-            fundingHistoryFetched: fetchedChannels.has(
-                WsChannels.USER_FUNDINGS,
-            ),
-            webDataFetched: fetchedChannels.has(WsChannels.WEB_DATA2),
-        };
-    }, [Array.from(fetchedChannels).join(',')]);
+    // Derive fetched states directly - Set.has() is O(1) and cheap
+    const orderHistoryFetched = fetchedChannels.has(
+        WsChannels.USER_HISTORICAL_ORDERS,
+    );
+    const tradeHistoryFetched = fetchedChannels.has(WsChannels.USER_FILLS);
+    const fundingHistoryFetched = fetchedChannels.has(WsChannels.USER_FUNDINGS);
+    const webDataFetched = fetchedChannels.has(WsChannels.WEB_DATA2);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
@@ -177,6 +164,10 @@ export default function TradeTable(props: TradeTableProps) {
 
     const handleFilterChange = (selectedId: string) => {
         setSelectedFilter(selectedId);
+    };
+
+    const handleClearFilter = () => {
+        setSelectedFilter('all');
     };
 
     const rightAlignedContent = (
@@ -202,6 +193,7 @@ export default function TradeTable(props: TradeTableProps) {
                                 : webDataFetched
                         }
                         selectedFilter={selectedFilter}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.openOrders':
@@ -210,6 +202,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                         isFetched={orderHistoryFetched}
                         data={userOrders}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             // case 'TWAP':
@@ -219,6 +212,8 @@ export default function TradeTable(props: TradeTableProps) {
                     <TradeHistoryTable
                         data={userFills}
                         isFetched={tradeHistoryFetched}
+                        selectedFilter={selectedFilter}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.fundingHistory':
@@ -227,6 +222,7 @@ export default function TradeTable(props: TradeTableProps) {
                         userFundings={userFundings}
                         isFetched={fundingHistoryFetched}
                         selectedFilter={selectedFilter}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.orderHistory':
@@ -235,12 +231,10 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                         data={orderHistory}
                         isFetched={orderHistoryFetched}
+                        onClearFilter={handleClearFilter}
                     />
                 );
-            case 'common.depositsAndWithdrawals':
-                return (
-                    <DepositsWithdrawalsTable isFetched={tradeHistoryFetched} />
-                );
+
             case 'common.depositors':
                 return (
                     <VaultDepositorsTable
@@ -272,8 +266,7 @@ export default function TradeTable(props: TradeTableProps) {
                 />
             )}
             <motion.div
-                className={`${styles.tableContent} ${!showTabs ? styles.noTabs : ''} ${
-                    portfolioPage ? styles.portfolioPage : ''
+                className={`${styles.tableContent} ${!showTabs ? styles.noTabs : ''}
                 }`}
                 key={selectedTradeTab}
                 initial={{ opacity: 0 }}

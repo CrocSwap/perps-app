@@ -106,25 +106,25 @@ export default function DepositModal({
             }
 
             // Create a timeout promise
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(
-                    () =>
-                        reject(
-                            new Error(
-                                t('transactions.transactionTimedOut', {
-                                    timeInSeconds: 15,
-                                }),
+            const timeoutPromise: ReturnType<typeof executeDeposit> =
+                new Promise((_, reject) => {
+                    setTimeout(
+                        () =>
+                            reject(
+                                new Error(
+                                    t('transactions.transactionTimedOut', {
+                                        timeInSeconds: 15,
+                                    }),
+                                ),
                             ),
-                        ),
-                    15000,
-                );
-            });
+                        15000,
+                    );
+                });
 
             // Race between the deposit and the timeout
-            const result = await Promise.race([
-                executeDeposit(depositAmount),
-                timeoutPromise,
-            ]);
+            const result = await Promise.race<
+                Awaited<ReturnType<typeof executeDeposit>>
+            >([executeDeposit(depositAmount), timeoutPromise]);
 
             if (result.success && result.confirmed) {
                 setTransactionStatus('success');
@@ -295,6 +295,7 @@ export default function DepositModal({
                     value={amount}
                     onChange={handleInputChange}
                     aria-label={t('aria.depositInput')}
+                    data-modal-initial-focus
                     inputMode='numeric'
                     pattern='[0-9]*'
                     placeholder={t('transactions.enterAmountMin10')}
@@ -302,7 +303,11 @@ export default function DepositModal({
                     step='any'
                     className={isBelowMinimum ? styles.inputBelowMin : ''}
                 />
-                <button onClick={handleMaxClick} className={styles.maxButton}>
+                <button
+                    onClick={handleMaxClick}
+                    className={styles.maxButton}
+                    aria-label={t('aria.setMaxAmount')}
+                >
                     Max
                 </button>
                 {error && <div className={styles.error}>{error}</div>}

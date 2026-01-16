@@ -4,7 +4,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './WithdrawModal.module.css';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface WithdrawModalProps {
     vault: {
@@ -22,6 +22,7 @@ export default function WithdrawModal({
     onWithdraw,
     // onClose,
 }: WithdrawModalProps) {
+    const { t } = useTranslation();
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
 
@@ -96,13 +97,19 @@ export default function WithdrawModal({
                     value={amount}
                     onChange={handleInputChange}
                     aria-label={t('aria.withdrawInput')}
+                    data-modal-initial-focus
                     inputMode='numeric'
                     pattern='[0-9]*'
                     placeholder='Enter amount'
                     min='0'
                     step='any'
                 />
-                <button onClick={handleMaxClick}>Max</button>
+                <button
+                    onClick={handleMaxClick}
+                    aria-label={t('aria.setMaxAmount')}
+                >
+                    Max
+                </button>
                 {error && <div className={styles.error}>{error}</div>}
             </div>
 
@@ -128,8 +135,9 @@ export default function WithdrawModal({
                 className={styles.actionButton}
                 onClick={handleWithdraw}
                 disabled={isButtonDisabled}
+                aria-label={t('common.withdraw')}
             >
-                Withdraw
+                {t('common.withdraw')}
             </button>
         </div>
     );
