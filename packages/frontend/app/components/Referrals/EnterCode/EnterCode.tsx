@@ -3,8 +3,12 @@ import { Trans, useTranslation } from 'react-i18next';
 import { FaSpinner } from 'react-icons/fa';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import styles from './EnterCode.module.css';
+import type { enterCodeViewsType } from '../CodeTabs/CodeTabs';
+import { useReferralStore } from '~/stores/ReferralStore';
 
 interface PropsIF {
+    view: enterCodeViewsType;
+    setView: (view: enterCodeViewsType) => void;
     isSessionEstablished: boolean;
     totVolume: number | undefined;
     totVolumeFormatted: string;
@@ -23,6 +27,8 @@ interface PropsIF {
 
 export default function EnterCode(props: PropsIF) {
     const {
+        view,
+        setView,
         isSessionEstablished,
         totVolume,
         totVolumeFormatted,
@@ -39,25 +45,27 @@ export default function EnterCode(props: PropsIF) {
         setInvalidCode,
     } = props;
 
+    const referralStore = useReferralStore();
+
     const { t } = useTranslation();
 
-    const spinner = (
-        <div
-            style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-            }}
-        >
-            <FaSpinner
-                style={{
-                    color: 'var(--accent1)',
-                    animation: 'spin 0.6s linear infinite',
-                }}
-            />
-        </div>
-    );
+    // const spinner = (
+    //     <div
+    //         style={{
+    //             display: 'flex',
+    //             justifyContent: 'center',
+    //             alignItems: 'center',
+    //             height: '100%',
+    //         }}
+    //     >
+    //         <FaSpinner
+    //             style={{
+    //                 color: 'var(--accent1)',
+    //                 animation: 'spin 0.6s linear infinite',
+    //             }}
+    //         />
+    //     </div>
+    // );
 
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
@@ -66,7 +74,7 @@ export default function EnterCode(props: PropsIF) {
                     <>
                         <div className={styles.current_ref_code}>
                             <h6>{t('referrals.usingAffiliateCode')}</h6>
-                            {isCachedValueValid && <p>{refCodeToConsume}</p>}
+                            <p>{referralStore.cached}</p>
                         </div>
                         <p className={styles.ref_code_blurb}>
                             Associating a code with your wallet address will
@@ -85,16 +93,16 @@ export default function EnterCode(props: PropsIF) {
                     <h6>{t('referrals.enterCode')}</h6>
                 )}
             </div>
-            {cached && totVolume !== undefined && totVolume < 10000 && (
+            {
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
                         bg='accent1'
-                        onClick={() => setEditModeReferral(true)}
+                        onClick={() => setView('enterCode')}
                     >
                         {t('common.edit')}
                     </SimpleButton>
                 </div>
-            )}
+            }
         </section>
     );
 
@@ -148,9 +156,7 @@ export default function EnterCode(props: PropsIF) {
                         !isUserRefCodeClaimed ||
                         isUserInputRefCodeSelfOwned
                     }
-                    onClick={(): void => {
-                        handleUpdateReferralCode(userInputRefCode);
-                    }}
+                    onClick={() => handleUpdateReferralCode(userInputRefCode)}
                 >
                     {t('common.confirm')}
                 </SimpleButton>
@@ -209,10 +215,15 @@ export default function EnterCode(props: PropsIF) {
         );
     }
 
-    const shouldShowInput =
-        (editModeReferral || !cached || isCachedValueValid === false) &&
-        totVolume !== undefined &&
-        totVolume < 10000;
+    // const shouldShowInput =
+    //     (editModeReferral || !cached || isCachedValueValid === false) &&
+    //     totVolume !== undefined &&
+    //     totVolume < 10000;
 
-    return shouldShowInput ? enterNewCodeElem : currentCodeElem;
+    const viewMap: Record<enterCodeViewsType, React.ReactNode> = {
+        enterCode: enterNewCodeElem,
+        viewCode: currentCodeElem,
+    };
+
+    return viewMap[view];
 }

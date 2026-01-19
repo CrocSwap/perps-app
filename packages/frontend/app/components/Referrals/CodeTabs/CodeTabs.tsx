@@ -50,6 +50,8 @@ const DEFAULT_AFFILIATE_CODE_LENGTH = 6;
 const AFFILIATE_PERCENT = '10%';
 const USER_PERCENT = '4%';
 
+export type enterCodeViewsType = 'enterCode' | 'viewCode';
+
 export default function CodeTabs(props: PropsIF) {
     // tab which should be open by default on page load
     const { initialTab = 'referrals.enterCode' } = props;
@@ -77,6 +79,12 @@ export default function CodeTabs(props: PropsIF) {
             .slice(0, DEFAULT_AFFILIATE_CODE_LENGTH);
     }, [affiliateAddress]);
 
+    // const CACHED_CODE_PLACEHOLDER = 'myCode';
+
+    // view to display in the `<EnterCode />` elem
+    const [enterCodeView, setEnterCodeView] =
+        useState<enterCodeViewsType>('enterCode');
+
     // boolean representing whether affiliate code has enough volume to be changed
     const canEditAffiliateCode = useMemo<boolean>(() => {
         return (
@@ -98,46 +106,44 @@ export default function CodeTabs(props: PropsIF) {
     const [justCopied, setJustCopied] = useState<boolean>(false);
 
     // ref code to use in the DOM (being referred by someone else)
-    const [refCodeToConsume, setRefCodeToConsume] = useState<
-        string | undefined
-    >(undefined);
+    const [refCodeToConsume, setRefCodeToConsume] = useState<string>('');
 
     // update refCodeToConsume whenever the cached value changes
-    useEffect(() => {
-        if (referralStore.cached && affiliateAddress) {
-            (async () => {
-                const isOwnedByUser: boolean | undefined =
-                    await checkIfOwnRefCode(
-                        referralStore.cached,
-                        affiliateAddress,
-                    );
-                isOwnedByUser === false &&
-                    setRefCodeToConsume(referralStore.cached);
-            })();
-        } else if (!referralStore.cached) {
-            setRefCodeToConsume(undefined);
-        }
-    }, [referralStore.cached, affiliateAddress]);
+    // useEffect(() => {
+    //     if (referralStore.cached && affiliateAddress) {
+    //         (async () => {
+    //             const isOwnedByUser: boolean | undefined =
+    //                 await checkIfOwnRefCode(
+    //                     referralStore.cached,
+    //                     affiliateAddress,
+    //                 );
+    //             isOwnedByUser === false &&
+    //                 setRefCodeToConsume(referralStore.cached);
+    //         })();
+    //     } else if (!referralStore.cached) {
+    //         setRefCodeToConsume(undefined);
+    //     }
+    // }, [referralStore.cached, affiliateAddress]);
 
     const [isRefCodeClaimed, setIsRefCodeClaimed] = useState<
         boolean | undefined
     >(undefined);
-    useEffect(() => {
-        if (refCodeToConsume === undefined || !refCodeToConsume.length) {
-            setIsRefCodeClaimed(undefined);
-        } else {
-            isAffiliateCodeFree(refCodeToConsume)
-                .then((isFree: boolean) => setIsRefCodeClaimed(!isFree))
-                .catch((err) => {
-                    setIsRefCodeClaimed(undefined);
-                    console.error(err);
-                });
-        }
-    }, [refCodeToConsume]);
+    // useEffect(() => {
+    //     if (refCodeToConsume === undefined || !refCodeToConsume.length) {
+    //         setIsRefCodeClaimed(undefined);
+    //     } else {
+    //         isAffiliateCodeFree(refCodeToConsume)
+    //             .then((isFree: boolean) => setIsRefCodeClaimed(!isFree))
+    //             .catch((err) => {
+    //                 setIsRefCodeClaimed(undefined);
+    //                 console.error(err);
+    //             });
+    //     }
+    // }, [refCodeToConsume]);
 
-    useEffect(() => {
-        console.log('isRefCodeClaimed: ', isRefCodeClaimed);
-    }, [isRefCodeClaimed]);
+    // useEffect(() => {
+    //     console.log('isRefCodeClaimed: ', isRefCodeClaimed);
+    // }, [isRefCodeClaimed]);
 
     const [_copiedData, copy] = useClipboard();
 
@@ -156,24 +162,24 @@ export default function CodeTabs(props: PropsIF) {
         );
     }, [referralStore.totVolume, formatNum]);
 
-    useEffect(() => {
-        if (
-            !referralStore.cached &&
-            referralStore.totVolume !== undefined &&
-            referralStore.totVolume < 10000
-        ) {
-            setEditModeReferral(true);
-        }
-    }, [referralStore.cached, referralStore.totVolume]);
+    // useEffect(() => {
+    //     if (
+    //         !referralStore.cached &&
+    //         referralStore.totVolume !== undefined &&
+    //         referralStore.totVolume < 10000
+    //     ) {
+    //         setEditModeReferral(true);
+    //     }
+    // }, [referralStore.cached, referralStore.totVolume]);
 
-    useEffect(() => {
-        if (justCopied) {
-            const timer = setTimeout(() => {
-                setJustCopied(false);
-            }, 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [justCopied]);
+    // useEffect(() => {
+    //     if (justCopied) {
+    //         const timer = setTimeout(() => {
+    //             setJustCopied(false);
+    //         }, 1000);
+    //         return () => clearTimeout(timer);
+    //     }
+    // }, [justCopied]);
 
     const isSessionEstablished = useMemo<boolean>(
         () => isEstablished(sessionState),
@@ -186,20 +192,22 @@ export default function CodeTabs(props: PropsIF) {
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
     // URL param takes priority over cached localStorage value
-    useEffect(() => {
-        if (
-            handleReferralURLParam.value &&
-            handleReferralURLParam.value !== referralStore.cached
-        ) {
-            // Reset validation state so the validation effect will re-run
-            setIsCachedValueValid(undefined);
-            setLastValidatedCode('');
-            referralStore.cache(handleReferralURLParam.value);
-        }
-    }, [handleReferralURLParam.value]);
+    // useEffect(() => {
+    //     if (
+    //         handleReferralURLParam.value &&
+    //         handleReferralURLParam.value !== referralStore.cached
+    //     ) {
+    //         // Reset validation state so the validation effect will re-run
+    //         setIsCachedValueValid(undefined);
+    //         setLastValidatedCode('');
+    //         referralStore.cache(handleReferralURLParam.value);
+    //     }
+    // }, [handleReferralURLParam.value]);
 
     // this holds an improperly formatted ref code to provide user feedback
     const [invalidCode, setInvalidCode] = useState<string>('');
+
+    // click handler for the CTA button when the user types a code
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
         // Don't make API calls with empty or whitespace-only codes
@@ -207,27 +215,33 @@ export default function CodeTabs(props: PropsIF) {
             return;
         }
 
-        // check FUUL API to see if code is claimed or free
-        const codeIsFree: boolean = await isAffiliateCodeFree(r);
+        // check FUUL API to see if code is claimed
+        // `true` => this code has been already registered by an affiliate
+        // `false` => this code does not exist in the FUUL system
+        const codeExistsInFUUL: boolean = await isAffiliateCodeFree(r);
+        console.log('codeExistsInFUUL: ', codeExistsInFUUL);
 
         // Always cache the code and set URL param
         handleReferralURLParam.set(r);
-        referralStore.cache(r);
+        // referralStore.cache(r);
 
         // if code is unclaimed, show in edit mode with error
-        if (!codeIsFree) {
-            setInvalidCode(r);
-            setIsCachedValueValid(false);
-            setEditModeReferral(true);
-            setUserInputRefCode(r);
+        if (!codeExistsInFUUL) {
+            // IMPORTANT: this block is error state
+            // setInvalidCode(r);
+            // setIsCachedValueValid(false);
+            // setEditModeReferral(true);
+            // setUserInputRefCode(r);
         } else {
-            // code is valid and claimed
-            invalidCode && setInvalidCode('');
-            setIsCachedValueValid(true);
-            setEditModeReferral(false);
+            // IMPORTANT: this block is normal (non-error) state
+            // invalidCode && setInvalidCode('');
+            // setIsCachedValueValid(true);
+            // setEditModeReferral(false);
+            referralStore.cache(r);
+            setEnterCodeView('viewCode');
         }
-        // Update lastValidatedCode to prevent the useEffect from re-validating
-        setLastValidatedCode(r);
+        // // Update lastValidatedCode to prevent the useEffect from re-validating
+        // setLastValidatedCode(r);
     }
 
     // pixel-width breakpoint to toggle shorter copy
@@ -246,37 +260,37 @@ export default function CodeTabs(props: PropsIF) {
     }, [narrowScreenForCopy]);
 
     // keep the correct tab highlighted when screen width changes
-    useEffect(() => {
-        // find which key in COPY_PER_SCREEN_WIDTH matches the current activeTab
-        const currentKey = Object.entries(COPY_PER_SCREEN_WIDTH).find(
-            ([_, value]) =>
-                value.full === activeTab || value.short === activeTab,
-        )?.[0] as keyof typeof COPY_PER_SCREEN_WIDTH | undefined;
+    // useEffect(() => {
+    //     // find which key in COPY_PER_SCREEN_WIDTH matches the current activeTab
+    //     const currentKey = Object.entries(COPY_PER_SCREEN_WIDTH).find(
+    //         ([_, value]) =>
+    //             value.full === activeTab || value.short === activeTab,
+    //     )?.[0] as keyof typeof COPY_PER_SCREEN_WIDTH | undefined;
 
-        if (currentKey) {
-            const currentTabCopySet = COPY_PER_SCREEN_WIDTH[currentKey];
-            // get the updated tab name based on new screen width type
-            const updatedTabName =
-                currentTabCopySet[narrowScreenForCopy ? 'short' : 'full'];
-            // update the value `activeTab` to the updated tab name
-            setActiveTab(updatedTabName);
-        }
-    }, [narrowScreenForCopy]);
+    //     if (currentKey) {
+    //         const currentTabCopySet = COPY_PER_SCREEN_WIDTH[currentKey];
+    //         // get the updated tab name based on new screen width type
+    //         const updatedTabName =
+    //             currentTabCopySet[narrowScreenForCopy ? 'short' : 'full'];
+    //         // update the value `activeTab` to the updated tab name
+    //         setActiveTab(updatedTabName);
+    //     }
+    // }, [narrowScreenForCopy]);
 
     const prevAffiliateAddress = useRef<string | undefined>(undefined);
 
     // reset temporary affiliate code when changing wallets
-    useEffect(() => {
-        // Only clear when switching between different wallets, not on initial connect
-        if (
-            prevAffiliateAddress.current &&
-            prevAffiliateAddress.current !== affiliateAddress?.toString()
-        ) {
-            setTemporaryAffiliateCode('');
-            referralStore.clear();
-        }
-        prevAffiliateAddress.current = affiliateAddress?.toString();
-    }, [affiliateAddress]);
+    // useEffect(() => {
+    //     // Only clear when switching between different wallets, not on initial connect
+    //     if (
+    //         prevAffiliateAddress.current &&
+    //         prevAffiliateAddress.current !== affiliateAddress?.toString()
+    //     ) {
+    //         setTemporaryAffiliateCode('');
+    //         referralStore.clear();
+    //     }
+    //     prevAffiliateAddress.current = affiliateAddress?.toString();
+    // }, [affiliateAddress]);
 
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
@@ -286,38 +300,38 @@ export default function CodeTabs(props: PropsIF) {
         useState<boolean | undefined>(undefined);
 
     // when the user manually enters a refCode, check if the code is owned by their wallet
-    useEffect(() => {
-        if (userInputRefCode && affiliateAddress) {
-            checkIfOwnRefCode(userInputRefCode, affiliateAddress.toString())
-                .then((isSelfOwned: boolean | undefined) =>
-                    setIsUserInputRefCodeSelfOwned(isSelfOwned),
-                )
-                .catch((err) => {
-                    setIsUserInputRefCodeSelfOwned(undefined);
-                    console.error(err);
-                });
-        } else {
-            setIsUserInputRefCodeSelfOwned(undefined);
-        }
-    }, [userInputRefCode, affiliateAddress]);
+    // useEffect(() => {
+    //     if (userInputRefCode && affiliateAddress) {
+    //         checkIfOwnRefCode(userInputRefCode, affiliateAddress.toString())
+    //             .then((isSelfOwned: boolean | undefined) =>
+    //                 setIsUserInputRefCodeSelfOwned(isSelfOwned),
+    //             )
+    //             .catch((err) => {
+    //                 setIsUserInputRefCodeSelfOwned(undefined);
+    //                 console.error(err);
+    //             });
+    //     } else {
+    //         setIsUserInputRefCodeSelfOwned(undefined);
+    //     }
+    // }, [userInputRefCode, affiliateAddress]);
 
     // when the user manually enters a refCode, make sure it exists
-    useEffect(() => {
-        if (userInputRefCode.length) {
-            (async () => {
-                try {
-                    // check with FUUL to determine if ref code is claimed
-                    const isCodeFree: boolean =
-                        await isAffiliateCodeFree(userInputRefCode);
-                    // normally `isCodeFree === true` means the code is available
-                    // right now the API is returning `false` when the code is available
-                    setIsUserRefCodeClaimed(isCodeFree);
-                } catch (error) {
-                    setIsUserRefCodeClaimed(false);
-                }
-            })();
-        }
-    }, [userInputRefCode]);
+    // useEffect(() => {
+    //     if (userInputRefCode.length) {
+    //         (async () => {
+    //             try {
+    //                 // check with FUUL to determine if ref code is claimed
+    //                 const isCodeFree: boolean =
+    //                     await isAffiliateCodeFree(userInputRefCode);
+    //                 // normally `isCodeFree === true` means the code is available
+    //                 // right now the API is returning `false` when the code is available
+    //                 setIsUserRefCodeClaimed(isCodeFree);
+    //             } catch (error) {
+    //                 setIsUserRefCodeClaimed(false);
+    //             }
+    //         })();
+    //     }
+    // }, [userInputRefCode]);
 
     // determines whether the value in zustand cache passes validation
     // legal characters, length, and format checks
@@ -329,159 +343,159 @@ export default function CodeTabs(props: PropsIF) {
     const [lastValidatedCode, setLastValidatedCode] = useState<string>('');
 
     // Validate cached referral code when it changes (e.g., from URL)
-    useEffect(() => {
-        // Don't validate if there's no cached code
-        if (!referralStore.cached) {
-            setIsCachedValueValid(undefined);
-            setLastValidatedCode('');
-            return;
-        }
+    // useEffect(() => {
+    //     // Don't validate if there's no cached code
+    //     if (!referralStore.cached) {
+    //         setIsCachedValueValid(undefined);
+    //         setLastValidatedCode('');
+    //         return;
+    //     }
 
-        // Don't re-validate if we already have a validation result for this specific code
-        if (
-            isCachedValueValid !== undefined &&
-            lastValidatedCode === referralStore.cached
-        ) {
-            return;
-        }
+    //     // Don't re-validate if we already have a validation result for this specific code
+    //     if (
+    //         isCachedValueValid !== undefined &&
+    //         lastValidatedCode === referralStore.cached
+    //     ) {
+    //         return;
+    //     }
 
-        (async () => {
-            const codeToValidate = referralStore.cached;
-            try {
-                const isCachedCodeFree: boolean =
-                    await isAffiliateCodeFree(codeToValidate);
-                console.log('isCodeFree: ', isCachedCodeFree);
+    //     (async () => {
+    //         const codeToValidate = referralStore.cached;
+    //         try {
+    //             const isCachedCodeFree: boolean =
+    //                 await isAffiliateCodeFree(codeToValidate);
+    //             console.log('isCodeFree: ', isCachedCodeFree);
 
-                if (isCachedCodeFree) {
-                    // Code is not claimed - show in edit mode with error
-                    setInvalidCode(codeToValidate);
-                    setIsCachedValueValid(false);
-                    setEditModeReferral(true);
-                    setUserInputRefCode(codeToValidate);
-                } else {
-                    // Code is valid and claimed
-                    setIsCachedValueValid(true);
-                    setEditModeReferral(false);
-                }
-                setLastValidatedCode(codeToValidate);
-            } catch (error) {
-                // On error, assume invalid to be safe
-                setIsCachedValueValid(false);
-                setEditModeReferral(true);
-                setUserInputRefCode(codeToValidate);
-                setLastValidatedCode(codeToValidate);
-            }
-        })();
-    }, [referralStore.cached, isCachedValueValid, lastValidatedCode]);
+    //             if (isCachedCodeFree) {
+    //                 // Code is not claimed - show in edit mode with error
+    //                 setInvalidCode(codeToValidate);
+    //                 setIsCachedValueValid(false);
+    //                 setEditModeReferral(true);
+    //                 setUserInputRefCode(codeToValidate);
+    //             } else {
+    //                 // Code is valid and claimed
+    //                 setIsCachedValueValid(true);
+    //                 setEditModeReferral(false);
+    //             }
+    //             setLastValidatedCode(codeToValidate);
+    //         } catch (error) {
+    //             // On error, assume invalid to be safe
+    //             setIsCachedValueValid(false);
+    //             setEditModeReferral(true);
+    //             setUserInputRefCode(codeToValidate);
+    //             setLastValidatedCode(codeToValidate);
+    //         }
+    //     })();
+    // }, [referralStore.cached, isCachedValueValid, lastValidatedCode]);
 
-    const tempAffiliateCodeCharsValidate = useMemo<boolean>(() => {
-        return checkForPermittedCharacters(temporaryAffiliateCode);
-    }, [temporaryAffiliateCode]);
+    // const tempAffiliateCodeCharsValidate = useMemo<boolean>(() => {
+    //     return checkForPermittedCharacters(temporaryAffiliateCode);
+    // }, [temporaryAffiliateCode]);
 
-    useEffect(() => {
-        (async () => {
-            if (isEstablished(sessionState)) {
-                const userWalletKey =
-                    sessionState.walletPublicKey ||
-                    sessionState.sessionPublicKey;
+    // useEffect(() => {
+    //     (async () => {
+    //         if (isEstablished(sessionState)) {
+    //             const userWalletKey =
+    //                 sessionState.walletPublicKey ||
+    //                 sessionState.sessionPublicKey;
 
-                const affiliateData = await getAffiliateCode(
-                    userWalletKey.toString(),
-                    UserIdentifierType.SolanaAddress,
-                );
+    //             const affiliateData = await getAffiliateCode(
+    //                 userWalletKey.toString(),
+    //                 UserIdentifierType.SolanaAddress,
+    //             );
 
-                if (affiliateData?.code) {
-                    setAffiliateCode(affiliateData.code);
-                }
+    //             if (affiliateData?.code) {
+    //                 setAffiliateCode(affiliateData.code);
+    //             }
 
-                // Only fetch and apply on-chain referrer if no URL parameter is present
-                // URL parameter always takes precedence
-                if (!handleReferralURLParam.value) {
-                    const referrer = await getReferrerAsync(
-                        userWalletKey.toString(),
-                    );
-                    if (referrer?.referrer_identifier) {
-                        const affiliateData = await getAffiliateCode(
-                            referrer.referrer_identifier as string,
-                            UserIdentifierType.SolanaAddress,
-                        );
-                        if (affiliateData?.code) {
-                            handleUpdateReferralCode(affiliateData.code);
-                        }
-                    }
-                }
-            } else {
-                setAffiliateCode('');
-            }
-        })();
-    }, [sessionState]);
+    //             // Only fetch and apply on-chain referrer if no URL parameter is present
+    //             // URL parameter always takes precedence
+    //             if (!handleReferralURLParam.value) {
+    //                 const referrer = await getReferrerAsync(
+    //                     userWalletKey.toString(),
+    //                 );
+    //                 if (referrer?.referrer_identifier) {
+    //                     const affiliateData = await getAffiliateCode(
+    //                         referrer.referrer_identifier as string,
+    //                         UserIdentifierType.SolanaAddress,
+    //                     );
+    //                     if (affiliateData?.code) {
+    //                         handleUpdateReferralCode(affiliateData.code);
+    //                     }
+    //                 }
+    //             }
+    //         } else {
+    //             setAffiliateCode('');
+    //         }
+    //     })();
+    // }, [sessionState]);
 
-    useEffect(() => {
-        if (!canEditAffiliateCode) {
-            setTemporaryAffiliateCode(defaultAffiliateCode);
-        }
-    }, [canEditAffiliateCode, defaultAffiliateCode]);
+    // useEffect(() => {
+    //     if (!canEditAffiliateCode) {
+    //         setTemporaryAffiliateCode(defaultAffiliateCode);
+    //     }
+    // }, [canEditAffiliateCode, defaultAffiliateCode]);
 
-    useEffect(() => {
-        if (!canEditAffiliateCode && editModeAffiliate) {
-            setEditModeAffiliate(false);
-        }
-    }, [canEditAffiliateCode, editModeAffiliate]);
+    // useEffect(() => {
+    //     if (!canEditAffiliateCode && editModeAffiliate) {
+    //         setEditModeAffiliate(false);
+    //     }
+    // }, [canEditAffiliateCode, editModeAffiliate]);
 
-    useEffect(() => {
-        // If no temporary code, immediately set as valid
-        if (!temporaryAffiliateCode) {
-            setIsTemporaryAffiliateCodeValid(undefined);
-            return;
-        }
+    // useEffect(() => {
+    //     // If no temporary code, immediately set as valid
+    //     if (!temporaryAffiliateCode) {
+    //         setIsTemporaryAffiliateCodeValid(undefined);
+    //         return;
+    //     }
 
-        // Don't check API if characters are invalid
-        if (!tempAffiliateCodeCharsValidate) {
-            setIsTemporaryAffiliateCodeValid(undefined);
-            return;
-        }
+    //     // Don't check API if characters are invalid
+    //     if (!tempAffiliateCodeCharsValidate) {
+    //         setIsTemporaryAffiliateCodeValid(undefined);
+    //         return;
+    //     }
 
-        // Set up debounced validation
-        const timer = setTimeout(async () => {
-            console.log(
-                'Starting validation for code:',
-                temporaryAffiliateCode,
-            );
-            try {
-                const codeIsFree = await isAffiliateCodeFree(
-                    temporaryAffiliateCode,
-                );
-                console.log('codeIsFree: ', codeIsFree);
-                const options = {
-                    method: 'GET',
-                    headers: {
-                        accept: 'application/json',
-                        authorization:
-                            'Bearer 74c36d38cf3f44ae2e90991a7e2857a0b035a623791a096e06c54b0c7f81354d',
-                    },
-                };
+    //     // Set up debounced validation
+    //     const timer = setTimeout(async () => {
+    //         console.log(
+    //             'Starting validation for code:',
+    //             temporaryAffiliateCode,
+    //         );
+    //         try {
+    //             const codeIsFree = await isAffiliateCodeFree(
+    //                 temporaryAffiliateCode,
+    //             );
+    //             console.log('codeIsFree: ', codeIsFree);
+    //             const options = {
+    //                 method: 'GET',
+    //                 headers: {
+    //                     accept: 'application/json',
+    //                     authorization:
+    //                         'Bearer 74c36d38cf3f44ae2e90991a7e2857a0b035a623791a096e06c54b0c7f81354d',
+    //                 },
+    //             };
 
-                fetch(
-                    'https://api.fuul.xyz/api/v1/referral_codes/' +
-                        temporaryAffiliateCode,
-                    options,
-                )
-                    .then((res) => res.json())
-                    .then((res) => console.log(res))
-                    .catch((err) => console.error(err));
-                setIsTemporaryAffiliateCodeValid(!codeIsFree);
-            } catch (error) {
-                console.log('Validation error:', error);
-                setIsTemporaryAffiliateCodeValid(false);
-            }
-        }, 500);
+    //             fetch(
+    //                 'https://api.fuul.xyz/api/v1/referral_codes/' +
+    //                     temporaryAffiliateCode,
+    //                 options,
+    //             )
+    //                 .then((res) => res.json())
+    //                 .then((res) => console.log(res))
+    //                 .catch((err) => console.error(err));
+    //             setIsTemporaryAffiliateCodeValid(!codeIsFree);
+    //         } catch (error) {
+    //             console.log('Validation error:', error);
+    //             setIsTemporaryAffiliateCodeValid(false);
+    //         }
+    //     }, 500);
 
-        return () => clearTimeout(timer);
-    }, [
-        temporaryAffiliateCode,
-        tempAffiliateCodeCharsValidate,
-        canEditAffiliateCode,
-    ]);
+    //     return () => clearTimeout(timer);
+    // }, [
+    //     temporaryAffiliateCode,
+    //     tempAffiliateCodeCharsValidate,
+    //     canEditAffiliateCode,
+    // ]);
 
     // fn to create an affiliate code for the wallet
     const createAffiliateCode = async () => {
@@ -614,19 +628,19 @@ export default function CodeTabs(props: PropsIF) {
     const [trackingLink, setTrackingLink] = useState('');
 
     // reset affiliate address input when user changes wallet
-    useEffect(() => setTemporaryAffiliateCode(''), [affiliateAddress]);
+    // useEffect(() => setTemporaryAffiliateCode(''), [affiliateAddress]);
 
-    useEffect(() => {
-        (async () => {
-            if (!affiliateCode || !affiliateAddress) return '';
-            const trackingLinkUrl = await Fuul.generateTrackingLink(
-                window.location.hostname,
-                affiliateAddress.toString(),
-                UserIdentifierType.SolanaAddress,
-            );
-            setTrackingLink(trackingLinkUrl);
-        })();
-    }, [affiliateCode]);
+    // useEffect(() => {
+    //     (async () => {
+    //         if (!affiliateCode || !affiliateAddress) return '';
+    //         const trackingLinkUrl = await Fuul.generateTrackingLink(
+    //             window.location.hostname,
+    //             affiliateAddress.toString(),
+    //             UserIdentifierType.SolanaAddress,
+    //         );
+    //         setTrackingLink(trackingLinkUrl);
+    //     })();
+    // }, [affiliateCode]);
 
     const claimElem = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
@@ -675,6 +689,8 @@ export default function CodeTabs(props: PropsIF) {
             case 'common.enter':
                 return (
                     <EnterCode
+                        view={enterCodeView}
+                        setView={setEnterCodeView}
                         isSessionEstablished={isSessionEstablished}
                         totVolume={referralStore.totVolume}
                         totVolumeFormatted={totVolumeFormatted}
@@ -685,7 +701,10 @@ export default function CodeTabs(props: PropsIF) {
                         setEditModeReferral={setEditModeReferral}
                         userInputRefCode={userInputRefCode}
                         setUserInputRefCode={setUserInputRefCode}
-                        isUserRefCodeClaimed={isUserRefCodeClaimed}
+                        isUserRefCodeClaimed={
+                            // isUserRefCodeClaimed
+                            true
+                        }
                         isUserInputRefCodeSelfOwned={
                             isUserInputRefCodeSelfOwned
                         }
@@ -715,7 +734,8 @@ export default function CodeTabs(props: PropsIF) {
                             isTemporaryAffiliateCodeValid
                         }
                         tempAffiliateCodeCharsValidate={
-                            tempAffiliateCodeCharsValidate
+                            // tempAffiliateCodeCharsValidate
+                            true
                         }
                         canEditAffiliateCode={canEditAffiliateCode}
                         defaultAffiliateCode={defaultAffiliateCode}
