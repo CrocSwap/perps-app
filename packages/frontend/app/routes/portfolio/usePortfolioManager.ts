@@ -203,15 +203,26 @@ export function usePortfolioManager(urlAddress?: string) {
                 EMBER_ENDPOINT_ALL + '/' + targetAddress.toString();
 
             const response = await fetch(emberEndpointForUser);
-            const data = await response.json();
-            const userData = data.stats;
-            if (data.error) {
-                console.log('error fetching user data');
-            } else if (data.stats) {
-                setUserData(userData);
+            if (response.status === 404) {
+                setUserData(undefined);
+                return;
             }
+
+            if (!response.ok) {
+                setUserData(undefined);
+                return;
+            }
+            const data = await response.json().catch(() => undefined);
+
+            if (!data || data.error || !data.stats) {
+                setUserData(undefined);
+                return;
+            }
+
+            setUserData(data.stats);
         } catch (error) {
             console.log(error);
+            setUserData(undefined);
         }
     }, [targetAddress]);
 

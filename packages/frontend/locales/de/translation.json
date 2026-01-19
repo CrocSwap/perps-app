@@ -45,11 +45,13 @@
         "announcements": "Ankündigungen",
         "leverage": "Hebel",
         "comingSoon": "Demnächst verfügbar",
+        "or": "oder",
         "enter": "Eingeben",
         "claim": "Beanspruchen",
         "seeDocsForMore": "Weitere Informationen finden Sie in der Dokumentation.",
         "clearFilter": "Filter löschen",
-        "activate": "Aktivieren"
+        "activate": "Aktivieren",
+        "copied": "Kopiert!"
     },
     "transactions": {
         "orderTypes": "Ordertypen",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "Kontoübersicht",
+        "updateFrequencyInMinutes": "Aktualisiert alle {{numMinutes}} Minuten",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -713,7 +717,9 @@
         "exceedsAvailableBalance": "Der Betrag überschreitet das verfügbare Guthaben von {{balance}}",
         "transactionTimedOut": "Transaktion nach 15 Sekunden zeitüberschritten",
         "connectToViewPortfolio": "Verbinden um Ihr Portfolio anzuzeigen",
-        "connectDescription": "Melden Sie sich mit Ihrer Wallet an, um Ihr Portfolio, Positionen und Handelshistorie anzuzeigen."
+        "connectDescription": "Melden Sie sich mit Ihrer Wallet an, um Ihr Portfolio, Positionen und Handelshistorie anzuzeigen.",
+        "pasteWalletAddress": "Wallet-Adresse einfügen",
+        "viewOtherAccount": "Anderes Konto anzeigen"
     },
     "pageTitles": {
         "portfolio": "Portfolio",

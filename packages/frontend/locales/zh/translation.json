@@ -45,11 +45,13 @@
         "announcements": "公告",
         "leverage": "杠杆",
         "comingSoon": "即将上线",
+        "or": "或",
         "enter": "输入",
         "claim": "领取",
         "seeDocsForMore": "更多信息请查看文档。",
         "clearFilter": "清除筛选",
-        "activate": "激活"
+        "activate": "激活",
+        "copied": "已复制！"
     },
     "transactions": {
         "orderTypes": "订单类型",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "账户概览",
+        "updateFrequencyInMinutes": "每{{numMinutes}}分钟更新一次",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -713,7 +717,10 @@
         "exceedsAvailableBalance": "金额超出可用余额 {{balance}}",
         "transactionTimedOut": "交易在 15 秒后超时",
         "connectToViewPortfolio": "连接以查看您的投资组合",
-        "connectDescription": "使用您的钱包登录以查看您的投资组合、持仓和交易历史。"
+        "connectDescription": "使用您的钱包登录以查看您的投资组合、持仓和交易历史。",
+        "pasteWalletAddress": "粘贴钱包地址",
+        "viewOtherAccount": "查看其他账户",
+        "returnToMyPortfolio": "返回我的投资组合"
     },
     "pageTitles": {
         "portfolio": "投资组合",

@@ -8,9 +8,13 @@ type PortfolioHeaderIF = {
     setSelectedVault: React.Dispatch<
         React.SetStateAction<{ label: string; value: string }>
     >;
-    selectedPeriod: { label: string; value: string };
+    selectedPeriod: { label: string; value: string; timeframe: number };
     setSelectedPeriod: React.Dispatch<
-        React.SetStateAction<{ label: string; value: string }>
+        React.SetStateAction<{
+            label: string;
+            value: string;
+            timeframe: number;
+        }>
     >;
 };
 
@@ -25,14 +29,26 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
 
     const vaultOptions = [
         { label: t('portfolio.perps'), value: 'perp' },
-        { label: t('portfolio.perpsAndVaults'), value: 'all' },
+        // { label: t('portfolio.perpsAndVaults'), value: 'all' },
     ];
 
     const periodOptions = [
-        { label: t('portfolio.twentyFourHour'), value: 'Day' },
-        { label: t('portfolio.sevenDay'), value: 'Week' },
-        { label: t('portfolio.thirtyDay'), value: 'Month' },
-        { label: t('portfolio.allTime'), value: 'AllTime' },
+        {
+            label: t('portfolio.twentyFourHour'),
+            value: 'Day',
+            timeframe: 24 * 60 * 60 * 1000,
+        },
+        {
+            label: t('portfolio.sevenDay'),
+            value: 'Week',
+            timeframe: 7 * 24 * 60 * 60 * 1000,
+        },
+        {
+            label: t('portfolio.thirtyDay'),
+            value: 'Month',
+            timeframe: 30 * 24 * 60 * 60 * 1000,
+        },
+        { label: t('portfolio.allTime'), value: 'AllTime', timeframe: 0 },
     ];
 
     return (
@@ -77,6 +93,10 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
                                         periodOptions.find(
                                             (opt) => opt.label === value,
                                         )?.value || '',
+                                    timeframe:
+                                        periodOptions.find(
+                                            (opt) => opt.label === value,
+                                        )?.timeframe || 0,
                                 })
                             }
                         />

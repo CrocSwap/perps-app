@@ -45,11 +45,13 @@
         "announcements": "Duyurular",
         "leverage": "Kaldıraç",
         "comingSoon": "Yakında",
+        "or": "veya",
         "enter": "Giriş",
         "claim": "Talep Et",
         "seeDocsForMore": "Daha fazlası için dokümanlara bakın.",
         "clearFilter": "Filtreyi temizle",
-        "activate": "Etkinleştir"
+        "activate": "Etkinleştir",
+        "copied": "Kopyalandı!"
     },
     "transactions": {
         "orderTypes": "Emir Türleri",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Toplam USD Değeri",
         "totalNetUsdValue": "Toplam Net USD Değeri",
         "performance": "Performans",
+        "accountOverview": "Hesap Özeti",
+        "updateFrequencyInMinutes": "{{numMinutes}} dakikada bir güncellenir",
         "positions": "Pozisyonlar",
         "feeSchedule": "Ücret Çizelgesi",
         "vipTiers": "VIP Seviyeleri",
@@ -713,7 +717,10 @@
         "exceedsAvailableBalance": "Tutar mevcut bakiyenizi aşmaktadır: {{balance}}",
         "transactionTimedOut": "İşlem 15 saniye sonra zaman aşımına uğradı",
         "connectToViewPortfolio": "Portföyünüzü Görüntülemek için Bağlanın",
-        "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın."
+        "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın.",
+        "pasteWalletAddress": "Cüzdan adresini yapıştır",
+        "viewOtherAccount": "Diğer hesabı görüntüle",
+        "returnToMyPortfolio": "Kendi portföyüme dön"
     },
     "pageTitles": {
         "portfolio": "Portföy",

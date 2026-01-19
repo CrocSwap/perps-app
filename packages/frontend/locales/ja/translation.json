@@ -45,11 +45,13 @@
         "announcements": "お知らせ",
         "leverage": "レバレッジ",
         "comingSoon": "近日公開",
+        "or": "または",
         "enter": "入力",
         "claim": "受け取る",
         "seeDocsForMore": "詳細はドキュメントをご覧ください。",
         "clearFilter": "フィルターをクリア",
-        "activate": "有効化"
+        "activate": "有効化",
+        "copied": "コピーしました！"
     },
     "transactions": {
         "orderTypes": "注文タイプ",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "アカウント概要",
+        "updateFrequencyInMinutes": "{{numMinutes}}分ごとに更新",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -713,7 +717,10 @@
         "exceedsAvailableBalance": "金額が利用可能残高 {{balance}} を超えています",
         "transactionTimedOut": "取引は15秒後にタイムアウトしました",
         "connectToViewPortfolio": "ポートフォリオを表示するには接続してください",
-        "connectDescription": "ウォレットでサインインして、ポートフォリオ、ポジション、取引履歴を表示します。"
+        "connectDescription": "ウォレットでサインインして、ポートフォリオ、ポジション、取引履歴を表示します。",
+        "pasteWalletAddress": "ウォレットアドレスを貼り付け",
+        "viewOtherAccount": "他のアカウントを表示",
+        "returnToMyPortfolio": "自分のポートフォリオに戻る"
     },
     "pageTitles": {
         "portfolio": "ポートフォリオ",

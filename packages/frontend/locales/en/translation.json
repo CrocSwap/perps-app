@@ -45,11 +45,13 @@
         "announcements": "Announcements",
         "leverage": "Leverage",
         "comingSoon": "Coming Soon",
+        "or": "or",
         "enter": "Enter",
         "claim": "Claim",
         "seeDocsForMore": "See the docs for more.",
         "clearFilter": "Clear filter",
-        "activate": "Activate"
+        "activate": "Activate",
+        "copied": "Copied!"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "Account Overview",
+        "updateFrequencyInMinutes": "Updates every {{numMinutes}} minutes",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -713,7 +717,10 @@
         "exceedsAvailableBalance": "Amount exceeds available balance of {{balance}}",
         "transactionTimedOut": "Transaction timed out after 15 seconds",
         "connectToViewPortfolio": "Connect to View Your Portfolio",
-        "connectDescription": "Sign in with your wallet to view your portfolio, positions, and trading history."
+        "connectDescription": "Sign in with your wallet to view your portfolio, positions, and trading history.",
+        "pasteWalletAddress": "Paste wallet address",
+        "viewOtherAccount": "View other account",
+        "returnToMyPortfolio": "Return to my portfolio"
     },
     "pageTitles": {
         "portfolio": "Portfolio",

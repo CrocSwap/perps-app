@@ -1,6 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
-import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+    memo,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
@@ -18,11 +25,13 @@ import {
     IoArrowDown,
     IoChevronForward,
     IoChevronBack,
+    IoCopyOutline,
 } from 'react-icons/io5';
 import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTable';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 import { Resizable, type NumberSize } from 're-resizable';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import useClipboard from '~/hooks/useClipboard';
 import {
     isEstablished,
     SessionButton,
@@ -141,6 +150,10 @@ function Portfolio() {
         (!!loggedInAddress &&
             urlAddress.toLowerCase() === loggedInAddress.toLowerCase());
 
+    const myPortfolioPath = loggedInAddress
+        ? `/v2/portfolio/${loggedInAddress}`
+        : '/v2/portfolio';
+
     const showTransactButtons = hasSession && isViewingOwnPortfolio;
 
     // Determine if we should show the "connect" view
@@ -148,6 +161,94 @@ function Portfolio() {
     // We check userAddress in addition to session state because session may not be
     // immediately established on hydration, but userAddress persists in the store
     const showConnectView = !hasSession && !userAddress && !urlAddress;
+
+    // State for toggling between address display and input mode in header
+    const [isAddressInputMode, setIsAddressInputMode] = useState(false);
+    const addressInputRef = useRef<HTMLInputElement>(null);
+
+    // Clipboard copy for address
+    const [, copyToClipboard] = useClipboard();
+    const [showCopied, setShowCopied] = useState(false);
+
+    const handleWalletAddressFocus = useCallback(
+        (e: React.FocusEvent<HTMLInputElement>) => {
+            if (typeof window === 'undefined') return;
+            if (!window.matchMedia?.('(pointer: coarse)').matches) return;
+
+            const el = e.currentTarget;
+
+            window.setTimeout(() => {
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest',
+                });
+            }, 150);
+
+            window.setTimeout(() => {
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest',
+                });
+            }, 600);
+        },
+        [],
+    );
+
+    const handleCopyAddress = useCallback(async () => {
+        if (!urlAddress) return;
+        const success = await copyToClipboard(urlAddress);
+        if (success) {
+            setShowCopied(true);
+            setTimeout(() => setShowCopied(false), 1500);
+        }
+    }, [copyToClipboard, urlAddress]);
+
+    // Handler for wallet address input - navigates immediately on valid address
+    const handleAddressInput = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = e.target.value.trim();
+            // Basic validation: Solana addresses are base58 encoded, typically 32-44 chars
+            if (
+                value.length >= 32 &&
+                value.length <= 44 &&
+                /^[1-9A-HJ-NP-Za-km-z]+$/.test(value)
+            ) {
+                setIsAddressInputMode(false);
+                navigate(`/v2/portfolio/${value}`);
+            }
+        },
+        [navigate],
+    );
+
+    // Focus input when entering input mode
+    useEffect(() => {
+        if (isAddressInputMode && addressInputRef.current) {
+            addressInputRef.current.focus();
+        }
+    }, [isAddressInputMode]);
+
+    // Escape key cancels input mode
+    useEffect(() => {
+        if (!isAddressInputMode) return;
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setIsAddressInputMode(false);
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => {
+            window.removeEventListener('keydown', onKeyDown);
+        };
+    }, [isAddressInputMode]);
+
+    // Reset input mode when URL address changes
+    useEffect(() => {
+        setIsAddressInputMode(false);
+    }, [urlAddress]);
 
     // Check if we're on the transactions sub-route (mobile only)
     const isTransactionsView = location.pathname.includes('/transactions');
@@ -277,6 +378,18 @@ function Portfolio() {
                         <h2>{t('portfolio.connectToViewPortfolio')}</h2>
                         <p>{t('portfolio.connectDescription')}</p>
                         <SessionButton />
+                        <div className={styles.connectViewDivider}>
+                            {t('common.or')}
+                        </div>
+                        <input
+                            type='text'
+                            className={styles.walletAddressInput}
+                            placeholder={t('portfolio.pasteWalletAddress')}
+                            onChange={handleAddressInput}
+                            onFocus={handleWalletAddressFocus}
+                            autoComplete='off'
+                            spellCheck={false}
+                        />
                     </div>
                 </div>
             </div>
@@ -425,7 +538,80 @@ function Portfolio() {
                         </Link>
                     </header>
                 ) : hasSession || urlAddress ? (
-                    <header>{t('pageTitles.portfolio')}</header>
+                    <header className={styles.portfolioHeader}>
+                        <span>{t('pageTitles.portfolio')}</span>
+                        <div className={styles.headerAddressSection}>
+                            {isAddressInputMode ? (
+                                <>
+                                    <input
+                                        ref={addressInputRef}
+                                        type='text'
+                                        className={
+                                            styles.walletAddressInputHeader
+                                        }
+                                        placeholder={t(
+                                            'portfolio.pasteWalletAddress',
+                                        )}
+                                        onChange={handleAddressInput}
+                                        onFocus={handleWalletAddressFocus}
+                                        autoComplete='off'
+                                        spellCheck={false}
+                                    />
+                                    <button
+                                        type='button'
+                                        className={styles.headerAddressCancel}
+                                        onClick={() =>
+                                            setIsAddressInputMode(false)
+                                        }
+                                    >
+                                        {t('common.cancel')}
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        type='button'
+                                        className={styles.headerCurrentAddress}
+                                        onClick={handleCopyAddress}
+                                    >
+                                        <span>
+                                            {showCopied
+                                                ? `✓ ${t('common.copied')}`
+                                                : urlAddress
+                                                  ? `${urlAddress.slice(0, 6)}...${urlAddress.slice(-4)}`
+                                                  : ''}
+                                        </span>
+                                        <IoCopyOutline
+                                            className={styles.headerCopyIcon}
+                                        />
+                                    </button>
+                                    {hasSession &&
+                                        loggedInAddress &&
+                                        !isViewingOwnPortfolio && (
+                                            <Link
+                                                to={myPortfolioPath}
+                                                className={
+                                                    styles.headerReturnToMine
+                                                }
+                                            >
+                                                {t(
+                                                    'portfolio.returnToMyPortfolio',
+                                                )}
+                                            </Link>
+                                        )}
+                                    <button
+                                        type='button'
+                                        className={styles.headerViewOther}
+                                        onClick={() =>
+                                            setIsAddressInputMode(true)
+                                        }
+                                    >
+                                        {t('portfolio.viewOtherAccount')}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </header>
                 ) : null}
 
                 <div className={styles.column}>

@@ -45,11 +45,13 @@
         "announcements": "Annonces",
         "leverage": "Effet de levier",
         "comingSoon": "Bientôt disponible",
+        "or": "ou",
         "enter": "Entrer",
         "claim": "Réclamer",
         "seeDocsForMore": "Voir la documentation pour en savoir plus.",
         "clearFilter": "Effacer le filtre",
-        "activate": "Activer"
+        "activate": "Activer",
+        "copied": "Copié !"
     },
     "transactions": {
         "orderTypes": "Types d'ordre",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Valeur totale en USD",
         "totalNetUsdValue": "Valeur nette totale en USD",
         "performance": "Performance",
+        "accountOverview": "Aperçu du compte",
+        "updateFrequencyInMinutes": "Mise à jour toutes les {{numMinutes}} minutes",
         "positions": "Positions",
         "feeSchedule": "Calendrier des frais",
         "vipTiers": "Niveaux VIP",
@@ -711,9 +715,12 @@
         "amountGreaterThanZero": "Le montant doit être supérieur à 0",
         "minDepositAmount": "Montant minimum de dépôt : {{amount}}",
         "exceedsAvailableBalance": "Le montant dépasse le solde disponible de {{balance}}",
-        "transactionTimedOut": "La transaction a expiré après 15 secondes",
+        "transactionTimedOut": "Transaction expirée après 15 secondes",
         "connectToViewPortfolio": "Connectez-vous pour Voir Votre Portefeuille",
-        "connectDescription": "Connectez-vous avec votre portefeuille pour voir votre portefeuille, vos positions et votre historique de trading."
+        "connectDescription": "Connectez-vous avec votre portefeuille pour voir votre portefeuille, vos positions et votre historique de trading.",
+        "pasteWalletAddress": "Coller l'adresse du portefeuille",
+        "viewOtherAccount": "Voir un autre compte",
+        "returnToMyPortfolio": "Retourner à mon portefeuille"
     },
     "pageTitles": {
         "portfolio": "Portefeuille",

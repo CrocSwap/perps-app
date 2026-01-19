@@ -45,11 +45,13 @@
         "announcements": "Thông báo",
         "leverage": "Đòn bẩy",
         "comingSoon": "Sắp ra mắt",
+        "or": "hoặc",
         "enter": "Nhập",
         "claim": "Nhận",
         "seeDocsForMore": "Xem tài liệu để biết thêm chi tiết.",
         "clearFilter": "Xóa bộ lọc",
-        "activate": "Kích hoạt"
+        "activate": "Kích hoạt",
+        "copied": "Đã sao chép!"
     },
     "transactions": {
         "orderTypes": "Loại lệnh",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Tổng giá trị USD",
         "totalNetUsdValue": "Tổng giá trị USD ròng",
         "performance": "Hiệu suất",
+        "accountOverview": "Tổng quan tài khoản",
+        "updateFrequencyInMinutes": "Cập nhật mỗi {{numMinutes}} phút",
         "positions": "Vị thế",
         "feeSchedule": "Biểu phí",
         "vipTiers": "Cấp độ VIP",
@@ -729,7 +733,9 @@
         "pageNotFound": "Không Tìm Thấy Trang",
         "transactionTimedOut": "Giao dịch bị hết thời gian sau 15 giây",
         "connectToViewPortfolio": "Kết nối để Xem Danh Mục Đầu Tư",
-        "connectDescription": "Đăng nhập bằng ví của bạn để xem danh mục đầu tư, vị thế và lịch sử giao dịch."
+        "connectDescription": "Đăng nhập bằng ví của bạn để xem danh mục đầu tư, vị thế và lịch sử giao dịch.",
+        "pasteWalletAddress": "Dán địa chỉ ví",
+        "viewOtherAccount": "Xem tài khoản khác"
     },
     "pageTitles": {
         "portfolio": "Danh mục",

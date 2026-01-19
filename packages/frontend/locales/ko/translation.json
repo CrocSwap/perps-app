@@ -45,11 +45,13 @@
         "announcements": "공지사항",
         "leverage": "레버리지",
         "comingSoon": "출시 예정",
+        "or": "또는",
         "enter": "입력",
         "claim": "받기",
         "seeDocsForMore": "자세한 내용은 문서를 확인하세요.",
         "clearFilter": "필터 지우기",
-        "activate": "활성화"
+        "activate": "활성화",
+        "copied": "복사됨!"
     },
     "transactions": {
         "orderTypes": "주문 유형",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "계정 개요",
+        "updateFrequencyInMinutes": "{{numMinutes}}분마다 업데이트",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -713,7 +717,10 @@
         "exceedsAvailableBalance": "금액이 사용 가능 잔액 {{balance}}을 초과합니다",
         "transactionTimedOut": "15초 후 트랜잭션 시간 초과",
         "connectToViewPortfolio": "포트폴리오를 보려면 연결하세요",
-        "connectDescription": "지갑으로 로그인하여 포트폴리오, 포지션 및 거래 내역을 확인하세요."
+        "connectDescription": "지갑으로 로그인하여 포트폴리오, 포지션 및 거래 내역을 확인하세요.",
+        "pasteWalletAddress": "지갑 주소 붙여넣기",
+        "viewOtherAccount": "다른 계정 보기",
+        "returnToMyPortfolio": "내 포트폴리오로 돌아가기"
     },
     "pageTitles": {
         "portfolio": "포트폴리오",

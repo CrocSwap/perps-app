@@ -45,11 +45,13 @@
         "announcements": "Anuncios",
         "leverage": "Apalancamiento",
         "comingSoon": "Próximamente",
+        "or": "o",
         "enter": "Ingresar",
         "claim": "Reclamar",
         "seeDocsForMore": "Consulta la documentación para más información.",
         "clearFilter": "Borrar filtro",
-        "activate": "Activar"
+        "activate": "Activar",
+        "copied": "¡Copiado!"
     },
     "transactions": {
         "orderTypes": "Tipos de orden",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Valor total USD",
         "totalNetUsdValue": "Valor neto total en USD",
         "performance": "Rendimiento",
+        "accountOverview": "Resumen de la cuenta",
+        "updateFrequencyInMinutes": "Se actualiza cada {{numMinutes}} minutos",
         "positions": "Posiciones",
         "feeSchedule": "Programa de comisiones",
         "vipTiers": "Niveles VIP",
@@ -711,9 +715,12 @@
         "amountGreaterThanZero": "El monto debe ser mayor a 0",
         "minDepositAmount": "El monto mínimo de depósito es {{amount}}",
         "exceedsAvailableBalance": "El monto excede el saldo disponible de {{balance}}",
-        "transactionTimedOut": "La transacción expiró después de 15 segundos",
+        "transactionTimedOut": "Transacción agotó el tiempo tras 15 segundos",
         "connectToViewPortfolio": "Conectar para Ver Tu Portafolio",
-        "connectDescription": "Inicia sesión con tu billetera para ver tu portafolio, posiciones e historial de operaciones."
+        "connectDescription": "Inicia sesión con tu billetera para ver tu portafolio, posiciones e historial de operaciones.",
+        "pasteWalletAddress": "Pegar dirección de billetera",
+        "viewOtherAccount": "Ver otra cuenta",
+        "returnToMyPortfolio": "Volver a mi portafolio"
     },
     "pageTitles": {
         "portfolio": "Portafolio",

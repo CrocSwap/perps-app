@@ -174,15 +174,15 @@
 @media (max-width: 768px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr;
     }
 
-    .priceCell {
+    .orderValueCell {
         display: none;
     }
 }
@@ -190,12 +190,12 @@
 @media (max-width: 640px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 0.8fr 1fr 0.8fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
     }
 
     .sizeCell {
@@ -206,33 +206,25 @@
 @media (max-width: 540px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 0.8fr 1fr 0.8fr 0.8fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 1fr 0.8fr;
-    }
-
-    .coinCell {
-        display: none;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
     }
 }
 
 @media (max-width: 480px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 0.8fr 1fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
         padding: 0 var(--padding-xs);
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 1fr;
-    }
-
-    .directionCell {
-        display: none;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr;
     }
 
     .headerCell {

@@ -12,3 +12,8 @@ declare module '*?routes' {
     const routes: RouteObject[];
     export default routes;
 }
+
+declare module 'd3' {
+    const d3: any;
+    export = d3;
+}
