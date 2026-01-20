@@ -76,7 +76,7 @@
     justify-content: flex-end;
 }
 
-@media (max-width: 1400px) {
+@container (max-width: 1400px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr;
@@ -92,7 +92,7 @@
     }
 }
 
-@media (max-width: 1200px) {
+@container (max-width: 1200px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr;
@@ -108,15 +108,15 @@
     }
 }
 
-@media (max-width: 1000px) {
+@container (max-width: 1000px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr 1fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 1fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 1fr 1fr;
     }
 
     .typeCell {
@@ -124,15 +124,15 @@
     }
 }
 
-@media (max-width: 900px) {
+@container (max-width: 900px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr 1fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 1fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 1fr 1fr;
     }
 
     .sizeCell {
@@ -140,7 +140,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@container (max-width: 768px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns: 1fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr;
@@ -148,7 +148,7 @@
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 0.8fr 1fr 0.8fr 1fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 1fr 0.8fr 1fr 1fr;
     }
 
     .priceCell {
@@ -156,15 +156,15 @@
     }
 }
 
-@media (max-width: 640px) {
+@container (max-width: 640px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 0.8fr 0.8fr 1fr 0.8fr 1fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 1fr 0.8fr 1fr 0.8fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 0.8fr 1fr 1fr;
+        grid-template-columns: 1fr 0.8fr 0.8fr 1fr 1fr 0.8fr;
     }
 
     .triggerConditionsCell {
@@ -172,15 +172,15 @@
     }
 }
 
-@media (max-width: 540px) {
+@container (max-width: 540px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 0.8fr 1fr 0.8fr 1fr;
+        grid-template-columns: 1fr 0.8fr 1fr 0.8fr 1fr 0.8fr;
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 1fr 0.8fr 1fr 1fr;
+        grid-template-columns: 1fr 0.8fr 1fr 1fr 0.8fr;
     }
 
     .coinCell {
@@ -188,7 +188,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@container (max-width: 480px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns: 1fr 0.8fr 1fr 1fr;
@@ -213,7 +213,7 @@
     }
 }
 
-@media (max-width: 400px) {
+@container (max-width: 400px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns: 1fr 1fr 1fr;

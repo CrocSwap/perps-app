@@ -6,8 +6,15 @@ import OverlayCanvas from '~/routes/chart/overlayCanvas/overlayCanvas';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
 import YaxisOverlayCanvas from '~/routes/chart/overlayCanvas/yAxisOverlayCanvas';
+import type { TabType } from '~/routes/trade';
 
-const TradingViewWrapper: React.FC = () => {
+interface TradingViewWrapperProps {
+    switchTab?: (tab: TabType) => void;
+}
+
+const TradingViewWrapper: React.FC<TradingViewWrapperProps> = ({
+    switchTab,
+}) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [tvLib, setTvLib] = useState<any>(null);
     const [chartLoadingStatus, setChartLoadingStatus] = useState<
@@ -73,6 +80,7 @@ const TradingViewWrapper: React.FC = () => {
                     key={chartKey}
                     tradingviewLib={tvLib}
                     setChartLoadingStatus={setChartLoadingStatus}
+                    switchTab={switchTab}
                 >
                     <TradingViewChart />
                     <OverlayCanvas />

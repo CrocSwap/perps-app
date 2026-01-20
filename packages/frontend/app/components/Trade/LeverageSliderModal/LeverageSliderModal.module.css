@@ -10,6 +10,14 @@
     gap: var(--gap-m);
 }
 
+@media (max-width: 768px) {
+    .leverageSliderContainer {
+        width: min(100%, var(--container-width));
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
 .inputContainer {
     display: flex;
     align-items: center;

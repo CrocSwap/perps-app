@@ -205,4 +205,7 @@
     .scrollArrow {
         width: var(--scroll-arrow-svg-width-height-mobile);
     }
+    .tabsContainer {
+        gap: 0;
+    }
 }

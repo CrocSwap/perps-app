@@ -4,8 +4,8 @@ import * as d3 from 'd3';
 import {
     getPaneCanvasAndIFrameDoc,
     mousePositionRef,
-    scaleDataRef,
 } from './overlayCanvasUtils';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
 
 interface OverlayCanvasLayerProps {
     id: string;
@@ -29,6 +29,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
 }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const { chart, isChartReady } = useTradingView();
+    const storeScaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
 
     const [isPaneChanged, setIsPaneChanged] = useState(false);
 
@@ -38,17 +39,17 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
     useEffect(() => {
         if (!chart || !isChartReady) return;
 
-        const isFirstInit = !scaleDataRef.current;
+        const isFirstInit = !storeScaleDataRef.current;
 
         if (isFirstInit) {
             const yScale = d3.scaleLinear();
 
             const scaleSymlog = d3.scaleSymlog();
-            scaleDataRef.current = { yScale, scaleSymlog };
+            storeScaleDataRef.current = { yScale, scaleSymlog };
         }
 
-        const yScale = scaleDataRef.current!.yScale;
-        const scaleSymlog = scaleDataRef.current!.scaleSymlog;
+        const yScale = storeScaleDataRef.current!.yScale;
+        const scaleSymlog = storeScaleDataRef.current!.scaleSymlog;
 
         const { iframeDoc, paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
 
@@ -149,7 +150,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             {children({
                 canvasRef,
                 canvasSize: canvasSize,
-                scaleData: scaleDataRef.current,
+                scaleData: storeScaleDataRef.current,
                 mousePositionRef,
             })}
         </>

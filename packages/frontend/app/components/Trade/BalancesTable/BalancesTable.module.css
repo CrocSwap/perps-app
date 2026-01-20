@@ -1,16 +1,28 @@
 .rowContainer {
     width: 100%;
     height: var(--table-row-height);
-
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
-    grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1fr 0.5fr;
+    grid-template-columns:
+        minmax(60px, 1fr) /* Coin */
+        minmax(100px, 1.5fr) /* Total Balance */
+        minmax(100px, 1.5fr) /* Available Balance */
+        minmax(80px, 1fr) /* USDC Value */
+        minmax(90px, 1fr) /* Buying Power */
+        minmax(80px, 1fr) /* Contract */
+        minmax(60px, 0.5fr); /* Action/Send */
     align-items: center;
 }
 
 .rowContainer.noSendButton {
-    grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr;
+    grid-template-columns:
+        minmax(60px, 1fr)
+        minmax(100px, 1.5fr)
+        minmax(100px, 1.5fr)
+        minmax(90px, 1.5fr)
+        minmax(90px, 1.5fr)
+        minmax(80px, 1.5fr);
 }
 
 .headerContainer {
@@ -20,17 +32,28 @@
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
-    grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1fr 0.5fr;
+    grid-template-columns:
+        minmax(60px, 1fr)
+        minmax(100px, 1.5fr)
+        minmax(100px, 1.5fr)
+        minmax(80px, 1fr)
+        minmax(90px, 1fr)
+        minmax(80px, 1fr)
+        minmax(60px, 0.5fr);
     align-items: center;
-
     position: sticky;
     top: 0;
-
     z-index: 10;
 }
 
 .headerContainer.noSendButton {
-    grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr;
+    grid-template-columns:
+        minmax(60px, 1fr)
+        minmax(100px, 1.5fr)
+        minmax(100px, 1.5fr)
+        minmax(90px, 1.5fr)
+        minmax(90px, 1.5fr)
+        minmax(80px, 1.5fr);
 }
 
 .cell {
@@ -69,6 +92,7 @@
 .sendButton:hover {
     color: var(--text1, #f0f0f8);
 }
+
 .totalBalanceCell,
 .buyingPowerCell,
 .availableBalanceCell,
@@ -76,19 +100,13 @@
     text-align: right;
     justify-self: end;
 }
+
 .pnlCell,
 .contractCell {
     text-align: center;
     justify-self: center;
 }
 
-/* .coinCell {}
-  .totalBalanceCell {}
-  .availableBalanceCell {}
-  .usdcValueCell {}
-  .buyingPowerCell {}
-  .pnlCell {}
-  .contractCell {} */
 .actionCell {
     text-align: right;
     justify-self: end;
@@ -97,25 +115,49 @@
 @media (max-width: 1200px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 0.5fr;
+        grid-template-columns:
+            minmax(60px, 1fr)
+            minmax(100px, 1.5fr)
+            minmax(100px, 1.5fr)
+            minmax(80px, 1fr)
+            minmax(80px, 1fr)
+            minmax(60px, 0.5fr);
     }
 
     .rowContainer.noSendButton,
     .headerContainer.noSendButton {
-        grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr;
+        grid-template-columns:
+            minmax(60px, 1fr)
+            minmax(100px, 1.5fr)
+            minmax(100px, 1.5fr)
+            minmax(90px, 1.5fr)
+            minmax(90px, 1.5fr)
+            minmax(80px, 1.5fr);
     }
 }
 
 @media (max-width: 900px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 0.5fr;
+        grid-template-columns:
+            minmax(60px, 1fr)
+            minmax(100px, 1.5fr)
+            minmax(100px, 1.5fr)
+            minmax(80px, 1fr)
+            minmax(80px, 1fr)
+            minmax(60px, 0.5fr);
     }
 
     .rowContainer.noSendButton,
     .headerContainer.noSendButton {
-        grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1.5fr;
+        grid-template-columns:
+            minmax(60px, 1fr)
+            minmax(100px, 1.5fr)
+            minmax(100px, 1.5fr)
+            minmax(80px, 1fr)
+            minmax(80px, 1.5fr);
     }
+
     .buyingPowerCell {
         display: none;
     }
@@ -124,13 +166,23 @@
 @media (max-width: 700px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 1.5fr 1fr 1fr 0.5fr;
+        grid-template-columns:
+            minmax(60px, 1fr)
+            minmax(100px, 1.5fr)
+            minmax(80px, 1fr)
+            minmax(80px, 1fr)
+            minmax(60px, 0.5fr);
     }
 
     .rowContainer.noSendButton,
     .headerContainer.noSendButton {
-        grid-template-columns: 1fr 1.5fr 1fr 1.5fr;
+        grid-template-columns:
+            minmax(60px, 1fr)
+            minmax(100px, 1.5fr)
+            minmax(80px, 1fr)
+            minmax(80px, 1.5fr);
     }
+
     .availableBalanceCell {
         display: none;
     }
@@ -139,12 +191,19 @@
 @media (max-width: 480px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1fr 1.5fr 1fr 0.5fr;
+        grid-template-columns:
+            minmax(60px, 1fr)
+            minmax(90px, 1.5fr)
+            minmax(80px, 1fr)
+            minmax(60px, 0.5fr);
     }
 
     .rowContainer.noSendButton,
     .headerContainer.noSendButton {
-        grid-template-columns: 1fr 1.5fr 1.5fr;
+        grid-template-columns:
+            minmax(60px, 1fr)
+            minmax(90px, 1.5fr)
+            minmax(80px, 1.5fr);
     }
 
     .totalBalanceCell {
@@ -159,6 +218,7 @@
         font-size: 0.75rem;
         padding: 0.2rem 0.4rem;
     }
+
     .pnlCell {
         display: none;
     }

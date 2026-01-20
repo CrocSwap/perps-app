@@ -87,10 +87,37 @@ export function useAffiliateAudience(userIdentifier: string, enabled = true) {
         setError(null);
 
         try {
-            const audiences = await Fuul.getUserAudiences({
-                user_identifier: userIdentifier,
-                user_identifier_type: UserIdentifierType.SolanaAddress,
-            });
+            // Disabled SDK call, using direct fetch instead
+            // const audiences = await Fuul.getUserAudiences({
+            //     user_identifier: userIdentifier,
+            //     user_identifier_type: UserIdentifierType.SolanaAddress,
+            // });
+
+            const apiKey =
+                '6e6cf24f708ecb688968212aa9ee0b4b2774a5070bcc054e4f1c920969d7cc89';
+            const url = `https://api.fuul.xyz/api/v1/audiences/audience-segments/user?user_identifier=${userIdentifier}&user_identifier_type=solana_address`;
+
+            const headers = {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiKey}`,
+            };
+
+            console.log('FUUL getUserAudiences request:', { url, headers });
+
+            const response = await fetch(url, { method: 'GET', headers });
+            console.log(
+                'FUUL getUserAudiences response status:',
+                response.status,
+            );
+
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('FUUL getUserAudiences error:', text);
+                throw new Error(text);
+            }
+
+            const audiences = await response.json();
+            console.log('FUUL getUserAudiences success:', audiences);
 
             const isAffiliateAccepted = (audiences.results?.length ?? 0) > 0;
 
@@ -137,20 +164,74 @@ export function useAffiliateStats(userIdentifier: string, enabled = true) {
                 return { from, to };
             };
 
-            const [stats, newTradersData, activeTradersData] =
-                await Promise.all([
-                    Fuul.getAffiliateStats({
-                        user_identifier: userIdentifier,
-                        user_identifier_type: UserIdentifierType.SolanaAddress,
-                    }),
-                    Fuul.getAffiliateNewTraders({
-                        user_identifier: userIdentifier,
-                    }),
-                    Fuul.getAffiliateNewTraders({
-                        user_identifier: userIdentifier,
-                        ...getDateRange30Days(),
-                    }),
-                ]);
+            const apiKey =
+                'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+            const headers = {
+                accept: 'application/json',
+                authorization: `Bearer ${apiKey}`,
+            };
+
+            // Fetch affiliate stats
+            const statsUrl = `https://api.fuul.xyz/api/v1/affiliate-portal/stats?user_identifier=${userIdentifier}&user_identifier_type=solana_address`;
+            console.log('FUUL getAffiliateStats request:', { url: statsUrl });
+            const statsRes = await fetch(statsUrl, { method: 'GET', headers });
+            console.log(
+                'FUUL getAffiliateStats response status:',
+                statsRes.status,
+            );
+            if (!statsRes.ok) {
+                const text = await statsRes.text();
+                console.error('FUUL getAffiliateStats error:', text);
+                throw new Error(text);
+            }
+            const stats = await statsRes.json();
+            console.log('FUUL getAffiliateStats success:', stats);
+
+            // Fetch new traders (all time)
+            const newTradersUrl = `https://api.fuul.xyz/api/v1/affiliate-portal/new-traders?user_identifier=${userIdentifier}`;
+            console.log('FUUL getAffiliateNewTraders request:', {
+                url: newTradersUrl,
+            });
+            const newTradersRes = await fetch(newTradersUrl, {
+                method: 'GET',
+                headers,
+            });
+            console.log(
+                'FUUL getAffiliateNewTraders response status:',
+                newTradersRes.status,
+            );
+            if (!newTradersRes.ok) {
+                const text = await newTradersRes.text();
+                console.error('FUUL getAffiliateNewTraders error:', text);
+                throw new Error(text);
+            }
+            const newTradersData = await newTradersRes.json();
+            console.log('FUUL getAffiliateNewTraders success:', newTradersData);
+
+            // Fetch active traders (last 30 days)
+            const { from, to } = getDateRange30Days();
+            const activeTradersUrl = `https://api.fuul.xyz/api/v1/affiliate-portal/new-traders?user_identifier=${userIdentifier}&from=${from}&to=${to}`;
+            console.log('FUUL getAffiliateNewTraders (30d) request:', {
+                url: activeTradersUrl,
+            });
+            const activeTradersRes = await fetch(activeTradersUrl, {
+                method: 'GET',
+                headers,
+            });
+            console.log(
+                'FUUL getAffiliateNewTraders (30d) response status:',
+                activeTradersRes.status,
+            );
+            if (!activeTradersRes.ok) {
+                const text = await activeTradersRes.text();
+                console.error('FUUL getAffiliateNewTraders (30d) error:', text);
+                throw new Error(text);
+            }
+            const activeTradersData = await activeTradersRes.json();
+            console.log(
+                'FUUL getAffiliateNewTraders (30d) success:',
+                activeTradersData,
+            );
 
             const newTraders =
                 newTradersData.length > 0
@@ -210,10 +291,40 @@ export function usePayoutsByReferrer(userIdentifier: string, enabled = true) {
         setError(null);
 
         try {
-            const response = await Fuul.getPayoutsByReferrer({
-                user_identifier: userIdentifier,
-                user_identifier_type: UserIdentifierType.SolanaAddress,
-            });
+            // Disabled SDK call, using direct fetch instead
+            // const response = await Fuul.getPayoutsByReferrer({
+            //     user_identifier: userIdentifier,
+            //     user_identifier_type: UserIdentifierType.SolanaAddress,
+            // });
+
+            const apiKey =
+                'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+            const url = `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${userIdentifier}&user_identifier_type=solana_address`;
+            const headers = {
+                accept: 'application/json',
+                authorization: `Bearer ${apiKey}`,
+            };
+
+            console.log('FUUL getPayoutsByReferrer request:', { url, headers });
+
+            const res = await fetch(url, { method: 'GET', headers });
+            console.log(
+                'FUUL getPayoutsByReferrer response status:',
+                res.status,
+            );
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setData([]);
+                    return;
+                }
+                const text = await res.text();
+                console.error('FUUL getPayoutsByReferrer error:', text);
+                throw new Error(text);
+            }
+
+            const response = await res.json();
+            console.log('FUUL getPayoutsByReferrer success:', response);
 
             const transformedData = response.map(
                 (item: Record<string, ReferrerPayoutData>) => {
@@ -275,11 +386,40 @@ export function useUserReferrer(userIdentifier: string, enabled = true) {
         setError(null);
 
         try {
-            const response = await Fuul.getUserReferrer({
-                user_identifier: userIdentifier,
-                user_identifier_type: UserIdentifierType.SolanaAddress,
-            });
+            // Disabled SDK call, using direct fetch instead
+            // const response = await Fuul.getUserReferrer({
+            //     user_identifier: userIdentifier,
+            //     user_identifier_type: UserIdentifierType.SolanaAddress,
+            // });
 
+            const apiKey =
+                'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+            const url = `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${userIdentifier}&user_identifier_type=solana_address`;
+            const headers = {
+                accept: 'application/json',
+                authorization: `Bearer ${apiKey}`,
+            };
+
+            console.log('FUUL getUserReferrer request:', { url, headers });
+
+            const res = await fetch(url, { method: 'GET', headers });
+            console.log('FUUL getUserReferrer response status:', res.status);
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setData({
+                        referrer_user_rebate_rate: null,
+                        referrer_code: null,
+                    });
+                    return;
+                }
+                const text = await res.text();
+                console.error('FUUL getUserReferrer error:', text);
+                throw new Error(text);
+            }
+
+            const response = await res.json();
+            console.log('FUUL getUserReferrer success:', response);
             setData(response);
         } catch (err) {
             if (isNotFoundError(err)) {
@@ -319,11 +459,48 @@ export function useUserPayoutMovements(userIdentifier: string, enabled = true) {
         setError(null);
 
         try {
-            const response = await Fuul.getUserPayoutMovements({
-                user_identifier: userIdentifier,
-                identifier_type: UserIdentifierType.SolanaAddress,
+            // Disabled SDK call, using direct fetch instead
+            // const response = await Fuul.getUserPayoutMovements({
+            //     user_identifier: userIdentifier,
+            //     identifier_type: UserIdentifierType.SolanaAddress,
+            // });
+
+            const apiKey =
+                'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+            const url = `https://api.fuul.xyz/api/v1/payouts/movements?user_identifier=${userIdentifier}&identifier_type=solana_address&type=onchain-currency`;
+            const headers = {
+                accept: 'application/json',
+                authorization: `Bearer ${apiKey}`,
+            };
+
+            console.log('FUUL getUserPayoutMovements request:', {
+                url,
+                headers,
             });
 
+            const res = await fetch(url, { method: 'GET', headers });
+            console.log(
+                'FUUL getUserPayoutMovements response status:',
+                res.status,
+            );
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setData({
+                        total_results: 0,
+                        page: 1,
+                        page_size: 10,
+                        results: [],
+                    });
+                    return;
+                }
+                const text = await res.text();
+                console.error('FUUL getUserPayoutMovements error:', text);
+                throw new Error(text);
+            }
+
+            const response = await res.json();
+            console.log('FUUL getUserPayoutMovements success:', response);
             setData(response);
         } catch (err) {
             if (isNotFoundError(err)) {
@@ -372,10 +549,32 @@ export function useAffiliateCode(userIdentifier: string, enabled = true) {
         setError(null);
 
         try {
-            const response = await Fuul.getAffiliateCode(
-                userIdentifier,
-                UserIdentifierType.SolanaAddress,
-            );
+            // Disabled SDK call, using direct fetch instead
+            // const response = await Fuul.getAffiliateCode(
+            //     userIdentifier,
+            //     UserIdentifierType.SolanaAddress,
+            // );
+
+            const url = `https://api.fuul.xyz/api/v1/affiliates/${userIdentifier}?identifier_type=solana_address`;
+            const headers = { accept: 'application/json' };
+
+            console.log('FUUL getAffiliateCode request:', { url, headers });
+
+            const res = await fetch(url, { method: 'GET', headers });
+            console.log('FUUL getAffiliateCode response status:', res.status);
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setData(null);
+                    return;
+                }
+                const text = await res.text();
+                console.error('FUUL getAffiliateCode error:', text);
+                throw new Error(text);
+            }
+
+            const response = await res.json();
+            console.log('FUUL getAffiliateCode success:', response);
             setData(response);
         } catch (err) {
             if (isNotFoundError(err)) {

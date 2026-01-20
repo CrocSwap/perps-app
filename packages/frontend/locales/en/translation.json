@@ -45,11 +45,13 @@
         "announcements": "Announcements",
         "leverage": "Leverage",
         "comingSoon": "Coming Soon",
+        "or": "or",
         "enter": "Enter",
         "claim": "Claim",
         "seeDocsForMore": "See the docs for more.",
         "clearFilter": "Clear filter",
-        "activate": "Activate"
+        "activate": "Activate",
+        "copied": "Copied!"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -97,6 +99,10 @@
         "evenPriceDistribution": "Even Price Distribution",
         "market": "Market",
         "limit": "Limit",
+        "closePosition": "Close Position",
+        "closeAtCurrentPrice": "Close at Current Price",
+        "closeAtAPriceYouSet": "Close at a Price You Set",
+
         "price": "Price",
         "size": "Size",
         "time": "Time",
@@ -155,6 +161,7 @@
         "positionClosed": "Position Closed",
         "successfullyClosedPosition": "Successfully closed {{usdValueOfOrderStr}} {{symbol}} position",
         "tpSlForPosition": "TP/SL for Position",
+        "failedToClosePosition": "Failed to close position",
         "transactionTimedOut": "Transaction timed out after {{timeInSeconds}} seconds",
         "txFailedOrNotConfirmed": "Transaction failed or was not confirmed",
         "walletBalance": "Wallet balance",
@@ -310,6 +317,13 @@
         "completed": "Completed",
         "withdrawal": "Withdrawal",
         "spotTransfer": "Spot Transfer",
+        "reduceOnly": "Reduce Only",
+        "triggerConditions": "Trigger Conditions",
+        "tpsl": "TP/SL",
+        "status": "Status",
+        "network": "Network",
+        "action": "Action",
+        "accountValueChange": "Account Value Change",
         "order": "Order",
         "long": "Long",
         "short": "Short",
@@ -382,7 +396,8 @@
         "chart": "Chart",
         "book": "Order Book",
         "recent": "Recent",
-        "positions": "Positions"
+        "positions": "Positions",
+        "portfolio": "Portfolio"
     },
     "auth": {
         "login": "Login",
@@ -428,7 +443,7 @@
         "overwriteCurrentReferralCode": "Overwrite current referral code",
         "enterReferralCode": "Enter a referral code",
         "referralCodeNotValidPleaseConfirm": "The code <0>{{invalidCode}}</0> is not claimed in the referral program. Please confirm the code is correct.",
-        "yourCodeIs": "Your code is <0>{{affiliateCode}}</0> based on the first six characters of your wallet address. Please click 'Activate' to register this code in the referral system.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0> based on the first six characters of your wallet address. Please click 'Activate' to register this code in the referral system.",
         "createAnAffiliateCode": "Create an affiliate code",
         "createAUniqueCodeToEarn": "Create a unique code to earn 10% of referred users' fees.",
         "codeAlreadyInUse": "Code Already In Use",
@@ -438,11 +453,12 @@
             "enterCode": "Connect your wallet to enter a referral code"
         },
         "usersWithTradingVolume": "This code may be customized or updated by users after reaching $1M in trading volume.",
-        "doNotSelfRefer": "The code <0>{{affiliateCode}}</0> cannot be registered by the same address by which it was created. Please choose a different code.",
+        "doNotSelfRefer": "The code <0>{{refCode}}</0> cannot be registered by the same address by which it was created. Please choose a different code.",
         "toCustomizeAffiliateCode": "Affiliate codes default to the first six characters of your wallet address. Users with > $1M in trading volume can customize their affiliate code.",
         "claimRewardsWithAmount": "Claim {{amount}} in rewards",
         "selectATabToViewData": "Select a tab to view data",
-        "trackingLinkExplanation": "You will receive <0>{{affiliatePercent}}</0> of referred users fees and they will receive a <1>{{userPercent}}</1> discount."
+        "trackingLinkExplanation": "You will receive <0>{{referrerPercent}}</0> of referred users fees and they will receive a <1>{{inviteePercent}}</1> discount.",
+        "claim": "Claim"
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",
@@ -643,6 +659,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "Account Overview",
+        "updateFrequencyInMinutes": "Updates every {{numMinutes}} minutes",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -663,6 +681,8 @@
         "accountValue": "Account Value",
         "collateral": "Collateral",
         "pnl": "PNL",
+        "realizedPnl": "Realized PnL",
+        "unrealizedPnl": "Unrealized PnL",
         "volume": "Volume",
         "maxDrawdown": "Max Drawdown",
         "totalEquity": "Total Equity",
@@ -685,7 +705,12 @@
         "amountGreaterThanZero": "Amount must be greater than 0",
         "minDepositAmount": "Minimum deposit amount is {{amount}}",
         "exceedsAvailableBalance": "Amount exceeds available balance of {{balance}}",
-        "transactionTimedOut": "Transaction timed out after 15 seconds"
+        "transactionTimedOut": "Transaction timed out after 15 seconds",
+        "connectToViewPortfolio": "Connect to View Your Portfolio",
+        "connectDescription": "Sign in with your wallet to view your portfolio, positions, and trading history.",
+        "pasteWalletAddress": "Paste wallet address",
+        "viewOtherAccount": "View other account",
+        "returnToMyPortfolio": "Return to my portfolio"
     },
     "pageTitles": {
         "portfolio": "Portfolio",
@@ -720,6 +745,7 @@
         "privacy": "Privacy Policy"
     },
     "keyboardShortcuts": {
+        "conflict": "Already used by: {{shortcut}}",
         "menuLabel": "Shortcuts",
         "title": "Keyboard Shortcuts",
         "hintPress": "Press",

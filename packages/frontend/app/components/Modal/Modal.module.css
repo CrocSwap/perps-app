@@ -64,7 +64,7 @@
     width: 100%;
 
     /* Key fixes for mobile browsers */
-    max-height: 85dvh; /* Dynamic viewport height - adapts to browser UI */
+    max-height: 85dvh;
 
     /* This is important: extend the background color all the way to the bottom */
     padding-bottom: env(safe-area-inset-bottom, 16px);
@@ -186,7 +186,12 @@
 @media (max-width: 768px) {
     .modalContent {
         overflow-y: auto;
-        height: 90%;
+        /* height: 90%; */
+        min-height: 150px;
+    }
+    .bottomSheet,
+    .modalContent {
+        user-select: none;
     }
 
     /* Add a spacer at the bottom to ensure content isn't hidden */

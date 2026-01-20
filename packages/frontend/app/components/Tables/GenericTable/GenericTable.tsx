@@ -11,12 +11,14 @@ import {
     useRef,
     useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { useIsClient } from '~/hooks/useIsClient';
 import { useDebugStore } from '~/stores/DebugStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import {
     TableState,
     type HeaderCell,
@@ -58,6 +60,8 @@ interface GenericTableProps<
     tableModel?: HeaderCell[];
     csvDataFetcher?: (...args: Parameters<F>) => Promise<T[]>;
     csvDataFetcherArgs?: Parameters<F>;
+    id?: string;
+    isHttpInfoCallsDisabled?: boolean;
 }
 
 export default function GenericTable<
@@ -65,10 +69,11 @@ export default function GenericTable<
     S,
     F extends (...args: Parameters<F>) => Promise<T[]>,
 >(props: GenericTableProps<T, S, F>) {
-    const id = useId();
+    const internalId = useId();
     const navigate = useNavigate();
 
     const sessionState = useSession();
+    const { userAddress } = useUserDataStore();
 
     const sessionButtonRef = useRef<HTMLDivElement>(null);
     const {
@@ -81,18 +86,22 @@ export default function GenericTable<
         sorterMethod,
         isFetched,
         pageMode,
-        skeletonRows = 7,
-        skeletonColRatios = [2, 1, 1.5, 1.5, 1.5, 1.5, 1, 1, 1],
-        slicedLimit = 10,
         viewAllLink,
-        storageKey,
-        // defaultSortBy,
-        // defaultSortDirection,
+        skeletonRows = 10,
+        skeletonColRatios,
+        slicedLimit = 10,
+        defaultSortBy,
+        defaultSortDirection,
         heightOverride = '100%',
         tableModel,
         csvDataFetcher,
         csvDataFetcherArgs,
+        storageKey,
+        id: propId,
+        isHttpInfoCallsDisabled = true,
     } = props;
+
+    const id = propId || internalId;
 
     function safeParse<T>(value: string | null, fallback: T): T {
         if (!value || value === 'undefined') return fallback;
@@ -106,13 +115,13 @@ export default function GenericTable<
     const sortByKey = `GenericTable:${storageKey}:sortBy`;
     const sortDirKey = `GenericTable:${storageKey}:sortDir`;
 
-    const [sortBy, setSortBy] = useState<S>(props.defaultSortBy as S);
+    const [sortBy, setSortBy] = useState<S>(defaultSortBy as S);
 
     const { manualAddressEnabled, manualAddress, isDebugWalletActive } =
         useDebugStore();
 
     const [sortDirection, setSortDirection] = useState<TableSortDirection>(
-        props.defaultSortDirection as TableSortDirection,
+        defaultSortDirection as TableSortDirection,
     );
 
     useEffect(() => {
@@ -121,17 +130,17 @@ export default function GenericTable<
         const storedSortDir = window.localStorage.getItem(sortDirKey);
 
         if (storedSortBy) {
-            setSortBy(safeParse<S>(storedSortBy, props.defaultSortBy as S));
+            setSortBy(safeParse<S>(storedSortBy, defaultSortBy as S));
         }
         if (storedSortDir) {
             setSortDirection(
                 safeParse<TableSortDirection>(
                     storedSortDir,
-                    props.defaultSortDirection as TableSortDirection,
+                    defaultSortDirection as TableSortDirection,
                 ),
             );
         }
-    }, [sortDirKey, sortByKey]);
+    }, [sortDirKey, sortByKey, defaultSortBy, defaultSortDirection]);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -154,12 +163,15 @@ export default function GenericTable<
 
     const [rowLimit, setRowLimit] = useState(slicedLimit);
 
-    const isHttpInfoCallsDisabled = true;
     const isSessionEstablished = useMemo(() => {
-        if (manualAddressEnabled) {
-            return manualAddress && manualAddress.length > 0;
+        if (manualAddressEnabled && manualAddress && manualAddress.length > 0) {
+            return true;
         }
         if (isDebugWalletActive) {
+            return true;
+        }
+        // Also consider it "established" if we have a userAddress from the store (e.g. from URL)
+        if (!!userAddress && userAddress !== '') {
             return true;
         }
         return isEstablished(sessionState);
@@ -168,7 +180,11 @@ export default function GenericTable<
         manualAddressEnabled,
         manualAddress,
         isDebugWalletActive,
+        userAddress,
     ]);
+
+    const showData = isSessionEstablished;
+
     const isShowAllEnabled = isSessionEstablished && data.length > slicedLimit;
 
     const checkShadow = useCallback(() => {
@@ -301,6 +317,16 @@ export default function GenericTable<
         setSortBy(nextBy as S);
         setSortDirection(nextDir!);
     };
+    const showActionsContainer =
+        (!isHttpInfoCallsDisabled &&
+            ((sortedData.length > slicedLimit &&
+                !pageMode &&
+                viewAllLink &&
+                viewAllLink.length > 0) ||
+                (tableModel &&
+                    (pageMode || csvDataFetcher) &&
+                    tableModel.some((header) => header.exportable)))) ||
+        (pageMode && sortedData.length > 0);
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -431,7 +457,7 @@ export default function GenericTable<
                     pageMode ? styles.pageMode : styles.notPage
                 } ${isShowAllEnabled ? styles.scrollVisible : ''}`}
                 style={{
-                    overflowY: isSessionEstablished ? 'auto' : 'hidden',
+                    overflowY: showData ? 'auto' : 'hidden',
                 }}
             >
                 <span
@@ -444,23 +470,23 @@ export default function GenericTable<
                         renderHeader(sortDirection, handleSort, sortBy)
                     )}
                 </span>
-                {isSessionEstablished && tableState === TableState.LOADING && (
+                {showData && tableState === TableState.LOADING && (
                     <SkeletonTable
                         rows={skeletonRows}
                         colRatios={skeletonColRatios}
                     />
                 )}
-                {isSessionEstablished &&
+                {showData &&
                     tableState === TableState.FILLED &&
                     dataToShow.map(renderRow)}
-                {isSessionEstablished && tableState === TableState.EMPTY && (
+                {showData && tableState === TableState.EMPTY && (
                     <NoDataRow
                         text={noDataMessage}
                         actionLabel={noDataActionLabel}
                         onAction={onNoDataAction}
                     />
                 )}
-                {!isSessionEstablished && (
+                {!showData && (
                     <div
                         className={`plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Generic+Table ${styles.sessionButtonContainer}`}
                         ref={sessionButtonRef}
@@ -469,15 +495,17 @@ export default function GenericTable<
                     </div>
                 )}
 
-                {!isHttpInfoCallsDisabled && sortedData.length > 0 && (
+                {showActionsContainer && (
                     <div
                         id={`${id}-actionsContainer`}
-                        className={styles.actionsContainer}
+                        className={`${styles.actionsContainer} ${
+                            !viewAllLink ? styles.showAllMode : ''
+                        }`}
                     >
-                        {sortedData.length > slicedLimit &&
+                        {!isHttpInfoCallsDisabled &&
+                            sortedData.length > slicedLimit &&
                             !pageMode &&
-                            viewAllLink &&
-                            viewAllLink.length > 0 && (
+                            viewAllLink && (
                                 <a
                                     href='#'
                                     className={styles.viewAllLink}
@@ -486,7 +514,9 @@ export default function GenericTable<
                                     View All
                                 </a>
                             )}
-                        {tableModel &&
+
+                        {!isHttpInfoCallsDisabled &&
+                            tableModel &&
                             (pageMode || csvDataFetcher) &&
                             tableModel.some((header) => header.exportable) && (
                                 <a
@@ -498,15 +528,6 @@ export default function GenericTable<
                                 </a>
                             )}
                     </div>
-                )}
-
-                {isHttpInfoCallsDisabled && (
-                    <div
-                        id={`${id}-actionsContainer`}
-                        className={
-                            styles.actionsContainer + ' ' + styles.showAllMode
-                        }
-                    ></div>
                 )}
 
                 {pageMode && (

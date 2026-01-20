@@ -4,7 +4,15 @@
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
+    grid-template-columns:
+        minmax(120px, 1.2fr) /* Time - can't shrink below 120px */
+        minmax(50px, 0.8fr) /* Coin */
+        minmax(80px, 0.8fr) /* Direction */
+        minmax(70px, 0.8fr) /* Price */
+        minmax(60px, 0.8fr) /* Size */
+        minmax(80px, 1fr) /* Trade Value - main flex column */
+        minmax(60px, 0.8fr) /* Fee */
+        minmax(70px, 0.8fr); /* Closed PnL */
     align-items: center;
     transition: background-color 0.3s ease;
 }
@@ -36,12 +44,18 @@
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
+    grid-template-columns:
+        minmax(120px, 1.2fr)
+        minmax(50px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(70px, 0.8fr)
+        minmax(60px, 0.8fr)
+        minmax(80px, 1fr)
+        minmax(60px, 0.8fr)
+        minmax(70px, 0.8fr);
     align-items: center;
-
     position: sticky;
     top: 0;
-
     z-index: 10;
 }
 
@@ -99,10 +113,18 @@
     display: flex;
     justify-content: flex-end;
 }
+
 @media (max-width: 1200px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
+        grid-template-columns:
+            minmax(120px, 1.2fr)
+            minmax(80px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(60px, 0.8fr)
+            minmax(80px, 1fr)
+            minmax(60px, 0.8fr)
+            minmax(70px, 0.8fr);
     }
 
     .coinCell {
@@ -113,7 +135,13 @@
 @media (max-width: 1000px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1.2fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
+        grid-template-columns:
+            minmax(120px, 1.2fr)
+            minmax(80px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(80px, 1fr)
+            minmax(60px, 0.8fr)
+            minmax(70px, 0.8fr);
     }
 
     .sizeCell {
@@ -124,7 +152,12 @@
 @media (max-width: 800px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1.2fr 0.8fr 1fr 0.8fr 0.8fr;
+        grid-template-columns:
+            minmax(120px, 1.2fr)
+            minmax(80px, 0.8fr)
+            minmax(80px, 1fr)
+            minmax(60px, 0.8fr)
+            minmax(70px, 0.8fr);
     }
 
     .priceCell {
@@ -135,7 +168,11 @@
 @media (max-width: 640px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1.2fr 1fr 0.8fr 0.8fr;
+        grid-template-columns:
+            minmax(120px, 1.2fr)
+            minmax(80px, 1fr)
+            minmax(60px, 0.8fr)
+            minmax(70px, 0.8fr);
     }
 
     .feeCell {
@@ -146,7 +183,10 @@
 @media (max-width: 480px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 1.2fr 1fr 0.8fr;
+        grid-template-columns:
+            minmax(100px, 1.2fr)
+            minmax(80px, 1fr)
+            minmax(70px, 0.8fr);
         padding: 0 var(--padding-xs);
     }
 

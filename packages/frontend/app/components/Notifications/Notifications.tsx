@@ -17,6 +17,8 @@ import SimpleButton from '../SimpleButton/SimpleButton';
 import Notification from './Notification';
 import styles from './Notifications.module.css';
 import { t } from 'i18next';
+import { useWs } from '~/contexts/WsContext';
+import { useDebugStore } from '~/stores/DebugStore';
 
 interface NewsItemIF {
     headline: string;
@@ -32,6 +34,8 @@ export default function Notifications() {
     backgroundFillNotifRef.current = enableBackgroundFillNotif;
     const { userAddress } = useUserDataStore();
     const { info } = useSdk();
+    const wsContext = useWs();
+    const { isDebugWalletActive } = useDebugStore();
 
     const { showReload, setShowReload } = useVersionCheck();
     const [hoveredNotifications, setHoveredNotifications] = useState<
@@ -151,15 +155,41 @@ export default function Notifications() {
     useEffect(() => {
         if (!info) return;
         if (!userAddress || userAddress === '') return;
-        const { unsubscribe } = info.subscribe(
-            {
-                type: WsChannels.NOTIFICATION,
-                user: userAddress,
-            },
-            postNotification,
-        );
-        return unsubscribe;
-    }, [userAddress, info]);
+
+        let unsubscribeNotification: (() => void) | undefined;
+
+        if (isDebugWalletActive && wsContext) {
+            // Use wsContext in debug mode (avoid duplicate connection to same endpoint)
+            const notificationConfig = {
+                handler: (data: any) => {
+                    // WsContext passes msg.data directly to handler
+                    postNotification({ data });
+                },
+                payload: { user: userAddress },
+            };
+            wsContext.subscribe(WsChannels.NOTIFICATION, notificationConfig);
+            unsubscribeNotification = () => {
+                wsContext.unsubscribe(
+                    WsChannels.NOTIFICATION,
+                    notificationConfig,
+                );
+            };
+        } else {
+            // Use SDK in normal mode
+            const { unsubscribe } = info.subscribe(
+                {
+                    type: WsChannels.NOTIFICATION,
+                    user: userAddress,
+                },
+                postNotification,
+            );
+            unsubscribeNotification = unsubscribe;
+        }
+
+        return () => {
+            unsubscribeNotification?.();
+        };
+    }, [userAddress, info, isDebugWalletActive, wsContext]);
 
     const postNotification = useCallback((payload: NotificationMsg) => {
         if (!payload || !payload.data) return;

@@ -45,7 +45,13 @@
         "announcements": "お知らせ",
         "leverage": "レバレッジ",
         "comingSoon": "近日公開",
-        "clearFilter": "フィルターをクリア"
+        "or": "または",
+        "enter": "入力",
+        "claim": "受け取る",
+        "seeDocsForMore": "詳細はドキュメントをご覧ください。",
+        "clearFilter": "フィルターをクリア",
+        "activate": "有効化",
+        "copied": "コピーしました！"
     },
     "transactions": {
         "orderTypes": "注文タイプ",
@@ -93,6 +99,10 @@
         "evenPriceDistribution": "均等価格分布",
         "market": "成行",
         "limit": "指値",
+        "closePosition": "ポジションを決済",
+        "closeAtCurrentPrice": "現在の価格で決済",
+        "closeAtAPriceYouSet": "指定した価格で決済",
+
         "price": "価格",
         "size": "サイズ",
         "time": "時間",
@@ -311,9 +321,12 @@
         "triggerConditions": "発動条件",
         "tpsl": "TP/SL",
         "status": "ステータス",
+        "network": "ネットワーク",
+        "action": "アクション",
+        "accountValueChange": "口座価値の変化",
         "order": "注文",
-        "long": "Long",
-        "short": "Short",
+        "long": "ロング",
+        "short": "ショート",
         "noOpenPositions": "未決済ポジションなし",
         "noOpenPositionsForMarket": "{{symbol}}の未決済ポジションなし",
         "noOpenLongPositions": "ロングの未決済ポジションなし",
@@ -383,7 +396,8 @@
         "chart": "チャート",
         "book": "注文板",
         "recent": "最新",
-        "positions": "ポジション"
+        "positions": "ポジション",
+        "portfolio": "ポートフォリオ"
     },
     "auth": {
         "login": "ログイン",
@@ -429,7 +443,7 @@
         "overwriteCurrentReferralCode": "現在の紹介コードを上書き",
         "enterReferralCode": "紹介コードを入力してください",
         "referralCodeNotValidPleaseConfirm": "コード <0>{{invalidCode}}</0> は紹介プログラムで申請されていません。コードが正しいか確認してください。",
-        "yourCodeIs": "あなたのコードはウォレットアドレスの最初の6文字に基づく <0>{{affiliateCode}}</0> です。このコードを紹介システムに登録するには「アクティベート」をクリックしてください。",
+        "yourCodeIs": "あなたのコードはウォレットアドレスの最初の6文字に基づく <0>{{referrerCode}}</0> です。このコードを紹介システムに登録するには「アクティベート」をクリックしてください。",
         "createAnAffiliateCode": "アフィリエイトコードを作成",
         "createAUniqueCodeToEarn": "紹介されたユーザーの手数料の10%を獲得するために、ユニークなコードを作成してください。",
         "codeAlreadyInUse": "コードは既に使用されています",
@@ -439,11 +453,11 @@
             "enterCode": "紹介コードを入力するにはウォレットを接続してください"
         },
         "usersWithTradingVolume": "このコードは、取引高が100万ドルに達した後、ユーザーによってカスタマイズまたは更新される場合があります。",
-        "doNotSelfRefer": "コード <0>{{affiliateCode}}</0> は、作成されたのと同じアドレスで登録することはできません。別のコードを選択してください。",
+        "doNotSelfRefer": "コード <0>{{refCode}}</0> は、作成されたのと同じアドレスで登録することはできません。別のコードを選択してください。",
         "toCustomizeAffiliateCode": "アフィリエイトコードはデフォルトでウォレットアドレスの最初の6文字になります。取引高が100万ドルを超えるユーザーはアフィリエイトコードをカスタマイズできます。",
         "claimRewardsWithAmount": "{{amount}} の報酬を請求",
         "selectATabToViewData": "データ表示するタブを選択してください",
-        "trackingLinkExplanation": "紹介されたユーザーの手数料の <0>{{affiliatePercent}}</0> を受け取り、そのユーザーは <1>{{userPercent}}</1> の割引を受けられます。",
+        "trackingLinkExplanation": "紹介されたユーザーの手数料の <0>{{referrerPercent}}</0> を受け取り、そのユーザーは <1>{{inviteePercent}}</1> の割引を受けられます。",
         "claim": "請求する"
     },
     "deposit": {
@@ -576,6 +590,7 @@
         "withdrawInput": "出金入力欄",
         "scrollTabsLeft": "タブを左にスクロール",
         "scrollTabsRight": "タブを右にスクロール",
+        "mobileActionMenu": "モバイルアクションメニューを切り替え",
         "leverageValue": "レバレッジ値",
         "leverageAmount": "レバレッジ金額",
         "setLeverageTo": "{{value}}倍にレバレッジを設定",
@@ -644,6 +659,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "アカウント概要",
+        "updateFrequencyInMinutes": "{{numMinutes}}分ごとに更新",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -664,6 +681,8 @@
         "accountValue": "アカウント価値",
         "collateral": "証拠金",
         "pnl": "損益",
+        "realizedPnl": "実現損益",
+        "unrealizedPnl": "未実現損益",
         "volume": "出来高",
         "maxDrawdown": "最大ドローダウン",
         "totalEquity": "総資産",
@@ -686,7 +705,12 @@
         "amountGreaterThanZero": "金額は0より大きく設定してください",
         "minDepositAmount": "最低入金額は {{amount}} です",
         "exceedsAvailableBalance": "金額が利用可能残高 {{balance}} を超えています",
-        "transactionTimedOut": "取引は15秒後にタイムアウトしました"
+        "transactionTimedOut": "取引は15秒後にタイムアウトしました",
+        "connectToViewPortfolio": "ポートフォリオを表示するには接続してください",
+        "connectDescription": "ウォレットでサインインして、ポートフォリオ、ポジション、取引履歴を表示します。",
+        "pasteWalletAddress": "ウォレットアドレスを貼り付け",
+        "viewOtherAccount": "他のアカウントを表示",
+        "returnToMyPortfolio": "自分のポートフォリオに戻る"
     },
     "pageTitles": {
         "portfolio": "ポートフォリオ",
@@ -721,6 +745,7 @@
         "privacy": "プライバシーポリシー"
     },
     "keyboardShortcuts": {
+        "conflict": "すでに使用されています: {{shortcut}}",
         "menuLabel": "ショートカット",
         "title": "キーボードショートカット",
         "hintPress": "",

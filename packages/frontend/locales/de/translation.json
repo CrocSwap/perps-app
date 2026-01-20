@@ -45,7 +45,13 @@
         "announcements": "Ankündigungen",
         "leverage": "Hebel",
         "comingSoon": "Demnächst verfügbar",
-        "clearFilter": "Filter löschen"
+        "or": "oder",
+        "enter": "Eingeben",
+        "claim": "Beanspruchen",
+        "seeDocsForMore": "Weitere Informationen finden Sie in der Dokumentation.",
+        "clearFilter": "Filter löschen",
+        "activate": "Aktivieren",
+        "copied": "Kopiert!"
     },
     "transactions": {
         "orderTypes": "Ordertypen",
@@ -93,6 +99,10 @@
         "evenPriceDistribution": "Gleichmäßige Preisverteilung",
         "market": "Markt",
         "limit": "Limit",
+        "closePosition": "Position schließen",
+        "closeAtCurrentPrice": "Zum aktuellen Preis schließen",
+        "closeAtAPriceYouSet": "Zu einem festgelegten Preis schließen",
+
         "price": "Preis",
         "size": "Größe",
         "time": "Zeit",
@@ -311,6 +321,9 @@
         "triggerConditions": "Auslöse-Bedingungen",
         "tpsl": "TP/SL",
         "status": "Status",
+        "network": "Netzwerk",
+        "action": "Aktion",
+        "accountValueChange": "Änderung des Kontowerts",
         "order": "Order",
         "long": "Long",
         "short": "Short",
@@ -383,7 +396,8 @@
         "chart": "Chart",
         "book": "Orderbuch",
         "recent": "Kürzlich",
-        "positions": "Positionen"
+        "positions": "Positionen",
+        "portfolio": "Portfolio"
     },
     "auth": {
         "login": "Anmelden",
@@ -429,7 +443,7 @@
         "overwriteCurrentReferralCode": "Aktuellen Empfehlungscode überschreiben",
         "enterReferralCode": "Empfehlungscode eingeben",
         "referralCodeNotValidPleaseConfirm": "Der Code <0>{{invalidCode}}</0> wurde im Empfehlungsprogramm nicht beansprucht. Bitte bestätigen Sie, dass der Code korrekt ist.",
-        "yourCodeIs": "Ihr Code lautet <0>{{affiliateCode}}</0>, basierend auf den ersten sechs Zeichen Ihrer Wallet-Adresse. Bitte klicken Sie auf 'Aktivieren', um diesen Code im Empfehlungssystem zu registrieren.",
+        "yourCodeIs": "Ihr Code lautet <0>{{referrerCode}}</0>, basierend auf den ersten sechs Zeichen Ihrer Wallet-Adresse. Bitte klicken Sie auf 'Aktivieren', um diesen Code im Empfehlungssystem zu registrieren.",
         "createAnAffiliateCode": "Einen Affiliate-Code erstellen",
         "createAUniqueCodeToEarn": "Erstellen Sie einen einzigartigen Code, um 10% der Gebühren der geworbenen Benutzer zu verdienen.",
         "codeAlreadyInUse": "Code bereits in Verwendung",
@@ -439,11 +453,11 @@
             "enterCode": "Verbinden Sie Ihre Wallet, um einen Empfehlungscode einzugeben"
         },
         "usersWithTradingVolume": "Dieser Code kann von Benutzern angepasst oder aktualisiert werden, nachdem sie ein Handelsvolumen von 1 Mio. USD erreicht haben.",
-        "doNotSelfRefer": "Der Code <0>{{affiliateCode}}</0> kann nicht von derselben Adresse registriert werden, mit der er erstellt wurde. Bitte wählen Sie einen anderen Code.",
+        "doNotSelfRefer": "Der Code <0>{{refCode}}</0> kann nicht von derselben Adresse registriert werden, mit der er erstellt wurde. Bitte wählen Sie einen anderen Code.",
         "toCustomizeAffiliateCode": "Affiliate-Codes entsprechen standardmäßig den ersten sechs Zeichen Ihrer Wallet-Adresse. Benutzer mit > 1 Mio. USD Handelsvolumen können ihren Affiliate-Code anpassen.",
         "claimRewardsWithAmount": "{{amount}} an Belohnungen beanspruchen",
         "selectATabToViewData": "Wählen Sie einen Tab aus, um Daten anzuzeigen",
-        "trackingLinkExplanation": "Sie erhalten <0>{{affiliatePercent}}</0> der Gebühren der geworbenen Benutzer und diese erhalten einen Rabatt von <1>{{userPercent}}</1>.",
+        "trackingLinkExplanation": "Sie erhalten <0>{{referrerPercent}}</0> der Gebühren der geworbenen Benutzer und diese erhalten einen Rabatt von <1>{{inviteePercent}}</1>.",
         "claim": "Einlösen"
     },
     "deposit": {
@@ -576,6 +590,7 @@
         "withdrawInput": "Auszahlungsfeld",
         "scrollTabsLeft": "Tabs nach links scrollen",
         "scrollTabsRight": "Tabs nach rechts scrollen",
+        "mobileActionMenu": "Mobiles Aktionsmenü umschalten",
         "leverageValue": "Hebelwert",
         "leverageAmount": "Hebelbetrag",
         "setLeverageTo": "Hebel auf {{value}}x setzen",
@@ -644,6 +659,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "Kontoübersicht",
+        "updateFrequencyInMinutes": "Aktualisiert alle {{numMinutes}} Minuten",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -664,6 +681,8 @@
         "accountValue": "Kontowert",
         "collateral": "Sicherheit",
         "pnl": "PNL",
+        "realizedPnl": "Realisierter PnL",
+        "unrealizedPnl": "Nicht realisierter PnL",
         "volume": "Volumen",
         "maxDrawdown": "Max. Drawdown",
         "totalEquity": "Gesamtkapital",
@@ -686,7 +705,11 @@
         "amountGreaterThanZero": "Der Betrag muss größer als 0 sein",
         "minDepositAmount": "Mindesteinzahlungsbetrag ist {{amount}}",
         "exceedsAvailableBalance": "Der Betrag überschreitet das verfügbare Guthaben von {{balance}}",
-        "transactionTimedOut": "Transaktion nach 15 Sekunden zeitüberschritten"
+        "transactionTimedOut": "Transaktion nach 15 Sekunden zeitüberschritten",
+        "connectToViewPortfolio": "Verbinden um Ihr Portfolio anzuzeigen",
+        "connectDescription": "Melden Sie sich mit Ihrer Wallet an, um Ihr Portfolio, Positionen und Handelshistorie anzuzeigen.",
+        "pasteWalletAddress": "Wallet-Adresse einfügen",
+        "viewOtherAccount": "Anderes Konto anzeigen"
     },
     "pageTitles": {
         "portfolio": "Portfolio",
@@ -711,7 +734,7 @@
         "more": "Mehr",
         "termsOfService": "Nutzungsbedingungen",
         "privacyPolicy": "Datenschutzrichtlinie",
-        "affiliates": "Affiliates",
+        "affiliates": "Partnerprogramm",
         "pageNotFound": "Seite nicht gefunden"
     },
     "docs": {
@@ -721,6 +744,7 @@
         "privacy": "Datenschutzrichtlinie"
     },
     "keyboardShortcuts": {
+        "conflict": "Bereits verwendet von: {{shortcut}}",
         "menuLabel": "Tastenkürzel",
         "title": "Tastenkürzel",
         "hintPress": "Drücke",

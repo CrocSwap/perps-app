@@ -36,16 +36,17 @@ export default function VaultCharts({ info }: VaultChartsProps) {
     // );
 
     const periodOptions = [
-        { label: '24H', value: 0 },
-        { label: '7D', value: 1 },
-        { label: '30D', value: 2 },
-        { label: 'All-time', value: 3 },
+        { label: '24H', value: 0, timeframe: 24 * 60 * 60 * 1000 },
+        { label: '7D', value: 1, timeframe: 7 * 24 * 60 * 60 * 1000 },
+        { label: '30D', value: 2, timeframe: 30 * 24 * 60 * 60 * 1000 },
+        { label: 'All-time', value: 3, timeframe: 0 },
     ];
 
     const [selectedPeriod, setSelectedPeriod] = useState<{
         label: string;
         value: number;
-    }>({ label: 'All-time', value: 3 });
+        timeframe: number;
+    }>({ label: 'All-time', value: 3, timeframe: 0 });
 
     const parseUserProfileData = (data: VaultPortfolioIF, key: number) => {
         const userPositionData = data[key][1] as VaultPortfolioHistoryIF;
@@ -131,6 +132,9 @@ export default function VaultCharts({ info }: VaultChartsProps) {
                             value:
                                 periodOptions.find((opt) => opt.label === value)
                                     ?.value ?? 3,
+                            timeframe:
+                                periodOptions.find((opt) => opt.label === value)
+                                    ?.timeframe ?? 0,
                         })
                     }
                 />

@@ -48,3 +48,12 @@
     left: 50%;
     transform: translateX(-50%);
 }
+
+@media (max-width: 420px) {
+    .container {
+        max-width: 100%;
+        width: 97%;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+}

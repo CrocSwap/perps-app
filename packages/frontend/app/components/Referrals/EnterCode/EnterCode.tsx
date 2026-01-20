@@ -11,8 +11,8 @@ interface PropsIF {
     cached: string;
     isCachedValueValid: boolean | undefined;
     refCodeToConsume: string | undefined;
-    editModeReferral: boolean;
-    setEditModeReferral: (value: boolean) => void;
+    editModeInvitee: boolean;
+    setEditModeInvitee: (value: boolean) => void;
     userInputRefCode: string;
     setUserInputRefCode: (value: string) => void;
     isUserRefCodeClaimed: boolean | undefined;
@@ -29,8 +29,8 @@ export default function EnterCode(props: PropsIF) {
         cached,
         isCachedValueValid,
         refCodeToConsume,
-        editModeReferral,
-        setEditModeReferral,
+        editModeInvitee,
+        setEditModeInvitee,
         userInputRefCode,
         setUserInputRefCode,
         isUserRefCodeClaimed,
@@ -41,23 +41,23 @@ export default function EnterCode(props: PropsIF) {
 
     const { t } = useTranslation();
 
-    const spinner = (
-        <div
-            style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-            }}
-        >
-            <FaSpinner
-                style={{
-                    color: 'var(--accent1)',
-                    animation: 'spin 0.6s linear infinite',
-                }}
-            />
-        </div>
-    );
+    // const spinner = (
+    //     <div
+    //         style={{
+    //             display: 'flex',
+    //             justifyContent: 'center',
+    //             alignItems: 'center',
+    //             height: '100%',
+    //         }}
+    //     >
+    //         <FaSpinner
+    //             style={{
+    //                 color: 'var(--accent1)',
+    //                 animation: 'spin 0.6s linear infinite',
+    //             }}
+    //         />
+    //     </div>
+    // );
 
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
@@ -71,8 +71,8 @@ export default function EnterCode(props: PropsIF) {
                         <p className={styles.ref_code_blurb}>
                             Associating a code with your wallet address will
                             register you to earn rewards on your transactions.
-                            Rewards will also be paid to the affiliate who
-                            created the code.
+                            Rewards will also be paid to the user who created
+                            the code.
                         </p>
                         {isCachedValueValid === false && (
                             <p>
@@ -89,7 +89,7 @@ export default function EnterCode(props: PropsIF) {
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
                         bg='accent1'
-                        onClick={() => setEditModeReferral(true)}
+                        onClick={() => setEditModeInvitee(true)}
                     >
                         {t('common.edit')}
                     </SimpleButton>
@@ -131,7 +131,7 @@ export default function EnterCode(props: PropsIF) {
                     <p>
                         <Trans
                             i18nKey='referrals.doNotSelfRefer'
-                            values={{ affiliateCode: userInputRefCode }}
+                            values={{ refCode: userInputRefCode }}
                             components={[
                                 <span style={{ color: 'var(--accent2)' }} />,
                             ]}
@@ -159,7 +159,7 @@ export default function EnterCode(props: PropsIF) {
                         bg='dark3'
                         hoverBg='accent1'
                         onClick={() => {
-                            setEditModeReferral(false);
+                            setEditModeInvitee(false);
                             setInvalidCode('');
                         }}
                     >
@@ -210,7 +210,7 @@ export default function EnterCode(props: PropsIF) {
     }
 
     const shouldShowInput =
-        (editModeReferral || !cached || isCachedValueValid === false) &&
+        (editModeInvitee || !cached || isCachedValueValid === false) &&
         totVolume !== undefined &&
         totVolume < 10000;
 

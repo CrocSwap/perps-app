@@ -16,11 +16,12 @@
     "devDependencies": {
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",
-        "prettier": "^3.7.4"
+        "prettier": "^3.8.0"
     },
     "pnpm": {
         "overrides": {
-            "@vitejs/plugin-rsc": "0.5.3"
+            "@vitejs/plugin-rsc": "0.5.3",
+            "qs": "6.14.1"
         }
     }
 }

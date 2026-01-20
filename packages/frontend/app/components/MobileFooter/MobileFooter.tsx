@@ -16,7 +16,7 @@ import { RiTwitterXFill } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
 import { externalURLs } from '~/utils/Constants';
 import useOutsideClick from '~/hooks/useOutsideClick';
-import { LuSettings } from 'react-icons/lu';
+import { LuCircleUserRound, LuSettings } from 'react-icons/lu';
 import AppOptions from '../AppOptions/AppOptions';
 import PreventPullToRefresh from '~/hooks/PreventPullToRefresh';
 
@@ -128,6 +128,11 @@ const MobileFooter: React.FC<MobileFooterProps> = ({
             name: t('navigation.trade'),
             path: '/v2/trade',
             icon: tradeSvg,
+        },
+        {
+            name: t('navigation.portfolio'),
+            path: '/v2/portfolio',
+            icon: portfolioSvg,
         },
     ];
 
@@ -325,6 +330,7 @@ const NavItem: React.FC<{ item: NavItem; onClick?: () => void }> = React.memo(
 );
 
 const homeSvg = <RiHome2Line size={23} />;
+const portfolioSvg = <LuCircleUserRound size={23} />;
 
 const tradeSvg = (
     <svg

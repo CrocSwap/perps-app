@@ -27,6 +27,7 @@
     padding-bottom: var(--padding-s);
     display: flex;
     flex-direction: column;
+    container-type: inline-size;
 }
 
 .tableWrapper.showAllWrapper {

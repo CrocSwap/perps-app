@@ -111,8 +111,9 @@
     }
 
     .detailsContainer {
-        gap: clamp(16px, 4vw, 24px);
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 2fr 3fr;
+        gap: clamp(16px, 4vw, var(--gap-m));
         min-height: 0;
     }
 
@@ -122,8 +123,8 @@
         border-radius: 16px;
         background-color: var(--bg-dark2);
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-        min-width: min(46%, 340px);
-        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
         min-height: 0;
     }
 
@@ -144,7 +145,6 @@
     .tableContainer {
         grid-template-columns: 2fr 3fr;
         gap: clamp(10px, 2.8vw, 16px);
-        /* no height/max-height here */
         min-height: 0;
     }
 

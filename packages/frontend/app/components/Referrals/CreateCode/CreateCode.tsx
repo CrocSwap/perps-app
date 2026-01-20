@@ -9,51 +9,51 @@ import styles from './CreateCode.module.css';
 
 interface PropsIF {
     isSessionEstablished: boolean;
-    affiliateCode: string;
-    editModeAffiliate: boolean;
-    setEditModeAffiliate: (value: boolean) => void;
-    temporaryAffiliateCode: string;
-    setTemporaryAffiliateCode: (value: string) => void;
-    isTemporaryAffiliateCodeValid: boolean | undefined;
-    tempAffiliateCodeCharsValidate: boolean;
-    canEditAffiliateCode: boolean;
-    defaultAffiliateCode: string;
+    referrerCode: string;
+    editModeReferrer: boolean;
+    setEditModeReferrer: (value: boolean) => void;
+    temporaryReferrerCode: string;
+    setTemporaryReferrerCode: (value: string) => void;
+    isTemporaryReferrerCodeValid: boolean | undefined;
+    tempRefCodeCharsValidate: boolean;
+    canEditReferrerCode: boolean;
+    defaultReferrerCode: string;
     trackingLink: string;
     justCopied: boolean;
     setJustCopied: (value: boolean) => void;
     copy: (text: string) => void;
     totVolume: number | undefined;
     totVolumeFormatted: string;
-    affiliateEditVolumeThreshold: number;
-    affiliatePercent: string;
-    userPercent: string;
-    createAffiliateCode: () => Promise<void>;
-    updateAffiliateCode: () => Promise<void>;
+    referrerEditVolumeThreshold: number;
+    referrerPercent: string;
+    inviteePercent: string;
+    createRefCode: () => Promise<void>;
+    updateRefCode: () => Promise<void>;
 }
 
 export default function CreateCode(props: PropsIF) {
     const {
         isSessionEstablished,
-        affiliateCode,
-        editModeAffiliate,
-        setEditModeAffiliate,
-        temporaryAffiliateCode,
-        setTemporaryAffiliateCode,
-        isTemporaryAffiliateCodeValid,
-        tempAffiliateCodeCharsValidate,
-        canEditAffiliateCode,
-        defaultAffiliateCode,
+        referrerCode,
+        editModeReferrer,
+        setEditModeReferrer,
+        temporaryReferrerCode,
+        setTemporaryReferrerCode,
+        isTemporaryReferrerCodeValid,
+        tempRefCodeCharsValidate,
+        canEditReferrerCode,
+        defaultReferrerCode,
         trackingLink,
         justCopied,
         setJustCopied,
         copy,
         totVolume,
         totVolumeFormatted,
-        affiliateEditVolumeThreshold,
-        affiliatePercent,
-        userPercent,
-        createAffiliateCode,
-        updateAffiliateCode,
+        referrerEditVolumeThreshold,
+        referrerPercent,
+        inviteePercent,
+        createRefCode,
+        updateRefCode,
     } = props;
 
     const { t } = useTranslation();
@@ -74,14 +74,14 @@ export default function CreateCode(props: PropsIF) {
         );
     }
 
-    if (affiliateCode && !editModeAffiliate) {
+    if (referrerCode && !editModeReferrer) {
         return (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
                     <p>
                         <Trans
                             i18nKey='referrals.yourCodeIs'
-                            values={{ affiliateCode }}
+                            values={{ referrerCode }}
                             components={[
                                 <span style={{ color: 'var(--accent3)' }} />,
                             ]}
@@ -117,10 +117,7 @@ export default function CreateCode(props: PropsIF) {
                     <p className={styles.trackingLinkExplanation}>
                         <Trans
                             i18nKey='referrals.trackingLinkExplanation'
-                            values={{
-                                affiliatePercent: affiliatePercent,
-                                userPercent: userPercent,
-                            }}
+                            values={{ referrerPercent, inviteePercent }}
                             components={[<span />, <span />]}
                         />
                     </p>
@@ -130,7 +127,7 @@ export default function CreateCode(props: PropsIF) {
                     <VolumeProgressBar
                         volume={totVolume ?? 0}
                         volumeFormatted={totVolumeFormatted}
-                        barWidth={affiliateEditVolumeThreshold}
+                        barWidth={referrerEditVolumeThreshold}
                     />
                     <p className={styles.trackingLinkExplanation}>
                         {t('common.seeDocsForMore')}
@@ -140,8 +137,8 @@ export default function CreateCode(props: PropsIF) {
                     <SimpleButton
                         bg='accent1'
                         onClick={() => {
-                            setTemporaryAffiliateCode(affiliateCode);
-                            setEditModeAffiliate(true);
+                            setTemporaryReferrerCode(referrerCode);
+                            setEditModeReferrer(true);
                         }}
                     >
                         {t('common.edit')}
@@ -154,35 +151,35 @@ export default function CreateCode(props: PropsIF) {
     return (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
-                {canEditAffiliateCode ? (
+                {canEditReferrerCode ? (
                     <>
                         <h6>{t('referrals.createAnAffiliateCode')}</h6>
                         <input
                             type='text'
-                            value={temporaryAffiliateCode}
+                            value={temporaryReferrerCode}
                             onChange={(e) => {
                                 console.log(
-                                    'Affiliate code input changed:',
+                                    'Referral code input changed:',
                                     e.target.value,
                                 );
-                                setTemporaryAffiliateCode(e.target.value);
+                                setTemporaryReferrerCode(e.target.value);
                             }}
                             onKeyDown={async (e) => {
                                 if (
                                     e.key === 'Enter' &&
-                                    temporaryAffiliateCode.trim()
+                                    temporaryReferrerCode.trim()
                                 ) {
-                                    editModeAffiliate
-                                        ? updateAffiliateCode()
-                                        : createAffiliateCode();
+                                    editModeReferrer
+                                        ? updateRefCode()
+                                        : createRefCode();
                                 }
                             }}
                         />
                         <div className={styles.validation_item}>
-                            {temporaryAffiliateCode.length > 0 ? (
-                                temporaryAffiliateCode.length >= 2 &&
-                                temporaryAffiliateCode.length <= 30 &&
-                                tempAffiliateCodeCharsValidate ? (
+                            {temporaryReferrerCode.length > 0 ? (
+                                temporaryReferrerCode.length >= 2 &&
+                                temporaryReferrerCode.length <= 30 &&
+                                tempRefCodeCharsValidate ? (
                                     <FaCheck size={10} color='var(--green)' />
                                 ) : (
                                     <GiCancel size={10} color='var(--red)' />
@@ -196,8 +193,8 @@ export default function CreateCode(props: PropsIF) {
                             </p>
                         </div>
                         <div className={styles.validation_item}>
-                            {temporaryAffiliateCode.length > 0 ? (
-                                isTemporaryAffiliateCodeValid === true ? (
+                            {temporaryReferrerCode.length > 0 ? (
+                                isTemporaryReferrerCodeValid === true ? (
                                     <FaCheck size={10} color='var(--green)' />
                                 ) : (
                                     <GiCancel size={10} color='var(--red)' />
@@ -215,9 +212,9 @@ export default function CreateCode(props: PropsIF) {
                             <Trans
                                 i18nKey='referrals.yourCodeIs'
                                 values={{
-                                    affiliateCode:
-                                        affiliateCode ||
-                                        defaultAffiliateCode ||
+                                    referrerCode:
+                                        referrerCode ||
+                                        defaultReferrerCode ||
                                         '—',
                                 }}
                                 components={[
@@ -233,29 +230,29 @@ export default function CreateCode(props: PropsIF) {
                 <VolumeProgressBar
                     volume={totVolume ?? 0}
                     volumeFormatted={totVolumeFormatted}
-                    barWidth={affiliateEditVolumeThreshold}
+                    barWidth={referrerEditVolumeThreshold}
                 />
             </div>
             <div className={styles.refferal_code_buttons}>
                 <SimpleButton
                     bg='accent1'
                     onClick={() => {
-                        if (editModeAffiliate && canEditAffiliateCode) {
-                            void updateAffiliateCode();
+                        if (editModeReferrer && canEditReferrerCode) {
+                            void updateRefCode();
                         } else {
-                            void createAffiliateCode();
+                            void createRefCode();
                         }
                     }}
                 >
-                    {t(editModeAffiliate ? 'common.update' : 'common.activate')}
+                    {t(editModeReferrer ? 'common.update' : 'common.activate')}
                 </SimpleButton>
-                {editModeAffiliate && affiliateCode && canEditAffiliateCode && (
+                {editModeReferrer && referrerCode && canEditReferrerCode && (
                     <SimpleButton
                         bg='dark4'
                         hoverBg='accent1'
                         onClick={() => {
-                            setEditModeAffiliate(false);
-                            setTemporaryAffiliateCode('');
+                            setEditModeReferrer(false);
+                            setTemporaryReferrerCode('');
                         }}
                     >
                         {t('common.cancel')}

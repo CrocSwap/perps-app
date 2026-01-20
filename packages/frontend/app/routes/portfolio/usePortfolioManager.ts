@@ -119,10 +119,12 @@ const OTHER_FORMATTER = new Intl.NumberFormat('en-US', {
     maximumFractionDigits: 6,
 });
 
-export function usePortfolioManager() {
+export function usePortfolioManager(urlAddress?: string) {
     const { t } = useTranslation();
     const userDataStore = useUserDataStore();
     const userAddress = userDataStore.userAddress;
+    // Use URL address if provided, otherwise fall back to logged-in user address
+    const targetAddress = urlAddress || userAddress;
 
     const {
         balance: walletBalance,
@@ -188,31 +190,41 @@ export function usePortfolioManager() {
     });
 
     const [userData, setUserData] = useState<any>();
-
     const fetchUserData = useCallback(async () => {
-        if (!userAddress) {
+        if (!targetAddress) {
             setUserData(undefined);
             return;
         }
 
         try {
             const EMBER_ENDPOINT_ALL =
-                'https://ember-leaderboard.liquidity.tools/leaderboard';
+                'https://ember-leaderboard-v2.liquidity.tools/user';
             const emberEndpointForUser =
-                EMBER_ENDPOINT_ALL + '/' + userAddress.toString();
+                EMBER_ENDPOINT_ALL + '/' + targetAddress.toString();
 
             const response = await fetch(emberEndpointForUser);
-            const data = await response.json();
-
-            if (data.error) {
-                console.log('error fetching user data');
-            } else if (data.leaderboard && data.leaderboard.length > 0) {
-                setUserData({ data });
+            if (response.status === 404) {
+                setUserData(undefined);
+                return;
             }
+
+            if (!response.ok) {
+                setUserData(undefined);
+                return;
+            }
+            const data = await response.json().catch(() => undefined);
+
+            if (!data || data.error || !data.stats) {
+                setUserData(undefined);
+                return;
+            }
+
+            setUserData(data.stats);
         } catch (error) {
             console.log(error);
+            setUserData(undefined);
         }
-    }, [userAddress]);
+    }, [targetAddress]);
 
     // fetch user data on mount and every 30 seconds
     useEffect(() => {
@@ -362,5 +374,7 @@ export function usePortfolioManager() {
         stopWithdrawAutoRefresh,
         // Ember leaderboard user data
         userData,
+        // Expose userAddress for session state checks
+        userAddress,
     };
 }

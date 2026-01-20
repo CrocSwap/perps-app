@@ -156,6 +156,10 @@ export function getCustomShortcuts(): Record<string, ShortcutKeyToken[]> {
 
 export function setCustomShortcut(id: string, keys: ShortcutKeyToken[]): void {
     if (typeof window === 'undefined') return;
+
+    const conflictId = getShortcutConflictId(id, keys);
+    if (conflictId) return;
+
     const current = getCustomShortcuts();
     const defaultKeys = getDefaultShortcutKeys(id);
 
@@ -191,6 +195,12 @@ function getEffectiveKeys(id: string): ShortcutKeyToken[] {
     const custom = getCustomShortcuts();
     if (custom[id]) return custom[id];
     return getDefaultShortcutKeys(id);
+}
+
+function getAllShortcutIds(): string[] {
+    return DEFAULT_SHORTCUT_CATEGORIES.flatMap((cat) =>
+        cat.shortcuts.map((s) => s.id),
+    );
 }
 
 function normalizeToken(token: string): string {
@@ -246,6 +256,30 @@ function mainKeyTokenFromTokens(tokens: string[]): string | null {
     if (nonModifiers.length === 0) return null;
     if (nonModifiers.length === 1) return nonModifiers[0];
     return nonModifiers[nonModifiers.length - 1];
+}
+
+function shortcutSignatureFromTokens(tokens: string[]): string | null {
+    const main = mainKeyTokenFromTokens(tokens);
+    if (!main) return null;
+
+    const required = requiredModifiersFromTokens(tokens);
+    return `${required.shift ? 1 : 0}${required.alt ? 1 : 0}${required.ctrl ? 1 : 0}${required.meta ? 1 : 0}:${normalizeToken(main)}`;
+}
+
+export function getShortcutConflictId(
+    id: string,
+    proposedKeys: ShortcutKeyToken[],
+): string | null {
+    const proposedSig = shortcutSignatureFromTokens(proposedKeys);
+    if (!proposedSig) return null;
+
+    for (const otherId of getAllShortcutIds()) {
+        if (otherId === id) continue;
+        const sig = shortcutSignatureFromTokens(getEffectiveKeys(otherId));
+        if (sig && sig === proposedSig) return otherId;
+    }
+
+    return null;
 }
 
 function eventMatchesMainKey(e: KeyboardEvent, token: string): boolean {

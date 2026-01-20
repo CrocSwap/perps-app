@@ -88,17 +88,16 @@ export default function PageHeader() {
         (async () => {
             try {
                 const EMBER_ENDPOINT_ALL =
-                    'https://ember-leaderboard.liquidity.tools/leaderboard';
+                    'https://ember-leaderboard-v2.liquidity.tools/user';
                 const emberEndpointForUser =
                     EMBER_ENDPOINT_ALL + '/' + affiliateAddress.toString();
 
                 const response = await fetch(emberEndpointForUser);
                 const data = await response.json();
-
                 if (data.error) {
                     referralStore.setTotVolume(0);
-                } else if (data.leaderboard && data.leaderboard.length > 0) {
-                    const volume = data.leaderboard[0].volume;
+                } else if (data.stats) {
+                    const volume = data.stats.total_volume;
                     referralStore.setTotVolume(volume);
                 }
             } catch (error) {
@@ -435,21 +434,25 @@ export default function PageHeader() {
     const invalidRefCodeModal = useModal('closed');
 
     // run the FUUL context
-    const { isAffiliateCodeFree } = useFuul();
+    const { isRefCodeFree } = useFuul();
 
     useEffect(() => {
         const checkRefCode = async (): Promise<void> => {
             if (referralCodeFromURL.value) {
-                const isCodeClaimed: boolean = await isAffiliateCodeFree(
-                    referralCodeFromURL.value,
-                );
-                isCodeClaimed
-                    ? referralStore.cache(referralCodeFromURL.value)
-                    : invalidRefCodeModal.open();
+                // const isCodeClaimed: boolean = await isRefCodeFree(
+                //     referralCodeFromURL.value,
+                // );
+                // isCodeClaimed
+                //     ? referralStore.cache(referralCodeFromURL.value)
+                //     : invalidRefCodeModal.open();
+                referralStore.cache(referralCodeFromURL.value);
             }
         };
         checkRefCode();
-    }, [referralCodeFromURL.value, isAffiliateCodeFree]);
+    }, [
+        referralCodeFromURL.value,
+        // isRefCodeFree,
+    ]);
 
     return (
         <>

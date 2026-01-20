@@ -240,6 +240,7 @@ export default function ComboBoxContainer() {
                                             manualAddressInputKeyListener
                                         }
                                         autoFocus
+                                        placeholder={`Session address ${userAddress ? userAddress.slice(0, 6) + '...' + userAddress.slice(-4) : ''} is being used unless you enter a manual address`}
                                     />
                                 </>
                             ) : (

@@ -39,9 +39,11 @@ import type {
     UserFillIF,
     UserFundingIF,
 } from '~/utils/UserDataIFs';
+import { useWs } from '~/contexts/WsContext';
 
 export default function WebDataConsumer() {
     const { debugWallet, isDebugWalletActive } = useDebugStore();
+    const wsContext = useWs();
 
     const DUMMY_ADDRESS = useMemo(() => {
         if (isDebugWalletActive) {
@@ -170,100 +172,289 @@ export default function WebDataConsumer() {
         userNonFundingLedgerUpdatesRef.current = [];
         resetRefs();
 
-        // Subscribe to webData2 on user socket for user-specific data
-        console.log(
-            '[WEB_DATA2] Setting up subscription with user:',
-            userAddress,
-        );
-        const { unsubscribe } = info.subscribe(
-            { type: WsChannels.WEB_DATA2, user: userAddress },
-            postWebData2,
-            () => {
-                console.log('[WEB_DATA2] Subscription snapshot complete');
-                fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
-            },
-        );
+        // Subscribe to webData2
+        let unsubscribeWebData2: (() => void) | undefined;
 
-        // Also subscribe to webData2 on market socket for market data
-        // This ensures market data comes from the market endpoint even when user endpoint is different
-        let unsubscribeMarketData: (() => void) | undefined;
-        if (info.multiSocketInfo && isDebugWalletActive) {
-            const marketSocket = info.multiSocketInfo.getMarketSocket();
-            if (marketSocket) {
-                const marketDataCallback = (msg: any) => {
-                    // Only process market data from this subscription
-                    postWebData2MarketOnly(msg);
-                };
-                const result = marketSocket.subscribe(
-                    { type: WsChannels.WEB_DATA2, user: DUMMY_ADDRESS },
-                    marketDataCallback,
-                );
-                unsubscribeMarketData = result.unsubscribe;
-            }
+        if (isDebugWalletActive && wsContext) {
+            // Use wsContext in debug mode (avoid duplicate connection to same endpoint)
+            console.log(
+                '[WEB_DATA2] Setting up subscription via wsContext with user:',
+                DUMMY_ADDRESS,
+            );
+            const webData2Config = {
+                handler: (data: any) => {
+                    // WsContext passes msg.data directly to handler
+                    postWebData2MarketOnly({ data });
+                },
+                payload: { user: DUMMY_ADDRESS },
+            };
+            wsContext.subscribe(WsChannels.WEB_DATA2, webData2Config);
+            unsubscribeWebData2 = () => {
+                wsContext.unsubscribe(WsChannels.WEB_DATA2, webData2Config);
+            };
+        } else {
+            // Use SDK in normal mode
+            console.log(
+                '[WEB_DATA2] Setting up subscription via SDK with user:',
+                userAddress,
+            );
+            const { unsubscribe } = info.subscribe(
+                { type: WsChannels.WEB_DATA2, user: userAddress },
+                postWebData2,
+                () => {
+                    console.log('[WEB_DATA2] Subscription snapshot complete');
+                    fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
+                },
+            );
+            unsubscribeWebData2 = unsubscribe;
         }
 
-        console.log('[ORDER HISTORY] Setting up subscription:', {
-            user: userAddress,
-            hasMultiSocket: !!info.multiSocketInfo,
-            channel: WsChannels.USER_HISTORICAL_ORDERS,
-        });
-        const { unsubscribe: unsubscribeOrderHistory } = info.subscribe(
-            {
-                type: WsChannels.USER_HISTORICAL_ORDERS,
+        // Subscribe to userHistoricalOrders
+        let unsubscribeOrderHistory: (() => void) | undefined;
+
+        if (isDebugWalletActive && wsContext) {
+            // Use wsContext in debug mode
+            console.log(
+                '[ORDER HISTORY] Setting up subscription via wsContext:',
+                {
+                    user: DUMMY_ADDRESS,
+                    channel: WsChannels.USER_HISTORICAL_ORDERS,
+                },
+            );
+            const orderHistoryConfig = {
+                handler: (data: any) => {
+                    console.log(
+                        '[ORDER HISTORY] Message received via wsContext callback',
+                    );
+                    postUserHistoricalOrders({ data });
+                },
+                payload: { user: DUMMY_ADDRESS },
+            };
+            wsContext.subscribe(
+                WsChannels.USER_HISTORICAL_ORDERS,
+                orderHistoryConfig,
+            );
+            unsubscribeOrderHistory = () => {
+                wsContext.unsubscribe(
+                    WsChannels.USER_HISTORICAL_ORDERS,
+                    orderHistoryConfig,
+                );
+            };
+        } else {
+            // Use SDK in normal mode
+            console.log('[ORDER HISTORY] Setting up subscription via SDK:', {
                 user: userAddress,
-            },
-            (payload: any) => {
-                console.log(
-                    '[ORDER HISTORY] Message received via subscription callback',
+                hasMultiSocket: !!info.multiSocketInfo,
+                channel: WsChannels.USER_HISTORICAL_ORDERS,
+            });
+            const { unsubscribe } = info.subscribe(
+                {
+                    type: WsChannels.USER_HISTORICAL_ORDERS,
+                    user: userAddress,
+                },
+                (payload: any) => {
+                    console.log(
+                        '[ORDER HISTORY] Message received via SDK callback',
+                    );
+                    postUserHistoricalOrders(payload);
+                },
+            );
+            unsubscribeOrderHistory = unsubscribe;
+        }
+
+        // Subscribe to userFills
+        let unsubscribeUserFills: (() => void) | undefined;
+
+        if (isDebugWalletActive && wsContext) {
+            // Use wsContext in debug mode
+            console.log(
+                '[USER FILLS] Setting up subscription via wsContext with user:',
+                DUMMY_ADDRESS,
+            );
+            const userFillsConfig = {
+                handler: (data: any) => {
+                    console.log(
+                        '[USER FILLS] Message received via wsContext callback',
+                    );
+                    postUserFills({ data });
+                },
+                payload: { user: DUMMY_ADDRESS },
+            };
+            wsContext.subscribe(WsChannels.USER_FILLS, userFillsConfig);
+            unsubscribeUserFills = () => {
+                wsContext.unsubscribe(WsChannels.USER_FILLS, userFillsConfig);
+            };
+        } else {
+            // Use SDK in normal mode
+            console.log(
+                '[USER FILLS] Setting up subscription via SDK with user:',
+                userAddress,
+            );
+            const { unsubscribe } = info.subscribe(
+                { type: WsChannels.USER_FILLS, user: userAddress },
+                (payload: any) => {
+                    console.log(
+                        '[USER FILLS] Message received via SDK callback',
+                    );
+                    postUserFills(payload);
+                },
+                () => {
+                    console.log('[USER FILLS] Subscription snapshot complete');
+                    fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
+                },
+            );
+            unsubscribeUserFills = unsubscribe;
+        }
+
+        // Subscribe to userTwapSliceFills
+        let unsubscribeUserTwapSliceFills: (() => void) | undefined;
+
+        if (isDebugWalletActive && wsContext) {
+            // Use wsContext in debug mode
+            console.log(
+                '[TWAP SLICE FILLS] Setting up subscription via wsContext with user:',
+                DUMMY_ADDRESS,
+            );
+            const twapSliceFillsConfig = {
+                handler: (data: any) => {
+                    postUserTwapSliceFills({ data });
+                },
+                payload: { user: DUMMY_ADDRESS },
+            };
+            wsContext.subscribe(
+                WsChannels.TWAP_SLICE_FILLS,
+                twapSliceFillsConfig,
+            );
+            unsubscribeUserTwapSliceFills = () => {
+                wsContext.unsubscribe(
+                    WsChannels.TWAP_SLICE_FILLS,
+                    twapSliceFillsConfig,
                 );
-                postUserHistoricalOrders(payload);
-            },
-        );
+            };
+        } else {
+            // Use SDK in normal mode
+            console.log(
+                '[TWAP SLICE FILLS] Setting up subscription via SDK with user:',
+                userAddress,
+            );
+            const { unsubscribe } = info.subscribe(
+                { type: WsChannels.TWAP_SLICE_FILLS, user: userAddress },
+                postUserTwapSliceFills,
+                () => {
+                    fetchedChannelsRef.current.add(WsChannels.TWAP_SLICE_FILLS);
+                },
+            );
+            unsubscribeUserTwapSliceFills = unsubscribe;
+        }
 
-        console.log(
-            '[USER FILLS] Setting up subscription with user:',
-            userAddress,
-        );
-        const { unsubscribe: unsubscribeUserFills } = info.subscribe(
-            { type: WsChannels.USER_FILLS, user: userAddress },
-            (payload: any) => {
-                console.log(
-                    '[USER FILLS] Message received via subscription callback',
+        // Subscribe to userTwapHistory
+        let unsubscribeUserTwapHistory: (() => void) | undefined;
+
+        if (isDebugWalletActive && wsContext) {
+            // Use wsContext in debug mode
+            console.log(
+                '[TWAP HISTORY] Setting up subscription via wsContext with user:',
+                DUMMY_ADDRESS,
+            );
+            const twapHistoryConfig = {
+                handler: (data: any) => {
+                    postUserTwapHistory({ data });
+                },
+                payload: { user: DUMMY_ADDRESS },
+            };
+            wsContext.subscribe(WsChannels.TWAP_HISTORY, twapHistoryConfig);
+            unsubscribeUserTwapHistory = () => {
+                wsContext.unsubscribe(
+                    WsChannels.TWAP_HISTORY,
+                    twapHistoryConfig,
                 );
-                postUserFills(payload);
-            },
-            () => {
-                console.log('[USER FILLS] Subscription snapshot complete');
-                fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
-            },
-        );
+            };
+        } else {
+            // Use SDK in normal mode
+            console.log(
+                '[TWAP HISTORY] Setting up subscription via SDK with user:',
+                userAddress,
+            );
+            const { unsubscribe } = info.subscribe(
+                { type: WsChannels.TWAP_HISTORY, user: userAddress },
+                postUserTwapHistory,
+                () => {
+                    fetchedChannelsRef.current.add(WsChannels.TWAP_HISTORY);
+                },
+            );
+            unsubscribeUserTwapHistory = unsubscribe;
+        }
 
-        const { unsubscribe: unsubscribeUserTwapSliceFills } = info.subscribe(
-            { type: WsChannels.TWAP_SLICE_FILLS, user: userAddress },
-            postUserTwapSliceFills,
-            () => {
-                fetchedChannelsRef.current.add(WsChannels.TWAP_SLICE_FILLS);
-            },
-        );
+        // Subscribe to userFundings
+        let unsubscribeUserFundings: (() => void) | undefined;
 
-        const { unsubscribe: unsubscribeUserTwapHistory } = info.subscribe(
-            { type: WsChannels.TWAP_HISTORY, user: userAddress },
-            postUserTwapHistory,
-            () => {
-                fetchedChannelsRef.current.add(WsChannels.TWAP_HISTORY);
-            },
-        );
+        if (isDebugWalletActive && wsContext) {
+            // Use wsContext in debug mode
+            console.log(
+                '[USER FUNDINGS] Setting up subscription via wsContext with user:',
+                DUMMY_ADDRESS,
+            );
+            const userFundingsConfig = {
+                handler: (data: any) => {
+                    postUserFundings({ data });
+                },
+                payload: { user: DUMMY_ADDRESS },
+            };
+            wsContext.subscribe(WsChannels.USER_FUNDINGS, userFundingsConfig);
+            unsubscribeUserFundings = () => {
+                wsContext.unsubscribe(
+                    WsChannels.USER_FUNDINGS,
+                    userFundingsConfig,
+                );
+            };
+        } else {
+            // Use SDK in normal mode
+            console.log(
+                '[USER FUNDINGS] Setting up subscription via SDK with user:',
+                userAddress,
+            );
+            const { unsubscribe } = info.subscribe(
+                { type: WsChannels.USER_FUNDINGS, user: userAddress },
+                postUserFundings,
+                () => {
+                    fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
+                },
+            );
+            unsubscribeUserFundings = unsubscribe;
+        }
 
-        const { unsubscribe: unsubscribeUserFundings } = info.subscribe(
-            { type: WsChannels.USER_FUNDINGS, user: userAddress },
-            postUserFundings,
-            () => {
-                fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
-            },
-        );
+        // Subscribe to userNonFundingLedgerUpdates
+        let unsubscribeUserNonFundingLedgerUpdates: (() => void) | undefined;
 
-        const { unsubscribe: unsubscribeUserNonFundingLedgerUpdates } =
-            info.subscribe(
+        if (isDebugWalletActive && wsContext) {
+            // Use wsContext in debug mode
+            console.log(
+                '[NON FUNDING LEDGER] Setting up subscription via wsContext with user:',
+                DUMMY_ADDRESS,
+            );
+            const nonFundingLedgerConfig = {
+                handler: (data: any) => {
+                    postUserNonFundingLedgerUpdates({ data });
+                },
+                payload: { user: DUMMY_ADDRESS },
+            };
+            wsContext.subscribe(
+                WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
+                nonFundingLedgerConfig,
+            );
+            unsubscribeUserNonFundingLedgerUpdates = () => {
+                wsContext.unsubscribe(
+                    WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
+                    nonFundingLedgerConfig,
+                );
+            };
+        } else {
+            // Use SDK in normal mode
+            console.log(
+                '[NON FUNDING LEDGER] Setting up subscription via SDK with user:',
+                userAddress,
+            );
+            const { unsubscribe } = info.subscribe(
                 {
                     type: WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
                     user: userAddress,
@@ -275,6 +466,8 @@ export default function WebDataConsumer() {
                     );
                 },
             );
+            unsubscribeUserNonFundingLedgerUpdates = unsubscribe;
+        }
 
         const userDataInterval = setInterval(() => {
             // NOTE: setUserOrders and setOrderHistory removed from here
@@ -320,16 +513,15 @@ export default function WebDataConsumer() {
             );
             clearInterval(userDataInterval);
             // clearInterval(monitorInterval);
-            unsubscribe();
-            unsubscribeMarketData?.();
-            unsubscribeOrderHistory();
-            unsubscribeUserFills();
-            unsubscribeUserTwapSliceFills();
-            unsubscribeUserTwapHistory();
-            unsubscribeUserFundings();
-            unsubscribeUserNonFundingLedgerUpdates();
+            unsubscribeWebData2?.();
+            unsubscribeOrderHistory?.();
+            unsubscribeUserFills?.();
+            unsubscribeUserTwapSliceFills?.();
+            unsubscribeUserTwapHistory?.();
+            unsubscribeUserFundings?.();
+            unsubscribeUserNonFundingLedgerUpdates?.();
         };
-    }, [userAddress, info, isDebugWalletActive]);
+    }, [userAddress, info, isDebugWalletActive, wsContext]);
 
     useEffect(() => {
         acccountOverviewPrevRef.current = accountOverview;
@@ -350,10 +542,8 @@ export default function WebDataConsumer() {
             //     setCoinPriceMap(data.data.coinPriceMap);
             // }
 
-            if (
-                isEstablished(sessionState) &&
-                data.data.user?.toLowerCase() === addressRef.current
-            ) {
+            // Process data if it matches the target address (from URL or session)
+            if (data.data.user?.toLowerCase() === addressRef.current) {
                 // Open orders now come from order history subscription
                 // Positions now come from RPC polling
                 userBalancesRef.current = data.data.userBalances;
@@ -378,6 +568,7 @@ export default function WebDataConsumer() {
             lastDataTimestampRef.current = Date.now();
 
             if (debugWalletActiveRef.current) {
+                fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
             }

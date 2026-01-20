@@ -31,3 +31,10 @@ export function generateSolanaAddress(): string {
     const randomBytes = generatePseudoRandomBytes(32);
     return base58Encode(randomBytes);
 }
+
+export const BASE58_REGEX =
+    /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/;
+
+export function isValidBase58(str: string): boolean {
+    return BASE58_REGEX.test(str);
+}

@@ -55,7 +55,7 @@ export function AffiliateCurrentLevelCard() {
     }, [commissionRatePercent, inviteePercent]);
 
     const code = affiliateCode?.code ?? '';
-    const referralUrl = code ? `https://perps.ambient.finance?ref=${code}` : '';
+    const referralUrl = code ? `${window.location.origin}?af=${code}` : '';
 
     const copyToClipboard = async (value: string) => {
         if (!value) return;

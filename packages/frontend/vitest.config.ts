@@ -4,12 +4,10 @@ import { defineConfig } from 'vitest/config';
 // and use a local cache directory. No Vite plugins are needed here
 // since tests use relative imports.
 export default defineConfig({
+    cacheDir: './.vitest',
     test: {
         include: ['app/**/*.test.{ts,tsx}'],
         environment: 'node',
         globals: true,
-        cache: {
-            dir: './.vitest',
-        },
     },
 });

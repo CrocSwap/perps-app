@@ -45,7 +45,13 @@
         "announcements": "Annonces",
         "leverage": "Effet de levier",
         "comingSoon": "Bientôt disponible",
-        "clearFilter": "Effacer le filtre"
+        "or": "ou",
+        "enter": "Entrer",
+        "claim": "Réclamer",
+        "seeDocsForMore": "Voir la documentation pour en savoir plus.",
+        "clearFilter": "Effacer le filtre",
+        "activate": "Activer",
+        "copied": "Copié !"
     },
     "transactions": {
         "orderTypes": "Types d'ordre",
@@ -93,6 +99,10 @@
         "evenPriceDistribution": "Répartition des prix égale",
         "market": "Marché",
         "limit": "Limite",
+        "closePosition": "Clôturer la position",
+        "closeAtCurrentPrice": "Clôturer au prix actuel",
+        "closeAtAPriceYouSet": "Clôturer à un prix défini",
+
         "price": "Prix",
         "size": "Taille",
         "time": "Heure",
@@ -311,6 +321,9 @@
         "triggerConditions": "Conditions déclenchantes",
         "tpsl": "TP/SL",
         "status": "Statut",
+        "network": "Réseau",
+        "action": "Action",
+        "accountValueChange": "Variation de la valeur du compte",
         "order": "Ordre",
         "long": "Long",
         "short": "Short",
@@ -383,7 +396,8 @@
         "chart": "Graphique",
         "book": "Carnet d'ordres",
         "recent": "Récent",
-        "positions": "Positions"
+        "positions": "Positions",
+        "portfolio": "Portefeuille"
     },
     "auth": {
         "login": "Connexion",
@@ -429,7 +443,7 @@
         "overwriteCurrentReferralCode": "Remplacer le code de parrainage actuel",
         "enterReferralCode": "Entrer un code de parrainage",
         "referralCodeNotValidPleaseConfirm": "Le code <0>{{invalidCode}}</0> n'est pas enregistré dans le programme de parrainage. Veuillez confirmer que le code est correct.",
-        "yourCodeIs": "Votre code est <0>{{affiliateCode}}</0> basé sur les six premiers caractères de votre adresse de wallet. Cliquez sur 'Activer' pour enregistrer ce code dans le système de parrainage.",
+        "yourCodeIs": "Votre code est <0>{{referrerCode}}</0> basé sur les six premiers caractères de votre adresse de wallet. Cliquez sur 'Activer' pour enregistrer ce code dans le système de parrainage.",
         "createAnAffiliateCode": "Créer un code d'affiliation",
         "createAUniqueCodeToEarn": "Créez un code unique pour gagner 10% des frais des utilisateurs parrainés.",
         "codeAlreadyInUse": "Code déjà utilisé",
@@ -439,11 +453,11 @@
             "enterCode": "Connectez votre wallet pour entrer un code de parrainage"
         },
         "usersWithTradingVolume": "Ce code peut être personnalisé ou mis à jour par les utilisateurs après avoir atteint 1M$ de volume de trading.",
-        "doNotSelfRefer": "Le code <0>{{affiliateCode}}</0> ne peut pas être enregistré par la même adresse qui l'a créé. Veuillez choisir un autre code.",
+        "doNotSelfRefer": "Le code <0>{{refCode}}</0> ne peut pas être enregistré par la même adresse qui l'a créé. Veuillez choisir un autre code.",
         "toCustomizeAffiliateCode": "Les codes d'affiliation correspondent par défaut aux six premiers caractères de votre adresse de wallet. Les utilisateurs avec > 1M$ de volume de trading peuvent personnaliser leur code.",
         "claimRewardsWithAmount": "Réclamer {{amount}} de récompenses",
         "selectATabToViewData": "Sélectionner un onglet pour afficher les données",
-        "trackingLinkExplanation": "Vous recevrez <0>{{affiliatePercent}}</0> des frais des utilisateurs parrainés et ils recevront une réduction de <1>{{userPercent}}</1>.",
+        "trackingLinkExplanation": "Vous recevrez <0>{{referrerPercent}}</0> des frais des utilisateurs parrainés et ils recevront une réduction de <1>{{inviteePercent}}</1>.",
         "claim": "Réclamer"
     },
     "deposit": {
@@ -576,6 +590,7 @@
         "withdrawInput": "Champ de saisie du retrait",
         "scrollTabsLeft": "Faire défiler les onglets vers la gauche",
         "scrollTabsRight": "Faire défiler les onglets vers la droite",
+        "mobileActionMenu": "Basculer le menu d'actions mobile",
         "leverageValue": "Valeur de l'effet de levier",
         "leverageAmount": "Montant de l'effet de levier",
         "setLeverageTo": "Définir l'effet de levier à {{value}}x",
@@ -644,6 +659,8 @@
         "totalUsdVal": "Valeur totale en USD",
         "totalNetUsdValue": "Valeur nette totale en USD",
         "performance": "Performance",
+        "accountOverview": "Aperçu du compte",
+        "updateFrequencyInMinutes": "Mise à jour toutes les {{numMinutes}} minutes",
         "positions": "Positions",
         "feeSchedule": "Calendrier des frais",
         "vipTiers": "Niveaux VIP",
@@ -664,6 +681,8 @@
         "accountValue": "Valeur du compte",
         "collateral": "Collatéral",
         "pnl": "PnL",
+        "realizedPnl": "PnL réalisé",
+        "unrealizedPnl": "PnL non réalisé",
         "volume": "Volume",
         "maxDrawdown": "Drawdown maximum",
         "totalEquity": "Équité totale",
@@ -686,7 +705,12 @@
         "amountGreaterThanZero": "Le montant doit être supérieur à 0",
         "minDepositAmount": "Montant minimum de dépôt : {{amount}}",
         "exceedsAvailableBalance": "Le montant dépasse le solde disponible de {{balance}}",
-        "transactionTimedOut": "La transaction a expiré après 15 secondes"
+        "transactionTimedOut": "Transaction expirée après 15 secondes",
+        "connectToViewPortfolio": "Connectez-vous pour Voir Votre Portefeuille",
+        "connectDescription": "Connectez-vous avec votre portefeuille pour voir votre portefeuille, vos positions et votre historique de trading.",
+        "pasteWalletAddress": "Coller l'adresse du portefeuille",
+        "viewOtherAccount": "Voir un autre compte",
+        "returnToMyPortfolio": "Retourner à mon portefeuille"
     },
     "pageTitles": {
         "portfolio": "Portefeuille",
@@ -721,6 +745,7 @@
         "privacy": "Politique de confidentialité"
     },
     "keyboardShortcuts": {
+        "conflict": "Déjà utilisé par : {{shortcut}}",
         "menuLabel": "Raccourcis",
         "title": "Raccourcis clavier",
         "hintPress": "Appuyez sur",

@@ -4,25 +4,31 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     getXandYLocationForChartDrag,
     getMainSeriesPaneIndex,
-    scaleDataRef,
     getPriceAxisContainer,
     getPaneCanvasAndIFrameDoc,
 } from './overlayCanvasUtils';
+import { formatPrice, getPricetoPixel } from '../orders/customOrderLineUtils';
 import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
 import { usePreviewOrderLines } from '../orders/usePreviewOrderLines';
 import { useChartStore } from '~/stores/TradingviewChartStore';
 import { useOpenOrderLines } from '../orders/useOpenOrderLines';
 import { usePositionOrderLines } from '../orders/usePositionOrderLines';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
+import { useMobile } from '~/hooks/useMediaQuery';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
 
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const yAxisCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    const paneCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const { chart, isChartReady } = useTradingView();
     const { orderInputPriceValue, symbol, isMidModeActive } =
         useTradeDataStore();
     const [isDrag, setIsDrag] = useState(false);
     const [mouseY, setMouseY] = useState(0);
     const [isPaneChanged, setIsPaneChanged] = useState(false);
+    const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
     const isNearOrderPriceRef = useRef(false);
     const isInitialSizeSetRef = useRef(false);
     const { updateYPosition } = usePreviewOrderLines();
@@ -32,6 +38,9 @@ const YAxisOverlayCanvas: React.FC = () => {
     const dragPriceRef = useRef<number | undefined>(undefined);
     const dragFrozenPriceRef = useRef<number | undefined>(undefined);
     const isDraggingRef = useRef(false);
+    const orderInputPriceValueRef = useRef<number | undefined>(
+        orderInputPriceValue.value,
+    );
 
     const { symbolInfo } = useTradeDataStore();
     const lastCandle = useChartStore((state) => state.lastCandle);
@@ -41,8 +50,43 @@ const YAxisOverlayCanvas: React.FC = () => {
     const openOrderLines = useOpenOrderLines();
     const positionOrderLines = usePositionOrderLines();
 
+    const { selectedOrderLine, setSelectedOrderLine } = useChartLinesStore();
+    const localSelectedOrderLineRef = useRef(selectedOrderLine);
+    const isMobile = useMobile();
+    const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
+
+    const syncCanvasSize = () => {
+        if (!chart || !canvasRef.current) return;
+
+        const { sizeReferenceCanvas, yAxisCanvas } =
+            getPriceAxisContainer(chart);
+
+        if (!sizeReferenceCanvas) return;
+
+        yAxisCanvasRef.current = yAxisCanvas;
+
+        const canvas = canvasRef.current;
+        canvas.style.width = sizeReferenceCanvas.style.width;
+        canvas.style.height = sizeReferenceCanvas.style.height;
+        canvas.width = sizeReferenceCanvas.width;
+        canvas.height = sizeReferenceCanvas.height;
+
+        if (isMobile) {
+            setCanvasSize({
+                width: sizeReferenceCanvas.width,
+                height: sizeReferenceCanvas.height,
+            });
+        }
+    };
+
+    const draggablePrice = useMemo(() => {
+        return isMobile && selectedOrderLine
+            ? selectedOrderLine.yPrice
+            : orderInputPriceValue.value;
+    }, [isMobile, selectedOrderLine, orderInputPriceValue.value]);
+
     const labelAnalysis = useMemo(() => {
-        if (!orderInputPriceValue.value || !chart) return null;
+        if (!draggablePrice || !chart) return null;
 
         const closePrice = lastCandle?.close || markPx;
         const scaleData = scaleDataRef.current;
@@ -67,8 +111,8 @@ const YAxisOverlayCanvas: React.FC = () => {
         ].filter((price) => price > 0);
 
         const orderPricePixel = isLogarithmic
-            ? scaleData.scaleSymlog(orderInputPriceValue.value)
-            : scaleData.yScale(orderInputPriceValue.value);
+            ? scaleData.scaleSymlog(draggablePrice)
+            : scaleData.yScale(draggablePrice);
 
         type LabelInfo = {
             price: number;
@@ -87,7 +131,7 @@ const YAxisOverlayCanvas: React.FC = () => {
                 isClosePrice: price === closePrice,
             })),
             {
-                price: orderInputPriceValue.value,
+                price: draggablePrice,
                 pixel: orderPricePixel,
                 isOrderLabel: true,
                 isClosePrice: false,
@@ -165,14 +209,55 @@ const YAxisOverlayCanvas: React.FC = () => {
             closePrice,
         };
     }, [
-        orderInputPriceValue.value,
+        draggablePrice,
         lastCandle?.close,
         markPx,
         openOrderLines,
         positionOrderLines,
         chart,
         JSON.stringify(scaleDataRef?.current?.yScale.domain()),
+        canvasSize,
     ]);
+
+    useEffect(() => {
+        localSelectedOrderLineRef.current = selectedOrderLine;
+
+        if (
+            isMobile &&
+            canvasRef.current &&
+            localSelectedOrderLineRef.current &&
+            selectedOrderLine === undefined
+        ) {
+            canvasRef.current.style.pointerEvents = 'none';
+        }
+    }, [selectedOrderLine, isMobile]);
+
+    useEffect(() => {
+        orderInputPriceValueRef.current = orderInputPriceValue.value;
+
+        // Sync selectedOrderLine when price changes from non-drag source (e.g., input field)
+        if (
+            isMobile &&
+            orderInputPriceValue.changeType !== 'dragging' &&
+            orderInputPriceValue.changeType !== 'dragEnd' &&
+            selectedOrderLine &&
+            selectedOrderLine.type === 'PREVIEW_ORDER' &&
+            orderInputPriceValue.value !== undefined
+        ) {
+            setSelectedOrderLine({
+                ...selectedOrderLine,
+                yPrice: orderInputPriceValue.value,
+                textValue:
+                    selectedOrderLine.textValue &&
+                    selectedOrderLine.textValue.type === 'Limit'
+                        ? {
+                              ...selectedOrderLine.textValue,
+                              price: orderInputPriceValue.value,
+                          }
+                        : selectedOrderLine.textValue,
+            });
+        }
+    }, [orderInputPriceValue.value, orderInputPriceValue.changeType]);
 
     useEffect(() => {
         if (!chart) return;
@@ -198,20 +283,32 @@ const YAxisOverlayCanvas: React.FC = () => {
                 unsubscribe();
             }
         };
-    }, [chart]);
+    }, [chart, isPaneChanged]);
 
     useEffect(() => {
         if (!chart || !isChartReady) return;
 
-        const { iframeDoc, yAxisCanvas, priceAxisContainers } =
-            getPriceAxisContainer(chart);
+        const {
+            iframeDoc,
+            yAxisCanvas,
+            sizeReferenceCanvas,
+            priceAxisContainers,
+        } = getPriceAxisContainer(chart);
+        const { paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
+
         if (
             !iframeDoc ||
             !yAxisCanvas ||
             !yAxisCanvas.parentNode ||
-            !priceAxisContainers
+            !priceAxisContainers ||
+            !sizeReferenceCanvas ||
+            !paneCanvas
         )
             return;
+
+        // Store references
+        yAxisCanvasRef.current = sizeReferenceCanvas;
+        paneCanvasRef.current = paneCanvas;
 
         if (!canvasRef.current) {
             const newCanvas = iframeDoc.createElement('canvas');
@@ -220,10 +317,11 @@ const YAxisOverlayCanvas: React.FC = () => {
             newCanvas.style.top = '0';
             newCanvas.style.left = '0';
             newCanvas.style.cursor = 'default';
-            newCanvas.style.pointerEvents = 'none';
+            newCanvas.style.pointerEvents =
+                isMobile && draggablePrice ? 'auto' : 'none';
             newCanvas.style.zIndex = '5555';
-            newCanvas.width = yAxisCanvas.width;
-            newCanvas.height = yAxisCanvas.height;
+            newCanvas.width = sizeReferenceCanvas.width;
+            newCanvas.height = sizeReferenceCanvas.height;
             yAxisCanvas.parentNode.appendChild(newCanvas);
             canvasRef.current = newCanvas;
         }
@@ -231,10 +329,20 @@ const YAxisOverlayCanvas: React.FC = () => {
         const canvas = canvasRef.current;
 
         const updateCanvasSize = () => {
-            canvas.width = yAxisCanvas.width;
-            canvas.style.width = `${yAxisCanvas.width}px`;
-            canvas.height = yAxisCanvas.height;
-            canvas.style.height = `${yAxisCanvas.height}px`;
+            const currentSizeRef = yAxisCanvasRef.current;
+            if (!currentSizeRef) return;
+
+            canvas.width = currentSizeRef.width;
+            canvas.style.width = currentSizeRef.style.width;
+            canvas.height = currentSizeRef.height;
+            canvas.style.height = currentSizeRef.style.height;
+
+            if (isMobile) {
+                setCanvasSize({
+                    width: currentSizeRef.width,
+                    height: currentSizeRef.height,
+                });
+            }
         };
 
         updateCanvasSize();
@@ -243,7 +351,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             updateCanvasSize();
         });
 
-        yAxisResizeObserver.observe(yAxisCanvas);
+        yAxisResizeObserver.observe(sizeReferenceCanvas);
 
         const containerWidths = new Map<HTMLElement, number>();
         priceAxisContainers.forEach((container) => {
@@ -286,41 +394,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             priceAxisResizeObserver.observe(container);
         });
 
-        const ensureCanvasSize = () => {
-            if (!isInitialSizeSetRef.current) {
-                const yAxisRect = yAxisCanvas.getBoundingClientRect();
-                const canvasRect = canvas.getBoundingClientRect();
-
-                // Check if canvas position needs updating
-                if (
-                    yAxisRect.left !== canvasRect.left ||
-                    yAxisRect.top !== canvasRect.top
-                ) {
-                    canvas.style.left = '0';
-                    canvas.style.top = '0';
-                }
-
-                // Check if canvas size needs updating
-                const styleWidth = canvas.style.width;
-                const styleHeight = canvas.style.height;
-
-                if (
-                    styleWidth !== yAxisCanvas.style.width ||
-                    styleHeight !== yAxisCanvas.style.height
-                ) {
-                    canvas.style.width = yAxisCanvas.style.width;
-                    canvas.style.height = yAxisCanvas.style.height;
-                    yAxisCanvas.width = canvas.width;
-                    yAxisCanvas.height = canvas.height;
-                }
-
-                isInitialSizeSetRef.current = true;
-            }
-        };
-
         const handleCanvasMouseMove = (e: MouseEvent) => {
-            ensureCanvasSize();
-
             const rect = canvas.getBoundingClientRect();
             const y = e.clientY - rect.top;
 
@@ -328,8 +402,6 @@ const YAxisOverlayCanvas: React.FC = () => {
         };
 
         const handleYAxisMouseMove = (e: MouseEvent) => {
-            ensureCanvasSize();
-
             const rect = yAxisCanvas.getBoundingClientRect();
             const y = e.clientY - rect.top;
 
@@ -360,12 +432,17 @@ const YAxisOverlayCanvas: React.FC = () => {
         };
     }, [chart, isChartReady, isPaneChanged]);
 
+    // Update canvas size when scale domain changes
+    useEffect(() => {
+        syncCanvasSize();
+    }, [chart, JSON.stringify(scaleDataRef?.current?.yScale.domain())]);
+
     useEffect(() => {
         if (
             !canvasRef.current ||
             !chart ||
             isDrag ||
-            !orderInputPriceValue.value ||
+            !draggablePrice ||
             !labelAnalysis
         )
             return;
@@ -376,10 +453,11 @@ const YAxisOverlayCanvas: React.FC = () => {
         const originalPixel = orderLabel.pixel;
         const originalPrice = orderLabel.price;
         const tolerance = 10;
-        const isNearOrderPrice = Math.abs(mouseY - adjustedPixel) <= tolerance;
+        const pixelToCheck = isMobile ? originalPixel : adjustedPixel;
+        const isNearOrderPrice = Math.abs(mouseY - pixelToCheck) <= tolerance;
 
-        let isNearClosePrice = false;
         const closePriceLabel = allLabels.find((l) => l.isClosePrice);
+        let isNearClosePrice = false;
 
         const localIsMidModeActivePixel = closePriceLabel
             ? Math.abs(originalPixel - closePriceLabel.adjustedPixel) <=
@@ -391,23 +469,27 @@ const YAxisOverlayCanvas: React.FC = () => {
             Math.abs(closePrice - originalPrice) / closePrice <=
             PRICE_TOLERANCE_RATIO;
 
-        if (
-            isMidModeActive ||
-            (localIsMidModeActive && localIsMidModeActivePixel)
-        ) {
-            if (closePriceLabel) {
-                isNearClosePrice =
-                    Math.abs(mouseY - closePriceLabel.adjustedPixel) <=
-                    tolerance;
+        if (!isMobile) {
+            if (
+                isMidModeActive ||
+                (localIsMidModeActive && localIsMidModeActivePixel)
+            ) {
+                if (closePriceLabel) {
+                    isNearClosePrice =
+                        Math.abs(mouseY - closePriceLabel.adjustedPixel) <=
+                        tolerance;
+                }
             }
         }
 
         const isDraggable = isNearOrderPrice || isNearClosePrice;
         isNearOrderPriceRef.current = isDraggable;
 
-        useTradeDataStore.getState().setIsPreviewOrderHovered(isDraggable);
+        if (!isMobile) {
+            useTradeDataStore.getState().setIsPreviewOrderHovered(isDraggable);
+        }
 
-        if (isDraggable) {
+        if (isDraggable || (isMobile && draggablePrice)) {
             canvas.style.cursor = 'grab';
             canvas.style.pointerEvents = 'auto';
         } else {
@@ -416,7 +498,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         }
     }, [
         mouseY,
-        orderInputPriceValue.value,
+        draggablePrice,
         chart,
         isDrag,
         symbol,
@@ -431,17 +513,35 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
-            dragPriceRef.current = orderInputPriceValue.value;
-            dragStartPriceRef.current = orderInputPriceValue.value;
+            const initialPrice =
+                isMobile && localSelectedOrderLineRef.current
+                    ? localSelectedOrderLineRef.current.yPrice
+                    : orderInputPriceValueRef.current;
+
+            dragPriceRef.current = initialPrice;
+            dragStartPriceRef.current = initialPrice;
             isDraggingRef.current = true;
             setIsDrag(true);
             canvas.style.cursor = 'grabbing';
             useTradeDataStore.getState().setIsMidModeActive(false);
+
+            // Track mobile y-axis drag start
+            if (isMobile && typeof plausible === 'function') {
+                plausible('Mobile Order Adjustment', {
+                    props: {
+                        method: 'Y-Axis Drag',
+                        action: 'Start',
+                        orderType:
+                            localSelectedOrderLineRef.current?.type ||
+                            'PREVIEW_ORDER',
+                    },
+                });
+            }
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
             if (!isDraggingRef.current) return;
-            if (mouseOutOfFrameRef.current) return;
+            if (mouseOutOfFrameRef.current && !isMobile) return;
 
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
@@ -471,7 +571,29 @@ const YAxisOverlayCanvas: React.FC = () => {
 
             if (newPrice !== undefined) {
                 // console.log('>>>>> updateYPosition', draggedPrice);
-                updateYPosition(newPrice);
+
+                if (
+                    !isMobile ||
+                    localSelectedOrderLineRef.current?.oid === 'previewOrder'
+                )
+                    updateYPosition(newPrice);
+
+                if (isMobile && localSelectedOrderLineRef.current) {
+                    setSelectedOrderLine({
+                        ...localSelectedOrderLineRef.current,
+                        yPrice: newPrice,
+                        textValue:
+                            localSelectedOrderLineRef.current.textValue &&
+                            localSelectedOrderLineRef.current.textValue.type ===
+                                'Limit'
+                                ? {
+                                      ...localSelectedOrderLineRef.current
+                                          .textValue,
+                                      price: newPrice,
+                                  }
+                                : localSelectedOrderLineRef.current.textValue,
+                    });
+                }
             }
         };
 
@@ -493,11 +615,44 @@ const YAxisOverlayCanvas: React.FC = () => {
                 dragPriceRef.current = dragStartPriceRef.current;
             }
 
-            useTradeDataStore.getState().setOrderInputPriceValue({
-                value: dragPriceRef.current,
-                changeType: 'dragEnd',
-            });
-            updateYPosition(dragPriceRef.current);
+            if (
+                !isMobile ||
+                localSelectedOrderLineRef.current?.oid === 'previewOrder'
+            ) {
+                useTradeDataStore.getState().setOrderInputPriceValue({
+                    value: dragPriceRef.current,
+                    changeType: 'dragEnd',
+                });
+                updateYPosition(dragPriceRef.current);
+            }
+
+            if (isMobile && localSelectedOrderLineRef.current) {
+                // Track y-axis drag completion
+                if (typeof plausible === 'function') {
+                    plausible('Mobile Order Adjustment', {
+                        props: {
+                            method: 'Y-Axis Drag',
+                            action: 'Complete',
+                            orderType: localSelectedOrderLineRef.current.type,
+                        },
+                    });
+                }
+
+                setSelectedOrderLine({
+                    ...localSelectedOrderLineRef.current,
+                    yPrice: dragPriceRef.current,
+                    textValue:
+                        localSelectedOrderLineRef.current.textValue &&
+                        localSelectedOrderLineRef.current.textValue.type ===
+                            'Limit'
+                            ? {
+                                  ...localSelectedOrderLineRef.current
+                                      .textValue,
+                                  price: dragPriceRef.current,
+                              }
+                            : localSelectedOrderLineRef.current.textValue,
+                });
+            }
 
             isDraggingRef.current = false;
             dragPriceRef.current = undefined;
@@ -522,7 +677,31 @@ const YAxisOverlayCanvas: React.FC = () => {
         return () => {
             d3.select(canvas).on('.drag', null);
         };
-    }, [canvasRef.current, chart, orderInputPriceValue.value, updateYPosition]);
+    }, [canvasRef.current, chart, isMobile]);
+
+    useEffect(() => {
+        if (!canvasRef.current || !isMobile) return;
+        if (!chart) return;
+
+        const canvas = canvasRef.current;
+        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        if (!iframeDoc) return;
+        const iframeBody = iframeDoc?.body;
+        if (!iframeBody) return;
+
+        const handlePointerDown = (event: PointerEvent) => {
+            const rect = canvas.getBoundingClientRect();
+            const y = event.clientY - rect.top;
+
+            setMouseY(y);
+        };
+
+        iframeBody.addEventListener('pointerdown', handlePointerDown);
+
+        return () => {
+            iframeBody.removeEventListener('pointerdown', handlePointerDown);
+        };
+    }, [canvasRef.current, chart, isMobile]);
 
     useEffect(() => {
         if (!chart) return;
@@ -561,6 +740,80 @@ const YAxisOverlayCanvas: React.FC = () => {
             };
         }
     }, [chart]);
+
+    useEffect(() => {
+        if (!canvasRef.current || !chart || !isMobile) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        if (!selectedOrderLine) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
+
+        const draw = () => {
+            const scaleData = scaleDataRef.current;
+            if (!scaleData) return;
+
+            const price = selectedOrderLine.yPrice;
+
+            const { pixel: yPixel } = getPricetoPixel(
+                chart,
+                price,
+                selectedOrderLine.type,
+                canvas.height,
+                scaleData,
+            );
+            const dpr = window.devicePixelRatio || 1;
+
+            const fontSize = 12 * dpr;
+            const borderWidth = 2;
+
+            const priceText = formatPrice(price);
+
+            ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif`;
+            const labelWidth = canvas.width;
+
+            const yPadding = 4 * dpr;
+            const labelHeight = 20 * dpr + yPadding;
+
+            const x = 0;
+            const y = yPixel - yPadding;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = borderWidth;
+            ctx.beginPath();
+            ctx.rect(x, y, canvas.width, labelHeight);
+            ctx.stroke();
+
+            ctx.restore();
+
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(x, y, canvas.width, labelHeight);
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const textX = Math.round(x + labelWidth / 2);
+            ctx.fillText(priceText, textX, y + labelHeight / 2);
+        };
+
+        draw();
+    }, [
+        canvasRef.current,
+        chart,
+        isMobile,
+        selectedOrderLine,
+        canvasSize,
+        JSON.stringify(scaleDataRef?.current?.yScale.domain()),
+    ]);
 
     return null;
 };

@@ -45,11 +45,13 @@
         "announcements": "Duyurular",
         "leverage": "Kaldıraç",
         "comingSoon": "Yakında",
+        "or": "veya",
         "enter": "Giriş",
         "claim": "Talep Et",
         "seeDocsForMore": "Daha fazlası için dokümanlara bakın.",
         "clearFilter": "Filtreyi temizle",
-        "activate": "Etkinleştir"
+        "activate": "Etkinleştir",
+        "copied": "Kopyalandı!"
     },
     "transactions": {
         "orderTypes": "Emir Türleri",
@@ -97,6 +99,10 @@
         "evenPriceDistribution": "Eşit Fiyat Dağılımı",
         "market": "Piyasa",
         "limit": "Limit",
+        "closePosition": "Pozisyonu kapat",
+        "closeAtCurrentPrice": "Mevcut fiyattan kapat",
+        "closeAtAPriceYouSet": "Belirlediğin fiyattan kapat",
+
         "price": "Fiyat",
         "size": "Büyüklük",
         "time": "Zaman",
@@ -311,6 +317,13 @@
         "completed": "Tamamlandı",
         "withdrawal": "Çekim",
         "spotTransfer": "Spot Transfer",
+        "reduceOnly": "Sadece azalt",
+        "triggerConditions": "Tetikleme Koşulları",
+        "tpsl": "TP/SL",
+        "status": "Durum",
+        "network": "Ağ",
+        "action": "Eylem",
+        "accountValueChange": "Hesap Değeri Değişimi",
         "order": "Emir",
         "long": "Long",
         "short": "Short",
@@ -383,7 +396,8 @@
         "chart": "Grafik",
         "book": "Emir Defteri",
         "recent": "Son",
-        "positions": "Pozisyonlar"
+        "positions": "Pozisyonlar",
+        "portfolio": "Portföy"
     },
     "auth": {
         "login": "Giriş",
@@ -429,7 +443,7 @@
         "overwriteCurrentReferralCode": "Mevcut referans kodunun üzerine yaz",
         "enterReferralCode": "Bir referans kodu girin",
         "referralCodeNotValidPleaseConfirm": "Kod <0>{{invalidCode}}</0> referans programında talep edilmemiş. Lütfen kodun doğru olduğunu onaylayın.",
-        "yourCodeIs": "Kodunuz, cüzdan adresinizin ilk altı karakterine dayalı olarak <0>{{affiliateCode}}</0>. Lütfen bu kodu referans sistemine kaydetmek için 'Etkinleştir'e tıklayın.",
+        "yourCodeIs": "Kodunuz, cüzdan adresinizin ilk altı karakterine dayalı olarak <0>{{referrerCode}}</0>. Lütfen bu kodu referans sistemine kaydetmek için 'Etkinleştir'e tıklayın.",
         "createAnAffiliateCode": "Bir ortaklık kodu oluşturun",
         "createAUniqueCodeToEarn": "Yönlendirilen kullanıcıların ücretlerinin %10'unu kazanmak için benzersiz bir kod oluşturun.",
         "codeAlreadyInUse": "Kod Zaten Kullanımda",
@@ -439,11 +453,11 @@
             "enterCode": "Bir referans kodu girmek için cüzdanınızı bağlayın"
         },
         "usersWithTradingVolume": "Bu kod, 1 milyon ABD doları işlem hacmine ulaştıktan sonra kullanıcılar tarafından özelleştirilebilir veya güncellenebilir.",
-        "doNotSelfRefer": "<0>{{affiliateCode}}</0> kodu, oluşturulduğu adresle aynı adres tarafından kaydedilemez. Lütfen farklı bir kod seçin.",
+        "doNotSelfRefer": "<0>{{refCode}}</0> kodu, oluşturulduğu adresle aynı adres tarafından kaydedilemez. Lütfen farklı bir kod seçin.",
         "toCustomizeAffiliateCode": "Ortaklık kodları varsayılan olarak cüzdan adresinizin ilk altı karakteridir. 1 milyon dolardan fazla işlem hacmine sahip kullanıcılar ortaklık kodlarını özelleştirebilir.",
         "claimRewardsWithAmount": "{{amount}} tutarında ödül talep et",
         "selectATabToViewData": "Verileri görüntülemek için bir sekme seçin",
-        "trackingLinkExplanation": "Yönlendirilen kullanıcı ücretlerinin <0>{{affiliatePercent}}</0> kadarını alacaksınız ve onlar <1>{{userPercent}}</1> indirim alacaklar.",
+        "trackingLinkExplanation": "Yönlendirilen kullanıcı ücretlerinin <0>{{referrerPercent}}</0> kadarını alacaksınız ve onlar <1>{{inviteePercent}}</1> indirim alacaklar.",
         "claim": "Talep et"
     },
     "deposit": {
@@ -576,6 +590,7 @@
         "withdrawInput": "Çekim girişi",
         "scrollTabsLeft": "Sekmeleri sola kaydır",
         "scrollTabsRight": "Sekmeleri sağa kaydır",
+        "mobileActionMenu": "Mobil aksiyon menüsünü aç/kapat",
         "leverageValue": "Kaldıraç değeri",
         "leverageAmount": "Kaldıraç tutarı",
         "setLeverageTo": "{{value}}x kaldıraç ayarla",
@@ -644,6 +659,8 @@
         "totalUsdVal": "Toplam USD Değeri",
         "totalNetUsdValue": "Toplam Net USD Değeri",
         "performance": "Performans",
+        "accountOverview": "Hesap Özeti",
+        "updateFrequencyInMinutes": "{{numMinutes}} dakikada bir güncellenir",
         "positions": "Pozisyonlar",
         "feeSchedule": "Ücret Çizelgesi",
         "vipTiers": "VIP Seviyeleri",
@@ -664,6 +681,8 @@
         "accountValue": "Hesap Değeri",
         "collateral": "Teminat",
         "pnl": "PNL",
+        "realizedPnl": "Gerçekleşmiş PnL",
+        "unrealizedPnl": "Gerçekleşmemiş PnL",
         "volume": "Hacim",
         "maxDrawdown": "Maksimum Düşüş",
         "totalEquity": "Toplam Varlık",
@@ -685,8 +704,13 @@
         "validAmountRequired": "Lütfen geçerli bir tutar girin",
         "amountGreaterThanZero": "Tutar sıfırdan büyük olmalıdır",
         "minDepositAmount": "Minimum yatırma tutarı {{amount}}",
-        "exceedsAvailableBalance": "Tutar mevcut bakiyenizi aşmaktadır",
-        "transactionTimedOut": "İşlem 15 saniye sonra zaman aşımına uğradı"
+        "exceedsAvailableBalance": "Tutar mevcut bakiyenizi aşmaktadır: {{balance}}",
+        "transactionTimedOut": "İşlem 15 saniye sonra zaman aşımına uğradı",
+        "connectToViewPortfolio": "Portföyünüzü Görüntülemek için Bağlanın",
+        "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın.",
+        "pasteWalletAddress": "Cüzdan adresini yapıştır",
+        "viewOtherAccount": "Diğer hesabı görüntüle",
+        "returnToMyPortfolio": "Kendi portföyüme dön"
     },
     "pageTitles": {
         "portfolio": "Portföy",
@@ -721,6 +745,7 @@
         "privacy": "Gizlilik Politikası"
     },
     "keyboardShortcuts": {
+        "conflict": "Zaten kullanılıyor: {{shortcut}}",
         "menuLabel": "Kısayollar",
         "title": "Klavye Kısayolları",
         "hintPress": "",

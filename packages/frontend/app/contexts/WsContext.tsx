@@ -1,7 +1,9 @@
 import React, {
     createContext,
+    useCallback,
     useContext,
     useEffect,
+    useMemo,
     useRef,
     useState,
 } from 'react';
@@ -203,65 +205,55 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         }
     }, [isTabActive]);
 
-    const subscribe = (key: string, config: WsSubscriptionConfig) => {
-        // initWorker(key);
+    const subscribe = useCallback(
+        (key: string, config: WsSubscriptionConfig) => {
+            if (!subscriptions.current.has(key)) {
+                subscriptions.current.set(key, []);
+            }
 
-        // add subscripton in hook
-        if (!subscriptions.current.has(key)) {
-            subscriptions.current.set(key, []);
-        }
+            if (config.single) {
+                const currentSubs = subscriptions.current.get(key) || [];
+                currentSubs.forEach((sub) => {
+                    registerWsSubscription(key, sub.payload || {}, true);
+                });
+                subscriptions.current.set(key, [config]);
+            } else {
+                subscriptions.current.get(key)!.push(config);
+            }
 
-        // else{
-        //   const subs = subscriptions.current.get(key)!;
-        //   let found = false;
-        //   subs.forEach(sub => {
-        //     if(JSON.stringify(sub.payload) === JSON.stringify(config.payload) ){
-        //       found = true;
-        //       return;
-        //     }
-        //   });
-        //   if(key === 'webData2'){
-        //     console.log('found', found);
-        //   }
-        //   if(found) return;
-        // }
-
-        if (config.single) {
-            const currentSubs = subscriptions.current.get(key) || [];
-            currentSubs.forEach((sub) => {
-                registerWsSubscription(key, sub.payload || {}, true);
-            });
-            subscriptions.current.set(key, [config]);
-        } else {
-            subscriptions.current.get(key)!.push(config);
-        }
-
-        // add subscription through websocket context
-        registerWsSubscription(key, config.payload || {});
-    };
+            // add subscription through websocket context
+            registerWsSubscription(key, config.payload || {});
+        },
+        [],
+    );
 
     // unsubscribe all subscriptions by channel
-    const unsubscribeAllByChannel = (channel: string) => {
+    const unsubscribeAllByChannel = useCallback((channel: string) => {
         if (subscriptions.current.has(channel)) {
             subscriptions.current.get(channel)!.forEach((config) => {
                 registerWsSubscription(channel, config.payload || {}, true);
             });
         }
         subscriptions.current.delete(channel);
-    };
+    }, []);
 
-    const unsubscribe = (key: string, config: WsSubscriptionConfig) => {
-        if (subscriptions.current.has(key)) {
-            const configs = subscriptions.current
-                .get(key)!
-                .filter((c) => c !== config);
-            if (configs.length === 0) {
-                subscriptions.current.delete(key);
-            } else {
-                subscriptions.current.set(key, configs);
+    const unsubscribe = useCallback(
+        (key: string, config: WsSubscriptionConfig) => {
+            if (subscriptions.current.has(key)) {
+                const configs = subscriptions.current
+                    .get(key)!
+                    .filter((c) => c !== config);
+                if (configs.length === 0) {
+                    subscriptions.current.delete(key);
+                } else {
+                    subscriptions.current.set(key, configs);
+                }
+                // Send unsubscribe message to server
+                registerWsSubscription(key, config.payload || {}, true);
             }
-        }
-    };
+        },
+        [],
+    );
 
     // const initWorker = (type: string) => {
     //     if (!isClient || workers.current.has(type)) {
@@ -322,25 +314,25 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         return workers.current.get(type);
     };
 
-    const forceReconnect = () => {
+    const forceReconnect = useCallback(() => {
         if (sleepModeRef.current) {
             return;
         }
-        console.log('>>>> force reconnect !!!!!!!!!!!!!!!!!!');
         connectWebSocket();
-    };
+    }, []);
+
+    const contextValue = useMemo(
+        () => ({
+            subscribe,
+            unsubscribe,
+            unsubscribeAllByChannel,
+            forceReconnect,
+        }),
+        [subscribe, unsubscribe, unsubscribeAllByChannel, forceReconnect],
+    );
 
     return (
-        <WsContext.Provider
-            value={{
-                subscribe,
-                unsubscribe,
-                unsubscribeAllByChannel,
-                forceReconnect,
-            }}
-        >
-            {children}
-        </WsContext.Provider>
+        <WsContext.Provider value={contextValue}>{children}</WsContext.Provider>
     );
 };
 

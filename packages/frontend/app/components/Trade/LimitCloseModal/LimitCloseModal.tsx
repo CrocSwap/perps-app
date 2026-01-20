@@ -46,7 +46,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         return midPrice;
     };
 
-    const [price, setPrice] = useState(String(getMidPrice()));
+    const [price, setPrice] = useState(String(getMidPrice() ?? markPx ?? ''));
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
     const [isMidModeActive, setIsMidModeActive] = useState(false);
 

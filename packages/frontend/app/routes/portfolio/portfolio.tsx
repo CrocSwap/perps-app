@@ -1,6 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
-import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+    memo,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import { useModal } from '~/hooks/useModal';
@@ -10,17 +18,25 @@ import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
 import { usePortfolioModals } from './usePortfolioModals';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import useOutsideClick from '~/hooks/useOutsideClick';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import {
-    PiCaretCircleDoubleDownLight,
-    PiCaretCircleDoubleUpLight,
-} from 'react-icons/pi';
+    IoArrowUp,
+    IoArrowDown,
+    IoChevronForward,
+    IoChevronBack,
+    IoCopyOutline,
+} from 'react-icons/io5';
 import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTable';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 import { Resizable, type NumberSize } from 're-resizable';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import useClipboard from '~/hooks/useClipboard';
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -34,6 +50,7 @@ export function meta() {
 function Portfolio() {
     const { t } = useTranslation();
     const mainRef = useRef<HTMLDivElement | null>(null);
+    const prevLoggedInAddressRef = useRef<string | null>(null);
 
     const DEFAULT_PANEL_HEIGHT = 480;
     const PANEL_MIN = 180;
@@ -41,9 +58,9 @@ function Portfolio() {
 
     const { portfolioPanelHeight, setPortfolioPanelHeight } = useAppSettings();
 
-    // Don't render until we've read from localStorage
+    // Hydration state
     const [isHydrated, setIsHydrated] = useState(false);
-    const [isLayoutReady, setIsLayoutReady] = useState(false);
+    const [isLayoutReady, setIsLayoutReady] = useState(true);
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,19 +70,26 @@ function Portfolio() {
             return;
         }
 
-        // If already hydrated
         if (persist.hasHydrated?.()) {
             setIsHydrated(true);
             return;
         }
 
-        // Wait for hydration
         const unsub = persist.onFinishHydration?.(() => {
             setIsHydrated(true);
         });
 
         return unsub;
     }, []);
+
+    useEffect(() => {
+        if (!isHydrated) return;
+        if (isLayoutReady) return;
+        const raf = requestAnimationFrame(() => {
+            setIsLayoutReady(true);
+        });
+        return () => cancelAnimationFrame(raf);
+    }, [isHydrated, isLayoutReady]);
 
     const [panelHeight, setPanelHeight] = useState<number>(
         portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT,
@@ -74,11 +98,13 @@ function Portfolio() {
     const startRef = useRef(panelHeight);
     const hasInitialized = useRef(false);
 
-    // Compute maxTop so the table never shrinks below TABLE_MIN
     useLayoutEffect(() => {
-        if (!isHydrated || hasInitialized.current) return; // Wait for hydration first, only run once
+        if (!isHydrated || hasInitialized.current) return;
         const el = mainRef.current;
-        if (!el) return;
+        if (!el) {
+            setIsLayoutReady(true);
+            return;
+        }
         const gap =
             parseFloat(
                 getComputedStyle(document.documentElement).getPropertyValue(
@@ -89,7 +115,6 @@ function Portfolio() {
         const computed = Math.max(PANEL_MIN, total - TABLE_MIN - gap);
         setMaxTop(computed);
 
-        // Set initial height from store, clamped to bounds
         hasInitialized.current = true;
         const storeValue = portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT;
         const clamped = Math.max(PANEL_MIN, Math.min(storeValue, computed));
@@ -97,7 +122,6 @@ function Portfolio() {
         setIsLayoutReady(true);
     }, [isHydrated, portfolioPanelHeight]);
 
-    // WHEN LAYOUT CHANGES (maxTop on window resize), clamp LOCAL state to respect bounds
     useEffect(() => {
         if (maxTop === null || !hasInitialized.current) return;
         setPanelHeight((prev) => {
@@ -106,12 +130,185 @@ function Portfolio() {
         });
     }, [maxTop]);
 
-    const { portfolio, formatCurrency, userData } = usePortfolioManager();
-    const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
-    const [mobileView, setMobileView] = useState<'performance' | 'table'>(
-        'performance',
+    const { address: urlAddress } = useParams<{ address?: string }>();
+    const { portfolio, formatCurrency, userData, userAddress } =
+        usePortfolioManager(urlAddress);
+    const { formatNum } = useNumFormatter();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Check if user has an established session
+    const sessionState = useSession();
+    const hasSession = isEstablished(sessionState);
+
+    // Determine if the user is viewing their own portfolio
+    const loggedInAddress = hasSession
+        ? sessionState.walletPublicKey?.toString()
+        : null;
+    const isViewingOwnPortfolio =
+        !urlAddress ||
+        (!!loggedInAddress &&
+            urlAddress.toLowerCase() === loggedInAddress.toLowerCase());
+
+    const myPortfolioPath = loggedInAddress
+        ? `/v2/portfolio/${loggedInAddress}`
+        : '/v2/portfolio';
+
+    const showTransactButtons = hasSession && isViewingOwnPortfolio;
+
+    // Determine if we should show the "connect" view
+    // Show it when: no session AND no userAddress AND no address in URL
+    // We check userAddress in addition to session state because session may not be
+    // immediately established on hydration, but userAddress persists in the store
+    const showConnectView = !hasSession && !userAddress && !urlAddress;
+
+    // State for toggling between address display and input mode in header
+    const [isAddressInputMode, setIsAddressInputMode] = useState(false);
+    const addressInputRef = useRef<HTMLInputElement>(null);
+
+    // Clipboard copy for address
+    const [, copyToClipboard] = useClipboard();
+    const [showCopied, setShowCopied] = useState(false);
+
+    const handleWalletAddressFocus = useCallback(
+        (e: React.FocusEvent<HTMLInputElement>) => {
+            if (typeof window === 'undefined') return;
+            if (!window.matchMedia?.('(pointer: coarse)').matches) return;
+
+            const el = e.currentTarget;
+
+            window.setTimeout(() => {
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest',
+                });
+            }, 150);
+
+            window.setTimeout(() => {
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest',
+                });
+            }, 600);
+        },
+        [],
     );
-    const { currency } = useNumFormatter();
+
+    const handleCopyAddress = useCallback(async () => {
+        if (!urlAddress) return;
+        const success = await copyToClipboard(urlAddress);
+        if (success) {
+            setShowCopied(true);
+            setTimeout(() => setShowCopied(false), 1500);
+        }
+    }, [copyToClipboard, urlAddress]);
+
+    // Handler for wallet address input - navigates immediately on valid address
+    const handleAddressInput = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = e.target.value.trim();
+            // Basic validation: Solana addresses are base58 encoded, typically 32-44 chars
+            if (
+                value.length >= 32 &&
+                value.length <= 44 &&
+                /^[1-9A-HJ-NP-Za-km-z]+$/.test(value)
+            ) {
+                setIsAddressInputMode(false);
+                navigate(`/v2/portfolio/${value}`);
+            }
+        },
+        [navigate],
+    );
+
+    // Focus input when entering input mode
+    useEffect(() => {
+        if (isAddressInputMode && addressInputRef.current) {
+            addressInputRef.current.focus();
+        }
+    }, [isAddressInputMode]);
+
+    // Escape key cancels input mode
+    useEffect(() => {
+        if (!isAddressInputMode) return;
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setIsAddressInputMode(false);
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => {
+            window.removeEventListener('keydown', onKeyDown);
+        };
+    }, [isAddressInputMode]);
+
+    // Reset input mode when URL address changes
+    useEffect(() => {
+        setIsAddressInputMode(false);
+    }, [urlAddress]);
+
+    // Check if we're on the transactions sub-route (mobile only)
+    const isTransactionsView = location.pathname.includes('/transactions');
+
+    useEffect(() => {
+        if (!hasSession) return;
+        if (urlAddress) return;
+        if (!loggedInAddress) return;
+
+        const suffix = isTransactionsView ? '/transactions' : '';
+        const nextPath = `/v2/portfolio/${loggedInAddress}${suffix}`;
+
+        if (location.pathname === nextPath) return;
+        navigate(nextPath, { replace: true });
+    }, [
+        hasSession,
+        isTransactionsView,
+        location.pathname,
+        loggedInAddress,
+        navigate,
+        urlAddress,
+    ]);
+
+    useEffect(() => {
+        if (!hasSession) return;
+        if (!loggedInAddress) return;
+
+        const prevLoggedInAddress = prevLoggedInAddressRef.current;
+        prevLoggedInAddressRef.current = loggedInAddress;
+
+        if (!urlAddress) return;
+        if (!prevLoggedInAddress) return;
+
+        // Only redirect when the user WAS viewing their own portfolio (bound to the previous wallet)
+        // and the wallet has since changed.
+        const wasViewingOwnPortfolio =
+            urlAddress.toLowerCase() === prevLoggedInAddress.toLowerCase();
+        if (!wasViewingOwnPortfolio) return;
+
+        const hasAddressChanged =
+            urlAddress.toLowerCase() !== loggedInAddress.toLowerCase();
+        if (!hasAddressChanged) return;
+
+        const suffix = isTransactionsView ? '/transactions' : '';
+        const nextPath = `/v2/portfolio/${loggedInAddress}${suffix}`;
+        const nextUrl = `${nextPath}${location.search}${location.hash}`;
+        const currentUrl = `${location.pathname}${location.search}${location.hash}`;
+
+        if (currentUrl === nextUrl) return;
+        navigate(nextPath, { replace: true });
+    }, [
+        hasSession,
+        isTransactionsView,
+        location.hash,
+        location.pathname,
+        location.search,
+        loggedInAddress,
+        navigate,
+        urlAddress,
+    ]);
 
     const {
         openDepositModal,
@@ -121,91 +318,192 @@ function Portfolio() {
     } = usePortfolioModals();
 
     const feeScheduleModalCtrl = useModal('closed');
-    const mobileActionMenuButtonRef = useRef<HTMLButtonElement>(null);
-    const mobileActionMenuRef = useOutsideClick<HTMLDivElement>((event) => {
-        const target = event.target as HTMLElement;
-        if (mobileActionMenuButtonRef.current?.contains(target)) return;
-        setIsMobileActionMenuOpen(false);
-    }, isMobileActionMenuOpen);
 
-    // Don't render anything until store has hydrated
+    const DASH_PLACEHOLDER = '-';
+    const hasPnl = typeof userData?.pnl === 'number';
+    const hasVolume = typeof userData?.volume === 'number';
+    const hasMaxDrawdown = typeof userData?.maxDrawdown === 'number';
+    const hasAccountValue = typeof userData?.account_value === 'number';
+    const hasVaultEquity = typeof userData?.vaultEquity === 'number';
+
+    const pnlFormatted = hasPnl
+        ? formatNum(userData.pnl, 2, true, true)
+        : DASH_PLACEHOLDER;
+    const volumeFormatted = hasVolume
+        ? formatNum(userData.volume, 2, true, true)
+        : DASH_PLACEHOLDER;
+    const maxDrawdownFormatted = hasMaxDrawdown
+        ? `${formatNum(userData.maxDrawdown, 2)}%`
+        : DASH_PLACEHOLDER;
+    const totalEquityFormatted = hasAccountValue
+        ? formatNum(userData.account_value, 2, true, true)
+        : DASH_PLACEHOLDER;
+    const accountEquityFormatted = hasAccountValue
+        ? formatNum(userData.account_value, 2, true, true)
+        : DASH_PLACEHOLDER;
+    const vaultEquityFormatted = hasVaultEquity
+        ? formatNum(userData.vaultEquity)
+        : DASH_PLACEHOLDER;
+
+    // Calculate PNL percentage for display
+    const totalValue = portfolio.balances.contract + portfolio.balances.wallet;
+    const pnlValue = hasPnl ? userData.pnl : 0;
+    const pnlPercent = totalValue > 0 ? (pnlValue / totalValue) * 100 : 0;
+    const isPnlPositive = pnlValue >= 0;
+
     if (!isHydrated) {
         return null;
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // CONNECT VIEW - Show when no session and no URL address
+    // ═══════════════════════════════════════════════════════════════════════
+    if (showConnectView) {
+        return (
+            <div className={styles.outer}>
+                <div className={styles.container}>
+                    <AnimatedBackground
+                        mode='absolute'
+                        layers={1}
+                        opacity={1}
+                        duration='15s'
+                        strokeWidth='2'
+                        palette={{
+                            color1: '#1E1E24',
+                            color2: '#7371FC',
+                            color3: '#CDC1FF',
+                        }}
+                    />
+                    <div className={styles.connectView}>
+                        <h2>{t('portfolio.connectToViewPortfolio')}</h2>
+                        <p>{t('portfolio.connectDescription')}</p>
+                        <SessionButton />
+                        <div className={styles.connectViewDivider}>
+                            {t('common.or')}
+                        </div>
+                        <input
+                            type='text'
+                            className={styles.walletAddressInput}
+                            placeholder={t('portfolio.pasteWalletAddress')}
+                            onChange={handleAddressInput}
+                            onFocus={handleWalletAddressFocus}
+                            autoComplete='off'
+                            spellCheck={false}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // MOBILE TOP - HERO CARD ONLY
+    // ═══════════════════════════════════════════════════════════════════════
     const mobileTop = (
         <section className={styles.mobileTop}>
-            <div className={styles.detailsContent}>
-                <h6>{t('portfolio.vol14d')}</h6>
-                <h3>{currency(portfolio.tradingVolume.biWeekly, true)}</h3>
-                <div
-                    className={styles.view_detail_clickable}
-                    onClick={() => console.log('viewing volume')}
-                >
-                    {t('portfolio.viewVolume')}
+            {/* Hero Card - Net Value */}
+            <div className={styles.mobileHeroCard}>
+                <div className={styles.heroLabel}>Total Net Value</div>
+                <div className={styles.heroValue}>
+                    {totalEquityFormatted}
+                    {/* {formatCurrency(totalValue)} */}
                 </div>
-            </div>
-            <div className={styles.detailsContent}>
-                <h6>{t('portfolio.feesTakerMaker')}</h6>
-                <h3>
-                    {portfolio.fees.taker}% / {portfolio.fees.maker}%
-                </h3>
                 <div
-                    className={styles.view_detail_clickable}
-                    style={{ visibility: 'hidden' }}
-                    onClick={() => feeScheduleModalCtrl.open()}
+                    className={`${styles.heroPnl} ${isPnlPositive ? styles.positive : styles.negative}`}
                 >
-                    {t('portfolio.viewFeeSchedule')}
-                </div>
-            </div>
-            <div
-                className={`${styles.detailsContent} ${styles.netValueMobile}`}
-            >
-                <h6>{t('portfolio.totalUsdVal')}</h6>
-                <h3>
-                    {currency(
-                        portfolio.balances.contract + portfolio.balances.wallet,
-                        true,
+                    <span className={styles.heroPnlIcon}>
+                        {isPnlPositive ? <IoArrowUp /> : <IoArrowDown />}
+                    </span>
+                    {hasPnl ? (
+                        <>
+                            {formatCurrency(Math.abs(pnlValue))} (
+                            {isPnlPositive ? '+' : ''}
+                            {pnlPercent.toFixed(2)}%)
+                        </>
+                    ) : (
+                        DASH_PLACEHOLDER
                     )}
-                </h3>
-            </div>
-            <button
-                ref={mobileActionMenuButtonRef}
-                onClick={() => setIsMobileActionMenuOpen((v) => !v)}
-                className={styles.actionMenuButton}
-                aria-label={t('aria.mobileActionMenu')}
-            >
-                {!isMobileActionMenuOpen ? (
-                    <PiCaretCircleDoubleDownLight size={24} />
-                ) : (
-                    <PiCaretCircleDoubleUpLight size={24} />
-                )}
-            </button>
-            {isMobileActionMenuOpen && (
-                <div
-                    className={styles.mobileActionMenuContainer}
-                    ref={mobileActionMenuRef}
-                >
-                    <SimpleButton onClick={openDepositModal} bg='accent1'>
-                        {t('common.deposit')}
-                    </SimpleButton>
-                    <SimpleButton
-                        onClick={openWithdrawModal}
-                        bg='dark3'
-                        hoverBg='accent1'
-                    >
-                        {t('common.withdraw')}
-                    </SimpleButton>
                 </div>
-            )}
+
+                {/* Balance breakdown inside hero */}
+                <div className={styles.heroBalances}>
+                    <div className={styles.heroBalanceItem}>
+                        <span className={styles.heroBalanceLabel}>
+                            {t('tradeTable.contract')}
+                        </span>
+                        <span className={styles.heroBalanceValue}>
+                            {formatCurrency(portfolio.balances.contract)}
+                        </span>
+                    </div>
+                    <div className={styles.heroBalanceDivider} />
+                    <div className={styles.heroBalanceItem}>
+                        <span className={styles.heroBalanceLabel}>
+                            {t('transactions.walletBalance')}
+                        </span>
+                        <span className={styles.heroBalanceValue}>
+                            {formatCurrency(portfolio.balances.wallet)}
+                        </span>
+                    </div>
+                    <div className={styles.heroBalanceDivider} />
+                    <div className={styles.heroBalanceItem}>
+                        <span className={styles.heroBalanceLabel}>
+                            {t('portfolio.fees')}
+                        </span>
+                        <span className={styles.heroBalanceValue}>0.00%</span>
+                    </div>
+                </div>
+            </div>
         </section>
     );
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // MOBILE STATS - Rendered at bottom
+    // ═══════════════════════════════════════════════════════════════════════
+    const mobileStatsSection = (
+        <div className={styles.mobileStats}>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>PNL</span>
+                <span
+                    className={`${styles.mobileStatValue} ${pnlValue >= 0 ? styles.positive : styles.negative}`}
+                >
+                    {pnlFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Volume</span>
+                <span className={styles.mobileStatValue}>
+                    {volumeFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Max Drawdown</span>
+                <span className={styles.mobileStatValue}>
+                    {maxDrawdownFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Total Equity</span>
+                <span className={styles.mobileStatValue}>
+                    {totalEquityFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Account Equity</span>
+                <span className={styles.mobileStatValue}>
+                    {accountEquityFormatted}
+                </span>
+            </div>
+            <div className={styles.mobileStatRow}>
+                <span className={styles.mobileStatLabel}>Vault Equity</span>
+                <span className={styles.mobileStatValue}>
+                    {vaultEquityFormatted}
+                </span>
+            </div>
+        </div>
+    );
+
     return (
-        <div
-            className={styles.outer}
-            style={{ opacity: isLayoutReady ? 1 : 0 }}
-        >
+        <div className={styles.outer}>
             <div className={styles.container}>
                 <AnimatedBackground
                     mode='absolute'
@@ -220,11 +518,107 @@ function Portfolio() {
                     }}
                 />
                 <WebDataConsumer />
-                <header>{t('pageTitles.portfolio')}</header>
+
+                {/* Header - changes on mobile transactions view */}
+                {isTransactionsView ? (
+                    <header className={styles.mobileTransactionsHeader}>
+                        <Link to='/v2/portfolio' className={styles.backLink}>
+                            <IoChevronBack />
+                            <span className={styles.breadcrumb}>
+                                <span className={styles.breadcrumbParent}>
+                                    Portfolio
+                                </span>
+                                <span className={styles.breadcrumbSeparator}>
+                                    &gt;
+                                </span>
+                                <span className={styles.breadcrumbCurrent}>
+                                    Transactions
+                                </span>
+                            </span>
+                        </Link>
+                    </header>
+                ) : hasSession || urlAddress ? (
+                    <header className={styles.portfolioHeader}>
+                        <span>{t('pageTitles.portfolio')}</span>
+                        <div className={styles.headerAddressSection}>
+                            {isAddressInputMode ? (
+                                <>
+                                    <input
+                                        ref={addressInputRef}
+                                        type='text'
+                                        className={
+                                            styles.walletAddressInputHeader
+                                        }
+                                        placeholder={t(
+                                            'portfolio.pasteWalletAddress',
+                                        )}
+                                        onChange={handleAddressInput}
+                                        onFocus={handleWalletAddressFocus}
+                                        autoComplete='off'
+                                        spellCheck={false}
+                                    />
+                                    <button
+                                        type='button'
+                                        className={styles.headerAddressCancel}
+                                        onClick={() =>
+                                            setIsAddressInputMode(false)
+                                        }
+                                    >
+                                        {t('common.cancel')}
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        type='button'
+                                        className={styles.headerCurrentAddress}
+                                        onClick={handleCopyAddress}
+                                    >
+                                        <span>
+                                            {showCopied
+                                                ? `✓ ${t('common.copied')}`
+                                                : urlAddress
+                                                  ? `${urlAddress.slice(0, 6)}...${urlAddress.slice(-4)}`
+                                                  : ''}
+                                        </span>
+                                        <IoCopyOutline
+                                            className={styles.headerCopyIcon}
+                                        />
+                                    </button>
+                                    {hasSession &&
+                                        loggedInAddress &&
+                                        !isViewingOwnPortfolio && (
+                                            <Link
+                                                to={myPortfolioPath}
+                                                className={
+                                                    styles.headerReturnToMine
+                                                }
+                                            >
+                                                {t(
+                                                    'portfolio.returnToMyPortfolio',
+                                                )}
+                                            </Link>
+                                        )}
+                                    <button
+                                        type='button'
+                                        className={styles.headerViewOther}
+                                        onClick={() =>
+                                            setIsAddressInputMode(true)
+                                        }
+                                    >
+                                        {t('portfolio.viewOtherAccount')}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </header>
+                ) : null}
 
                 <div className={styles.column}>
-                    {mobileTop}
+                    {/* Mobile Hero Section */}
+                    {!isTransactionsView && mobileTop}
 
+                    {/* Desktop Details Container */}
                     <div className={styles.detailsContainer}>
                         <div className={styles.detailsContent}>
                             <h6>{t('portfolio.fees')}</h6>
@@ -249,64 +643,55 @@ function Portfolio() {
                             className={`${styles.detailsContent} ${styles.netValueMobile}`}
                         >
                             <h6>{t('portfolio.totalNetUsdValue')}</h6>
-                            <h3>
-                                {formatCurrency(
-                                    portfolio.balances.contract +
-                                        portfolio.balances.wallet,
-                                )}
-                            </h3>
+                            <h3>{totalEquityFormatted}</h3>
+                            {/* <h3>{formatCurrency(totalValue)}</h3> */}
                         </div>
-
-                        <div className={styles.totalNetDisplay}>
-                            <h6>
-                                <span>{t('portfolio.totalNetUsdValue')}:</span>{' '}
-                                {formatCurrency(
-                                    portfolio.balances.contract +
-                                        portfolio.balances.wallet,
+                        {showTransactButtons ? (
+                            <div className={styles.totalNetDisplay}>
+                                <h6>
+                                    <span>
+                                        {t('portfolio.totalNetUsdValue')}:
+                                    </span>{' '}
+                                    {totalEquityFormatted}
+                                    {/* {formatCurrency(totalValue)} */}
+                                </h6>
+                                {showTransactButtons && (
+                                    <div className={styles.buttonContainer}>
+                                        <div className={styles.rowButton}>
+                                            <SimpleButton
+                                                onClick={openDepositModal}
+                                                bg='accent1'
+                                            >
+                                                {t('common.deposit')}
+                                            </SimpleButton>
+                                            <SimpleButton
+                                                onClick={openWithdrawModal}
+                                                bg='dark3'
+                                                hoverBg='accent1'
+                                            >
+                                                {t('common.withdraw')}
+                                            </SimpleButton>
+                                            <SimpleButton
+                                                onClick={openSendModal}
+                                                className={styles.sendMobile}
+                                                bg='dark3'
+                                                hoverBg='accent1'
+                                            >
+                                                {t('common.send')}
+                                            </SimpleButton>
+                                        </div>
+                                    </div>
                                 )}
-                            </h6>
-                            <div className={styles.buttonContainer}>
-                                <div className={styles.rowButton}>
-                                    <SimpleButton
-                                        onClick={openDepositModal}
-                                        bg='accent1'
-                                    >
-                                        {t('common.deposit')}
-                                    </SimpleButton>
-                                    <SimpleButton
-                                        onClick={openWithdrawModal}
-                                        bg='dark3'
-                                        hoverBg='accent1'
-                                    >
-                                        {t('common.withdraw')}
-                                    </SimpleButton>
-                                    <SimpleButton
-                                        onClick={openSendModal}
-                                        className={styles.sendMobile}
-                                        bg='dark3'
-                                        hoverBg='accent1'
-                                    >
-                                        {t('common.send')}
-                                    </SimpleButton>
-                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Mobile toggle buttons */}
-                    <div className={styles.mobileToggle}>
-                        <button
-                            className={`${styles.toggleButton} ${mobileView === 'performance' ? styles.active : ''}`}
-                            onClick={() => setMobileView('performance')}
-                        >
-                            {t('portfolio.performance')}
-                        </button>
-                        <button
-                            className={`${styles.toggleButton} ${mobileView === 'table' ? styles.active : ''}`}
-                            onClick={() => setMobileView('table')}
-                        >
-                            {t('portfolio.positions')}
-                        </button>
+                        ) : (
+                            <div className={styles.totalNetDisplayNonUser}>
+                                <span>{t('portfolio.totalNetUsdValue')}</span>{' '}
+                                <h6>
+                                    {totalEquityFormatted}
+                                    {/* {formatCurrency(totalValue)} */}
+                                </h6>
+                            </div>
+                        )}
                     </div>
 
                     <section
@@ -350,7 +735,6 @@ function Portfolio() {
                                     setPanelHeight(next);
                                 }}
                                 onResizeStop={() => {
-                                    // Persist only on user action
                                     setPortfolioPanelHeight(panelHeight);
                                 }}
                             >
@@ -371,31 +755,89 @@ function Portfolio() {
                             </Resizable>
 
                             <section className={styles.table}>
-                                <PortfolioTables />
+                                <PortfolioTables urlAddress={urlAddress} />
                             </section>
                         </div>
 
-                        {/* Mobile: Toggle between views */}
+                        {/* Mobile: Conditional content based on route */}
                         <div className={styles.mobileViewContainer}>
-                            {mobileView === 'performance' ? (
+                            {isTransactionsView ? (
+                                /* Transactions View - All stacked tables */
                                 <section
-                                    style={{
-                                        height: '100%',
-                                        overflow: 'visible',
-                                    }}
+                                    className={styles.mobileTransactionsContent}
                                 >
-                                    {isLayoutReady && (
-                                        <MemoizedPerformancePanel
-                                            userData={userData}
-                                            panelHeight={panelHeight}
-                                            isMobile={true}
-                                        />
-                                    )}
+                                    <PortfolioTables
+                                        layout='stacked'
+                                        visibleSections={[
+                                            'common.tradeHistory',
+                                            'common.orderHistory',
+                                        ]}
+                                        isTransactionsView
+                                        urlAddress={urlAddress}
+                                    />
                                 </section>
                             ) : (
-                                <section className={styles.table}>
-                                    <PortfolioTables />
-                                </section>
+                                /* Default Portfolio View */
+                                <>
+                                    <section
+                                        style={{
+                                            height: '100%',
+                                            overflow: 'visible',
+                                        }}
+                                    >
+                                        {isLayoutReady && (
+                                            <MemoizedPerformancePanel
+                                                userData={userData}
+                                                panelHeight={panelHeight}
+                                                isMobile={true}
+                                            />
+                                        )}
+                                    </section>
+                                    {/* Mobile Stats */}
+                                    {mobileStatsSection}
+                                    {/* Mobile Action Buttons */}
+                                    {showTransactButtons && (
+                                        <div className={styles.mobileActions}>
+                                            <button
+                                                className={`${styles.mobileActionBtn} ${styles.primary}`}
+                                                onClick={openDepositModal}
+                                            >
+                                                Deposit
+                                            </button>
+                                            <button
+                                                className={`${styles.mobileActionBtn} ${styles.secondary}`}
+                                                onClick={openWithdrawModal}
+                                            >
+                                                Withdraw
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Stacked Tables - right under performance */}
+                                    <section
+                                        className={styles.mobileStackedTables}
+                                    >
+                                        <PortfolioTables
+                                            layout='stacked'
+                                            visibleSections={[
+                                                'common.positions',
+                                                'common.openOrders',
+                                                'common.balances',
+                                            ]}
+                                            stackedTableHeight={180}
+                                            urlAddress={urlAddress}
+                                        />
+                                    </section>
+
+                                    {/* View All History - right under tables */}
+                                    <Link
+                                        to='/v2/portfolio/transactions'
+                                        className={styles.viewAllHistoryLink}
+                                    >
+                                        <span>View All History</span>
+                                        <IoChevronForward />
+                                    </Link>
+                                </>
                             )}
                         </div>
                     </section>
