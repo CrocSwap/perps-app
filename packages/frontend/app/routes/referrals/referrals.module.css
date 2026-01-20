@@ -145,7 +145,6 @@
     .tableContainer {
         grid-template-columns: 2fr 3fr;
         gap: clamp(10px, 2.8vw, 16px);
-        /* no height/max-height here */
         min-height: 0;
     }
 

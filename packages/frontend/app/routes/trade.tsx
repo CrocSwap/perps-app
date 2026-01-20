@@ -1007,7 +1007,7 @@ export default function Trade() {
                     >
                         {(activeTab === 'chart' ||
                             visibilityRefs.current.chart) && (
-                            <MemoizedTradingViewWrapper />
+                            <MemoizedTradingViewWrapper switchTab={switchTab} />
                         )}
                     </div>
                     <div
@@ -1183,7 +1183,9 @@ export default function Trade() {
                                         id='chartSection'
                                         className={styles.chart}
                                     >
-                                        <MemoizedTradingViewWrapper />
+                                        <MemoizedTradingViewWrapper
+                                            switchTab={switchTab}
+                                        />
                                     </div>
                                 </div>
                                 <div

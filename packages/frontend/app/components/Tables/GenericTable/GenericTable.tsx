@@ -317,6 +317,16 @@ export default function GenericTable<
         setSortBy(nextBy as S);
         setSortDirection(nextDir!);
     };
+    const showActionsContainer =
+        (!isHttpInfoCallsDisabled &&
+            ((sortedData.length > slicedLimit &&
+                !pageMode &&
+                viewAllLink &&
+                viewAllLink.length > 0) ||
+                (tableModel &&
+                    (pageMode || csvDataFetcher) &&
+                    tableModel.some((header) => header.exportable)))) ||
+        (pageMode && sortedData.length > 0);
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -485,15 +495,17 @@ export default function GenericTable<
                     </div>
                 )}
 
-                {!isHttpInfoCallsDisabled && sortedData.length > 0 && (
+                {showActionsContainer && (
                     <div
                         id={`${id}-actionsContainer`}
-                        className={styles.actionsContainer}
+                        className={`${styles.actionsContainer} ${
+                            !viewAllLink ? styles.showAllMode : ''
+                        }`}
                     >
-                        {sortedData.length > slicedLimit &&
+                        {!isHttpInfoCallsDisabled &&
+                            sortedData.length > slicedLimit &&
                             !pageMode &&
-                            viewAllLink &&
-                            viewAllLink.length > 0 && (
+                            viewAllLink && (
                                 <a
                                     href='#'
                                     className={styles.viewAllLink}
@@ -502,7 +514,9 @@ export default function GenericTable<
                                     View All
                                 </a>
                             )}
-                        {tableModel &&
+
+                        {!isHttpInfoCallsDisabled &&
+                            tableModel &&
                             (pageMode || csvDataFetcher) &&
                             tableModel.some((header) => header.exportable) && (
                                 <a
@@ -514,15 +528,6 @@ export default function GenericTable<
                                 </a>
                             )}
                     </div>
-                )}
-
-                {isHttpInfoCallsDisabled && (
-                    <div
-                        id={`${id}-actionsContainer`}
-                        className={
-                            styles.actionsContainer + ' ' + styles.showAllMode
-                        }
-                    ></div>
                 )}
 
                 {pageMode && (

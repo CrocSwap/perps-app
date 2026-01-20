@@ -50,6 +50,10 @@ type AppSettingsStore = {
 
     portfolioPanelHeight: number | null;
     setPortfolioPanelHeight: (h: number | null) => void;
+    portfolioPerformanceTab: 'performance' | 'accountValue' | 'collateral';
+    setPortfolioPerformanceTab: (
+        tab: 'performance' | 'accountValue' | 'collateral',
+    ) => void;
     navigationKeyboardShortcutsEnabled: boolean;
     setNavigationKeyboardShortcutsEnabled: (enabled: boolean) => void;
 
@@ -61,6 +65,8 @@ const LS_KEY = 'VISUAL_SETTINGS';
 const DEFAULT_CHART_TOP_HEIGHT: number | null = null;
 const DEFAULT_WALLET_COLLAPSED = false;
 const DEFAULT_PORTFOLIO_PANEL_HEIGHT: number | null = null;
+const DEFAULT_PORTFOLIO_PERFORMANCE_TAB: AppSettingsStore['portfolioPerformanceTab'] =
+    'performance';
 
 export const useAppSettings = create<AppSettingsStore>()(
     persist(
@@ -89,6 +95,9 @@ export const useAppSettings = create<AppSettingsStore>()(
 
             portfolioPanelHeight: DEFAULT_PORTFOLIO_PANEL_HEIGHT,
             setPortfolioPanelHeight: (h) => set({ portfolioPanelHeight: h }),
+            portfolioPerformanceTab: DEFAULT_PORTFOLIO_PERFORMANCE_TAB,
+            setPortfolioPerformanceTab: (tab) =>
+                set({ portfolioPerformanceTab: tab }),
             navigationKeyboardShortcutsEnabled: true,
             setNavigationKeyboardShortcutsEnabled: (enabled) =>
                 set({ navigationKeyboardShortcutsEnabled: enabled }),
@@ -101,7 +110,7 @@ export const useAppSettings = create<AppSettingsStore>()(
         {
             name: LS_KEY,
             storage: createJSONStorage(() => localStorage),
-            version: 5,
+            version: 6,
             migrate: (persistedState: unknown, version: number) => {
                 const state = persistedState as AppSettingsStore;
 
@@ -125,6 +134,13 @@ export const useAppSettings = create<AppSettingsStore>()(
                         tradingKeyboardShortcutsEnabled: true,
                     };
                 }
+                if (version < 6) {
+                    return {
+                        ...state,
+                        portfolioPerformanceTab:
+                            DEFAULT_PORTFOLIO_PERFORMANCE_TAB,
+                    };
+                }
 
                 return persistedState;
             },
@@ -136,6 +152,7 @@ export const useAppSettings = create<AppSettingsStore>()(
                 chartTopHeight: state.chartTopHeight,
                 isWalletCollapsed: state.isWalletCollapsed,
                 portfolioPanelHeight: state.portfolioPanelHeight,
+                portfolioPerformanceTab: state.portfolioPerformanceTab,
                 navigationKeyboardShortcutsEnabled:
                     state.navigationKeyboardShortcutsEnabled,
                 tradingKeyboardShortcutsEnabled:

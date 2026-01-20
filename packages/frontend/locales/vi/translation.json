@@ -45,11 +45,13 @@
         "announcements": "Thông báo",
         "leverage": "Đòn bẩy",
         "comingSoon": "Sắp ra mắt",
+        "or": "hoặc",
         "enter": "Nhập",
         "claim": "Nhận",
         "seeDocsForMore": "Xem tài liệu để biết thêm chi tiết.",
         "clearFilter": "Xóa bộ lọc",
-        "activate": "Kích hoạt"
+        "activate": "Kích hoạt",
+        "copied": "Đã sao chép!"
     },
     "transactions": {
         "orderTypes": "Loại lệnh",
@@ -452,7 +454,7 @@
         "overwriteCurrentReferralCode": "Ghi đè mã giới thiệu hiện tại",
         "enterReferralCode": "Nhập mã giới thiệu",
         "referralCodeNotValidPleaseConfirm": "Mã <0>{{invalidCode}}</0> chưa được đăng ký trong chương trình giới thiệu. Vui lòng kiểm tra lại mã.",
-        "yourCodeIs": "Mã của bạn là <0>{{affiliateCode}}</0> (dựa trên 6 ký tự đầu của địa chỉ ví). Vui lòng nhấn 'Kích hoạt' để đăng ký mã này trong hệ thống giới thiệu.",
+        "yourCodeIs": "Mã của bạn là <0>{{referrerCode}}</0> (dựa trên 6 ký tự đầu của địa chỉ ví). Vui lòng nhấn 'Kích hoạt' để đăng ký mã này trong hệ thống giới thiệu.",
         "createAnAffiliateCode": "Tạo mã giới thiệu",
         "createAUniqueCodeToEarn": "Tạo mã riêng để nhận 10% phí từ người dùng được giới thiệu.",
         "codeAlreadyInUse": "Mã đã được sử dụng",
@@ -462,11 +464,11 @@
             "enterCode": "Kết nối ví để nhập mã giới thiệu"
         },
         "usersWithTradingVolume": "Mã này có thể được tuỳ chỉnh/cập nhật sau khi người dùng đạt $1M khối lượng giao dịch.",
-        "doNotSelfRefer": "Mã <0>{{affiliateCode}}</0> không thể được đăng ký bởi cùng địa chỉ đã tạo ra nó. Vui lòng chọn mã khác.",
+        "doNotSelfRefer": "Mã <0>{{refCode}}</0> không thể được đăng ký bởi cùng địa chỉ đã tạo ra nó. Vui lòng chọn mã khác.",
         "toCustomizeAffiliateCode": "Mã giới thiệu mặc định là 6 ký tự đầu của địa chỉ ví. Người dùng có khối lượng giao dịch > $1M có thể tuỳ chỉnh mã giới thiệu.",
         "claimRewardsWithAmount": "Nhận {{amount}} phần thưởng",
         "selectATabToViewData": "Chọn một tab để xem dữ liệu",
-        "trackingLinkExplanation": "Bạn sẽ nhận <0>{{affiliatePercent}}</0> phí từ người dùng được giới thiệu và họ sẽ nhận giảm giá <1>{{userPercent}}</1>."
+        "trackingLinkExplanation": "Bạn sẽ nhận <0>{{referrerPercent}}</0> phí từ người dùng được giới thiệu và họ sẽ nhận giảm giá <1>{{inviteePercent}}</1>."
     },
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Tổng giá trị USD",
         "totalNetUsdValue": "Tổng giá trị USD ròng",
         "performance": "Hiệu suất",
+        "accountOverview": "Tổng quan tài khoản",
+        "updateFrequencyInMinutes": "Cập nhật mỗi {{numMinutes}} phút",
         "positions": "Vị thế",
         "feeSchedule": "Biểu phí",
         "vipTiers": "Cấp độ VIP",
@@ -729,7 +733,9 @@
         "pageNotFound": "Không Tìm Thấy Trang",
         "transactionTimedOut": "Giao dịch bị hết thời gian sau 15 giây",
         "connectToViewPortfolio": "Kết nối để Xem Danh Mục Đầu Tư",
-        "connectDescription": "Đăng nhập bằng ví của bạn để xem danh mục đầu tư, vị thế và lịch sử giao dịch."
+        "connectDescription": "Đăng nhập bằng ví của bạn để xem danh mục đầu tư, vị thế và lịch sử giao dịch.",
+        "pasteWalletAddress": "Dán địa chỉ ví",
+        "viewOtherAccount": "Xem tài khoản khác"
     },
     "pageTitles": {
         "portfolio": "Danh mục",

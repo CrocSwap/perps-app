@@ -45,11 +45,13 @@
         "announcements": "Duyurular",
         "leverage": "Kaldıraç",
         "comingSoon": "Yakında",
+        "or": "veya",
         "enter": "Giriş",
         "claim": "Talep Et",
         "seeDocsForMore": "Daha fazlası için dokümanlara bakın.",
         "clearFilter": "Filtreyi temizle",
-        "activate": "Etkinleştir"
+        "activate": "Etkinleştir",
+        "copied": "Kopyalandı!"
     },
     "transactions": {
         "orderTypes": "Emir Türleri",
@@ -451,7 +453,7 @@
         "overwriteCurrentReferralCode": "Mevcut referans kodunun üzerine yaz",
         "enterReferralCode": "Bir referans kodu girin",
         "referralCodeNotValidPleaseConfirm": "Kod <0>{{invalidCode}}</0> referans programında talep edilmemiş. Lütfen kodun doğru olduğunu onaylayın.",
-        "yourCodeIs": "Kodunuz, cüzdan adresinizin ilk altı karakterine dayalı olarak <0>{{affiliateCode}}</0>. Lütfen bu kodu referans sistemine kaydetmek için 'Etkinleştir'e tıklayın.",
+        "yourCodeIs": "Kodunuz, cüzdan adresinizin ilk altı karakterine dayalı olarak <0>{{referrerCode}}</0>. Lütfen bu kodu referans sistemine kaydetmek için 'Etkinleştir'e tıklayın.",
         "createAnAffiliateCode": "Bir ortaklık kodu oluşturun",
         "createAUniqueCodeToEarn": "Yönlendirilen kullanıcıların ücretlerinin %10'unu kazanmak için benzersiz bir kod oluşturun.",
         "codeAlreadyInUse": "Kod Zaten Kullanımda",
@@ -461,11 +463,11 @@
             "enterCode": "Bir referans kodu girmek için cüzdanınızı bağlayın"
         },
         "usersWithTradingVolume": "Bu kod, 1 milyon ABD doları işlem hacmine ulaştıktan sonra kullanıcılar tarafından özelleştirilebilir veya güncellenebilir.",
-        "doNotSelfRefer": "<0>{{affiliateCode}}</0> kodu, oluşturulduğu adresle aynı adres tarafından kaydedilemez. Lütfen farklı bir kod seçin.",
+        "doNotSelfRefer": "<0>{{refCode}}</0> kodu, oluşturulduğu adresle aynı adres tarafından kaydedilemez. Lütfen farklı bir kod seçin.",
         "toCustomizeAffiliateCode": "Ortaklık kodları varsayılan olarak cüzdan adresinizin ilk altı karakteridir. 1 milyon dolardan fazla işlem hacmine sahip kullanıcılar ortaklık kodlarını özelleştirebilir.",
         "claimRewardsWithAmount": "{{amount}} tutarında ödül talep et",
         "selectATabToViewData": "Verileri görüntülemek için bir sekme seçin",
-        "trackingLinkExplanation": "Yönlendirilen kullanıcı ücretlerinin <0>{{affiliatePercent}}</0> kadarını alacaksınız ve onlar <1>{{userPercent}}</1> indirim alacaklar.",
+        "trackingLinkExplanation": "Yönlendirilen kullanıcı ücretlerinin <0>{{referrerPercent}}</0> kadarını alacaksınız ve onlar <1>{{inviteePercent}}</1> indirim alacaklar.",
         "claim": "Talep et"
     },
     "deposit": {
@@ -667,6 +669,8 @@
         "totalUsdVal": "Toplam USD Değeri",
         "totalNetUsdValue": "Toplam Net USD Değeri",
         "performance": "Performans",
+        "accountOverview": "Hesap Özeti",
+        "updateFrequencyInMinutes": "{{numMinutes}} dakikada bir güncellenir",
         "positions": "Pozisyonlar",
         "feeSchedule": "Ücret Çizelgesi",
         "vipTiers": "VIP Seviyeleri",
@@ -713,7 +717,10 @@
         "exceedsAvailableBalance": "Tutar mevcut bakiyenizi aşmaktadır: {{balance}}",
         "transactionTimedOut": "İşlem 15 saniye sonra zaman aşımına uğradı",
         "connectToViewPortfolio": "Portföyünüzü Görüntülemek için Bağlanın",
-        "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın."
+        "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın.",
+        "pasteWalletAddress": "Cüzdan adresini yapıştır",
+        "viewOtherAccount": "Diğer hesabı görüntüle",
+        "returnToMyPortfolio": "Kendi portföyüme dön"
     },
     "pageTitles": {
         "portfolio": "Portföy",

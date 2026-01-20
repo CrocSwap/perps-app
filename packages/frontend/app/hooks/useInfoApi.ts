@@ -348,6 +348,35 @@ export function useInfoApi() {
         return ret;
     };
 
+    const fetchUserHistory = async (
+        userPubkey: string,
+    ): Promise<{
+        pnlHistory: { time: number; value: number }[];
+        accountValueHistory: { time: number; value: number }[];
+    }> => {
+        const response = await fetch(
+            `https://ember-leaderboard-v2.liquidity.tools/user/${userPubkey}/history`,
+            {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            },
+        );
+        const data = await response.json();
+
+        const pnlHistory: { time: number; value: number }[] = [];
+        const accountValueHistory: { time: number; value: number }[] = [];
+
+        if (data && data.history && Array.isArray(data.history)) {
+            for (const entry of data.history) {
+                const time = entry.window_start;
+                pnlHistory.push({ time, value: entry.pnl });
+                accountValueHistory.push({ time, value: entry.account_value });
+            }
+        }
+
+        return { pnlHistory, accountValueHistory };
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -362,5 +391,6 @@ export function useInfoApi() {
         fetchUserNonFundingLedgerUpdates,
         fetchTokenId,
         fetchTokenDetails,
+        fetchUserHistory,
     };
 }

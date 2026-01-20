@@ -22,6 +22,108 @@
     font-size: var(--font-size-xl, 36px);
 }
 
+.portfolioHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-m);
+}
+
+.walletAddressInputHeader {
+    width: clamp(320px, 32vw, 460px);
+    padding: var(--padding-s) var(--padding-m);
+    background: rgba(22, 22, 28, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-s);
+    color: var(--text1);
+    font-size: var(--font-size-xs);
+    font-family: monospace;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.walletAddressInputHeader::placeholder {
+    color: var(--text2);
+    font-family: inherit;
+}
+
+.walletAddressInputHeader:focus::placeholder {
+    color: transparent;
+}
+
+.walletAddressInputHeader:focus {
+    outline: none;
+    border-color: var(--accent1);
+    background: rgba(115, 113, 252, 0.05);
+}
+
+.headerAddressSection {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+.headerCurrentAddress {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: monospace;
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    background: rgba(22, 22, 28, 0.6);
+    padding: var(--padding-xs) var(--padding-s);
+    border-radius: var(--radius-s);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.headerCurrentAddress:hover {
+    color: var(--accent1);
+}
+
+.headerCopyIcon {
+    flex: 0 0 auto;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.headerViewOther,
+.headerAddressCancel {
+    background: none;
+    border: none;
+    color: var(--accent1);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    padding: var(--padding-xs) var(--padding-s);
+    transition: opacity 0.2s ease;
+}
+
+.headerReturnToMine {
+    color: var(--accent1);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    padding: var(--padding-xs) var(--padding-s);
+    transition: opacity 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.headerViewOther:hover,
+.headerAddressCancel:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.headerReturnToMine:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.headerAddressCancel {
+    color: var(--text2);
+}
+
 .column {
     height: 100%;
     display: grid;
@@ -56,6 +158,53 @@
     color: var(--text2);
     max-width: 400px;
     margin: 0;
+}
+
+.connectViewDivider {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-m);
+    width: 100%;
+    max-width: 400px;
+    color: var(--text2);
+    font-size: var(--font-size-s);
+}
+
+.connectViewDivider::before,
+.connectViewDivider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.walletAddressInput {
+    width: 100%;
+    max-width: 400px;
+    padding: var(--padding-m);
+    background: rgba(22, 22, 28, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-m);
+    color: var(--text1);
+    font-size: var(--font-size-s);
+    font-family: monospace;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.walletAddressInput::placeholder {
+    color: var(--text2);
+    font-family: inherit;
+}
+
+.walletAddressInput:focus::placeholder {
+    color: transparent;
+}
+
+.walletAddressInput:focus {
+    outline: none;
+    border-color: var(--accent1);
+    background: rgba(115, 113, 252, 0.05);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -858,6 +1007,29 @@
         background: var(--bg-dark1);
     }
 
+    .portfolioHeader {
+        padding: var(--padding-s) var(--padding-s);
+    }
+
+    .walletAddressInputHeader {
+        width: auto;
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: var(--padding-xs) var(--padding-s);
+        font-size: var(--font-size-xs);
+    }
+
+    .headerAddressSection {
+        flex: 1 1 auto;
+        min-width: 0;
+        justify-content: flex-end;
+    }
+
+    .headerAddressCancel {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
     .column {
         display: flex;
         flex-direction: column;
@@ -1127,6 +1299,23 @@
         );
     }
 
+    .portfolioHeader {
+        align-items: flex-start;
+    }
+
+    .headerAddressSection {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .headerReturnToMine {
+        flex: 0 0 100%;
+        order: 10;
+        text-align: right;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
     .container header {
         font-size: var(--font-size-l);
     }
@@ -1219,14 +1408,4 @@
    SAFE AREA INSETS (for notched devices)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-@supports (padding-top: env(safe-area-inset-top)) {
-    .container {
-        /* padding-left: max(16px, env(safe-area-inset-left));
-        padding-right: max(16px, env(safe-area-inset-right)); */
-    }
-
-    @media (max-width: 768px) {
-        .column {
-        }
-    }
-}
+/* Safe area insets for notched devices - currently no overrides needed */

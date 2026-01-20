@@ -45,11 +45,13 @@
         "announcements": "お知らせ",
         "leverage": "レバレッジ",
         "comingSoon": "近日公開",
+        "or": "または",
         "enter": "入力",
         "claim": "受け取る",
         "seeDocsForMore": "詳細はドキュメントをご覧ください。",
         "clearFilter": "フィルターをクリア",
-        "activate": "有効化"
+        "activate": "有効化",
+        "copied": "コピーしました！"
     },
     "transactions": {
         "orderTypes": "注文タイプ",
@@ -451,7 +453,7 @@
         "overwriteCurrentReferralCode": "現在の紹介コードを上書き",
         "enterReferralCode": "紹介コードを入力してください",
         "referralCodeNotValidPleaseConfirm": "コード <0>{{invalidCode}}</0> は紹介プログラムで申請されていません。コードが正しいか確認してください。",
-        "yourCodeIs": "あなたのコードはウォレットアドレスの最初の6文字に基づく <0>{{affiliateCode}}</0> です。このコードを紹介システムに登録するには「アクティベート」をクリックしてください。",
+        "yourCodeIs": "あなたのコードはウォレットアドレスの最初の6文字に基づく <0>{{referrerCode}}</0> です。このコードを紹介システムに登録するには「アクティベート」をクリックしてください。",
         "createAnAffiliateCode": "アフィリエイトコードを作成",
         "createAUniqueCodeToEarn": "紹介されたユーザーの手数料の10%を獲得するために、ユニークなコードを作成してください。",
         "codeAlreadyInUse": "コードは既に使用されています",
@@ -461,11 +463,11 @@
             "enterCode": "紹介コードを入力するにはウォレットを接続してください"
         },
         "usersWithTradingVolume": "このコードは、取引高が100万ドルに達した後、ユーザーによってカスタマイズまたは更新される場合があります。",
-        "doNotSelfRefer": "コード <0>{{affiliateCode}}</0> は、作成されたのと同じアドレスで登録することはできません。別のコードを選択してください。",
+        "doNotSelfRefer": "コード <0>{{refCode}}</0> は、作成されたのと同じアドレスで登録することはできません。別のコードを選択してください。",
         "toCustomizeAffiliateCode": "アフィリエイトコードはデフォルトでウォレットアドレスの最初の6文字になります。取引高が100万ドルを超えるユーザーはアフィリエイトコードをカスタマイズできます。",
         "claimRewardsWithAmount": "{{amount}} の報酬を請求",
         "selectATabToViewData": "データ表示するタブを選択してください",
-        "trackingLinkExplanation": "紹介されたユーザーの手数料の <0>{{affiliatePercent}}</0> を受け取り、そのユーザーは <1>{{userPercent}}</1> の割引を受けられます。",
+        "trackingLinkExplanation": "紹介されたユーザーの手数料の <0>{{referrerPercent}}</0> を受け取り、そのユーザーは <1>{{inviteePercent}}</1> の割引を受けられます。",
         "claim": "請求する"
     },
     "deposit": {
@@ -667,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "アカウント概要",
+        "updateFrequencyInMinutes": "{{numMinutes}}分ごとに更新",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -713,7 +717,10 @@
         "exceedsAvailableBalance": "金額が利用可能残高 {{balance}} を超えています",
         "transactionTimedOut": "取引は15秒後にタイムアウトしました",
         "connectToViewPortfolio": "ポートフォリオを表示するには接続してください",
-        "connectDescription": "ウォレットでサインインして、ポートフォリオ、ポジション、取引履歴を表示します。"
+        "connectDescription": "ウォレットでサインインして、ポートフォリオ、ポジション、取引履歴を表示します。",
+        "pasteWalletAddress": "ウォレットアドレスを貼り付け",
+        "viewOtherAccount": "他のアカウントを表示",
+        "returnToMyPortfolio": "自分のポートフォリオに戻る"
     },
     "pageTitles": {
         "portfolio": "ポートフォリオ",

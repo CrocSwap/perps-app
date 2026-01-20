@@ -72,7 +72,7 @@ export default function Referrals() {
 
     const [rewardsEarned, setRewardsEarned] = useState<string>('...');
 
-    const [referralCount, setReferralCount] = useState<string>('...');
+    const [inviteeCount, setInviteeCount] = useState<string>('...');
 
     const [payoutMovements, setPayoutMovements] = useState<PayoutMovementIF[]>(
         [],
@@ -134,7 +134,7 @@ export default function Referrals() {
                 console.log('payouts: ', res);
                 console.log('calculating payouts...');
                 setPayoutsByReferrer(res);
-                setReferralCount(res.length.toString());
+                setInviteeCount(res.length.toString());
                 const totalPayouts: number = res.reduce(
                     (acc: number, payout: any) => {
                         // Each payout object has one unknown key with an object value containing volume
@@ -198,12 +198,14 @@ export default function Referrals() {
                         </a>
                     </p>
                 </div>
-                <SimpleButton bg={'dark2'}>Register as Affiliate</SimpleButton>
+                <SimpleButton bg={'dark2'}>
+                    Register for the Referral Program
+                </SimpleButton>
             </header>
             <div className={styles.detailsContainer}>
                 <div className={styles.detailsContent}>
                     <h6>{t('referrals.tradersReferred')}</h6>
-                    <h3>{referralCount}</h3>
+                    <h3>{inviteeCount}</h3>
                 </div>
                 <div className={styles.detailsContent}>
                     <h6>{t('referrals.rewardsEarned')}</h6>

@@ -54,17 +54,20 @@ import type {
     TradingTerminalFeatureset,
 } from '~/tv/charting_library';
 import { processSymbolUrlParam } from '~/utils/AppUtils';
+import type { TabType } from '~/routes/trade';
 
 import i18n from 'i18next';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
     isChartReady: boolean;
+    switchTab?: (tab: TabType) => void;
 }
 
 export const TradingViewContext = createContext<TradingViewContextType>({
     chart: null,
     isChartReady: false,
+    switchTab: undefined,
 });
 
 export interface ChartContainerProps {
@@ -90,7 +93,8 @@ export const TradingViewProvider: React.FC<{
     setChartLoadingStatus: React.Dispatch<
         React.SetStateAction<'loading' | 'error' | 'ready'>
     >;
-}> = ({ children, tradingviewLib, setChartLoadingStatus }) => {
+    switchTab?: (tab: TabType) => void;
+}> = ({ children, tradingviewLib, setChartLoadingStatus, switchTab }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
@@ -332,15 +336,21 @@ export const TradingViewProvider: React.FC<{
                 showBuysSellsOnChart && chart.chart().refreshMarks();
             });
 
-            chart.subscribe('study_event', (studyId: any) => {
-                const studyElement = chart.activeChart().getStudyById(studyId);
-
-                const colors = getBsColor();
-                studyElement.applyOverrides({
-                    'volume.color.0': colors.sell,
-                    'volume.color.1': colors.buy,
-                });
-            });
+            chart.subscribe(
+                'study_event',
+                (studyId: any, studyEventType: any) => {
+                    if (studyEventType !== 'remove') {
+                        const studyElement = chart
+                            .activeChart()
+                            .getStudyById(studyId);
+                        const colors = getBsColor();
+                        studyElement.applyOverrides({
+                            'volume.color.0': colors.sell,
+                            'volume.color.1': colors.buy,
+                        });
+                    }
+                },
+            );
         }
     }, [chart]);
 
@@ -670,7 +680,7 @@ export const TradingViewProvider: React.FC<{
     }, [userFills]);
 
     return (
-        <TradingViewContext.Provider value={{ chart, isChartReady }}>
+        <TradingViewContext.Provider value={{ chart, isChartReady, switchTab }}>
             {children}
         </TradingViewContext.Provider>
     );

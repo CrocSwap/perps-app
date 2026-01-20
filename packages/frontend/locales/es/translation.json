@@ -45,11 +45,13 @@
         "announcements": "Anuncios",
         "leverage": "Apalancamiento",
         "comingSoon": "Próximamente",
+        "or": "o",
         "enter": "Ingresar",
         "claim": "Reclamar",
         "seeDocsForMore": "Consulta la documentación para más información.",
         "clearFilter": "Borrar filtro",
-        "activate": "Activar"
+        "activate": "Activar",
+        "copied": "¡Copiado!"
     },
     "transactions": {
         "orderTypes": "Tipos de orden",
@@ -451,7 +453,7 @@
         "overwriteCurrentReferralCode": "Sobrescribir código de referido actual",
         "enterReferralCode": "Ingresar un código de referido",
         "referralCodeNotValidPleaseConfirm": "El código <0>{{invalidCode}}</0> no está registrado en el programa de referidos. Por favor, confirme que el código es correcto.",
-        "yourCodeIs": "Tu código es <0>{{affiliateCode}}</0> basado en los primeros seis caracteres de tu dirección de wallet. Haz clic en 'Activar' para registrar este código en el sistema de referidos.",
+        "yourCodeIs": "Tu código es <0>{{referrerCode}}</0> basado en los primeros seis caracteres de tu dirección de wallet. Haz clic en 'Activar' para registrar este código en el sistema de referidos.",
         "createAnAffiliateCode": "Crear un código de afiliado",
         "createAUniqueCodeToEarn": "Crea un código único para ganar el 10% de las comisiones de usuarios referidos.",
         "codeAlreadyInUse": "Código ya en uso",
@@ -461,11 +463,11 @@
             "enterCode": "Conecta tu wallet para ingresar un código de referido"
         },
         "usersWithTradingVolume": "Este código puede ser personalizado o actualizado por usuarios después de alcanzar $1M en volumen de trading.",
-        "doNotSelfRefer": "El código <0>{{affiliateCode}}</0> no puede ser registrado por la misma dirección que lo creó. Por favor, elige un código diferente.",
+        "doNotSelfRefer": "El código <0>{{refCode}}</0> no puede ser registrado por la misma dirección que lo creó. Por favor, elige un código diferente.",
         "toCustomizeAffiliateCode": "Los códigos de afiliado por defecto son los primeros seis caracteres de tu dirección de wallet. Usuarios con > $1M en volumen de trading pueden personalizar su código.",
         "claimRewardsWithAmount": "Reclamar {{amount}} en recompensas",
         "selectATabToViewData": "Selecciona una pestaña para ver datos",
-        "trackingLinkExplanation": "Recibirás <0>{{affiliatePercent}}</0> de las comisiones de usuarios referidos y ellos recibirán un descuento de <1>{{userPercent}}</1>.",
+        "trackingLinkExplanation": "Recibirás <0>{{referrerPercent}}</0> de las comisiones de usuarios referidos y ellos recibirán un descuento de <1>{{inviteePercent}}</1>.",
         "claim": "Reclamar"
     },
     "deposit": {
@@ -667,6 +669,8 @@
         "totalUsdVal": "Valor total USD",
         "totalNetUsdValue": "Valor neto total en USD",
         "performance": "Rendimiento",
+        "accountOverview": "Resumen de la cuenta",
+        "updateFrequencyInMinutes": "Se actualiza cada {{numMinutes}} minutos",
         "positions": "Posiciones",
         "feeSchedule": "Programa de comisiones",
         "vipTiers": "Niveles VIP",
@@ -711,9 +715,12 @@
         "amountGreaterThanZero": "El monto debe ser mayor a 0",
         "minDepositAmount": "El monto mínimo de depósito es {{amount}}",
         "exceedsAvailableBalance": "El monto excede el saldo disponible de {{balance}}",
-        "transactionTimedOut": "La transacción expiró después de 15 segundos",
+        "transactionTimedOut": "Transacción agotó el tiempo tras 15 segundos",
         "connectToViewPortfolio": "Conectar para Ver Tu Portafolio",
-        "connectDescription": "Inicia sesión con tu billetera para ver tu portafolio, posiciones e historial de operaciones."
+        "connectDescription": "Inicia sesión con tu billetera para ver tu portafolio, posiciones e historial de operaciones.",
+        "pasteWalletAddress": "Pegar dirección de billetera",
+        "viewOtherAccount": "Ver otra cuenta",
+        "returnToMyPortfolio": "Volver a mi portafolio"
     },
     "pageTitles": {
         "portfolio": "Portafolio",

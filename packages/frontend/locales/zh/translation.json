@@ -45,11 +45,13 @@
         "announcements": "公告",
         "leverage": "杠杆",
         "comingSoon": "即将上线",
+        "or": "或",
         "enter": "输入",
         "claim": "领取",
         "seeDocsForMore": "更多信息请查看文档。",
         "clearFilter": "清除筛选",
-        "activate": "激活"
+        "activate": "激活",
+        "copied": "已复制！"
     },
     "transactions": {
         "orderTypes": "订单类型",
@@ -452,7 +454,7 @@
         "overwriteCurrentReferralCode": "覆盖当前推荐码",
         "enterReferralCode": "输入推荐码",
         "referralCodeNotValidPleaseConfirm": "该代码 <0>{{invalidCode}}</0> 尚未在推荐计划中注册。请确认代码是否正确。",
-        "yourCodeIs": "您的代码是 <0>{{affiliateCode}}</0>（基于钱包地址前六位字符）。请点击“激活”以在推荐系统中注册该代码。",
+        "yourCodeIs": "您的代码是 <0>{{referrerCode}}</0>（基于钱包地址前六位字符）。请点击“激活”以在推荐系统中注册该代码。",
         "createAnAffiliateCode": "创建推广码",
         "createAUniqueCodeToEarn": "创建一个唯一代码，可赚取被推荐用户手续费的 10%。",
         "codeAlreadyInUse": "代码已被占用",
@@ -462,11 +464,11 @@
             "enterCode": "连接钱包以输入推荐码"
         },
         "usersWithTradingVolume": "当交易量达到 $1M 后，用户可自定义或更新该代码。",
-        "doNotSelfRefer": "代码 <0>{{affiliateCode}}</0> 不能由创建该代码的同一地址注册。请选择其他代码。",
+        "doNotSelfRefer": "代码 <0>{{refCode}}</0> 不能由创建该代码的同一地址注册。请选择其他代码。",
         "toCustomizeAffiliateCode": "推广码默认使用钱包地址前六位字符。交易量超过 $1M 的用户可自定义推广码。",
         "claimRewardsWithAmount": "领取 {{amount}} 奖励",
         "selectATabToViewData": "选择一个标签以查看数据",
-        "trackingLinkExplanation": "您将获得被推荐用户手续费的 <0>{{affiliatePercent}}</0>，他们将获得 <1>{{userPercent}}</1> 的折扣。"
+        "trackingLinkExplanation": "您将获得被推荐用户手续费的 <0>{{referrerPercent}}</0>，他们将获得 <1>{{inviteePercent}}</1> 的折扣。"
     },
     "deposit": {
         "prompt": "从Fogo充值{{token}}",
@@ -667,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "账户概览",
+        "updateFrequencyInMinutes": "每{{numMinutes}}分钟更新一次",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -713,7 +717,10 @@
         "exceedsAvailableBalance": "金额超出可用余额 {{balance}}",
         "transactionTimedOut": "交易在 15 秒后超时",
         "connectToViewPortfolio": "连接以查看您的投资组合",
-        "connectDescription": "使用您的钱包登录以查看您的投资组合、持仓和交易历史。"
+        "connectDescription": "使用您的钱包登录以查看您的投资组合、持仓和交易历史。",
+        "pasteWalletAddress": "粘贴钱包地址",
+        "viewOtherAccount": "查看其他账户",
+        "returnToMyPortfolio": "返回我的投资组合"
     },
     "pageTitles": {
         "portfolio": "投资组合",

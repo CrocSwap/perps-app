@@ -5,12 +5,18 @@
     height: 100%;
     background: var(--bg-dark2);
     border-radius: var(--radius-m);
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 .container > div:nth-of-type(2) {
     height: 100%;
     width: 100%;
     justify-content: flex-start;
     align-items: flex-start;
+}
+.tableContent {
+    height: 100%;
+    width: 100%;
 }
 .performanceContainer,
 .loadingContainer {
@@ -20,6 +26,8 @@
     grid-template-columns: 300px 1fr;
     gap: var(--gap-m);
     padding: 0 0 0 var(--padding-m);
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 .performanceContainer {
     min-height: 0;
@@ -34,15 +42,62 @@
     padding-top: var(--padding-m);
 }
 
+.accountOverviewHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-bottom: var(--padding-s);
+}
+
+.accountOverviewTitle {
+    color: var(--text1);
+    font-size: var(--font-size-s, 12px);
+    font-weight: 600;
+}
+
+.accountOverviewSubtitle {
+    color: var(--text2, #bcbcc4);
+    font-size: var(--font-size-xs, 11px);
+}
+
 .perfChart {
     width: 100%;
     height: 100%;
 
-    display: grid;
-    grid-template-rows: 15% 85%;
+    display: flex;
+    flex-direction: column;
 
-    align-items: center;
     background: var(--dark2);
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.chartControls {
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    padding: 8px 12px;
+}
+
+.chartControlsTabsRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: visible;
+    min-width: 0;
+}
+
+.chartControlsFiltersRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: visible;
 }
 .metricRow {
     display: flex;
@@ -85,7 +140,7 @@
     .performanceContainer {
         display: flex;
         flex-direction: column;
-        gap: var(--gap-s);
+        gap: 0;
         padding: 0;
         overflow: visible;
     }
@@ -98,6 +153,12 @@
 
     .perfChart {
         overflow: visible;
+        padding: 0 8px 8px 8px;
+        overflow-x: hidden;
+    }
+
+    .chartControls {
+        padding: 8px;
     }
 
     .container {

@@ -45,11 +45,13 @@
         "announcements": "공지사항",
         "leverage": "레버리지",
         "comingSoon": "출시 예정",
+        "or": "또는",
         "enter": "입력",
         "claim": "받기",
         "seeDocsForMore": "자세한 내용은 문서를 확인하세요.",
         "clearFilter": "필터 지우기",
-        "activate": "활성화"
+        "activate": "활성화",
+        "copied": "복사됨!"
     },
     "transactions": {
         "orderTypes": "주문 유형",
@@ -451,7 +453,7 @@
         "overwriteCurrentReferralCode": "현재 추천 코드 덮어쓰기",
         "enterReferralCode": "추천 코드 입력",
         "referralCodeNotValidPleaseConfirm": "코드 <0>{{invalidCode}}</0>는 추천 프로그램에 등록되지 않았습니다. 코드가 정확한지 확인해 주세요.",
-        "yourCodeIs": "귀하의 코드는 지갑 주소의 첫 6글자를 기반으로 한 <0>{{affiliateCode}}</0>입니다. 추천 시스템에 이 코드를 등록하려면 '활성화'를 클릭하세요.",
+        "yourCodeIs": "귀하의 코드는 지갑 주소의 첫 6글자를 기반으로 한 <0>{{referrerCode}}</0>입니다. 추천 시스템에 이 코드를 등록하려면 '활성화'를 클릭하세요.",
         "createAnAffiliateCode": "제휴 코드 생성",
         "createAUniqueCodeToEarn": "추천된 사용자의 수수료 10%를 적립하려면 고유 코드를 생성하세요.",
         "codeAlreadyInUse": "이미 사용 중인 코드",
@@ -461,11 +463,11 @@
             "enterCode": "추천 코드를 입력하려면 지갑을 연결하세요"
         },
         "usersWithTradingVolume": "이 코드는 거래량이 100만 달러에 도달한 후 사용자가 맞춤 설정하거나 업데이트할 수 있습니다.",
-        "doNotSelfRefer": "코드 <0>{{affiliateCode}}</0>는 생성된 주소와 동일한 주소로 등록할 수 없습니다. 다른 코드를 선택해 주세요.",
+        "doNotSelfRefer": "코드 <0>{{refCode}}</0>는 생성된 주소와 동일한 주소로 등록할 수 없습니다. 다른 코드를 선택해 주세요.",
         "toCustomizeAffiliateCode": "제휴 코드는 기본적으로 지갑 주소의 첫 6글자로 설정됩니다. 거래량이 100만 달러 이상인 사용자는 제휴 코드를 맞춤 설정할 수 있습니다.",
         "claimRewardsWithAmount": "{{amount}} 보상 청구",
         "selectATabToViewData": "데이터를 보려면 탭을 선택하세요",
-        "trackingLinkExplanation": "추천된 사용자의 수수료 <0>{{affiliatePercent}}</0>를 받게 되며, 해당 사용자는 <1>{{userPercent}}</1> 할인을 받게 됩니다.",
+        "trackingLinkExplanation": "추천된 사용자의 수수료 <0>{{referrerPercent}}</0>를 받게 되며, 해당 사용자는 <1>{{inviteePercent}}</1> 할인을 받게 됩니다.",
         "claim": "요청하기"
     },
     "deposit": {
@@ -667,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "계정 개요",
+        "updateFrequencyInMinutes": "{{numMinutes}}분마다 업데이트",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
@@ -713,7 +717,10 @@
         "exceedsAvailableBalance": "금액이 사용 가능 잔액 {{balance}}을 초과합니다",
         "transactionTimedOut": "15초 후 트랜잭션 시간 초과",
         "connectToViewPortfolio": "포트폴리오를 보려면 연결하세요",
-        "connectDescription": "지갑으로 로그인하여 포트폴리오, 포지션 및 거래 내역을 확인하세요."
+        "connectDescription": "지갑으로 로그인하여 포트폴리오, 포지션 및 거래 내역을 확인하세요.",
+        "pasteWalletAddress": "지갑 주소 붙여넣기",
+        "viewOtherAccount": "다른 계정 보기",
+        "returnToMyPortfolio": "내 포트폴리오로 돌아가기"
     },
     "pageTitles": {
         "portfolio": "포트폴리오",
