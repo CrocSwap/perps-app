@@ -58,6 +58,8 @@ export default function PageHeader() {
     // Feedback modal state
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
+    const [countryISOCode, setCountryISOCode] = useState<string | null>(null);
+
     // run the FUUL context
     const { trackPageView } = useFuul();
 
@@ -391,6 +393,22 @@ export default function PageHeader() {
 
     const { totVolume } = useReferralStore();
 
+    useEffect(() => {
+        fetch('/.netlify/functions/show-country')
+            .then((response) => response.json())
+            .then((data) => {
+                const detected = data?.country;
+                if (typeof detected === 'string') {
+                    setCountryISOCode(detected.toUpperCase());
+                } else {
+                    setCountryISOCode(null);
+                }
+            })
+            .catch(() => {
+                setCountryISOCode(null);
+            });
+    }, []);
+
     // track page views with Fuul
     useEffect(() => {
         if (
@@ -398,14 +416,21 @@ export default function PageHeader() {
             totVolume !== undefined &&
             !Number.isNaN(totVolume) &&
             // totVolume < 10000 &&
-            userDataStore.userAddress
+            userDataStore.userAddress &&
+            countryISOCode !== 'KR'
         ) {
             console.log('sending pageview for: ', location.pathname);
             trackPageView();
         } else {
             localStorage.removeItem('fuul.sent_pageview');
         }
-    }, [location, isFuulInitialized, totVolume, userDataStore.userAddress]);
+    }, [
+        location,
+        isFuulInitialized,
+        totVolume,
+        userDataStore.userAddress,
+        countryISOCode,
+    ]);
 
     const showDepositSlot = isUserConnected || !isShortScreen;
     const navigate = useNavigate();
