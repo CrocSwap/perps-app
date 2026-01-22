@@ -431,10 +431,29 @@ export default function PageHeader() {
         }
     };
 
+    // logic to open and close the invalid ref code modal
     const invalidRefCodeModal = useModal('closed');
+    // boolean tracking whether user closed ref code modal
+    const [wasInvalidCodeModalShown, setWasInvalidCodeModalShown] =
+        useState(false);
 
     // run the FUUL context
-    const { isRefCodeFree } = useFuul();
+    const { checkIfCodeExists, isInitialized } = useFuul();
+
+    // logic to open the invalid ref code modal when relevant
+    useEffect(() => {
+        const runLogic = async (codeToCheck: string): Promise<void> => {
+            const isCodeRegistered: boolean =
+                await checkIfCodeExists(codeToCheck);
+            if (!isCodeRegistered && !wasInvalidCodeModalShown) {
+                invalidRefCodeModal.open();
+                setWasInvalidCodeModalShown(true);
+            }
+        };
+        if (isInitialized && referralCodeFromURL.value) {
+            runLogic(referralCodeFromURL.value);
+        }
+    }, [isInitialized, referralCodeFromURL.value]);
 
     useEffect(() => {
         const checkRefCode = async (): Promise<void> => {
@@ -739,8 +758,12 @@ export default function PageHeader() {
                 >
                     <div className={styles.invalid_ref_code_modal}>
                         <p>
-                            The referral code you entered is not recognized.
-                            Please check the code and try again.
+                            The referral code{' '}
+                            <span className={styles.highlight_code}>
+                                {referralCodeFromURL.value}
+                            </span>{' '}
+                            is not recognized. Please check the code and try
+                            again.
                         </p>
                         <Link
                             to='/v2/referrals'

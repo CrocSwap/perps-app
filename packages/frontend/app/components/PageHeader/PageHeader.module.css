@@ -329,21 +329,42 @@
 .invalid_ref_code_modal {
     display: flex;
     flex-direction: column;
-    margin: var(--margin-m);
-    gap: var(--gap-m);
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
+    gap: var(--gap-l);
     align-items: center;
     justify-content: center;
+    min-width: 340px;
+    max-width: 440px;
 }
 
 .invalid_ref_code_modal > p {
     color: var(--text2);
+    font-size: var(--font-size-s);
+    text-align: center;
+    line-height: 1.5;
+}
+
+.invalid_ref_code_modal .highlight_code {
+    color: var(--accent2);
 }
 
 .invalid_ref_code_modal a {
-    color: var(--accent1);
-    outline: 1px solid var(--accent1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px var(--padding-m);
+    background-color: var(--accent1);
+    color: var(--text1);
     border-radius: var(--radius-s);
-    padding: var(--padding-xs) var(--padding-s);
+    font-size: var(--font-size-m);
+    font-weight: 400;
+    text-decoration: none;
+    transition: background-color var(--ease-in-out-med);
+}
+
+.invalid_ref_code_modal a:hover {
+    background-color: color-mix(in srgb, var(--accent1) 85%, black);
 }
 
 @keyframes bounce {
