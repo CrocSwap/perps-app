@@ -1,5 +1,13 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
+import {
+    Fuul,
+    UserIdentifierType,
+    type Affiliate,
+    type GetClaimableChecksParams,
+    type GetClaimableChecksResponse,
+    type GetClaimCheckTotalsParams,
+    type GetClaimCheckTotalsResponse,
+} from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
 
 interface FuulContextType {
@@ -15,6 +23,9 @@ interface FuulContextType {
         userIdentifier: string,
         identifierType: UserIdentifierType,
     ) => Promise<Affiliate | null>;
+    getClaimableRewards: (
+        params: GetClaimableChecksParams,
+    ) => Promise<GetClaimableChecksResponse | null>;
 }
 
 const FuulContext = createContext<FuulContextType>({
@@ -23,6 +34,7 @@ const FuulContext = createContext<FuulContextType>({
     sendConversionEvent: () => Promise.resolve(),
     isRefCodeFree: () => Promise.resolve(false),
     getRefCode: () => Promise.resolve(null),
+    getClaimableRewards: () => Promise.resolve(null),
 });
 
 export const useFuul = () => {
@@ -99,6 +111,7 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
                 sendConversionEvent,
                 isRefCodeFree: Fuul.isAffiliateCodeFree,
                 getRefCode: Fuul.getAffiliateCode,
+                getClaimableRewards: Fuul.getClaimableChecks,
             }}
         >
             {children}
