@@ -97,10 +97,14 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
                 isInitialized,
                 trackPageView,
                 sendConversionEvent,
-                checkIfCodeExists: async (code: string): Promise<boolean> => {
-                    const isCodeFree: boolean =
-                        await Fuul.isAffiliateCodeFree(code);
-                    return !isCodeFree;
+                checkIfCodeExists: (code: string): Promise<boolean> => {
+                    // const isCodeFree = await Fuul.isAffiliateCodeFree(code);
+                    // return !isCodeFree;
+                    return fetch(
+                        `https://api.fuul.xyz/api/v1/affiliates/codes/${code}`,
+                    )
+                        .then((response) => response.json())
+                        .then((data) => !data.free);
                 },
                 getRefCode: Fuul.getAffiliateCode,
             }}

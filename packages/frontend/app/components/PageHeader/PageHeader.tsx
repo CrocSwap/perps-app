@@ -449,11 +449,16 @@ export default function PageHeader() {
     // logic to open the invalid ref code modal when relevant
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
-            const isCodeRegistered: boolean =
-                await checkIfCodeExists(codeToCheck);
+            const isCodeRegistered = await checkIfCodeExists(codeToCheck);
+            console.log(isCodeRegistered);
             console.log(userDataStore.userAddress);
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
+                    console.log(
+                        'isCodeRegistered',
+                        isCodeRegistered,
+                        codeToCheck,
+                    );
                     refCodeModal.open(
                         isCodeRegistered ? 'goodCode' : 'badCode',
                     );
