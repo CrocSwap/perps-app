@@ -833,7 +833,7 @@ export default function PageHeader() {
                             <p>
                                 You've been referred to Ambient by a friend.
                                 Please connect your wallet to accept and start
-                                trading with the
+                                trading with the{' '}
                                 <span className={styles.highlight_code}>
                                     {referralCodeFromURL.value}
                                 </span>{' '}
