@@ -805,9 +805,13 @@ export default function PageHeader() {
                     {refCodeModal.content === 'goodCode' && (
                         <div className={styles.invalid_ref_code_modal}>
                             <p>
-                                Please click 'Accept' to accept the referral
-                                code. If you deny this referral code it can
-                                still be activated later on the Referrals page.
+                                Please click 'Accept' to accept the{' '}
+                                <span className={styles.highlight_code}>
+                                    {referralCodeFromURL.value}
+                                </span>{' '}
+                                referral code. If you deny this referral code it
+                                can still be activated later on the Referrals
+                                page.
                             </p>
                             <div className={styles.referral_code_modal_buttons}>
                                 <button onClick={refCodeModal.close}>
@@ -828,8 +832,12 @@ export default function PageHeader() {
                         <div className={styles.invalid_ref_code_modal}>
                             <p>
                                 You've been referred to Ambient by a friend.
-                                Please connect your wallet to accept the
-                                referral.
+                                Please connect your wallet to accept and start
+                                trading with the
+                                <span className={styles.highlight_code}>
+                                    {referralCodeFromURL.value}
+                                </span>{' '}
+                                referral code.
                             </p>
                             <SessionButton />
                         </div>
