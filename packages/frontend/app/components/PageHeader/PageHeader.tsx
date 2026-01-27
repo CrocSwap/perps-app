@@ -782,6 +782,7 @@ export default function PageHeader() {
                     close={refCodeModal.close}
                     position='center'
                     title='Referral Code'
+                    stopOutsideClick
                 >
                     {refCodeModal.content === 'badCode' && (
                         <div className={styles.invalid_ref_code_modal}>
