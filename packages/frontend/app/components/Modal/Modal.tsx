@@ -12,6 +12,7 @@ interface ModalProps {
     mobileBreakpoint?: number;
     forceBottomSheet?: boolean;
     title: string;
+    stopOutsideClick?: boolean;
 }
 
 /** Proxy component that forwards its content to the GlobalModalHost. */
@@ -23,6 +24,7 @@ export default function Modal(props: ModalProps) {
         mobileBreakpoint = 768,
         forceBottomSheet = false,
         title,
+        stopOutsideClick = false,
     } = props;
 
     const isMobile = useMobile(mobileBreakpoint);
@@ -43,6 +45,7 @@ export default function Modal(props: ModalProps) {
             position: actualPosition,
             content: children,
             onRequestClose: close, // host closes → call caller's close()
+            stopOutsideClick,
         });
 
         return () => {
@@ -54,8 +57,13 @@ export default function Modal(props: ModalProps) {
 
     // Keep host in sync if props/children change while mounted
     useEffect(() => {
-        update({ title, position: actualPosition, content: children });
-    }, [title, actualPosition, children, update]);
+        update({
+            title,
+            position: actualPosition,
+            content: children,
+            stopOutsideClick,
+        });
+    }, [title, actualPosition, children, stopOutsideClick, update]);
 
     // Nothing is rendered locally; global host handles it.
     return null;

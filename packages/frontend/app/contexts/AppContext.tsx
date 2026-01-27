@@ -93,9 +93,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         // 4. Fallback to Debug Wallet or Empty
         if (isDebugWalletActive) {
             setUserAddress(debugWallet.address);
-        } else if (userAddress) {
-            // Keep last known address/data available for read-only views
-            return;
         } else {
             setUserAddress('');
             resetUserData();
