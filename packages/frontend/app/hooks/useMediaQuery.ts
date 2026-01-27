@@ -77,6 +77,17 @@ export function useDesktop(breakpoint: number = 1024): boolean {
 }
 
 /**
+ * Predefined media query hook for mobile devices in landscape orientation
+ * @param breakpoint - Optional max-width breakpoint in pixels (default: 768)
+ * @returns boolean indicating if the viewport is mobile-sized AND in landscape
+ */
+export function useMobileLandscape(breakpoint: number = 768): boolean {
+    return useMediaQuery(
+        `(max-width: ${breakpoint}px) and (orientation: landscape)`,
+    );
+}
+
+/**
  * Predefined media query hook for detecting dark mode preference
  * @returns boolean indicating if the user prefers dark mode
  */

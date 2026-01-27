@@ -86,15 +86,15 @@
         "sellShortLimitOrderPending": "Vendre / Short ordre limite en attente",
         "successfullyPlacedSellOrderFor": "Ordre de vente placé pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
         "placingSellShortLimitOrderFor": "Placement de l'ordre limite de vente pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
-        "enterValidLimitPrice": "Entrez un prix limite valide",
-        "enterValidOrderSize": "Entrez une taille d'ordre valide",
+        "enterValidLimitPrice": "Entrer un prix limite valide",
+        "enterValidOrderSize": "Entrer une taille d'ordre valide",
         "buyLongLimitOrderPlaced": "Acheter / Long ordre limite placé",
         "successfullyPlacedBuyOrderFor": "Ordre d'achat placé pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
         "buyLongLimitOrderPending": "Acheter / Long ordre limite en attente",
         "placingBuyLongLimitOrderFor": "Placement de l'ordre limite d'achat pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
         "priceDistribution": "Répartition des prix",
-        "flat": "Stable",
-        "flatPriceDistribution": "Répartition des prix stable",
+        "flat": "Plat",
+        "flatPriceDistribution": "Répartition des prix plate",
         "evenlySplit": "Répartition égale",
         "evenPriceDistribution": "Répartition des prix égale",
         "market": "Marché",
@@ -121,7 +121,7 @@
         "increasing": "En augmentation",
         "decreasing": "En diminution",
         "totalOrders": "Nombre total d'ordres",
-        "orderRatioSumMustBe100": "La somme des ratios doit être de 100 %",
+        "orderRatioSumMustBe100": "La somme des ratios doit égaler 100 %",
         "collapseDetails": "Réduire les détails",
         "expandDetails": "Développer les détails",
         "frequency": "Fréquence",
@@ -137,7 +137,7 @@
         "buySellAtCurrentPrice": "Acheter/vendre au prix actuel",
         "buySellAtSpecificPrice": "Acheter/vendre à un prix spécifique",
         "maxTradeSizeLimitedTo": "Taille maximale de trade limitée",
-        "yourPositionIsLimitedByOpenInterest": "Votre position {{coin}} est limitée par le plafond de {{limitedBy}}",
+        "yourPositionIsLimitedByOpenInterest": "Votre position en {{coin}} est limitée par le plafond d'{{limitedBy}}",
         "currentMaxTradeSizeForMarket": "Taille maximale de trade actuelle pour ce marché : {{limit}}",
         "placingLimitOrderFor": "Placement de l'ordre limite pour {{usdValueOfOrderStr}} {{symbol}} à {{limitPrice}}",
         "sellOrderPending": "Ordre de vente en attente",
@@ -173,7 +173,7 @@
         "successfullyWithdrawn": "Retrait réussi de {{amount}} {{unit}}",
         "withdrawFailed": "Échec du retrait",
         "availableToDeposit": "Disponible pour dépôt",
-        "availableToDepositTooltip": "Disponible pour dépôt selon la capacité de la vault et le solde du portefeuille",
+        "availableToDepositTooltip": "Disponible pour dépôt selon la capacité du vault et le solde du portefeuille",
         "availableToWithdraw": "Disponible pour retrait",
         "availableToWithdrawTooltip": "Montant total disponible à retirer de votre portefeuille",
         "invalidAmount": "Montant invalide",
@@ -216,9 +216,9 @@
         },
         "orderFilled": {
             "title": "Ordre {{side}} exécuté",
-            "message": "Ordre {{side}} exécuté avec succès pour {{usdValueOfFillStr}} de {{symbol}} à {{fillPrice}}",
-            "buySide": "acheter",
-            "sellSide": "vendre"
+            "message": "Ordre {{side}} de {{usdValueOfFillStr}} en {{symbol}} exécuté avec succès à {{fillPrice}}",
+            "buySide": "d'achat",
+            "sellSide": "de vente"
         },
         "errorUpdatingOrder": {
             "title": "Erreur lors de la mise à jour de l'ordre"
@@ -261,10 +261,10 @@
             "title": "Mise à jour de l'ordre limite en attente",
             "message": "Mise à jour de l'ordre {{side}} pour {{value}} de {{coin}} à {{limitPrice}}"
         },
-        "filled": "Exécutée",
-        "open": "Ouverte",
-        "partiallyFilled": "Partiellement exécutée",
-        "canceled": "Annulée",
+        "filled": "Exécuté",
+        "open": "Ouvert",
+        "partiallyFilled": "Partiellement exécuté",
+        "canceled": "Annulé",
         "pending": "En attente",
         "limitTxFailedFallbackMessage": "La transaction d'ordre limité a échoué",
         "marketTxFailedFallbackMessage": "La transaction d'ordre au marché a échoué",
@@ -306,7 +306,7 @@
         "filledSize": "Taille exécutée",
         "orderValue": "Valeur de l'ordre",
         "price": "Prix",
-        "tradeValue": "Valeur échangée",
+        "tradeValue": "Valeur du trade",
         "fee": "Frais",
         "closedPnl": "PnL clôturé",
         "depositor": "Déposant",
@@ -426,20 +426,10 @@
         "connectWalletForTrading": "Connectez votre portefeuille pour trader sans frais de gaz."
     },
     "home": {
-        "title": "Trader des Perps avec Ambient",
-        "subtitle": "Exécution rapide. Aucun frais taker. Jusqu'à 100x de levier.",
-        "startTrading": "Commencer à trader",
-        "learnMore": "En savoir plus",
-        "hero": {
-            "heading1": "De zéro à",
-            "one": " Un",
-            "heading2": "Protocole de trading décentralisé",
-            "description": "Ambient est une plateforme DEX de perps entièrement nouvelle, combinant des produits DeFi uniques avec une expérience utilisateur comparable à celle des CEX.",
-            "stats": {
-                "totalVolume": "Volume total",
-                "activeUsers": "Utilisateurs actifs"
-            }
-        }
+        "title": "Tradez des Perps avec Ambient",
+        "tradeNow": "Trader maintenant",
+        "explore": "Explorer",
+        "subtitle": "L’expérience de trading on‑chain la plus rapide est arrivée"
     },
     "referrals": {
         "title": "Parrainages",
@@ -502,8 +492,8 @@
         "language": "Langue"
     },
     "symbolInfo": {
-        "mark": "Indicatif",
-        "markTooltip": "Valeur estimée pour éviter les liquidations injustes",
+        "mark": "Mark",
+        "markTooltip": "Valeur juste estimée pour éviter les liquidations injustes",
         "oracle": "Oracle",
         "oracleTooltip": "Prix en temps réel depuis l'oracle Pyth Network",
         "oracleTooltipPythStale": "Oracle Pyth Network (prix potentiellement obsolète)",
@@ -515,7 +505,7 @@
         "openInterest": "Intérêt ouvert",
         "openInterestTooltip": "Intérêt ouvert total sur le marché",
         "fundingRate": "Taux de financement",
-        "fundingRateTooltip": "Taux horaire où les longs paient les shorts (ou inversement si négatif). Pas de frais supplémentaires ; le financement ajuste les prix au marché spot.",
+        "fundingRateTooltip": "Taux horaire où les longs paient les shorts (ou inversement si négatif) pour aligner les prix au marché spot. Pas de frais supplémentaires ; le financement est un paiement pair-à-pair.",
         "fundingCountdown": "Compte à rebours financement",
         "fundingCountdownTooltip": "Temps restant jusqu'au prochain financement"
     },
@@ -612,8 +602,8 @@
             "hours": "Champ du nombre d'heures pour le prix en cours"
         },
         "yourDepositAmount": "Montant de votre dépôt",
-        "flatPriceDistribution": "Répartition des prix égale",
-        "evenPriceDistribution": "Répartition équilibrée des prix",
+        "flatPriceDistribution": "Répartition des prix plate",
+        "evenPriceDistribution": "Répartition des prix équilibrée",
         "thumbsUp": "Pouce levé",
         "thumbsDown": "Pouce baissé",
         "closeNav": "Fermer le menu de navigation",
