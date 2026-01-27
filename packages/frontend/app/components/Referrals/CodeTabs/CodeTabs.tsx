@@ -119,6 +119,9 @@ export default function CodeTabs(props: PropsIF) {
         }
     }, [referralStore.cached, referrerAddress]);
 
+    // run the FUUL context
+    const { checkIfCodeExists, getRefCode } = useFuul();
+
     const [isRefCodeClaimed, setIsRefCodeClaimed] = useState<
         boolean | undefined
     >(undefined);
@@ -126,7 +129,7 @@ export default function CodeTabs(props: PropsIF) {
         if (refCodeToConsume === undefined || !refCodeToConsume.length) {
             setIsRefCodeClaimed(undefined);
         } else {
-            isRefCodeFree(refCodeToConsume)
+            checkIfCodeExists(refCodeToConsume)
                 .then((isFree: boolean) => setIsRefCodeClaimed(!isFree))
                 .catch((err) => {
                     setIsRefCodeClaimed(undefined);
@@ -180,9 +183,6 @@ export default function CodeTabs(props: PropsIF) {
         [sessionState],
     );
 
-    // run the FUUL context
-    const { isRefCodeFree, getRefCode } = useFuul();
-
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
     // URL param takes priority over cached localStorage value
@@ -208,7 +208,7 @@ export default function CodeTabs(props: PropsIF) {
         }
 
         // check FUUL API to see if code is claimed or free
-        const codeIsFree: boolean = await isRefCodeFree(r);
+        const codeIsFree: boolean = await checkIfCodeExists(r);
 
         // Always cache the code and set URL param
         handleReferralURLParam.set(r);
@@ -308,7 +308,7 @@ export default function CodeTabs(props: PropsIF) {
                 try {
                     // check with FUUL to determine if ref code is claimed
                     const isCodeFree: boolean =
-                        await isRefCodeFree(userInputRefCode);
+                        await checkIfCodeExists(userInputRefCode);
                     // normally `isCodeFree === true` means the code is available
                     // right now the API is returning `false` when the code is available
                     setIsUserRefCodeClaimed(isCodeFree);
@@ -349,7 +349,7 @@ export default function CodeTabs(props: PropsIF) {
             const codeToValidate = referralStore.cached;
             try {
                 const isCachedCodeFree: boolean =
-                    await isRefCodeFree(codeToValidate);
+                    await checkIfCodeExists(codeToValidate);
                 console.log('isCodeFree: ', isCachedCodeFree);
 
                 if (isCachedCodeFree) {
@@ -445,7 +445,9 @@ export default function CodeTabs(props: PropsIF) {
         const timer = setTimeout(async () => {
             console.log('Starting validation for code:', temporaryReferrerCode);
             try {
-                const codeIsFree = await isRefCodeFree(temporaryReferrerCode);
+                const codeIsFree = await checkIfCodeExists(
+                    temporaryReferrerCode,
+                );
                 console.log('codeIsFree: ', codeIsFree);
                 const options = {
                     method: 'GET',
