@@ -496,8 +496,15 @@ export default function PageHeader() {
         // isRefCodeFree,
     ]);
 
-    function mockAcceptRefCode(): void {
-        alert('nice');
+    const notificationStore = useNotificationStore();
+
+    function mockAcceptRefCode(refCode: string): void {
+        notificationStore.add({
+            title: 'Referral Code Accepted',
+            message: `You have successfully accepted the ${refCode} referral code.`,
+            icon: 'check',
+            removeAfter: 5000,
+        });
     }
 
     return (
@@ -819,7 +826,9 @@ export default function PageHeader() {
                                 </button>
                                 <button
                                     onClick={() => {
-                                        mockAcceptRefCode();
+                                        mockAcceptRefCode(
+                                            referralCodeFromURL.value ?? '',
+                                        );
                                         refCodeModal.close();
                                     }}
                                 >
