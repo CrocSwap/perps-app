@@ -655,6 +655,25 @@
     "chart": {
         "liqPrice": "청산 가격"
     },
+    "quickTrade": {
+        "title": "Quick Trade Mode",
+        "quick": "Quick",
+        "quickWithType": "Quick {{tradeType}}",
+        "sizeTooltip": "Size: {{size}} {{currency}}",
+        "clickToEnable": "Click to enable quick trade mode",
+        "sellAtLimit": "Sell @ {{price}} limit",
+        "buyAtLimit": "Buy @ {{price}} limit",
+        "buyAtStop": "Buy @ {{price}} stop ",
+        "sellAtStop": "Sell @ {{price}} stop",
+        "sellSizeAtLimit": "Sell {{size}} @ {{price}} limit",
+        "buySizeAtLimit": "Buy {{size}} @ {{price}} limit",
+        "buySizeAtStop": "Buy {{size}} @ {{price}} stop",
+        "sellSizeAtStop": "Sell {{size}} @ {{price}} stop",
+        "infoText": "Click on the chart to place an order instantly when enabled.",
+        "description": "Configure quick trade settings for faster order placement",
+        "enableConfirmationBypass": "Enable Confirmation bypass",
+        "saveAndEnable": "Save & Enable"
+    },
     "meta": {
         "title": "Ambient Finance | Fogo 무기한 선물",
         "description": "Ambient Finance로 Fogo에서 무기한 선물을 거래하세요. 테이커 수수료 제로, 최대 100배 레버리지, 초고속 체결.",

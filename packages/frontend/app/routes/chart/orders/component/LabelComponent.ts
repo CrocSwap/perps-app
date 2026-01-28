@@ -20,7 +20,11 @@ import {
     getXandYLocationForChartDrag,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
-import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
+import {
+    formatLineLabel,
+    getPricetoPixel,
+    updateOverlayCanvasSize,
+} from '../customOrderLineUtils';
 import {
     drawLabel,
     drawLabelMobile,
@@ -87,6 +91,7 @@ const LabelComponent = ({
         selectedOrderLine,
         shouldConfirmOrder,
         setShouldConfirmOrder,
+        setShowPlusButton,
     } = useChartLinesStore();
 
     const priceDomain = useChartScaleStore((state) => state.priceDomain);
@@ -323,7 +328,9 @@ const LabelComponent = ({
         const draw = () => {
             let heightAttr = canvasSize?.height;
             let widthAttr = canvasSize?.width;
-
+            if (overlayCanvasRef.current) {
+                updateOverlayCanvasSize(overlayCanvasRef.current, canvasSize);
+            }
             if (overlayCanvasRef.current) {
                 const { iframeDoc, paneCanvas } =
                     getPaneCanvasAndIFrameDoc(chart);
@@ -612,10 +619,12 @@ const LabelComponent = ({
                         isLiqPriceLineDraggable)) &&
                 isLabel.label?.type !== 'Cancel'
             ) {
+                setShowPlusButton(false);
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
                 }
             } else {
+                setShowPlusButton(true);
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.cursor = 'pointer';
                     overlayCanvasRef.current.style.pointerEvents = 'none';
@@ -672,6 +681,7 @@ const LabelComponent = ({
                                     '.chart-markup-table.pane',
                                 );
                                 if (isLabel) {
+                                    setShowPlusButton(false);
                                     if (overlayCanvasRef.current) {
                                         if (isLabel.matchType === 'onLabel') {
                                             if (
@@ -722,6 +732,7 @@ const LabelComponent = ({
                                         }
                                     }
                                 } else {
+                                    setShowPlusButton(true);
                                     if (pane) {
                                         (pane as HTMLElement).style.cursor =
                                             'crosshair';

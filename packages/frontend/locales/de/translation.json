@@ -655,6 +655,25 @@
     "chart": {
         "liqPrice": "Liquidationspreis"
     },
+    "quickTrade": {
+        "title": "Quick Trade Mode",
+        "quick": "Quick",
+        "quickWithType": "Quick {{tradeType}}",
+        "sizeTooltip": "Size: {{size}} {{currency}}",
+        "clickToEnable": "Click to enable quick trade mode",
+        "sellAtLimit": "Sell @ {{price}} limit",
+        "buyAtLimit": "Buy @ {{price}} limit",
+        "buyAtStop": "Buy @ {{price}} stop (Coming Soon)",
+        "sellAtStop": "Sell @ {{price}} stop (Coming Soon)",
+        "sellSizeAtLimit": "Sell {{size}} @ {{price}} limit",
+        "buySizeAtLimit": "Buy {{size}} @ {{price}} limit",
+        "buySizeAtStop": "Buy {{size}} @ {{price}} stop (Coming Soon)",
+        "sellSizeAtStop": "Sell {{size}} @ {{price}} stop (Coming Soon)",
+        "infoText": "Click on the chart to place an order instantly when enabled.",
+        "description": "Configure quick trade settings for faster order placement",
+        "enableConfirmationBypass": "Enable Confirmation bypass",
+        "saveAndEnable": "Save & Enable"
+    },
     "meta": {
         "title": "Ambient Finance | Perpetual Futures auf Fogo",
         "description": "Handeln Sie Perpetual Futures auf Fogo mit Ambient Finance. Keine Taker-Gebühren, bis zu 100x Hebel und blitzschnelle Ausführung.",

@@ -655,6 +655,25 @@
     "chart": {
         "liqPrice": "清算価格"
     },
+    "quickTrade": {
+        "title": "Quick Trade Mode",
+        "quick": "Quick",
+        "quickWithType": "Quick {{tradeType}}",
+        "sizeTooltip": "Size: {{size}} {{currency}}",
+        "clickToEnable": "Click to enable quick trade mode",
+        "sellAtLimit": "Sell @ {{price}} limit",
+        "buyAtLimit": "Buy @ {{price}} limit",
+        "buyAtStop": "Buy @ {{price}} stop ",
+        "sellAtStop": "Sell @ {{price}} stop",
+        "sellSizeAtLimit": "Sell {{size}} @ {{price}} limit",
+        "buySizeAtLimit": "Buy {{size}} @ {{price}} limit",
+        "buySizeAtStop": "Buy {{size}} @ {{price}} stop",
+        "sellSizeAtStop": "Sell {{size}} @ {{price}} stop",
+        "infoText": "Click on the chart to place an order instantly when enabled.",
+        "description": "Configure quick trade settings for faster order placement",
+        "enableConfirmationBypass": "Enable Confirmation bypass",
+        "saveAndEnable": "Save & Enable"
+    },
     "meta": {
         "title": "Ambient Finance | Fogo上の無期限先物",
         "description": "Ambient FinanceでFogo上の無期限先物を取引。テイカー手数料ゼロ、最大100倍レバレッジ、超高速約定。",
