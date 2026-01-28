@@ -145,6 +145,14 @@ export default function PageHeader() {
     const showRPCButton = false;
     const location = useLocation();
 
+    // close the ref code modal if the user navigates to the referrals page
+    // gatekeeping at the DOM level alone may desynchronize state
+    useEffect(() => {
+        if (location.pathname === '/v2/referrals') {
+            refCodeModal.close();
+        }
+    }, [location.pathname]);
+
     // symbol for active market
     const { symbol } = useTradeDataStore();
 
@@ -449,9 +457,8 @@ export default function PageHeader() {
     // logic to open the invalid ref code modal when relevant
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
+            if (location.pathname === '/v2/referrals') return;
             const isCodeRegistered = await checkIfCodeExists(codeToCheck);
-            console.log(isCodeRegistered);
-            console.log(userDataStore.userAddress);
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
                     console.log(
@@ -784,7 +791,7 @@ export default function PageHeader() {
                     <AppOptions closePanel={() => appSettingsModal.close()} />
                 </Modal>
             )}
-            {refCodeModal.isOpen && (
+            {refCodeModal.isOpen && location.pathname !== '/v2/referrals' && (
                 <Modal
                     close={refCodeModal.close}
                     position='center'
