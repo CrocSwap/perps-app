@@ -473,29 +473,28 @@ export default function PageHeader() {
         isUserConnected,
     ]);
 
+    // logic to ingest a ref code from the URL
     useEffect(() => {
-        const checkRefCode = async (): Promise<void> => {
+        // fn to ingest a ref code from the URL
+        const handleRefCodeFromURL = async (): Promise<void> => {
+            // gatekeeping to prevent logic from running when irrelevant
             if (referralCodeFromURL.value) {
-                // const isCodeClaimed: boolean = await isRefCodeFree(
-                //     referralCodeFromURL.value,
-                // );
-                // isCodeClaimed
-                //     ? referralStore.cache(referralCodeFromURL.value)
-                //     : refCodeModal.open();
+                // persist ref code in the old cache (will remove later)
                 referralStore.cache(referralCodeFromURL.value);
+                // persist ref code in local storage + state
                 if (
+                    // must be a new ref code
                     referralCodeFromURL.value !== referralStore.cached2.code &&
+                    // gatekeep action if an approved ref code was persisted
                     !referralStore.cached2.isCodeApprovedByInvitee
                 ) {
                     referralStore.cache2(referralCodeFromURL.value);
                 }
             }
         };
-        checkRefCode();
-    }, [
-        referralCodeFromURL.value,
-        // isRefCodeFree,
-    ]);
+        // run logic
+        handleRefCodeFromURL();
+    }, [referralCodeFromURL.value]);
 
     const notificationStore = useNotificationStore();
 
