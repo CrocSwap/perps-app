@@ -454,10 +454,9 @@ export default function PageHeader() {
     // run the FUUL context
     const { checkIfCodeExists, isInitialized } = useFuul();
 
-    // logic to open the invalid ref code modal when relevant
+    // logic to open the ref code modal when relevant
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
-            if (location.pathname === '/v2/referrals') return;
             const isCodeRegistered = await checkIfCodeExists(codeToCheck);
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
@@ -475,7 +474,12 @@ export default function PageHeader() {
                 }
             }
         };
-        if (isInitialized && referralCodeFromURL.value) {
+        // gatekeeping to prevent logic from running when irrelevant
+        if (
+            isInitialized &&
+            referralCodeFromURL.value &&
+            location.pathname !== '/v2/referrals'
+        ) {
             runLogic(referralCodeFromURL.value);
         }
     }, [

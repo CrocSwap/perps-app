@@ -97,7 +97,7 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
                 isInitialized,
                 trackPageView,
                 sendConversionEvent,
-                checkIfCodeExists: (code: string): Promise<boolean> => {
+                checkIfCodeExists: async (code: string): Promise<boolean> => {
                     // const isCodeFree = await Fuul.isAffiliateCodeFree(code);
                     // return !isCodeFree;
                     return fetch(
