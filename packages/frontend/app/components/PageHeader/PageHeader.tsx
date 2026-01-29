@@ -4,17 +4,10 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useRef, useState } from 'react';
-import { Fuul } from '@fuul/sdk';
 import { useFuul } from '~/contexts/FuulContext';
-// import { AiOutlineQuestionCircle } from 'react-icons/ai';
-// import {
-//     DFLT_EMBER_MARKET,
-//     getUserMarginBucket,
-//     USD_MINT,
-// } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation, useSearchParams, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import useMediaQuery, { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -26,11 +19,9 @@ import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
-// import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
-// import WalletDropdown from './WalletDropdown/WalletDropdown';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -80,8 +71,6 @@ export default function PageHeader() {
     const userPublicKey: string | null = isUserConnected
         ? sessionState.walletPublicKey?.toString()
         : null;
-    // useEffect(() => console.log({walletAddress, isUserConnected}), [walletAddress, isUserConnected]);
-    // console.log({walletAddress, isUserConnected});
 
     // Fetch user's total volume for FUUL tracking
     useEffect(() => {
@@ -111,10 +100,8 @@ export default function PageHeader() {
         })();
     }, [userDataStore.userAddress]);
 
-    const { isInitialized: isFuulInitialized } = useFuul();
-
     const sessionButtonRef = useRef<HTMLSpanElement>(null);
-    const { notifications, latestTx } = useNotificationStore();
+    const notificationStore = useNotificationStore();
     const { navigationKeyboardShortcutsEnabled } = useAppSettings();
 
     useEffect(() => {
@@ -327,7 +314,7 @@ export default function PageHeader() {
                 matchesShortcutEvent(e, latestTxShortcut.keys)
             ) {
                 e.preventDefault();
-                const latest = latestTx;
+                const latest = notificationStore.latestTx;
                 if (latest?.txLink) {
                     window.open(latest.txLink, '_blank', 'noopener,noreferrer');
                 }
@@ -359,7 +346,7 @@ export default function PageHeader() {
         isKeyboardShortcutsOpen,
         openDepositModal,
         openWithdrawModal,
-        latestTx,
+        notificationStore.latestTx,
         t,
     ]);
 
@@ -444,11 +431,6 @@ export default function PageHeader() {
             const isCodeRegistered = await checkIfCodeExists(codeToCheck);
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
-                    console.log(
-                        'isCodeRegistered',
-                        isCodeRegistered,
-                        codeToCheck,
-                    );
                     refCodeModal.open(
                         isCodeRegistered ? 'goodCode' : 'badCode',
                     );
@@ -495,9 +477,6 @@ export default function PageHeader() {
         // run logic
         handleRefCodeFromURL();
     }, [referralCodeFromURL.value]);
-
-    // logic to dispatch an in-app notification
-    const notificationStore = useNotificationStore();
 
     // fn to mock user accepting a ref code
     function mockAcceptRefCode(refCode: string): void {
