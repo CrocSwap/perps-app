@@ -13,7 +13,7 @@ export interface ReferralStoreIF {
     totVolume: number | undefined;
     cache(refCode: string): void;
     cache2(refCode: string): void;
-    markCodeRegistered(refCode: string): void;
+    markCodeRegistered(refCode: string, isRegistered?: boolean): void;
     markCodeApproved(refCode: string): void;
     setTotVolume(volume: number | undefined): void;
     clear(): void;
@@ -55,13 +55,16 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     },
                 });
             },
-            markCodeRegistered(refCode: string): void {
+            markCodeRegistered(
+                refCode: string,
+                isRegistered: boolean = true,
+            ): void {
                 const codeFromCache: string = get().cached2.code;
                 if (refCode === codeFromCache) {
                     set({
                         cached2: {
                             code: codeFromCache,
-                            isCodeRegistered: true,
+                            isCodeRegistered: isRegistered,
                             isCodeApprovedByInvitee:
                                 get().cached2.isCodeApprovedByInvitee,
                         },
@@ -108,7 +111,10 @@ export const useReferralStore = create<ReferralStoreIF>()(
         {
             name: LS_KEY,
             storage: createJSONStorage(ssrSafeStorage),
-            partialize: (state) => ({ cached: state.cached }),
+            partialize: (state) => ({
+                cached: state.cached,
+                cached2: state.cached2,
+            }),
             version: 1,
         },
     ),

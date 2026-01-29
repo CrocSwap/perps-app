@@ -499,6 +499,12 @@ export default function PageHeader() {
                 //     ? referralStore.cache(referralCodeFromURL.value)
                 //     : refCodeModal.open();
                 referralStore.cache(referralCodeFromURL.value);
+                if (
+                    referralCodeFromURL.value !== referralStore.cached2.code &&
+                    !referralStore.cached2.isCodeApprovedByInvitee
+                ) {
+                    referralStore.cache2(referralCodeFromURL.value);
+                }
             }
         };
         checkRefCode();
@@ -510,6 +516,7 @@ export default function PageHeader() {
     const notificationStore = useNotificationStore();
 
     function mockAcceptRefCode(refCode: string): void {
+        referralStore.markCodeApproved(refCode);
         notificationStore.add({
             title: 'Referral Code Accepted',
             message: `You have successfully accepted the ${refCode} referral code.`,
@@ -837,8 +844,11 @@ export default function PageHeader() {
                                 </button>
                                 <button
                                     onClick={() => {
+                                        if (!referralCodeFromURL.value) {
+                                            return;
+                                        }
                                         mockAcceptRefCode(
-                                            referralCodeFromURL.value ?? '',
+                                            referralCodeFromURL.value,
                                         );
                                         refCodeModal.close();
                                     }}
