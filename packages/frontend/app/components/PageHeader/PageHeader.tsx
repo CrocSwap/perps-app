@@ -404,22 +404,6 @@ export default function PageHeader() {
 
     const { totVolume } = useReferralStore();
 
-    // track page views with Fuul
-    useEffect(() => {
-        if (
-            isFuulInitialized &&
-            totVolume !== undefined &&
-            !Number.isNaN(totVolume) &&
-            // totVolume < 10000 &&
-            userDataStore.userAddress
-        ) {
-            console.log('sending pageview for: ', location.pathname);
-            trackPageView();
-        } else {
-            localStorage.removeItem('fuul.sent_pageview');
-        }
-    }, [location, isFuulInitialized, totVolume, userDataStore.userAddress]);
-
     const showDepositSlot = isUserConnected || !isShortScreen;
     const navigate = useNavigate();
     const isHomePage = location.pathname === '/';
@@ -516,6 +500,7 @@ export default function PageHeader() {
     const notificationStore = useNotificationStore();
 
     function mockAcceptRefCode(refCode: string): void {
+        trackPageView();
         referralStore.markCodeApproved(refCode);
         notificationStore.add({
             title: 'Referral Code Accepted',
