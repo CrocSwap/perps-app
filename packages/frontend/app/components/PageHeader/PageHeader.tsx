@@ -496,11 +496,16 @@ export default function PageHeader() {
         handleRefCodeFromURL();
     }, [referralCodeFromURL.value]);
 
+    // logic to dispatch an in-app notification
     const notificationStore = useNotificationStore();
 
+    // fn to mock user accepting a ref code
     function mockAcceptRefCode(refCode: string): void {
+        // dispatch a pageview event to FUUL
         trackPageView();
+        // update local storage to reflect approval
         referralStore.markCodeApproved(refCode);
+        // dispatch a notification
         notificationStore.add({
             title: 'Referral Code Accepted',
             message: `You have successfully accepted the ${refCode} referral code.`,
