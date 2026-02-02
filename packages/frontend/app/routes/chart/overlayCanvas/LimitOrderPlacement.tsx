@@ -360,11 +360,19 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     if (mousePrice) {
                         const dropdownWidth = 280;
 
-                        const posX =
-                            buttonBounds.x +
-                            rect.left -
-                            dropdownWidth +
-                            buttonBounds.width / dpr;
+                        const panes = chart.activeChart().getPanes();
+                        const mainPane = panes[0];
+                        const hasRightPriceScale =
+                            mainPane &&
+                            mainPane.getRightPriceScales().length > 0;
+
+                        const posX = hasRightPriceScale
+                            ? buttonBounds.x +
+                              rect.left -
+                              dropdownWidth +
+                              buttonBounds.width / dpr
+                            : buttonBounds.x + rect.left;
+
                         const posY =
                             rect.top +
                             buttonBounds.y +
@@ -547,7 +555,14 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             const buttonSize = 21 * dpr;
             const padding = dpr;
 
-            const buttonX = canvas.width - buttonSize - padding;
+            const panes = chart.activeChart().getPanes();
+            const mainPane = panes[0];
+            const hasRightPriceScale =
+                mainPane && mainPane.getRightPriceScales().length > 0;
+
+            const buttonX = hasRightPriceScale
+                ? canvas.width - buttonSize - padding
+                : padding;
             const buttonY = mouseY - buttonSize / 2;
 
             setButtonBounds({
