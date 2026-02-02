@@ -1,0 +1,22 @@
+.liqChartCanvasWrapper {
+    position: relative;
+}
+
+.liqChartCanvasWrapper.liqMobile {
+    position: absolute;
+    height: 100%;
+    right: 0;
+    top: 0;
+    z-index: 10;
+}
+
+.liqMobile .distCanvas,
+.liqMobile .hoverCanvas,
+.liqMobile .linesCanvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* .hoverCanvas {
+    background: rgba(255, 255, 0, 0.5);
+} */

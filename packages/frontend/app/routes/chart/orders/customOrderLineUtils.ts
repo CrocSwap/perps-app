@@ -113,8 +113,7 @@ export const getPricetoPixel = (
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { coordOffset } = (priceScale as any)._priceScale._logFormula;
             scaleData.scaleSymlog.constant(coordOffset);
-            const logPrice = scaleData.scaleSymlog(price) * dpr;
-
+            const logPrice = scaleData.scaleSymlog(price);
             pixel = logPrice - textHeight / 2;
         } else {
             const priceDifference = maxPrice - minPrice;

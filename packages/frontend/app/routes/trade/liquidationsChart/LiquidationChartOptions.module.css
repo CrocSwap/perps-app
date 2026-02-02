@@ -1,0 +1,25 @@
+.liqOptionsWrapper {
+    position: fixed;
+    z-index: 99;
+    min-width: 20rem;
+    padding: var(--padding-s);
+    background-color: var(--bg-dark3);
+    border-radius: var(--radius-s);
+    left: 50vw;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    font-size: var(--font-size-s);
+}
+
+.liqOptionsHeader {
+    font-size: calc(var(--font-size-s) * 1.2);
+    color: var(--text3);
+    text-align: center;
+    display: block;
+}
+
+.liqOptionsRow {
+    display: flex;
+    flex-direction: row;
+}

@@ -12,6 +12,12 @@ import { useDebugStore } from '~/stores/DebugStore';
 import { useWorker, WORKERS } from '~/hooks/useWorker';
 import { useAppStateStore } from '~/stores/AppStateStore';
 
+// Alternate endpoint (ember2)
+const EMBER2_WS_URL = 'wss://ember-leaderboard-v2.liquidity.tools/ws';
+
+// Channel types that should use the ember2 endpoint
+const EMBER2_CHANNELS = new Set(['liquidationLevels', 'liquidations']);
+
 interface WsContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribe: (key: string, config: WsSubscriptionConfig) => void;
@@ -64,6 +70,15 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     const reconnectAttemptsRef = useRef(0);
     const connectWebSocketRef = useRef<() => void>(() => {});
     const scheduleReconnectRef = useRef<(reason?: string) => void>(() => {});
+
+    // Secondary socket for ember2 endpoint
+    const ember2SocketRef = useRef<WebSocket | null>(null);
+    const ember2Subscriptions = useRef<Map<string, WsSubscriptionConfig[]>>(
+        new Map(),
+    );
+    const [ember2ReadyState, setEmber2ReadyState] = useState<number>(
+        WebSocketReadyState.CLOSED,
+    );
 
     const { isWsSleepMode } = useDebugStore();
     const { isTabActive, setWsReconnecting } = useAppStateStore();
@@ -211,6 +226,66 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         scheduleReconnectRef.current = scheduleReconnect;
     }, [scheduleReconnect]);
 
+    // Connect to ember2 WebSocket (lazy - only when needed)
+    const connectEmber2WebSocket = useCallback(() => {
+        if (!isClient) {
+            return;
+        }
+
+        // Don't reconnect if already open or connecting
+        if (
+            ember2SocketRef.current?.readyState === WebSocketReadyState.OPEN ||
+            ember2SocketRef.current?.readyState ===
+                WebSocketReadyState.CONNECTING
+        ) {
+            return;
+        }
+
+        const socket = new WebSocket(EMBER2_WS_URL);
+        ember2SocketRef.current = socket;
+
+        socket.onopen = () => {
+            setEmber2ReadyState(WebSocketReadyState.OPEN);
+            // Re-subscribe to all ember2 subscriptions
+            ember2Subscriptions.current.forEach((configs, key) => {
+                configs.forEach((config) => {
+                    registerEmber2Subscription(key, config.payload || {});
+                });
+            });
+        };
+
+        socket.onmessage = (event) => {
+            if (sleepModeRef.current) {
+                return;
+            }
+
+            if (event.data) {
+                try {
+                    const msg = JSON.parse(event.data);
+                    const channel = msg.channel || msg.type;
+
+                    if (ember2Subscriptions.current.has(channel)) {
+                        ember2Subscriptions.current
+                            .get(channel)
+                            ?.forEach((config) => {
+                                config.handler(msg.data ?? msg);
+                            });
+                    }
+                } catch (e) {
+                    // Ignore parse errors
+                }
+            }
+        };
+
+        socket.onclose = () => {
+            setEmber2ReadyState(WebSocketReadyState.CLOSED);
+        };
+
+        socket.onerror = () => {
+            socket.close();
+        };
+    }, [isClient]);
+
     useEffect(() => {
         if (isClient) {
             connectWebSocket();
@@ -248,6 +323,29 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         );
     };
 
+    // Send subscription message to ember2 WebSocket
+    const sendEmber2Message = (msg: string) => {
+        if (ember2SocketRef.current?.readyState === WebSocketReadyState.OPEN) {
+            ember2SocketRef.current.send(msg);
+        }
+    };
+
+    const registerEmber2Subscription = (
+        type: string,
+        payload: any,
+        unsubscribe: boolean = false,
+    ) => {
+        sendEmber2Message(
+            JSON.stringify({
+                type: unsubscribe ? 'unsubscribe' : 'subscribe',
+                subscription: {
+                    type: type,
+                    ...payload,
+                },
+            }),
+        );
+    };
+
     useEffect(() => {
         if (readyStateRef.current === WebSocketReadyState.OPEN) {
             subscriptions.current.forEach((configs, key) => {
@@ -264,13 +362,26 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
                 socketRef.current?.close();
                 shouldReconnect.current = true;
             }
+            // Also close ember2 socket
+            if (
+                ember2SocketRef.current?.readyState === WebSocketReadyState.OPEN
+            ) {
+                ember2SocketRef.current?.close();
+            }
         } else {
             if (shouldReconnect.current) {
                 connectWebSocket();
                 shouldReconnect.current = false;
             }
+            // Reconnect ember2 socket if there are active subscriptions
+            if (
+                ember2Subscriptions.current.size > 0 &&
+                ember2SocketRef.current?.readyState !== WebSocketReadyState.OPEN
+            ) {
+                connectEmber2WebSocket();
+            }
         }
-    }, [internetConnected]);
+    }, [internetConnected, connectEmber2WebSocket]);
 
     useEffect(() => {
         if (isTabActive) {
@@ -281,14 +392,58 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
                 setWsReconnecting(true);
                 connectWebSocket();
             }
+            // Reconnect ember2 socket if needed
+            if (
+                ember2Subscriptions.current.size > 0 &&
+                ember2SocketRef.current?.readyState !==
+                    WebSocketReadyState.OPEN &&
+                shouldReconnectForTabActive.current
+            ) {
+                connectEmber2WebSocket();
+            }
             shouldReconnectForTabActive.current = false;
         } else {
             shouldReconnectForTabActive.current = true;
         }
-    }, [isTabActive]);
+    }, [isTabActive, connectEmber2WebSocket]);
 
     const subscribe = useCallback(
         (key: string, config: WsSubscriptionConfig) => {
+            // Check if this channel should use the ember2 endpoint
+            if (EMBER2_CHANNELS.has(key)) {
+                // Ensure ember2 socket is connected
+                connectEmber2WebSocket();
+
+                if (!ember2Subscriptions.current.has(key)) {
+                    ember2Subscriptions.current.set(key, []);
+                }
+
+                if (config.single) {
+                    const currentSubs =
+                        ember2Subscriptions.current.get(key) || [];
+                    currentSubs.forEach((sub) => {
+                        registerEmber2Subscription(
+                            key,
+                            sub.payload || {},
+                            true,
+                        );
+                    });
+                    ember2Subscriptions.current.set(key, [config]);
+                } else {
+                    ember2Subscriptions.current.get(key)!.push(config);
+                }
+
+                // Send subscription if socket is already open
+                if (
+                    ember2SocketRef.current?.readyState ===
+                    WebSocketReadyState.OPEN
+                ) {
+                    registerEmber2Subscription(key, config.payload || {});
+                }
+                return;
+            }
+
+            // Default: use main WebSocket
             if (!subscriptions.current.has(key)) {
                 subscriptions.current.set(key, []);
             }
@@ -310,11 +465,27 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
                 scheduleReconnectRef.current('subscribe');
             }
         },
-        [],
+        [connectEmber2WebSocket],
     );
 
     // unsubscribe all subscriptions by channel
     const unsubscribeAllByChannel = useCallback((channel: string) => {
+        // Check if this is an ember2 channel
+        if (EMBER2_CHANNELS.has(channel)) {
+            if (ember2Subscriptions.current.has(channel)) {
+                ember2Subscriptions.current.get(channel)!.forEach((config) => {
+                    registerEmber2Subscription(
+                        channel,
+                        config.payload || {},
+                        true,
+                    );
+                });
+            }
+            ember2Subscriptions.current.delete(channel);
+            return;
+        }
+
+        // Default: main WebSocket
         if (subscriptions.current.has(channel)) {
             subscriptions.current.get(channel)!.forEach((config) => {
                 registerWsSubscription(channel, config.payload || {}, true);
@@ -325,6 +496,24 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
 
     const unsubscribe = useCallback(
         (key: string, config: WsSubscriptionConfig) => {
+            // Check if this is an ember2 channel
+            if (EMBER2_CHANNELS.has(key)) {
+                if (ember2Subscriptions.current.has(key)) {
+                    const configs = ember2Subscriptions.current
+                        .get(key)!
+                        .filter((c) => c !== config);
+                    if (configs.length === 0) {
+                        ember2Subscriptions.current.delete(key);
+                    } else {
+                        ember2Subscriptions.current.set(key, configs);
+                    }
+                    // Send unsubscribe message to ember2 server
+                    registerEmber2Subscription(key, config.payload || {}, true);
+                }
+                return;
+            }
+
+            // Default: main WebSocket
             if (subscriptions.current.has(key)) {
                 const configs = subscriptions.current
                     .get(key)!
@@ -405,7 +594,13 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
             return;
         }
         connectWebSocket();
-    }, []);
+        // Also reconnect ember2 socket if there are active subscriptions
+        if (ember2Subscriptions.current.size > 0) {
+            ember2SocketRef.current?.close();
+            ember2SocketRef.current = null;
+            connectEmber2WebSocket();
+        }
+    }, [connectEmber2WebSocket]);
 
     const contextValue = useMemo(
         () => ({
