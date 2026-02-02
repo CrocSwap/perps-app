@@ -577,8 +577,16 @@
         "xCTA": "Auf 𝕏 teilen",
         "copyLinkCTA": "Link kopieren",
         "textPlaceholder": "Handeln Sie jetzt {{coin}}-Perps auf {{twitter}} im {{fogo}} Testnet",
-        "sharePosition": "Position mit PnL {{pnl}} teilen"
+        "sharePosition": "Position mit PnL {{pnl}} teilen",
+
+        "pnl": "PnL",
+        "details": "Details",
+        "copyImageCTA": "Bild kopieren",
+        "copying": "Wird kopiert…",
+        "copied": "Kopiert!",
+        "shareHint": "Teilen auf X kopiert das Bild auch in die Zwischenablage"
     },
+
     "colors": {
         "default": "Standard",
         "opposite": "Gegensatz",

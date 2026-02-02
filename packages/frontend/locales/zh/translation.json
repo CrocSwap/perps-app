@@ -577,7 +577,14 @@
         "xCTA": "在𝕏分享",
         "copyLinkCTA": "复制链接",
         "textPlaceholder": "立即在{{fogo}} Testnet通过{{twitter}}交易{{coin}}合约",
-        "sharePosition": "分享PnL {{pnl}}的持仓"
+        "sharePosition": "分享PnL {{pnl}}的持仓",
+
+        "pnl": "PnL",
+        "details": "详情",
+        "copyImageCTA": "复制图片",
+        "copying": "正在复制…",
+        "copied": "已复制！",
+        "shareHint": "点击𝕏分享并复制图像到剪贴板"
     },
     "colors": {
         "default": "默认",

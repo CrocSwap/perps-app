@@ -577,7 +577,14 @@
         "xCTA": "Chia sẻ lên 𝕏",
         "copyLinkCTA": "Sao chép liên kết",
         "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay",
-        "sharePosition": "Chia sẻ vị thế với PnL {{pnl}}"
+        "sharePosition": "Chia sẻ vị thế với PnL {{pnl}}",
+
+        "pnl": "PnL",
+        "details": "Chi tiết",
+        "copyImageCTA": "Sao chép hình ảnh",
+        "copying": "Đang sao chép…",
+        "copied": "Đã sao chép!",
+        "shareHint": "Nhấn Chia sẻ trên X cũng sẽ sao chép hình ảnh vào bộ nhớ tạm của bạn"
     },
     "colors": {
         "default": "Mặc định",

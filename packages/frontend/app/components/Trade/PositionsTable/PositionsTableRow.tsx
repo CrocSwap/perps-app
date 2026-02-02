@@ -110,27 +110,66 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             [baseColor, hexToRgba],
         );
 
-        // Memoize modal openers
-        const openShareModal = useCallback(() => {
-            setModalContent('share');
+        // Handler for row click - opens the share modal on details tab
+        const openShareModalFromRow = useCallback(() => {
+            setModalContent('shareDetails');
             modalCtrl.open();
         }, [modalCtrl]);
 
-        const openTpSlModal = useCallback(() => {
-            setModalContent('tpsl');
-            modalCtrl.open();
-        }, [modalCtrl]);
+        // Handle row keyboard navigation
+        const handleRowKeyDown = useCallback(
+            (e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openShareModalFromRow();
+                }
+            },
+            [openShareModalFromRow],
+        );
 
-        const openLeverageModal = useCallback(() => {
-            setModalContent('leverage');
-            modalCtrl.open();
-        }, [modalCtrl]);
+        // Memoize modal openers (with stopPropagation)
+        const openShareModal = useCallback(
+            (e: React.MouseEvent) => {
+                e.stopPropagation();
+                setModalContent('share');
+                modalCtrl.open();
+            },
+            [modalCtrl],
+        );
+
+        const openTpSlModal = useCallback(
+            (e: React.MouseEvent) => {
+                e.stopPropagation();
+                setModalContent('tpsl');
+                modalCtrl.open();
+            },
+            [modalCtrl],
+        );
+
+        const openLeverageModal = useCallback(
+            (e: React.MouseEvent) => {
+                e.stopPropagation();
+                setModalContent('leverage');
+                modalCtrl.open();
+            },
+            [modalCtrl],
+        );
 
         // Memoize modal content
         const renderModalContent = useCallback(() => {
             if (modalContent === 'share') {
                 return (
                     <ShareModal close={modalCtrl.close} position={position} />
+                );
+            }
+
+            if (modalContent === 'shareDetails') {
+                return (
+                    <ShareModal
+                        close={modalCtrl.close}
+                        position={position}
+                        initialTab='details'
+                    />
                 );
             }
 
@@ -228,10 +267,14 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             return null;
         }, [modalContent, modalCtrl.close, position, isMobile, t]);
 
-        // Memoize navigation handler
-        const handleCoinClick = useCallback(() => {
-            navigate(`/v2/trade/${position.coin?.toLowerCase()}`);
-        }, [navigate, position.coin]);
+        // Memoize navigation handler (with stopPropagation)
+        const handleCoinClick = useCallback(
+            (e: React.MouseEvent) => {
+                e.stopPropagation();
+                navigate(`/v2/trade/${position.coin?.toLowerCase()}`);
+            },
+            [navigate, position.coin],
+        );
 
         // Handle market close
         const handleMarketClose = useCallback(async () => {
@@ -401,6 +444,14 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         return (
             <div
                 className={`${styles.rowContainer} ${!showTpSl ? styles.noTpSl : ''}`}
+                onClick={openShareModalFromRow}
+                onKeyDown={handleRowKeyDown}
+                role='button'
+                tabIndex={0}
+                style={{ cursor: 'pointer' }}
+                aria-label={t('share.sharePosition', {
+                    coin: position.coin,
+                })}
             >
                 <div
                     className={`${styles.cell} ${styles.coinCell}`}
@@ -535,7 +586,8 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         {isMobile ? (
                             <button
                                 className={styles.primaryCloseButton}
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.stopPropagation();
                                     setModalContent('closeOptions');
                                     modalCtrl.open();
                                 }}
@@ -546,7 +598,8 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             <>
                                 <button
                                     className={styles.actionButton}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         setModalContent('marketClose');
                                         modalCtrl.open();
                                     }}
@@ -555,7 +608,8 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 </button>
                                 <button
                                     className={styles.actionButton}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         setModalContent('limitChase');
                                         modalCtrl.open();
                                     }}

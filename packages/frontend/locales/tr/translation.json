@@ -577,7 +577,14 @@
         "xCTA": "𝕏'te paylaş",
         "copyLinkCTA": "Bağlantıyı kopyala",
         "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap",
-        "sharePosition": "PnL {{pnl}} pozisyonunu paylaş"
+        "sharePosition": "PnL {{pnl}} pozisyonunu paylaş",
+
+        "pnl": "PnL",
+        "details": "Detaylar",
+        "copyImageCTA": "Görseli kopyala",
+        "copying": "Kopyalanıyor…",
+        "copied": "Kopyalandı!",
+        "shareHint": "X’te Paylaş’a tıklamak, görseli panonuza da kopyalar"
     },
     "colors": {
         "default": "Varsayılan",

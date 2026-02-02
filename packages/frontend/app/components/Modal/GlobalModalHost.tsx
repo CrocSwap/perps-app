@@ -22,6 +22,7 @@ type Payload = {
     content: ReactNode;
     /** called only when user closes from the host (backdrop/close/drag) */
     onRequestClose?: () => void;
+    noHeader?: boolean;
     /** when true, clicking outside the modal will not close it */
     stopOutsideClick?: boolean;
 };
@@ -298,7 +299,11 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                             className={styles.centerModal}
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <header>
+                            <header
+                                className={
+                                    payload.noHeader ? styles.noHeader : ''
+                                }
+                            >
                                 <span />
                                 <h3 id='global-modal-title'>{payload.title}</h3>
                                 <button

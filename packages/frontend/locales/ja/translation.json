@@ -577,7 +577,14 @@
         "xCTA": "𝕏で共有",
         "copyLinkCTA": "リンクをコピー",
         "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう",
-        "sharePosition": "PnL {{pnl}}のポジションを共有"
+        "sharePosition": "PnL {{pnl}}のポジションを共有",
+
+        "pnl": "PnL",
+        "details": "詳細",
+        "copyImageCTA": "画像をコピー",
+        "copying": "コピー中…",
+        "copied": "コピーしました！",
+        "shareHint": "Xで共有すると、画像もクリップボードにコピーされます"
     },
     "colors": {
         "default": "デフォルト",
