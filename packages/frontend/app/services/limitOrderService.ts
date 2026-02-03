@@ -7,6 +7,7 @@ import {
 import { Connection, PublicKey } from '@solana/web3.js';
 import { marketOrderLogManager } from './MarketOrderLogManager';
 import { t } from 'i18next';
+import { buildCompleteConversionIx } from '~/utils/refreg';
 
 export interface LimitOrderResult {
     success: boolean;
@@ -205,7 +206,15 @@ export class LimitOrderService {
             );
 
             // Extract instructions from the transaction
-            const instructions = transaction.instructions;
+            const instructions = [...transaction.instructions];
+
+            const conversionIx = await buildCompleteConversionIx({
+                sessionPublicKey,
+                walletPublicKey: userWalletKey,
+            });
+            if (conversionIx) {
+                instructions.push(conversionIx);
+            }
 
             console.log('📤 Sending limit order transaction:');
             console.log('  - Instructions to send:', instructions.length);
