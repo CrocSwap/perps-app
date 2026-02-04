@@ -47,35 +47,33 @@ function parseBase58ToBytes(value: string): Uint8Array | null {
     }
 }
 
-async function sha256Bytes(value: string): Promise<Uint8Array | null> {
-    if (typeof crypto === 'undefined' || !crypto.subtle) {
-        console.info('[refreg] crypto.subtle not available');
+function padTo32Bytes(bytes: Uint8Array): Uint8Array | null {
+    if (bytes.length > 32) {
+        console.error(
+            `[refreg] tracking_id exceeds 32 bytes (got ${bytes.length})`,
+        );
         return null;
     }
-    try {
-        const bytes = new TextEncoder().encode(value);
-        const digest = await crypto.subtle.digest('SHA-256', bytes);
-        return new Uint8Array(digest);
-    } catch (error) {
-        console.info('[refreg] Failed to hash tracking id:', error);
-        return null;
-    }
+    const output = new Uint8Array(32);
+    output.set(bytes, 32 - bytes.length);
+    return output;
 }
 
-async function getTrackingIdHash(): Promise<Uint8Array | null> {
+function getTrackingIdBytes(): Uint8Array | null {
     const trackingIdRaw = readLocalStorage(TRACKING_ID_STORAGE_KEY);
     if (!trackingIdRaw) {
         console.info('[refreg] tracking_id missing');
         return null;
     }
 
-    const trackingIdBytes = await sha256Bytes(trackingIdRaw);
-    if (!trackingIdBytes || trackingIdBytes.length !== 32) {
+    const trackingIdBytes = new TextEncoder().encode(trackingIdRaw);
+    const paddedTrackingIdBytes = padTo32Bytes(trackingIdBytes);
+    if (!paddedTrackingIdBytes) {
         console.info('[refreg] invalid tracking_id');
         return null;
     }
 
-    return trackingIdBytes;
+    return paddedTrackingIdBytes;
 }
 
 function getReferralIdBytes(): Uint8Array | null {
@@ -227,7 +225,7 @@ export async function buildConnectWalletIx(
     params: BuildIxParams,
 ): Promise<TransactionInstruction | null> {
     try {
-        const trackingIdBytes = await getTrackingIdHash();
+        const trackingIdBytes = getTrackingIdBytes();
         if (!trackingIdBytes) {
             return null;
         }
@@ -243,7 +241,7 @@ export async function buildTradeRefregInstructions(
     params: BuildIxParams,
 ): Promise<TransactionInstruction[]> {
     try {
-        const trackingIdBytes = await getTrackingIdHash();
+        const trackingIdBytes = getTrackingIdBytes();
         if (!trackingIdBytes) {
             return [];
         }
