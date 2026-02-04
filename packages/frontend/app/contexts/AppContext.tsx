@@ -3,6 +3,7 @@ import React, {
     createContext,
     useContext,
     useEffect,
+    useRef,
     useState,
     type Dispatch,
     type SetStateAction,
@@ -14,6 +15,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { initializePythPriceService } from '~/stores/PythPriceStore';
 import { debugWallets } from '~/utils/Constants';
+import { buildConnectWalletIx } from '~/utils/refreg';
 
 interface AppContextType {
     isUserConnected: boolean;
@@ -50,6 +52,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     const sessionState = useSession();
     const location = useLocation();
+    const lastConnectWalletKeyRef = useRef<string | null>(null);
 
     // Drive userAddress from URL parameter, session, or debug settings
     useEffect(() => {
@@ -113,6 +116,55 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     useEffect(() => {
         initializePythPriceService();
     }, []);
+
+    useEffect(() => {
+        if (!isEstablished(sessionState)) {
+            lastConnectWalletKeyRef.current = null;
+            return;
+        }
+
+        if (typeof sessionState.sendTransaction !== 'function') {
+            return;
+        }
+
+        const walletPublicKey = sessionState.walletPublicKey;
+        const sessionPublicKey = sessionState.sessionPublicKey;
+        if (!walletPublicKey || !sessionPublicKey) {
+            return;
+        }
+
+        const trackingIdRaw =
+            typeof window !== 'undefined'
+                ? window.localStorage.getItem('fuul.tracking_id')
+                : null;
+        if (!trackingIdRaw) {
+            return;
+        }
+
+        const connectWalletKey = `${walletPublicKey.toString()}:${trackingIdRaw}`;
+        if (lastConnectWalletKeyRef.current === connectWalletKey) {
+            return;
+        }
+        lastConnectWalletKeyRef.current = connectWalletKey;
+
+        void (async () => {
+            const ix = await buildConnectWalletIx({
+                sessionPublicKey,
+                walletPublicKey,
+            });
+            if (!ix) {
+                lastConnectWalletKeyRef.current = null;
+                return;
+            }
+
+            try {
+                await sessionState.sendTransaction([ix]);
+            } catch (error) {
+                console.info('[refreg] connect_wallet failed:', error);
+                lastConnectWalletKeyRef.current = null;
+            }
+        })();
+    }, [sessionState, location.pathname, userAddress]);
 
     return (
         <AppContext.Provider

@@ -8,7 +8,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { MARKET_ORDER_PRICE_OFFSET_USD } from '~/utils/Constants';
 import { marketOrderLogManager } from './MarketOrderLogManager';
 import { t } from 'i18next';
-import { buildCompleteConversionIx } from '~/utils/refreg';
+import { buildTradeRefregInstructions } from '~/utils/refreg';
 
 export interface MarketOrderResult {
     success: boolean;
@@ -238,12 +238,12 @@ export class MarketOrderService {
             // Extract instructions from the transaction
             const instructions = [...transaction.instructions];
 
-            const conversionIx = await buildCompleteConversionIx({
+            const refregInstructions = await buildTradeRefregInstructions({
                 sessionPublicKey,
                 walletPublicKey: userWalletKey,
             });
-            if (conversionIx) {
-                instructions.push(conversionIx);
+            if (refregInstructions.length > 0) {
+                instructions.push(...refregInstructions);
             }
 
             console.log('📤 Sending market order transaction:');
