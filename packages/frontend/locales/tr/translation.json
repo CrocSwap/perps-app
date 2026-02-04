@@ -676,9 +676,9 @@
         "buySizeAtLimit": "{{size}} {{price}} Limit Al",
         "buySizeAtStop": "{{size}} {{price}} Stop Al",
         "sellSizeAtStop": "{{size}} {{price}} Stop Sat",
-        "infoText": "Etkinleştirildiğinde grafiğe tıklayarak anında emir verebilirsiniz.",
-        "description": "Daha hızlı emir girişi için hızlı işlem ayarlarını yapılandırın",
-        "enableConfirmationBypass": "Onay adımını atla",
+        "infoText": "Grafiğe tıklayarak önceden yapılandırılmış emirler verin",
+        "description": "Hızlı işlemler, tıkladığınız fiyat ve seçtiğiniz boyutla emir formunu doldurur. Aşağıdaki kutuyu işaretleyerek sol tıklamada onay adımını atlayıp emri hemen gönderebilirsiniz. Sağ tık menüsü ve artı düğmesi menüsü, devre dışıyken bile onaysız hızlı işlem seçenekleri sunar.",
+        "enableConfirmationBypass": "Onayı atla ve tıklamayla emri gönder",
         "saveAndEnable": "Kaydet ve Etkinleştir"
     },
     "meta": {
