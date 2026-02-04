@@ -6,7 +6,6 @@ import {
     type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import { AnimatePresence, motion } from 'framer-motion';
 import React, {
     memo,
     useCallback,
@@ -40,6 +39,7 @@ import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import {
     BTC_MAX_LEVERAGE,
+    MAX_BTC_NOTIONAL,
     MIN_ORDER_VALUE,
     MIN_POSITION_USD_SIZE,
     getTxLink,
@@ -138,6 +138,12 @@ function OrderInput({
                   blurb: t('transactions.buySellAtSpecificPrice'),
                   icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
               },
+              {
+                  value: 'apex',
+                  label: 'Apex',
+                  blurb: 'Continuous manual close mode',
+                  icon: <PiSquaresFour color={'var(--accent1)'} size={25} />,
+              },
               // disabled code 21 Jul 25
               //   {
               //       value: 'stop_market',
@@ -190,6 +196,7 @@ function OrderInput({
         setObChosenPrice,
         symbol,
         symbolInfo,
+        positions,
         marginMode,
         setMarginMode,
         setOrderInputPriceValue,
@@ -204,6 +211,21 @@ function OrderInput({
 
     const orderInputPriceValueRef = useRef<number | undefined>(undefined);
     orderInputPriceValueRef.current = orderInputPriceValue.value;
+
+    const apexPosition = useMemo(() => {
+        const currentSymbol = symbol?.toLowerCase?.() ?? '';
+        if (!currentSymbol) return null;
+        return (
+            positions.find(
+                (position) =>
+                    position?.coin?.toLowerCase?.() === currentSymbol &&
+                    Math.abs(position.szi) > 0,
+            ) ?? null
+        );
+    }, [positions, symbol]);
+
+    const isApexMode = marketOrderType === 'apex';
+    const isApexOpen = isApexMode && !!apexPosition;
 
     // Track if direction change came from debounced price input (to prevent auto-focus)
     const directionChangeFromInputRef = useRef(false);
@@ -567,7 +589,11 @@ function OrderInput({
 
     const usdOrderValue = useMemo(() => {
         let orderValue = 0;
-        if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
+        if (
+            marketOrderType === 'market' ||
+            marketOrderType === 'stop_market' ||
+            marketOrderType === 'apex'
+        ) {
             orderValue = notionalQtyNum * (markPx || 1);
         } else if (
             (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
@@ -577,6 +603,118 @@ function OrderInput({
         }
         return orderValue;
     }, [notionalQtyNum, marketOrderType, markPx]);
+
+    const apexPnl = useMemo(() => {
+        if (!apexPosition) return null;
+        if (typeof apexPosition.unrealizedPnl === 'number')
+            return apexPosition.unrealizedPnl;
+        if (!markPx) return null;
+        const size = Math.abs(apexPosition.szi);
+        const delta =
+            apexPosition.szi > 0
+                ? markPx - apexPosition.entryPx
+                : apexPosition.entryPx - markPx;
+        return size * delta;
+    }, [apexPosition, markPx]);
+
+    const apexMarginReturn = useMemo(() => {
+        if (!apexPosition) return null;
+        return apexPnl;
+    }, [apexPosition, apexPnl]);
+
+    const [apexReferencePrice, setApexReferencePrice] = useState<number | null>(
+        null,
+    );
+
+    const apexMultiplier = useMemo(() => {
+        if (!markPx) return null;
+        if (apexPosition) {
+            const roe = apexPosition.returnOnEquity;
+            if (!isFinite(roe)) return null;
+            return roe >= 0 ? 1 + roe : -1 / (1 + roe);
+        }
+        const referencePrice = apexReferencePrice;
+        if (!referencePrice) return null;
+        const isLong = tradeDirection === 'buy';
+        const baseRatio = isLong
+            ? markPx / referencePrice
+            : referencePrice / markPx;
+        if (!isFinite(baseRatio) || baseRatio === 0) return null;
+        return baseRatio >= 1 ? baseRatio : -1 / baseRatio;
+    }, [apexPosition, apexReferencePrice, markPx, tradeDirection]);
+
+    const [apexMultiplierHistory, setApexMultiplierHistory] = useState<
+        number[]
+    >([]);
+
+    useEffect(() => {
+        if (!isApexMode) {
+            setApexMultiplierHistory([]);
+            setApexReferencePrice(null);
+            return;
+        }
+        if (!apexPosition && !apexReferencePrice && markPx) {
+            setApexReferencePrice(markPx);
+        }
+    }, [isApexMode, apexPosition, apexReferencePrice, markPx]);
+
+    useEffect(() => {
+        if (!isApexMode) return;
+        setApexMultiplierHistory([]);
+        setApexReferencePrice(markPx ?? null);
+    }, [isApexMode, symbol]);
+
+    useEffect(() => {
+        if (!isApexMode || apexMultiplier === null) return;
+        setApexMultiplierHistory((prev) => {
+            const next = [...prev, apexMultiplier];
+            if (next.length > 120) {
+                next.shift();
+            }
+            return next;
+        });
+    }, [isApexMode, apexMultiplier]);
+
+    const apexSparklinePoints = useMemo(() => {
+        if (!apexMultiplierHistory.length) return '';
+        const width = 300;
+        const height = 60;
+        const min = Math.min(...apexMultiplierHistory);
+        const max = Math.max(...apexMultiplierHistory);
+        const range = max - min || 1;
+        return apexMultiplierHistory
+            .map((value, index) => {
+                const x =
+                    apexMultiplierHistory.length === 1
+                        ? 0
+                        : (index / (apexMultiplierHistory.length - 1)) * width;
+                const y = height - ((value - min) / range) * height;
+                return `${x},${y}`;
+            })
+            .join(' ');
+    }, [apexMultiplierHistory]);
+
+    const apexSparklineBaselineY = useMemo(() => {
+        if (!apexMultiplierHistory.length) return null;
+        const height = 60;
+        const min = Math.min(...apexMultiplierHistory);
+        const max = Math.max(...apexMultiplierHistory);
+        const range = max - min || 1;
+        const baselineValue =
+            apexMultiplier !== null && apexMultiplier < 0 ? -1 : 1;
+        return height - ((baselineValue - min) / range) * height;
+    }, [apexMultiplierHistory, apexMultiplier]);
+
+    const apexMultiplierDisplay = useMemo(() => {
+        if (!apexPosition) return '1x';
+        if (apexMultiplier === null) return '--';
+        const formatted = formatNumWithOnlyDecimals(
+            Math.abs(apexMultiplier),
+            3,
+            true,
+        );
+        return `${apexMultiplier >= 0 ? '' : '-'}${formatted}x`;
+    }, [apexMultiplier, apexPosition, formatNumWithOnlyDecimals]);
 
     const marginRequired = useMemo(() => {
         return usdOrderValue / leverage;
@@ -910,7 +1048,7 @@ function OrderInput({
     };
 
     useEffect(() => {
-        if (marketOrderType === 'market') {
+        if (marketOrderType === 'market' || marketOrderType === 'apex') {
             setOrderInputPriceValue({ value: 0, changeType: 'inputChange' });
         } else if (
             marketOrderType === 'limit' &&
@@ -1524,6 +1662,148 @@ function OrderInput({
         sizePercentageValue,
     ]);
 
+    const handleApexClose = useCallback(async (): Promise<void> => {
+        if (!apexPosition || !markPx) return;
+
+        const size = Math.abs(apexPosition.szi);
+        if (!size || size <= 0) {
+            notifications.add({
+                title: t('transactions.invalidOrderSize.title'),
+                message: t('transactions.enterValidOrderSize'),
+                icon: 'error',
+            });
+            return;
+        }
+
+        setIsProcessingOrder(true);
+
+        try {
+            const closingSide = apexPosition.szi > 0 ? 'sell' : 'buy';
+            const bestBidPrice = buys.length > 0 ? buys[0].px : markPx;
+            const bestAskPrice = sells.length > 0 ? sells[0].px : markPx;
+
+            const notionalUsd = size * (markPx || 1);
+            const isSubminimumClose = notionalUsd < MIN_ORDER_VALUE * 0.99;
+            const subminimumCloseQty = MIN_ORDER_VALUE / (markPx || 1);
+            const quantity = isSubminimumClose
+                ? subminimumCloseQty
+                : Math.min(size * 1.01, MAX_BTC_NOTIONAL);
+
+            const timeOfTxBuildStart = Date.now();
+
+            const result = await executeMarketOrder({
+                quantity,
+                side: closingSide,
+                leverage: apexPosition.leverage?.value ?? leverage,
+                bestBidPrice: closingSide === 'sell' ? bestBidPrice : undefined,
+                bestAskPrice: closingSide === 'buy' ? bestAskPrice : undefined,
+                reduceOnly: true,
+            });
+
+            const usdValueOfOrderStr = formatNum(
+                size * (markPx || 0),
+                2,
+                true,
+                true,
+            );
+
+            if (result.success) {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Success',
+                            orderType: 'Market',
+                            success: true,
+                            direction: closingSide === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
+                notifications.add({
+                    title: t('marketLimitClose.positionClosed'),
+                    message: `${t('transactions.successfullyClosedPosition', { usdValueOfOrderStr, symbol: symbolInfo?.coin })}`,
+                    icon: 'check',
+                    txLink: getTxLink(result.signature),
+                    removeAfter: 5000,
+                });
+                setShouldUpdateAfterTrade(true);
+            } else {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Fail',
+                            orderType: 'Market',
+                            success: false,
+                            errorMessage: result.error || 'Transaction failed',
+                            direction: closingSide === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
+                notifications.add({
+                    title: t('transactions.closeFailedTitle'),
+                    message: result.error || t('transactions.closeFailed'),
+                    icon: 'error',
+                    removeAfter: 10000,
+                    txLink: getTxLink(result.signature),
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error closing position:', error);
+            notifications.add({
+                title: t('transactions.closeFailedTitle'),
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : t('transactions.unknownErrorOccurred'),
+                icon: 'error',
+                removeAfter: 10000,
+            });
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Market Close Fail',
+                        orderType: 'Market',
+                        success: false,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
+        } finally {
+            setIsProcessingOrder(false);
+        }
+    }, [
+        apexPosition,
+        markPx,
+        buys,
+        sells,
+        executeMarketOrder,
+        leverage,
+        formatNum,
+        notifications,
+        t,
+        symbolInfo?.coin,
+    ]);
+
     // fn to submit a 'Sell' market order
     const submitMarketSell = useCallback(async (): Promise<void> => {
         // Validate position size
@@ -2098,8 +2378,10 @@ function OrderInput({
         if (activeOptions.skipOpenOrderConfirm)
             setSubmitButtonRecentlyClicked(true);
         if (tradeDirection === 'buy') {
-            if (marketOrderType === 'market') {
-                if (activeOptions.skipOpenOrderConfirm) {
+            if (marketOrderType === 'market' || marketOrderType === 'apex') {
+                if (marketOrderType === 'apex' && !apexPosition) {
+                    submitMarketBuy();
+                } else if (activeOptions.skipOpenOrderConfirm) {
                     submitMarketBuy();
                 } else {
                     confirmOrderModal.open('market_buy');
@@ -2112,8 +2394,10 @@ function OrderInput({
                 }
             }
         } else {
-            if (marketOrderType === 'market') {
-                if (activeOptions.skipOpenOrderConfirm) {
+            if (marketOrderType === 'market' || marketOrderType === 'apex') {
+                if (marketOrderType === 'apex' && !apexPosition) {
+                    submitMarketSell();
+                } else if (activeOptions.skipOpenOrderConfirm) {
                     submitMarketSell();
                 } else {
                     confirmOrderModal.open('market_sell');
@@ -2136,6 +2420,7 @@ function OrderInput({
         submitLimitBuy,
         submitMarketSell,
         submitLimitSell,
+        apexPosition,
     ]);
 
     // Get portfolio modals state
@@ -2207,16 +2492,19 @@ function OrderInput({
         return maxTradeSizeInUsd < 0;
     }, [maxTradeSizeInUsd]);
 
-    const isDisabled =
+    const isApexClose = isApexMode && !!apexPosition;
+    const isDisabledBase =
         userExceededOI ||
         isDepositRequired ||
         isMarginInsufficientDebounced ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||
         isPriceInvalid ||
-        submitButtonRecentlyClicked ||
+        isMarketOrderLoading ||
         isReduceInWrongDirection ||
-        isReduceOnlyExceedingPositionSize;
+        isReduceOnlyExceedingPositionSize ||
+        notionalQtyNum === 0;
+    const isDisabled = isApexClose ? isProcessingOrder : isDisabledBase;
 
     // hook to handle Enter key press for order submission
     useEffect(() => {
@@ -2387,21 +2675,25 @@ function OrderInput({
         }
     }, []);
 
-    const submitButtonText = userExceededOI
-        ? t('transactions.maxOpenInterestReached')
-        : normalizedEquity < MIN_POSITION_USD_SIZE
-          ? t('transactions.depositToTrade')
-          : isReduceInWrongDirection
-            ? t('transactions.switchDirectionToReduce')
-            : isMarginInsufficientDebounced
-              ? tradeDirection === 'buy'
-                  ? t('transactions.maxLongDepositToTrade')
-                  : t('transactions.maxShortDepositToTrade')
-              : notionalQtyNum && sizeLessThanMinimum
-                ? isReduceOnlyEnabled
-                    ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} ${t('transactions.minimumOr100Percent')}`
-                    : `${formatNum(MIN_ORDER_VALUE, 2, true, true)} ${t('transactions.minimum')}`
-                : t('common.submit');
+    const submitButtonText = isApexMode
+        ? apexPosition
+            ? t('transactions.closePosition')
+            : 'Open Apex Position'
+        : userExceededOI
+          ? t('transactions.maxOpenInterestReached')
+          : normalizedEquity < MIN_POSITION_USD_SIZE
+            ? t('transactions.depositToTrade')
+            : isReduceInWrongDirection
+              ? t('transactions.switchDirectionToReduce')
+              : isMarginInsufficientDebounced
+                ? tradeDirection === 'buy'
+                    ? t('transactions.maxLongDepositToTrade')
+                    : t('transactions.maxShortDepositToTrade')
+                : notionalQtyNum && sizeLessThanMinimum
+                  ? isReduceOnlyEnabled
+                      ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} ${t('transactions.minimumOr100Percent')}`
+                      : `${formatNum(MIN_ORDER_VALUE, 2, true, true)} ${t('transactions.minimum')}`
+                  : t('common.submit');
 
     const inputDetailsData = useMemo(
         () => [
@@ -2548,136 +2840,301 @@ function OrderInput({
                                 <PiSquaresFour />
                             </button>
                         </div>
-                        <TradeDirection
-                            tradeDirection={tradeDirection}
-                            setTradeDirection={setTradeDirection}
-                        />
 
-                        <LeverageSlider {...leverageSliderProps} />
-
-                        <div className={styles.inputDetailsDataContainer}>
-                            {inputDetailsData.map((data, idx) => (
-                                <div
-                                    key={idx}
-                                    className={styles.inputDetailsDataContent}
-                                >
-                                    <div className={styles.inputDetailsLabel}>
-                                        <span>{data.label}</span>
-                                        <Tooltip
-                                            content={data?.tooltipLabel}
-                                            position='right'
-                                        >
-                                            <LuCircleHelp size={12} />
-                                        </Tooltip>
-                                    </div>
-                                    <span className={styles.inputDetailValue}>
-                                        {data.value}
+                        {isApexMode ? (
+                            <div className={styles.apexPanel}>
+                                <div className={styles.apexHeader}>Apex</div>
+                                <div className={styles.apexMultiplier}>
+                                    <span
+                                        className={styles.apexMultiplierLabel}
+                                    >
+                                        Multiplier
                                     </span>
-                                </div>
-                            ))}
-                            {!isReduceOnlyEnabled &&
-                                maxOrderSizeWouldExceedRemainingOIDebounced &&
-                                (!!sizePercentageValue || !!sizeDisplay) && (
-                                    <div
+                                    <span
+                                        className={styles.apexMultiplierValue}
                                         style={{
-                                            width: '100%',
-                                            display: 'flex',
-                                            justifyContent: 'center',
+                                            color: !apexPosition
+                                                ? 'var(--text1)'
+                                                : apexMultiplier !== null &&
+                                                    apexMultiplier > 0
+                                                  ? buyColor
+                                                  : apexMultiplier !== null &&
+                                                      apexMultiplier < 0
+                                                    ? sellColor
+                                                    : 'var(--text1)',
                                         }}
                                     >
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '4px',
-                                                color: 'var(--orange)',
-                                                justifyContent: 'center',
-                                                width: '100%',
-                                                fontSize: 'var(--font-size-s)',
-                                            }}
-                                        >
+                                        {apexMultiplierDisplay}
+                                    </span>
+                                </div>
+                                <div className={styles.apexSparkline}>
+                                    <svg viewBox='0 0 300 60' role='img'>
+                                        {apexSparklineBaselineY !== null && (
+                                            <line
+                                                x1='0'
+                                                x2='300'
+                                                y1={apexSparklineBaselineY}
+                                                y2={apexSparklineBaselineY}
+                                                stroke='rgba(255, 255, 255, 0.2)'
+                                                strokeDasharray='4 4'
+                                            />
+                                        )}
+                                        <polyline
+                                            points={apexSparklinePoints}
+                                            fill='none'
+                                            stroke={
+                                                apexMultiplier !== null &&
+                                                apexMultiplier > 0
+                                                    ? buyColor
+                                                    : apexMultiplier !== null &&
+                                                        apexMultiplier < 0
+                                                      ? sellColor
+                                                      : 'var(--accent1)'
+                                            }
+                                            strokeWidth='2'
+                                        />
+                                    </svg>
+                                </div>
+                                {isApexOpen ? (
+                                    <>
+                                        <div className={styles.apexReturnRow}>
                                             <span
+                                                className={
+                                                    styles.apexReturnLabel
+                                                }
+                                            >
+                                                Return on Close
+                                            </span>
+                                            <span
+                                                className={
+                                                    styles.apexReturnValue
+                                                }
+                                            >
+                                                {apexMarginReturn !== null
+                                                    ? formatNum(
+                                                          apexMarginReturn,
+                                                          2,
+                                                          true,
+                                                          true,
+                                                      )
+                                                    : '--'}
+                                            </span>
+                                        </div>
+                                        <button
+                                            className={styles.apexCloseButton}
+                                            onClick={() => handleApexClose()}
+                                            disabled={isDisabled}
+                                        >
+                                            {submitButtonText}
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className={styles.apexStats}>
+                                            <div className={styles.apexStat}>
+                                                <span
+                                                    className={
+                                                        styles.apexStatLabel
+                                                    }
+                                                >
+                                                    Mark Price
+                                                </span>
+                                                <span
+                                                    className={
+                                                        styles.apexStatValue
+                                                    }
+                                                >
+                                                    {markPx
+                                                        ? formatNum(
+                                                              markPx,
+                                                              2,
+                                                              true,
+                                                              true,
+                                                          )
+                                                        : '--'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <TradeDirection
+                                            tradeDirection={tradeDirection}
+                                            setTradeDirection={
+                                                setTradeDirection
+                                            }
+                                        />
+                                        <LeverageSlider
+                                            {...leverageSliderProps}
+                                        />
+                                        <SizeInput {...sizeInputProps} />
+                                        <PositionSize
+                                            {...sizeSliderPercentageValueProps}
+                                        />
+                                    </>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                <TradeDirection
+                                    tradeDirection={tradeDirection}
+                                    setTradeDirection={setTradeDirection}
+                                />
+
+                                <LeverageSlider {...leverageSliderProps} />
+
+                                <div
+                                    className={styles.inputDetailsDataContainer}
+                                >
+                                    {inputDetailsData.map((data, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={
+                                                styles.inputDetailsDataContent
+                                            }
+                                        >
+                                            <div
+                                                className={
+                                                    styles.inputDetailsLabel
+                                                }
+                                            >
+                                                <span>{data.label}</span>
+                                                <Tooltip
+                                                    content={data?.tooltipLabel}
+                                                    position='right'
+                                                >
+                                                    <LuCircleHelp size={12} />
+                                                </Tooltip>
+                                            </div>
+                                            <span
+                                                className={
+                                                    styles.inputDetailValue
+                                                }
+                                            >
+                                                {data.value}
+                                            </span>
+                                        </div>
+                                    ))}
+                                    {!isReduceOnlyEnabled &&
+                                        maxOrderSizeWouldExceedRemainingOIDebounced &&
+                                        (!!sizePercentageValue ||
+                                            !!sizeDisplay) && (
+                                            <div
                                                 style={{
-                                                    cursor: 'default',
+                                                    width: '100%',
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
                                                 }}
                                             >
-                                                {maxTradeSizeWarningShort}
-                                            </span>
-                                            <Tooltip
-                                                content={
-                                                    maxTradeSizeWarningLong
-                                                }
-                                                position='bottom'
-                                            >
-                                                <LuCircleHelp size={12} />
-                                            </Tooltip>
-                                        </div>
-                                    </div>
-                                )}
-                        </div>
+                                                <div
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        color: 'var(--orange)',
+                                                        justifyContent:
+                                                            'center',
+                                                        width: '100%',
+                                                        fontSize:
+                                                            'var(--font-size-s)',
+                                                    }}
+                                                >
+                                                    <span
+                                                        style={{
+                                                            cursor: 'default',
+                                                        }}
+                                                    >
+                                                        {
+                                                            maxTradeSizeWarningShort
+                                                        }
+                                                    </span>
+                                                    <Tooltip
+                                                        content={
+                                                            maxTradeSizeWarningLong
+                                                        }
+                                                        position='bottom'
+                                                    >
+                                                        <LuCircleHelp
+                                                            size={12}
+                                                        />
+                                                    </Tooltip>
+                                                </div>
+                                            </div>
+                                        )}
+                                </div>
 
-                        {/* {marketOrderType === 'chase_limit' && (
+                                {/* {marketOrderType === 'chase_limit' && (
                                 <ChasePrice {...chasePriceProps} / predu>
                             )} */}
 
-                        {showStopPriceComponent && (
-                            <StopPrice {...stopPriceProps} />
-                        )}
-                        {showPriceInputComponent && (
-                            <PriceInput {...priceInputProps} />
-                        )}
-                        <SizeInput {...sizeInputProps} />
-                        <PositionSize {...sizeSliderPercentageValueProps} />
+                                {showStopPriceComponent && (
+                                    <StopPrice {...stopPriceProps} />
+                                )}
+                                {showPriceInputComponent && (
+                                    <PriceInput {...priceInputProps} />
+                                )}
+                                <SizeInput {...sizeInputProps} />
+                                <PositionSize
+                                    {...sizeSliderPercentageValueProps}
+                                />
 
-                        {showPriceRangeComponent && (
-                            <PriceRange {...priceRangeProps} />
-                        )}
-                        {marketOrderType === 'scale' &&
-                            priceDistributionButtons}
-                        {marketOrderType === 'twap' && <RunningTime />}
+                                {showPriceRangeComponent && (
+                                    <PriceRange {...priceRangeProps} />
+                                )}
+                                {marketOrderType === 'scale' &&
+                                    priceDistributionButtons}
+                                {marketOrderType === 'twap' && <RunningTime />}
 
-                        <ReduceAndProfitToggle
-                            {...reduceAndProfitToggleProps}
-                        />
+                                <ReduceAndProfitToggle
+                                    {...reduceAndProfitToggleProps}
+                                />
+                            </>
+                        )}
                     </div>
-                    <div
-                        key='buttondetails'
-                        className={styles.button_details_container}
-                    >
-                        {isUserLoggedIn && (
-                            <Tooltip
-                                content={disabledReason}
-                                position='top'
-                                disabled={!isDisabled}
-                            >
-                                <button
-                                    ref={submitButtonRef}
-                                    data-testid='submit-order-button'
-                                    className={`${styles.submit_button}`}
-                                    style={{
-                                        backgroundColor:
-                                            tradeDirection === 'buy'
-                                                ? buyColor
-                                                : sellColor,
-                                        fontSize:
-                                            submitButtonText.length > 20
-                                                ? 'var(--font-size-s)'
-                                                : 'var(--font-size-m)',
-                                    }}
-                                    onClick={handleSubmitOrder}
-                                    disabled={isDisabled}
+                    {!isApexOpen && (
+                        <div
+                            key='buttondetails'
+                            className={styles.button_details_container}
+                        >
+                            {isUserLoggedIn && (
+                                <Tooltip
+                                    content={disabledReason}
+                                    position='top'
+                                    disabled={!isDisabled}
                                 >
-                                    {submitButtonText}
-                                </button>
-                            </Tooltip>
-                        )}
-                        <OrderDetails
-                            orderMarketPrice={marketOrderType}
-                            usdOrderValue={usdOrderValue}
-                            marginRequired={marginRequired}
-                            liquidationPrice={liquidationPrice}
-                        />
-                    </div>
+                                    <button
+                                        ref={submitButtonRef}
+                                        data-testid='submit-order-button'
+                                        className={`${styles.submit_button}`}
+                                        style={{
+                                            backgroundColor: isApexClose
+                                                ? 'var(--bg-dark3)'
+                                                : tradeDirection === 'buy'
+                                                  ? buyColor
+                                                  : sellColor,
+                                            fontSize:
+                                                submitButtonText.length > 20
+                                                    ? 'var(--font-size-s)'
+                                                    : 'var(--font-size-m)',
+                                        }}
+                                        onClick={() => {
+                                            if (isApexMode && apexPosition) {
+                                                handleApexClose();
+                                                return;
+                                            }
+                                            handleSubmitOrder();
+                                        }}
+                                        disabled={isDisabled}
+                                    >
+                                        {submitButtonText}
+                                    </button>
+                                </Tooltip>
+                            )}
+                            <OrderDetails
+                                orderMarketPrice={marketOrderType}
+                                usdOrderValue={usdOrderValue}
+                                marginRequired={marginRequired}
+                                liquidationPrice={liquidationPrice}
+                            />
+                        </div>
+                    )}
                 </>
             )}
             {confirmOrderModal.isOpen && (

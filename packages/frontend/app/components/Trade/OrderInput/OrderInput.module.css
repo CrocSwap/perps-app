@@ -52,6 +52,131 @@
     border-radius: var(--radius-s);
     border: 1px solid var(--bg-dark4, #27272c);
 }
+
+.apexPanel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    padding: var(--padding-s);
+    border-radius: var(--radius-s);
+    border: 1px solid var(--bg-dark4, #27272c);
+    background: linear-gradient(135deg, #1a1b22 0%, #111117 100%);
+}
+
+.apexHeader {
+    font-size: var(--font-size-m);
+    font-weight: 600;
+    color: var(--text1, #f0f0f8);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.apexStats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-s);
+}
+
+.apexMultiplier {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--padding-xs) var(--padding-s);
+    border-radius: var(--radius-s);
+    background-color: var(--bg-dark3, #1c1c22);
+    border: 1px solid var(--bg-dark4, #27272c);
+}
+
+.apexMultiplierLabel {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text2, #bcbcc4);
+}
+
+.apexMultiplierValue {
+    font-size: calc(var(--font-size-m) + 6px);
+    font-weight: 600;
+}
+
+.apexSparkline {
+    width: 100%;
+    height: 70px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: var(--radius-s);
+    padding: var(--padding-xs);
+}
+
+.apexSparkline svg {
+    width: 100%;
+    height: 100%;
+}
+
+.apexReturnRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--padding-xs) var(--padding-s);
+    border-radius: var(--radius-s);
+    background-color: var(--bg-dark3, #1c1c22);
+    border: 1px solid var(--bg-dark4, #27272c);
+}
+
+.apexReturnLabel {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text2, #bcbcc4);
+}
+
+.apexReturnValue {
+    font-size: var(--font-size-s);
+    font-weight: 600;
+    color: var(--text1, #f0f0f8);
+}
+
+.apexCloseButton {
+    width: 100%;
+    height: 44px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--bg-dark4, #27272c);
+    background-color: var(--bg-dark3, #1c1c22);
+    color: var(--text1, #f0f0f8);
+    font-size: var(--font-size-m);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.apexCloseButton:hover {
+    background-color: var(--bg-dark4, #27272c);
+}
+
+.apexCloseButton:disabled {
+    cursor: not-allowed;
+    color: var(--text2, #bcbcc4);
+}
+
+.apexStat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--padding-xs);
+    border-radius: var(--radius-xs);
+    background-color: var(--bg-dark3, #1c1c22);
+}
+
+.apexStatLabel {
+    font-size: var(--font-size-xs);
+    color: var(--text2, #bcbcc4);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.apexStatValue {
+    font-size: var(--font-size-s);
+    color: var(--text1, #f0f0f8);
+}
 .inputDetailsDataContent {
     width: 100%;
     display: flex;
