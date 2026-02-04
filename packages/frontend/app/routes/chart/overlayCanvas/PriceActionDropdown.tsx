@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
 import { t } from 'i18next';
+import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
 
 interface PriceActionDropdownProps {
     position: {
@@ -25,13 +25,6 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
     const { activeOrder } = useOrderPlacementStore();
 
     const isAbove = markPx !== undefined && position.price > markPx;
-    const showBuyShortcut = markPx !== undefined && position.price < markPx;
-    const showSellShortcut = markPx !== undefined && position.price > markPx;
-
-    // Detect Mac platform
-    const isMac =
-        typeof navigator !== 'undefined' &&
-        /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 
     const displaySize = activeOrder
         ? `${activeOrder.size} ${activeOrder.currency}`
@@ -42,11 +35,7 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
               label: activeOrder
                   ? `${t('quickTrade.sellSizeAtLimit', { size: displaySize, price: position.price.toFixed(2) })}`
                   : `${t('quickTrade.sellAtLimit', { price: position.price.toFixed(2) })}`,
-              shortcut: showSellShortcut
-                  ? isMac
-                      ? '⌥ ⇧ S'
-                      : 'Alt + Shift + S'
-                  : undefined,
+              shortcut: undefined,
               disabled: false,
               onClick: () => {
                   onSellStop(position.price);
@@ -58,11 +47,7 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
               label: activeOrder
                   ? `${t('quickTrade.buySizeAtLimit', { size: displaySize, price: position.price.toFixed(2) })}`
                   : `${t('quickTrade.buyAtLimit', { price: position.price.toFixed(2) })}`,
-              shortcut: showBuyShortcut
-                  ? isMac
-                      ? '⌥ ⇧ B'
-                      : 'Alt + Shift + B'
-                  : undefined,
+              shortcut: undefined,
               disabled: false,
               onClick: () => {
                   onBuyLimit(position.price);
@@ -76,11 +61,7 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
               label: activeOrder
                   ? `${t('quickTrade.buySizeAtStop', { size: displaySize, price: position.price.toFixed(2) })}`
                   : `${t('quickTrade.buyAtStop', { price: position.price.toFixed(2) })}`,
-              shortcut: showBuyShortcut
-                  ? isMac
-                      ? '⌥ ⇧ B'
-                      : 'Alt + Shift + B'
-                  : undefined,
+              shortcut: undefined,
               disabled: true,
               onClick: () => {
                   onBuyLimit(position.price);
@@ -92,11 +73,7 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
               label: activeOrder
                   ? `${t('quickTrade.sellSizeAtStop', { size: displaySize, price: position.price.toFixed(2) })}`
                   : `${t('quickTrade.sellAtStop', { price: position.price.toFixed(2) })}`,
-              shortcut: showSellShortcut
-                  ? isMac
-                      ? '⌥ ⇧ S'
-                      : 'Alt + Shift + S'
-                  : undefined,
+              shortcut: undefined,
               disabled: true,
               onClick: () => {
                   onSellStop(position.price);

@@ -58,6 +58,10 @@ import { processSymbolUrlParam } from '~/utils/AppUtils';
 import type { TabType } from '~/routes/trade';
 import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
 import { getPaneCanvasAndIFrameDoc } from '~/routes/chart/overlayCanvas/overlayCanvasUtils';
+import {
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
 
 import i18n from 'i18next';
 
@@ -892,6 +896,8 @@ export const TradingViewProvider: React.FC<{
                 }
                 toggleQuickMode();
             }
+            // Block TradingView symbol search for alphanumeric keys,
+            // but allow keys that match a known keyboard shortcut
             if (
                 !e.ctrlKey &&
                 !e.altKey &&
@@ -899,8 +905,14 @@ export const TradingViewProvider: React.FC<{
                 isSingleChar &&
                 isAlphaNumeric
             ) {
-                e.preventDefault();
-                e.stopPropagation();
+                const categories = getKeyboardShortcutCategories(i18n.t);
+                const isKnownShortcut = categories.some((cat) =>
+                    cat.shortcuts.some((s) => matchesShortcutEvent(e, s.keys)),
+                );
+                if (!isKnownShortcut) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
             }
         };
 

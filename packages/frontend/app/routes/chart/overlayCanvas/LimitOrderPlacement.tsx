@@ -19,6 +19,11 @@ import { t } from 'i18next';
 import { getTxLink } from '~/utils/Constants';
 import type { LimitOrderParams } from '~/services/limitOrderService';
 import { getDurationSegment } from '~/utils/functions/getSegment';
+import {
+    getKeyboardShortcutCategories,
+    getKeyboardShortcutById,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -190,36 +195,47 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         chart
             .activeChart()
             .crossHairMoved()
-            .subscribe(null, ({ offsetX, offsetY, price }) => {
-                if (!chart || !scaleData) return;
+            .subscribe(
+                null,
+                ({
+                    offsetX,
+                    offsetY,
+                    price,
+                }: {
+                    offsetX: number;
+                    offsetY: number;
+                    price: number;
+                }) => {
+                    if (!chart || !scaleData) return;
 
-                const { paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
+                    const { paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
 
-                if (!paneCanvas || !offsetX || !offsetY) {
-                    setMousePrice(null);
-                    return;
-                }
+                    if (!paneCanvas || !offsetX || !offsetY) {
+                        setMousePrice(null);
+                        return;
+                    }
 
-                const rect = paneCanvas.getBoundingClientRect();
+                    const rect = paneCanvas.getBoundingClientRect();
 
-                if (!rect) return;
+                    if (!rect) return;
 
-                const cssOffsetX = offsetX - rect.left;
-                const cssOffsetY = offsetY - rect.top;
+                    const cssOffsetX = offsetX - rect.left;
+                    const cssOffsetY = offsetY - rect.top;
 
-                const scaleY = paneCanvas.height / rect.height;
-                const scaleX = paneCanvas.width / rect.width;
+                    const scaleY = paneCanvas.height / rect.height;
+                    const scaleX = paneCanvas.width / rect.width;
 
-                const overlayOffsetX = cssOffsetX * scaleX;
-                const overlayOffsetY = cssOffsetY * scaleY;
+                    const overlayOffsetX = cssOffsetX * scaleX;
+                    const overlayOffsetY = cssOffsetY * scaleY;
 
-                overlayCanvasMousePositionRef.current = {
-                    x: overlayOffsetX,
-                    y: overlayOffsetY,
-                };
+                    overlayCanvasMousePositionRef.current = {
+                        x: overlayOffsetX,
+                        y: overlayOffsetY,
+                    };
 
-                setMousePrice(parseFloat(price.toFixed(3)));
-            });
+                    setMousePrice(parseFloat(price.toFixed(3)));
+                },
+            );
 
         const { iframeDoc, paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
         if (!iframeDoc || !paneCanvas) return;
@@ -495,32 +511,39 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     ]);
 
     useEffect(() => {
-        if (!chart || !mousePrice) return;
+        if (!chart) return;
 
         const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
         if (!iframeDoc) return;
 
-        const handleKeyDown = (e: KeyboardEvent) => {
-            // Alt/Option + Shift + B for Buy (Windows: Alt, Mac: Option)
-            if (e.altKey && e.shiftKey && e.code === 'KeyB') {
+        const handleIframeKeyDown = (e: KeyboardEvent) => {
+            // Check if this is the settings shortcut (cmd+,) and prevent default browser behavior
+            const categories = getKeyboardShortcutCategories(t);
+            const settingsShortcut = getKeyboardShortcutById(
+                categories,
+                'settings.open',
+            );
+
+            if (
+                settingsShortcut &&
+                matchesShortcutEvent(e, settingsShortcut.keys)
+            ) {
                 e.preventDefault();
-                if (!activeOrder) {
-                    openQuickModeConfirm();
-                    return;
-                }
-                handleBuyLimit(mousePrice);
-                return;
             }
-            // Alt/Option + Shift + S for Sell (Windows: Alt, Mac: Option)
-            if (e.altKey && e.shiftKey && e.code === 'KeyS') {
-                e.preventDefault();
-                if (!activeOrder) {
-                    openQuickModeConfirm();
-                    return;
-                }
-                handleSellStop(mousePrice);
-                return;
-            }
+
+            // Forward iframe keydown to window so global shortcuts work
+            window.dispatchEvent(
+                new KeyboardEvent('keydown', {
+                    key: e.key,
+                    code: e.code,
+                    altKey: e.altKey,
+                    ctrlKey: e.ctrlKey,
+                    metaKey: e.metaKey,
+                    shiftKey: e.shiftKey,
+                    repeat: e.repeat,
+                    bubbles: true,
+                }),
+            );
 
             // for demonstration cursor
             if (e.altKey) {
@@ -532,14 +555,12 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             }
         };
 
-        iframeDoc.addEventListener('keydown', handleKeyDown);
-        document.addEventListener('keydown', handleKeyDown);
+        iframeDoc.addEventListener('keydown', handleIframeKeyDown);
 
         return () => {
-            iframeDoc.removeEventListener('keydown', handleKeyDown);
-            document.removeEventListener('keydown', handleKeyDown);
+            iframeDoc.removeEventListener('keydown', handleIframeKeyDown);
         };
-    }, [chart, mousePrice, activeOrder, openQuickModeConfirm]);
+    }, [chart]);
 
     useEffect(() => {
         if (!chart || !isChartReady || !canvasSize) return;
