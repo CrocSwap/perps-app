@@ -663,6 +663,25 @@
     "chart": {
         "liqPrice": "Liquidationspreis"
     },
+    "quickTrade": {
+        "title": "Schnellhandelsmodus",
+        "quick": "Schnell",
+        "quickWithType": "Schnell {{tradeType}}",
+        "sizeTooltip": "Größe: {{size}} {{currency}}",
+        "clickToEnable": "Klicken, um den Schnellhandelsmodus zu aktivieren",
+        "sellAtLimit": "Verkaufen @ {{price}} Limit",
+        "buyAtLimit": "Kaufen @ {{price}} Limit",
+        "buyAtStop": "Kaufen @ {{price}} Stop",
+        "sellAtStop": "Verkaufen @ {{price}} Stop",
+        "sellSizeAtLimit": "Verkaufen {{size}} @ {{price}} Limit",
+        "buySizeAtLimit": "Kaufen {{size}} @ {{price}} Limit",
+        "buySizeAtStop": "Kaufen {{size}} @ {{price}} Stop",
+        "sellSizeAtStop": "Verkaufen {{size}} @ {{price}} Stop",
+        "infoText": "Klicken Sie auf den Chart, um vorkonfigurierte Orders zu platzieren",
+        "description": "Schnelltrades füllen das Orderformular mit dem angeklickten Preis und der ausgewählten Größe aus. Aktivieren Sie das Kontrollkästchen unten, um die Order sofort per Linksklick zu senden und die Bestätigung zu umgehen. Das Rechtsklick-Menü und das Plus-Button-Menü bieten ebenfalls Optionen für Schnelltrades ohne Bestätigung, selbst wenn deaktiviert.",
+        "enableConfirmationBypass": "Bestätigung überspringen und Order per Klick senden",
+        "saveAndEnable": "Speichern und aktivieren"
+    },
     "meta": {
         "title": "Ambient Finance | Perpetual Futures auf Fogo",
         "description": "Handeln Sie Perpetual Futures auf Fogo mit Ambient Finance. Keine Taker-Gebühren, bis zu 100x Hebel und blitzschnelle Ausführung.",

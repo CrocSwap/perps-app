@@ -662,6 +662,25 @@
     "chart": {
         "liqPrice": "Giá thanh lý"
     },
+    "quickTrade": {
+        "title": "Chế độ giao dịch nhanh",
+        "quick": "Nhanh",
+        "quickWithType": "Nhanh {{tradeType}}",
+        "sizeTooltip": "Khối lượng: {{size}} {{currency}}",
+        "clickToEnable": "Nhấp để bật chế độ giao dịch nhanh",
+        "sellAtLimit": "Bán @ {{price}} giới hạn",
+        "buyAtLimit": "Mua @ {{price}} giới hạn",
+        "buyAtStop": "Mua @ {{price}} dừng",
+        "sellAtStop": "Bán @ {{price}} dừng",
+        "sellSizeAtLimit": "Bán {{size}} @ {{price}} giới hạn",
+        "buySizeAtLimit": "Mua {{size}} @ {{price}} giới hạn",
+        "buySizeAtStop": "Mua {{size}} @ {{price}} dừng",
+        "sellSizeAtStop": "Bán {{size}} @ {{price}} dừng",
+        "infoText": "Nhấp vào biểu đồ để đặt lệnh đã cấu hình sẵn",
+        "description": "Giao dịch nhanh sẽ điền biểu mẫu lệnh với mức giá đã nhấp và khối lượng bạn chọn. Chọn ô bên dưới để gửi lệnh ngay khi nhấp chuột trái, bỏ qua bước xác nhận trên biểu mẫu. Menu chuột phải và menu nút dấu cộng cũng có các tùy chọn giao dịch nhanh không cần xác nhận ngay cả khi đang tắt.",
+        "enableConfirmationBypass": "Bỏ qua xác nhận và gửi lệnh khi nhấp",
+        "saveAndEnable": "Lưu và bật"
+    },
     "meta": {
         "title": "Ambient Finance | Hợp đồng vĩnh viễn trên Fogo",
         "description": "Giao dịch hợp đồng vĩnh viễn trên Fogo với Ambient Finance. Không phí taker, đòn bẩy lên đến 100x và khớp lệnh siêu nhanh.",
