@@ -16,10 +16,15 @@ import {
 import { DashboardTab } from './TabController';
 import styles from '../affiliates.module.css';
 
+// DEV OVERRIDE: Set to null to use actual logged-in user
+const DEV_USER_ADDRESS_OVERRIDE: string | null =
+    '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
+
 export function AffiliateCurrentLevelCard() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
-    const { userAddress } = useUserDataStore();
+    const { userAddress: storeUserAddress } = useUserDataStore();
+    const userAddress = DEV_USER_ADDRESS_OVERRIDE ?? storeUserAddress;
     const [, setSearchParams] = useSearchParams();
 
     const { data: audienceData } = useAffiliateAudience(

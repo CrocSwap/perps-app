@@ -20,10 +20,15 @@ import { getCommissionByAudienceId } from '../utils/affiliate-levels';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from '../affiliates.module.css';
 
+// DEV OVERRIDE: Set to null to use actual logged-in user
+const DEV_USER_ADDRESS_OVERRIDE: string | null =
+    '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
+
 export function LinksView() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
-    const { userAddress } = useUserDataStore();
+    const { userAddress: storeUserAddress } = useUserDataStore();
+    const userAddress = DEV_USER_ADDRESS_OVERRIDE ?? storeUserAddress;
     const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 
     const { data: audienceData } = useAffiliateAudience(
