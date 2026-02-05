@@ -35,21 +35,24 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
     const { chart, isChartReady } = useTradingView();
-    const storeScaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
 
     const [isPaneChanged, setIsPaneChanged] = useState(false);
 
-    const [zoomChanged, setZoomChanged] = useState(false);
     const prevRangeRef = useRef<{ min: number; max: number } | null>(null);
 
     const animationFrameRef = useRef<number>(0);
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isZoomingRef = useRef(false);
+    const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
+    const zoomChanged = useChartScaleStore((state) => state.zoomChanged);
+    const setZoomChanged = useChartScaleStore((state) => state.setZoomChanged);
+    const setPriceDomain = useChartScaleStore((state) => state.setPriceDomain);
 
-    const [canvasSize, setCanvasSize] = useState<CanvasSize>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [canvasSize, setCanvasSize] = useState<any>();
 
     useEffect(() => {
-        if (!chart || !storeScaleDataRef.current) return;
+        if (!chart || !scaleDataRef.current) return;
 
         const chartRef = chart.activeChart();
         const paneIndex = getMainSeriesPaneIndex(chart);
@@ -66,11 +69,11 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
                     max: priceRange.to,
                 };
 
-                storeScaleDataRef.current?.yScale.domain([
+                scaleDataRef.current?.yScale.domain([
                     currentRange.min,
                     currentRange.max,
                 ]);
-                storeScaleDataRef.current?.scaleSymlog.domain([
+                scaleDataRef.current?.scaleSymlog.domain([
                     currentRange.min,
                     currentRange.max,
                 ]);
@@ -83,6 +86,10 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
 
                 if (hasChanged) {
                     prevRangeRef.current = currentRange;
+                    setPriceDomain({
+                        min: currentRange.min,
+                        max: currentRange.max,
+                    });
 
                     if (!isZoomingRef.current) {
                         isZoomingRef.current = true;
@@ -113,25 +120,23 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
                 clearTimeout(debounceTimerRef.current);
             }
         };
-    }, [chart, storeScaleDataRef.current]);
+    }, [chart, scaleDataRef.current]);
 
     useEffect(() => {
         if (!chart || !isChartReady) return;
 
-        // BACKUP : LIQUIDATION
-        //     const isFirstInit = !scaleDataRef.current;
         const dpr = window.devicePixelRatio || 1;
-        const isFirstInit = !storeScaleDataRef.current;
+        const isFirstInit = !scaleDataRef.current;
 
         if (isFirstInit) {
             const yScale = d3.scaleLinear();
 
             const scaleSymlog = d3.scaleSymlog();
-            storeScaleDataRef.current = { yScale, scaleSymlog };
+            scaleDataRef.current = { yScale, scaleSymlog };
         }
 
-        const yScale = storeScaleDataRef.current!.yScale;
-        const scaleSymlog = storeScaleDataRef.current!.scaleSymlog;
+        const yScale = scaleDataRef.current!.yScale;
+        const scaleSymlog = scaleDataRef.current!.scaleSymlog;
 
         const { iframeDoc, paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
 
@@ -237,7 +242,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
                 canvasRef,
                 canvasWrapperRef,
                 canvasSize: canvasSize,
-                scaleData: storeScaleDataRef.current,
+                scaleData: scaleDataRef.current,
                 mousePositionRef,
                 zoomChanged: zoomChanged,
             })}

@@ -27,6 +27,10 @@ export type LineLabel =
       }
     | { type: 'Liq'; text: string };
 
+export type CanvasSize = {
+    width: number;
+    height: number;
+};
 export const addCustomOrderLine = async (
     chart: IChartingLibraryWidget,
     orderPrice: number,
@@ -90,9 +94,11 @@ export const getPricetoPixel = (
     const dpr = window.devicePixelRatio || 1;
     const textHeight = (lineType === 'LIQ' ? 18 : 15) * dpr;
     let pixel = 0;
+    let rawPixel = 0;
 
     const paneIndex = getMainSeriesPaneIndex(chart);
-    if (paneIndex === null) return { pixel: 0, chartHeight: 0, textHeight: 0 };
+    if (paneIndex === null)
+        return { pixel: 0, rawPixel: 0, chartHeight: 0, textHeight: 0 };
     const priceScalePane = chart.activeChart().getPanes()[
         paneIndex
     ] as IPaneApi;
@@ -104,7 +110,8 @@ export const getPricetoPixel = (
             ? chartHeight
             : priceScalePane.getHeight();
 
-        if (!priceRange) return { pixel: 0, chartHeight: 0, textHeight: 0 };
+        if (!priceRange)
+            return { pixel: 0, rawPixel: 0, chartHeight: 0, textHeight: 0 };
 
         const maxPrice = priceRange.to;
         const minPrice = priceRange.from;
@@ -113,7 +120,9 @@ export const getPricetoPixel = (
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { coordOffset } = (priceScale as any)._priceScale._logFormula;
             scaleData.scaleSymlog.constant(coordOffset);
-            const logPrice = scaleData.scaleSymlog(price);
+            const logPrice = scaleData.scaleSymlog(price) * dpr;
+
+            rawPixel = logPrice;
             pixel = logPrice - textHeight / 2;
         } else {
             const priceDifference = maxPrice - minPrice;
@@ -121,17 +130,19 @@ export const getPricetoPixel = (
             const pixelCoordinate =
                 (relativePrice / priceDifference) * chartHeightTemp;
 
+            rawPixel = chartHeightTemp - pixelCoordinate;
             pixel = chartHeightTemp - pixelCoordinate - textHeight / 2;
         }
 
         return {
             pixel: pixel,
+            rawPixel: rawPixel,
             chartHeight: chartHeightTemp,
             textHeight: textHeight,
         };
     }
 
-    return { pixel: 0, chartHeight: 0, textHeight: 0 };
+    return { pixel: 0, rawPixel: 0, chartHeight: 0, textHeight: 0 };
 };
 
 export function estimateTextWidth(text: string, fontSize: number = 10): number {
@@ -412,3 +423,19 @@ export function isInsideCancelTextBounds(
         clickY <= textY + estimatedHeight
     );
 }
+
+export const updateOverlayCanvasSize = (
+    canvas: HTMLCanvasElement,
+    canvasSize: CanvasSize,
+) => {
+    const dpr = window.devicePixelRatio || 1;
+
+    const width = canvasSize.width;
+    const height = canvasSize.height;
+
+    canvas.width = width;
+    canvas.style.width = `${width / dpr}px`;
+
+    canvas.height = height;
+    canvas.style.height = `${height / dpr}px`;
+};

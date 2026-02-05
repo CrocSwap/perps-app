@@ -18,10 +18,13 @@ import {
     getMainSeriesPaneIndex,
     getPaneCanvasAndIFrameDoc,
     getXandYLocationForChartDrag,
-    updateOverlayCanvasSize,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
-import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
+import {
+    formatLineLabel,
+    getPricetoPixel,
+    updateOverlayCanvasSize,
+} from '../customOrderLineUtils';
 import {
     drawLabel,
     drawLabelMobile,
@@ -92,6 +95,8 @@ const LabelComponent = ({
         selectedOrderLine,
         shouldConfirmOrder,
         setShouldConfirmOrder,
+        setShowPlusButton,
+        setIsCancelClicking,
     } = useChartLinesStore();
 
     const priceDomain = useChartScaleStore((state) => state.priceDomain);
@@ -423,9 +428,8 @@ const LabelComponent = ({
         let animationFrameId: number | null = null;
 
         const draw = () => {
-            const heightAttr = canvasSize?.height;
-            const widthAttr = canvasSize?.width;
-
+            let heightAttr = canvasSize?.height;
+            let widthAttr = canvasSize?.width;
             if (overlayCanvasRef.current) {
                 updateOverlayCanvasSize(overlayCanvasRef.current, canvasSize);
             }
@@ -716,6 +720,7 @@ const LabelComponent = ({
                         isLiqPriceLineDraggable)) &&
                 isLabel.label?.type !== 'Cancel'
             ) {
+                setShowPlusButton(false);
                 if (overlayCanvasRef.current) {
                     if (
                         dragLabelTooltipRef.current &&
@@ -735,6 +740,7 @@ const LabelComponent = ({
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
                 }
             } else {
+                setShowPlusButton(true);
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.cursor = 'pointer';
                     overlayCanvasRef.current.style.pointerEvents = 'none';
@@ -791,6 +797,7 @@ const LabelComponent = ({
                                     '.chart-markup-table.pane',
                                 );
                                 if (isLabel) {
+                                    setShowPlusButton(false);
                                     if (overlayCanvasRef.current) {
                                         if (isLabel.matchType === 'onLabel') {
                                             if (
@@ -841,6 +848,7 @@ const LabelComponent = ({
                                         }
                                     }
                                 } else {
+                                    setShowPlusButton(true);
                                     if (pane) {
                                         (pane as HTMLElement).style.cursor =
                                             'crosshair';
@@ -969,12 +977,15 @@ const LabelComponent = ({
     }, [chart, isDrag, drawnLabelsRef.current, isMobile]);
 
     const handleCancel = async (order: LineData) => {
+        setIsCancelClicking(true);
+
         if (!order.oid) {
             notifications.add({
                 title: t('transactions.cancelFailed.title'),
                 message: t('transactions.cancelFailed.message'),
                 icon: 'error',
             });
+            setIsCancelClicking(false);
             return;
         }
 
@@ -1091,6 +1102,8 @@ const LabelComponent = ({
                     },
                 });
             }
+        } finally {
+            setIsCancelClicking(false);
         }
     };
 

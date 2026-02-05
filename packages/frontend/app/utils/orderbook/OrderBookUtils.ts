@@ -430,3 +430,17 @@ export const createRandomOrderBookLiq = (
 
     return { liqBuys, liqSells };
 };
+
+export const triggerPulseAnimation = (
+    id: string,
+    animClass = 'divPulseNeon',
+    checkerClass: string,
+) => {
+    const el = document.getElementById(id);
+    if (el?.classList.contains(checkerClass)) return;
+    el?.classList.add(animClass);
+    el?.classList.add(checkerClass);
+    setTimeout(() => {
+        el?.classList.remove(animClass);
+    }, 800);
+};

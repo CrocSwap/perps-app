@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { useParams } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import {
     clearAllChartCaches,
     clearChartCachesForSymbol,
@@ -58,6 +59,12 @@ import type {
 } from '~/tv/charting_library';
 import { processSymbolUrlParam } from '~/utils/AppUtils';
 import type { TabType } from '~/routes/trade';
+import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
+import { getPaneCanvasAndIFrameDoc } from '~/routes/chart/overlayCanvas/overlayCanvasUtils';
+import {
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
 
 import i18n from 'i18next';
 import { useLiqChartStore } from '~/stores/LiqChartStore';
@@ -101,6 +108,24 @@ export const TradingViewProvider: React.FC<{
     switchTab?: (tab: TabType) => void;
 }> = ({ children, tradingviewLib, setChartLoadingStatus, switchTab }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
+    const { toggleQuickMode, openQuickModeConfirm, resetQuickModeState } =
+        useOrderPlacementStore();
+
+    const session = useSession();
+    const isSessionEstablished = isEstablished(session);
+    const isSessionEstablishedRef = useRef(isSessionEstablished);
+
+    useEffect(() => {
+        isSessionEstablishedRef.current = isSessionEstablished;
+    }, [isSessionEstablished]);
+
+    const clickSessionButton = useCallback(() => {
+        const sessionWrap = document.querySelector('[class*="sessionWrap"]');
+        const sessionBtn = sessionWrap?.querySelector(
+            'button, [role="button"]',
+        ) as HTMLElement | null;
+        sessionBtn?.click();
+    }, []);
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
@@ -111,6 +136,12 @@ export const TradingViewProvider: React.FC<{
     const { showLiqOptions, setShowLiqOptions } = useLiqChartStore();
 
     const { setBuyLiqs, setSellLiqs } = useLiquidationStore();
+
+    useEffect(() => {
+        if (!isSessionEstablished) {
+            resetQuickModeState();
+        }
+    }, [isSessionEstablished, resetQuickModeState]);
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
@@ -162,6 +193,17 @@ export const TradingViewProvider: React.FC<{
 
     // logic to change the active color pair
     const { bsColor, getBsColor } = useAppSettings();
+
+    const { confirmOrder } = useOrderPlacementStore();
+    const { symbolInfo } = useTradeDataStore();
+
+    const markPx = symbolInfo?.markPx || 1;
+
+    const markPxRef = useRef(markPx);
+
+    useEffect(() => {
+        markPxRef.current = markPx;
+    }, [markPx]);
 
     function changeColors(c: colorSetIF): void {
         // make sure the chart exists
@@ -577,6 +619,159 @@ export const TradingViewProvider: React.FC<{
                     }
                 });
 
+            // Add Quick Trade Mode controls to header (Toggle + Dropdown)
+            tvWidget.headerReady().then(() => {
+                const container = tvWidget.createButton({ align: 'left' });
+                container.style.display = 'flex';
+                container.style.alignItems = 'center';
+                container.style.marginLeft = '8px';
+
+                const quickButton = document.createElement('button');
+                quickButton.style.padding = '8px 12px';
+                quickButton.style.backgroundColor = '#2a2e39';
+                quickButton.style.border = 'none';
+                quickButton.style.borderRadius = '4px 0px 0px 4px';
+                quickButton.style.color = '#cbcaca';
+                quickButton.style.fontSize = '13px';
+                quickButton.style.fontWeight = '500';
+                quickButton.style.cursor = 'pointer';
+                quickButton.style.height = '30px';
+                quickButton.style.display = 'flex';
+                quickButton.style.alignItems = 'center';
+                quickButton.style.gap = '6px';
+                quickButton.style.transition = 'all 0.15s';
+
+                // Lightning Icon
+                const lightningIcon = document.createElement('span');
+                lightningIcon.innerHTML = `
+<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+</svg>
+`;
+                lightningIcon.style.display = 'flex';
+                lightningIcon.style.alignItems = 'center';
+                lightningIcon.style.justifyContent = 'center';
+                lightningIcon.style.color = 'inherit';
+
+                const quickText = document.createElement('span');
+                quickText.textContent = i18n.t('quickTrade.title');
+
+                quickButton.appendChild(quickText);
+                quickButton.appendChild(lightningIcon);
+
+                const settingsButton = document.createElement('button');
+                settingsButton.style.display = 'flex';
+                settingsButton.style.alignItems = 'center';
+                settingsButton.style.justifyContent = 'center';
+                settingsButton.style.width = '30px';
+                settingsButton.style.height = '30px';
+                settingsButton.style.backgroundColor = '#1e2029';
+                settingsButton.style.border = 'none';
+                settingsButton.style.borderRadius = '0px 4px 4px 0px';
+                settingsButton.style.color = '#cbcaca';
+                settingsButton.style.fontSize = '14px';
+                settingsButton.style.cursor = 'pointer';
+                settingsButton.innerHTML = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="#cbcaca" x="0px" y="0px" width="50" height="50" viewBox="0 0 50 50"> <path d="M 22.205078 2 A 1.0001 1.0001 0 0 0 21.21875 2.8378906 L 20.246094 8.7929688 C 19.076509 9.1331971 17.961243 9.5922728 16.910156 10.164062 L 11.996094 6.6542969 A 1.0001 1.0001 0 0 0 10.708984 6.7597656 L 6.8183594 10.646484 A 1.0001 1.0001 0 0 0 6.7070312 11.927734 L 10.164062 16.873047 C 9.583454 17.930271 9.1142098 19.051824 8.765625 20.232422 L 2.8359375 21.21875 A 1.0001 1.0001 0 0 0 2.0019531 22.205078 L 2.0019531 27.705078 A 1.0001 1.0001 0 0 0 2.8261719 28.691406 L 8.7597656 29.742188 C 9.1064607 30.920739 9.5727226 32.043065 10.154297 33.101562 L 6.6542969 37.998047 A 1.0001 1.0001 0 0 0 6.7597656 39.285156 L 10.648438 43.175781 A 1.0001 1.0001 0 0 0 11.927734 43.289062 L 16.882812 39.820312 C 17.936999 40.39548 19.054994 40.857928 20.228516 41.201172 L 21.21875 47.164062 A 1.0001 1.0001 0 0 0 22.205078 48 L 27.705078 48 A 1.0001 1.0001 0 0 0 28.691406 47.173828 L 29.751953 41.1875 C 30.920633 40.838997 32.033372 40.369697 33.082031 39.791016 L 38.070312 43.291016 A 1.0001 1.0001 0 0 0 39.351562 43.179688 L 43.240234 39.287109 A 1.0001 1.0001 0 0 0 43.34375 37.996094 L 39.787109 33.058594 C 40.355783 32.014958 40.813915 30.908875 41.154297 29.748047 L 47.171875 28.693359 A 1.0001 1.0001 0 0 0 47.998047 27.707031 L 47.998047 22.207031 A 1.0001 1.0001 0 0 0 47.160156 21.220703 L 41.152344 20.238281 C 40.80968 19.078827 40.350281 17.974723 39.78125 16.931641 L 43.289062 11.933594 A 1.0001 1.0001 0 0 0 43.177734 10.652344 L 39.287109 6.7636719 A 1.0001 1.0001 0 0 0 37.996094 6.6601562 L 33.072266 10.201172 C 32.023186 9.6248101 30.909713 9.1579916 29.738281 8.8125 L 28.691406 2.828125 A 1.0001 1.0001 0 0 0 27.705078 2 L 22.205078 2 z M 23.056641 4 L 26.865234 4 L 27.861328 9.6855469 A 1.0001 1.0001 0 0 0 28.603516 10.484375 C 30.066026 10.848832 31.439607 11.426549 32.693359 12.185547 A 1.0001 1.0001 0 0 0 33.794922 12.142578 L 38.474609 8.7792969 L 41.167969 11.472656 L 37.835938 16.220703 A 1.0001 1.0001 0 0 0 37.796875 17.310547 C 38.548366 18.561471 39.118333 19.926379 39.482422 21.380859 A 1.0001 1.0001 0 0 0 40.291016 22.125 L 45.998047 23.058594 L 45.998047 26.867188 L 40.279297 27.871094 A 1.0001 1.0001 0 0 0 39.482422 28.617188 C 39.122545 30.069817 38.552234 31.434687 37.800781 32.685547 A 1.0001 1.0001 0 0 0 37.845703 33.785156 L 41.224609 38.474609 L 38.53125 41.169922 L 33.791016 37.84375 A 1.0001 1.0001 0 0 0 32.697266 37.808594 C 31.44975 38.567585 30.074755 39.148028 28.617188 39.517578 A 1.0001 1.0001 0 0 0 27.876953 40.3125 L 26.867188 46 L 23.052734 46 L 22.111328 40.337891 A 1.0001 1.0001 0 0 0 21.365234 39.53125 C 19.90185 39.170557 18.522094 38.59371 17.259766 37.835938 A 1.0001 1.0001 0 0 0 16.171875 37.875 L 11.46875 41.169922 L 8.7734375 38.470703 L 12.097656 33.824219 A 1.0001 1.0001 0 0 0 12.138672 32.724609 C 11.372652 31.458855 10.793319 30.079213 10.427734 28.609375 A 1.0001 1.0001 0 0 0 9.6328125 27.867188 L 4.0019531 26.867188 L 4.0019531 23.052734 L 9.6289062 22.117188 A 1.0001 1.0001 0 0 0 10.435547 21.373047 C 10.804273 19.898143 11.383325 18.518729 12.146484 17.255859 A 1.0001 1.0001 0 0 0 12.111328 16.164062 L 8.8261719 11.46875 L 11.523438 8.7734375 L 16.185547 12.105469 A 1.0001 1.0001 0 0 0 17.28125 12.148438 C 18.536908 11.394293 19.919867 10.822081 21.384766 10.462891 A 1.0001 1.0001 0 0 0 22.132812 9.6523438 L 23.056641 4 z M 25 17 C 20.593567 17 17 20.593567 17 25 C 17 29.406433 20.593567 33 25 33 C 29.406433 33 33 29.406433 33 25 C 33 20.593567 29.406433 17 25 17 z M 25 19 C 28.325553 19 31 21.674447 31 25 C 31 28.325553 28.325553 31 25 31 C 21.674447 31 19 28.325553 19 25 C 19 21.674447 21.674447 19 25 19 z"></path> </svg>
+
+`;
+
+                const updateQuickState = () => {
+                    const state = useOrderPlacementStore.getState();
+
+                    const { paneCanvas } = getPaneCanvasAndIFrameDoc(tvWidget);
+                    const canvasWidth = paneCanvas?.width || 0;
+                    const isNarrow = canvasWidth < 800;
+
+                    if (isNarrow) {
+                        quickText.textContent = i18n.t('quickTrade.quick');
+                    } else if (state.activeOrder) {
+                        quickText.textContent = i18n.t(
+                            'quickTrade.quickWithType',
+                            { tradeType: state.activeOrder.tradeType },
+                        );
+                    } else {
+                        quickText.textContent = i18n.t('quickTrade.title');
+                    }
+
+                    if (state.activeOrder) {
+                        container.setAttribute(
+                            'title',
+                            i18n.t('quickTrade.sizeTooltip', {
+                                size: state.activeOrder.size,
+                                currency: state.activeOrder.currency,
+                            }),
+                        );
+                    } else {
+                        container.setAttribute(
+                            'title',
+                            i18n.t('quickTrade.clickToEnable'),
+                        );
+                    }
+
+                    if (state.quickMode) {
+                        quickButton.style.backgroundColor =
+                            'var(--accent1-dark, #5f5df0)';
+                        quickButton.style.color = '#ffffff';
+                    } else {
+                        quickButton.style.backgroundColor = '#2a2e39';
+                        quickButton.style.color = '#cbcaca';
+                    }
+                };
+
+                updateQuickState();
+
+                const unsubscribe = useOrderPlacementStore.subscribe(() => {
+                    updateQuickState();
+                });
+
+                quickButton.addEventListener('click', () => {
+                    const state = useOrderPlacementStore.getState();
+                    if (!state.activeOrder) {
+                        openQuickModeConfirm();
+                        return;
+                    }
+                    if (!isSessionEstablishedRef.current) {
+                        clickSessionButton();
+                        return;
+                    }
+                    toggleQuickMode();
+                });
+
+                quickButton.addEventListener('mouseenter', () => {
+                    const state = useOrderPlacementStore.getState();
+                    if (!state.quickMode) {
+                        quickButton.style.backgroundColor = '#4a5060';
+                    }
+                });
+                quickButton.addEventListener('mouseleave', updateQuickState);
+
+                settingsButton.addEventListener('click', () => {
+                    openQuickModeConfirm();
+                });
+
+                settingsButton.addEventListener('mouseenter', () => {
+                    settingsButton.style.backgroundColor = '#4a5060';
+                });
+
+                settingsButton.addEventListener('mouseleave', () => {
+                    settingsButton.style.backgroundColor = '#1e2029';
+                });
+
+                container.appendChild(quickButton);
+                container.appendChild(settingsButton);
+
+                const handleResize = () => {
+                    updateQuickState();
+                };
+                window.addEventListener('resize', handleResize);
+
+                return () => {
+                    unsubscribe();
+                    window.removeEventListener('resize', handleResize);
+                };
+            });
+
             setChart(tvWidget);
         });
     }, [chartState, info, tradingviewLib, marketId]);
@@ -608,6 +803,137 @@ export const TradingViewProvider: React.FC<{
             }
         };
     }, [chartState, info, i18n.language, initChart, tradingviewLib]);
+
+    useEffect(() => {
+        if (!chart) return;
+
+        chart.onContextMenu((_unixTime: number, price: number) => {
+            const state = useOrderPlacementStore.getState();
+            const activeOrder = state.activeOrder;
+
+            const formattedPrice = Number(price.toFixed(2));
+            const isAbove = formattedPrice > markPxRef.current;
+
+            if (!activeOrder) {
+                const topOrder = isAbove
+                    ? {
+                          text: i18n.t('quickTrade.sellAtLimit', {
+                              price: formattedPrice,
+                          }),
+                          side: 'sell' as const,
+                      }
+                    : {
+                          text: i18n.t('quickTrade.buyAtLimit', {
+                              price: formattedPrice,
+                          }),
+                          side: 'buy' as const,
+                      };
+
+                const bottomOrder = isAbove
+                    ? {
+                          text: `${i18n.t('quickTrade.buyAtStop', {
+                              price: formattedPrice,
+                          })} (${i18n.t('common.comingSoon')})`,
+                          side: 'buy' as const,
+                      }
+                    : {
+                          text: `${i18n.t('quickTrade.sellAtStop', {
+                              price: formattedPrice,
+                          })} (${i18n.t('common.comingSoon')})`,
+                          side: 'sell' as const,
+                      };
+
+                return [
+                    {
+                        position: 'top' as const,
+                        text: topOrder.text,
+                        click: () => {
+                            openQuickModeConfirm();
+                        },
+                    },
+                    {
+                        position: 'top' as const,
+                        text: bottomOrder.text,
+                        click: () => {},
+                    },
+                    {
+                        position: 'top' as const,
+                        text: '-',
+                        click: () => {},
+                    },
+                ];
+            }
+
+            const displaySize = `${activeOrder.size} ${activeOrder.currency}`;
+
+            const topOrder = isAbove
+                ? {
+                      text: i18n.t('quickTrade.sellSizeAtLimit', {
+                          size: displaySize,
+                          price: formattedPrice,
+                      }),
+                      side: 'sell' as const,
+                      type: 'Limit' as const,
+                  }
+                : {
+                      text: i18n.t('quickTrade.buySizeAtLimit', {
+                          size: displaySize,
+                          price: formattedPrice,
+                      }),
+                      side: 'buy' as const,
+                      type: 'Limit' as const,
+                  };
+
+            const bottomOrder = isAbove
+                ? {
+                      text: `${i18n.t('quickTrade.buySizeAtStop', {
+                          size: displaySize,
+                          price: formattedPrice,
+                      })} (${i18n.t('common.comingSoon')})`,
+                      side: 'buy' as const,
+                      type: 'Stop' as const,
+                  }
+                : {
+                      text: `${i18n.t('quickTrade.sellSizeAtStop', {
+                          size: displaySize,
+                          price: formattedPrice,
+                      })} (${i18n.t('common.comingSoon')})`,
+                      side: 'sell' as const,
+                      type: 'Stop' as const,
+                  };
+
+            return [
+                {
+                    position: 'top' as const,
+                    text: topOrder.text,
+                    click: () => {
+                        if (!isSessionEstablishedRef.current) {
+                            clickSessionButton();
+                            return;
+                        }
+                        confirmOrder({
+                            price: formattedPrice,
+                            side: topOrder.side,
+                            type: activeOrder.tradeType,
+                            size: activeOrder.size,
+                            currency: activeOrder.currency,
+                            timestamp: Date.now(),
+                        });
+                    },
+                },
+                {
+                    position: 'top' as const,
+                    text: bottomOrder.text,
+                    click: () => {},
+                },
+                {
+                    position: 'top' as const,
+                    text: '-',
+                    click: () => {},
+                },
+            ];
+        });
+    }, [chart]);
 
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;
@@ -648,6 +974,21 @@ export const TradingViewProvider: React.FC<{
                 e.preventDefault();
                 setDebugToolbarOpen(!debugToolbarOpenRef.current);
             }
+            if (e.code === 'KeyQ' && e.altKey) {
+                e.preventDefault();
+                const state = useOrderPlacementStore.getState();
+                if (!state.activeOrder) {
+                    openQuickModeConfirm();
+                    return;
+                }
+                if (!isSessionEstablishedRef.current) {
+                    clickSessionButton();
+                    return;
+                }
+                toggleQuickMode();
+            }
+            // Block TradingView symbol search for alphanumeric keys,
+            // but allow keys that match a known keyboard shortcut
             if (
                 !e.ctrlKey &&
                 !e.altKey &&
@@ -655,14 +996,22 @@ export const TradingViewProvider: React.FC<{
                 isSingleChar &&
                 isAlphaNumeric
             ) {
-                e.preventDefault();
-                e.stopPropagation();
+                const categories = getKeyboardShortcutCategories(i18n.t);
+                const isKnownShortcut = categories.some((cat) =>
+                    cat.shortcuts.some((s) => matchesShortcutEvent(e, s.keys)),
+                );
+                if (!isKnownShortcut) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
             }
         };
 
+        window.addEventListener('keydown', blockSymbolSearchKeys, true);
         iframeDoc?.addEventListener('keydown', blockSymbolSearchKeys, true);
 
         return () => {
+            window.removeEventListener('keydown', blockSymbolSearchKeys, true);
             iframeDoc?.removeEventListener(
                 'keydown',
                 blockSymbolSearchKeys,
