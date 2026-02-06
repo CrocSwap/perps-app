@@ -1,15 +1,10 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
+import { Fuul, type Affiliate, type UserIdentifierType } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
 
 interface FuulContextType {
     isInitialized: boolean;
     trackPageView: () => void;
-    sendConversionEvent: (
-        userIdentifier: string,
-        identifierType: UserIdentifierType,
-        eventName: string,
-    ) => Promise<void>;
     isRefCodeFree: (code: string) => Promise<boolean>;
     getRefCode: (
         userIdentifier: string,
@@ -20,7 +15,6 @@ interface FuulContextType {
 const FuulContext = createContext<FuulContextType>({
     isInitialized: false,
     trackPageView: () => {},
-    sendConversionEvent: () => Promise.resolve(),
     isRefCodeFree: () => Promise.resolve(false),
     getRefCode: () => Promise.resolve(null),
 });
@@ -70,33 +64,11 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }
 
-    async function sendConversionEvent(
-        userIdentifier: string,
-        identifierType: UserIdentifierType,
-        eventName: string,
-    ): Promise<void> {
-        if (!isInitialized) {
-            console.warn(
-                'Cannot send conversion event before Fuul system is initialized',
-            );
-            return;
-        }
-        try {
-            await Fuul.sendEvent(eventName, {
-                user_id: userIdentifier,
-                user_id_type: identifierType,
-            });
-        } catch (error) {
-            console.error('Failed to send conversion event:', error);
-        }
-    }
-
     return (
         <FuulContext.Provider
             value={{
                 isInitialized,
                 trackPageView,
-                sendConversionEvent,
                 isRefCodeFree: Fuul.isAffiliateCodeFree,
                 getRefCode: Fuul.getAffiliateCode,
             }}
