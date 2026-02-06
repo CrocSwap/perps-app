@@ -662,6 +662,25 @@
     "chart": {
         "liqPrice": "清算価格"
     },
+    "quickTrade": {
+        "title": "クイック取引モード",
+        "quick": "クイック",
+        "quickWithType": "クイック {{tradeType}}",
+        "sizeTooltip": "数量: {{size}} {{currency}}",
+        "clickToEnable": "クリックしてクイック取引モードを有効にする",
+        "sellAtLimit": "{{price}} 指値で売る",
+        "buyAtLimit": "{{price}} 指値で買う",
+        "buyAtStop": "{{price}} 逆指値で買う",
+        "sellAtStop": "{{price}} 逆指値で売る",
+        "sellSizeAtLimit": "{{size}} {{price}} 指値で売る",
+        "buySizeAtLimit": "{{size}} {{price}} 指値で買う",
+        "buySizeAtStop": "{{size}} {{price}} 逆指値で買う",
+        "sellSizeAtStop": "{{size}} {{price}} 逆指値で売る",
+        "infoText": "チャートをクリックして事前設定の注文を出す",
+        "description": "クイック取引は、クリックした価格と選択した数量で注文フォームを埋めます。下のチェックボックスを選ぶと、左クリックで注文確認を省略して即時送信します。右クリックメニューとプラスボタンメニューには、無効時でも確認なしでクイック取引できるオプションがあります。",
+        "enableConfirmationBypass": "確認を省略してクリックで注文を送信",
+        "saveAndEnable": "保存して有効化"
+    },
     "meta": {
         "title": "Ambient Finance | Fogo上の無期限先物",
         "description": "Ambient FinanceでFogo上の無期限先物を取引。テイカー手数料ゼロ、最大100倍レバレッジ、超高速約定。",

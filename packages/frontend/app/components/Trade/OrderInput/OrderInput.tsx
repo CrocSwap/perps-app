@@ -76,6 +76,7 @@ import type {
 import { useTranslation } from 'react-i18next';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { useMobile } from '~/hooks/useMediaQuery';
+import { triggerPulseAnimation } from '~/utils/orderbook/OrderBookUtils';
 
 const useOnlyMarket = false;
 
@@ -194,6 +195,7 @@ function OrderInput({
         setMarginMode,
         setOrderInputPriceValue,
         orderInputPriceValue,
+        orderInputSizeValue,
         tradeDirection,
         setTradeDirection,
         setIsMidModeActive,
@@ -948,22 +950,58 @@ function OrderInput({
                 }
             }
 
+            if (orderInputPriceValue.changeType === 'quickTradeMode') {
+                triggerPulseAnimation(
+                    'trade-module-price-input-container',
+                    'divPulseNeon',
+                    'pulsed-quick-trade',
+                );
+                triggerPulseAnimation(
+                    'trade-module-size-input-container',
+                    'divPulseNeon',
+                    'pulsed-quick-trade',
+                );
+                return;
+            }
+
             if (
                 isMidModeActiveRef.current ||
                 orderInputPriceValue.changeType !== 'dragEnd'
             )
                 return;
-            const orderElem = document.getElementById(
+            triggerPulseAnimation(
                 'trade-module-price-input-container',
+                'divPulseNeon',
+                'pulsed',
             );
-            if (orderElem?.classList.contains('pulsed')) return;
-            orderElem?.classList.add('divPulseNeon');
-            orderElem?.classList.add('pulsed');
-            setTimeout(() => {
-                orderElem?.classList.remove('divPulseNeon');
-            }, 800);
         }
     }, [orderInputPriceValue.value, usualResolution]);
+
+    useEffect(() => {
+        if (orderInputSizeValue.value > 0) {
+            let convertedValue = orderInputSizeValue.value;
+
+            // Convert if denominations don't match
+            if (orderInputSizeValue.denom !== selectedDenom && markPx) {
+                if (
+                    orderInputSizeValue.denom === 'usd' &&
+                    selectedDenom === 'symbol'
+                ) {
+                    // USD to Symbol: divide by markPx
+                    convertedValue = orderInputSizeValue.value / markPx;
+                } else if (
+                    orderInputSizeValue.denom === 'symbol' &&
+                    selectedDenom === 'usd'
+                ) {
+                    // Symbol to USD: multiply by markPx
+                    convertedValue = orderInputSizeValue.value * markPx;
+                }
+            }
+
+            setSizeDisplay(formatNumWithOnlyDecimals(convertedValue, 6, true));
+            setIsEditingSizeInput(false);
+        }
+    }, [orderInputSizeValue, selectedDenom, markPx]);
 
     // Set direction when price input value changes (already debounced via assignPrice)
     useEffect(() => {
