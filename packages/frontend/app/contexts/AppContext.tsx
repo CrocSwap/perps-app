@@ -158,7 +158,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                     );
 
                     void pollConnectWalletConsistency({
-                        txSignature: transactionResult.signature,
                         walletPublicKey,
                         referralAttribution: connectWallet.referralAttribution,
                     }).catch((error) => {

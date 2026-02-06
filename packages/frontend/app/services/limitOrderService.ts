@@ -249,7 +249,6 @@ export class LimitOrderService {
                 );
 
                 void pollTradeConsistency({
-                    txSignature: transactionResult.signature,
                     walletPublicKey: userWalletKey,
                     includesFirstTrade: refregResult.includesFirstTrade,
                     includesCompleteConversion:

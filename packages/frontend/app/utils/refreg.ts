@@ -6,8 +6,6 @@ import {
     TransactionInstruction,
 } from '@solana/web3.js';
 import { Buffer } from 'buffer';
-import { useNotificationStore } from '../stores/NotificationStore';
-import { getTxLink } from './Constants';
 
 type BuildIxParams = {
     sessionPublicKey: PublicKey;
@@ -73,14 +71,15 @@ const REFERRAL_KIND_STORAGE_KEY = 'referral_kind';
 const REFERRAL_ID_STORAGE_KEY = 'referral_id';
 const REFERRAL_STORE_STORAGE_KEY = 'AFFILIATE_DATA';
 const TRACKING_ID_STORAGE_KEY = 'fuul.tracking_id';
+const CONVERSION_DETECTED_STORAGE_PREFIX = 'refreg.conversion_detected';
 
 const COMPLETE_CONVERSION_TAG = 0;
 const CONNECT_WALLET_TAG = 1;
 const FIRST_TRADE_TAG = 2;
 
-const REFREG_POLL_INTERVAL_MS = 1_000;
-const REFREG_POLL_TIMEOUT_MS = 45_000;
+const REFREG_POLL_INTERVAL_MS = 30_000;
 const REFREG_REQUEST_TIMEOUT_MS = 5_000;
+const activeConversionStatusPolls = new Set<string>();
 
 function parseEnvPublicKey(
     value: string,
@@ -111,6 +110,15 @@ function readLocalStorage(key: string): string | null {
     } catch (error) {
         console.info('[refreg] localStorage access failed:', error);
         return null;
+    }
+}
+
+function writeLocalStorage(key: string, value: string): void {
+    if (typeof window === 'undefined') return;
+    try {
+        window.localStorage.setItem(key, value);
+    } catch (error) {
+        console.info('[refreg] localStorage write failed:', error);
     }
 }
 
@@ -310,6 +318,25 @@ function getUserKey(walletPublicKey: PublicKey): string {
     return walletPublicKey.toBase58();
 }
 
+function getConversionDetectedStorageKey(walletPublicKey: PublicKey): string {
+    return `${CONVERSION_DETECTED_STORAGE_PREFIX}:${getDappIdBase58()}:${walletPublicKey.toBase58()}`;
+}
+
+function isConversionDetectedLocally(walletPublicKey: PublicKey): boolean {
+    return (
+        readLocalStorage(getConversionDetectedStorageKey(walletPublicKey)) ===
+        '1'
+    );
+}
+
+function markConversionDetectedLocally(walletPublicKey: PublicKey): void {
+    writeLocalStorage(getConversionDetectedStorageKey(walletPublicKey), '1');
+}
+
+function getConversionPollKey(walletPublicKey: PublicKey): string {
+    return `${getDappIdBase58()}:${walletPublicKey.toBase58()}`;
+}
+
 function buildApiUrl(path: string, params: Record<string, string>): string {
     const url = new URL(path, REFREG_API_BASE_URL);
     Object.entries(params).forEach(([key, value]) => {
@@ -384,7 +411,11 @@ export async function fetchConversionStatus(params: {
             return null;
         }
 
-        return response.converted === true;
+        const converted = response.converted === true;
+        if (converted) {
+            markConversionDetectedLocally(params.walletPublicKey);
+        }
+        return converted;
     } catch (error) {
         console.info('[refreg] conversion-status preflight failed:', error);
         return null;
@@ -595,6 +626,22 @@ export async function buildTradeRefregInstructions(
     params: BuildIxParams,
 ): Promise<TradeRefregBuildResult> {
     try {
+        if (isConversionDetectedLocally(params.walletPublicKey)) {
+            return {
+                instructions: [
+                    buildFirstTradeInstruction({
+                        actor: params.sessionPublicKey,
+                        walletPublicKey: params.walletPublicKey,
+                        dappId: getDappIdBytes(),
+                    }),
+                ],
+                includesFirstTrade: true,
+                includesCompleteConversion: false,
+                referralAttribution: null,
+                trackingId: null,
+            };
+        }
+
         const dappId = getDappIdBytes();
         const instructions: TransactionInstruction[] = [
             buildFirstTradeInstruction({
@@ -683,12 +730,9 @@ function delay(ms: number): Promise<void> {
 
 async function pollUntil(
     label: string,
-    txSignature: string,
     check: () => Promise<boolean>,
 ): Promise<boolean> {
-    const start = Date.now();
-
-    while (Date.now() - start < REFREG_POLL_TIMEOUT_MS) {
+    while (true) {
         try {
             const done = await check();
             if (done) {
@@ -700,19 +744,32 @@ async function pollUntil(
 
         await delay(REFREG_POLL_INTERVAL_MS);
     }
+}
 
-    console.warn(
-        `[refreg] Timed out waiting for ${label}. tx=${txSignature}. Please contact support with this transaction signature.`,
-    );
+function startBackgroundConversionStatusPolling(
+    walletPublicKey: PublicKey,
+): void {
+    if (isConversionDetectedLocally(walletPublicKey)) {
+        return;
+    }
 
-    useNotificationStore.getState().add({
-        title: 'Referral indexing delayed',
-        message: `Referral state check timed out after 45s (${label}). Share tx ${txSignature} with support.`,
-        icon: 'error',
-        txLink: getTxLink(txSignature),
+    const pollKey = getConversionPollKey(walletPublicKey);
+    if (activeConversionStatusPolls.has(pollKey)) {
+        return;
+    }
+
+    activeConversionStatusPolls.add(pollKey);
+
+    void pollUntil('conversion-status indexing', async () => {
+        if (isConversionDetectedLocally(walletPublicKey)) {
+            return true;
+        }
+
+        const converted = await fetchConversionStatus({ walletPublicKey });
+        return converted === true;
+    }).finally(() => {
+        activeConversionStatusPolls.delete(pollKey);
     });
-
-    return false;
 }
 
 async function checkByUserEndpoint(path: string, walletPublicKey: PublicKey) {
@@ -729,15 +786,19 @@ async function checkByUserEndpoint(path: string, walletPublicKey: PublicKey) {
 }
 
 export async function pollConnectWalletConsistency(args: {
-    txSignature: string;
     walletPublicKey: PublicKey;
     referralAttribution: ReferralAttribution;
 }): Promise<RefregTxPollResult[]> {
+    if (isConversionDetectedLocally(args.walletPublicKey)) {
+        return [];
+    }
+
+    startBackgroundConversionStatusPolling(args.walletPublicKey);
+
     const results: RefregTxPollResult[] = [];
 
     const connectWalletIndexed = await pollUntil(
         'connect-wallet indexing',
-        args.txSignature,
         async () =>
             checkByUserEndpoint(
                 '/v1/connect-wallet/by-user',
@@ -766,17 +827,24 @@ export async function pollConnectWalletConsistency(args: {
 }
 
 export async function pollTradeConsistency(args: {
-    txSignature: string;
     walletPublicKey: PublicKey;
     includesFirstTrade: boolean;
     includesCompleteConversion: boolean;
     referralAttribution: ReferralAttribution | null;
 }): Promise<RefregTxPollResult[]> {
+    if (isConversionDetectedLocally(args.walletPublicKey)) {
+        return [];
+    }
+
+    if (args.referralAttribution) {
+        startBackgroundConversionStatusPolling(args.walletPublicKey);
+    }
+
     const checks: Promise<RefregTxPollResult>[] = [];
 
     if (args.includesFirstTrade) {
         checks.push(
-            pollUntil('first-trade indexing', args.txSignature, async () =>
+            pollUntil('first-trade indexing', async () =>
                 checkByUserEndpoint(
                     '/v1/first-trade/by-user',
                     args.walletPublicKey,
@@ -790,30 +858,11 @@ export async function pollTradeConsistency(args: {
 
     if (args.includesCompleteConversion) {
         checks.push(
-            pollUntil(
-                'conversion-status indexing',
-                args.txSignature,
-                async () => {
-                    const converted = await fetchConversionStatus({
-                        walletPublicKey: args.walletPublicKey,
-                    });
-                    return converted === true;
-                },
-            ).then((success) => ({
-                check: 'referrals/conversion-status',
-                success,
-            })),
-        );
-
-        checks.push(
-            pollUntil(
-                'conversion record indexing',
-                args.txSignature,
-                async () =>
-                    checkByUserEndpoint(
-                        '/v1/referrals/by-user',
-                        args.walletPublicKey,
-                    ),
+            pollUntil('conversion record indexing', async () =>
+                checkByUserEndpoint(
+                    '/v1/referrals/by-user',
+                    args.walletPublicKey,
+                ),
             ).then((success) => ({
                 check: 'referrals/by-user',
                 success,
