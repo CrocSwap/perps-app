@@ -7,7 +7,10 @@ import {
 import { Connection, PublicKey } from '@solana/web3.js';
 import { marketOrderLogManager } from './MarketOrderLogManager';
 import { t } from 'i18next';
-import { buildTradeRefregInstructions } from '~/utils/refreg';
+import {
+    buildTradeRefregInstructions,
+    pollTradeConsistency,
+} from '~/utils/refreg';
 
 export interface LimitOrderResult {
     success: boolean;
@@ -208,12 +211,12 @@ export class LimitOrderService {
             // Extract instructions from the transaction
             const instructions = [...transaction.instructions];
 
-            const refregInstructions = await buildTradeRefregInstructions({
+            const refregResult = await buildTradeRefregInstructions({
                 sessionPublicKey,
                 walletPublicKey: userWalletKey,
             });
-            if (refregInstructions.length > 0) {
-                instructions.push(...refregInstructions);
+            if (refregResult.instructions.length > 0) {
+                instructions.push(...refregResult.instructions);
             }
 
             console.log('📤 Sending limit order transaction:');
@@ -244,6 +247,17 @@ export class LimitOrderService {
                     '✅ Order transaction successful:',
                     transactionResult.signature,
                 );
+
+                void pollTradeConsistency({
+                    txSignature: transactionResult.signature,
+                    walletPublicKey: userWalletKey,
+                    includesFirstTrade: refregResult.includesFirstTrade,
+                    includesCompleteConversion:
+                        refregResult.includesCompleteConversion,
+                    referralAttribution: refregResult.referralAttribution,
+                }).catch((error) => {
+                    console.info('[refreg] limit trade polling failed:', error);
+                });
                 return {
                     success: true,
                     signature: transactionResult.signature,

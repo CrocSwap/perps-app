@@ -4,18 +4,19 @@ import React, {
     useContext,
     useEffect,
     useRef,
-    useState,
     type Dispatch,
     type SetStateAction,
 } from 'react';
-import { useCallback } from 'react';
 import { useLocation } from 'react-router';
 import { useDebugStore } from '~/stores/DebugStore';
+import { useReferralStore } from '~/stores/ReferralStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { initializePythPriceService } from '~/stores/PythPriceStore';
-import { debugWallets } from '~/utils/Constants';
-import { buildConnectWalletIx } from '~/utils/refreg';
+import {
+    buildConnectWalletIx,
+    pollConnectWalletConsistency,
+} from '~/utils/refreg';
 
 interface AppContextType {
     isUserConnected: boolean;
@@ -34,19 +35,15 @@ export interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-    const [isUserConnected, setIsUserConnected] = useState(false);
-
     const {
         isDebugWalletActive,
         debugWallet,
-        setDebugWallet,
         manualAddressEnabled,
         manualAddress,
-        setManualAddressEnabled,
-        setManualAddress,
     } = useDebugStore();
 
     const { setUserAddress, userAddress } = useUserDataStore();
+    const cachedReferralCode = useReferralStore((state) => state.cached);
 
     const { resetUserData } = useTradeDataStore();
 
@@ -133,38 +130,50 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             return;
         }
 
-        const trackingIdRaw =
-            typeof window !== 'undefined'
-                ? window.localStorage.getItem('fuul.tracking_id')
-                : null;
-        if (!trackingIdRaw) {
-            return;
-        }
-
-        const connectWalletKey = `${walletPublicKey.toString()}:${trackingIdRaw}`;
-        if (lastConnectWalletKeyRef.current === connectWalletKey) {
-            return;
-        }
-        lastConnectWalletKeyRef.current = connectWalletKey;
-
         void (async () => {
-            const ix = await buildConnectWalletIx({
+            const connectWallet = await buildConnectWalletIx({
                 sessionPublicKey,
                 walletPublicKey,
             });
-            if (!ix) {
+
+            if (!connectWallet) {
                 lastConnectWalletKeyRef.current = null;
                 return;
             }
 
+            if (lastConnectWalletKeyRef.current === connectWallet.fingerprint) {
+                return;
+            }
+            lastConnectWalletKeyRef.current = connectWallet.fingerprint;
+
             try {
-                await sessionState.sendTransaction([ix]);
+                const transactionResult = await sessionState.sendTransaction([
+                    connectWallet.instruction,
+                ]);
+
+                if (transactionResult?.signature) {
+                    console.info(
+                        '[refreg] connect_wallet tx signature:',
+                        transactionResult.signature,
+                    );
+
+                    void pollConnectWalletConsistency({
+                        txSignature: transactionResult.signature,
+                        walletPublicKey,
+                        referralAttribution: connectWallet.referralAttribution,
+                    }).catch((error) => {
+                        console.info(
+                            '[refreg] connect_wallet polling failed:',
+                            error,
+                        );
+                    });
+                }
             } catch (error) {
                 console.info('[refreg] connect_wallet failed:', error);
                 lastConnectWalletKeyRef.current = null;
             }
         })();
-    }, [sessionState, location.pathname, userAddress]);
+    }, [sessionState, location.pathname, userAddress, cachedReferralCode]);
 
     return (
         <AppContext.Provider
