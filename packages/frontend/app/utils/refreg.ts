@@ -785,6 +785,18 @@ async function checkByUserEndpoint(path: string, walletPublicKey: PublicKey) {
     return !isApiErrorResponse(response);
 }
 
+async function checkByUserEndpointOnce(
+    path: string,
+    walletPublicKey: PublicKey,
+): Promise<boolean> {
+    try {
+        return await checkByUserEndpoint(path, walletPublicKey);
+    } catch (error) {
+        console.info(`[refreg] ${path} one-shot check failed:`, error);
+        return false;
+    }
+}
+
 export async function pollConnectWalletConsistency(args: {
     walletPublicKey: PublicKey;
     referralAttribution: ReferralAttribution;
@@ -797,13 +809,9 @@ export async function pollConnectWalletConsistency(args: {
 
     const results: RefregTxPollResult[] = [];
 
-    const connectWalletIndexed = await pollUntil(
-        'connect-wallet indexing',
-        async () =>
-            checkByUserEndpoint(
-                '/v1/connect-wallet/by-user',
-                args.walletPublicKey,
-            ),
+    const connectWalletIndexed = await checkByUserEndpointOnce(
+        '/v1/connect-wallet/by-user',
+        args.walletPublicKey,
     );
 
     results.push({
@@ -844,11 +852,9 @@ export async function pollTradeConsistency(args: {
 
     if (args.includesFirstTrade) {
         checks.push(
-            pollUntil('first-trade indexing', async () =>
-                checkByUserEndpoint(
-                    '/v1/first-trade/by-user',
-                    args.walletPublicKey,
-                ),
+            checkByUserEndpointOnce(
+                '/v1/first-trade/by-user',
+                args.walletPublicKey,
             ).then((success) => ({
                 check: 'first-trade/by-user',
                 success,
@@ -858,11 +864,9 @@ export async function pollTradeConsistency(args: {
 
     if (args.includesCompleteConversion) {
         checks.push(
-            pollUntil('conversion record indexing', async () =>
-                checkByUserEndpoint(
-                    '/v1/referrals/by-user',
-                    args.walletPublicKey,
-                ),
+            checkByUserEndpointOnce(
+                '/v1/referrals/by-user',
+                args.walletPublicKey,
             ).then((success) => ({
                 check: 'referrals/by-user',
                 success,
