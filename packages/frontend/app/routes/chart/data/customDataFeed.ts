@@ -390,6 +390,12 @@ export const createDataFeed = (
 
             const poller = setInterval(() => {
                 if (isFetching) return;
+                // Skip polling when tab is hidden to prevent the chart
+                // from silently auto-scrolling right over hours of idle,
+                // which compresses all candles into a thin sliver.
+                // The chart's sleep/wake recovery handles data refresh
+                // when the user returns.
+                if (document.hidden) return;
 
                 isFetching = true;
                 abortController = new AbortController();
