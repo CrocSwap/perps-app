@@ -146,8 +146,12 @@ export const TradingViewProvider: React.FC<{
 
     const dataFeedRef = useRef<CustomDataFeedType | null>(null);
 
-    const { debugToolbarOpen, setDebugToolbarOpen, lastOnlineAt } =
-        useAppStateStore();
+    const {
+        debugToolbarOpen,
+        setDebugToolbarOpen,
+        lastOnlineAt,
+        setChartRefreshing,
+    } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
 
@@ -939,6 +943,7 @@ export const TradingViewProvider: React.FC<{
             );
 
             if (intervalMinutes <= lastSleepDurationInMinutes) {
+                setChartRefreshing(true);
                 chart?.resetCache();
                 chart?.chart().resetData();
                 chart?.chart().restoreChart();
@@ -959,6 +964,7 @@ export const TradingViewProvider: React.FC<{
             lastOnlineAtRef.current = lastOnlineAt;
 
             // Give the network a moment to stabilize, then refresh
+            setChartRefreshing(true);
             const timeoutId = setTimeout(() => {
                 try {
                     // Clear caches and force a full data reload

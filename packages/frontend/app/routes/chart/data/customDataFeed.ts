@@ -26,6 +26,7 @@ import {
     supportedResolutions,
 } from './utils/utils';
 import { useChartStore } from '~/stores/TradingviewChartStore';
+import { useAppStateStore } from '~/stores/AppStateStore';
 import type { UserFillIF } from '~/utils/UserDataIFs';
 
 const subscriptions = new Map<string, { unsubscribe: () => void }>();
@@ -387,16 +388,10 @@ export const createDataFeed = (
             const intervalParam = convertResolutionToIntervalParam(resolution);
             let isFetching = false;
             let abortController: AbortController | null = null;
+            let wasHidden = false;
 
-            const poller = setInterval(() => {
+            const fetchLatestCandle = () => {
                 if (isFetching) return;
-                // Skip polling when tab is hidden to prevent the chart
-                // from silently auto-scrolling right over hours of idle,
-                // which compresses all candles into a thin sliver.
-                // The chart's sleep/wake recovery handles data refresh
-                // when the user returns.
-                if (document.hidden) return;
-
                 isFetching = true;
                 abortController = new AbortController();
                 const currentTime = new Date().getTime();
@@ -441,10 +436,38 @@ export const createDataFeed = (
                     })
                     .finally(() => {
                         isFetching = false;
+                        useAppStateStore.getState().setChartRefreshing(false);
                     });
+            };
+
+            const poller = setInterval(() => {
+                // Skip polling when tab is hidden to prevent the chart
+                // from silently auto-scrolling right over hours of idle,
+                // which compresses all candles into a thin sliver.
+                // The chart's sleep/wake recovery handles data refresh
+                // when the user returns.
+                if (document.hidden) {
+                    wasHidden = true;
+                    return;
+                }
+                fetchLatestCandle();
             }, TIMEOUT_CANDLE_POLLING);
+
+            const onVisibilityChange = () => {
+                if (!document.hidden && wasHidden) {
+                    wasHidden = false;
+                    useAppStateStore.getState().setChartRefreshing(true);
+                    fetchLatestCandle();
+                }
+            };
+            document.addEventListener('visibilitychange', onVisibilityChange);
+
             const unsubscribe = () => {
                 clearInterval(poller);
+                document.removeEventListener(
+                    'visibilitychange',
+                    onVisibilityChange,
+                );
                 if (abortController) {
                     abortController.abort();
                     abortController = null;
