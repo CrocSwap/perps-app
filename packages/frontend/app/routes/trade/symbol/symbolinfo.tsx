@@ -1,11 +1,12 @@
 // SymbolInfo.tsx
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { POLLING_API_URL } from '~/utils/Constants';
 import styles from './symbolinfo.module.css';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import SymbolSearch from './symbolsearch/symbolsearch';
@@ -60,6 +61,61 @@ const SymbolInfo: React.FC = React.memo(() => {
     const seoKeywords = useMemo(() => {
         return `${marketIdWithFallback} perps, Solana perps, perpetual futures, Fogo, Ambient Finance, ${marketIdWithFallback} trading, crypto leverage trading, perps DEX`;
     }, [marketIdWithFallback]);
+
+    const titleOverrideRef = useRef(titleOverride);
+    titleOverrideRef.current = titleOverride;
+    const formatNumRef = useRef(formatNum);
+    formatNumRef.current = formatNum;
+
+    useEffect(() => {
+        const coin = marketId || 'BTC';
+        const abortControllerRef = { current: null as AbortController | null };
+
+        const fetchAndUpdateTitle = () => {
+            if (titleOverrideRef.current && titleOverrideRef.current.length > 0)
+                return;
+
+            abortControllerRef.current?.abort();
+            abortControllerRef.current = new AbortController();
+
+            fetch(`${POLLING_API_URL}/info`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'metaAndAssetCtxs' }),
+                signal: abortControllerRef.current.signal,
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    const universe = data?.[0]?.universe;
+                    const assetCtxs = data?.[1];
+                    if (!universe || !assetCtxs) return;
+
+                    const idx = universe.findIndex((c: any) => c.name === coin);
+                    if (idx < 0 || !assetCtxs[idx]) return;
+
+                    const markPx = Number(assetCtxs[idx].markPx);
+                    if (!markPx || !Number.isFinite(markPx)) return;
+
+                    const fmt = formatNumRef.current;
+                    document.title = `$${fmt(markPx)} | ${coin.toUpperCase()} | Ambient`;
+                })
+                .catch((err) => {
+                    if (err.name !== 'AbortError') {
+                        console.error(
+                            'Error fetching background mark price:',
+                            err,
+                        );
+                    }
+                });
+        };
+
+        const interval = setInterval(fetchAndUpdateTitle, 30_000);
+
+        return () => {
+            clearInterval(interval);
+            abortControllerRef.current?.abort();
+        };
+    }, [marketId]);
 
     const hasData =
         !!symbolInfo &&
