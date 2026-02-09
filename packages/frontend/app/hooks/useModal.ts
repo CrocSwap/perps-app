@@ -10,6 +10,10 @@ export interface useModalIF<T extends string | number = string> {
     content: T;
 }
 
+interface useModalArgsIF {
+    defaultState?: modalDefaultStates;
+}
+
 // default states for modal
 //      'open' → modal is open on initial render
 //      'closed' → modal is closed on initial render
@@ -19,8 +23,11 @@ type modalDefaultStates = 'open' | 'closed' | number;
 // main fn body for hook
 // type annotation is currently being consumed as a content router
 export function useModal<T extends string | number = string>(
-    defaultState?: modalDefaultStates,
+    args?: useModalArgsIF,
 ): useModalIF<T> {
+    // logic to deconstruct params with default values as necessary
+    const { defaultState = 'closed' } = args ?? {};
+
     // variable to track if modal is open on initial render
     let shouldOpenAtRender: boolean;
 

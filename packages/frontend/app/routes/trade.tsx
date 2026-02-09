@@ -140,7 +140,7 @@ export default function Trade() {
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
 
-    const marketCloseModalCtrl = useModal('closed');
+    const marketCloseModalCtrl = useModal();
 
     const currentMarketPosition = useMemo(() => {
         const currentSymbol = symbol?.toLowerCase?.() ?? '';

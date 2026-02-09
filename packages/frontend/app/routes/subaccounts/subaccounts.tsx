@@ -16,10 +16,10 @@ export function meta() {
 
 export default function Subaccounts() {
     // logic to open and close subaccount creation modal
-    const createSubaccountModal = useModal('closed');
+    const createSubaccountModal = useModal();
 
     // logic to open and close transfer modal
-    const transferModalCtrl = useModal('closed');
+    const transferModalCtrl = useModal();
 
     // state data for subaccounts
     const data: useAccountsIF = useAccounts();

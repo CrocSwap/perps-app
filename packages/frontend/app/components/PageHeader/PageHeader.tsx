@@ -186,7 +186,7 @@ export default function PageHeader() {
     // }, isHelpDropdownOpen);
 
     // logic to open and close modals
-    const appSettingsModal = useModal('closed');
+    const appSettingsModal = useModal();
     const openAppSettingsModalRef = useRef(appSettingsModal.open);
     openAppSettingsModalRef.current = appSettingsModal.open;
 
@@ -431,7 +431,7 @@ export default function PageHeader() {
         }
     };
 
-    const invalidRefCodeModal = useModal('closed');
+    const invalidRefCodeModal = useModal();
 
     // run the FUUL context
     const { isRefCodeFree } = useFuul();

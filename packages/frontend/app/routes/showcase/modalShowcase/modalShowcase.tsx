@@ -8,16 +8,16 @@ export default function ModalShowcase() {
     const [showCode, setShowCode] = useState<any>({});
 
     // Modal controls for different examples
-    const basicModal = useModal('closed');
-    const centerModal = useModal('closed');
-    const bottomRightModal = useModal('closed');
-    const bottomSheetModal = useModal('closed');
-    const forceBottomSheetModal = useModal('closed');
-    const autoOpenModal = useModal('closed');
-    const longContentModal = useModal('closed');
-    const formModal = useModal('closed');
-    const nestedModal = useModal('closed');
-    const innerNestedModal = useModal('closed');
+    const basicModal = useModal();
+    const centerModal = useModal();
+    const bottomRightModal = useModal();
+    const bottomSheetModal = useModal();
+    const forceBottomSheetModal = useModal();
+    const autoOpenModal = useModal();
+    const longContentModal = useModal();
+    const formModal = useModal();
+    const nestedModal = useModal();
+    const innerNestedModal = useModal();
 
     const toggleCode = (section: any) => {
         setShowCode((prev: any) => ({ ...prev, [section]: !prev[section] }));
@@ -83,7 +83,7 @@ export default function ModalShowcase() {
 import { useModal } from '~/hooks/useModal';
 
 function MyComponent() {
-    const modalCtrl = useModal('closed');
+    const modalCtrl = useModal();
     
     return (
         <>
@@ -253,9 +253,7 @@ function MyComponent() {
                         <SimpleButton bg='green' onClick={autoOpenModal.open}>
                             Manual Open
                         </SimpleButton>
-                        <span className={styles.buttonLabel}>
-                            useModal('closed')
-                        </span>
+                        <span className={styles.buttonLabel}>useModal()</span>
                     </div>
                 </div>
 
@@ -264,13 +262,13 @@ function MyComponent() {
                         {`import { useModal } from '~/hooks/useModal';
 
 // Default closed state
-const modalCtrl = useModal('closed');
+const modalCtrl = useModal();
 
 // Auto-open on component mount
-const autoModal = useModal('open');
+const autoModal = useModal({ defaultState: 'open' });
 
 // Auto-open after delay (milliseconds)
-const delayedModal = useModal(2000);
+const delayedModal = useModal({ defaultState: 2000 });
 
 // Hook interface
 interface useModalIF {
@@ -344,8 +342,8 @@ interface useModalIF {
 </Modal>
 
 // Nested modals
-const outerModal = useModal('closed');
-const innerModal = useModal('closed');
+const outerModal = useModal();
+const innerModal = useModal();
 
 {outerModal.isOpen && (
     <Modal close={outerModal.close} title="Outer Modal">

@@ -23,9 +23,9 @@ export interface UsePortfolioModalsReturn {
 }
 
 export function usePortfolioModals(): UsePortfolioModalsReturn {
-    const depositModal = useModal('closed');
-    const withdrawModal = useModal('closed');
-    const sendModal = useModal('closed');
+    const depositModal = useModal();
+    const withdrawModal = useModal();
+    const sendModal = useModal();
 
     const {
         selectedPortfolio,

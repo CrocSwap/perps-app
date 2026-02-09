@@ -25,7 +25,7 @@ export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode, isFetched, selectedFilter, onClearFilter } = props;
     const { coinPriceMap, symbol, symbolInfo } = useTradeDataStore();
     const { positions } = useUnifiedMarginData();
-    const appSettingsModal = useModal('closed');
+    const appSettingsModal = useModal();
 
     const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
 
