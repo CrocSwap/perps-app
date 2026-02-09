@@ -945,8 +945,10 @@ export const TradingViewProvider: React.FC<{
 
             if (intervalMinutes <= lastSleepDurationInMinutes && chart) {
                 setChartRefreshing(true);
-                const currentSymbol = symbol || 'BTC';
-                const currentResolution = chartInterval || '60';
+                const currentSymbol =
+                    chart.activeChart().symbol() || symbol || 'BTC';
+                const currentResolution =
+                    chart.activeChart().resolution() || chartInterval || '60';
                 refreshStaleCache(currentSymbol, currentResolution, () => {
                     try {
                         chart.chart().resetData();
@@ -976,8 +978,10 @@ export const TradingViewProvider: React.FC<{
 
             // Give the network a moment to stabilize, then refresh
             setChartRefreshing(true);
-            const currentSymbol = symbol || 'BTC';
-            const currentResolution = chartInterval || '60';
+            const currentSymbol =
+                chart.activeChart().symbol() || symbol || 'BTC';
+            const currentResolution =
+                chart.activeChart().resolution() || chartInterval || '60';
             const timeoutId = setTimeout(() => {
                 refreshStaleCache(currentSymbol, currentResolution, () => {
                     try {
