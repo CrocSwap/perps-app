@@ -661,6 +661,25 @@
     "chart": {
         "liqPrice": "Prix de liq."
     },
+    "quickTrade": {
+        "title": "Mode de trading rapide",
+        "quick": "Rapide",
+        "quickWithType": "Rapide {{tradeType}}",
+        "sizeTooltip": "Taille : {{size}} {{currency}}",
+        "clickToEnable": "Cliquez pour activer le mode de trading rapide",
+        "sellAtLimit": "Vendre @ {{price}} limite",
+        "buyAtLimit": "Acheter @ {{price}} limite",
+        "buyAtStop": "Acheter @ {{price}} stop",
+        "sellAtStop": "Vendre @ {{price}} stop",
+        "sellSizeAtLimit": "Vendre {{size}} @ {{price}} limite",
+        "buySizeAtLimit": "Acheter {{size}} @ {{price}} limite",
+        "buySizeAtStop": "Acheter {{size}} @ {{price}} stop",
+        "sellSizeAtStop": "Vendre {{size}} @ {{price}} stop",
+        "infoText": "Cliquez sur le graphique pour placer des ordres préconfigurés",
+        "description": "Les transactions rapides remplissent le formulaire d’ordre au prix cliqué et à la taille sélectionnée. Cochez la case ci-dessous pour envoyer l’ordre immédiatement d’un clic gauche en contournant la confirmation du formulaire. Le menu clic droit et le menu du bouton plus proposent aussi des options de trading rapide sans confirmation même lorsqu’il est désactivé.",
+        "enableConfirmationBypass": "Ignorer la confirmation et envoyer l’ordre au clic",
+        "saveAndEnable": "Enregistrer et activer"
+    },
     "meta": {
         "title": "Ambient Finance | Contrats perpétuels sur Fogo",
         "description": "Tradez des contrats perpétuels sur Fogo avec Ambient Finance. Zéro frais taker, jusqu'à 100x de levier et exécution ultra-rapide.",

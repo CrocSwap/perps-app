@@ -38,8 +38,18 @@ export const convertResolutionToIntervalParam = (
     if (!resolution || resolution.length === 0) return '1d';
     if (resolution === '1W') return '1w';
     if (resolution === '1M') return '1M';
-    else if (resolution.indexOf('D') > -1) {
+    if (resolution.indexOf('D') > -1) {
         return resolution.toLowerCase();
+    }
+
+    const normalizedResolution = resolution.toLowerCase();
+    if (
+        normalizedResolution.endsWith('h') ||
+        normalizedResolution.endsWith('m') ||
+        normalizedResolution.endsWith('d') ||
+        normalizedResolution.endsWith('w')
+    ) {
+        return normalizedResolution;
     }
 
     const minutesVal = Number(resolution.replace(/[^0-9]/g, ''));
@@ -57,6 +67,20 @@ export const convertResolutionToIntervalParam = (
 
 export function resolutionToSeconds(resolution: string): number {
     if (!resolution) return 60;
+
+    const normalizedResolution = resolution.toLowerCase();
+    if (normalizedResolution.endsWith('h')) {
+        return Number(normalizedResolution.replace('h', '')) * 3600;
+    }
+    if (normalizedResolution.endsWith('m')) {
+        return Number(normalizedResolution.replace('m', '')) * 60;
+    }
+    if (normalizedResolution.endsWith('d')) {
+        return Number(normalizedResolution.replace('d', '')) * 86400;
+    }
+    if (normalizedResolution.endsWith('w')) {
+        return Number(normalizedResolution.replace('w', '')) * 604800;
+    }
 
     if (resolution === '1D' || resolution === 'D') return 86400;
     if (resolution === '3D') return 3 * 86400;

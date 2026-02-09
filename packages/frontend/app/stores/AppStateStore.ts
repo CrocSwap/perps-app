@@ -17,6 +17,8 @@ type AppStateStore = {
     setDebugToolbarOpen: (debugToolbarOpen: boolean) => void;
     isTabActive: boolean;
     setIsTabActive: (isTabActive: boolean) => void;
+    chartRefreshing: boolean;
+    setChartRefreshing: (chartRefreshing: boolean) => void;
 };
 
 export const useAppStateStore = create<AppStateStore>((set, get) => ({
@@ -45,4 +47,6 @@ export const useAppStateStore = create<AppStateStore>((set, get) => ({
         set({ debugToolbarOpen }),
     isTabActive: true,
     setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
+    chartRefreshing: false,
+    setChartRefreshing: (chartRefreshing: boolean) => set({ chartRefreshing }),
 }));

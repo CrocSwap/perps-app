@@ -2,9 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import * as d3 from 'd3';
 import {
+    getMainSeriesPaneIndex,
     getPaneCanvasAndIFrameDoc,
     mousePositionRef,
 } from './overlayCanvasUtils';
+import type { IPaneApi } from '~/tv/charting_library';
 import { useChartScaleStore } from '~/stores/ChartScaleStore';
 
 interface OverlayCanvasLayerProps {
@@ -13,6 +15,7 @@ interface OverlayCanvasLayerProps {
     pointerEvents?: 'none' | 'auto';
     children: (props: {
         canvasRef: React.RefObject<HTMLCanvasElement | null>;
+        canvasWrapperRef: React.RefObject<HTMLDivElement | null>;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         canvasSize: any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,34 +31,124 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
     children,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
     const { chart, isChartReady } = useTradingView();
-    const storeScaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
 
     const [isPaneChanged, setIsPaneChanged] = useState(false);
+
+    const prevRangeRef = useRef<{ min: number; max: number } | null>(null);
+
+    const animationFrameRef = useRef<number>(0);
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isZoomingRef = useRef(false);
+    const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
+    const setZoomChanged = useChartScaleStore((state) => state.setZoomChanged);
+    const setPriceDomain = useChartScaleStore((state) => state.setPriceDomain);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [canvasSize, setCanvasSize] = useState<any>();
 
     useEffect(() => {
+        if (!chart || !scaleDataRef.current) return;
+
+        const chartRef = chart.activeChart();
+        const paneIndex = getMainSeriesPaneIndex(chart);
+        if (paneIndex === null) return;
+        const priceScalePane = chartRef.getPanes()[paneIndex] as IPaneApi;
+        const priceScale = priceScalePane.getMainSourcePriceScale();
+        if (!priceScale) return;
+
+        const loop = () => {
+            const priceRange = priceScale.getVisiblePriceRange();
+            if (priceRange) {
+                const currentRange = {
+                    min: priceRange.from,
+                    max: priceRange.to,
+                };
+
+                scaleDataRef.current?.yScale.domain([
+                    currentRange.min,
+                    currentRange.max,
+                ]);
+                scaleDataRef.current?.scaleSymlog.domain([
+                    currentRange.min,
+                    currentRange.max,
+                ]);
+
+                const prevRange = prevRangeRef.current;
+                const hasChanged =
+                    !prevRange ||
+                    prevRange.min !== currentRange.min ||
+                    prevRange.max !== currentRange.max;
+
+                if (hasChanged) {
+                    prevRangeRef.current = currentRange;
+                    setPriceDomain({
+                        min: currentRange.min,
+                        max: currentRange.max,
+                    });
+
+                    if (!isZoomingRef.current) {
+                        isZoomingRef.current = true;
+                        setZoomChanged(true);
+                    }
+
+                    if (debounceTimerRef.current) {
+                        clearTimeout(debounceTimerRef.current);
+                    }
+
+                    debounceTimerRef.current = setTimeout(() => {
+                        isZoomingRef.current = false;
+                        setZoomChanged(false);
+                    }, 200);
+                }
+            }
+
+            animationFrameRef.current = requestAnimationFrame(loop);
+        };
+
+        animationFrameRef.current = requestAnimationFrame(loop);
+
+        return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, [chart, scaleDataRef.current]);
+
+    useEffect(() => {
         if (!chart || !isChartReady) return;
 
-        const isFirstInit = !storeScaleDataRef.current;
+        const isFirstInit = !scaleDataRef.current;
 
         if (isFirstInit) {
             const yScale = d3.scaleLinear();
 
             const scaleSymlog = d3.scaleSymlog();
-            storeScaleDataRef.current = { yScale, scaleSymlog };
+            scaleDataRef.current = { yScale, scaleSymlog };
         }
 
-        const yScale = storeScaleDataRef.current!.yScale;
-        const scaleSymlog = storeScaleDataRef.current!.scaleSymlog;
+        const yScale = scaleDataRef.current!.yScale;
+        const scaleSymlog = scaleDataRef.current!.scaleSymlog;
 
         const { iframeDoc, paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
 
         if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
 
         if (!canvasRef.current) {
+            const wrapper = iframeDoc.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.pointerEvents = pointerEvents;
+            wrapper.style.zIndex = zIndex.toString();
+            wrapper.style.top = '0';
+            wrapper.style.left = '0';
+            wrapper.id = id + '-wrapper';
+
+            paneCanvas.parentNode.appendChild(wrapper);
+
             const newCanvas = iframeDoc.createElement('canvas');
             newCanvas.id = id;
             newCanvas.style.position = 'absolute';
@@ -68,6 +161,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             newCanvas.height = paneCanvas.height;
             paneCanvas.parentNode.appendChild(newCanvas);
             canvasRef.current = newCanvas;
+            canvasWrapperRef.current = wrapper;
         }
 
         const dpr = window.devicePixelRatio || 1;
@@ -149,8 +243,9 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         <>
             {children({
                 canvasRef,
+                canvasWrapperRef,
                 canvasSize: canvasSize,
-                scaleData: storeScaleDataRef.current,
+                scaleData: scaleDataRef.current,
                 mousePositionRef,
             })}
         </>

@@ -2,7 +2,7 @@ import { bsColorSets } from '~/stores/AppSettingsStore';
 import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
 import {
     getChartThemeColors,
-    mapResolutionToInterval,
+    convertResolutionToIntervalParam,
     resolutionToSeconds,
 } from './utils/utils';
 import type { Bar } from '~/tv/charting_library';
@@ -14,6 +14,28 @@ const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
 
 const MAX_CANDLES_PER_SERIES = 50000;
 const MAX_MARKS_PER_SYMBOL = 5000;
+
+// Keys flagged as stale will bypass the hasDataForRange cache check
+// on the next getHistoricalData call, forcing a fresh API fetch.
+const staleKeys = new Set<string>();
+
+const normalizeResolutionKey = (resolution: string): string => {
+    if (!resolution) return resolution;
+    const normalized = resolution.toLowerCase();
+    if (normalized.endsWith('m')) {
+        return normalized.replace('m', '');
+    }
+    if (normalized.endsWith('h')) {
+        const hours = Number(normalized.replace('h', ''));
+        return Number.isFinite(hours) ? String(hours * 60) : resolution;
+    }
+    if (normalized.endsWith('d')) return 'D';
+    if (normalized.endsWith('w')) return 'W';
+    if (normalized === '1d') return 'D';
+    if (normalized === '1w') return 'W';
+    if (normalized === '1m') return 'M';
+    return resolution;
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function trimCandleCache(cachedData: any[]) {
@@ -36,24 +58,119 @@ export async function getHistoricalData(
     from: number,
     to: number,
 ) {
-    const key = `${symbol}-${resolution}`;
+    const key = `${symbol}-${normalizeResolutionKey(resolution)}`;
     const cachedData = dataCache.get(key) || [];
 
-    const candleCount = (to - from) / resolutionToSeconds(resolution);
-    const hasDataForRange =
-        cachedData.filter(
-            (bar) => bar.time >= from * 1000 && bar.time <= to * 1000,
-        ).length >= candleCount;
-
-    if (hasDataForRange) {
-        return cachedData.filter(
-            (bar) => bar.time >= from * 1000 && bar.time <= to * 1000,
-        );
+    const isStale = staleKeys.has(key);
+    if (isStale) {
+        staleKeys.delete(key);
     }
 
-    const period = mapResolutionToInterval(resolution);
+    const candleCount = (to - from) / resolutionToSeconds(resolution);
+    const cachedBarsInRange = cachedData.filter(
+        (bar) => bar.time >= from * 1000 && bar.time <= to * 1000,
+    );
+    const hasDataForRange = !isStale && cachedBarsInRange.length >= candleCount;
+
+    console.log('[candleCache] getHistoricalData', {
+        key,
+        from: new Date(from * 1000).toISOString(),
+        to: new Date(to * 1000).toISOString(),
+        isStale,
+        cachedBarsInRange: cachedBarsInRange.length,
+        candleCount: Math.round(candleCount),
+        hasDataForRange,
+        totalCached: cachedData.length,
+    });
+
+    if (hasDataForRange) {
+        return cachedBarsInRange;
+    }
+
+    const period = convertResolutionToIntervalParam(resolution);
     const data = await fetchCandles(symbol, period, from, to).then(
         (res: any) => {
+            if (res) {
+                const formattedData = res.map((item: any) => ({
+                    time: item.t,
+                    open: Number(item.o),
+                    high: Number(item.h),
+                    low: Number(item.l),
+                    close: Number(item.c),
+                    volume: Number(item.v),
+                }));
+
+                console.log(
+                    '[candleCache] API returned',
+                    formattedData.length,
+                    'bars for',
+                    key,
+                );
+
+                for (const newBar of formattedData) {
+                    const index = cachedData.findIndex(
+                        (bar) => bar.time === newBar.time,
+                    );
+
+                    if (index > -1) {
+                        cachedData[index] = newBar;
+                    } else {
+                        cachedData.push(newBar);
+                    }
+                }
+
+                const filteredCandle = cachedData.filter(
+                    (bar) => bar.time >= from * 1000 && bar.time <= to * 1000,
+                );
+                const sortedFiltered = filteredCandle.sort(
+                    (a, b) => a.time - b.time,
+                );
+
+                console.log(
+                    '[candleCache] returning',
+                    sortedFiltered.length,
+                    'bars after merge',
+                );
+
+                trimCandleCache(cachedData);
+
+                dataCache.set(key, cachedData);
+
+                return sortedFiltered;
+            }
+        },
+    );
+
+    return data;
+}
+
+/**
+ * Fetches fresh candle data in the background and updates the cache.
+ * Does NOT call resetData() — the caller should do that in the onDone
+ * callback so TradingView re-reads the now-fresh cache without any
+ * blank-chart flash.
+ */
+export function refreshStaleCache(
+    symbol: string,
+    resolution: string,
+    onDone: () => void,
+) {
+    const key = `${symbol}-${normalizeResolutionKey(resolution)}`;
+    const cachedData = dataCache.get(key) || [];
+
+    const now = Math.floor(Date.now() / 1000);
+    const lastCachedTime = cachedData[cachedData.length - 1]?.time;
+    const overlapSeconds = resolutionToSeconds(resolution) * 2;
+    // If we have cached bars, fetch only from the last cached candle
+    // (with small overlap) to now to fill any idle gap.
+    const from = lastCachedTime
+        ? Math.max(Math.floor(lastCachedTime / 1000) - overlapSeconds, 0)
+        : now - 86400;
+    const to = now;
+
+    const period = convertResolutionToIntervalParam(resolution);
+    fetchCandles(symbol, period, from, to)
+        .then((res: any) => {
             if (res) {
                 const formattedData = res.map((item: any) => ({
                     time: item.t,
@@ -76,23 +193,13 @@ export async function getHistoricalData(
                     }
                 }
 
-                const filteredCandle = cachedData.filter(
-                    (bar) => bar.time >= from * 1000 && bar.time <= to * 1000,
-                );
-                const sortedFiltered = filteredCandle.sort(
-                    (a, b) => a.time - b.time,
-                );
-
                 trimCandleCache(cachedData);
-
                 dataCache.set(key, cachedData);
-
-                return sortedFiltered;
             }
-        },
-    );
-
-    return data;
+        })
+        .finally(() => {
+            onDone();
+        });
 }
 
 export function updateCandleCache(
@@ -100,7 +207,7 @@ export function updateCandleCache(
     resolution: string,
     tick: Bar,
 ) {
-    const key = `${symbol}-${resolution}`;
+    const key = `${symbol}-${normalizeResolutionKey(resolution)}`;
     const cachedData = dataCache.get(key) || [];
     const tickTime = tick.time;
 
@@ -236,6 +343,11 @@ export function getMarkColorData() {
     }
 
     return bsColorSets['default'];
+}
+
+export function markCacheStale(symbol: string, resolution: string) {
+    const key = `${symbol}-${normalizeResolutionKey(resolution)}`;
+    staleKeys.add(key);
 }
 
 export function clearChartCachesForSymbol(symbol: string) {

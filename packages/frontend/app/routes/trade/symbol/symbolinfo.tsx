@@ -1,11 +1,12 @@
 // SymbolInfo.tsx
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { POLLING_API_URL } from '~/utils/Constants';
 import styles from './symbolinfo.module.css';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import SymbolSearch from './symbolsearch/symbolsearch';
@@ -60,6 +61,82 @@ const SymbolInfo: React.FC = React.memo(() => {
     const seoKeywords = useMemo(() => {
         return `${marketIdWithFallback} perps, Solana perps, perpetual futures, Fogo, Ambient Finance, ${marketIdWithFallback} trading, crypto leverage trading, perps DEX`;
     }, [marketIdWithFallback]);
+
+    const titleOverrideRef = useRef(titleOverride);
+    titleOverrideRef.current = titleOverride;
+    const formatNumRef = useRef(formatNum);
+    formatNumRef.current = formatNum;
+
+    useEffect(() => {
+        const coin = marketId || 'BTC';
+        const apiUrl = POLLING_API_URL;
+        let abortController: AbortController | null = null;
+
+        const fetchAndUpdateTitle = () => {
+            if (titleOverrideRef.current && titleOverrideRef.current.length > 0)
+                return;
+
+            abortController?.abort();
+            abortController = new AbortController();
+
+            fetch(`${apiUrl}/info`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'metaAndAssetCtxs' }),
+                signal: abortController.signal,
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    const universe = data?.[0]?.universe;
+                    const assetCtxs = data?.[1];
+                    if (!universe || !assetCtxs) return;
+
+                    const idx = universe.findIndex((c: any) => c.name === coin);
+                    if (idx < 0 || !assetCtxs[idx]) return;
+
+                    const markPx = Number(assetCtxs[idx].markPx);
+                    if (!markPx || !Number.isFinite(markPx)) return;
+
+                    const fmt = formatNumRef.current;
+                    document.title = `$${fmt(markPx)} | ${coin.toUpperCase()} | Ambient`;
+                })
+                .catch((err) => {
+                    if (err.name !== 'AbortError') {
+                        console.error(
+                            'Error fetching background mark price:',
+                            err,
+                        );
+                    }
+                });
+        };
+
+        // Use a Web Worker for the timer so it is NOT throttled in
+        // background tabs (setInterval is throttled to ≤1/min by browsers).
+        const workerBlob = new Blob(
+            [
+                `let id;
+self.onmessage=function(e){
+  if(e.data==='start'){id=setInterval(function(){self.postMessage('tick')},30000)}
+  if(e.data==='stop'){clearInterval(id)}
+};`,
+            ],
+            { type: 'application/javascript' },
+        );
+        const workerUrl = URL.createObjectURL(workerBlob);
+        const worker = new Worker(workerUrl);
+
+        worker.onmessage = () => {
+            fetchAndUpdateTitle();
+        };
+        worker.postMessage('start');
+
+        return () => {
+            worker.postMessage('stop');
+            worker.terminate();
+            URL.revokeObjectURL(workerUrl);
+            abortController?.abort();
+        };
+    }, [marketId]);
 
     const hasData =
         !!symbolInfo &&

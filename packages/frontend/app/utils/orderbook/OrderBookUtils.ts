@@ -295,3 +295,17 @@ export const genRandomActiveTwap = (): ActiveTwapIF => {
         user: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
     };
 };
+
+export const triggerPulseAnimation = (
+    id: string,
+    animClass = 'divPulseNeon',
+    checkerClass: string,
+) => {
+    const el = document.getElementById(id);
+    if (el?.classList.contains(checkerClass)) return;
+    el?.classList.add(animClass);
+    el?.classList.add(checkerClass);
+    setTimeout(() => {
+        el?.classList.remove(animClass);
+    }, 800);
+};

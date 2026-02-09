@@ -11,7 +11,7 @@ const WatchList: React.FC = () => {
         useTradeDataStore();
 
     const whiteListedCoins = new Set(['BTC', 'ETH', 'SOL']);
-    const clickableCoins = new Set(['BTC']); // Only BTC is clickable
+    const clickableCoins = new Set(['BTC', 'ETH']); // Only BTC is clickable
 
     const [watchListMode, setWatchListMode] = useState<'dollar' | 'percent'>(
         'dollar',
