@@ -39,7 +39,31 @@
     width: 56px;
 }
 
+@keyframes chartRefreshingPulse {
+    0%,
+    100% {
+        opacity: 0.08;
+    }
+    50% {
+        opacity: 0.18;
+    }
+}
+
 .chartRefreshing {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.chartRefreshingOverlay {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-dark2, #1e2029);
+    animation: chartRefreshingPulse 2s ease-in-out infinite;
+}
+
+.chartRefreshingLabel {
     position: absolute;
     top: 40px;
     left: 8px;
@@ -51,8 +75,6 @@
     background: color-mix(in srgb, var(--bg-dark2, #1e2029) 85%, transparent);
     color: var(--text2, #9a9aaf);
     font-size: 11px;
-    z-index: 10;
-    pointer-events: none;
 }
 
 .chartRefreshingSpinner {

@@ -95,6 +95,59 @@ export async function getHistoricalData(
     return data;
 }
 
+/**
+ * Fetches fresh candle data in the background and updates the cache.
+ * Does NOT call resetData() — the caller should do that in the onDone
+ * callback so TradingView re-reads the now-fresh cache without any
+ * blank-chart flash.
+ */
+export function refreshStaleCache(
+    symbol: string,
+    resolution: string,
+    onDone: () => void,
+) {
+    const key = `${symbol}-${resolution}`;
+    const cachedData = dataCache.get(key) || [];
+
+    const now = Math.floor(Date.now() / 1000);
+    // Fetch the last 24h of data to cover any idle gap
+    const from = now - 86400;
+    const to = now;
+
+    const period = mapResolutionToInterval(resolution);
+    fetchCandles(symbol, period, from, to)
+        .then((res: any) => {
+            if (res) {
+                const formattedData = res.map((item: any) => ({
+                    time: item.t,
+                    open: Number(item.o),
+                    high: Number(item.h),
+                    low: Number(item.l),
+                    close: Number(item.c),
+                    volume: Number(item.v),
+                }));
+
+                for (const newBar of formattedData) {
+                    const index = cachedData.findIndex(
+                        (bar) => bar.time === newBar.time,
+                    );
+
+                    if (index > -1) {
+                        cachedData[index] = newBar;
+                    } else {
+                        cachedData.push(newBar);
+                    }
+                }
+
+                trimCandleCache(cachedData);
+                dataCache.set(key, cachedData);
+            }
+        })
+        .finally(() => {
+            onDone();
+        });
+}
+
 export function updateCandleCache(
     symbol: string,
     resolution: string,

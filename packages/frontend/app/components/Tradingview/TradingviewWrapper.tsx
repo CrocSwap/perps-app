@@ -100,8 +100,11 @@ const TradingViewWrapper: React.FC<TradingViewWrapperProps> = ({
 
             {chartRefreshing && chartLoadingStatus === 'ready' && (
                 <div className={styles.chartRefreshing}>
-                    <div className={styles.chartRefreshingSpinner}></div>
-                    <span>Refreshing chart...</span>
+                    <div className={styles.chartRefreshingOverlay} />
+                    <div className={styles.chartRefreshingLabel}>
+                        <div className={styles.chartRefreshingSpinner}></div>
+                        <span>Refreshing chart...</span>
+                    </div>
                 </div>
             )}
 

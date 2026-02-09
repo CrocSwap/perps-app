@@ -13,6 +13,7 @@ import {
     clearAllChartCaches,
     clearChartCachesForSymbol,
     getMarkFillData,
+    refreshStaleCache,
 } from '~/routes/chart/data/candleDataCache';
 import {
     createDataFeed,
@@ -942,14 +943,24 @@ export const TradingViewProvider: React.FC<{
                 ((lastAwakeMs - lastSleepMs) / 60000).toFixed(2),
             );
 
-            if (intervalMinutes <= lastSleepDurationInMinutes) {
+            if (intervalMinutes <= lastSleepDurationInMinutes && chart) {
                 setChartRefreshing(true);
-                chart?.resetCache();
-                chart?.chart().resetData();
-                chart?.chart().restoreChart();
+                const currentSymbol = symbol || 'BTC';
+                const currentResolution = chartInterval || '60';
+                refreshStaleCache(currentSymbol, currentResolution, () => {
+                    try {
+                        chart.chart().resetData();
+                    } catch (e) {
+                        console.error(
+                            'Error resetting chart data after refresh:',
+                            e,
+                        );
+                    }
+                    setChartRefreshing(false);
+                });
             }
         }
-    }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
+    }, [lastSleepMs, lastAwakeMs, chartInterval, chart, symbol]);
 
     // Refresh chart when coming back online
     const lastOnlineAtRef = useRef(lastOnlineAt);
@@ -965,15 +976,21 @@ export const TradingViewProvider: React.FC<{
 
             // Give the network a moment to stabilize, then refresh
             setChartRefreshing(true);
+            const currentSymbol = symbol || 'BTC';
+            const currentResolution = chartInterval || '60';
             const timeoutId = setTimeout(() => {
-                try {
-                    // Clear caches and force a full data reload
-                    clearAllChartCaches();
-                    chart.activeChart().resetData();
-                    chart.activeChart().refreshMarks();
-                } catch (e) {
-                    console.error('Error refreshing chart after reconnect:', e);
-                }
+                refreshStaleCache(currentSymbol, currentResolution, () => {
+                    try {
+                        chart.activeChart().resetData();
+                        chart.activeChart().refreshMarks();
+                    } catch (e) {
+                        console.error(
+                            'Error refreshing chart after reconnect:',
+                            e,
+                        );
+                    }
+                    setChartRefreshing(false);
+                });
             }, 1000);
 
             return () => clearTimeout(timeoutId);

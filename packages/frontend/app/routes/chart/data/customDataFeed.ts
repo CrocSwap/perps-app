@@ -436,7 +436,6 @@ export const createDataFeed = (
                     })
                     .finally(() => {
                         isFetching = false;
-                        useAppStateStore.getState().setChartRefreshing(false);
                     });
             };
 
@@ -456,7 +455,6 @@ export const createDataFeed = (
             const onVisibilityChange = () => {
                 if (!document.hidden && wasHidden) {
                     wasHidden = false;
-                    useAppStateStore.getState().setChartRefreshing(true);
                     fetchLatestCandle();
                 }
             };
