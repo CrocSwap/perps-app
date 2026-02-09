@@ -12,6 +12,7 @@ export interface useModalIF<T extends string | number = string> {
 
 interface useModalArgsIF {
     defaultState?: modalDefaultStates;
+    canReopen?: boolean;
 }
 
 // default states for modal
@@ -26,7 +27,7 @@ export function useModal<T extends string | number = string>(
     args?: useModalArgsIF,
 ): useModalIF<T> {
     // logic to deconstruct params with default values as necessary
-    const { defaultState = 'closed' } = args ?? {};
+    const { defaultState = 'closed', canReopen = true } = args ?? {};
 
     // variable to track if modal is open on initial render
     let shouldOpenAtRender: boolean;
@@ -60,10 +61,13 @@ export function useModal<T extends string | number = string>(
 
     // modal control functions
     const openModal = (c?: T): void => {
-        if (c) {
-            setContent(c);
+        if (canReopen || isFirstOpening.current) {
+            if (c) {
+                setContent(c);
+            }
+            isFirstOpening.current = false;
+            setIsOpen(true);
         }
-        setIsOpen(true);
     };
     const closeModal = (): void => setIsOpen(false);
     const toggleModal = (): void => setIsOpen(!isOpen);
