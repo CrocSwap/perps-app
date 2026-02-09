@@ -662,6 +662,25 @@
     "chart": {
         "liqPrice": "청산 가격"
     },
+    "quickTrade": {
+        "title": "빠른 거래 모드",
+        "quick": "빠른",
+        "quickWithType": "빠른 {{tradeType}}",
+        "sizeTooltip": "수량: {{size}} {{currency}}",
+        "clickToEnable": "빠른 거래 모드를 활성화하려면 클릭하세요",
+        "sellAtLimit": "{{price}} 제한 매도",
+        "buyAtLimit": "{{price}} 제한 매수",
+        "buyAtStop": "{{price}} 스탑 매수",
+        "sellAtStop": "{{price}} 스탑 매도",
+        "sellSizeAtLimit": "{{size}} {{price}} 제한 매도",
+        "buySizeAtLimit": "{{size}} {{price}} 제한 매수",
+        "buySizeAtStop": "{{size}} {{price}} 스탑 매수",
+        "sellSizeAtStop": "{{size}} {{price}} 스탑 매도",
+        "infoText": "차트에서 클릭해 미리 설정된 주문을 넣으세요",
+        "description": "빠른 거래는 클릭한 가격과 선택한 수량으로 주문 양식을 채웁니다. 아래 체크박스를 선택하면 좌클릭 시 주문 확인을 건너뛰고 즉시 주문을 전송합니다. 비활성화되어 있어도 우클릭 메뉴와 더하기 버튼 메뉴에 확인 없이 빠른 거래를 실행할 수 있는 옵션이 있습니다.",
+        "enableConfirmationBypass": "확인을 건너뛰고 클릭 시 주문 전송",
+        "saveAndEnable": "저장하고 활성화"
+    },
     "meta": {
         "title": "Ambient Finance | Fogo 무기한 선물",
         "description": "Ambient Finance로 Fogo에서 무기한 선물을 거래하세요. 테이커 수수료 제로, 최대 100배 레버리지, 초고속 체결.",

@@ -2,7 +2,10 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { setLS } from '~/utils/AppUtils';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import type {
+    OrderDataIF,
+    OrderBookMode,
+} from '~/utils/orderbook/OrderBookIFs';
 import type { SymbolInfoIF, TokenDetailsIF } from '~/utils/SymbolInfoIFs';
 import {
     createUserTradesSlice,
@@ -11,6 +14,11 @@ import {
 import type { OrderInputValue, OrderSide } from '~/utils/CommonIFs';
 
 export type marginModesT = 'margin.cross.title' | 'margin.isolated.title';
+
+export type OrderInputSizeValue = {
+    value: number;
+    denom: OrderBookMode;
+};
 
 type TradeDataStore = UserTradeDataStore & {
     marginMode: marginModesT;
@@ -57,6 +65,8 @@ type TradeDataStore = UserTradeDataStore & {
     setIsPreviewOrderHovered: (isHovered: boolean) => void;
     highlightedTradeOid: number | null;
     setHighlightedTradeOid: (oid: number | null) => void;
+    orderInputSizeValue: OrderInputSizeValue;
+    setOrderInputSizeValue: (size: OrderInputSizeValue) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -176,6 +186,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             highlightedTradeOid: null,
             setHighlightedTradeOid: (oid: number | null) =>
                 set({ highlightedTradeOid: oid }),
+            orderInputSizeValue: { value: 0, denom: 'usd' },
+            setOrderInputSizeValue: (size: OrderInputSizeValue) =>
+                set({ orderInputSizeValue: size }),
         }),
         {
             name: 'TRADE_DATA',
