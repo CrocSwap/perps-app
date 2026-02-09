@@ -388,7 +388,6 @@ export const createDataFeed = (
             const intervalParam = convertResolutionToIntervalParam(resolution);
             let isFetching = false;
             let abortController: AbortController | null = null;
-            let wasHidden = false;
 
             const fetchLatestCandle = () => {
                 if (isFetching) return;
@@ -443,33 +442,17 @@ export const createDataFeed = (
                 // Skip polling when tab is hidden to prevent the chart
                 // from silently auto-scrolling right over hours of idle,
                 // which compresses all candles into a thin sliver.
-                // Gap-fill is handled by TradingviewContext via
-                // refreshStaleCache + resetData on tab resume.
+                // Gap-fill on tab resume is handled by TradingviewContext
+                // (clearCandleCacheForKey + setSymbol), which tears down
+                // this subscription and creates a fresh one.
                 if (document.hidden) {
-                    wasHidden = true;
                     return;
                 }
                 fetchLatestCandle();
             }, TIMEOUT_CANDLE_POLLING);
 
-            const onVisibilityChange = () => {
-                if (!document.hidden && wasHidden) {
-                    wasHidden = false;
-                    // Fetch the latest candle immediately so onTick keeps
-                    // the current bar up-to-date. The full gap-fill is
-                    // handled by TradingviewContext (refreshStaleCache +
-                    // resetData).
-                    fetchLatestCandle();
-                }
-            };
-            document.addEventListener('visibilitychange', onVisibilityChange);
-
             const unsubscribe = () => {
                 clearInterval(poller);
-                document.removeEventListener(
-                    'visibilitychange',
-                    onVisibilityChange,
-                );
                 if (abortController) {
                     abortController.abort();
                     abortController = null;

@@ -314,6 +314,11 @@ export function getMarkColorData() {
     return bsColorSets['default'];
 }
 
+export function clearCandleCacheForKey(symbol: string, resolution: string) {
+    const key = `${symbol}-${normalizeResolutionKey(resolution)}`;
+    dataCache.delete(key);
+}
+
 export function clearChartCachesForSymbol(symbol: string) {
     const candlePrefix = `${symbol}-`;
     for (const key of dataCache.keys()) {

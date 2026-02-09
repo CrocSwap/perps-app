@@ -11,9 +11,9 @@ import { useSdk } from '~/hooks/useSdk';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import {
     clearAllChartCaches,
+    clearCandleCacheForKey,
     clearChartCachesForSymbol,
     getMarkFillData,
-    refreshStaleCache,
 } from '~/routes/chart/data/candleDataCache';
 import {
     createDataFeed,
@@ -123,7 +123,7 @@ export const TradingViewProvider: React.FC<{
         sessionBtn?.click();
     }, []);
 
-    const { info, lastSleepMs, lastAwakeMs } = useSdk();
+    const { info } = useSdk();
 
     const { symbol, addToFetchedChannels, userFills } = useTradeDataStore();
 
@@ -850,24 +850,6 @@ export const TradingViewProvider: React.FC<{
         });
     }, [chart]);
 
-    const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
-        let coef = 1;
-
-        if (!interval) return 1;
-
-        if (interval.includes('D')) {
-            coef = 24 * 60;
-        } else if (interval.includes('W')) {
-            coef = 24 * 60 * 7;
-        } else if (interval.includes('M')) {
-            coef = 60 * 24 * 30;
-        }
-
-        const intervalNum = Number(interval.replace(/[^0-9]/g, ''));
-
-        return intervalNum * coef;
-    }, []);
-
     useEffect(() => {
         const chartDiv = document.getElementById('tv_chart');
         const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
@@ -935,40 +917,14 @@ export const TradingViewProvider: React.FC<{
         };
     }, [chart]);
 
-    useEffect(() => {
-        if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
-            const intervalMinutes = tvIntervalToMinutes(
-                chartInterval as ResolutionString,
-            );
-            const lastSleepDurationInMinutes = parseFloat(
-                ((lastAwakeMs - lastSleepMs) / 60000).toFixed(2),
-            );
-
-            if (intervalMinutes <= lastSleepDurationInMinutes && chart) {
-                setChartRefreshing(true);
-                const currentSymbol =
-                    chart.activeChart().symbol() || symbol || 'BTC';
-                const currentResolution =
-                    chart.activeChart().resolution() || chartInterval || '60';
-                refreshStaleCache(currentSymbol, currentResolution, () => {
-                    try {
-                        chart.chart().resetData();
-                    } catch (e) {
-                        console.error(
-                            'Error resetting chart data after refresh:',
-                            e,
-                        );
-                    }
-                    setChartRefreshing(false);
-                });
-            }
-        }
-    }, [lastSleepMs, lastAwakeMs, chartInterval, chart, symbol]);
-
-    // Refresh chart when tab becomes active again after being hidden.
-    // TradingView's onTick only accepts the current/next bar, so feeding
-    // historical bars via onTick does nothing. Instead we refresh the
-    // cache and call resetData() so TradingView re-reads from the cache.
+    // Refresh chart when tab becomes active again after being hidden
+    // (covers both tab-switch and device sleep/wake).
+    // TradingView's onTick only accepts the current/next bar, so we
+    // must reload the full series to fill any gap. We avoid resetData()
+    // because it breaks the time-scale renderer (x-axis labels vanish).
+    // Instead we clear the cache and call setSymbol(same symbol) which
+    // triggers a clean resolveSymbol → getBars → subscribeBars cycle
+    // that fetches fresh data from the API.
     const wasTabActiveRef = useRef(isTabActive);
     useEffect(() => {
         const wasActive = wasTabActiveRef.current;
@@ -980,57 +936,15 @@ export const TradingViewProvider: React.FC<{
                 chart.activeChart().symbol() || symbol || 'BTC';
             const currentResolution =
                 chart.activeChart().resolution() || chartInterval || '60';
-            refreshStaleCache(currentSymbol, currentResolution, () => {
-                try {
-                    chart.activeChart().resetData();
-                } catch (e) {
-                    console.error(
-                        'Error resetting chart data after tab resume:',
-                        e,
-                    );
-                }
-                setChartRefreshing(false);
-            });
+            clearCandleCacheForKey(currentSymbol, currentResolution);
+            try {
+                chart.activeChart().setSymbol(currentSymbol);
+            } catch (e) {
+                console.error('Error refreshing chart after tab resume:', e);
+            }
+            setChartRefreshing(false);
         }
     }, [isTabActive, chart, symbol, chartInterval]);
-
-    // Refresh chart when coming back online
-    const lastOnlineAtRef = useRef(lastOnlineAt);
-    useEffect(() => {
-        // Only trigger if lastOnlineAt actually changed (not on initial mount)
-        if (
-            lastOnlineAt > 0 &&
-            lastOnlineAt !== lastOnlineAtRef.current &&
-            chart
-        ) {
-            console.log('>>> Refreshing chart after coming back online');
-            lastOnlineAtRef.current = lastOnlineAt;
-
-            // Give the network a moment to stabilize, then refresh
-            setChartRefreshing(true);
-            const currentSymbol =
-                chart.activeChart().symbol() || symbol || 'BTC';
-            const currentResolution =
-                chart.activeChart().resolution() || chartInterval || '60';
-            const timeoutId = setTimeout(() => {
-                refreshStaleCache(currentSymbol, currentResolution, () => {
-                    try {
-                        chart.activeChart().resetData();
-                        chart.activeChart().refreshMarks();
-                    } catch (e) {
-                        console.error(
-                            'Error refreshing chart after reconnect:',
-                            e,
-                        );
-                    }
-                    setChartRefreshing(false);
-                });
-            }, 1000);
-
-            return () => clearTimeout(timeoutId);
-        }
-        lastOnlineAtRef.current = lastOnlineAt;
-    }, [lastOnlineAt, chart]);
 
     useEffect(() => {
         if (!chart || !symbol) return;
