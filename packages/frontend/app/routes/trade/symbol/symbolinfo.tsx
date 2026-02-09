@@ -69,20 +69,21 @@ const SymbolInfo: React.FC = React.memo(() => {
 
     useEffect(() => {
         const coin = marketId || 'BTC';
-        const abortControllerRef = { current: null as AbortController | null };
+        const apiUrl = POLLING_API_URL;
+        let abortController: AbortController | null = null;
 
         const fetchAndUpdateTitle = () => {
             if (titleOverrideRef.current && titleOverrideRef.current.length > 0)
                 return;
 
-            abortControllerRef.current?.abort();
-            abortControllerRef.current = new AbortController();
+            abortController?.abort();
+            abortController = new AbortController();
 
-            fetch(`${POLLING_API_URL}/info`, {
+            fetch(`${apiUrl}/info`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: 'metaAndAssetCtxs' }),
-                signal: abortControllerRef.current.signal,
+                signal: abortController.signal,
             })
                 .then((res) => res.json())
                 .then((data) => {
@@ -109,11 +110,31 @@ const SymbolInfo: React.FC = React.memo(() => {
                 });
         };
 
-        const interval = setInterval(fetchAndUpdateTitle, 30_000);
+        // Use a Web Worker for the timer so it is NOT throttled in
+        // background tabs (setInterval is throttled to ≤1/min by browsers).
+        const workerBlob = new Blob(
+            [
+                `let id;
+self.onmessage=function(e){
+  if(e.data==='start'){id=setInterval(function(){self.postMessage('tick')},30000)}
+  if(e.data==='stop'){clearInterval(id)}
+};`,
+            ],
+            { type: 'application/javascript' },
+        );
+        const workerUrl = URL.createObjectURL(workerBlob);
+        const worker = new Worker(workerUrl);
+
+        worker.onmessage = () => {
+            fetchAndUpdateTitle();
+        };
+        worker.postMessage('start');
 
         return () => {
-            clearInterval(interval);
-            abortControllerRef.current?.abort();
+            worker.postMessage('stop');
+            worker.terminate();
+            URL.revokeObjectURL(workerUrl);
+            abortController?.abort();
         };
     }, [marketId]);
 
