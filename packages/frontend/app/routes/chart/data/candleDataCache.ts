@@ -15,6 +15,24 @@ const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
 const MAX_CANDLES_PER_SERIES = 50000;
 const MAX_MARKS_PER_SYMBOL = 5000;
 
+const normalizeResolutionKey = (resolution: string): string => {
+    if (!resolution) return resolution;
+    const normalized = resolution.toLowerCase();
+    if (normalized.endsWith('m')) {
+        return normalized.replace('m', '');
+    }
+    if (normalized.endsWith('h')) {
+        const hours = Number(normalized.replace('h', ''));
+        return Number.isFinite(hours) ? String(hours * 60) : resolution;
+    }
+    if (normalized.endsWith('d')) return 'D';
+    if (normalized.endsWith('w')) return 'W';
+    if (normalized === '1d') return 'D';
+    if (normalized === '1w') return 'W';
+    if (normalized === '1m') return 'M';
+    return resolution;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function trimCandleCache(cachedData: any[]) {
     if (cachedData.length > MAX_CANDLES_PER_SERIES) {
@@ -36,7 +54,7 @@ export async function getHistoricalData(
     from: number,
     to: number,
 ) {
-    const key = `${symbol}-${resolution}`;
+    const key = `${symbol}-${normalizeResolutionKey(resolution)}`;
     const cachedData = dataCache.get(key) || [];
 
     const candleCount = (to - from) / resolutionToSeconds(resolution);
@@ -106,7 +124,7 @@ export function refreshStaleCache(
     resolution: string,
     onDone: () => void,
 ) {
-    const key = `${symbol}-${resolution}`;
+    const key = `${symbol}-${normalizeResolutionKey(resolution)}`;
     const cachedData = dataCache.get(key) || [];
 
     const now = Math.floor(Date.now() / 1000);
@@ -158,7 +176,7 @@ export function updateCandleCache(
     resolution: string,
     tick: Bar,
 ) {
-    const key = `${symbol}-${resolution}`;
+    const key = `${symbol}-${normalizeResolutionKey(resolution)}`;
     const cachedData = dataCache.get(key) || [];
     const tickTime = tick.time;
 
