@@ -388,6 +388,7 @@ export const createDataFeed = (
             const intervalParam = convertResolutionToIntervalParam(resolution);
             let isFetching = false;
             let abortController: AbortController | null = null;
+            let lastBarTime = 0;
 
             const fetchLatestCandle = () => {
                 if (isFetching) return;
@@ -420,6 +421,7 @@ export const createDataFeed = (
                         ) {
                             const tick = processWSCandleMessage(candleData);
                             onTick(tick);
+                            lastBarTime = tick.time;
                             useChartStore.getState().setLastCandle(tick);
                             updateCandleCache(
                                 symbolInfo.ticker,
@@ -438,13 +440,69 @@ export const createDataFeed = (
                     });
             };
 
+            // Fetch all candles from lastBarTime to now and feed them
+            // to onTick in chronological order to fill gaps after the
+            // tab was hidden.
+            const fetchGapCandles = () => {
+                if (!symbolInfo.ticker || lastBarTime === 0) return;
+                const now = Date.now();
+                fetch(`${POLLING_API_URL}/info`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: 'candleSnapshot',
+                        req: {
+                            coin: symbolInfo.ticker,
+                            interval: intervalParam,
+                            startTime: lastBarTime,
+                            endTime: now,
+                        },
+                    }),
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        if (!Array.isArray(data)) return;
+                        const bars = data
+                            .filter((d: any) => d.s === symbolInfo.ticker)
+                            .map((d: any) => processWSCandleMessage(d))
+                            .sort((a: any, b: any) => a.time - b.time);
+                        for (const bar of bars) {
+                            onTick(bar);
+                            if (symbolInfo.ticker) {
+                                updateCandleCache(
+                                    symbolInfo.ticker,
+                                    resolution,
+                                    bar,
+                                );
+                            }
+                        }
+                        if (bars.length > 0) {
+                            lastBarTime = bars[bars.length - 1].time;
+                            useChartStore
+                                .getState()
+                                .setLastCandle(bars[bars.length - 1]);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching gap candles:', error);
+                    });
+            };
+
+            const onVisibilityChange = () => {
+                if (!document.hidden) {
+                    fetchGapCandles();
+                }
+            };
+            document.addEventListener('visibilitychange', onVisibilityChange);
+
             const poller = setInterval(() => {
                 // Skip polling when tab is hidden to prevent the chart
                 // from silently auto-scrolling right over hours of idle,
                 // which compresses all candles into a thin sliver.
-                // Gap-fill on tab resume is handled by TradingviewContext
-                // (clearCandleCacheForKey + setSymbol), which tears down
-                // this subscription and creates a fresh one.
+                // Gap-fill on tab resume is handled by onVisibilityChange
+                // above via fetchGapCandles.
                 if (document.hidden) {
                     return;
                 }
@@ -453,6 +511,10 @@ export const createDataFeed = (
 
             const unsubscribe = () => {
                 clearInterval(poller);
+                document.removeEventListener(
+                    'visibilitychange',
+                    onVisibilityChange,
+                );
                 if (abortController) {
                     abortController.abort();
                     abortController = null;

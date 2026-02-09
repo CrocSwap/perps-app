@@ -11,7 +11,6 @@ import { useSdk } from '~/hooks/useSdk';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import {
     clearAllChartCaches,
-    clearCandleCacheForKey,
     clearChartCachesForSymbol,
     getMarkFillData,
 } from '~/routes/chart/data/candleDataCache';
@@ -147,13 +146,8 @@ export const TradingViewProvider: React.FC<{
 
     const dataFeedRef = useRef<CustomDataFeedType | null>(null);
 
-    const {
-        debugToolbarOpen,
-        setDebugToolbarOpen,
-        lastOnlineAt,
-        setChartRefreshing,
-        isTabActive,
-    } = useAppStateStore();
+    const { debugToolbarOpen, setDebugToolbarOpen, lastOnlineAt } =
+        useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
 
@@ -916,35 +910,6 @@ export const TradingViewProvider: React.FC<{
             );
         };
     }, [chart]);
-
-    // Refresh chart when tab becomes active again after being hidden
-    // (covers both tab-switch and device sleep/wake).
-    // TradingView's onTick only accepts the current/next bar, so we
-    // must reload the full series to fill any gap. We avoid resetData()
-    // because it breaks the time-scale renderer (x-axis labels vanish).
-    // Instead we clear the cache and call setSymbol(same symbol) which
-    // triggers a clean resolveSymbol → getBars → subscribeBars cycle
-    // that fetches fresh data from the API.
-    const wasTabActiveRef = useRef(isTabActive);
-    useEffect(() => {
-        const wasActive = wasTabActiveRef.current;
-        wasTabActiveRef.current = isTabActive;
-
-        if (isTabActive && !wasActive && chart) {
-            setChartRefreshing(true);
-            const currentSymbol =
-                chart.activeChart().symbol() || symbol || 'BTC';
-            const currentResolution =
-                chart.activeChart().resolution() || chartInterval || '60';
-            clearCandleCacheForKey(currentSymbol, currentResolution);
-            try {
-                chart.activeChart().setSymbol(currentSymbol);
-            } catch (e) {
-                console.error('Error refreshing chart after tab resume:', e);
-            }
-            setChartRefreshing(false);
-        }
-    }, [isTabActive, chart, symbol, chartInterval]);
 
     useEffect(() => {
         if (!chart || !symbol) return;
