@@ -152,6 +152,7 @@ export const TradingViewProvider: React.FC<{
         setDebugToolbarOpen,
         lastOnlineAt,
         setChartRefreshing,
+        isTabActive,
     } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
@@ -963,6 +964,35 @@ export const TradingViewProvider: React.FC<{
             }
         }
     }, [lastSleepMs, lastAwakeMs, chartInterval, chart, symbol]);
+
+    // Refresh chart when tab becomes active again after being hidden.
+    // TradingView's onTick only accepts the current/next bar, so feeding
+    // historical bars via onTick does nothing. Instead we refresh the
+    // cache and call resetData() so TradingView re-reads from the cache.
+    const wasTabActiveRef = useRef(isTabActive);
+    useEffect(() => {
+        const wasActive = wasTabActiveRef.current;
+        wasTabActiveRef.current = isTabActive;
+
+        if (isTabActive && !wasActive && chart) {
+            setChartRefreshing(true);
+            const currentSymbol =
+                chart.activeChart().symbol() || symbol || 'BTC';
+            const currentResolution =
+                chart.activeChart().resolution() || chartInterval || '60';
+            refreshStaleCache(currentSymbol, currentResolution, () => {
+                try {
+                    chart.activeChart().resetData();
+                } catch (e) {
+                    console.error(
+                        'Error resetting chart data after tab resume:',
+                        e,
+                    );
+                }
+                setChartRefreshing(false);
+            });
+        }
+    }, [isTabActive, chart, symbol, chartInterval]);
 
     // Refresh chart when coming back online
     const lastOnlineAtRef = useRef(lastOnlineAt);
