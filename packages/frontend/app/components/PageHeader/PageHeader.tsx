@@ -44,6 +44,7 @@ import {
     matchesShortcutEvent,
 } from '~/utils/keyboardShortcuts';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -416,9 +417,9 @@ export default function PageHeader() {
     };
 
     // logic to open and close the invalid ref code modal
-    const refCodeModal = useModal<'goodCode' | 'badCode' | 'noWallet'>(
-        'closed',
-    );
+    const refCodeModal = useModal<
+        'goodCode' | 'badCode' | 'address' | 'noWallet'
+    >('closed');
     // boolean tracking whether user closed ref code modal
     const [wasRefCodeModalShown, setWasRefCodeModalShown] = useState(false);
 
@@ -428,12 +429,21 @@ export default function PageHeader() {
     // logic to open the ref code modal when relevant
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
-            const isCodeRegistered = await checkIfCodeExists(codeToCheck);
+            // check if the code has been registered in the FUUL system
+            const isCodeRegistered: boolean =
+                await checkIfCodeExists(codeToCheck);
+            // check if the code fits the format of an SVM address
+            const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
+
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
-                    refCodeModal.open(
-                        isCodeRegistered ? 'goodCode' : 'badCode',
-                    );
+                    if (isCodeRegistered) {
+                        refCodeModal.open('goodCode');
+                    } else if (isCodeSVM) {
+                        refCodeModal.open('address');
+                    } else {
+                        refCodeModal.open('badCode');
+                    }
                     setWasRefCodeModalShown(true);
                 } else {
                     refCodeModal.open('noWallet');
@@ -805,6 +815,36 @@ export default function PageHeader() {
                                 referral code. If you deny this referral code it
                                 can still be activated later on the Referrals
                                 page.
+                            </p>
+                            <div className={styles.referral_code_modal_buttons}>
+                                <button onClick={refCodeModal.close}>
+                                    Deny
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (!referralCodeFromURL.value) {
+                                            return;
+                                        }
+                                        mockAcceptRefCode(
+                                            referralCodeFromURL.value,
+                                        );
+                                        refCodeModal.close();
+                                    }}
+                                >
+                                    Accept
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                    {refCodeModal.content === 'address' && (
+                        <div className={styles.invalid_ref_code_modal}>
+                            <p>
+                                Please click 'Accept' to accept the{' '}
+                                <span className={styles.highlight_code}>
+                                    {referralCodeFromURL.value}
+                                </span>{' '}
+                                referral code (address). This referral can still
+                                be activated later on the Referrals page.
                             </p>
                             <div className={styles.referral_code_modal_buttons}>
                                 <button onClick={refCodeModal.close}>
