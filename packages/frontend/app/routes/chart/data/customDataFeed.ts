@@ -389,6 +389,7 @@ export const createDataFeed = (
             let isFetching = false;
             let abortController: AbortController | null = null;
             let wasHidden = false;
+            let hiddenAtMs = 0;
 
             const fetchLatestCandle = () => {
                 if (isFetching) return;
@@ -439,6 +440,54 @@ export const createDataFeed = (
                     });
             };
 
+            const fetchMissingCandles = (hiddenSinceMs: number) => {
+                const currentTime = new Date().getTime();
+                const gapMs = currentTime - hiddenSinceMs;
+                if (gapMs < 5000) {
+                    fetchLatestCandle();
+                    return;
+                }
+                fetch(`${POLLING_API_URL}/info`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: 'candleSnapshot',
+                        req: {
+                            coin: symbolInfo.ticker,
+                            interval: intervalParam,
+                            endTime: currentTime,
+                            startTime: hiddenSinceMs,
+                        },
+                    }),
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        if (!Array.isArray(data) || !symbolInfo.ticker) return;
+                        const bars = data
+                            .filter((d: any) => d && d.s === symbolInfo.ticker)
+                            .map((d: any) => processWSCandleMessage(d))
+                            .sort((a: any, b: any) => a.time - b.time);
+                        for (const bar of bars) {
+                            onTick(bar);
+                            updateCandleCache(
+                                symbolInfo.ticker,
+                                resolution,
+                                bar,
+                            );
+                        }
+                        if (bars.length > 0) {
+                            useChartStore
+                                .getState()
+                                .setLastCandle(bars[bars.length - 1]);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching missing candles:', error);
+                    });
+            };
+
             const poller = setInterval(() => {
                 // Skip polling when tab is hidden to prevent the chart
                 // from silently auto-scrolling right over hours of idle,
@@ -446,7 +495,10 @@ export const createDataFeed = (
                 // The chart's sleep/wake recovery handles data refresh
                 // when the user returns.
                 if (document.hidden) {
-                    wasHidden = true;
+                    if (!wasHidden) {
+                        wasHidden = true;
+                        hiddenAtMs = Date.now();
+                    }
                     return;
                 }
                 fetchLatestCandle();
@@ -454,8 +506,10 @@ export const createDataFeed = (
 
             const onVisibilityChange = () => {
                 if (!document.hidden && wasHidden) {
+                    const savedHiddenAt = hiddenAtMs;
                     wasHidden = false;
-                    fetchLatestCandle();
+                    hiddenAtMs = 0;
+                    fetchMissingCandles(savedHiddenAt);
                 }
             };
             document.addEventListener('visibilitychange', onVisibilityChange);
