@@ -127,7 +127,7 @@ export const TradingViewProvider: React.FC<{
         sessionBtn?.click();
     }, []);
 
-    const { info, lastSleepMs, lastAwakeMs } = useSdk();
+    const { info } = useSdk();
 
     const { symbol, addToFetchedChannels, userFills } = useTradeDataStore();
 
@@ -935,24 +935,6 @@ export const TradingViewProvider: React.FC<{
         });
     }, [chart]);
 
-    const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
-        let coef = 1;
-
-        if (!interval) return 1;
-
-        if (interval.includes('D')) {
-            coef = 24 * 60;
-        } else if (interval.includes('W')) {
-            coef = 24 * 60 * 7;
-        } else if (interval.includes('M')) {
-            coef = 60 * 24 * 30;
-        }
-
-        const intervalNum = Number(interval.replace(/[^0-9]/g, ''));
-
-        return intervalNum * coef;
-    }, []);
-
     useEffect(() => {
         const chartDiv = document.getElementById('tv_chart');
         const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
@@ -1019,52 +1001,6 @@ export const TradingViewProvider: React.FC<{
             );
         };
     }, [chart]);
-
-    useEffect(() => {
-        if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
-            const intervalMinutes = tvIntervalToMinutes(
-                chartInterval as ResolutionString,
-            );
-            const lastSleepDurationInMinutes = parseFloat(
-                ((lastAwakeMs - lastSleepMs) / 60000).toFixed(2),
-            );
-
-            if (intervalMinutes <= lastSleepDurationInMinutes) {
-                chart?.resetCache();
-                chart?.chart().resetData();
-                chart?.chart().restoreChart();
-            }
-        }
-    }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
-
-    // Refresh chart when coming back online
-    const lastOnlineAtRef = useRef(lastOnlineAt);
-    useEffect(() => {
-        // Only trigger if lastOnlineAt actually changed (not on initial mount)
-        if (
-            lastOnlineAt > 0 &&
-            lastOnlineAt !== lastOnlineAtRef.current &&
-            chart
-        ) {
-            console.log('>>> Refreshing chart after coming back online');
-            lastOnlineAtRef.current = lastOnlineAt;
-
-            // Give the network a moment to stabilize, then refresh
-            const timeoutId = setTimeout(() => {
-                try {
-                    // Clear caches and force a full data reload
-                    clearAllChartCaches();
-                    chart.activeChart().resetData();
-                    chart.activeChart().refreshMarks();
-                } catch (e) {
-                    console.error('Error refreshing chart after reconnect:', e);
-                }
-            }, 1000);
-
-            return () => clearTimeout(timeoutId);
-        }
-        lastOnlineAtRef.current = lastOnlineAt;
-    }, [lastOnlineAt, chart]);
 
     useEffect(() => {
         if (!chart || !symbol) return;

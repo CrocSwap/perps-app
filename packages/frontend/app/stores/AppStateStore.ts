@@ -20,6 +20,8 @@ type AppStateStore = {
     setLiquidationsActive: (liquidationsActive: boolean) => void;
     isTabActive: boolean;
     setIsTabActive: (isTabActive: boolean) => void;
+    chartRefreshing: boolean;
+    setChartRefreshing: (chartRefreshing: boolean) => void;
 };
 
 export const useAppStateStore = create<AppStateStore>()(
@@ -54,6 +56,9 @@ export const useAppStateStore = create<AppStateStore>()(
                 set({ liquidationsActive }),
             isTabActive: true,
             setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
+            chartRefreshing: false,
+            setChartRefreshing: (chartRefreshing: boolean) =>
+                set({ chartRefreshing }),
         }),
         {
             name: 'APP_STATE',

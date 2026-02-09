@@ -27,7 +27,7 @@ const TradingViewWrapper: React.FC<TradingViewWrapperProps> = ({
     >('loading');
 
     // Use a key to force remount of TradingViewProvider when coming back online
-    const { lastOnlineAt } = useAppStateStore();
+    const { lastOnlineAt, chartRefreshing } = useAppStateStore();
     const [chartKey, setChartKey] = useState(0);
     const {
         showQuickModeConfirm,
@@ -100,6 +100,16 @@ const TradingViewWrapper: React.FC<TradingViewWrapperProps> = ({
                     <YaxisOverlayCanvas />
                     <LiquidationChartOptions />
                 </TradingViewProvider>
+            )}
+
+            {chartRefreshing && chartLoadingStatus === 'ready' && (
+                <div className={styles.chartRefreshing}>
+                    <div className={styles.chartRefreshingOverlay} />
+                    <div className={styles.chartRefreshingLabel}>
+                        <div className={styles.chartRefreshingSpinner}></div>
+                        <span>Refreshing chart...</span>
+                    </div>
+                </div>
             )}
 
             {showQuickModeConfirm && (
