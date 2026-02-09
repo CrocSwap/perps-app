@@ -11,7 +11,9 @@ interface ModalProps {
     children: ReactNode;
     mobileBreakpoint?: number;
     forceBottomSheet?: boolean;
+    noHeader?: boolean;
     title: string;
+    stopOutsideClick?: boolean;
 }
 
 /** Proxy component that forwards its content to the GlobalModalHost. */
@@ -23,6 +25,8 @@ export default function Modal(props: ModalProps) {
         mobileBreakpoint = 768,
         forceBottomSheet = false,
         title,
+        noHeader = false,
+        stopOutsideClick = false,
     } = props;
 
     const isMobile = useMobile(mobileBreakpoint);
@@ -42,7 +46,9 @@ export default function Modal(props: ModalProps) {
             title,
             position: actualPosition,
             content: children,
+            noHeader,
             onRequestClose: close, // host closes → call caller's close()
+            stopOutsideClick,
         });
 
         return () => {
@@ -54,8 +60,14 @@ export default function Modal(props: ModalProps) {
 
     // Keep host in sync if props/children change while mounted
     useEffect(() => {
-        update({ title, position: actualPosition, content: children });
-    }, [title, actualPosition, children, update]);
+        update({
+            title,
+            noHeader,
+            position: actualPosition,
+            content: children,
+            stopOutsideClick,
+        });
+    }, [title, actualPosition, children, noHeader, stopOutsideClick, update]);
 
     // Nothing is rendered locally; global host handles it.
     return null;

@@ -577,8 +577,16 @@
         "xCTA": "Auf 𝕏 teilen",
         "copyLinkCTA": "Link kopieren",
         "textPlaceholder": "Handeln Sie jetzt {{coin}}-Perps auf {{twitter}} im {{fogo}} Testnet",
-        "sharePosition": "Position mit PnL {{pnl}} teilen"
+        "sharePosition": "Position mit PnL {{pnl}} teilen",
+
+        "pnl": "PnL",
+        "details": "Details",
+        "copyImageCTA": "Bild kopieren",
+        "copying": "Wird kopiert…",
+        "copied": "Kopiert!",
+        "shareHint": "Teilen auf X kopiert das Bild auch in die Zwischenablage"
     },
+
     "colors": {
         "default": "Standard",
         "opposite": "Gegensatz",
@@ -654,6 +662,25 @@
     },
     "chart": {
         "liqPrice": "Liquidationspreis"
+    },
+    "quickTrade": {
+        "title": "Schnellhandelsmodus",
+        "quick": "Schnell",
+        "quickWithType": "Schnell {{tradeType}}",
+        "sizeTooltip": "Größe: {{size}} {{currency}}",
+        "clickToEnable": "Klicken, um den Schnellhandelsmodus zu aktivieren",
+        "sellAtLimit": "Verkaufen @ {{price}} Limit",
+        "buyAtLimit": "Kaufen @ {{price}} Limit",
+        "buyAtStop": "Kaufen @ {{price}} Stop",
+        "sellAtStop": "Verkaufen @ {{price}} Stop",
+        "sellSizeAtLimit": "Verkaufen {{size}} @ {{price}} Limit",
+        "buySizeAtLimit": "Kaufen {{size}} @ {{price}} Limit",
+        "buySizeAtStop": "Kaufen {{size}} @ {{price}} Stop",
+        "sellSizeAtStop": "Verkaufen {{size}} @ {{price}} Stop",
+        "infoText": "Klicken Sie auf den Chart, um vorkonfigurierte Orders zu platzieren",
+        "description": "Schnelltrades füllen das Orderformular mit dem angeklickten Preis und der ausgewählten Größe aus. Aktivieren Sie das Kontrollkästchen unten, um die Order sofort per Linksklick zu senden und die Bestätigung zu umgehen. Das Rechtsklick-Menü und das Plus-Button-Menü bieten ebenfalls Optionen für Schnelltrades ohne Bestätigung, selbst wenn deaktiviert.",
+        "enableConfirmationBypass": "Bestätigung überspringen und Order per Klick senden",
+        "saveAndEnable": "Speichern und aktivieren"
     },
     "meta": {
         "title": "Ambient Finance | Perpetual Futures auf Fogo",
