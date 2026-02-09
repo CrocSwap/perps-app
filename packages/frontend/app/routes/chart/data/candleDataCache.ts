@@ -2,7 +2,7 @@ import { bsColorSets } from '~/stores/AppSettingsStore';
 import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
 import {
     getChartThemeColors,
-    mapResolutionToInterval,
+    convertResolutionToIntervalParam,
     resolutionToSeconds,
 } from './utils/utils';
 import type { Bar } from '~/tv/charting_library';
@@ -51,7 +51,7 @@ export async function getHistoricalData(
         );
     }
 
-    const period = mapResolutionToInterval(resolution);
+    const period = convertResolutionToIntervalParam(resolution);
     const data = await fetchCandles(symbol, period, from, to).then(
         (res: any) => {
             if (res) {
@@ -110,11 +110,16 @@ export function refreshStaleCache(
     const cachedData = dataCache.get(key) || [];
 
     const now = Math.floor(Date.now() / 1000);
-    // Fetch the last 24h of data to cover any idle gap
-    const from = now - 86400;
+    const lastCachedTime = cachedData[cachedData.length - 1]?.time;
+    const overlapSeconds = resolutionToSeconds(resolution) * 2;
+    // If we have cached bars, fetch only from the last cached candle
+    // (with small overlap) to now to fill any idle gap.
+    const from = lastCachedTime
+        ? Math.max(Math.floor(lastCachedTime / 1000) - overlapSeconds, 0)
+        : now - 86400;
     const to = now;
 
-    const period = mapResolutionToInterval(resolution);
+    const period = convertResolutionToIntervalParam(resolution);
     fetchCandles(symbol, period, from, to)
         .then((res: any) => {
             if (res) {
