@@ -38,3 +38,50 @@
     height: 56px;
     width: 56px;
 }
+
+@keyframes chartRefreshingPulse {
+    0%,
+    100% {
+        opacity: 0.08;
+    }
+    50% {
+        opacity: 0.18;
+    }
+}
+
+.chartRefreshing {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.chartRefreshingOverlay {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-dark2, #1e2029);
+    animation: chartRefreshingPulse 2s ease-in-out infinite;
+}
+
+.chartRefreshingLabel {
+    position: absolute;
+    top: 40px;
+    left: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--bg-dark2, #1e2029) 85%, transparent);
+    color: var(--text2, #9a9aaf);
+    font-size: 11px;
+}
+
+.chartRefreshingSpinner {
+    animation: spinner__container-rotate 0.9s linear infinite;
+    border: 2px solid var(--text2, #9a9aaf);
+    border-top-color: var(--accent1, #7371fc);
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+}
