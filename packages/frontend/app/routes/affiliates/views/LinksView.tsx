@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import {
     IoLink,
@@ -30,6 +31,25 @@ export function LinksView() {
     const { userAddress: storeUserAddress } = useUserDataStore();
     const userAddress = DEV_USER_ADDRESS_OVERRIDE ?? storeUserAddress;
     const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+    const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const toggleRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (!dropdownOpen) return;
+        const handleClick = (e: MouseEvent) => {
+            const target = e.target as Node;
+            if (
+                dropdownRef.current?.contains(target) ||
+                toggleRef.current?.contains(target)
+            ) {
+                return;
+            }
+            setDropdownOpen(null);
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [dropdownOpen]);
 
     const { data: audienceData } = useAffiliateAudience(
         userAddress || '',
@@ -209,43 +229,92 @@ export function LinksView() {
                                             style={{ position: 'relative' }}
                                         >
                                             <button
+                                                ref={toggleRef}
                                                 className={
                                                     styles['pagination-button']
                                                 }
-                                                onClick={() =>
-                                                    setDropdownOpen(
+                                                onClick={(e) => {
+                                                    if (
                                                         dropdownOpen ===
-                                                            entry.code
-                                                            ? null
-                                                            : entry.code,
-                                                    )
-                                                }
+                                                        entry.code
+                                                    ) {
+                                                        setDropdownOpen(null);
+                                                    } else {
+                                                        const rect =
+                                                            e.currentTarget.getBoundingClientRect();
+                                                        setDropdownPos({
+                                                            top:
+                                                                rect.bottom + 4,
+                                                            right:
+                                                                window.innerWidth -
+                                                                rect.right,
+                                                        });
+                                                        setDropdownOpen(
+                                                            entry.code,
+                                                        );
+                                                    }
+                                                }}
                                             >
                                                 <IoEllipsisVertical size={16} />
                                             </button>
-                                            {dropdownOpen === entry.code && (
-                                                <div
-                                                    className={
-                                                        styles['dropdown-menu']
-                                                    }
-                                                >
-                                                    <button
-                                                        className={
-                                                            styles[
-                                                                'dropdown-item'
-                                                            ]
-                                                        }
-                                                        onClick={() =>
-                                                            copyToClipboard(
-                                                                entry.code,
-                                                            )
-                                                        }
+                                            {dropdownOpen === entry.code &&
+                                                createPortal(
+                                                    <div
+                                                        ref={dropdownRef}
+                                                        style={{
+                                                            position: 'fixed',
+                                                            top: dropdownPos.top,
+                                                            right: dropdownPos.right,
+                                                            zIndex: 9999,
+                                                            background:
+                                                                '#12121a',
+                                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                            borderRadius: '8px',
+                                                            minWidth: '10rem',
+                                                            padding: '0.25rem',
+                                                            boxShadow:
+                                                                '0 10px 15px -3px rgba(0, 0, 0, 0.3)',
+                                                        }}
                                                     >
-                                                        <IoCopy size={14} />
-                                                        Copy Link
-                                                    </button>
-                                                </div>
-                                            )}
+                                                        <button
+                                                            style={{
+                                                                display: 'flex',
+                                                                alignItems:
+                                                                    'center',
+                                                                gap: '0.5rem',
+                                                                width: '100%',
+                                                                padding:
+                                                                    '0.5rem 0.75rem',
+                                                                fontSize:
+                                                                    '0.875rem',
+                                                                color: '#f0f0f8',
+                                                                background:
+                                                                    'transparent',
+                                                                border: 'none',
+                                                                borderRadius:
+                                                                    '4px',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                            onMouseEnter={(e) =>
+                                                                (e.currentTarget.style.background =
+                                                                    'rgba(255, 255, 255, 0.1)')
+                                                            }
+                                                            onMouseLeave={(e) =>
+                                                                (e.currentTarget.style.background =
+                                                                    'transparent')
+                                                            }
+                                                            onClick={() =>
+                                                                copyToClipboard(
+                                                                    entry.code,
+                                                                )
+                                                            }
+                                                        >
+                                                            <IoCopy size={14} />
+                                                            Copy Link
+                                                        </button>
+                                                    </div>,
+                                                    document.body,
+                                                )}
                                         </td>
                                     </tr>
                                 ))}
