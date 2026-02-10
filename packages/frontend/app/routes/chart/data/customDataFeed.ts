@@ -2,6 +2,7 @@
 
 import type { Info } from '@perps-app/sdk';
 import type {
+    Bar,
     IDatafeedChartApi,
     LibrarySymbolInfo,
     Mark,
@@ -395,6 +396,11 @@ export const createDataFeed = (
                 isFetching = true;
                 abortController = new AbortController();
                 const currentTime = new Date().getTime();
+                // Use lastBarTime to anchor the fetch window so small gaps
+                // are always back-filled even after brief network hiccups.
+                const startTime = lastBarTime
+                    ? lastBarTime - 1000
+                    : currentTime - 1000 * 10;
                 fetch(`${POLLING_API_URL}/info`, {
                     method: 'POST',
                     headers: {
@@ -406,28 +412,39 @@ export const createDataFeed = (
                             coin: symbolInfo.ticker,
                             interval: intervalParam,
                             endTime: currentTime,
-                            startTime: currentTime - 1000 * 10,
+                            startTime,
                         },
                     }),
                     signal: abortController.signal,
                 })
                     .then((res) => res.json())
                     .then((data) => {
-                        const candleData = data[0];
                         if (
-                            symbolInfo.ticker &&
-                            candleData &&
-                            candleData.s === symbolInfo.ticker
-                        ) {
-                            const tick = processWSCandleMessage(candleData);
+                            !symbolInfo.ticker ||
+                            !Array.isArray(data) ||
+                            data.length === 0
+                        )
+                            return;
+
+                        // Process all returned candles so gaps are filled
+                        const bars = data
+                            .filter((c: any) => c && c.s === symbolInfo.ticker)
+                            .map((c: any) => processWSCandleMessage(c))
+                            .sort((a: Bar, b: Bar) => a.time - b.time);
+
+                        for (const tick of bars) {
                             onTick(tick);
-                            lastBarTime = tick.time;
-                            useChartStore.getState().setLastCandle(tick);
                             updateCandleCache(
-                                symbolInfo.ticker,
+                                symbolInfo.ticker!,
                                 resolution,
                                 tick,
                             );
+                        }
+
+                        if (bars.length > 0) {
+                            const latest = bars[bars.length - 1];
+                            lastBarTime = latest.time;
+                            useChartStore.getState().setLastCandle(latest);
                         }
                     })
                     .catch((error) => {
