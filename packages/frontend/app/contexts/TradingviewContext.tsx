@@ -13,6 +13,7 @@ import {
     clearAllChartCaches,
     clearChartCachesForSymbol,
     getMarkFillData,
+    refreshStaleCache,
 } from '~/routes/chart/data/candleDataCache';
 import {
     createDataFeed,
@@ -143,11 +144,17 @@ export const TradingViewProvider: React.FC<{
     const [chartInterval, setChartInterval] = useState<string | undefined>(
         chartState?.interval,
     );
+    const chartIntervalRef = useRef(chartInterval);
+    chartIntervalRef.current = chartInterval;
 
     const dataFeedRef = useRef<CustomDataFeedType | null>(null);
 
-    const { debugToolbarOpen, setDebugToolbarOpen, lastOnlineAt } =
-        useAppStateStore();
+    const {
+        debugToolbarOpen,
+        setDebugToolbarOpen,
+        lastOnlineAt,
+        setChartRefreshing,
+    } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
 
@@ -950,6 +957,38 @@ export const TradingViewProvider: React.FC<{
         intervalChangedSubscribe(chart, setIsChartReady);
         visibleRangeChangedSubscribe(chart);
     }, [chart]);
+
+    // When the tab becomes visible after being hidden, backfill any
+    // missing candles into the cache and force TradingView to re-read
+    // via getBars.  The onTick callback from subscribeBars can only
+    // update the most recent bar, so feeding historical bars through
+    // it silently drops them — hence the resetData() approach.
+    useEffect(() => {
+        if (!chart || !symbol) return;
+
+        const onVisibilityChange = () => {
+            if (document.hidden) return;
+
+            const resolution = chartIntervalRef.current || '60';
+            setChartRefreshing(true);
+            refreshStaleCache(symbol, resolution, () => {
+                try {
+                    chart.activeChart().resetData();
+                } catch (e) {
+                    console.error('[chart] resetData failed:', e);
+                }
+                setChartRefreshing(false);
+            });
+        };
+
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        return () => {
+            document.removeEventListener(
+                'visibilitychange',
+                onVisibilityChange,
+            );
+        };
+    }, [chart, symbol, setChartRefreshing]);
 
     useEffect(() => {
         if (chart) {
