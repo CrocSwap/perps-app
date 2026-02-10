@@ -739,22 +739,39 @@ export async function buildTradeRefregInstructions(
         });
         if (isConversionDetectedLocally(params.walletPublicKey)) {
             console.info(
-                '[refreg] conversion latch found locally; skipping complete_conversion build',
+                '[refreg] conversion latch found locally; skipping trade refreg instruction build',
             );
             const result: TradeRefregBuildResult = {
-                instructions: [
-                    buildFirstTradeInstruction({
-                        actor: params.sessionPublicKey,
-                        walletPublicKey: params.walletPublicKey,
-                        dappId: getDappIdBytes(),
-                    }),
-                ],
-                includesFirstTrade: true,
+                instructions: [],
+                includesFirstTrade: false,
                 includesCompleteConversion: false,
                 referralAttribution: null,
                 trackingId: null,
             };
             console.log('[refreg] trade refreg result (local latch)', {
+                walletPublicKey: params.walletPublicKey.toBase58(),
+                instructionCount: result.instructions.length,
+                includesFirstTrade: result.includesFirstTrade,
+                includesCompleteConversion: result.includesCompleteConversion,
+            });
+            return result;
+        }
+
+        const isAlreadyConverted = await fetchConversionStatus({
+            walletPublicKey: params.walletPublicKey,
+        });
+        if (isAlreadyConverted === true) {
+            console.info(
+                '[refreg] conversion already detected via API; skipping trade refreg instruction build',
+            );
+            const result: TradeRefregBuildResult = {
+                instructions: [],
+                includesFirstTrade: false,
+                includesCompleteConversion: false,
+                referralAttribution: null,
+                trackingId: null,
+            };
+            console.log('[refreg] trade refreg result (already converted)', {
                 walletPublicKey: params.walletPublicKey.toBase58(),
                 instructionCount: result.instructions.length,
                 includesFirstTrade: result.includesFirstTrade,
@@ -806,31 +823,6 @@ export async function buildTradeRefregInstructions(
                 trackingId: null,
             };
             console.log('[refreg] trade refreg result (no tracking_id)', {
-                walletPublicKey: params.walletPublicKey.toBase58(),
-                instructionCount: result.instructions.length,
-                includesFirstTrade: result.includesFirstTrade,
-                includesCompleteConversion: result.includesCompleteConversion,
-                referralKind: referralAttribution.referralKind,
-                referralSourceValue: referralAttribution.sourceValue,
-            });
-            return result;
-        }
-
-        const isAlreadyConverted = await fetchConversionStatus({
-            walletPublicKey: params.walletPublicKey,
-        });
-        if (isAlreadyConverted === true) {
-            console.info(
-                '[refreg] conversion already detected via API; skipping complete_conversion',
-            );
-            const result: TradeRefregBuildResult = {
-                instructions,
-                includesFirstTrade: true,
-                includesCompleteConversion: false,
-                referralAttribution,
-                trackingId,
-            };
-            console.log('[refreg] trade refreg result (already converted)', {
                 walletPublicKey: params.walletPublicKey.toBase58(),
                 instructionCount: result.instructions.length,
                 includesFirstTrade: result.includesFirstTrade,
