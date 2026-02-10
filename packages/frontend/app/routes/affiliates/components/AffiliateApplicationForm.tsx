@@ -7,10 +7,6 @@ import { useFormStatusStore } from '../hooks/useFormStatusStore';
 import { ApplicationPendingCard } from './ApplicationPendingCard';
 import styles from '../affiliates.module.css';
 
-// DEV OVERRIDE: Set to null to use actual logged-in user
-const DEV_USER_ADDRESS_OVERRIDE: string | null =
-    '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
-
 type HubspotValidationDetails = {
     status?: string;
     message?: string;
@@ -255,8 +251,7 @@ const initialChannel: SocialChannel = {
 };
 
 export function AffiliateApplicationForm() {
-    const { userAddress: storeUserAddress } = useUserDataStore();
-    const userAddress = DEV_USER_ADDRESS_OVERRIDE ?? storeUserAddress;
+    const { userAddress } = useUserDataStore();
     const { addCompletedWallet, completedWallets, _hasHydrated } =
         useFormStatusStore();
 

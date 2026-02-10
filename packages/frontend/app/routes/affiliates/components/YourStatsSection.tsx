@@ -12,10 +12,6 @@ import { formatLargeNumber, formatTokenAmount } from '../utils/format-numbers';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from '../affiliates.module.css';
 
-// DEV OVERRIDE: Set to null to use actual logged-in user
-const DEV_USER_ADDRESS_OVERRIDE: string | null =
-    '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
-
 const STATS_LABELS = {
     FEES_EARNED: 'Fees earned',
     ACTIVE_TRADERS: 'Active traders',
@@ -27,8 +23,7 @@ const STATS_LABELS = {
 export function YourStatsSection() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
-    const { userAddress: storeUserAddress } = useUserDataStore();
-    const userAddress = DEV_USER_ADDRESS_OVERRIDE ?? storeUserAddress;
+    const { userAddress } = useUserDataStore();
 
     const {
         data: stats,

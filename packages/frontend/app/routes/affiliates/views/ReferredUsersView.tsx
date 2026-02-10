@@ -19,15 +19,10 @@ import {
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from '../affiliates.module.css';
 
-// DEV OVERRIDE: Set to null to use actual logged-in user
-const DEV_USER_ADDRESS_OVERRIDE: string | null =
-    '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
-
 export function ReferredUsersView() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
-    const { userAddress: storeUserAddress } = useUserDataStore();
-    const userAddress = DEV_USER_ADDRESS_OVERRIDE ?? storeUserAddress;
+    const { userAddress } = useUserDataStore();
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState('');
