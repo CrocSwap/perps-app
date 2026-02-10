@@ -33,18 +33,23 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
-        console.log('fuul', { isInitialized });
+        console.log('[fuul] init effect', {
+            isInitialized,
+            hasApiKey: Boolean(FUUL_API_KEY),
+        });
         if (FUUL_API_KEY && !isInitialized) {
             try {
                 const result = Fuul.init({
                     apiKey: FUUL_API_KEY,
                 });
-                console.log('fuul', { result });
+                console.log('[fuul] init success', { result });
                 // Assume initialization is successful if no error is thrown
                 setIsInitialized(true);
             } catch (error) {
                 console.error('Failed to initialize Fuul:', error);
             }
+        } else if (!FUUL_API_KEY) {
+            console.warn('[fuul] init skipped: missing API key');
         }
     }, [FUUL_API_KEY]);
 
@@ -55,8 +60,13 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
     ];
 
     function trackPageView(): void {
+        console.log('[fuul] trackPageView invoked', {
+            isInitialized,
+            projects,
+        });
         if (isInitialized) {
             Fuul.sendPageview(undefined, projects);
+            console.log('[fuul] sendPageview dispatched');
         } else {
             console.warn(
                 'Cannot send pageview before Fuul system is initialized',

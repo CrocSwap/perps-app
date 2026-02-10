@@ -80,6 +80,22 @@ const FIRST_TRADE_TAG = 2;
 const REFREG_POLL_INTERVAL_MS = 30_000;
 const REFREG_REQUEST_TIMEOUT_MS = 5_000;
 const activeConversionStatusPolls = new Set<string>();
+let hasLoggedRefregConfig = false;
+
+function logRefregConfigOnce(): void {
+    if (hasLoggedRefregConfig) {
+        return;
+    }
+
+    hasLoggedRefregConfig = true;
+    console.log('[refreg] runtime config', {
+        programId: REFREG_PROGRAM_ID.toBase58(),
+        dappId: REFREG_DAPP_ID.toBase58(),
+        apiBaseUrl: REFREG_API_BASE_URL,
+        pollIntervalMs: REFREG_POLL_INTERVAL_MS,
+        requestTimeoutMs: REFREG_REQUEST_TIMEOUT_MS,
+    });
+}
 
 function parseEnvPublicKey(
     value: string,
@@ -166,8 +182,11 @@ function parseTrackingIdToId32(value: string): Uint8Array | null {
     }
 
     const utf8Bytes = new TextEncoder().encode(trimmed);
-    if (utf8Bytes.length === 32) {
-        return utf8Bytes;
+    if (utf8Bytes.length > 0 && utf8Bytes.length <= 32) {
+        const out = new Uint8Array(32);
+        // Left-pad short tracking ids with 0x00 bytes to satisfy [u8; 32].
+        out.set(utf8Bytes, 32 - utf8Bytes.length);
+        return out;
     }
 
     return null;
@@ -232,6 +251,12 @@ function resolveReferralAttribution(): ReferralAttribution | null {
         }
 
         try {
+            console.log(
+                '[refreg] resolved referral attribution from explicit storage (kind=1)',
+                {
+                    sourceValue: explicitIdRaw,
+                },
+            );
             return {
                 referralKind: 1,
                 referralId: paddedStringToId32(explicitIdRaw),
@@ -246,6 +271,12 @@ function resolveReferralAttribution(): ReferralAttribution | null {
     if (explicitIdRaw.length > 0) {
         const asPubkey = parseBase58PublicKeyBytes(explicitIdRaw);
         if (asPubkey) {
+            console.log(
+                '[refreg] resolved referral attribution from explicit storage (auto kind=0 pubkey)',
+                {
+                    sourceValue: explicitIdRaw,
+                },
+            );
             return {
                 referralKind: 0,
                 referralId: asPubkey,
@@ -254,6 +285,12 @@ function resolveReferralAttribution(): ReferralAttribution | null {
         }
 
         try {
+            console.log(
+                '[refreg] resolved referral attribution from explicit storage (auto kind=1 string)',
+                {
+                    sourceValue: explicitIdRaw,
+                },
+            );
             return {
                 referralKind: 1,
                 referralId: paddedStringToId32(explicitIdRaw),
@@ -268,10 +305,19 @@ function resolveReferralAttribution(): ReferralAttribution | null {
 
     const cachedReferralCode = readPersistedReferralCode();
     if (!cachedReferralCode) {
+        console.info(
+            '[refreg] referral attribution unavailable: no explicit referral id and no cached referral code',
+        );
         return null;
     }
 
     try {
+        console.log(
+            '[refreg] resolved referral attribution from cached referral code',
+            {
+                sourceValue: cachedReferralCode,
+            },
+        );
         return {
             referralKind: 1,
             referralId: paddedStringToId32(cachedReferralCode),
@@ -293,10 +339,15 @@ function getTrackingIdBytes(): Uint8Array | null {
     const trackingId = parseTrackingIdToId32(trackingIdRaw);
     if (!trackingId) {
         console.info(
-            '[refreg] tracking_id must be exactly 32 bytes (base58 pubkey, 64-char hex, or UTF-8 length 32)',
+            '[refreg] tracking_id must resolve to 32 bytes (base58 pubkey, 64-char hex, or UTF-8 <= 32 bytes left-padded with 0x00)',
         );
         return null;
     }
+
+    console.log('[refreg] tracking_id resolved to id32', {
+        value: trackingIdRaw,
+        base58Id32: id32ToBase58(trackingId),
+    });
 
     return trackingId;
 }
@@ -366,11 +417,18 @@ async function fetchRefregJson<T>(
     params: Record<string, string>,
     timeoutMs = REFREG_REQUEST_TIMEOUT_MS,
 ): Promise<T> {
+    const url = buildApiUrl(path, params);
+    console.log('[refreg] API request', {
+        path,
+        url,
+        timeoutMs,
+    });
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-        const response = await fetch(buildApiUrl(path, params), {
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -379,6 +437,11 @@ async function fetchRefregJson<T>(
         });
 
         const json = (await response.json()) as T;
+        console.log('[refreg] API response', {
+            path,
+            status: response.status,
+            ok: response.ok,
+        });
 
         if (!response.ok) {
             throw new Error(
@@ -400,6 +463,7 @@ export async function fetchConversionStatus(params: {
     walletPublicKey: PublicKey;
 }): Promise<boolean | null> {
     try {
+        logRefregConfigOnce();
         const response = await fetchRefregJson<
             ConversionStatusResponse | RefregApiError
         >('/v1/referrals/conversion-status', {
@@ -408,12 +472,23 @@ export async function fetchConversionStatus(params: {
         });
 
         if (isApiErrorResponse(response)) {
+            console.log(
+                '[refreg] conversion-status returned API error payload',
+                response,
+            );
             return null;
         }
 
         const converted = response.converted === true;
+        console.info('[refreg] conversion-status response', {
+            walletPublicKey: params.walletPublicKey.toBase58(),
+            converted,
+        });
         if (converted) {
             markConversionDetectedLocally(params.walletPublicKey);
+            console.info('[refreg] conversion latch marked in localStorage', {
+                walletPublicKey: params.walletPublicKey.toBase58(),
+            });
         }
         return converted;
     } catch (error) {
@@ -432,6 +507,7 @@ export async function fetchReferralStats(params: {
     referralId: Uint8Array;
 }): Promise<ReferralStatsResponse | null> {
     try {
+        logRefregConfigOnce();
         const response = await fetchRefregJson<
             ReferralStatsResponse | RefregApiError
         >('/v1/referrals/stats', {
@@ -441,9 +517,20 @@ export async function fetchReferralStats(params: {
         });
 
         if (isApiErrorResponse(response)) {
+            console.log('[refreg] referral-stats returned API error payload', {
+                referralKind: params.referralKind,
+                referralId: id32ToBase58(params.referralId),
+                response,
+            });
             return null;
         }
 
+        console.info('[refreg] referral-stats response', {
+            referralKind: params.referralKind,
+            referralId: id32ToBase58(params.referralId),
+            pending_count: response.pending_count,
+            converted_count: response.converted_count,
+        });
         return response;
     } catch (error) {
         console.info('[refreg] referral-stats fetch failed:', error);
@@ -583,13 +670,24 @@ export async function buildConnectWalletIx(
     params: BuildIxParams,
 ): Promise<ConnectWalletBuildResult | null> {
     try {
+        logRefregConfigOnce();
+        console.info('[refreg] buildConnectWalletIx start', {
+            walletPublicKey: params.walletPublicKey.toBase58(),
+            sessionPublicKey: params.sessionPublicKey.toBase58(),
+        });
         const trackingId = getTrackingIdBytes();
         if (!trackingId) {
+            console.info(
+                '[refreg] buildConnectWalletIx skipped: tracking_id not available/invalid',
+            );
             return null;
         }
 
         const referralAttribution = resolveReferralAttribution();
         if (!referralAttribution) {
+            console.info(
+                '[refreg] buildConnectWalletIx skipped: referral attribution unavailable',
+            );
             return null;
         }
 
@@ -610,6 +708,14 @@ export async function buildConnectWalletIx(
             id32ToBase58(referralAttribution.referralId),
         ].join(':');
 
+        console.log('[refreg] buildConnectWalletIx success', {
+            walletPublicKey: params.walletPublicKey.toBase58(),
+            fingerprint,
+            referralKind: referralAttribution.referralKind,
+            referralSourceValue: referralAttribution.sourceValue,
+            trackingId: id32ToBase58(trackingId),
+        });
+
         return {
             instruction,
             fingerprint,
@@ -626,8 +732,16 @@ export async function buildTradeRefregInstructions(
     params: BuildIxParams,
 ): Promise<TradeRefregBuildResult> {
     try {
+        logRefregConfigOnce();
+        console.info('[refreg] buildTradeRefregInstructions start', {
+            walletPublicKey: params.walletPublicKey.toBase58(),
+            sessionPublicKey: params.sessionPublicKey.toBase58(),
+        });
         if (isConversionDetectedLocally(params.walletPublicKey)) {
-            return {
+            console.info(
+                '[refreg] conversion latch found locally; skipping complete_conversion build',
+            );
+            const result: TradeRefregBuildResult = {
                 instructions: [
                     buildFirstTradeInstruction({
                         actor: params.sessionPublicKey,
@@ -640,6 +754,13 @@ export async function buildTradeRefregInstructions(
                 referralAttribution: null,
                 trackingId: null,
             };
+            console.log('[refreg] trade refreg result (local latch)', {
+                walletPublicKey: params.walletPublicKey.toBase58(),
+                instructionCount: result.instructions.length,
+                includesFirstTrade: result.includesFirstTrade,
+                includesCompleteConversion: result.includesCompleteConversion,
+            });
+            return result;
         }
 
         const dappId = getDappIdBytes();
@@ -653,13 +774,23 @@ export async function buildTradeRefregInstructions(
 
         const referralAttribution = resolveReferralAttribution();
         if (!referralAttribution) {
-            return {
+            console.info(
+                '[refreg] no referral attribution; returning first_trade only',
+            );
+            const result: TradeRefregBuildResult = {
                 instructions,
                 includesFirstTrade: true,
                 includesCompleteConversion: false,
                 referralAttribution: null,
                 trackingId: null,
             };
+            console.log('[refreg] trade refreg result (first_trade only)', {
+                walletPublicKey: params.walletPublicKey.toBase58(),
+                instructionCount: result.instructions.length,
+                includesFirstTrade: result.includesFirstTrade,
+                includesCompleteConversion: result.includesCompleteConversion,
+            });
+            return result;
         }
 
         const trackingId = getTrackingIdBytes();
@@ -667,26 +798,47 @@ export async function buildTradeRefregInstructions(
             console.info(
                 '[refreg] Skipping complete_conversion because tracking_id is unavailable',
             );
-            return {
+            const result: TradeRefregBuildResult = {
                 instructions,
                 includesFirstTrade: true,
                 includesCompleteConversion: false,
                 referralAttribution,
                 trackingId: null,
             };
+            console.log('[refreg] trade refreg result (no tracking_id)', {
+                walletPublicKey: params.walletPublicKey.toBase58(),
+                instructionCount: result.instructions.length,
+                includesFirstTrade: result.includesFirstTrade,
+                includesCompleteConversion: result.includesCompleteConversion,
+                referralKind: referralAttribution.referralKind,
+                referralSourceValue: referralAttribution.sourceValue,
+            });
+            return result;
         }
 
         const isAlreadyConverted = await fetchConversionStatus({
             walletPublicKey: params.walletPublicKey,
         });
         if (isAlreadyConverted === true) {
-            return {
+            console.info(
+                '[refreg] conversion already detected via API; skipping complete_conversion',
+            );
+            const result: TradeRefregBuildResult = {
                 instructions,
                 includesFirstTrade: true,
                 includesCompleteConversion: false,
                 referralAttribution,
                 trackingId,
             };
+            console.log('[refreg] trade refreg result (already converted)', {
+                walletPublicKey: params.walletPublicKey.toBase58(),
+                instructionCount: result.instructions.length,
+                includesFirstTrade: result.includesFirstTrade,
+                includesCompleteConversion: result.includesCompleteConversion,
+                referralKind: referralAttribution.referralKind,
+                referralSourceValue: referralAttribution.sourceValue,
+            });
+            return result;
         }
 
         instructions.push(
@@ -700,13 +852,23 @@ export async function buildTradeRefregInstructions(
             }),
         );
 
-        return {
+        const result: TradeRefregBuildResult = {
             instructions,
             includesFirstTrade: true,
             includesCompleteConversion: true,
             referralAttribution,
             trackingId,
         };
+        console.log('[refreg] trade refreg result (first_trade + conversion)', {
+            walletPublicKey: params.walletPublicKey.toBase58(),
+            instructionCount: result.instructions.length,
+            includesFirstTrade: result.includesFirstTrade,
+            includesCompleteConversion: result.includesCompleteConversion,
+            referralKind: referralAttribution.referralKind,
+            referralSourceValue: referralAttribution.sourceValue,
+            trackingId: id32ToBase58(trackingId),
+        });
+        return result;
     } catch (error) {
         console.info(
             '[refreg] Skipping trade refreg instructions due to error:',
@@ -732,16 +894,28 @@ async function pollUntil(
     label: string,
     check: () => Promise<boolean>,
 ): Promise<boolean> {
+    let attempt = 0;
     while (true) {
+        attempt += 1;
+        console.log(`[refreg] ${label} poll attempt`, {
+            attempt,
+        });
         try {
             const done = await check();
             if (done) {
+                console.log(`[refreg] ${label} poll resolved`, {
+                    attempt,
+                });
                 return true;
             }
         } catch (error) {
             console.info(`[refreg] ${label} poll attempt failed:`, error);
         }
 
+        console.log(`[refreg] ${label} poll pending`, {
+            attempt,
+            nextDelayMs: REFREG_POLL_INTERVAL_MS,
+        });
         await delay(REFREG_POLL_INTERVAL_MS);
     }
 }
@@ -750,15 +924,29 @@ function startBackgroundConversionStatusPolling(
     walletPublicKey: PublicKey,
 ): void {
     if (isConversionDetectedLocally(walletPublicKey)) {
+        console.info(
+            '[refreg] conversion poller not started: local conversion latch already set',
+            { walletPublicKey: walletPublicKey.toBase58() },
+        );
         return;
     }
 
     const pollKey = getConversionPollKey(walletPublicKey);
     if (activeConversionStatusPolls.has(pollKey)) {
+        console.info(
+            '[refreg] conversion poller already active for wallet, skipping duplicate',
+            { pollKey },
+        );
         return;
     }
 
     activeConversionStatusPolls.add(pollKey);
+    console.info('[refreg] starting background conversion poller', {
+        pollKey,
+        walletPublicKey: walletPublicKey.toBase58(),
+        intervalMs: REFREG_POLL_INTERVAL_MS,
+        activePollers: activeConversionStatusPolls.size,
+    });
 
     void pollUntil('conversion-status indexing', async () => {
         if (isConversionDetectedLocally(walletPublicKey)) {
@@ -769,10 +957,19 @@ function startBackgroundConversionStatusPolling(
         return converted === true;
     }).finally(() => {
         activeConversionStatusPolls.delete(pollKey);
+        console.info('[refreg] background conversion poller finished', {
+            pollKey,
+            walletPublicKey: walletPublicKey.toBase58(),
+            activePollers: activeConversionStatusPolls.size,
+        });
     });
 }
 
 async function checkByUserEndpoint(path: string, walletPublicKey: PublicKey) {
+    console.log('[refreg] one-shot by-user check request', {
+        path,
+        walletPublicKey: walletPublicKey.toBase58(),
+    });
     const response = await fetchRefregJson<Record<string, unknown>>(
         path,
         {
@@ -782,7 +979,13 @@ async function checkByUserEndpoint(path: string, walletPublicKey: PublicKey) {
         REFREG_REQUEST_TIMEOUT_MS,
     );
 
-    return !isApiErrorResponse(response);
+    const success = !isApiErrorResponse(response);
+    console.log('[refreg] one-shot by-user check response', {
+        path,
+        walletPublicKey: walletPublicKey.toBase58(),
+        success,
+    });
+    return success;
 }
 
 async function checkByUserEndpointOnce(
@@ -801,7 +1004,16 @@ export async function pollConnectWalletConsistency(args: {
     walletPublicKey: PublicKey;
     referralAttribution: ReferralAttribution;
 }): Promise<RefregTxPollResult[]> {
+    logRefregConfigOnce();
+    console.info('[refreg] pollConnectWalletConsistency start', {
+        walletPublicKey: args.walletPublicKey.toBase58(),
+        referralKind: args.referralAttribution.referralKind,
+        referralSourceValue: args.referralAttribution.sourceValue,
+    });
     if (isConversionDetectedLocally(args.walletPublicKey)) {
+        console.info(
+            '[refreg] pollConnectWalletConsistency short-circuited: conversion already latched',
+        );
         return [];
     }
 
@@ -813,6 +1025,10 @@ export async function pollConnectWalletConsistency(args: {
         '/v1/connect-wallet/by-user',
         args.walletPublicKey,
     );
+    console.info('[refreg] connect-wallet/by-user one-shot result', {
+        walletPublicKey: args.walletPublicKey.toBase58(),
+        success: connectWalletIndexed,
+    });
 
     results.push({
         check: 'connect-wallet/by-user',
@@ -831,6 +1047,11 @@ export async function pollConnectWalletConsistency(args: {
         });
     }
 
+    console.log('[refreg] pollConnectWalletConsistency completed', {
+        walletPublicKey: args.walletPublicKey.toBase58(),
+        checks: results,
+    });
+
     return results;
 }
 
@@ -840,7 +1061,17 @@ export async function pollTradeConsistency(args: {
     includesCompleteConversion: boolean;
     referralAttribution: ReferralAttribution | null;
 }): Promise<RefregTxPollResult[]> {
+    logRefregConfigOnce();
+    console.info('[refreg] pollTradeConsistency start', {
+        walletPublicKey: args.walletPublicKey.toBase58(),
+        includesFirstTrade: args.includesFirstTrade,
+        includesCompleteConversion: args.includesCompleteConversion,
+        hasReferralAttribution: Boolean(args.referralAttribution),
+    });
     if (isConversionDetectedLocally(args.walletPublicKey)) {
+        console.info(
+            '[refreg] pollTradeConsistency short-circuited: conversion already latched',
+        );
         return [];
     }
 
@@ -874,7 +1105,19 @@ export async function pollTradeConsistency(args: {
         );
     }
 
+    if (checks.length === 0) {
+        console.log('[refreg] pollTradeConsistency no one-shot checks queued', {
+            walletPublicKey: args.walletPublicKey.toBase58(),
+            includesFirstTrade: args.includesFirstTrade,
+            includesCompleteConversion: args.includesCompleteConversion,
+        });
+    }
+
     const results = await Promise.all(checks);
+    console.log('[refreg] pollTradeConsistency one-shot results', {
+        walletPublicKey: args.walletPublicKey.toBase58(),
+        checks: results,
+    });
 
     if (args.includesCompleteConversion && args.referralAttribution) {
         const stats = await fetchReferralStats({
@@ -889,6 +1132,11 @@ export async function pollTradeConsistency(args: {
             });
         }
     }
+
+    console.log('[refreg] pollTradeConsistency completed', {
+        walletPublicKey: args.walletPublicKey.toBase58(),
+        checks: results,
+    });
 
     return results;
 }

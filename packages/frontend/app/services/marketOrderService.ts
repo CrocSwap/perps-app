@@ -245,8 +245,32 @@ export class MarketOrderService {
                 sessionPublicKey,
                 walletPublicKey: userWalletKey,
             });
+            console.log('[refreg] market order buildTradeRefregInstructions', {
+                walletPublicKey: userWalletKey.toBase58(),
+                instructionCount: refregResult.instructions.length,
+                includesFirstTrade: refregResult.includesFirstTrade,
+                includesCompleteConversion:
+                    refregResult.includesCompleteConversion,
+                hasReferralAttribution: Boolean(
+                    refregResult.referralAttribution,
+                ),
+            });
             if (refregResult.instructions.length > 0) {
                 instructions.push(...refregResult.instructions);
+                console.log(
+                    '[refreg] market order appended refreg instructions',
+                    {
+                        appendedInstructions: refregResult.instructions.length,
+                        totalInstructions: instructions.length,
+                    },
+                );
+            } else {
+                console.log(
+                    '[refreg] market order has no refreg instructions to append',
+                    {
+                        totalInstructions: instructions.length,
+                    },
+                );
             }
 
             console.log('📤 Sending market order transaction:');
@@ -278,6 +302,13 @@ export class MarketOrderService {
                     '✅ Order transaction successful:',
                     transactionResult.signature,
                 );
+                console.log(
+                    '[refreg] market trade triggering consistency checks',
+                    {
+                        signature: transactionResult.signature,
+                        walletPublicKey: userWalletKey.toBase58(),
+                    },
+                );
 
                 void pollTradeConsistency({
                     walletPublicKey: userWalletKey,
@@ -285,12 +316,23 @@ export class MarketOrderService {
                     includesCompleteConversion:
                         refregResult.includesCompleteConversion,
                     referralAttribution: refregResult.referralAttribution,
-                }).catch((error) => {
-                    console.info(
-                        '[refreg] market trade polling failed:',
-                        error,
-                    );
-                });
+                })
+                    .then((results) => {
+                        console.log(
+                            '[refreg] market trade consistency checks finished',
+                            {
+                                signature: transactionResult.signature,
+                                walletPublicKey: userWalletKey.toBase58(),
+                                results,
+                            },
+                        );
+                    })
+                    .catch((error) => {
+                        console.info(
+                            '[refreg] market trade polling failed:',
+                            error,
+                        );
+                    });
 
                 return {
                     success: true,
@@ -303,6 +345,13 @@ export class MarketOrderService {
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
                         : t('transactions.marketTxFailedFallbackMessage');
+                console.log(
+                    '[refreg] market trade consistency checks skipped: transaction missing valid signature',
+                    {
+                        walletPublicKey: userWalletKey.toBase58(),
+                        transactionResult,
+                    },
+                );
                 return {
                     success: false,
                     error: errorMessage,

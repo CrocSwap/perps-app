@@ -215,8 +215,32 @@ export class LimitOrderService {
                 sessionPublicKey,
                 walletPublicKey: userWalletKey,
             });
+            console.log('[refreg] limit order buildTradeRefregInstructions', {
+                walletPublicKey: userWalletKey.toBase58(),
+                instructionCount: refregResult.instructions.length,
+                includesFirstTrade: refregResult.includesFirstTrade,
+                includesCompleteConversion:
+                    refregResult.includesCompleteConversion,
+                hasReferralAttribution: Boolean(
+                    refregResult.referralAttribution,
+                ),
+            });
             if (refregResult.instructions.length > 0) {
                 instructions.push(...refregResult.instructions);
+                console.log(
+                    '[refreg] limit order appended refreg instructions',
+                    {
+                        appendedInstructions: refregResult.instructions.length,
+                        totalInstructions: instructions.length,
+                    },
+                );
+            } else {
+                console.log(
+                    '[refreg] limit order has no refreg instructions to append',
+                    {
+                        totalInstructions: instructions.length,
+                    },
+                );
             }
 
             console.log('📤 Sending limit order transaction:');
@@ -247,6 +271,13 @@ export class LimitOrderService {
                     '✅ Order transaction successful:',
                     transactionResult.signature,
                 );
+                console.log(
+                    '[refreg] limit trade triggering consistency checks',
+                    {
+                        signature: transactionResult.signature,
+                        walletPublicKey: userWalletKey.toBase58(),
+                    },
+                );
 
                 void pollTradeConsistency({
                     walletPublicKey: userWalletKey,
@@ -254,9 +285,23 @@ export class LimitOrderService {
                     includesCompleteConversion:
                         refregResult.includesCompleteConversion,
                     referralAttribution: refregResult.referralAttribution,
-                }).catch((error) => {
-                    console.info('[refreg] limit trade polling failed:', error);
-                });
+                })
+                    .then((results) => {
+                        console.log(
+                            '[refreg] limit trade consistency checks finished',
+                            {
+                                signature: transactionResult.signature,
+                                walletPublicKey: userWalletKey.toBase58(),
+                                results,
+                            },
+                        );
+                    })
+                    .catch((error) => {
+                        console.info(
+                            '[refreg] limit trade polling failed:',
+                            error,
+                        );
+                    });
                 return {
                     success: true,
                     signature: transactionResult.signature,
@@ -268,6 +313,13 @@ export class LimitOrderService {
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
                         : t('transactions.limitTxFailedFallbackMessage');
+                console.log(
+                    '[refreg] limit trade consistency checks skipped: transaction missing valid signature',
+                    {
+                        walletPublicKey: userWalletKey.toBase58(),
+                        transactionResult,
+                    },
+                );
                 return {
                     success: false,
                     error: errorMessage,
