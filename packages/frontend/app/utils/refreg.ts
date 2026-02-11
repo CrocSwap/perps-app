@@ -67,8 +67,6 @@ const REFERRAL_SEED_PREFIX = new TextEncoder().encode('referral');
 const CONNECT_WALLET_SEED_PREFIX = new TextEncoder().encode('connect_wallet');
 const FIRST_TRADE_SEED_PREFIX = new TextEncoder().encode('first_trade');
 
-const REFERRAL_KIND_STORAGE_KEY = 'referral_kind';
-const REFERRAL_ID_STORAGE_KEY = 'referral_id';
 const REFERRAL_STORE_STORAGE_KEY = 'AFFILIATE_DATA';
 const TRACKING_ID_STORAGE_KEY = 'fuul.tracking_id';
 const CONVERSION_DETECTED_STORAGE_PREFIX = 'refreg.conversion_detected';
@@ -193,19 +191,18 @@ function parseTrackingIdToId32(value: string): Uint8Array | null {
 }
 
 export function paddedStringToId32(value: string): Uint8Array {
+    if (!/^[\x00-\x7F]*$/.test(value)) {
+        throw new Error('padded string id must be ASCII');
+    }
+
     const raw = new TextEncoder().encode(value);
     if (raw.length > 32) {
         throw new Error('padded string id must be <= 32 bytes');
     }
     const out = new Uint8Array(32);
-    out.set(raw);
+    // Left-pad short ids with 0x00 bytes to satisfy [u8; 32].
+    out.set(raw, 32 - raw.length);
     return out;
-}
-
-function parseReferralKind(rawKind: string | null): ReferralKind | null {
-    if (rawKind === '0') return 0;
-    if (rawKind === '1') return 1;
-    return null;
 }
 
 function parseReferralKindValue(rawKind: unknown): ReferralKind | null {
@@ -228,28 +225,30 @@ function readRecordField(
     return undefined;
 }
 
-function parseReferralIdFromConnectWalletRecord(
-    referralKind: ReferralKind,
+function deriveReferralAttributionFromId(
     rawReferralId: string,
-): Uint8Array | null {
+    sourceValue: string,
+): ReferralAttribution | null {
     const trimmed = rawReferralId.trim();
     if (!trimmed) {
         return null;
     }
 
-    const fromHex = parseHexId32(trimmed);
     const fromBase58 = parseBase58PublicKeyBytes(trimmed);
-
-    if (referralKind === 0) {
-        return fromBase58 ?? fromHex;
-    }
-
-    if (fromHex || fromBase58) {
-        return fromHex ?? fromBase58;
+    if (fromBase58) {
+        return {
+            referralKind: 0,
+            referralId: fromBase58,
+            sourceValue,
+        };
     }
 
     try {
-        return paddedStringToId32(trimmed);
+        return {
+            referralKind: 1,
+            referralId: paddedStringToId32(trimmed),
+            sourceValue,
+        };
     } catch {
         return null;
     }
@@ -275,105 +274,33 @@ function readPersistedReferralCode(): string | null {
 }
 
 function resolveReferralAttribution(): ReferralAttribution | null {
-    const explicitKind = parseReferralKind(
-        readLocalStorage(REFERRAL_KIND_STORAGE_KEY),
-    );
-    const explicitIdRaw =
-        readLocalStorage(REFERRAL_ID_STORAGE_KEY)?.trim() || '';
-
-    if (explicitIdRaw.length > 0 && explicitKind !== null) {
-        if (explicitKind === 0) {
-            const referralId = parseBase58PublicKeyBytes(explicitIdRaw);
-            if (!referralId) {
-                console.info(
-                    '[refreg] referral_kind=0 requires a valid base58 pubkey referral_id',
-                );
-                return null;
-            }
-            return {
-                referralKind: 0,
-                referralId,
-                sourceValue: explicitIdRaw,
-            };
-        }
-
-        try {
-            console.log(
-                '[refreg] resolved referral attribution from explicit storage (kind=1)',
-                {
-                    sourceValue: explicitIdRaw,
-                },
-            );
-            return {
-                referralKind: 1,
-                referralId: paddedStringToId32(explicitIdRaw),
-                sourceValue: explicitIdRaw,
-            };
-        } catch {
-            console.info('[refreg] Invalid referral_id for referral_kind=1');
-            return null;
-        }
-    }
-
-    if (explicitIdRaw.length > 0) {
-        const asPubkey = parseBase58PublicKeyBytes(explicitIdRaw);
-        if (asPubkey) {
-            console.log(
-                '[refreg] resolved referral attribution from explicit storage (auto kind=0 pubkey)',
-                {
-                    sourceValue: explicitIdRaw,
-                },
-            );
-            return {
-                referralKind: 0,
-                referralId: asPubkey,
-                sourceValue: explicitIdRaw,
-            };
-        }
-
-        try {
-            console.log(
-                '[refreg] resolved referral attribution from explicit storage (auto kind=1 string)',
-                {
-                    sourceValue: explicitIdRaw,
-                },
-            );
-            return {
-                referralKind: 1,
-                referralId: paddedStringToId32(explicitIdRaw),
-                sourceValue: explicitIdRaw,
-            };
-        } catch {
-            console.info(
-                '[refreg] Ignoring invalid explicit referral_id value',
-            );
-        }
-    }
-
     const cachedReferralCode = readPersistedReferralCode();
     if (!cachedReferralCode) {
         console.info(
-            '[refreg] referral attribution unavailable: no explicit referral id and no cached referral code',
+            '[refreg] referral attribution unavailable: no cached referral code',
         );
         return null;
     }
 
-    try {
+    const referralAttribution = deriveReferralAttributionFromId(
+        cachedReferralCode,
+        cachedReferralCode,
+    );
+    if (referralAttribution) {
         console.log(
             '[refreg] resolved referral attribution from cached referral code',
             {
                 sourceValue: cachedReferralCode,
+                referralKind: referralAttribution.referralKind,
             },
         );
-        return {
-            referralKind: 1,
-            referralId: paddedStringToId32(cachedReferralCode),
-            sourceValue: cachedReferralCode,
-        };
-    } catch {
-        console.info('[refreg] Cached referral code exceeds 32 UTF-8 bytes');
-        return null;
+        return referralAttribution;
     }
+
+    console.info(
+        '[refreg] Cached referral code must be base58 pubkey or ASCII <= 32 bytes',
+    );
+    return null;
 }
 
 function getTrackingIdBytes(): Uint8Array | null {
@@ -639,16 +566,7 @@ async function fetchConnectWalletAttributionByUser(params: {
             'referral_kind',
             'referralKind',
         );
-        const referralKind = parseReferralKindValue(rawReferralKind);
-        if (referralKind === null) {
-            console.info(
-                '[refreg] connect-wallet/by-user missing referral_kind in record',
-                {
-                    walletPublicKey: params.walletPublicKey.toBase58(),
-                },
-            );
-            return null;
-        }
+        const referralKindFromRecord = parseReferralKindValue(rawReferralKind);
 
         const rawReferralId = readRecordField(
             record,
@@ -663,26 +581,40 @@ async function fetchConnectWalletAttributionByUser(params: {
                 '[refreg] connect-wallet/by-user missing referral_id in record',
                 {
                     walletPublicKey: params.walletPublicKey.toBase58(),
-                    referralKind,
                 },
             );
             return null;
         }
 
-        const referralId = parseReferralIdFromConnectWalletRecord(
-            referralKind,
-            rawReferralId,
+        const trimmedReferralId = rawReferralId.trim();
+        const referralAttribution = deriveReferralAttributionFromId(
+            trimmedReferralId,
+            `connect-wallet/by-user:${trimmedReferralId}`,
         );
-        if (!referralId) {
+        if (!referralAttribution) {
             console.info(
                 '[refreg] connect-wallet/by-user referral_id could not be parsed',
                 {
                     walletPublicKey: params.walletPublicKey.toBase58(),
-                    referralKind,
                     rawReferralId,
                 },
             );
             return null;
+        }
+
+        if (
+            referralKindFromRecord !== null &&
+            referralKindFromRecord !== referralAttribution.referralKind
+        ) {
+            console.info(
+                '[refreg] connect-wallet/by-user referral_kind does not match derived kind; using derived kind from referral_id',
+                {
+                    walletPublicKey: params.walletPublicKey.toBase58(),
+                    referralKindFromRecord,
+                    referralKindDerived: referralAttribution.referralKind,
+                    rawReferralId: trimmedReferralId,
+                },
+            );
         }
 
         const rawTrackingId = readRecordField(
@@ -698,7 +630,6 @@ async function fetchConnectWalletAttributionByUser(params: {
                 '[refreg] connect-wallet/by-user missing tracking_id in record',
                 {
                     walletPublicKey: params.walletPublicKey.toBase58(),
-                    referralKind,
                     rawReferralId,
                 },
             );
@@ -717,16 +648,10 @@ async function fetchConnectWalletAttributionByUser(params: {
             return null;
         }
 
-        const referralAttribution: ReferralAttribution = {
-            referralKind,
-            referralId,
-            sourceValue: `connect-wallet/by-user:${rawReferralId.trim()}`,
-        };
-
         console.info('[refreg] connect-wallet/by-user attribution resolved', {
             walletPublicKey: params.walletPublicKey.toBase58(),
-            referralKind,
-            referralId: id32ToBase58(referralId),
+            referralKind: referralAttribution.referralKind,
+            referralId: id32ToBase58(referralAttribution.referralId),
             trackingId: id32ToBase58(trackingId),
         });
 
