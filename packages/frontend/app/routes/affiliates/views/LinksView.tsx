@@ -16,8 +16,8 @@ import {
     useAffiliateCode,
     useAffiliateAudience,
 } from '../hooks/useAffiliateData';
-import { formatUSD } from '../utils/format-numbers';
 import { getCommissionByAudienceId } from '../utils/affiliate-levels';
+import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from '../affiliates.module.css';
 
@@ -25,6 +25,7 @@ export function LinksView() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const { userAddress } = useUserDataStore();
+    const { currency } = useNumFormatter();
     const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
     const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -60,13 +61,17 @@ export function LinksView() {
 
     const audienceId = audienceData?.audiences?.results?.[0]?.id;
     const levelCommission = audienceId
-        ? (getCommissionByAudienceId(audienceId) ?? 0.2)
-        : 0.2;
-    const commissionRatePercent = levelCommission * 100;
+        ? (getCommissionByAudienceId(audienceId) ?? null)
+        : null;
+    const commissionRatePercent =
+        levelCommission != null ? levelCommission * 100 : null;
 
-    const userRebateRate = affiliateCode?.user_rebate_rate ?? 0;
-    const inviteePercent = userRebateRate * 100;
-    const youPercent = commissionRatePercent - inviteePercent;
+    const userRebateRate = affiliateCode?.user_rebate_rate ?? null;
+    const inviteePercent = userRebateRate != null ? userRebateRate * 100 : null;
+    const youPercent =
+        commissionRatePercent != null && inviteePercent != null
+            ? commissionRatePercent - inviteePercent
+            : null;
 
     const data = affiliateCode
         ? [
@@ -197,11 +202,10 @@ export function LinksView() {
                                             })}
                                         </td>
                                         <td className={styles['table-cell']}>
-                                            {entry.you_percentage.toFixed(0)}% /{' '}
-                                            {entry.invitee_percentage.toFixed(
-                                                0,
-                                            )}
-                                            %
+                                            {entry.you_percentage != null &&
+                                            entry.invitee_percentage != null
+                                                ? `${entry.you_percentage.toFixed(0)}% / ${entry.invitee_percentage.toFixed(0)}%`
+                                                : '?'}
                                         </td>
                                         <td className={styles['table-cell']}>
                                             {entry.clicks.toLocaleString()}
@@ -217,7 +221,10 @@ export function LinksView() {
                                                 fontWeight: 600,
                                             }}
                                         >
-                                            ${formatUSD(entry.total_earnings)}
+                                            {currency(
+                                                entry.total_earnings,
+                                                true,
+                                            )}
                                         </td>
                                         <td
                                             className={styles['table-cell']}

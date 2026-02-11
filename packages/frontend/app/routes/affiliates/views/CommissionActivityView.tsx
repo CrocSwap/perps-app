@@ -7,7 +7,7 @@ import { TableErrorState } from '../components/TableErrorState';
 import { ViewLayout } from '../components/ViewLayout';
 import { EmptyState } from '../components/EmptyState';
 import { useUserPayoutMovements } from '../hooks/useAffiliateData';
-import { formatTokenAmount } from '../utils/format-numbers';
+import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from '../affiliates.module.css';
 
@@ -26,6 +26,7 @@ export function CommissionActivityView() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const { userAddress } = useUserDataStore();
+    const { currency } = useNumFormatter();
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
 
@@ -166,8 +167,7 @@ export function CommissionActivityView() {
                                                 fontWeight: 600,
                                             }}
                                         >
-                                            $
-                                            {formatTokenAmount(entry.amount, 6)}
+                                            {currency(entry.amount / 1e6, true)}
                                         </td>
                                     </tr>
                                 ))}

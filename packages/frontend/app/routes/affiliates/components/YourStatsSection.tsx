@@ -8,7 +8,7 @@ import {
     useUserReferrer,
     useUserPayoutMovements,
 } from '../hooks/useAffiliateData';
-import { formatLargeNumber, formatTokenAmount } from '../utils/format-numbers';
+import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from '../affiliates.module.css';
 
@@ -24,6 +24,7 @@ export function YourStatsSection() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const { userAddress } = useUserDataStore();
+    const { formatNum, currency } = useNumFormatter();
 
     const {
         data: stats,
@@ -53,19 +54,14 @@ export function YourStatsSection() {
         () =>
             payoutMovements?.results?.filter(
                 (movement) => !movement.is_referrer,
-            ) ?? [],
+            ) ?? null,
         [payoutMovements],
     );
 
     const rebatesEarned = useMemo(() => {
+        if (endUserMovements === null) return null;
         return endUserMovements.reduce((sum, movement) => {
-            const amount = Number(
-                formatTokenAmount(Number(movement.total_amount), 6).replace(
-                    /,/g,
-                    '',
-                ),
-            );
-            return sum + amount;
+            return sum + Number(movement.total_amount) / 1e6;
         }, 0);
     }, [endUserMovements]);
 
@@ -76,27 +72,39 @@ export function YourStatsSection() {
             | undefined,
     ): number | null => {
         if (!earnings || earnings.length === 0) return null;
+        console.log('earnings', earnings);
         const usdEarning = earnings.find((e) => e.currency === 'USD');
         return usdEarning?.amount ?? null;
     };
 
+    const feesUSD = getUSDAmount(stats?.total_earnings);
     const affiliateEarnings = isConnected
-        ? `$${formatLargeNumber(getUSDAmount(stats?.total_earnings) ?? 0)}`
+        ? feesUSD != null
+            ? currency(feesUSD, true)
+            : '$?'
         : '-';
     const volumeReferred = isConnected
         ? stats?.referred_volume !== null &&
           stats?.referred_volume !== undefined
-            ? `$${formatLargeNumber(stats.referred_volume)}`
-            : '-'
+            ? currency(stats.referred_volume, true)
+            : '$?'
         : '-';
+    const formatCount = (value: number) =>
+        value === 0 ? '0' : formatNum(value, 0);
     const newTraders = isConnected
-        ? formatLargeNumber(stats?.newTraders ?? 0)
+        ? stats?.newTraders != null
+            ? formatCount(stats.newTraders)
+            : '?'
         : '-';
     const activeTraders = isConnected
-        ? formatLargeNumber(stats?.activeTraders ?? 0)
+        ? stats?.activeTraders != null
+            ? formatCount(stats.activeTraders)
+            : '?'
         : '-';
     const invitees = isConnected
-        ? formatLargeNumber(stats?.referred_users ?? 0)
+        ? stats?.referred_users != null
+            ? formatCount(stats.referred_users)
+            : '?'
         : '-';
 
     return (
@@ -145,10 +153,21 @@ export function YourStatsSection() {
                             rebateRate={
                                 userRebateRate !== null
                                     ? `${(userRebateRate * 100).toFixed(0)}%`
-                                    : '-'
+                                    : '?'
                             }
-                            referredByCode={referrerData?.referrer_code ?? '-'}
-                            rebatesEarned={formatLargeNumber(rebatesEarned)}
+                            referredByCode={referrerData?.referrer_code ?? '?'}
+                            rebatesEarned={
+                                rebatesEarned != null
+                                    ? formatNum(
+                                          rebatesEarned,
+                                          2,
+                                          false,
+                                          false,
+                                          false,
+                                          true,
+                                      )
+                                    : '?'
+                            }
                         />
                     )}
 
