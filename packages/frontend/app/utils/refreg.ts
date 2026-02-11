@@ -208,6 +208,53 @@ function parseReferralKind(rawKind: string | null): ReferralKind | null {
     return null;
 }
 
+function parseReferralKindValue(rawKind: unknown): ReferralKind | null {
+    if (rawKind === 0 || rawKind === '0') return 0;
+    if (rawKind === 1 || rawKind === '1') return 1;
+    return null;
+}
+
+function readRecordField(
+    record: Record<string, unknown>,
+    snakeCaseKey: string,
+    camelCaseKey: string,
+): unknown {
+    if (snakeCaseKey in record) {
+        return record[snakeCaseKey];
+    }
+    if (camelCaseKey in record) {
+        return record[camelCaseKey];
+    }
+    return undefined;
+}
+
+function parseReferralIdFromConnectWalletRecord(
+    referralKind: ReferralKind,
+    rawReferralId: string,
+): Uint8Array | null {
+    const trimmed = rawReferralId.trim();
+    if (!trimmed) {
+        return null;
+    }
+
+    const fromHex = parseHexId32(trimmed);
+    const fromBase58 = parseBase58PublicKeyBytes(trimmed);
+
+    if (referralKind === 0) {
+        return fromBase58 ?? fromHex;
+    }
+
+    if (fromHex || fromBase58) {
+        return fromHex ?? fromBase58;
+    }
+
+    try {
+        return paddedStringToId32(trimmed);
+    } catch {
+        return null;
+    }
+}
+
 function readPersistedReferralCode(): string | null {
     const raw = readLocalStorage(REFERRAL_STORE_STORAGE_KEY);
     if (!raw) return null;
@@ -502,6 +549,30 @@ interface ReferralStatsResponse {
     converted_count: number;
 }
 
+interface ConnectWalletByUserRecord {
+    referral_kind?: unknown;
+    referralKind?: unknown;
+    referral_id?: unknown;
+    referralId?: unknown;
+    tracking_id?: unknown;
+    trackingId?: unknown;
+}
+
+interface ConnectWalletByUserResponse {
+    record?: ConnectWalletByUserRecord | null;
+    referral_kind?: unknown;
+    referralKind?: unknown;
+    referral_id?: unknown;
+    referralId?: unknown;
+    tracking_id?: unknown;
+    trackingId?: unknown;
+}
+
+interface ConnectWalletAttributionContext {
+    referralAttribution: ReferralAttribution;
+    trackingId: Uint8Array;
+}
+
 export async function fetchReferralStats(params: {
     referralKind: ReferralKind;
     referralId: Uint8Array;
@@ -534,6 +605,140 @@ export async function fetchReferralStats(params: {
         return response;
     } catch (error) {
         console.info('[refreg] referral-stats fetch failed:', error);
+        return null;
+    }
+}
+
+async function fetchConnectWalletAttributionByUser(params: {
+    walletPublicKey: PublicKey;
+}): Promise<ConnectWalletAttributionContext | null> {
+    try {
+        const response = await fetchRefregJson<
+            ConnectWalletByUserResponse | RefregApiError
+        >('/v1/connect-wallet/by-user', {
+            dapp_id: getDappIdBase58(),
+            user_pubkey: getUserKey(params.walletPublicKey),
+        });
+
+        if (isApiErrorResponse(response)) {
+            console.log(
+                '[refreg] connect-wallet/by-user returned API error payload',
+                response,
+            );
+            return null;
+        }
+
+        const root = response as Record<string, unknown>;
+        const record =
+            response.record && typeof response.record === 'object'
+                ? (response.record as Record<string, unknown>)
+                : root;
+
+        const rawReferralKind = readRecordField(
+            record,
+            'referral_kind',
+            'referralKind',
+        );
+        const referralKind = parseReferralKindValue(rawReferralKind);
+        if (referralKind === null) {
+            console.info(
+                '[refreg] connect-wallet/by-user missing referral_kind in record',
+                {
+                    walletPublicKey: params.walletPublicKey.toBase58(),
+                },
+            );
+            return null;
+        }
+
+        const rawReferralId = readRecordField(
+            record,
+            'referral_id',
+            'referralId',
+        );
+        if (
+            typeof rawReferralId !== 'string' ||
+            rawReferralId.trim().length === 0
+        ) {
+            console.info(
+                '[refreg] connect-wallet/by-user missing referral_id in record',
+                {
+                    walletPublicKey: params.walletPublicKey.toBase58(),
+                    referralKind,
+                },
+            );
+            return null;
+        }
+
+        const referralId = parseReferralIdFromConnectWalletRecord(
+            referralKind,
+            rawReferralId,
+        );
+        if (!referralId) {
+            console.info(
+                '[refreg] connect-wallet/by-user referral_id could not be parsed',
+                {
+                    walletPublicKey: params.walletPublicKey.toBase58(),
+                    referralKind,
+                    rawReferralId,
+                },
+            );
+            return null;
+        }
+
+        const rawTrackingId = readRecordField(
+            record,
+            'tracking_id',
+            'trackingId',
+        );
+        if (
+            typeof rawTrackingId !== 'string' ||
+            rawTrackingId.trim().length === 0
+        ) {
+            console.info(
+                '[refreg] connect-wallet/by-user missing tracking_id in record',
+                {
+                    walletPublicKey: params.walletPublicKey.toBase58(),
+                    referralKind,
+                    rawReferralId,
+                },
+            );
+            return null;
+        }
+
+        const trackingId = parseTrackingIdToId32(rawTrackingId);
+        if (!trackingId) {
+            console.info(
+                '[refreg] connect-wallet/by-user tracking_id could not be parsed',
+                {
+                    walletPublicKey: params.walletPublicKey.toBase58(),
+                    rawTrackingId,
+                },
+            );
+            return null;
+        }
+
+        const referralAttribution: ReferralAttribution = {
+            referralKind,
+            referralId,
+            sourceValue: `connect-wallet/by-user:${rawReferralId.trim()}`,
+        };
+
+        console.info('[refreg] connect-wallet/by-user attribution resolved', {
+            walletPublicKey: params.walletPublicKey.toBase58(),
+            referralKind,
+            referralId: id32ToBase58(referralId),
+            trackingId: id32ToBase58(trackingId),
+        });
+
+        return {
+            referralAttribution,
+            trackingId,
+        };
+    } catch (error) {
+        console.info(
+            '[refreg] connect-wallet/by-user attribution fetch failed:',
+            error,
+        );
         return null;
     }
 }
@@ -789,10 +994,46 @@ export async function buildTradeRefregInstructions(
             }),
         ];
 
-        const referralAttribution = resolveReferralAttribution();
+        let referralAttribution = resolveReferralAttribution();
+        let trackingId = getTrackingIdBytes();
+
+        if (!referralAttribution || !trackingId) {
+            console.info(
+                '[refreg] trade attribution incomplete in local storage; attempting connect-wallet/by-user fallback',
+                {
+                    walletPublicKey: params.walletPublicKey.toBase58(),
+                    hasLocalReferralAttribution: Boolean(referralAttribution),
+                    hasLocalTrackingId: Boolean(trackingId),
+                },
+            );
+            const connectWalletFallback =
+                await fetchConnectWalletAttributionByUser({
+                    walletPublicKey: params.walletPublicKey,
+                });
+
+            if (connectWalletFallback) {
+                if (!referralAttribution) {
+                    referralAttribution =
+                        connectWalletFallback.referralAttribution;
+                }
+                if (!trackingId) {
+                    trackingId = connectWalletFallback.trackingId;
+                }
+
+                console.info(
+                    '[refreg] trade attribution hydrated from connect-wallet/by-user',
+                    {
+                        walletPublicKey: params.walletPublicKey.toBase58(),
+                        hasReferralAttribution: Boolean(referralAttribution),
+                        hasTrackingId: Boolean(trackingId),
+                    },
+                );
+            }
+        }
+
         if (!referralAttribution) {
             console.info(
-                '[refreg] no referral attribution; returning first_trade only',
+                '[refreg] no referral attribution (after fallback); returning first_trade only',
             );
             const result: TradeRefregBuildResult = {
                 instructions,
@@ -810,10 +1051,9 @@ export async function buildTradeRefregInstructions(
             return result;
         }
 
-        const trackingId = getTrackingIdBytes();
         if (!trackingId) {
             console.info(
-                '[refreg] Skipping complete_conversion because tracking_id is unavailable',
+                '[refreg] Skipping complete_conversion because tracking_id is unavailable (after fallback)',
             );
             const result: TradeRefregBuildResult = {
                 instructions,
