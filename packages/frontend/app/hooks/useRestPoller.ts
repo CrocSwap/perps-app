@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { POLLING_API_URL } from '~/utils/Constants';
 
 export interface UsePollerIF {
@@ -10,60 +10,80 @@ export interface UsePollerIF {
 export function useRestPoller(props: UsePollerIF = {}) {
     const { url = POLLING_API_URL } = props;
 
-    const intervalMap = new Map<string, NodeJS.Timeout>();
+    const intervalMapRef = useRef(new Map<string, NodeJS.Timeout>());
 
-    useEffect(() => {}, []);
+    // Clean up all intervals on unmount
+    useEffect(() => {
+        const map = intervalMapRef.current;
+        return () => {
+            map.forEach((interval) => clearInterval(interval));
+            map.clear();
+        };
+    }, []);
 
     const toKey = useCallback((endpoint: string, payload: any) => {
         return `${endpoint}-${JSON.stringify(payload)}`;
     }, []);
 
-    const subscribeToPoller = (
-        endpoint: string,
-        payload: any,
-        handler: (data: any) => void,
-        intervalMs: number,
-        callInit: boolean = false,
-    ) => {
-        const key = toKey(endpoint, payload);
-        const interval = setInterval(() => {
-            fetch(`${url}/${endpoint}`, {
-                method: 'POST',
-                body: JSON.stringify(payload),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then(async (res) => {
-                const data = await res.json();
-                handler(data);
-                return data;
-            });
-        }, intervalMs);
+    const subscribeToPoller = useCallback(
+        (
+            endpoint: string,
+            payload: any,
+            handler: (data: any) => void,
+            intervalMs: number,
+            callInit: boolean = false,
+        ) => {
+            const key = toKey(endpoint, payload);
 
-        if (callInit) {
-            fetch(`${url}/${endpoint}`, {
-                method: 'POST',
-                body: JSON.stringify(payload),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then(async (res) => {
-                const data = await res.json();
-                handler(data);
-            });
-        }
+            // Clear any existing interval for this key to prevent duplicates
+            const existing = intervalMapRef.current.get(key);
+            if (existing) {
+                clearInterval(existing);
+            }
 
-        intervalMap.set(key, interval);
-    };
+            const interval = setInterval(() => {
+                fetch(`${url}/${endpoint}`, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then(async (res) => {
+                    const data = await res.json();
+                    handler(data);
+                    return data;
+                });
+            }, intervalMs);
 
-    const unsubscribeFromPoller = (endpoint: string, payload: any) => {
-        const key = toKey(endpoint, payload);
-        const interval = intervalMap.get(key);
-        if (interval) {
-            clearInterval(interval);
-            intervalMap.delete(key);
-        }
-    };
+            if (callInit) {
+                fetch(`${url}/${endpoint}`, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then(async (res) => {
+                    const data = await res.json();
+                    handler(data);
+                });
+            }
+
+            intervalMapRef.current.set(key, interval);
+        },
+        [url, toKey],
+    );
+
+    const unsubscribeFromPoller = useCallback(
+        (endpoint: string, payload: any) => {
+            const key = toKey(endpoint, payload);
+            const interval = intervalMapRef.current.get(key);
+            if (interval) {
+                clearInterval(interval);
+                intervalMapRef.current.delete(key);
+            }
+        },
+        [toKey],
+    );
 
     return { subscribeToPoller, unsubscribeFromPoller };
 }
