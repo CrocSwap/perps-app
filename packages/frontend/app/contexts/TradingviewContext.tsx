@@ -40,8 +40,11 @@ import {
     getChartDefaultColors,
     getChartThemeColors,
     mapI18nToTvLocale,
+    getLiquidationsSvgIcon,
     priceFormatterFactory,
     type ChartLayout,
+    createCustomToolbarButton,
+    CustomToolbarBtnIcons,
 } from '~/routes/chart/data/utils/utils';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
@@ -65,6 +68,8 @@ import {
 } from '~/utils/keyboardShortcuts';
 
 import i18n from 'i18next';
+import { useLiqChartStore } from '~/stores/LiqChartStore';
+import { useLiquidationStore } from '~/stores/LiquidationStore';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -129,6 +134,10 @@ export const TradingViewProvider: React.FC<{
 
     const previousSymbolRef = useRef<string | null>(null);
 
+    const { showLiqOptions, setShowLiqOptions } = useLiqChartStore();
+
+    const { setBuyLiqs, setSellLiqs } = useLiquidationStore();
+
     useEffect(() => {
         if (!isSessionEstablished) {
             resetQuickModeState();
@@ -168,6 +177,10 @@ export const TradingViewProvider: React.FC<{
         }
         setChartState(res);
     }, [i18n.language]);
+
+    const { liquidationsActive, setLiquidationsActive } = useAppStateStore();
+    const liquidationsActiveRef = useRef(liquidationsActive);
+    liquidationsActiveRef.current = liquidationsActive;
 
     const defaultProps: Omit<ChartContainerProps, 'container'> = {
         symbolName: 'BTC',
@@ -468,23 +481,101 @@ export const TradingViewProvider: React.FC<{
 
         tvWidget.headerReady().then(() => {
             setChartLoadingStatus('ready');
-        });
-        //     liquidationsButton.addEventListener('click', onClick);
-        //     liquidationsButton.addEventListener('mouseenter', onMouseEnter);
-        //     liquidationsButton.addEventListener('mouseleave', onMouseLeave);
+            const liquidationsWrapper = tvWidget.createButton({
+                align: 'left',
+            });
+            const {
+                button: liquidationsButton,
+                settingsButton: liquidationsSettingsButton,
+            } = createCustomToolbarButton(liquidationsWrapper, {
+                text: 'Liquidations',
+                id: 'liquidations-button',
+                settingsButtonId: 'liquidations-settings-button',
+                iconHtml: CustomToolbarBtnIcons.liquidations,
+                settingsButton: true,
+            });
 
-        //     return () => {
-        //         liquidationsButton.removeEventListener('click', onClick);
-        //         liquidationsButton.removeEventListener(
-        //             'mouseenter',
-        //             onMouseEnter,
-        //         );
-        //         liquidationsButton.removeEventListener(
-        //             'mouseleave',
-        //             onMouseLeave,
-        //         );
-        //     };
-        // });
+            let isToggled = liquidationsActive;
+
+            const updateButtonStyle = () => {
+                if (isToggled) {
+                    liquidationsButton.style.borderColor =
+                        'color-mix(in srgb, var(--accent1-dark, #5f5df0) 70%, transparent)';
+                    liquidationsButton.style.color = '#ffffff';
+                    if (liquidationsSettingsButton) {
+                        liquidationsSettingsButton.style.borderColor =
+                            'color-mix(in srgb, var(--accent1-dark, #5f5df0) 60%, transparent)';
+                        liquidationsSettingsButton.style.color = '#ffffff';
+                    }
+                } else {
+                    liquidationsButton.style.borderColor = '#2a2e39';
+                    liquidationsButton.style.color = '#cbcaca';
+                    if (liquidationsSettingsButton) {
+                        liquidationsSettingsButton.style.borderColor =
+                            'transparent';
+                        liquidationsSettingsButton.style.color = '#cbcaca';
+                    }
+                }
+            };
+
+            updateButtonStyle();
+
+            const onClick = () => {
+                isToggled = !isToggled;
+                setLiquidationsActive(isToggled);
+                updateButtonStyle();
+            };
+
+            const onMouseEnter = () => {
+                const wrapper = liquidationsButton.querySelector(
+                    '.liquidations-wrapper',
+                ) as HTMLDivElement;
+                if (wrapper) {
+                    wrapper.style.backgroundColor = '#313030';
+                }
+            };
+            const onMouseLeave = () => {
+                const wrapper = liquidationsButton.querySelector(
+                    '.liquidations-wrapper',
+                ) as HTMLDivElement;
+                if (wrapper) wrapper.style.backgroundColor = 'transparent';
+            };
+
+            let showOpts = showLiqOptions || false;
+            const onSettingsClick = () => {
+                showOpts = !showOpts;
+                setShowLiqOptions(showOpts);
+            };
+
+            liquidationsButton.addEventListener('click', onClick);
+            // liquidationsButton.addEventListener('contextmenu', onRightClick);
+            if (liquidationsSettingsButton) {
+                liquidationsSettingsButton.addEventListener(
+                    'click',
+                    onSettingsClick,
+                );
+            }
+            liquidationsButton.addEventListener('mouseenter', onMouseEnter);
+            liquidationsButton.addEventListener('mouseleave', onMouseLeave);
+
+            return () => {
+                liquidationsButton.removeEventListener('click', onClick);
+                liquidationsButton.removeEventListener(
+                    'mouseenter',
+                    onMouseEnter,
+                );
+                liquidationsButton.removeEventListener(
+                    'mouseleave',
+                    onMouseLeave,
+                );
+                if (liquidationsSettingsButton) {
+                    liquidationsSettingsButton.removeEventListener(
+                        'click',
+                        onSettingsClick,
+                    );
+                }
+            };
+        });
 
         tvWidget.onChartReady(() => {
             tvWidget.subscribe('onMarkClick', (markId: number) => {
@@ -1000,6 +1091,24 @@ export const TradingViewProvider: React.FC<{
             dataFeedRef.current.updateUserFills(userFills);
         }
     }, [userFills]);
+
+    // reset liq data after 10 secs
+    useEffect(() => {
+        let liqResetTimeout: NodeJS.Timeout;
+        if (!liquidationsActive) {
+            liqResetTimeout = setTimeout(() => {
+                if (!liquidationsActiveRef.current) {
+                    setBuyLiqs([]);
+                    setSellLiqs([]);
+                }
+            }, 10000);
+        }
+        return () => {
+            if (liqResetTimeout) {
+                clearTimeout(liqResetTimeout);
+            }
+        };
+    }, [liquidationsActive]);
 
     return (
         <TradingViewContext.Provider value={{ chart, isChartReady, switchTab }}>
