@@ -7,7 +7,6 @@ import React, {
     createContext,
     useContext,
     useEffect,
-    useLayoutEffect,
     useState,
     type Dispatch,
     type SetStateAction,
@@ -57,19 +56,24 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const sessionState = useSession();
     const location = useLocation();
 
-    const { setIsSessionReestablishing } = useAppStateStore();
+    const isSessionReestablishing = useAppStateStore(
+        (state) => state.isSessionReestablishing,
+    );
+    const setIsSessionReestablishing = useAppStateStore(
+        (state) => state.setIsSessionReestablishing,
+    );
+    const isReestablishing = [
+        SessionStateType.Initializing,
+        SessionStateType.CheckingStoredSession,
+        SessionStateType.RequestingLimits,
+        SessionStateType.SettingLimits,
+        SessionStateType.WalletConnecting,
+        SessionStateType.SelectingWallet,
+    ].includes(sessionState.type);
 
-    useLayoutEffect(() => {
-        const isReestablishing = [
-            SessionStateType.Initializing,
-            SessionStateType.CheckingStoredSession,
-            SessionStateType.RequestingLimits,
-            SessionStateType.SettingLimits,
-            SessionStateType.WalletConnecting,
-            SessionStateType.SelectingWallet,
-        ].includes(sessionState.type);
+    if (isSessionReestablishing !== isReestablishing) {
         setIsSessionReestablishing(isReestablishing);
-    }, [sessionState.type, setIsSessionReestablishing]);
+    }
 
     // Drive userAddress from URL parameter, session, or debug settings
     useEffect(() => {
