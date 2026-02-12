@@ -13,6 +13,7 @@ import {
     clearAllChartCaches,
     clearChartCachesForSymbol,
     getMarkFillData,
+    refreshStaleCache,
 } from '~/routes/chart/data/candleDataCache';
 import {
     createDataFeed,
@@ -122,7 +123,7 @@ export const TradingViewProvider: React.FC<{
         sessionBtn?.click();
     }, []);
 
-    const { info, lastSleepMs, lastAwakeMs } = useSdk();
+    const { info } = useSdk();
 
     const { symbol, addToFetchedChannels, userFills } = useTradeDataStore();
 
@@ -143,6 +144,8 @@ export const TradingViewProvider: React.FC<{
     const [chartInterval, setChartInterval] = useState<string | undefined>(
         chartState?.interval,
     );
+    const chartIntervalRef = useRef(chartInterval);
+    chartIntervalRef.current = chartInterval;
 
     const dataFeedRef = useRef<CustomDataFeedType | null>(null);
 
@@ -844,24 +847,6 @@ export const TradingViewProvider: React.FC<{
         });
     }, [chart]);
 
-    const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
-        let coef = 1;
-
-        if (!interval) return 1;
-
-        if (interval.includes('D')) {
-            coef = 24 * 60;
-        } else if (interval.includes('W')) {
-            coef = 24 * 60 * 7;
-        } else if (interval.includes('M')) {
-            coef = 60 * 24 * 30;
-        }
-
-        const intervalNum = Number(interval.replace(/[^0-9]/g, ''));
-
-        return intervalNum * coef;
-    }, []);
-
     useEffect(() => {
         const chartDiv = document.getElementById('tv_chart');
         const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
@@ -930,52 +915,6 @@ export const TradingViewProvider: React.FC<{
     }, [chart]);
 
     useEffect(() => {
-        if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
-            const intervalMinutes = tvIntervalToMinutes(
-                chartInterval as ResolutionString,
-            );
-            const lastSleepDurationInMinutes = parseFloat(
-                ((lastAwakeMs - lastSleepMs) / 60000).toFixed(2),
-            );
-
-            if (intervalMinutes <= lastSleepDurationInMinutes) {
-                chart?.resetCache();
-                chart?.chart().resetData();
-                chart?.chart().restoreChart();
-            }
-        }
-    }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
-
-    // Refresh chart when coming back online
-    const lastOnlineAtRef = useRef(lastOnlineAt);
-    useEffect(() => {
-        // Only trigger if lastOnlineAt actually changed (not on initial mount)
-        if (
-            lastOnlineAt > 0 &&
-            lastOnlineAt !== lastOnlineAtRef.current &&
-            chart
-        ) {
-            console.log('>>> Refreshing chart after coming back online');
-            lastOnlineAtRef.current = lastOnlineAt;
-
-            // Give the network a moment to stabilize, then refresh
-            const timeoutId = setTimeout(() => {
-                try {
-                    // Clear caches and force a full data reload
-                    clearAllChartCaches();
-                    chart.activeChart().resetData();
-                    chart.activeChart().refreshMarks();
-                } catch (e) {
-                    console.error('Error refreshing chart after reconnect:', e);
-                }
-            }, 1000);
-
-            return () => clearTimeout(timeoutId);
-        }
-        lastOnlineAtRef.current = lastOnlineAt;
-    }, [lastOnlineAt, chart]);
-
-    useEffect(() => {
         if (!chart || !symbol) return;
 
         const previousSymbol = previousSymbolRef.current;
@@ -1014,6 +953,40 @@ export const TradingViewProvider: React.FC<{
         intervalChangedSubscribe(chart, setIsChartReady);
         visibleRangeChangedSubscribe(chart);
     }, [chart]);
+
+    // When the tab becomes visible after being hidden, silently
+    // back-fill any missing candles into the cache.  We intentionally
+    // avoid chart.activeChart().resetData() because it clears all
+    // rendered data and marks, causing a visible flicker.  Instead we
+    // just update the cache in-place; the subscribeBars poller (which
+    // pauses while the tab is hidden) will resume and push the latest
+    // bar via onTick, keeping the chart up-to-date without any flash.
+    useEffect(() => {
+        if (!chart || !symbol) return;
+
+        const onVisibilityChange = () => {
+            if (document.hidden) return;
+
+            const resolution = chartIntervalRef.current || '60';
+            refreshStaleCache(symbol, resolution, () => {
+                try {
+                    if (showBuysSellsOnChart) {
+                        chart.chart().refreshMarks();
+                    }
+                } catch (e) {
+                    console.error('[chart] refreshMarks failed:', e);
+                }
+            });
+        };
+
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        return () => {
+            document.removeEventListener(
+                'visibilitychange',
+                onVisibilityChange,
+            );
+        };
+    }, [chart, symbol, showBuysSellsOnChart]);
 
     useEffect(() => {
         if (chart) {

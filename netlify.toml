@@ -147,7 +147,22 @@ VITE_CONTEXT = "branch-deploy"
   from = "/v2/*"
   to = "/index.html"
   status = 200
-  
+
+# Redirect /referrals to /v2/referrals
+[[redirects]]
+  from = "/referrals"
+  to = "/v2/referrals"
+  status = 302
+  force = true
+
+# Redirect /affiliates to /v2/affiliates
+[[redirects]]
+  from = "/affiliates"
+  to = "/v2/affiliates"
+  status = 302
+  force = true
+
+# Catch-all for everything else - redirects to testnet
 [[redirects]]
   from = "/*"
   to = "http://ambient-finance-testnet.netlify.app/:splat" # TODO: update to http://ambient-finance.netlify.app/:splat

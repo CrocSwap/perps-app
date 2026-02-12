@@ -1,10 +1,22 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { Fuul, type Affiliate, type UserIdentifierType } from '@fuul/sdk';
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useMemo,
+    useState,
+    useEffect,
+} from 'react';
+import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
 
 interface FuulContextType {
     isInitialized: boolean;
     trackPageView: () => void;
+    sendConversionEvent: (
+        userIdentifier: string,
+        identifierType: UserIdentifierType,
+        eventName: string,
+    ) => Promise<void>;
     isRefCodeFree: (code: string) => Promise<boolean>;
     getRefCode: (
         userIdentifier: string,
@@ -15,6 +27,7 @@ interface FuulContextType {
 const FuulContext = createContext<FuulContextType>({
     isInitialized: false,
     trackPageView: () => {},
+    sendConversionEvent: () => Promise.resolve(),
     isRefCodeFree: () => Promise.resolve(false),
     getRefCode: () => Promise.resolve(null),
 });
@@ -26,6 +39,12 @@ export const useFuul = () => {
     }
     return context;
 };
+
+// just for pageview tracking
+const FUUL_PROJECTS = [
+    '3b31ebc0-f09d-4880-9c8c-04769701ef9a',
+    '0303273c-c574-4a64-825c-b67091ec6813',
+];
 
 export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
@@ -53,36 +72,53 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }, [FUUL_API_KEY]);
 
-    // just for pageview tracking
-    const projects = [
-        '3b31ebc0-f09d-4880-9c8c-04769701ef9a',
-        '0303273c-c574-4a64-825c-b67091ec6813',
-    ];
-
-    function trackPageView(): void {
-        console.log('[fuul] trackPageView invoked', {
-            isInitialized,
-            projects,
-        });
+    const trackPageView = useCallback((): void => {
         if (isInitialized) {
-            Fuul.sendPageview(undefined, projects);
-            console.log('[fuul] sendPageview dispatched');
+            Fuul.sendPageview(undefined, FUUL_PROJECTS);
         } else {
             console.warn(
                 'Cannot send pageview before Fuul system is initialized',
             );
         }
-    }
+    }, [isInitialized]);
+
+    const sendConversionEvent = useCallback(
+        async (
+            userIdentifier: string,
+            identifierType: UserIdentifierType,
+            eventName: string,
+        ): Promise<void> => {
+            if (!isInitialized) {
+                console.warn(
+                    'Cannot send conversion event before Fuul system is initialized',
+                );
+                return;
+            }
+            try {
+                await Fuul.sendEvent(eventName, {
+                    user_id: userIdentifier,
+                    user_id_type: identifierType,
+                });
+            } catch (error) {
+                console.error('Failed to send conversion event:', error);
+            }
+        },
+        [isInitialized],
+    );
+
+    const contextValue = useMemo(
+        () => ({
+            isInitialized,
+            trackPageView,
+            sendConversionEvent,
+            isRefCodeFree: Fuul.isAffiliateCodeFree,
+            getRefCode: Fuul.getAffiliateCode,
+        }),
+        [isInitialized, trackPageView, sendConversionEvent],
+    );
 
     return (
-        <FuulContext.Provider
-            value={{
-                isInitialized,
-                trackPageView,
-                isRefCodeFree: Fuul.isAffiliateCodeFree,
-                getRefCode: Fuul.getAffiliateCode,
-            }}
-        >
+        <FuulContext.Provider value={contextValue}>
             {children}
         </FuulContext.Provider>
     );
