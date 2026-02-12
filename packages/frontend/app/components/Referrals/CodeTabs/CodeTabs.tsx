@@ -24,6 +24,7 @@ import EnterCode from '~/components/Referrals/EnterCode/EnterCode';
 import CreateCode from '../CreateCode/CreateCode';
 import { checkForPermittedCharacters, checkIfOwnRefCode } from '../functions';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import { debugLog } from '~/utils/debugLog';
 
 interface PropsIF {
     initialTab?: string;
@@ -62,7 +63,7 @@ export default function CodeTabs(props: PropsIF) {
     );
 
     useEffect(() => {
-        console.log({ isSessionReestablishing, isSessionEstablished });
+        debugLog({ isSessionReestablishing, isSessionEstablished });
     }, [isSessionReestablishing, isSessionEstablished]);
 
     // tab which should be open by default on page load
