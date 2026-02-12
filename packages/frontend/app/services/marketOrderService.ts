@@ -11,6 +11,7 @@ import { t } from 'i18next';
 import {
     buildTradeRefregInstructions,
     pollTradeConsistency,
+    sendStandaloneRefregTransactions,
 } from '~/utils/refreg';
 
 export interface MarketOrderResult {
@@ -241,38 +242,6 @@ export class MarketOrderService {
             // Extract instructions from the transaction
             const instructions = [...transaction.instructions];
 
-            const refregResult = await buildTradeRefregInstructions({
-                sessionPublicKey,
-                walletPublicKey: userWalletKey,
-            });
-            console.log('[refreg] market order buildTradeRefregInstructions', {
-                walletPublicKey: userWalletKey.toBase58(),
-                instructionCount: refregResult.instructions.length,
-                includesFirstTrade: refregResult.includesFirstTrade,
-                includesCompleteConversion:
-                    refregResult.includesCompleteConversion,
-                hasReferralAttribution: Boolean(
-                    refregResult.referralAttribution,
-                ),
-            });
-            if (refregResult.instructions.length > 0) {
-                instructions.push(...refregResult.instructions);
-                console.log(
-                    '[refreg] market order appended refreg instructions',
-                    {
-                        appendedInstructions: refregResult.instructions.length,
-                        totalInstructions: instructions.length,
-                    },
-                );
-            } else {
-                console.log(
-                    '[refreg] market order has no refreg instructions to append',
-                    {
-                        totalInstructions: instructions.length,
-                    },
-                );
-            }
-
             console.log('📤 Sending market order transaction:');
             console.log('  - Instructions to send:', instructions.length);
             console.log(
@@ -302,37 +271,63 @@ export class MarketOrderService {
                     '✅ Order transaction successful:',
                     transactionResult.signature,
                 );
-                console.log(
-                    '[refreg] market trade triggering consistency checks',
-                    {
-                        signature: transactionResult.signature,
-                        walletPublicKey: userWalletKey.toBase58(),
-                    },
-                );
-
-                void pollTradeConsistency({
-                    walletPublicKey: userWalletKey,
-                    includesFirstTrade: refregResult.includesFirstTrade,
-                    includesCompleteConversion:
-                        refregResult.includesCompleteConversion,
-                    referralAttribution: refregResult.referralAttribution,
-                })
-                    .then((results) => {
-                        console.log(
-                            '[refreg] market trade consistency checks finished',
-                            {
-                                signature: transactionResult.signature,
-                                walletPublicKey: userWalletKey.toBase58(),
-                                results,
-                            },
-                        );
-                    })
-                    .catch((error) => {
-                        console.info(
-                            '[refreg] market trade polling failed:',
-                            error,
-                        );
+                void (async () => {
+                    const refregResult = await buildTradeRefregInstructions({
+                        sessionPublicKey,
+                        walletPublicKey: userWalletKey,
                     });
+                    console.log(
+                        '[refreg] market order buildTradeRefregInstructions',
+                        {
+                            walletPublicKey: userWalletKey.toBase58(),
+                            instructionCount: refregResult.instructions.length,
+                            includesFirstTrade: refregResult.includesFirstTrade,
+                            includesCompleteConversion:
+                                refregResult.includesCompleteConversion,
+                            hasReferralAttribution: Boolean(
+                                refregResult.referralAttribution,
+                            ),
+                        },
+                    );
+
+                    await sendStandaloneRefregTransactions({
+                        context: 'market_order',
+                        walletPublicKey: userWalletKey,
+                        instructions: refregResult.instructions,
+                        sendTransaction,
+                        parentTransactionSignature: transactionResult.signature,
+                    });
+
+                    console.log(
+                        '[refreg] market trade triggering consistency checks',
+                        {
+                            signature: transactionResult.signature,
+                            walletPublicKey: userWalletKey.toBase58(),
+                        },
+                    );
+
+                    const results = await pollTradeConsistency({
+                        walletPublicKey: userWalletKey,
+                        includesFirstTrade: refregResult.includesFirstTrade,
+                        includesCompleteConversion:
+                            refregResult.includesCompleteConversion,
+                        referralAttribution: refregResult.referralAttribution,
+                    });
+
+                    console.log(
+                        '[refreg] market trade consistency checks finished',
+                        {
+                            signature: transactionResult.signature,
+                            walletPublicKey: userWalletKey.toBase58(),
+                            results,
+                        },
+                    );
+                })().catch((error) => {
+                    console.info(
+                        '[refreg] market trade follow-up flow failed:',
+                        error,
+                    );
+                });
 
                 return {
                     success: true,

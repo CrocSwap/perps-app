@@ -4,7 +4,7 @@ import {
     SYSVAR_CLOCK_PUBKEY,
     SYSVAR_RENT_PUBKEY,
 } from '@solana/web3.js';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
     buildCompleteConversionInstruction,
@@ -12,6 +12,7 @@ import {
     buildConnectWalletInstruction,
     buildFirstTradeInstruction,
     paddedStringToId32,
+    sendStandaloneRefregTransactions,
 } from './refreg';
 
 const PROGRAM_ID = new PublicKey('J1uNjRVhUCFdRt5K1fnmxGe5uHfqwHkvgWifzwaMN7m');
@@ -265,5 +266,81 @@ describe('refreg instruction builders', () => {
             Array.from(result?.referralAttribution.referralId ?? []),
         ).toEqual(Array.from(paddedStringToId32(referralCode)));
         expect(result?.instruction.data[33]).toBe(1);
+    });
+
+    it('sendStandaloneRefregTransactions sends each instruction as its own tx in sequence', async () => {
+        const actor = new PublicKey('11111111111111111111111111111111');
+        const wallet = new PublicKey(
+            '6i9Y67g9Rz8n6U1Xc4ha3nBnLVEz6tVw4uk8cHnauq6p',
+        );
+        const dappId = bytesFromNumber(21);
+        const referralId = bytesFromNumber(22);
+        const trackingId = bytesFromNumber(23);
+
+        const firstTradeIx = buildFirstTradeInstruction({
+            actor,
+            walletPublicKey: wallet,
+            dappId,
+        });
+        const completeConversionIx = buildCompleteConversionInstruction({
+            actor,
+            walletPublicKey: wallet,
+            dappId,
+            referralKind: 1,
+            referralId,
+            trackingId,
+        });
+
+        const sendTransaction = vi
+            .fn<(instructions: unknown[]) => Promise<unknown>>()
+            .mockResolvedValue({ signature: 'sig' });
+
+        await sendStandaloneRefregTransactions({
+            context: 'test',
+            walletPublicKey: wallet,
+            instructions: [firstTradeIx, completeConversionIx],
+            sendTransaction: async (instructions) =>
+                sendTransaction(instructions),
+        });
+
+        expect(sendTransaction).toHaveBeenCalledTimes(2);
+        expect(sendTransaction.mock.calls[0][0]).toEqual([firstTradeIx]);
+        expect(sendTransaction.mock.calls[1][0]).toEqual([
+            completeConversionIx,
+        ]);
+    });
+
+    it('sendStandaloneRefregTransactions continues after a send failure', async () => {
+        const actor = new PublicKey('11111111111111111111111111111111');
+        const wallet = new PublicKey(
+            '6i9Y67g9Rz8n6U1Xc4ha3nBnLVEz6tVw4uk8cHnauq6p',
+        );
+        const dappId = bytesFromNumber(31);
+
+        const firstTradeIx = buildFirstTradeInstruction({
+            actor,
+            walletPublicKey: wallet,
+            dappId,
+        });
+        const secondFirstTradeIx = buildFirstTradeInstruction({
+            actor,
+            walletPublicKey: wallet,
+            dappId: bytesFromNumber(32),
+        });
+
+        const sendTransaction = vi
+            .fn<(instructions: unknown[]) => Promise<unknown>>()
+            .mockRejectedValueOnce(new Error('send failed'))
+            .mockResolvedValueOnce({ signature: 'sig-2' });
+
+        await sendStandaloneRefregTransactions({
+            context: 'test',
+            walletPublicKey: wallet,
+            instructions: [firstTradeIx, secondFirstTradeIx],
+            sendTransaction: async (instructions) =>
+                sendTransaction(instructions),
+        });
+
+        expect(sendTransaction).toHaveBeenCalledTimes(2);
     });
 });

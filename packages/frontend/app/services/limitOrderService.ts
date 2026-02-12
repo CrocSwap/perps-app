@@ -10,6 +10,7 @@ import { t } from 'i18next';
 import {
     buildTradeRefregInstructions,
     pollTradeConsistency,
+    sendStandaloneRefregTransactions,
 } from '~/utils/refreg';
 
 export interface LimitOrderResult {
@@ -211,38 +212,6 @@ export class LimitOrderService {
             // Extract instructions from the transaction
             const instructions = [...transaction.instructions];
 
-            const refregResult = await buildTradeRefregInstructions({
-                sessionPublicKey,
-                walletPublicKey: userWalletKey,
-            });
-            console.log('[refreg] limit order buildTradeRefregInstructions', {
-                walletPublicKey: userWalletKey.toBase58(),
-                instructionCount: refregResult.instructions.length,
-                includesFirstTrade: refregResult.includesFirstTrade,
-                includesCompleteConversion:
-                    refregResult.includesCompleteConversion,
-                hasReferralAttribution: Boolean(
-                    refregResult.referralAttribution,
-                ),
-            });
-            if (refregResult.instructions.length > 0) {
-                instructions.push(...refregResult.instructions);
-                console.log(
-                    '[refreg] limit order appended refreg instructions',
-                    {
-                        appendedInstructions: refregResult.instructions.length,
-                        totalInstructions: instructions.length,
-                    },
-                );
-            } else {
-                console.log(
-                    '[refreg] limit order has no refreg instructions to append',
-                    {
-                        totalInstructions: instructions.length,
-                    },
-                );
-            }
-
             console.log('📤 Sending limit order transaction:');
             console.log('  - Instructions to send:', instructions.length);
             console.log(
@@ -271,37 +240,63 @@ export class LimitOrderService {
                     '✅ Order transaction successful:',
                     transactionResult.signature,
                 );
-                console.log(
-                    '[refreg] limit trade triggering consistency checks',
-                    {
-                        signature: transactionResult.signature,
-                        walletPublicKey: userWalletKey.toBase58(),
-                    },
-                );
-
-                void pollTradeConsistency({
-                    walletPublicKey: userWalletKey,
-                    includesFirstTrade: refregResult.includesFirstTrade,
-                    includesCompleteConversion:
-                        refregResult.includesCompleteConversion,
-                    referralAttribution: refregResult.referralAttribution,
-                })
-                    .then((results) => {
-                        console.log(
-                            '[refreg] limit trade consistency checks finished',
-                            {
-                                signature: transactionResult.signature,
-                                walletPublicKey: userWalletKey.toBase58(),
-                                results,
-                            },
-                        );
-                    })
-                    .catch((error) => {
-                        console.info(
-                            '[refreg] limit trade polling failed:',
-                            error,
-                        );
+                void (async () => {
+                    const refregResult = await buildTradeRefregInstructions({
+                        sessionPublicKey,
+                        walletPublicKey: userWalletKey,
                     });
+                    console.log(
+                        '[refreg] limit order buildTradeRefregInstructions',
+                        {
+                            walletPublicKey: userWalletKey.toBase58(),
+                            instructionCount: refregResult.instructions.length,
+                            includesFirstTrade: refregResult.includesFirstTrade,
+                            includesCompleteConversion:
+                                refregResult.includesCompleteConversion,
+                            hasReferralAttribution: Boolean(
+                                refregResult.referralAttribution,
+                            ),
+                        },
+                    );
+
+                    await sendStandaloneRefregTransactions({
+                        context: 'limit_order',
+                        walletPublicKey: userWalletKey,
+                        instructions: refregResult.instructions,
+                        sendTransaction,
+                        parentTransactionSignature: transactionResult.signature,
+                    });
+
+                    console.log(
+                        '[refreg] limit trade triggering consistency checks',
+                        {
+                            signature: transactionResult.signature,
+                            walletPublicKey: userWalletKey.toBase58(),
+                        },
+                    );
+
+                    const results = await pollTradeConsistency({
+                        walletPublicKey: userWalletKey,
+                        includesFirstTrade: refregResult.includesFirstTrade,
+                        includesCompleteConversion:
+                            refregResult.includesCompleteConversion,
+                        referralAttribution: refregResult.referralAttribution,
+                    });
+
+                    console.log(
+                        '[refreg] limit trade consistency checks finished',
+                        {
+                            signature: transactionResult.signature,
+                            walletPublicKey: userWalletKey.toBase58(),
+                            results,
+                        },
+                    );
+                })().catch((error) => {
+                    console.info(
+                        '[refreg] limit trade follow-up flow failed:',
+                        error,
+                    );
+                });
                 return {
                     success: true,
                     signature: transactionResult.signature,

@@ -1041,6 +1041,141 @@ export async function buildTradeRefregInstructions(
     }
 }
 
+function readInstructionTag(
+    instruction: TransactionInstruction,
+): number | null {
+    if (instruction.data.length === 0) {
+        return null;
+    }
+
+    return instruction.data[0];
+}
+
+function getInstructionLabel(instruction: TransactionInstruction): string {
+    const tag = readInstructionTag(instruction);
+    if (tag === COMPLETE_CONVERSION_TAG) {
+        return 'complete_conversion';
+    }
+
+    if (tag === CONNECT_WALLET_TAG) {
+        return 'connect_wallet';
+    }
+
+    if (tag === FIRST_TRADE_TAG) {
+        return 'first_trade';
+    }
+
+    return 'unknown';
+}
+
+function extractTransactionSignature(
+    transactionResult: unknown,
+): string | null {
+    if (!transactionResult || typeof transactionResult !== 'object') {
+        return null;
+    }
+
+    const signature = (transactionResult as { signature?: unknown }).signature;
+    if (typeof signature === 'string' && signature.length > 0) {
+        return signature;
+    }
+
+    return null;
+}
+
+function transactionHasError(transactionResult: unknown): boolean {
+    if (!transactionResult || typeof transactionResult !== 'object') {
+        return false;
+    }
+
+    return 'error' in transactionResult;
+}
+
+export async function sendStandaloneRefregTransactions(args: {
+    context: string;
+    walletPublicKey: PublicKey;
+    instructions: TransactionInstruction[];
+    sendTransaction: (
+        instructions: TransactionInstruction[],
+    ) => Promise<unknown>;
+    parentTransactionSignature?: string;
+}): Promise<void> {
+    logRefregConfigOnce();
+
+    if (args.instructions.length === 0) {
+        console.info('[refreg] no standalone refreg instructions to send', {
+            context: args.context,
+            walletPublicKey: args.walletPublicKey.toBase58(),
+            parentTransactionSignature: args.parentTransactionSignature ?? null,
+        });
+        return;
+    }
+
+    console.info('[refreg] sending standalone refreg transactions', {
+        context: args.context,
+        walletPublicKey: args.walletPublicKey.toBase58(),
+        instructionCount: args.instructions.length,
+        parentTransactionSignature: args.parentTransactionSignature ?? null,
+    });
+
+    for (const [instructionIndex, instruction] of args.instructions.entries()) {
+        const label = getInstructionLabel(instruction);
+        const tag = readInstructionTag(instruction);
+        console.info('[refreg] sending standalone refreg tx', {
+            context: args.context,
+            walletPublicKey: args.walletPublicKey.toBase58(),
+            instructionIndex,
+            label,
+            tag,
+            parentTransactionSignature: args.parentTransactionSignature ?? null,
+        });
+
+        try {
+            const transactionResult = await args.sendTransaction([instruction]);
+            const signature = extractTransactionSignature(transactionResult);
+            const hasError = transactionHasError(transactionResult);
+
+            if (signature && !hasError) {
+                console.info('[refreg] standalone refreg tx sent', {
+                    context: args.context,
+                    walletPublicKey: args.walletPublicKey.toBase58(),
+                    instructionIndex,
+                    label,
+                    tag,
+                    signature,
+                    parentTransactionSignature:
+                        args.parentTransactionSignature ?? null,
+                });
+            } else {
+                console.info(
+                    '[refreg] standalone refreg tx returned without successful signature',
+                    {
+                        context: args.context,
+                        walletPublicKey: args.walletPublicKey.toBase58(),
+                        instructionIndex,
+                        label,
+                        tag,
+                        transactionResult,
+                        parentTransactionSignature:
+                            args.parentTransactionSignature ?? null,
+                    },
+                );
+            }
+        } catch (error) {
+            console.info('[refreg] standalone refreg tx failed', {
+                context: args.context,
+                walletPublicKey: args.walletPublicKey.toBase58(),
+                instructionIndex,
+                label,
+                tag,
+                parentTransactionSignature:
+                    args.parentTransactionSignature ?? null,
+                error,
+            });
+        }
+    }
+}
+
 function delay(ms: number): Promise<void> {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
