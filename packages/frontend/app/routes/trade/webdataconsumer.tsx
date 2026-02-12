@@ -127,17 +127,22 @@ export default function WebDataConsumer() {
     }, [symbol, coins]);
 
     // Add a periodic check to ensure symbolInfo stays updated
+    // Use a ref for symbolInfo to avoid interval churn when symbolInfo changes
+    const symbolInfoRef = useRef<SymbolInfoIF | null>(symbolInfo);
+    symbolInfoRef.current = symbolInfo;
+
     useEffect(() => {
         const updateInterval = setInterval(() => {
             const foundCoin = coins.find((coin) => coin.coin === symbol);
-            if (foundCoin && symbolInfo) {
+            if (foundCoin && symbolInfoRef.current) {
                 // Only update if data has actually changed to avoid unnecessary re-renders
                 if (
-                    foundCoin.markPx !== symbolInfo.markPx ||
-                    foundCoin.oraclePx !== symbolInfo.oraclePx ||
-                    foundCoin.dayNtlVlm !== symbolInfo.dayNtlVlm ||
-                    foundCoin.funding !== symbolInfo.funding ||
-                    foundCoin.openInterest !== symbolInfo.openInterest
+                    foundCoin.markPx !== symbolInfoRef.current.markPx ||
+                    foundCoin.oraclePx !== symbolInfoRef.current.oraclePx ||
+                    foundCoin.dayNtlVlm !== symbolInfoRef.current.dayNtlVlm ||
+                    foundCoin.funding !== symbolInfoRef.current.funding ||
+                    foundCoin.openInterest !==
+                        symbolInfoRef.current.openInterest
                 ) {
                     setSymbolInfo(foundCoin);
                 }
@@ -145,7 +150,7 @@ export default function WebDataConsumer() {
         }, 1000);
 
         return () => clearInterval(updateInterval);
-    }, [symbol, coins, symbolInfo, setSymbolInfo]);
+    }, [symbol, coins]);
 
     useEffect(() => {
         console.log('[WebDataConsumer] Subscription setup effect triggered:', {

@@ -13,6 +13,7 @@ import {
     clearAllChartCaches,
     clearChartCachesForSymbol,
     getMarkFillData,
+    refreshStaleCache,
 } from '~/routes/chart/data/candleDataCache';
 import {
     createDataFeed,
@@ -152,6 +153,8 @@ export const TradingViewProvider: React.FC<{
     const [chartInterval, setChartInterval] = useState<string | undefined>(
         chartState?.interval,
     );
+    const chartIntervalRef = useRef(chartInterval);
+    chartIntervalRef.current = chartInterval;
 
     const dataFeedRef = useRef<CustomDataFeedType | null>(null);
 
@@ -1041,6 +1044,40 @@ export const TradingViewProvider: React.FC<{
         intervalChangedSubscribe(chart, setIsChartReady);
         visibleRangeChangedSubscribe(chart);
     }, [chart]);
+
+    // When the tab becomes visible after being hidden, silently
+    // back-fill any missing candles into the cache.  We intentionally
+    // avoid chart.activeChart().resetData() because it clears all
+    // rendered data and marks, causing a visible flicker.  Instead we
+    // just update the cache in-place; the subscribeBars poller (which
+    // pauses while the tab is hidden) will resume and push the latest
+    // bar via onTick, keeping the chart up-to-date without any flash.
+    useEffect(() => {
+        if (!chart || !symbol) return;
+
+        const onVisibilityChange = () => {
+            if (document.hidden) return;
+
+            const resolution = chartIntervalRef.current || '60';
+            refreshStaleCache(symbol, resolution, () => {
+                try {
+                    if (showBuysSellsOnChart) {
+                        chart.chart().refreshMarks();
+                    }
+                } catch (e) {
+                    console.error('[chart] refreshMarks failed:', e);
+                }
+            });
+        };
+
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        return () => {
+            document.removeEventListener(
+                'visibilitychange',
+                onVisibilityChange,
+            );
+        };
+    }, [chart, symbol, showBuysSellsOnChart]);
 
     useEffect(() => {
         if (chart) {

@@ -296,8 +296,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
                 clearTimeout(reconnectTimeoutRef.current);
                 reconnectTimeoutRef.current = null;
             }
-            // console.log('>>>> socket closed!!!!!!!!!!!!!');
-            // socketRef.current?.close();
+            socketRef.current?.close();
         };
     }, [url, isClient]); // ✅ Only runs when client-side is ready
 
