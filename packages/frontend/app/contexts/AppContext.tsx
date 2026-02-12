@@ -7,6 +7,7 @@ import React, {
     createContext,
     useContext,
     useEffect,
+    useLayoutEffect,
     useState,
     type Dispatch,
     type SetStateAction,
@@ -58,10 +59,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     const { setIsSessionReestablishing } = useAppStateStore();
 
-    useEffect(() => {
-        const isReestablishing =
-            sessionState.type === SessionStateType.Initializing ||
-            sessionState.type === SessionStateType.CheckingStoredSession;
+    useLayoutEffect(() => {
+        const isReestablishing = [
+            SessionStateType.Initializing,
+            SessionStateType.CheckingStoredSession,
+            SessionStateType.RequestingLimits,
+            SessionStateType.SettingLimits,
+            SessionStateType.WalletConnecting,
+            SessionStateType.SelectingWallet,
+        ].includes(sessionState.type);
         setIsSessionReestablishing(isReestablishing);
     }, [sessionState.type, setIsSessionReestablishing]);
 
