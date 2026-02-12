@@ -16,6 +16,7 @@ import type {
 import { getResolutionListForSymbol } from '~/utils/orderbook/OrderBookUtils';
 import LiquidationsChart from './LiquidationOBChart';
 import styles from './LiquidationsChartSection.module.css';
+import LiquidationFeed from './LiquidationFeed';
 import OBLiqFetcher from './ObLiqFetcher';
 
 interface LiquidationsChartSectionProps {
@@ -333,7 +334,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                 );
             }
         }
-        return <div>Feed</div>;
+        return <LiquidationFeed />;
     }, [
         activeTab,
         buyLiqsFilteredOB,
