@@ -13,9 +13,13 @@ import SymbolListTableRow from './SymbolListTableRow';
 
 interface SymbolListProps {
     setIsOpen: (isOpen: boolean) => void;
+    variant?: 'dropdown' | 'sheet';
 }
 
-const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
+const SymbolList: React.FC<SymbolListProps> = ({
+    setIsOpen,
+    variant = 'dropdown',
+}) => {
     const navigate = useNavigate();
 
     const { coins, setSymbol, favKeys } = useTradeDataStore();
@@ -141,7 +145,7 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
     return (
         <>
             <motion.div
-                className={styles.symbolListWrapper}
+                className={`${styles.symbolListWrapper} ${variant === 'sheet' ? styles.symbolListWrapperSheet : ''}`}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}

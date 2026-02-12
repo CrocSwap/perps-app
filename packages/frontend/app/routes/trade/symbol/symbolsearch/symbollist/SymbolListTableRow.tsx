@@ -4,6 +4,8 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import styles from './symbollist.module.css';
+import { useCallback } from 'react';
+import useMediaQuery from '~/hooks/useMediaQuery';
 
 interface SymbolListTableRowProps {
     symbol: SymbolInfoIF;
@@ -12,6 +14,7 @@ interface SymbolListTableRowProps {
 
 export default function SymbolListTableRow(props: SymbolListTableRowProps) {
     const { symbol, symbolSelectListener } = props;
+    const isMobileVersion = useMediaQuery('(max-width: 560px)');
 
     const { formatNum, getDefaultPrecision } = useNumFormatter();
     const { getBsColor } = useAppSettings();
@@ -23,10 +26,14 @@ export default function SymbolListTableRow(props: SymbolListTableRowProps) {
             const usdChange = symbol.last24hPriceChange;
             const percentChange = symbol.last24hPriceChangePercent;
             const precision = getDefaultPrecision(symbol.last24hPriceChange);
-            return {
-                str: `${usdChange > 0 ? '+' : ''}${formatNum(usdChange, precision + 1)} / ${formatNum(percentChange, 2)}%`,
-                usdChange,
-            };
+            const usdPart = `${usdChange > 0 ? '+' : ''}${formatNum(usdChange, precision + 1)}`;
+            const percentPart = `${percentChange > 0 ? '+' : ''}${formatNum(percentChange, 2)}%`;
+
+            const str = isMobileVersion
+                ? percentPart
+                : `${usdPart} / ${percentPart}`;
+
+            return { str, usdChange };
         }
         return { str: '+0.0 / %0.0', usdChange: 0 };
     };
@@ -45,6 +52,11 @@ export default function SymbolListTableRow(props: SymbolListTableRowProps) {
         }
         console.log('>>> handleFavClick', symbol.coin);
     };
+    const compactNum = useCallback(
+        (value: number, digits = 1, threshold = 10_000) =>
+            formatNum(value, null, false, false, false, true, threshold),
+        [formatNum],
+    );
 
     return (
         <div className={styles.rowContainer} onClick={handleClick}>
@@ -87,7 +99,28 @@ export default function SymbolListTableRow(props: SymbolListTableRowProps) {
                 {formatNum(symbol.funding * 100)}
             </div>
             <div className={`${styles.cell} ${styles.volumeCell}`}>
-                {formatNum(symbol.dayNtlVlm)}
+                {isMobileVersion
+                    ? '$' + compactNum(symbol.dayNtlVlm)
+                    : formatNum(symbol.dayNtlVlm)}
+            </div>
+            {/* Combined Last/Change for small screens */}
+            <div className={`${styles.cell} ${styles.priceChangeCombo}`}>
+                <span className={styles.comboPrice}>
+                    {formatNum(symbol.markPx)}
+                </span>
+                <span
+                    className={styles.comboChange}
+                    style={{
+                        color:
+                            get24hChangeString().usdChange > 0
+                                ? getBsColor().buy
+                                : get24hChangeString().usdChange < 0
+                                  ? getBsColor().sell
+                                  : 'var(--text2)',
+                    }}
+                >
+                    {get24hChangeString().str}
+                </span>
             </div>
             <div className={`${styles.cell} ${styles.openInterestCell}`}>
                 {formatNum(symbol.openInterestDollarized)}
