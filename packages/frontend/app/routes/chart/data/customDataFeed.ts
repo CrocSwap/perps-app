@@ -462,7 +462,7 @@ export const createDataFeed = (
                 // from silently auto-scrolling right over hours of idle,
                 // which compresses all candles into a thin sliver.
                 // Gap-fill on tab resume is handled by TradingviewContext
-                // via refreshStaleCache + chart.resetData().
+                // via refreshStaleCache (cache updated in-place, no resetData).
                 if (document.hidden) {
                     return;
                 }
