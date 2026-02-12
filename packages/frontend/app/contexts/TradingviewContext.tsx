@@ -149,12 +149,8 @@ export const TradingViewProvider: React.FC<{
 
     const dataFeedRef = useRef<CustomDataFeedType | null>(null);
 
-    const {
-        debugToolbarOpen,
-        setDebugToolbarOpen,
-        lastOnlineAt,
-        setChartRefreshing,
-    } = useAppStateStore();
+    const { debugToolbarOpen, setDebugToolbarOpen, lastOnlineAt } =
+        useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
 
@@ -958,11 +954,13 @@ export const TradingViewProvider: React.FC<{
         visibleRangeChangedSubscribe(chart);
     }, [chart]);
 
-    // When the tab becomes visible after being hidden, backfill any
-    // missing candles into the cache and force TradingView to re-read
-    // via getBars.  The onTick callback from subscribeBars can only
-    // update the most recent bar, so feeding historical bars through
-    // it silently drops them — hence the resetData() approach.
+    // When the tab becomes visible after being hidden, silently
+    // back-fill any missing candles into the cache.  We intentionally
+    // avoid chart.activeChart().resetData() because it clears all
+    // rendered data and marks, causing a visible flicker.  Instead we
+    // just update the cache in-place; the subscribeBars poller (which
+    // pauses while the tab is hidden) will resume and push the latest
+    // bar via onTick, keeping the chart up-to-date without any flash.
     useEffect(() => {
         if (!chart || !symbol) return;
 
@@ -970,14 +968,14 @@ export const TradingViewProvider: React.FC<{
             if (document.hidden) return;
 
             const resolution = chartIntervalRef.current || '60';
-            setChartRefreshing(true);
             refreshStaleCache(symbol, resolution, () => {
                 try {
-                    chart.activeChart().resetData();
+                    if (showBuysSellsOnChart) {
+                        chart.chart().refreshMarks();
+                    }
                 } catch (e) {
-                    console.error('[chart] resetData failed:', e);
+                    console.error('[chart] refreshMarks failed:', e);
                 }
-                setChartRefreshing(false);
             });
         };
 
@@ -988,7 +986,7 @@ export const TradingViewProvider: React.FC<{
                 onVisibilityChange,
             );
         };
-    }, [chart, symbol, setChartRefreshing]);
+    }, [chart, symbol, showBuysSellsOnChart]);
 
     useEffect(() => {
         if (chart) {
