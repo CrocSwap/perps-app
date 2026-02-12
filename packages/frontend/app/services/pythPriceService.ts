@@ -31,6 +31,7 @@ export class PythPriceService {
     private connectionStatusCallbacks: Set<ConnectionStatusCallback> =
         new Set();
     private reconnectTimer: NodeJS.Timeout | null = null;
+    private monitorTimer: NodeJS.Timeout | null = null;
     private isConnected = false;
     private priceCache: Map<string, PythPriceData> = new Map();
     private latencyStats: Map<string, number[]> = new Map();
@@ -67,7 +68,7 @@ export class PythPriceService {
         this.setConnectionStatus(true);
 
         // Check connection every 5 seconds
-        setInterval(async () => {
+        this.monitorTimer = setInterval(async () => {
             try {
                 // Try to fetch a price to check if connection is alive
                 const testFeedId = PYTH_PRICE_FEEDS.BTC.id;
@@ -374,10 +375,16 @@ export class PythPriceService {
         if (this.reconnectTimer) {
             clearTimeout(this.reconnectTimer);
         }
+        if (this.monitorTimer) {
+            clearInterval(this.monitorTimer);
+        }
+        this.pollingIntervals.forEach((interval) => clearInterval(interval));
+        this.pollingIntervals.clear();
         this.activeSubscriptions.clear();
         this.priceUpdateCallbacks.clear();
         this.connectionStatusCallbacks.clear();
         this.priceCache.clear();
+        this.latencyStats.clear();
         PythPriceService.instance = null;
     }
 }

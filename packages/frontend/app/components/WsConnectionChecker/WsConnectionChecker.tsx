@@ -31,12 +31,10 @@ export default function WsConnectionChecker() {
     const isTabPassive = useRef(false);
     const [hideReconnectIndicator, setHideReconnectIndicator] = useState(false);
 
-    const sleepModeBlackList = new Set([Pages.HOME]);
-
     const { page } = usePage();
 
     useEffect(() => {
-        if (page && sleepModeBlackList.has(page)) {
+        if (page === Pages.HOME) {
             setHideReconnectIndicator(true);
         } else {
             setHideReconnectIndicator(false);
