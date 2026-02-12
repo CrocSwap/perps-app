@@ -3,22 +3,35 @@
 
 declare global {
     interface Window {
-        debugLog: (...args: any[]) => void;
+        debugLog: (...args: unknown[]) => void;
     }
 }
 
+const getConsole = (): Console | undefined => {
+    try {
+        return Function('return globalThis.console')() as Console;
+    } catch {
+        return undefined;
+    }
+};
+
+const logWithConsole = (...args: unknown[]) => {
+    const consoleRef = getConsole();
+    consoleRef?.log?.(...args);
+};
+
 // Create a global debug function that always logs
 if (typeof window !== 'undefined') {
-    window.debugLog = (...args: any[]) => {
-        console.log(...args);
+    window.debugLog = (...args: unknown[]) => {
+        logWithConsole(...args);
     };
 }
 
 // Export for use in components
-export const debugLog = (...args: any[]) => {
+export const debugLog = (...args: unknown[]) => {
     if (typeof window !== 'undefined' && window.debugLog) {
         window.debugLog(...args);
     } else {
-        console.log(...args);
+        logWithConsole(...args);
     }
 };
