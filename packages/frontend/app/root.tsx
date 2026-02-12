@@ -271,7 +271,7 @@ export default function App() {
     const isHomePage = location.pathname === '/' || location.pathname === '';
     const isPortfolioPage = location.pathname.includes('portfolio');
     const noPaddingPages = isHomePage || isPortfolioPage;
-    const restrictedSiteModal = useModal('closed');
+    const restrictedSiteModal = useModal();
     const { t } = useTranslation();
 
     useEffect(() => {

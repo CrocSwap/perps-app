@@ -317,7 +317,7 @@ function Portfolio() {
         PortfolioModalsRenderer,
     } = usePortfolioModals();
 
-    const feeScheduleModalCtrl = useModal('closed');
+    const feeScheduleModalCtrl = useModal();
 
     const DASH_PLACEHOLDER = '-';
     const hasPnl = typeof userData?.pnl === 'number';
