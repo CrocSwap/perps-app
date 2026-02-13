@@ -26,6 +26,7 @@ import { checkForPermittedCharacters, checkIfOwnRefCode } from '../functions';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { debugLog } from '~/utils/debugLog';
 import { useDebounce } from '~/hooks/useDebounce';
+import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
 
 interface PropsIF {
     initialTab?: string;
@@ -135,7 +136,11 @@ export default function CodeTabs(props: PropsIF) {
     }, [referralStore.cached, referrerAddress]);
 
     // run the FUUL context
-    const { checkIfCodeExists, checkIfCodeIsAvailable, getRefCode } = useFuul();
+    const {
+        checkIfCodeExists,
+        checkIfCodeIsAvailableForInviteeToUse,
+        getRefCode,
+    } = useFuul();
 
     const [isRefCodeClaimed, setIsRefCodeClaimed] = useState<
         boolean | undefined
@@ -144,7 +149,7 @@ export default function CodeTabs(props: PropsIF) {
         if (refCodeToConsume === undefined || !refCodeToConsume.length) {
             setIsRefCodeClaimed(undefined);
         } else {
-            checkIfCodeIsAvailable(refCodeToConsume)
+            checkIfCodeIsAvailableForInviteeToUse(refCodeToConsume)
                 .then((isAvailable: boolean) =>
                     setIsRefCodeClaimed(isAvailable),
                 )
@@ -223,7 +228,8 @@ export default function CodeTabs(props: PropsIF) {
         }
 
         // check FUUL API to see if code exists and is available for use
-        const isCodeAvailable: boolean = await checkIfCodeIsAvailable(r);
+        const isCodeAvailable: boolean =
+            await checkIfCodeIsAvailableForInviteeToUse(r);
 
         // Always cache the code and set URL param
         handleReferralURLParam.set(r);
@@ -295,6 +301,10 @@ export default function CodeTabs(props: PropsIF) {
 
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
     const debouncedUserInputRefCode = useDebounce(userInputRefCode, 500);
+    const isInputSolanaAddress = useMemo<boolean>(
+        () => checkAddressFormat(userInputRefCode),
+        [userInputRefCode],
+    );
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
         boolean | undefined
     >(undefined);
@@ -303,6 +313,10 @@ export default function CodeTabs(props: PropsIF) {
 
     // when the user manually enters a refCode, check if the code is owned by their wallet
     useEffect(() => {
+        if (isInputSolanaAddress) {
+            setIsUserInputRefCodeSelfOwned(undefined);
+            return;
+        }
         if (debouncedUserInputRefCode && referrerAddress) {
             setIsUserInputRefCodeSelfOwned(undefined);
             checkIfOwnRefCode(
@@ -319,10 +333,14 @@ export default function CodeTabs(props: PropsIF) {
         } else {
             setIsUserInputRefCodeSelfOwned(undefined);
         }
-    }, [debouncedUserInputRefCode, referrerAddress]);
+    }, [debouncedUserInputRefCode, referrerAddress, isInputSolanaAddress]);
 
     // when the user manually enters a refCode, make sure it exists
     useEffect(() => {
+        if (isInputSolanaAddress) {
+            setIsUserRefCodeClaimed(true);
+            return;
+        }
         if (debouncedUserInputRefCode.length) {
             setIsUserRefCodeClaimed(undefined);
             (async () => {
@@ -330,16 +348,17 @@ export default function CodeTabs(props: PropsIF) {
                     // check with FUUL to determine if ref code is claimed
                     // isAffiliateCodeAvailable returns true when the code
                     // exists and has remaining uses (i.e. is a valid referral)
-                    const isCodeClaimed: boolean = await checkIfCodeIsAvailable(
-                        debouncedUserInputRefCode,
-                    );
+                    const isCodeClaimed: boolean =
+                        await checkIfCodeIsAvailableForInviteeToUse(
+                            debouncedUserInputRefCode,
+                        );
                     setIsUserRefCodeClaimed(isCodeClaimed);
                 } catch (error) {
                     setIsUserRefCodeClaimed(false);
                 }
             })();
         }
-    }, [debouncedUserInputRefCode]);
+    }, [debouncedUserInputRefCode, isInputSolanaAddress]);
 
     // determines whether the value in zustand cache passes validation
     // legal characters, length, and format checks
@@ -371,7 +390,7 @@ export default function CodeTabs(props: PropsIF) {
             const codeToValidate = referralStore.cached;
             try {
                 const isCodeAvailable: boolean =
-                    await checkIfCodeIsAvailable(codeToValidate);
+                    await checkIfCodeIsAvailableForInviteeToUse(codeToValidate);
 
                 if (!isCodeAvailable) {
                     // Code does not exist or has no remaining uses
@@ -711,6 +730,7 @@ export default function CodeTabs(props: PropsIF) {
                         userInputRefCode={userInputRefCode}
                         setUserInputRefCode={setUserInputRefCode}
                         isCheckingCode={isCheckingCode}
+                        isInputSolanaAddress={isInputSolanaAddress}
                         isUserRefCodeClaimed={isUserRefCodeClaimed}
                         isUserInputRefCodeSelfOwned={
                             isUserInputRefCodeSelfOwned

@@ -19,7 +19,11 @@ export default function RefCodeModal() {
     const location = useLocation();
     const sessionState = useSession();
     const { isSessionReestablishing } = useAppStateStore();
-    const { isInitialized, trackPageView, checkIfCodeIsAvailable } = useFuul();
+    const {
+        isInitialized,
+        trackPageView,
+        checkIfCodeIsAvailableForInviteeToUse,
+    } = useFuul();
     const referralStore = useReferralStore();
     const notificationStore = useNotificationStore();
     const referralCodeFromURL = useUrlParams(URL_PARAMS.referralCode);
@@ -60,7 +64,9 @@ export default function RefCodeModal() {
                 if (isUserConnected) {
                     if (isCodeSVM) {
                         refCodeModal.open('address');
-                    } else if (await checkIfCodeIsAvailable(codeToCheck)) {
+                    } else if (
+                        await checkIfCodeIsAvailableForInviteeToUse(codeToCheck)
+                    ) {
                         refCodeModal.open('goodCode');
                     } else {
                         refCodeModal.open('badCode');
