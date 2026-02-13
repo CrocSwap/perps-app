@@ -15,6 +15,7 @@ interface PropsIF {
     setEditModeInvitee: (value: boolean) => void;
     userInputRefCode: string;
     setUserInputRefCode: (value: string) => void;
+    isCheckingCode: boolean;
     isUserRefCodeClaimed: boolean | undefined;
     isUserInputRefCodeSelfOwned: boolean | undefined;
     handleUpdateReferralCode: (code: string) => void;
@@ -33,6 +34,7 @@ export default function EnterCode(props: PropsIF) {
         setEditModeInvitee,
         userInputRefCode,
         setUserInputRefCode,
+        isCheckingCode,
         isUserRefCodeClaimed,
         isUserInputRefCodeSelfOwned,
         handleUpdateReferralCode,
@@ -112,9 +114,17 @@ export default function EnterCode(props: PropsIF) {
                     value={userInputRefCode}
                     onChange={(e) => setUserInputRefCode(e.target.value)}
                 />
-                {!isUserRefCodeClaimed &&
+                {userInputRefCode.length >= 2 &&
                     userInputRefCode.length <= 30 &&
-                    userInputRefCode.length >= 2 && (
+                    (isCheckingCode ? (
+                        <p style={{ color: 'var(--text2)' }}>
+                            Checking code...
+                        </p>
+                    ) : isUserRefCodeClaimed ? (
+                        <p style={{ color: 'var(--positive)' }}>
+                            Code is valid!
+                        </p>
+                    ) : (
                         <p>
                             <Trans
                                 i18nKey='referrals.referralCodeNotValidPleaseConfirm'
@@ -126,7 +136,7 @@ export default function EnterCode(props: PropsIF) {
                                 ]}
                             />
                         </p>
-                    )}
+                    ))}
                 {isUserInputRefCodeSelfOwned && (
                     <p>
                         <Trans
@@ -145,6 +155,7 @@ export default function EnterCode(props: PropsIF) {
                     disabled={
                         userInputRefCode.length < 2 ||
                         userInputRefCode.length > 30 ||
+                        isCheckingCode ||
                         !isUserRefCodeClaimed ||
                         isUserInputRefCodeSelfOwned
                     }

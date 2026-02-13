@@ -4,7 +4,6 @@ import {
     SessionButton,
     useSession,
 } from '@fogo/sessions-sdk-react';
-import { Fuul } from '@fuul/sdk';
 import { Link, useLocation } from 'react-router';
 import { useModal } from '~/hooks/useModal';
 import Modal from '~/components/Modal/Modal';
@@ -20,7 +19,7 @@ export default function RefCodeModal() {
     const location = useLocation();
     const sessionState = useSession();
     const { isSessionReestablishing } = useAppStateStore();
-    const { isInitialized, trackPageView } = useFuul();
+    const { isInitialized, trackPageView, checkIfCodeIsAvailable } = useFuul();
     const referralStore = useReferralStore();
     const notificationStore = useNotificationStore();
     const referralCodeFromURL = useUrlParams(URL_PARAMS.referralCode);
@@ -61,9 +60,7 @@ export default function RefCodeModal() {
                 if (isUserConnected) {
                     if (isCodeSVM) {
                         refCodeModal.open('address');
-                    } else if (
-                        await Fuul.isAffiliateCodeAvailable(codeToCheck)
-                    ) {
+                    } else if (await checkIfCodeIsAvailable(codeToCheck)) {
                         refCodeModal.open('goodCode');
                     } else {
                         refCodeModal.open('badCode');
