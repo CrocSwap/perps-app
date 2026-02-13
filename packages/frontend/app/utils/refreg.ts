@@ -10,6 +10,7 @@ import { Buffer } from 'buffer';
 type BuildIxParams = {
     sessionPublicKey: PublicKey;
     walletPublicKey: PublicKey;
+    payerPublicKey: PublicKey;
 };
 
 export type ReferralKind = 0 | 1;
@@ -191,8 +192,10 @@ function parseTrackingIdToId32(value: string): Uint8Array | null {
 }
 
 export function paddedStringToId32(value: string): Uint8Array {
-    if (!/^[\x00-\x7F]*$/.test(value)) {
-        throw new Error('padded string id must be ASCII');
+    for (let idx = 0; idx < value.length; idx += 1) {
+        if (value.charCodeAt(idx) > 0x7f) {
+            throw new Error('padded string id must be ASCII');
+        }
     }
 
     const raw = new TextEncoder().encode(value);
@@ -670,6 +673,7 @@ async function fetchConnectWalletAttributionByUser(params: {
 
 export function buildConnectWalletInstruction(args: {
     actor: PublicKey;
+    payer: PublicKey;
     walletPublicKey: PublicKey;
     dappId: Uint8Array;
     referralKind: ReferralKind;
@@ -701,6 +705,7 @@ export function buildConnectWalletInstruction(args: {
         programId: REFREG_PROGRAM_ID,
         keys: [
             { pubkey: args.actor, isSigner: true, isWritable: true },
+            { pubkey: args.payer, isSigner: true, isWritable: true },
             { pubkey: record, isSigner: false, isWritable: true },
             {
                 pubkey: SystemProgram.programId,
@@ -716,6 +721,7 @@ export function buildConnectWalletInstruction(args: {
 
 export function buildFirstTradeInstruction(args: {
     actor: PublicKey;
+    payer: PublicKey;
     walletPublicKey: PublicKey;
     dappId: Uint8Array;
 }): TransactionInstruction {
@@ -738,6 +744,7 @@ export function buildFirstTradeInstruction(args: {
         programId: REFREG_PROGRAM_ID,
         keys: [
             { pubkey: args.actor, isSigner: true, isWritable: true },
+            { pubkey: args.payer, isSigner: true, isWritable: true },
             { pubkey: record, isSigner: false, isWritable: true },
             {
                 pubkey: SystemProgram.programId,
@@ -753,6 +760,7 @@ export function buildFirstTradeInstruction(args: {
 
 export function buildCompleteConversionInstruction(args: {
     actor: PublicKey;
+    payer: PublicKey;
     walletPublicKey: PublicKey;
     dappId: Uint8Array;
     referralKind: ReferralKind;
@@ -783,6 +791,7 @@ export function buildCompleteConversionInstruction(args: {
         programId: REFREG_PROGRAM_ID,
         keys: [
             { pubkey: args.actor, isSigner: true, isWritable: true },
+            { pubkey: args.payer, isSigner: true, isWritable: true },
             { pubkey: record, isSigner: false, isWritable: true },
             {
                 pubkey: SystemProgram.programId,
@@ -804,6 +813,7 @@ export async function buildConnectWalletIx(
         console.info('[refreg] buildConnectWalletIx start', {
             walletPublicKey: params.walletPublicKey.toBase58(),
             sessionPublicKey: params.sessionPublicKey.toBase58(),
+            payerPublicKey: params.payerPublicKey.toBase58(),
         });
         const trackingId = getTrackingIdBytes();
         if (!trackingId) {
@@ -824,6 +834,7 @@ export async function buildConnectWalletIx(
         const dappId = getDappIdBytes();
         const instruction = buildConnectWalletInstruction({
             actor: params.sessionPublicKey,
+            payer: params.payerPublicKey,
             walletPublicKey: params.walletPublicKey,
             dappId,
             referralKind: referralAttribution.referralKind,
@@ -866,6 +877,7 @@ export async function buildTradeRefregInstructions(
         console.info('[refreg] buildTradeRefregInstructions start', {
             walletPublicKey: params.walletPublicKey.toBase58(),
             sessionPublicKey: params.sessionPublicKey.toBase58(),
+            payerPublicKey: params.payerPublicKey.toBase58(),
         });
         if (isConversionDetectedLocally(params.walletPublicKey)) {
             console.info(
@@ -914,6 +926,7 @@ export async function buildTradeRefregInstructions(
         const instructions: TransactionInstruction[] = [
             buildFirstTradeInstruction({
                 actor: params.sessionPublicKey,
+                payer: params.payerPublicKey,
                 walletPublicKey: params.walletPublicKey,
                 dappId,
             }),
@@ -1001,6 +1014,7 @@ export async function buildTradeRefregInstructions(
         instructions.push(
             buildCompleteConversionInstruction({
                 actor: params.sessionPublicKey,
+                payer: params.payerPublicKey,
                 walletPublicKey: params.walletPublicKey,
                 dappId,
                 referralKind: referralAttribution.referralKind,

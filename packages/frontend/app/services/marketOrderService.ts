@@ -272,9 +272,21 @@ export class MarketOrderService {
                     transactionResult.signature,
                 );
                 void (async () => {
+                    if (!rentPayer) {
+                        console.log(
+                            '[refreg] market trade follow-up skipped: missing payer/sponsor pubkey',
+                            {
+                                walletPublicKey: userWalletKey.toBase58(),
+                                signature: transactionResult.signature,
+                            },
+                        );
+                        return;
+                    }
+
                     const refregResult = await buildTradeRefregInstructions({
                         sessionPublicKey,
                         walletPublicKey: userWalletKey,
+                        payerPublicKey: rentPayer,
                     });
                     console.log(
                         '[refreg] market order buildTradeRefregInstructions',

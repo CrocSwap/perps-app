@@ -81,6 +81,9 @@ describe('refreg instruction builders', () => {
 
     it('encodes connect_wallet with tag=1, length=98, canonical-wallet PDA seed, and account order', () => {
         const actor = new PublicKey('11111111111111111111111111111111');
+        const payer = new PublicKey(
+            'E4fSAVhA2f7hELMzb4UqQz9Sfj1R2fuW9x4rbxruq7as',
+        );
         const wallet = new PublicKey(
             '3NgWnYjgV5Uk5ja5uwjL4f8dp9aDraHn6Fu4By8wY6xk',
         );
@@ -90,6 +93,7 @@ describe('refreg instruction builders', () => {
 
         const ix = buildConnectWalletInstruction({
             actor,
+            payer,
             walletPublicKey: wallet,
             dappId,
             referralKind: 1,
@@ -119,28 +123,33 @@ describe('refreg instruction builders', () => {
             Array.from(trackingId),
         );
 
-        expect(ix.keys).toHaveLength(5);
+        expect(ix.keys).toHaveLength(6);
         expect(ix.keys[0]).toEqual({
             pubkey: actor,
             isSigner: true,
             isWritable: true,
         });
         expect(ix.keys[1]).toEqual({
+            pubkey: payer,
+            isSigner: true,
+            isWritable: true,
+        });
+        expect(ix.keys[2]).toEqual({
             pubkey: expectedRecord,
             isSigner: false,
             isWritable: true,
         });
-        expect(ix.keys[2]).toEqual({
+        expect(ix.keys[3]).toEqual({
             pubkey: SystemProgram.programId,
             isSigner: false,
             isWritable: false,
         });
-        expect(ix.keys[3]).toEqual({
+        expect(ix.keys[4]).toEqual({
             pubkey: SYSVAR_CLOCK_PUBKEY,
             isSigner: false,
             isWritable: false,
         });
-        expect(ix.keys[4]).toEqual({
+        expect(ix.keys[5]).toEqual({
             pubkey: SYSVAR_RENT_PUBKEY,
             isSigner: false,
             isWritable: false,
@@ -149,6 +158,9 @@ describe('refreg instruction builders', () => {
 
     it('encodes first_trade with tag=2, length=33 and canonical-wallet PDA seed', () => {
         const actor = new PublicKey('11111111111111111111111111111111');
+        const payer = new PublicKey(
+            'E4fSAVhA2f7hELMzb4UqQz9Sfj1R2fuW9x4rbxruq7as',
+        );
         const wallet = new PublicKey(
             '4n4VG5orhYkUUFagfXyyCB7cb4f1vU6H6PzF5fS6vrUK',
         );
@@ -156,6 +168,7 @@ describe('refreg instruction builders', () => {
 
         const ix = buildFirstTradeInstruction({
             actor,
+            payer,
             walletPublicKey: wallet,
             dappId,
         });
@@ -172,11 +185,14 @@ describe('refreg instruction builders', () => {
         expect(ix.data.length).toBe(33);
         expect(ix.data[0]).toBe(2);
         expect(Array.from(ix.data.slice(1, 33))).toEqual(Array.from(dappId));
-        expect(ix.keys[1].pubkey.toBase58()).toBe(expectedRecord.toBase58());
+        expect(ix.keys[2].pubkey.toBase58()).toBe(expectedRecord.toBase58());
     });
 
     it('encodes complete_conversion with tag=0, length=98 and referral PDA seed', () => {
         const actor = new PublicKey('11111111111111111111111111111111');
+        const payer = new PublicKey(
+            'E4fSAVhA2f7hELMzb4UqQz9Sfj1R2fuW9x4rbxruq7as',
+        );
         const wallet = new PublicKey(
             '6i9Y67g9Rz8n6U1Xc4ha3nBnLVEz6tVw4uk8cHnauq6p',
         );
@@ -186,6 +202,7 @@ describe('refreg instruction builders', () => {
 
         const ix = buildCompleteConversionInstruction({
             actor,
+            payer,
             walletPublicKey: wallet,
             dappId,
             referralKind: 0,
@@ -201,7 +218,7 @@ describe('refreg instruction builders', () => {
         expect(ix.data.length).toBe(98);
         expect(ix.data[0]).toBe(0);
         expect(ix.data[33]).toBe(0);
-        expect(ix.keys[1].pubkey.toBase58()).toBe(expectedRecord.toBase58());
+        expect(ix.keys[2].pubkey.toBase58()).toBe(expectedRecord.toBase58());
     });
 
     it('paddedStringToId32 returns left-padded ASCII bytes and rejects invalid input', () => {
@@ -229,10 +246,14 @@ describe('refreg instruction builders', () => {
             '3NgWnYjgV5Uk5ja5uwjL4f8dp9aDraHn6Fu4By8wY6xk',
         );
         const actor = new PublicKey('11111111111111111111111111111111');
+        const payer = new PublicKey(
+            'E4fSAVhA2f7hELMzb4UqQz9Sfj1R2fuW9x4rbxruq7as',
+        );
 
         const result = await buildConnectWalletIx({
             sessionPublicKey: actor,
             walletPublicKey: wallet,
+            payerPublicKey: payer,
         });
 
         expect(result).not.toBeNull();
@@ -254,10 +275,14 @@ describe('refreg instruction builders', () => {
             '4n4VG5orhYkUUFagfXyyCB7cb4f1vU6H6PzF5fS6vrUK',
         );
         const actor = new PublicKey('11111111111111111111111111111111');
+        const payer = new PublicKey(
+            'E4fSAVhA2f7hELMzb4UqQz9Sfj1R2fuW9x4rbxruq7as',
+        );
 
         const result = await buildConnectWalletIx({
             sessionPublicKey: actor,
             walletPublicKey: wallet,
+            payerPublicKey: payer,
         });
 
         expect(result).not.toBeNull();
@@ -270,6 +295,9 @@ describe('refreg instruction builders', () => {
 
     it('sendStandaloneRefregTransactions sends each instruction as its own tx in sequence', async () => {
         const actor = new PublicKey('11111111111111111111111111111111');
+        const payer = new PublicKey(
+            'E4fSAVhA2f7hELMzb4UqQz9Sfj1R2fuW9x4rbxruq7as',
+        );
         const wallet = new PublicKey(
             '6i9Y67g9Rz8n6U1Xc4ha3nBnLVEz6tVw4uk8cHnauq6p',
         );
@@ -279,11 +307,13 @@ describe('refreg instruction builders', () => {
 
         const firstTradeIx = buildFirstTradeInstruction({
             actor,
+            payer,
             walletPublicKey: wallet,
             dappId,
         });
         const completeConversionIx = buildCompleteConversionInstruction({
             actor,
+            payer,
             walletPublicKey: wallet,
             dappId,
             referralKind: 1,
@@ -312,6 +342,9 @@ describe('refreg instruction builders', () => {
 
     it('sendStandaloneRefregTransactions continues after a send failure', async () => {
         const actor = new PublicKey('11111111111111111111111111111111');
+        const payer = new PublicKey(
+            'E4fSAVhA2f7hELMzb4UqQz9Sfj1R2fuW9x4rbxruq7as',
+        );
         const wallet = new PublicKey(
             '6i9Y67g9Rz8n6U1Xc4ha3nBnLVEz6tVw4uk8cHnauq6p',
         );
@@ -319,11 +352,13 @@ describe('refreg instruction builders', () => {
 
         const firstTradeIx = buildFirstTradeInstruction({
             actor,
+            payer,
             walletPublicKey: wallet,
             dappId,
         });
         const secondFirstTradeIx = buildFirstTradeInstruction({
             actor,
+            payer,
             walletPublicKey: wallet,
             dappId: bytesFromNumber(32),
         });

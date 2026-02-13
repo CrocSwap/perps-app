@@ -139,9 +139,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
         const walletPublicKey = sessionState.walletPublicKey;
         const sessionPublicKey = sessionState.sessionPublicKey;
+        const payerPublicKey = sessionState.payer;
         if (!walletPublicKey || !sessionPublicKey) {
             console.info(
                 '[refreg] connect_wallet effect skipped: missing wallet/session pubkey',
+            );
+            return;
+        }
+        if (!payerPublicKey) {
+            console.info(
+                '[refreg] connect_wallet effect skipped: missing payer/sponsor pubkey',
             );
             return;
         }
@@ -150,11 +157,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             console.info('[refreg] building connect_wallet instruction', {
                 walletPublicKey: walletPublicKey.toBase58(),
                 sessionPublicKey: sessionPublicKey.toBase58(),
+                payerPublicKey: payerPublicKey.toBase58(),
             });
 
             const connectWallet = await buildConnectWalletIx({
                 sessionPublicKey,
                 walletPublicKey,
+                payerPublicKey,
             });
 
             if (!connectWallet) {
@@ -188,26 +197,58 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             lastConnectWalletKeyRef.current = connectWallet.fingerprint;
 
             try {
+                const submitStartedAt = Date.now();
+                const instruction = connectWallet.instruction;
+                const instructionTag =
+                    instruction.data.length > 0 ? instruction.data[0] : null;
+
                 console.info('[refreg] sending connect_wallet tx', {
                     fingerprint: connectWallet.fingerprint,
+                    walletPublicKey: walletPublicKey.toBase58(),
+                    sessionPublicKey: sessionPublicKey.toBase58(),
                     referralKind:
                         connectWallet.referralAttribution.referralKind,
                     referralSourceValue:
                         connectWallet.referralAttribution.sourceValue,
+                    instructionProgramId:
+                        connectWallet.instruction.programId.toBase58(),
+                    instructionTag,
+                    instructionDataLength: instruction.data.length,
+                    instructionKeyCount: instruction.keys.length,
+                    instructionKeys: instruction.keys.map((key, index) => ({
+                        index,
+                        pubkey: key.pubkey.toBase58(),
+                        isSigner: key.isSigner,
+                        isWritable: key.isWritable,
+                    })),
                 });
                 const transactionResult = await sessionState.sendTransaction([
                     connectWallet.instruction,
                 ]);
+                const submitDurationMs = Date.now() - submitStartedAt;
+                const txHash = transactionResult?.signature ?? null;
+                const hasTransactionError =
+                    Boolean(transactionResult) &&
+                    typeof transactionResult === 'object' &&
+                    'error' in transactionResult;
 
-                console.info(
-                    '[refreg] connect_wallet tx result:',
+                console.info('[refreg] connect_wallet tx submission resolved', {
+                    fingerprint: connectWallet.fingerprint,
+                    walletPublicKey: walletPublicKey.toBase58(),
+                    txHash,
+                    signature: txHash,
+                    confirmed: transactionResult?.confirmed ?? null,
+                    submitDurationMs,
+                    hasTransactionError,
                     transactionResult,
-                );
+                });
                 if (transactionResult?.signature) {
-                    console.info(
-                        '[refreg] connect_wallet tx signature:',
-                        transactionResult.signature,
-                    );
+                    console.info('[refreg] connect_wallet tx hash received', {
+                        txHash: transactionResult.signature,
+                        signature: transactionResult.signature,
+                        walletPublicKey: walletPublicKey.toBase58(),
+                        submitDurationMs,
+                    });
 
                     void pollConnectWalletConsistency({
                         walletPublicKey,
@@ -231,15 +272,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                         });
                 } else {
                     console.log(
-                        '[refreg] connect_wallet tx returned without signature; consistency checks skipped',
+                        '[refreg] connect_wallet tx returned without tx hash/signature; consistency checks skipped',
                         {
+                            fingerprint: connectWallet.fingerprint,
                             walletPublicKey: walletPublicKey.toBase58(),
+                            submitDurationMs,
+                            hasTransactionError,
                             transactionResult,
                         },
                     );
                 }
             } catch (error) {
-                console.info('[refreg] connect_wallet failed:', error);
+                console.info('[refreg] connect_wallet sendTransaction threw:', {
+                    fingerprint: connectWallet.fingerprint,
+                    walletPublicKey: walletPublicKey.toBase58(),
+                    sessionPublicKey: sessionPublicKey.toBase58(),
+                    error,
+                });
                 lastConnectWalletKeyRef.current = null;
             }
         })();
