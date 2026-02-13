@@ -577,7 +577,14 @@
         "xCTA": "Compartir en 𝕏",
         "copyLinkCTA": "Copiar enlace",
         "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora",
-        "sharePosition": "Compartir posición con PnL {{pnl}}"
+        "sharePosition": "Compartir posición con PnL {{pnl}}",
+
+        "pnl": "PnL",
+        "details": "Detalles",
+        "copyImageCTA": "Copiar imagen",
+        "copying": "Copiando…",
+        "copied": "¡Copiado!",
+        "shareHint": "Hacer clic en Compartir en 𝕏 y copiar la imagen a tu portapapeles"
     },
     "colors": {
         "default": "Predeterminado",
@@ -654,6 +661,25 @@
     },
     "chart": {
         "liqPrice": "Precio liq."
+    },
+    "quickTrade": {
+        "title": "Modo de comercio rápido",
+        "quick": "Rápido",
+        "quickWithType": "Rápido {{tradeType}}",
+        "sizeTooltip": "Tamaño: {{size}} {{currency}}",
+        "clickToEnable": "Haz clic para activar el modo de comercio rápido",
+        "sellAtLimit": "Vender @ {{price}} límite",
+        "buyAtLimit": "Comprar @ {{price}} límite",
+        "buyAtStop": "Comprar @ {{price}} stop",
+        "sellAtStop": "Vender @ {{price}} stop",
+        "sellSizeAtLimit": "Vender {{size}} @ {{price}} límite",
+        "buySizeAtLimit": "Comprar {{size}} @ {{price}} límite",
+        "buySizeAtStop": "Comprar {{size}} @ {{price}} stop",
+        "sellSizeAtStop": "Vender {{size}} @ {{price}} stop",
+        "infoText": "Haz clic en el gráfico para colocar órdenes preconfiguradas",
+        "description": "Las operaciones rápidas rellenan el formulario de orden con el precio seleccionado y tu tamaño elegido. Marca la casilla de abajo para enviar la orden inmediatamente con clic izquierdo, omitiendo la confirmación del formulario. El menú de clic derecho y el menú del botón más también incluyen opciones para operar rápidamente sin confirmación incluso cuando está desactivado.",
+        "enableConfirmationBypass": "Omitir confirmación y enviar la orden al hacer clic",
+        "saveAndEnable": "Guardar y activar"
     },
     "meta": {
         "title": "Ambient Finance | Futuros perpetuos en Fogo",

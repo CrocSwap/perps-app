@@ -1,0 +1,332 @@
+/* ============================================
+   INLINE EXPANDED VARIANT - Compact horizontal bar
+   ============================================ */
+
+.inlineContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-m);
+    padding: var(--padding-xs) var(--padding-s);
+    background: var(--bg-dark3, #1e1e24);
+    border-top: 1px solid var(--border, #333);
+    min-height: 36px;
+}
+
+.inlineData {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-l);
+    flex-wrap: wrap;
+}
+
+.inlineItem {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+.inlineLabel {
+    font-size: var(--font-size-xs, 10px);
+    color: var(--text2, #6a6a6d);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.inlineValue {
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1, #f0f0f8);
+}
+
+.inlineActions {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+    flex-shrink: 0;
+}
+
+.inlineActionBtn {
+    padding: 4px 8px;
+    background: transparent;
+    border: 1px solid var(--border, #333);
+    border-radius: var(--radius-xs, 3px);
+    color: var(--text2, #6a6a6d);
+    font-size: var(--font-size-xs, 10px);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.inlineActionBtn:hover {
+    border-color: var(--text2);
+    color: var(--text1, #f0f0f8);
+}
+
+.actionDivider {
+    width: 1px;
+    height: 16px;
+    background: var(--border, #333);
+    margin: 0 var(--gap-xs);
+}
+
+.inlineCloseBtn,
+.inlineLimitBtn {
+    padding: 4px 10px;
+    border: none;
+    border-radius: var(--radius-xs, 3px);
+    font-size: var(--font-size-xs, 10px);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.inlineCloseBtn {
+    background: var(--accent1, #7371fc);
+    color: white;
+}
+
+.inlineCloseBtn:hover {
+    background: var(--accent1-hover, #5a58d4);
+}
+
+.inlineLimitBtn {
+    background: transparent;
+    border: 1px solid var(--accent1, #7371fc);
+    color: var(--accent1, #7371fc);
+}
+
+.inlineLimitBtn:hover {
+    background: rgba(115, 113, 252, 0.1);
+}
+
+/* ============================================
+   BOTTOM SHEET VARIANT STYLES
+   ============================================ */
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.sheet {
+    width: 100%;
+    max-height: 85vh;
+    background: var(--bg-dark2, #1a1a1f);
+    border-radius: 16px 16px 0 0;
+    padding: var(--padding-s) var(--padding-m) var(--padding-l);
+    overflow-y: auto;
+    transform: translateY(100%);
+    animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.handleBar {
+    width: 32px;
+    height: 4px;
+    background: var(--text2, #6a6a6d);
+    border-radius: 2px;
+    margin: 0 auto var(--margin-s);
+    opacity: 0.4;
+}
+
+.sheetHeader {
+    margin-bottom: var(--margin-m);
+}
+
+.titleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--margin-s);
+}
+
+.coinBadge {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+    padding: 4px 8px;
+    border: 1px solid;
+    border-radius: var(--radius-s, 4px);
+}
+
+.coinName {
+    font-size: var(--font-size-m, 14px);
+    font-weight: 600;
+}
+
+.leverageBadge {
+    font-size: var(--font-size-xs, 10px);
+    opacity: 0.8;
+}
+
+.directionBadge {
+    font-size: var(--font-size-xs, 10px);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    opacity: 0.7;
+}
+
+.closeButton {
+    background: transparent;
+    border: none;
+    color: var(--text2, #6a6a6d);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-xs, 3px);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeButton:hover {
+    background: var(--bg-dark4, #2a2a2f);
+    color: var(--text1, #f0f0f8);
+}
+
+.pnlHero {
+    text-align: center;
+    padding: var(--padding-s) 0;
+}
+
+.pnlValueLarge {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.pnlPercentLarge {
+    display: block;
+    font-size: var(--font-size-m, 14px);
+    opacity: 0.85;
+    margin-top: 2px;
+}
+
+.sheetGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap-s);
+    padding: var(--padding-s);
+    background: var(--bg-dark3, #222228);
+    border-radius: var(--radius-s, 4px);
+    margin-bottom: var(--margin-m);
+}
+
+.gridItem {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.gridLabel {
+    font-size: var(--font-size-xs, 10px);
+    color: var(--text2, #6a6a6d);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.gridValue {
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1, #f0f0f8);
+    font-weight: 500;
+}
+
+.sheetActions {
+    display: flex;
+    gap: var(--gap-xs);
+    margin-bottom: var(--margin-s);
+}
+
+.secondaryButton {
+    flex: 1;
+    padding: 8px 12px;
+    background: var(--bg-dark4, #2a2a2f);
+    border: 1px solid var(--border, #333);
+    border-radius: var(--radius-xs, 3px);
+    color: var(--text1, #f0f0f8);
+    font-size: var(--font-size-s, 12px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.secondaryButton:hover {
+    background: var(--bg-dark5, #3a3a3f);
+    border-color: var(--text2);
+}
+
+.sheetCloseActions {
+    display: flex;
+    gap: var(--gap-xs);
+}
+
+.marketCloseButton,
+.limitCloseButton {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: var(--radius-xs, 3px);
+    font-size: var(--font-size-s, 12px);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.marketCloseButton {
+    background: var(--accent1, #7371fc);
+    color: white;
+}
+
+.marketCloseButton:hover {
+    background: var(--accent1-hover, #5a58d4);
+}
+
+.limitCloseButton {
+    background: transparent;
+    border: 1px solid var(--accent1, #7371fc);
+    color: var(--accent1, #7371fc);
+}
+
+.limitCloseButton:hover {
+    background: rgba(115, 113, 252, 0.1);
+}
+
+/* Responsive: stack inline items if too narrow */
+@container (max-width: 600px) {
+    .inlineContainer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--gap-s);
+        padding: var(--padding-s);
+    }
+
+    .inlineActions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

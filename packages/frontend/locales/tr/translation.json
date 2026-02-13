@@ -577,7 +577,14 @@
         "xCTA": "𝕏'te paylaş",
         "copyLinkCTA": "Bağlantıyı kopyala",
         "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap",
-        "sharePosition": "PnL {{pnl}} pozisyonunu paylaş"
+        "sharePosition": "PnL {{pnl}} pozisyonunu paylaş",
+
+        "pnl": "PnL",
+        "details": "Detaylar",
+        "copyImageCTA": "Görseli kopyala",
+        "copying": "Kopyalanıyor…",
+        "copied": "Kopyalandı!",
+        "shareHint": "X’te Paylaş’a tıklamak, görseli panonuza da kopyalar"
     },
     "colors": {
         "default": "Varsayılan",
@@ -654,6 +661,25 @@
     },
     "chart": {
         "liqPrice": "Lik. fiyatı"
+    },
+    "quickTrade": {
+        "title": "Hızlı İşlem Modu",
+        "quick": "Hızlı",
+        "quickWithType": "Hızlı {{tradeType}}",
+        "sizeTooltip": "Boyut: {{size}} {{currency}}",
+        "clickToEnable": "Hızlı işlem modunu etkinleştirmek için tıklayın",
+        "sellAtLimit": "{{price}} Limit Sat",
+        "buyAtLimit": "{{price}} Limit Al",
+        "buyAtStop": "{{price}} Stop Al",
+        "sellAtStop": "{{price}} Stop Sat",
+        "sellSizeAtLimit": "{{size}} {{price}} Limit Sat",
+        "buySizeAtLimit": "{{size}} {{price}} Limit Al",
+        "buySizeAtStop": "{{size}} {{price}} Stop Al",
+        "sellSizeAtStop": "{{size}} {{price}} Stop Sat",
+        "infoText": "Grafiğe tıklayarak önceden yapılandırılmış emirler verin",
+        "description": "Hızlı işlemler, tıkladığınız fiyat ve seçtiğiniz boyutla emir formunu doldurur. Aşağıdaki kutuyu işaretleyerek sol tıklamada onay adımını atlayıp emri hemen gönderebilirsiniz. Sağ tık menüsü ve artı düğmesi menüsü, devre dışıyken bile onaysız hızlı işlem seçenekleri sunar.",
+        "enableConfirmationBypass": "Onayı atla ve tıklamayla emri gönder",
+        "saveAndEnable": "Kaydet ve Etkinleştir"
     },
     "meta": {
         "title": "Ambient Finance | Fogo Süresiz Vadeli İşlemler",

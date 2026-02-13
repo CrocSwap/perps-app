@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
 import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradingview';
-import OverlayCanvas from '~/routes/chart/overlayCanvas/overlayCanvas';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
 import YaxisOverlayCanvas from '~/routes/chart/overlayCanvas/yAxisOverlayCanvas';
+import OrderLinesOverlayCanvas from '~/routes/chart/overlayCanvas/OrderLinesOverlayCanvas';
+import LimitOrderPlacementCanvas from '~/routes/chart/overlayCanvas/LimitOrderPlacementCanvas';
+import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
+import { QuickModeConfirmModal } from '~/routes/chart/components/QuickModeConfirmModal';
 import type { TabType } from '~/routes/trade';
 
 interface TradingViewWrapperProps {
@@ -24,6 +27,12 @@ const TradingViewWrapper: React.FC<TradingViewWrapperProps> = ({
     // Use a key to force remount of TradingViewProvider when coming back online
     const { lastOnlineAt } = useAppStateStore();
     const [chartKey, setChartKey] = useState(0);
+    const {
+        showQuickModeConfirm,
+        closeQuickModeConfirm,
+        saveQuickModeSettings,
+        saveAndEnableQuickMode,
+    } = useOrderPlacementStore();
 
     useEffect(() => {
         let mounted = true;
@@ -83,9 +92,18 @@ const TradingViewWrapper: React.FC<TradingViewWrapperProps> = ({
                     switchTab={switchTab}
                 >
                     <TradingViewChart />
-                    <OverlayCanvas />
+                    <OrderLinesOverlayCanvas />
+                    <LimitOrderPlacementCanvas />
                     <YaxisOverlayCanvas />
                 </TradingViewProvider>
+            )}
+
+            {showQuickModeConfirm && (
+                <QuickModeConfirmModal
+                    onClose={closeQuickModeConfirm}
+                    onSave={saveQuickModeSettings}
+                    onSaveAndEnable={saveAndEnableQuickMode}
+                />
             )}
         </div>
     );

@@ -18,6 +18,8 @@ export default function WsConnectionChecker() {
         useAppStateStore();
 
     const titleSetterIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const titleWorkerRef = useRef<Worker | null>(null);
+    const titleWorkerUrlRef = useRef<string | null>(null);
     const [tokenId, setTokenId] = useState<string>('');
 
     const { fetchTokenId, fetchTokenDetails } = useInfoApi();
@@ -29,12 +31,10 @@ export default function WsConnectionChecker() {
     const isTabPassive = useRef(false);
     const [hideReconnectIndicator, setHideReconnectIndicator] = useState(false);
 
-    const sleepModeBlackList = new Set([Pages.HOME]);
-
     const { page } = usePage();
 
     useEffect(() => {
-        if (page && sleepModeBlackList.has(page)) {
+        if (page === Pages.HOME) {
             setHideReconnectIndicator(true);
         } else {
             setHideReconnectIndicator(false);
@@ -97,7 +97,36 @@ export default function WsConnectionChecker() {
             };
             fetcher();
 
-            titleSetterIntervalRef.current = setInterval(async () => {
+            if (titleSetterIntervalRef.current) {
+                clearInterval(titleSetterIntervalRef.current);
+                titleSetterIntervalRef.current = null;
+            }
+
+            if (titleWorkerRef.current) {
+                titleWorkerRef.current.terminate();
+                titleWorkerRef.current = null;
+            }
+            if (titleWorkerUrlRef.current) {
+                URL.revokeObjectURL(titleWorkerUrlRef.current);
+                titleWorkerUrlRef.current = null;
+            }
+
+            const workerBlob = new Blob(
+                [
+                    `let id;
+self.onmessage=function(e){
+  if(e.data==='start'){id=setInterval(function(){self.postMessage('tick')},${WS_SLEEP_MODE_PRICE_CHECK})}
+  if(e.data==='stop'){clearInterval(id)}
+};`,
+                ],
+                { type: 'application/javascript' },
+            );
+            const workerUrl = URL.createObjectURL(workerBlob);
+            const worker = new Worker(workerUrl);
+            titleWorkerRef.current = worker;
+            titleWorkerUrlRef.current = workerUrl;
+
+            worker.onmessage = async () => {
                 if (tokenId) {
                     const tokenDetails = await fetchTokenDetails(tokenId);
                     // update page title
@@ -106,10 +135,20 @@ export default function WsConnectionChecker() {
                     );
                     updateSymbolInfo(tokenDetails); // update symbol price in store also
                 }
-            }, WS_SLEEP_MODE_PRICE_CHECK);
+            };
+            worker.postMessage('start');
         } else {
             if (titleSetterIntervalRef.current) {
                 clearInterval(titleSetterIntervalRef.current);
+                titleSetterIntervalRef.current = null;
+            }
+            if (titleWorkerRef.current) {
+                titleWorkerRef.current.terminate();
+                titleWorkerRef.current = null;
+            }
+            if (titleWorkerUrlRef.current) {
+                URL.revokeObjectURL(titleWorkerUrlRef.current);
+                titleWorkerUrlRef.current = null;
             }
             setTitleOverride('');
         }
@@ -117,6 +156,15 @@ export default function WsConnectionChecker() {
         return () => {
             if (titleSetterIntervalRef.current) {
                 clearInterval(titleSetterIntervalRef.current);
+                titleSetterIntervalRef.current = null;
+            }
+            if (titleWorkerRef.current) {
+                titleWorkerRef.current.terminate();
+                titleWorkerRef.current = null;
+            }
+            if (titleWorkerUrlRef.current) {
+                URL.revokeObjectURL(titleWorkerUrlRef.current);
+                titleWorkerUrlRef.current = null;
             }
         };
     }, [isWsSleepMode, symbol, tokenId]);

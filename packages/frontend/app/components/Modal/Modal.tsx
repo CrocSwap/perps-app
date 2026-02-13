@@ -11,6 +11,7 @@ interface ModalProps {
     children: ReactNode;
     mobileBreakpoint?: number;
     forceBottomSheet?: boolean;
+    noHeader?: boolean;
     title: string;
     stopOutsideClick?: boolean;
 }
@@ -24,6 +25,7 @@ export default function Modal(props: ModalProps) {
         mobileBreakpoint = 768,
         forceBottomSheet = false,
         title,
+        noHeader = false,
         stopOutsideClick = false,
     } = props;
 
@@ -44,6 +46,7 @@ export default function Modal(props: ModalProps) {
             title,
             position: actualPosition,
             content: children,
+            noHeader,
             onRequestClose: close, // host closes → call caller's close()
             stopOutsideClick,
         });
@@ -59,11 +62,12 @@ export default function Modal(props: ModalProps) {
     useEffect(() => {
         update({
             title,
+            noHeader,
             position: actualPosition,
             content: children,
             stopOutsideClick,
         });
-    }, [title, actualPosition, children, stopOutsideClick, update]);
+    }, [title, actualPosition, children, noHeader, stopOutsideClick, update]);
 
     // Nothing is rendered locally; global host handles it.
     return null;

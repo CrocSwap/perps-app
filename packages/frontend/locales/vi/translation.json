@@ -577,7 +577,14 @@
         "xCTA": "Chia sẻ lên 𝕏",
         "copyLinkCTA": "Sao chép liên kết",
         "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay",
-        "sharePosition": "Chia sẻ vị thế với PnL {{pnl}}"
+        "sharePosition": "Chia sẻ vị thế với PnL {{pnl}}",
+
+        "pnl": "PnL",
+        "details": "Chi tiết",
+        "copyImageCTA": "Sao chép hình ảnh",
+        "copying": "Đang sao chép…",
+        "copied": "Đã sao chép!",
+        "shareHint": "Nhấn Chia sẻ trên X cũng sẽ sao chép hình ảnh vào bộ nhớ tạm của bạn"
     },
     "colors": {
         "default": "Mặc định",
@@ -654,6 +661,25 @@
     },
     "chart": {
         "liqPrice": "Giá thanh lý"
+    },
+    "quickTrade": {
+        "title": "Chế độ giao dịch nhanh",
+        "quick": "Nhanh",
+        "quickWithType": "Nhanh {{tradeType}}",
+        "sizeTooltip": "Khối lượng: {{size}} {{currency}}",
+        "clickToEnable": "Nhấp để bật chế độ giao dịch nhanh",
+        "sellAtLimit": "Bán @ {{price}} giới hạn",
+        "buyAtLimit": "Mua @ {{price}} giới hạn",
+        "buyAtStop": "Mua @ {{price}} dừng",
+        "sellAtStop": "Bán @ {{price}} dừng",
+        "sellSizeAtLimit": "Bán {{size}} @ {{price}} giới hạn",
+        "buySizeAtLimit": "Mua {{size}} @ {{price}} giới hạn",
+        "buySizeAtStop": "Mua {{size}} @ {{price}} dừng",
+        "sellSizeAtStop": "Bán {{size}} @ {{price}} dừng",
+        "infoText": "Nhấp vào biểu đồ để đặt lệnh đã cấu hình sẵn",
+        "description": "Giao dịch nhanh sẽ điền biểu mẫu lệnh với mức giá đã nhấp và khối lượng bạn chọn. Chọn ô bên dưới để gửi lệnh ngay khi nhấp chuột trái, bỏ qua bước xác nhận trên biểu mẫu. Menu chuột phải và menu nút dấu cộng cũng có các tùy chọn giao dịch nhanh không cần xác nhận ngay cả khi đang tắt.",
+        "enableConfirmationBypass": "Bỏ qua xác nhận và gửi lệnh khi nhấp",
+        "saveAndEnable": "Lưu và bật"
     },
     "meta": {
         "title": "Ambient Finance | Hợp đồng vĩnh viễn trên Fogo",

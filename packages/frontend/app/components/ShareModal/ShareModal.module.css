@@ -1,23 +1,87 @@
-.share_modal {
-    --button-height: 23px;
+.container {
+    padding: var(--padding-m);
+}
+
+/* Left side - logo at top, swappable content below */
+.leftSide {
+    background-image: url('./shareCardBackground.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     display: flex;
-    flex-direction: row;
-    max-width: 1200px;
-    /* padding: 0 192px; */
-    gap: 24px;
-    padding: 0 50px 50px 50px;
-
-    background-color: var(--bg-dark3);
+    flex-direction: column;
+    overflow: visible;
+    padding: var(--padding-m);
 }
 
-.picture_overlay {
-    display: grid;
-    grid-template-rows: 3fr 5fr 1fr 1fr;
-    width: 900px;
-    height: 500px;
-    padding: var(--padding-l);
+/* Logo - fixed at top */
+.perpsLogo {
+    width: 200px;
+    flex-shrink: 0;
 }
 
+/* Content area below logo - fills remaining space */
+.leftContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+    overflow: visible;
+}
+
+/* Market info for share view */
+.marketInfoContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: var(--padding-m);
+}
+
+/* Right side - always visible */
+.rightSide {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-l);
+}
+
+/* View Toggle */
+.view_toggle {
+    display: flex;
+    gap: 8px;
+    padding: 4px;
+    background-color: var(--bg-dark4);
+    border-radius: var(--radius-m);
+    width: fit-content;
+    align-self: flex-end;
+}
+
+.toggle_btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-s);
+    background-color: transparent;
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+}
+
+.toggle_btn:hover {
+    color: var(--text1);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.toggle_btn.active {
+    background-color: var(--accent1);
+    color: var(--text1);
+}
+
+/* Market info styles */
 .market {
     display: flex;
     flex-direction: column;
@@ -34,10 +98,22 @@
     width: 30px;
     height: 30px;
     border-radius: var(--radius-m);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.symbol_icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .symbol {
     font-size: var(--font-size-l);
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 .yield {
@@ -45,8 +121,11 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    height: 40px;
+    width: 70px;
     padding: var(--padding-xs);
     border-radius: var(--radius-s);
+    /* line-height: 1; */
 }
 
 .market_pct {
@@ -57,6 +136,7 @@
     display: flex;
     flex-direction: row;
     gap: var(--gap-m);
+    flex-wrap: wrap;
 }
 
 .price {
@@ -68,32 +148,16 @@
 .price > div:first-child {
     font-size: var(--text-size-m);
     color: var(--text2);
+    line-height: 1.2;
 }
 
 .price > div:last-child {
     font-size: var(--text-size-m);
     color: var(--text1);
+    line-height: 1.2;
 }
 
-.info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    max-width: 240px;
-}
-
-.referral_code {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    color: var(--text2);
-    font-size: var(--font-size-m);
-}
-
-.referral_code > div:last-child {
-    color: var(--accent3);
-}
-
+/* Custom text area */
 .custom_text {
     display: flex;
     flex-direction: column;
@@ -113,10 +177,10 @@
     border: none;
     resize: none;
     overflow: hidden;
-    color: var(--white);
     font-size: var(--font-size-s) !important;
 }
 
+/* Button bank */
 .button_bank {
     display: flex;
     flex-direction: column;
@@ -125,7 +189,7 @@
 
 .button_bank > button {
     width: 100%;
-    height: var(--button-height);
+    height: var(--button-height, 40px);
     transition: all 0.3s ease-in-out;
     outline: none;
     border: none;
@@ -135,11 +199,237 @@
     gap: var(--gap-s);
     flex-shrink: 0;
     border-radius: var(--radius-s, 8px);
-    background: var(--accent1,);
+    background: var(--accent1);
     color: var(--text1);
     font-size: var(--font-size-m, 18px);
     padding: 1px var(--padding-s);
 }
+
 .button_bank > button:hover {
     background-color: color-mix(in srgb, var(--accent1) 90%, black);
+}
+
+.button_bank > button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Copy button - secondary style */
+.copyButton {
+    background: transparent !important;
+    border: 1px solid var(--accent1) !important;
+    color: var(--accent1) !important;
+}
+
+.copyButton:hover:not(:disabled) {
+    background: rgba(115, 113, 252, 0.1) !important;
+}
+.shareHint {
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    text-align: center;
+}
+
+/* ============================================
+   RESPONSIVE STYLES
+   ============================================ */
+
+@media screen and (min-width: 500px) {
+    .container {
+        min-width: 500px;
+        display: grid;
+        grid-template-columns: 1fr 205px;
+        height: auto;
+        gap: var(--gap-m);
+    }
+
+    .leftSide {
+        height: auto;
+        max-height: none;
+    }
+}
+
+@media screen and (min-width: 769px) {
+    .container {
+        width: 80vw;
+        min-height: 500px;
+        /* max-width: 1200px; */
+        grid-template-columns: 1fr 245px;
+    }
+
+    .perpsLogo {
+        width: 220px;
+    }
+
+    .market_tkn {
+        height: auto !important;
+    }
+
+    .symbol_icon {
+        width: 50px;
+        height: 50px;
+    }
+
+    /* Scale up fonts */
+    .symbol {
+        font-size: calc(var(--font-size-l) * 1.2);
+    }
+
+    .market_pct {
+        font-size: calc(var(--font-size-xxl) * 1.2);
+    }
+
+    .yield {
+        height: 48px;
+        width: 84px;
+        font-size: calc(var(--font-size-s) * 1.15);
+    }
+
+    .price > div:first-child {
+        font-size: var(--font-size-m);
+    }
+
+    .price > div:last-child {
+        font-size: var(--font-size-l);
+    }
+
+    /* Scale up custom text area */
+    .custom_text > label {
+        font-size: calc(var(--font-size-m) * 1.1);
+    }
+
+    .custom_text > textarea {
+        height: 180px;
+        width: 100%;
+        font-size: calc(var(--font-size-s) * 1.15) !important;
+        padding: var(--padding-m);
+    }
+
+    /* Scale up buttons */
+    .button_bank > button {
+        height: 48px;
+        font-size: calc(var(--font-size-m) * 1.1);
+    }
+
+    .toggle_btn {
+        padding: 10px 18px;
+        font-size: calc(var(--font-size-s) * 1.1);
+    }
+
+    /* Adjust spacing */
+    .leftContent {
+        gap: var(--gap-m);
+    }
+
+    .prices {
+        gap: calc(var(--gap-m) * 1.2);
+    }
+    .view_toggle {
+        width: 100%;
+    }
+}
+
+@media screen and (min-width: 1080px) {
+    .container {
+        width: 1000px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .view_toggle {
+        align-self: center;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .toggle_btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .custom_text > textarea {
+        width: 100%;
+    }
+
+    .button_bank > button {
+        height: 40px;
+    }
+
+    .perpsLogo {
+        width: 160px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .container {
+        height: 500px;
+        overflow-y: scroll;
+    }
+
+    .leftSide {
+        min-height: auto;
+        max-height: none;
+        padding: var(--padding-s);
+    }
+
+    .perpsLogo {
+        width: 140px;
+    }
+
+    .symbol_icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .symbol {
+        font-size: var(--font-size-m, 16px);
+    }
+
+    .yield {
+        font-size: var(--font-size-xs, 12px);
+        padding: 2px 6px;
+    }
+
+    .market_pct {
+        font-size: var(--font-size-xl, 24px);
+    }
+
+    .price > div:first-child {
+        font-size: var(--text-size-s, 12px);
+    }
+
+    .price > div:last-child {
+        font-size: var(--text-size-s, 14px);
+    }
+
+    .custom_text > textarea {
+        height: 120px;
+    }
+
+    .toggle_btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+.twitterCapture {
+    background-image: url('./shareCardBackground.png');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding-left: var(--padding-l);
+}
+.twitterCapture .prices {
+    gap: var(--gap-l);
+}
+.twitterCapture .prices > .price > div:first-child {
+    font-size: var(--font-size-xl);
+}
+
+.twitterCapture .prices > .price > div:last-child {
+    font-size: var(--font-size-xxl);
+}
+
+.twitterCapture .market_tkn {
+    padding: var(--padding-s) 0;
 }

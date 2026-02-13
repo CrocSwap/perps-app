@@ -4,6 +4,7 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useRef, useState } from 'react';
+import { Fuul } from '@fuul/sdk';
 import { useFuul } from '~/contexts/FuulContext';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
@@ -45,6 +46,7 @@ import {
 } from '~/utils/keyboardShortcuts';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
+import { useAppStateStore } from '~/stores/AppStateStore';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -67,6 +69,27 @@ export default function PageHeader() {
     const { t } = useTranslation();
 
     const sessionState = useSession();
+    const { isSessionReestablishing } = useAppStateStore();
+
+    // track whether the session has completed its initial resolution
+    // this prevents the 'noWallet' modal from flashing during startup
+    // when the session transitions through NotEstablished before Established
+    const [hasSessionResolved, setHasSessionResolved] = useState(false);
+    useEffect(() => {
+        if (
+            !hasSessionResolved &&
+            !isSessionReestablishing &&
+            !isEstablished(sessionState)
+        ) {
+            // only mark resolved once reestablishing is done and session is not established
+            // i.e. the user genuinely has no wallet connected
+            const timer = setTimeout(() => setHasSessionResolved(true), 500);
+            return () => clearTimeout(timer);
+        }
+        if (isEstablished(sessionState)) {
+            setHasSessionResolved(true);
+        }
+    }, [isSessionReestablishing, sessionState, hasSessionResolved]);
 
     const isUserConnected = isEstablished(sessionState);
     const userPublicKey: string | null = isUserConnected
@@ -424,14 +447,14 @@ export default function PageHeader() {
     const [wasRefCodeModalShown, setWasRefCodeModalShown] = useState(false);
 
     // run the FUUL context
-    const { checkIfCodeExists, isInitialized } = useFuul();
+    const { isInitialized } = useFuul();
 
     // logic to open the ref code modal when relevant
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
-            // check if the code has been registered in the FUUL system
+            // check if the code is a registered, usable referral code
             const isCodeRegistered: boolean =
-                await checkIfCodeExists(codeToCheck);
+                await Fuul.isAffiliateCodeAvailable(codeToCheck);
             // check if the code fits the format of an SVM address
             const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
 
@@ -445,16 +468,19 @@ export default function PageHeader() {
                         refCodeModal.open('badCode');
                     }
                     setWasRefCodeModalShown(true);
-                } else {
+                } else if (hasSessionResolved) {
                     refCodeModal.open('noWallet');
                 }
             }
         };
         // gatekeeping to prevent logic from running when irrelevant
+        // wait for session re-establishment to finish before running
+        // to avoid flashing the 'noWallet' modal during startup
         if (
             isInitialized &&
             referralCodeFromURL.value &&
-            location.pathname !== '/v2/referrals'
+            location.pathname !== '/v2/referrals' &&
+            hasSessionResolved
         ) {
             runLogic(referralCodeFromURL.value);
         }
@@ -463,6 +489,7 @@ export default function PageHeader() {
         referralCodeFromURL.value,
         userPublicKey,
         isUserConnected,
+        hasSessionResolved,
     ]);
 
     // logic to ingest a ref code from the URL

@@ -23,6 +23,8 @@ import { useFuul } from '~/contexts/FuulContext';
 import EnterCode from '~/components/Referrals/EnterCode/EnterCode';
 import CreateCode from '../CreateCode/CreateCode';
 import { checkForPermittedCharacters, checkIfOwnRefCode } from '../functions';
+import { useAppStateStore } from '~/stores/AppStateStore';
+import { debugLog } from '~/utils/debugLog';
 
 interface PropsIF {
     initialTab?: string;
@@ -51,6 +53,19 @@ const REFERRER_PERCENT = '10%';
 const INVITEE_PERCENT = '4%';
 
 export default function CodeTabs(props: PropsIF) {
+    const { isSessionReestablishing } = useAppStateStore();
+
+    const sessionState = useSession();
+
+    const isSessionEstablished = useMemo<boolean>(
+        () => isEstablished(sessionState),
+        [sessionState],
+    );
+
+    useEffect(() => {
+        debugLog({ isSessionReestablishing, isSessionEstablished });
+    }, [isSessionReestablishing, isSessionEstablished]);
+
     // tab which should be open by default on page load
     const { initialTab = 'referrals.enterCode' } = props;
     // tab which is currently open
@@ -63,7 +78,6 @@ export default function CodeTabs(props: PropsIF) {
     // referrer code for use (not temporary during edit mode)
     const [referrerCode, setReferrerCode] = useState('');
     // we need this for FOGO sessions
-    const sessionState = useSession();
     // data on the current user (mainly wallet address)
     const userDataStore = useUserDataStore();
     const referrerAddress = userDataStore.userAddress;
@@ -178,10 +192,8 @@ export default function CodeTabs(props: PropsIF) {
         }
     }, [justCopied]);
 
-    const isSessionEstablished = useMemo<boolean>(
-        () => isEstablished(sessionState),
-        [sessionState],
-    );
+    // run the FUUL context
+    // const { isRefCodeFree, getRefCode } = useFuul();
 
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 

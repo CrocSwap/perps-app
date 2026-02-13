@@ -55,7 +55,7 @@ const LineComponent = ({
         const chartRef = chart.activeChart();
 
         const element = chartRef.getShapeById(id);
-        if (element) chartRef.removeEntity(id);
+        if (element) chartRef.removeEntity(id, { disableUndo: true });
     };
     const cleanupShapes = async () => {
         if (cleanupInProgressRef.current) {
@@ -75,7 +75,10 @@ const LineComponent = ({
                         const { lineId } = order;
 
                         const element = chartRef.getShapeById(lineId);
-                        if (element) chartRef.removeEntity(lineId);
+                        if (element)
+                            chartRef.removeEntity(lineId, {
+                                disableUndo: true,
+                            });
                     }
                 }
             }
@@ -94,6 +97,18 @@ const LineComponent = ({
         const init = async () => {
             setLocalChartReady(false);
             await cleanupShapes();
+
+            if (chart && isChartReady) {
+                const chartRef = chart.activeChart();
+                const allShapes = chartRef.getAllShapes();
+
+                for (const shape of allShapes) {
+                    const shapeObj = chartRef.getShapeById(shape.id);
+                    if (shapeObj && !shapeObj.isSelectionEnabled()) {
+                        chartRef.removeEntity(shape.id, { disableUndo: true });
+                    }
+                }
+            }
 
             if (isChartReady) {
                 timeoutId = setTimeout(() => {
