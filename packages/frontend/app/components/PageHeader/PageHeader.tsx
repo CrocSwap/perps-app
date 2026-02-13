@@ -4,8 +4,6 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useRef, useState } from 'react';
-import { Fuul } from '@fuul/sdk';
-import { useFuul } from '~/contexts/FuulContext';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation, useNavigate } from 'react-router';
@@ -27,11 +25,7 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
-import {
-    URL_PARAMS,
-    useUrlParams,
-    type UrlParamMethodsIF,
-} from '~/hooks/useURLParams';
+import RefCodeModal from './RefCodeModal/RefCodeModal';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
 import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
@@ -45,23 +39,14 @@ import {
     matchesShortcutEvent,
 } from '~/utils/keyboardShortcuts';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
-import { useAppStateStore } from '~/stores/AppStateStore';
 
 export default function PageHeader() {
     // Feedback modal state
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
-    // run the FUUL context
-    const { trackPageView } = useFuul();
-
     const handleFeedbackClose = () => {
         setIsFeedbackOpen(false);
     };
-
-    const referralCodeFromURL: UrlParamMethodsIF = useUrlParams(
-        URL_PARAMS.referralCode,
-    );
 
     const userDataStore = useUserDataStore();
 
@@ -69,32 +54,8 @@ export default function PageHeader() {
     const { t } = useTranslation();
 
     const sessionState = useSession();
-    const { isSessionReestablishing } = useAppStateStore();
-
-    // track whether the session has completed its initial resolution
-    // this prevents the 'noWallet' modal from flashing during startup
-    // when the session transitions through NotEstablished before Established
-    const [hasSessionResolved, setHasSessionResolved] = useState(false);
-    useEffect(() => {
-        if (
-            !hasSessionResolved &&
-            !isSessionReestablishing &&
-            !isEstablished(sessionState)
-        ) {
-            // only mark resolved once reestablishing is done and session is not established
-            // i.e. the user genuinely has no wallet connected
-            const timer = setTimeout(() => setHasSessionResolved(true), 500);
-            return () => clearTimeout(timer);
-        }
-        if (isEstablished(sessionState)) {
-            setHasSessionResolved(true);
-        }
-    }, [isSessionReestablishing, sessionState, hasSessionResolved]);
 
     const isUserConnected = isEstablished(sessionState);
-    const userPublicKey: string | null = isUserConnected
-        ? sessionState.walletPublicKey?.toString()
-        : null;
 
     // Fetch user's total volume for FUUL tracking
     useEffect(() => {
@@ -431,95 +392,6 @@ export default function PageHeader() {
         }
     };
 
-    // logic to open and close the invalid ref code modal
-    const refCodeModal = useModal<
-        'goodCode' | 'badCode' | 'address' | 'noWallet'
-    >('closed');
-    // boolean tracking whether user closed ref code modal
-    const [wasRefCodeModalShown, setWasRefCodeModalShown] = useState(false);
-
-    // run the FUUL context
-    const { isInitialized } = useFuul();
-
-    // logic to open the ref code modal when relevant
-    useEffect(() => {
-        const runLogic = async (codeToCheck: string): Promise<void> => {
-            // check if the code fits the format of an SVM address
-            const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
-            // decision tree to open the ref code modal with the relevant state
-            // don't re-open the modal or run logic if the modal was opened previously
-            if (!wasRefCodeModalShown) {
-                if (isUserConnected) {
-                    if (isCodeSVM) {
-                        refCodeModal.open('address');
-                    } else if (
-                        await Fuul.isAffiliateCodeAvailable(codeToCheck)
-                    ) {
-                        refCodeModal.open('goodCode');
-                    } else {
-                        refCodeModal.open('badCode');
-                    }
-                    setWasRefCodeModalShown(true);
-                } else if (hasSessionResolved) {
-                    refCodeModal.open('noWallet');
-                }
-            }
-        };
-        // gatekeeping to prevent logic from running when irrelevant
-        if (
-            isInitialized &&
-            referralCodeFromURL.value &&
-            location.pathname !== '/v2/referrals' &&
-            hasSessionResolved
-        ) {
-            runLogic(referralCodeFromURL.value);
-        }
-    }, [
-        isInitialized,
-        referralCodeFromURL.value,
-        userPublicKey,
-        isUserConnected,
-        hasSessionResolved,
-    ]);
-
-    // logic to ingest a ref code from the URL
-    useEffect(() => {
-        // fn to ingest a ref code from the URL
-        const handleRefCodeFromURL = async (): Promise<void> => {
-            // gatekeeping to prevent logic from running when irrelevant
-            if (referralCodeFromURL.value) {
-                // persist ref code in the old cache (will remove later)
-                referralStore.cache(referralCodeFromURL.value);
-                // persist ref code in local storage + state
-                if (
-                    // must be a new ref code
-                    referralCodeFromURL.value !== referralStore.cached2.code &&
-                    // gatekeep action if an approved ref code was persisted
-                    !referralStore.cached2.isCodeApprovedByInvitee
-                ) {
-                    referralStore.cache2(referralCodeFromURL.value);
-                }
-            }
-        };
-        // run logic
-        handleRefCodeFromURL();
-    }, [referralCodeFromURL.value]);
-
-    // fn to mock user accepting a ref code
-    function mockAcceptRefCode(refCode: string): void {
-        // dispatch a pageview event to FUUL
-        trackPageView();
-        // update local storage to reflect approval
-        referralStore.markCodeApproved(refCode);
-        // dispatch a notification
-        notificationStore.add({
-            title: 'Referral Code Accepted',
-            message: `You have successfully accepted the ${refCode} referral code.`,
-            icon: 'check',
-            removeAfter: 5000,
-        });
-    }
-
     return (
         <>
             <header id={'pageHeader'} className={styles.container}>
@@ -797,108 +669,7 @@ export default function PageHeader() {
                     <AppOptions closePanel={() => appSettingsModal.close()} />
                 </Modal>
             )}
-            {refCodeModal.isOpen && location.pathname !== '/v2/referrals' && (
-                <Modal
-                    close={refCodeModal.close}
-                    position='center'
-                    title='Referral Code'
-                    stopOutsideClick
-                >
-                    {refCodeModal.content === 'badCode' && (
-                        <div className={styles.invalid_ref_code_modal}>
-                            <p>
-                                The referral code{' '}
-                                <span className={styles.highlight_code}>
-                                    {referralCodeFromURL.value}
-                                </span>{' '}
-                                is not recognized. Please check the code and try
-                                again.
-                            </p>
-                            <Link
-                                to='/v2/referrals'
-                                onClick={refCodeModal.close}
-                            >
-                                Go to Referrals
-                            </Link>
-                        </div>
-                    )}
-                    {refCodeModal.content === 'goodCode' && (
-                        <div className={styles.invalid_ref_code_modal}>
-                            <p>
-                                Please click 'Accept' to accept the{' '}
-                                <span className={styles.highlight_code}>
-                                    {referralCodeFromURL.value}
-                                </span>{' '}
-                                referral code. If you deny this referral code it
-                                can still be activated later on the Referrals
-                                page.
-                            </p>
-                            <div className={styles.referral_code_modal_buttons}>
-                                <button onClick={refCodeModal.close}>
-                                    Deny
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (!referralCodeFromURL.value) {
-                                            return;
-                                        }
-                                        mockAcceptRefCode(
-                                            referralCodeFromURL.value,
-                                        );
-                                        refCodeModal.close();
-                                    }}
-                                >
-                                    Accept
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                    {refCodeModal.content === 'address' && (
-                        <div className={styles.invalid_ref_code_modal}>
-                            <p>
-                                Please click 'Accept' to accept the{' '}
-                                <span className={styles.highlight_code}>
-                                    {referralCodeFromURL.value}
-                                </span>{' '}
-                                referral code (address). This referral can still
-                                be activated later on the Referrals page.
-                            </p>
-                            <div className={styles.referral_code_modal_buttons}>
-                                <button onClick={refCodeModal.close}>
-                                    Deny
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (!referralCodeFromURL.value) {
-                                            return;
-                                        }
-                                        mockAcceptRefCode(
-                                            referralCodeFromURL.value,
-                                        );
-                                        refCodeModal.close();
-                                    }}
-                                >
-                                    Accept
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                    {refCodeModal.content === 'noWallet' && (
-                        <div className={styles.invalid_ref_code_modal}>
-                            <p>
-                                You've been referred to Ambient by a friend.
-                                Please connect your wallet to accept and start
-                                trading with the{' '}
-                                <span className={styles.highlight_code}>
-                                    {referralCodeFromURL.value}
-                                </span>{' '}
-                                referral code.
-                            </p>
-                            <SessionButton />
-                        </div>
-                    )}
-                </Modal>
-            )}
+            <RefCodeModal />
             {PortfolioModalsRenderer}
             <FeedbackModal
                 isOpen={isFeedbackOpen}
