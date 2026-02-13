@@ -452,12 +452,10 @@ export default function PageHeader() {
     // logic to open the ref code modal when relevant
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
-            // check if the code is a registered, usable referral code
-            // const isCodeRegistered: boolean =
-            //     await Fuul.isAffiliateCodeAvailable(codeToCheck);
             // check if the code fits the format of an SVM address
             const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
-
+            // decision tree to open the ref code modal with the relevant state
+            // don't re-open the modal or run logic if the modal was opened previously
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
                     if (isCodeSVM) {
@@ -465,8 +463,6 @@ export default function PageHeader() {
                     } else if (
                         await Fuul.isAffiliateCodeAvailable(codeToCheck)
                     ) {
-                        console.clear();
-                        console.log('making request!');
                         refCodeModal.open('goodCode');
                     } else {
                         refCodeModal.open('badCode');
@@ -478,8 +474,6 @@ export default function PageHeader() {
             }
         };
         // gatekeeping to prevent logic from running when irrelevant
-        // wait for session re-establishment to finish before running
-        // to avoid flashing the 'noWallet' modal during startup
         if (
             isInitialized &&
             referralCodeFromURL.value &&
