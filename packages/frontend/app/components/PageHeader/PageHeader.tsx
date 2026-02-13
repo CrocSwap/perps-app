@@ -453,17 +453,21 @@ export default function PageHeader() {
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
             // check if the code is a registered, usable referral code
-            const isCodeRegistered: boolean =
-                await Fuul.isAffiliateCodeAvailable(codeToCheck);
+            // const isCodeRegistered: boolean =
+            //     await Fuul.isAffiliateCodeAvailable(codeToCheck);
             // check if the code fits the format of an SVM address
             const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
 
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
-                    if (isCodeRegistered) {
-                        refCodeModal.open('goodCode');
-                    } else if (isCodeSVM) {
+                    if (isCodeSVM) {
                         refCodeModal.open('address');
+                    } else if (
+                        await Fuul.isAffiliateCodeAvailable(codeToCheck)
+                    ) {
+                        console.clear();
+                        console.log('making request!');
+                        refCodeModal.open('goodCode');
                     } else {
                         refCodeModal.open('badCode');
                     }
