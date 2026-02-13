@@ -319,11 +319,9 @@ export default function CodeTabs(props: PropsIF) {
             (async () => {
                 try {
                     // check with FUUL to determine if ref code is claimed
-                    const isCodeFree: boolean =
+                    const doesCodeExist: boolean =
                         await checkIfCodeExists(userInputRefCode);
-                    // normally `isCodeFree === true` means the code is available
-                    // right now the API is returning `false` when the code is available
-                    setIsUserRefCodeClaimed(isCodeFree);
+                    setIsUserRefCodeClaimed(doesCodeExist);
                 } catch (error) {
                     setIsUserRefCodeClaimed(false);
                 }
