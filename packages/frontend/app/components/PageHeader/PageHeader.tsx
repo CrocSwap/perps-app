@@ -156,14 +156,6 @@ export default function PageHeader() {
     const showRPCButton = false;
     const location = useLocation();
 
-    // close the ref code modal if the user navigates to the referrals page
-    // gatekeeping at the DOM level alone may desynchronize state
-    useEffect(() => {
-        if (location.pathname === '/v2/referrals') {
-            refCodeModal.close();
-        }
-    }, [location.pathname]);
-
     // symbol for active market
     const { symbol } = useTradeDataStore();
 
