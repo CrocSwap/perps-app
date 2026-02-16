@@ -11,6 +11,8 @@ export interface ReferralStoreIF {
     cached: string;
     cached2: RefCodeCacheIF;
     totVolume: number | undefined;
+    convertedWallets: string[];
+    checkForConversion: (address: string) => Promise<void>;
     cache(refCode: string): void;
     cache2(refCode: string): void;
     markCodeRegistered(refCode: string, isRegistered?: boolean): void;
@@ -25,11 +27,11 @@ const ssrSafeStorage = () =>
     (typeof window !== 'undefined'
         ? window.localStorage
         : {
-              getItem: (_key: string) => null,
-              setItem: (_key: string, _value: string) => {},
-              removeItem: (_key: string) => {},
+              getItem: () => null,
+              setItem: () => {},
+              removeItem: () => {},
               clear: () => {},
-              key: (_index: number) => null,
+              key: () => null,
               length: 0,
           }) as Storage;
 
@@ -42,6 +44,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 isCodeRegistered: undefined,
                 isCodeApprovedByInvitee: undefined,
             },
+            convertedWallets: [],
             totVolume: undefined,
             cache(refCode: string): void {
                 set({ cached: refCode });
@@ -107,6 +110,28 @@ export const useReferralStore = create<ReferralStoreIF>()(
             clear(): void {
                 set({ cached: '', totVolume: undefined });
             },
+            async checkForConversion(address: string): Promise<void> {
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        accept: 'application/json',
+                        authorization:
+                            'Bearer 459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661',
+                    },
+                };
+                fetch(
+                    `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${'4BZFWXMp2cs55pZgDnMfSTciAFBXSQSN1ZPrhkKpED2q'}&user_identifier_type=solana_address`,
+                    options,
+                )
+                    .then((res) => res.json())
+                    .then((res) =>
+                        console.log(
+                            '🔍 [ReferralStore] checkForConversion:',
+                            res.referrer_identifier,
+                        ),
+                    )
+                    .catch((err) => console.error(err));
+            },
         }),
         {
             name: LS_KEY,
@@ -114,6 +139,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
             partialize: (state) => ({
                 cached: state.cached,
                 cached2: state.cached2,
+                convertedWallets: state.convertedWallets,
             }),
             version: 1,
         },

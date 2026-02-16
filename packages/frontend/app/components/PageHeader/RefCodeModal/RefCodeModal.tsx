@@ -33,6 +33,12 @@ export default function RefCodeModal() {
         ? sessionState.walletPublicKey?.toString()
         : null;
 
+    useEffect(() => {
+        if (userPublicKey) {
+            referralStore.checkForConversion(userPublicKey);
+        }
+    }, [userPublicKey]);
+
     // track whether the session has completed its initial resolution
     // this prevents the 'noWallet' modal from flashing during startup
     // when the session transitions through NotEstablished before Established
