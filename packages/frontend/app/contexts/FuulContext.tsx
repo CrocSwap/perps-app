@@ -17,7 +17,8 @@ interface FuulContextType {
         identifierType: UserIdentifierType,
         eventName: string,
     ) => Promise<void>;
-    isRefCodeFree: (code: string) => Promise<boolean>;
+    checkIfCodeExists: (code: string) => Promise<boolean>;
+    checkIfCodeIsAvailableForInviteeToUse: (code: string) => Promise<boolean>;
     getRefCode: (
         userIdentifier: string,
         identifierType: UserIdentifierType,
@@ -28,7 +29,8 @@ const FuulContext = createContext<FuulContextType>({
     isInitialized: false,
     trackPageView: () => {},
     sendConversionEvent: () => Promise.resolve(),
-    isRefCodeFree: () => Promise.resolve(false),
+    checkIfCodeExists: () => Promise.resolve(false),
+    checkIfCodeIsAvailableForInviteeToUse: () => Promise.resolve(false),
     getRefCode: () => Promise.resolve(null),
 });
 
@@ -111,7 +113,9 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
             isInitialized,
             trackPageView,
             sendConversionEvent,
-            isRefCodeFree: Fuul.isAffiliateCodeFree,
+            checkIfCodeExists: Fuul.isAffiliateCodeFree,
+            checkIfCodeIsAvailableForInviteeToUse:
+                Fuul.isAffiliateCodeAvailable,
             getRefCode: Fuul.getAffiliateCode,
         }),
         [isInitialized, trackPageView, sendConversionEvent],

@@ -15,6 +15,8 @@ interface PropsIF {
     setEditModeInvitee: (value: boolean) => void;
     userInputRefCode: string;
     setUserInputRefCode: (value: string) => void;
+    isCheckingCode: boolean;
+    isInputSolanaAddress: boolean;
     isUserRefCodeClaimed: boolean | undefined;
     isUserInputRefCodeSelfOwned: boolean | undefined;
     handleUpdateReferralCode: (code: string) => void;
@@ -33,6 +35,8 @@ export default function EnterCode(props: PropsIF) {
         setEditModeInvitee,
         userInputRefCode,
         setUserInputRefCode,
+        isCheckingCode,
+        isInputSolanaAddress,
         isUserRefCodeClaimed,
         isUserInputRefCodeSelfOwned,
         handleUpdateReferralCode,
@@ -112,21 +116,36 @@ export default function EnterCode(props: PropsIF) {
                     value={userInputRefCode}
                     onChange={(e) => setUserInputRefCode(e.target.value)}
                 />
-                {!isUserRefCodeClaimed &&
-                    userInputRefCode.length <= 30 &&
-                    userInputRefCode.length >= 2 && (
-                        <p>
-                            <Trans
-                                i18nKey='referrals.referralCodeNotValidPleaseConfirm'
-                                values={{ invalidCode: userInputRefCode }}
-                                components={[
-                                    <span
-                                        style={{ color: 'var(--accent2)' }}
-                                    />,
-                                ]}
-                            />
+                {userInputRefCode.length >= 2 &&
+                    (isInputSolanaAddress ? (
+                        <p style={{ color: 'var(--text2)' }}>
+                            This appears to be a wallet address. Please confirm
+                            with your referrer that it is correct.
                         </p>
-                    )}
+                    ) : (
+                        userInputRefCode.length <= 30 &&
+                        (isCheckingCode ? (
+                            <p style={{ color: 'var(--text2)' }}>
+                                Checking code...
+                            </p>
+                        ) : isUserRefCodeClaimed ? (
+                            <p style={{ color: 'var(--positive)' }}>
+                                Code is valid!
+                            </p>
+                        ) : (
+                            <p>
+                                <Trans
+                                    i18nKey='referrals.referralCodeNotValidPleaseConfirm'
+                                    values={{ invalidCode: userInputRefCode }}
+                                    components={[
+                                        <span
+                                            style={{ color: 'var(--accent2)' }}
+                                        />,
+                                    ]}
+                                />
+                            </p>
+                        ))
+                    ))}
                 {isUserInputRefCodeSelfOwned && (
                     <p>
                         <Trans
@@ -144,7 +163,9 @@ export default function EnterCode(props: PropsIF) {
                     bg='accent1'
                     disabled={
                         userInputRefCode.length < 2 ||
-                        userInputRefCode.length > 30 ||
+                        (!isInputSolanaAddress &&
+                            userInputRefCode.length > 30) ||
+                        isCheckingCode ||
                         !isUserRefCodeClaimed ||
                         isUserInputRefCodeSelfOwned
                     }
