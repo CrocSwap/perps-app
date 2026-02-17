@@ -4,7 +4,7 @@ import {
     SessionButton,
     useSession,
 } from '@fogo/sessions-sdk-react';
-import { Link, useLocation } from 'react-router';
+import { Link } from 'react-router';
 import { useModal } from '~/hooks/useModal';
 import Modal from '~/components/Modal/Modal';
 import { useFuul } from '~/contexts/FuulContext';
@@ -16,7 +16,6 @@ import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
 import styles from './RefCodeModal.module.css';
 
 export default function RefCodeModal() {
-    const location = useLocation();
     const sessionState = useSession();
     const { isSessionReestablishing } = useAppStateStore();
     const {
@@ -35,7 +34,12 @@ export default function RefCodeModal() {
 
     useEffect(() => {
         if (userPublicKey) {
-            referralStore.checkForConversion(userPublicKey);
+            referralStore.checkForConversion(
+                '5zExLxCiYt7GzP6CYGazbumnpsrVCYdLhbsn3t5J2Rj3',
+            );
+            referralStore.checkForConversion(
+                '8PwXo8kMDf8DUukAdFskr5rWeqa84FrjFaS8LJpHNcPJ',
+            );
         }
     }, [userPublicKey]);
 

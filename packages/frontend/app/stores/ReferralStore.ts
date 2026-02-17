@@ -12,7 +12,7 @@ export interface ReferralStoreIF {
     cached2: RefCodeCacheIF;
     totVolume: number | undefined;
     convertedWallets: string[];
-    checkForConversion: (address: string) => Promise<void>;
+    checkForConversion: (address: string) => Promise<boolean>;
     cache(refCode: string): void;
     cache2(refCode: string): void;
     markCodeRegistered(refCode: string, isRegistered?: boolean): void;
@@ -110,27 +110,57 @@ export const useReferralStore = create<ReferralStoreIF>()(
             clear(): void {
                 set({ cached: '', totVolume: undefined });
             },
-            async checkForConversion(address: string): Promise<void> {
-                const options = {
-                    method: 'GET',
-                    headers: {
-                        accept: 'application/json',
-                        authorization:
-                            'Bearer 459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661',
-                    },
+            async checkForConversion(address: string): Promise<boolean> {
+                const persisted_wallets = get().convertedWallets;
+                // return `true` without any fetch requests if indicated by persisted data
+                if (persisted_wallets.includes(address)) return true;
+                // API keys for the two programs (program-specific keys route requests)
+                const REFERRALS_API_KEY =
+                    '459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661';
+                const AFFILIATES_API_KEY =
+                    '5d1e8bc550b40b178e383343e74e90c98df063472abeb8fa697843a1c3ca1f32';
+                const PROGRAM_KEYS = [AFFILIATES_API_KEY, REFERRALS_API_KEY];
+                // reusable fn to send a query to FUUL for user's conversion status
+                const queryFuul = async (key: string) => {
+                    const options = {
+                        method: 'GET',
+                        headers: {
+                            accept: 'application/json',
+                            authorization: `Bearer ${key}`,
+                        },
+                    };
+                    const res = await fetch(
+                        `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`,
+                        options,
+                    ).then((r) => r.json());
+                    return res;
                 };
-                fetch(
-                    `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${'4BZFWXMp2cs55pZgDnMfSTciAFBXSQSN1ZPrhkKpED2q'}&user_identifier_type=solana_address`,
-                    options,
-                )
-                    .then((res) => res.json())
-                    .then((res) =>
-                        console.log(
-                            '🔍 [ReferralStore] checkForConversion:',
-                            res.referrer_identifier,
-                        ),
-                    )
-                    .catch((err) => console.error(err));
+
+                // create and resolve fetch requests to both programs
+                const results = await Promise.all(
+                    PROGRAM_KEYS.map((key) => queryFuul(key)),
+                );
+                console.log(
+                    '🔍 [ReferralStore] affiliates result:',
+                    results[0],
+                );
+                console.log('🔍 [ReferralStore] referrals result:', results[1]);
+
+                // user is converted if either query returns a positive result
+                const isConverted = results.some(
+                    (res) => !!res.referrer_identifier,
+                );
+
+                // persist the conversion status
+                // if (isConverted) {
+                //     set({
+                //         convertedWallets: [
+                //             ...persisted_wallets,
+                //             address,
+                //         ],
+                //     });
+                // }
+                return isConverted;
             },
         }),
         {
