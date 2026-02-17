@@ -47,7 +47,7 @@ export const useAppStateStore = create<AppStateStore>((set, get) => ({
         set({ debugToolbarOpen }),
     isTabActive: true,
     setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
-    isSessionReestablishing: false,
+    isSessionReestablishing: true,
     setIsSessionReestablishing: (isSessionReestablishing: boolean) =>
         set({ isSessionReestablishing }),
 }));
