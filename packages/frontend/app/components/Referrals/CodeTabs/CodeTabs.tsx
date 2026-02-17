@@ -24,6 +24,7 @@ import EnterCode from '~/components/Referrals/EnterCode/EnterCode';
 import CreateCode from '../CreateCode/CreateCode';
 import { checkForPermittedCharacters, checkIfOwnRefCode } from '../functions';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { debugLog } from '~/utils/debugLog';
 import { useDebounce } from '~/hooks/useDebounce';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
@@ -56,6 +57,7 @@ const INVITEE_PERCENT = '4%';
 
 export default function CodeTabs(props: PropsIF) {
     const { isSessionReestablishing } = useAppStateStore();
+    const refCodeModalStore = useRefCodeModalStore();
 
     const sessionState = useSession();
 
@@ -242,10 +244,11 @@ export default function CodeTabs(props: PropsIF) {
             setEditModeInvitee(true);
             setUserInputRefCode(r);
         } else {
-            // code is valid and claimed
+            // code is valid and claimed - open the confirmation modal
             invalidCode && setInvalidCode('');
             setIsCachedValueValid(true);
             setEditModeInvitee(false);
+            refCodeModalStore.openModal(r);
         }
         // Update lastValidatedCode to prevent the useEffect from re-validating
         setLastValidatedCode(r);

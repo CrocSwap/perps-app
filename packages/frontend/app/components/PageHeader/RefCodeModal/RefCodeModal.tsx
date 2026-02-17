@@ -12,6 +12,7 @@ import { useAppStateStore } from '~/stores/AppStateStore';
 import { URL_PARAMS, useUrlParams } from '~/hooks/useURLParams';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
 import styles from './RefCodeModal.module.css';
 
@@ -25,6 +26,7 @@ export default function RefCodeModal() {
     } = useFuul();
     const referralStore = useReferralStore();
     const notificationStore = useNotificationStore();
+    const refCodeModalStore = useRefCodeModalStore();
     const referralCodeFromURL = useUrlParams(URL_PARAMS.referralCode);
 
     const isUserConnected = isEstablished(sessionState);
@@ -94,6 +96,28 @@ export default function RefCodeModal() {
         hasSessionResolved,
     ]);
 
+    // logic to open modal when triggered from store (e.g., from EnterCode confirm button)
+    useEffect(() => {
+        const runLogic = async (codeToCheck: string): Promise<void> => {
+            const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
+            if (isCodeSVM) {
+                refCodeModal.open('address');
+            } else if (
+                await checkIfCodeIsAvailableForInviteeToUse(codeToCheck)
+            ) {
+                refCodeModal.open('goodCode');
+            } else {
+                refCodeModal.open('badCode');
+            }
+        };
+        if (
+            refCodeModalStore.shouldOpenModal &&
+            refCodeModalStore.codeToConfirm
+        ) {
+            runLogic(refCodeModalStore.codeToConfirm);
+        }
+    }, [refCodeModalStore.shouldOpenModal, refCodeModalStore.codeToConfirm]);
+
     // logic to ingest a ref code from the URL
     useEffect(() => {
         const handleRefCodeFromURL = async (): Promise<void> => {
@@ -109,6 +133,15 @@ export default function RefCodeModal() {
         };
         handleRefCodeFromURL();
     }, [referralCodeFromURL.value]);
+
+    // use code from store if available, otherwise fall back to URL param
+    const activeRefCode =
+        refCodeModalStore.codeToConfirm || referralCodeFromURL.value;
+
+    function handleClose(): void {
+        refCodeModal.close();
+        refCodeModalStore.closeModal();
+    }
 
     function mockAcceptRefCode(refCode: string): void {
         trackPageView();
@@ -127,7 +160,7 @@ export default function RefCodeModal() {
 
     return (
         <Modal
-            close={refCodeModal.close}
+            close={handleClose}
             position='center'
             title='Referral Code'
             stopOutsideClick
@@ -137,11 +170,11 @@ export default function RefCodeModal() {
                     <p>
                         The referral code{' '}
                         <span className={styles.highlight_code}>
-                            {referralCodeFromURL.value}
+                            {activeRefCode}
                         </span>{' '}
                         is not recognized. Please check the code and try again.
                     </p>
-                    <Link to='/v2/referrals' onClick={refCodeModal.close}>
+                    <Link to='/v2/referrals' onClick={handleClose}>
                         Go to Referrals
                     </Link>
                 </div>
@@ -151,20 +184,20 @@ export default function RefCodeModal() {
                     <p>
                         Please click 'Accept' to accept the{' '}
                         <span className={styles.highlight_code}>
-                            {referralCodeFromURL.value}
+                            {activeRefCode}
                         </span>{' '}
                         referral code. If you deny this referral code it can
                         still be activated later on the Referrals page.
                     </p>
                     <div className={styles.referral_code_modal_buttons}>
-                        <button onClick={refCodeModal.close}>Deny</button>
+                        <button onClick={handleClose}>Deny</button>
                         <button
                             onClick={() => {
-                                if (!referralCodeFromURL.value) {
+                                if (!activeRefCode) {
                                     return;
                                 }
-                                mockAcceptRefCode(referralCodeFromURL.value);
-                                refCodeModal.close();
+                                mockAcceptRefCode(activeRefCode);
+                                handleClose();
                             }}
                         >
                             Accept
@@ -177,20 +210,20 @@ export default function RefCodeModal() {
                     <p>
                         Please click 'Accept' to accept the{' '}
                         <span className={styles.highlight_code}>
-                            {referralCodeFromURL.value}
+                            {activeRefCode}
                         </span>{' '}
                         referral code (address). This referral can still be
                         activated later on the Referrals page.
                     </p>
                     <div className={styles.referral_code_modal_buttons}>
-                        <button onClick={refCodeModal.close}>Deny</button>
+                        <button onClick={handleClose}>Deny</button>
                         <button
                             onClick={() => {
-                                if (!referralCodeFromURL.value) {
+                                if (!activeRefCode) {
                                     return;
                                 }
-                                mockAcceptRefCode(referralCodeFromURL.value);
-                                refCodeModal.close();
+                                mockAcceptRefCode(activeRefCode);
+                                handleClose();
                             }}
                         >
                             Accept
@@ -204,7 +237,7 @@ export default function RefCodeModal() {
                         You've been referred to Ambient by a friend. Please
                         connect your wallet to accept and start trading with the{' '}
                         <span className={styles.highlight_code}>
-                            {referralCodeFromURL.value}
+                            {activeRefCode}
                         </span>{' '}
                         referral code.
                     </p>
