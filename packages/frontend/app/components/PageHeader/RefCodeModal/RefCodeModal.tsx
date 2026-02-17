@@ -32,17 +32,6 @@ export default function RefCodeModal() {
         ? sessionState.walletPublicKey?.toString()
         : null;
 
-    useEffect(() => {
-        if (userPublicKey) {
-            referralStore.checkForConversion(
-                '5zExLxCiYt7GzP6CYGazbumnpsrVCYdLhbsn3t5J2Rj3',
-            );
-            referralStore.checkForConversion(
-                '8PwXo8kMDf8DUukAdFskr5rWeqa84FrjFaS8LJpHNcPJ',
-            );
-        }
-    }, [userPublicKey]);
-
     // track whether the session has completed its initial resolution
     // this prevents the 'noWallet' modal from flashing during startup
     // when the session transitions through NotEstablished before Established
@@ -69,6 +58,13 @@ export default function RefCodeModal() {
     // logic to open the ref code modal when relevant
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
+            if (
+                isUserConnected &&
+                userPublicKey &&
+                (await referralStore.checkForConversion(userPublicKey))
+            ) {
+                return;
+            }
             const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
