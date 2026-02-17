@@ -38,6 +38,7 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
+import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import {
     BTC_MAX_LEVERAGE,
     MIN_ORDER_VALUE,
@@ -227,6 +228,10 @@ function OrderInput({
     const isUserLoggedIn = useMemo(() => {
         return isEstablished(sessionState);
     }, [sessionState]);
+
+    const isUnifiedMarginLoading = useUnifiedMarginStore(
+        (state) => state.isLoading,
+    );
 
     // Market order service hook
     const { executeMarketOrder, isLoading: isMarketOrderLoading } =
@@ -626,16 +631,22 @@ function OrderInput({
     }, [maxTradeSizeInUsd]);
 
     const displayNumAvailableToTrade = useMemo(() => {
+        if (isUnifiedMarginLoading || !marginBucket) return '-';
+
         return maxTradeSizeLessThanMinPositionSize
             ? formatNum(0, 2, false, true)
             : formatNum(usdAvailableToTrade, 2, false, true);
     }, [
+        isUnifiedMarginLoading,
+        marginBucket,
         usdAvailableToTrade,
         maxTradeSizeLessThanMinPositionSize,
         activeGroupSeparator,
     ]);
 
     const displayNumCurrentPosition = useMemo(() => {
+        if (isUnifiedMarginLoading || !marginBucket) return '-';
+
         return currentPositionLessThanMinPositionSize
             ? formatNum(0, 2)
             : formatNum(
@@ -648,7 +659,12 @@ function OrderInput({
                   10000,
                   true,
               );
-    }, [currentPositionNotionalSize, activeGroupSeparator]);
+    }, [
+        isUnifiedMarginLoading,
+        marginBucket,
+        currentPositionNotionalSize,
+        activeGroupSeparator,
+    ]);
 
     const isMarginInsufficientDebounced = useDebounceOnTrue(
         isMarginInsufficient,
@@ -2455,7 +2471,10 @@ function OrderInput({
                 tooltipLabel: t('transactions.currentPositionTooltip', {
                     symbol,
                 }),
-                value: `${displayNumCurrentPosition} ${symbol}`,
+                value:
+                    displayNumCurrentPosition === '-'
+                        ? '-'
+                        : `${displayNumCurrentPosition} ${symbol}`,
             },
         ],
         [
