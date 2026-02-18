@@ -158,9 +158,10 @@ export default function RefCodeModal() {
 
     // check if the active ref code is the user's own code
     useEffect(() => {
-        if (userRefCode && activeRefCode) {
+        if (activeRefCode && userPublicKey) {
             const isSameCode =
-                userRefCode.toLowerCase() === activeRefCode.toLowerCase();
+                userRefCode === activeRefCode ||
+                activeRefCode === userPublicKey;
             setIsOwnCode(isSameCode);
             if (isSameCode && refCodeModal.isOpen) {
                 refCodeModal.open('ownCode');
@@ -171,7 +172,7 @@ export default function RefCodeModal() {
         } else {
             setIsOwnCode(false);
         }
-    }, [userRefCode, activeRefCode, refCodeModal.isOpen]);
+    }, [userRefCode, activeRefCode, userPublicKey, refCodeModal.isOpen]);
 
     function handleClose(): void {
         refCodeModal.close();

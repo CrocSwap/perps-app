@@ -127,7 +127,8 @@ export default function CodeTabs(props: PropsIF) {
                 const userCodeData =
                     await referralStore.getRefCodeByPubKey(referrerAddress);
                 const isOwnedByUser =
-                    userCodeData?.code === referralStore.cached;
+                    userCodeData?.code === referralStore.cached ||
+                    referralStore.cached === referrerAddress;
                 !isOwnedByUser && setRefCodeToConsume(referralStore.cached);
             })();
         } else if (!referralStore.cached) {
@@ -324,7 +325,9 @@ export default function CodeTabs(props: PropsIF) {
                 .getRefCodeByPubKey(referrerAddress.toString())
                 .then((userCodeData) => {
                     const isSelfOwned =
-                        userCodeData?.code === debouncedUserInputRefCode;
+                        userCodeData?.code === debouncedUserInputRefCode ||
+                        debouncedUserInputRefCode ===
+                            referrerAddress.toString();
                     setIsUserInputRefCodeSelfOwned(isSelfOwned);
                 })
                 .catch((err) => {
