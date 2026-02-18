@@ -6,7 +6,11 @@ import {
     useRouteError,
     isRouteErrorResponse,
 } from 'react-router';
+import { Buffer } from 'buffer';
 import Root from './root';
+
+// Force a consistent Buffer implementation before any app code runs
+globalThis.Buffer = Buffer;
 
 // Check if error is a chunk/module loading failure (typically happens offline)
 function isChunkLoadError(error: unknown): boolean {
