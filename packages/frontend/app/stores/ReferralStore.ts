@@ -15,12 +15,30 @@ export interface UserReferrerResponse {
     referrer_user_rebate_rate: number | null;
 }
 
+export interface AffiliateCodeResponse {
+    id: string;
+    name: string | null;
+    code: string;
+    user_identifier: string;
+    user_identifier_type: string;
+    updated_at: string;
+    created_at: string;
+    uses: number;
+    clicks: number;
+    total_users: number;
+    total_earnings: number;
+    user_rebate_rate: number | null;
+}
+
 export interface ReferralStoreIF {
     cached: string;
     cached2: RefCodeCacheIF;
     totVolume: number | undefined;
     convertedWallets: string[];
     fetchUserReferrer: (address: string) => Promise<UserReferrerResponse[]>;
+    getRefCodeByPubKey: (
+        userIdentifier: string,
+    ) => Promise<AffiliateCodeResponse | null>;
     checkForConversion: (address: string) => Promise<boolean>;
     cache(refCode: string): void;
     cache2(refCode: string): void;
@@ -161,6 +179,44 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 console.log('🔍 [ReferralStore] referrals result:', results[1]);
 
                 return results;
+            },
+            async getRefCodeByPubKey(
+                userIdentifier: string,
+            ): Promise<AffiliateCodeResponse | null> {
+                console.log(
+                    '🚀 [ReferralStore] getRefCodeByPubKey called with:',
+                    userIdentifier,
+                );
+                try {
+                    const res = await fetch(
+                        `https://api.fuul.xyz/api/v1/affiliates/${userIdentifier}?identifier_type=solana_address`,
+                        {
+                            method: 'GET',
+                            headers: { accept: 'application/json' },
+                        },
+                    );
+                    if (!res.ok) {
+                        if (res.status === 404) {
+                            console.log(
+                                '🔍 [ReferralStore] getRefCodeByPubKey: user has no code',
+                            );
+                            return null;
+                        }
+                        throw new Error(`HTTP ${res.status}`);
+                    }
+                    const data: AffiliateCodeResponse = await res.json();
+                    console.log(
+                        '🔍 [ReferralStore] getRefCodeByPubKey result:',
+                        data,
+                    );
+                    return data;
+                } catch (err) {
+                    console.error(
+                        '❌ [ReferralStore] getRefCodeByPubKey error:',
+                        err,
+                    );
+                    return null;
+                }
             },
             async checkForConversion(address: string): Promise<boolean> {
                 const persisted_wallets = get().convertedWallets;

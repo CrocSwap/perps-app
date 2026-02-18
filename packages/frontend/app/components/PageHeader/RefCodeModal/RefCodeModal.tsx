@@ -14,6 +14,7 @@ import { useReferralStore } from '~/stores/ReferralStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import styles from './RefCodeModal.module.css';
 
 export default function RefCodeModal() {
@@ -38,6 +39,23 @@ export default function RefCodeModal() {
     // this prevents the 'noWallet' modal from flashing during startup
     // when the session transitions through NotEstablished before Established
     const [hasSessionResolved, setHasSessionResolved] = useState(false);
+    const [userRefCode, setUserRefCode] = useState<string | null>(null);
+    const [isOwnCode, setIsOwnCode] = useState<boolean>(false);
+
+    // fetch user's own ref code when public key changes
+    useEffect(() => {
+        if (userPublicKey) {
+            referralStore.getRefCodeByPubKey(userPublicKey).then((res) => {
+                setUserRefCode(res?.code ?? null);
+                console.log(
+                    '🔑 [RefCodeModal] userRefCode set to:',
+                    res?.code ?? null,
+                );
+            });
+        } else {
+            setUserRefCode(null);
+        }
+    }, [userPublicKey]);
     useEffect(() => {
         if (
             !hasSessionResolved &&
@@ -53,7 +71,7 @@ export default function RefCodeModal() {
     }, [isSessionReestablishing, sessionState, hasSessionResolved]);
 
     const refCodeModal = useModal<
-        'goodCode' | 'badCode' | 'address' | 'noWallet'
+        'goodCode' | 'badCode' | 'address' | 'noWallet' | 'ownCode'
     >('closed');
     const [wasRefCodeModalShown, setWasRefCodeModalShown] = useState(false);
 
@@ -137,6 +155,23 @@ export default function RefCodeModal() {
     // use code from store if available, otherwise fall back to URL param
     const activeRefCode =
         refCodeModalStore.codeToConfirm || referralCodeFromURL.value;
+
+    // check if the active ref code is the user's own code
+    useEffect(() => {
+        if (userRefCode && activeRefCode) {
+            const isSameCode =
+                userRefCode.toLowerCase() === activeRefCode.toLowerCase();
+            setIsOwnCode(isSameCode);
+            if (isSameCode && refCodeModal.isOpen) {
+                refCodeModal.open('ownCode');
+                console.log(
+                    '🚫 [RefCodeModal] Detected own code, opening ownCode view',
+                );
+            }
+        } else {
+            setIsOwnCode(false);
+        }
+    }, [userRefCode, activeRefCode, refCodeModal.isOpen]);
 
     function handleClose(): void {
         refCodeModal.close();
@@ -242,6 +277,21 @@ export default function RefCodeModal() {
                         referral code.
                     </p>
                     <SessionButton />
+                </div>
+            )}
+            {refCodeModal.content === 'ownCode' && (
+                <div className={styles.invalid_ref_code_modal}>
+                    <p>
+                        The referral code{' '}
+                        <span style={{ color: 'var(--accent3)' }}>
+                            {activeRefCode}
+                        </span>{' '}
+                        appears registered to your wallet address. Please use a
+                        different code.
+                    </p>
+                    <SimpleButton bg='accent1' onClick={handleClose}>
+                        Ok
+                    </SimpleButton>
                 </div>
             )}
         </Modal>
