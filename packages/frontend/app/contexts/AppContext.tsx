@@ -49,6 +49,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     const { setUserAddress, userAddress } = useUserDataStore();
     const cachedReferralCode = useReferralStore((state) => state.cached);
+    const isCachedReferralCodeApproved = useReferralStore(
+        (state) => state.cached2.isCodeApprovedByInvitee === true,
+    );
 
     const { resetUserData } = useTradeDataStore();
 
@@ -143,6 +146,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             path: location.pathname,
             userAddress,
             hasCachedReferralCode: Boolean(cachedReferralCode),
+            isCachedReferralCodeApproved,
             isSessionEstablished: isEstablished(sessionState),
         });
 
@@ -174,6 +178,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             console.info(
                 '[refreg] connect_wallet effect skipped: missing payer/sponsor pubkey',
             );
+            return;
+        }
+        if (!cachedReferralCode || !isCachedReferralCodeApproved) {
+            console.info(
+                '[refreg] connect_wallet effect skipped: referral not approved by invitee',
+                {
+                    hasCachedReferralCode: Boolean(cachedReferralCode),
+                    isCachedReferralCodeApproved,
+                },
+            );
+            lastConnectWalletKeyRef.current = null;
             return;
         }
 
@@ -316,7 +331,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                 lastConnectWalletKeyRef.current = null;
             }
         })();
-    }, [sessionState, location.pathname, userAddress, cachedReferralCode]);
+    }, [
+        sessionState,
+        location.pathname,
+        userAddress,
+        cachedReferralCode,
+        isCachedReferralCodeApproved,
+    ]);
 
     return (
         <AppContext.Provider

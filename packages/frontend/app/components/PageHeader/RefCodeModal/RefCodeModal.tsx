@@ -30,9 +30,6 @@ export default function RefCodeModal() {
     const referralCodeFromURL = useUrlParams(URL_PARAMS.referralCode);
 
     const isUserConnected = isEstablished(sessionState);
-    const userPublicKey: string | null = isUserConnected
-        ? sessionState.walletPublicKey?.toString()
-        : null;
 
     // track whether the session has completed its initial resolution
     // this prevents the 'noWallet' modal from flashing during startup
@@ -60,13 +57,6 @@ export default function RefCodeModal() {
     // logic to open the ref code modal when relevant
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
-            if (
-                isUserConnected &&
-                userPublicKey &&
-                (await referralStore.checkForConversion(userPublicKey))
-            ) {
-                return;
-            }
             const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
@@ -91,7 +81,6 @@ export default function RefCodeModal() {
     }, [
         isInitialized,
         referralCodeFromURL.value,
-        userPublicKey,
         isUserConnected,
         hasSessionResolved,
     ]);
@@ -145,6 +134,9 @@ export default function RefCodeModal() {
 
     function mockAcceptRefCode(refCode: string): void {
         trackPageView();
+        if (referralStore.cached2.code !== refCode) {
+            referralStore.cache2(refCode);
+        }
         referralStore.markCodeApproved(refCode);
         notificationStore.add({
             title: 'Referral Code Accepted',
