@@ -70,15 +70,12 @@ const FIRST_TRADE_SEED_PREFIX = new TextEncoder().encode('first_trade');
 
 const REFERRAL_STORE_STORAGE_KEY = 'AFFILIATE_DATA';
 const TRACKING_ID_STORAGE_KEY = 'fuul.tracking_id';
-const CONVERSION_DETECTED_STORAGE_PREFIX = 'refreg.conversion_detected';
 
 const COMPLETE_CONVERSION_TAG = 0;
 const CONNECT_WALLET_TAG = 1;
 const FIRST_TRADE_TAG = 2;
 
-const REFREG_POLL_INTERVAL_MS = 30_000;
 const REFREG_REQUEST_TIMEOUT_MS = 5_000;
-const activeConversionStatusPolls = new Set<string>();
 let hasLoggedRefregConfig = false;
 
 function logRefregConfigOnce(): void {
@@ -91,7 +88,6 @@ function logRefregConfigOnce(): void {
         programId: REFREG_PROGRAM_ID.toBase58(),
         dappId: REFREG_DAPP_ID.toBase58(),
         apiBaseUrl: REFREG_API_BASE_URL,
-        pollIntervalMs: REFREG_POLL_INTERVAL_MS,
         requestTimeoutMs: REFREG_REQUEST_TIMEOUT_MS,
     });
 }
@@ -346,25 +342,6 @@ function getUserKey(walletPublicKey: PublicKey): string {
     return walletPublicKey.toBase58();
 }
 
-function getConversionDetectedStorageKey(walletPublicKey: PublicKey): string {
-    return `${CONVERSION_DETECTED_STORAGE_PREFIX}:${getDappIdBase58()}:${walletPublicKey.toBase58()}`;
-}
-
-function isConversionDetectedLocally(walletPublicKey: PublicKey): boolean {
-    return (
-        readLocalStorage(getConversionDetectedStorageKey(walletPublicKey)) ===
-        '1'
-    );
-}
-
-function markConversionDetectedLocally(walletPublicKey: PublicKey): void {
-    writeLocalStorage(getConversionDetectedStorageKey(walletPublicKey), '1');
-}
-
-function getConversionPollKey(walletPublicKey: PublicKey): string {
-    return `${getDappIdBase58()}:${walletPublicKey.toBase58()}`;
-}
-
 function buildApiUrl(path: string, params: Record<string, string>): string {
     const url = new URL(path, REFREG_API_BASE_URL);
     Object.entries(params).forEach(([key, value]) => {
@@ -429,48 +406,6 @@ async function fetchRefregJson<T>(
         return json;
     } finally {
         clearTimeout(timeoutId);
-    }
-}
-
-interface ConversionStatusResponse {
-    converted?: boolean;
-}
-
-export async function fetchConversionStatus(params: {
-    walletPublicKey: PublicKey;
-}): Promise<boolean | null> {
-    try {
-        logRefregConfigOnce();
-        const response = await fetchRefregJson<
-            ConversionStatusResponse | RefregApiError
-        >('/v1/referrals/conversion-status', {
-            dapp_id: getDappIdBase58(),
-            user_pubkey: getUserKey(params.walletPublicKey),
-        });
-
-        if (isApiErrorResponse(response)) {
-            console.log(
-                '[refreg] conversion-status returned API error payload',
-                response,
-            );
-            return null;
-        }
-
-        const converted = response.converted === true;
-        console.info('[refreg] conversion-status response', {
-            walletPublicKey: params.walletPublicKey.toBase58(),
-            converted,
-        });
-        if (converted) {
-            markConversionDetectedLocally(params.walletPublicKey);
-            console.info('[refreg] conversion latch marked in localStorage', {
-                walletPublicKey: params.walletPublicKey.toBase58(),
-            });
-        }
-        return converted;
-    } catch (error) {
-        console.info('[refreg] conversion-status preflight failed:', error);
-        return null;
     }
 }
 
@@ -879,49 +814,6 @@ export async function buildTradeRefregInstructions(
             sessionPublicKey: params.sessionPublicKey.toBase58(),
             payerPublicKey: params.payerPublicKey.toBase58(),
         });
-        if (isConversionDetectedLocally(params.walletPublicKey)) {
-            console.info(
-                '[refreg] conversion latch found locally; skipping trade refreg instruction build',
-            );
-            const result: TradeRefregBuildResult = {
-                instructions: [],
-                includesFirstTrade: false,
-                includesCompleteConversion: false,
-                referralAttribution: null,
-                trackingId: null,
-            };
-            console.log('[refreg] trade refreg result (local latch)', {
-                walletPublicKey: params.walletPublicKey.toBase58(),
-                instructionCount: result.instructions.length,
-                includesFirstTrade: result.includesFirstTrade,
-                includesCompleteConversion: result.includesCompleteConversion,
-            });
-            return result;
-        }
-
-        const isAlreadyConverted = await fetchConversionStatus({
-            walletPublicKey: params.walletPublicKey,
-        });
-        if (isAlreadyConverted === true) {
-            console.info(
-                '[refreg] conversion already detected via API; skipping trade refreg instruction build',
-            );
-            const result: TradeRefregBuildResult = {
-                instructions: [],
-                includesFirstTrade: false,
-                includesCompleteConversion: false,
-                referralAttribution: null,
-                trackingId: null,
-            };
-            console.log('[refreg] trade refreg result (already converted)', {
-                walletPublicKey: params.walletPublicKey.toBase58(),
-                instructionCount: result.instructions.length,
-                includesFirstTrade: result.includesFirstTrade,
-                includesCompleteConversion: result.includesCompleteConversion,
-            });
-            return result;
-        }
-
         const dappId = getDappIdBytes();
         const instructions: TransactionInstruction[] = [
             buildFirstTradeInstruction({
@@ -1190,87 +1082,6 @@ export async function sendStandaloneRefregTransactions(args: {
     }
 }
 
-function delay(ms: number): Promise<void> {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
-}
-
-async function pollUntil(
-    label: string,
-    check: () => Promise<boolean>,
-): Promise<boolean> {
-    let attempt = 0;
-    while (true) {
-        attempt += 1;
-        console.log(`[refreg] ${label} poll attempt`, {
-            attempt,
-        });
-        try {
-            const done = await check();
-            if (done) {
-                console.log(`[refreg] ${label} poll resolved`, {
-                    attempt,
-                });
-                return true;
-            }
-        } catch (error) {
-            console.info(`[refreg] ${label} poll attempt failed:`, error);
-        }
-
-        console.log(`[refreg] ${label} poll pending`, {
-            attempt,
-            nextDelayMs: REFREG_POLL_INTERVAL_MS,
-        });
-        await delay(REFREG_POLL_INTERVAL_MS);
-    }
-}
-
-function startBackgroundConversionStatusPolling(
-    walletPublicKey: PublicKey,
-): void {
-    if (isConversionDetectedLocally(walletPublicKey)) {
-        console.info(
-            '[refreg] conversion poller not started: local conversion latch already set',
-            { walletPublicKey: walletPublicKey.toBase58() },
-        );
-        return;
-    }
-
-    const pollKey = getConversionPollKey(walletPublicKey);
-    if (activeConversionStatusPolls.has(pollKey)) {
-        console.info(
-            '[refreg] conversion poller already active for wallet, skipping duplicate',
-            { pollKey },
-        );
-        return;
-    }
-
-    activeConversionStatusPolls.add(pollKey);
-    console.info('[refreg] starting background conversion poller', {
-        pollKey,
-        walletPublicKey: walletPublicKey.toBase58(),
-        intervalMs: REFREG_POLL_INTERVAL_MS,
-        activePollers: activeConversionStatusPolls.size,
-    });
-
-    void pollUntil('conversion-status indexing', async () => {
-        if (isConversionDetectedLocally(walletPublicKey)) {
-            return true;
-        }
-
-        const converted = await fetchConversionStatus({ walletPublicKey });
-        return converted === true;
-    }).finally(() => {
-        activeConversionStatusPolls.delete(pollKey);
-        console.info('[refreg] background conversion poller finished', {
-            pollKey,
-            walletPublicKey: walletPublicKey.toBase58(),
-            activePollers: activeConversionStatusPolls.size,
-        });
-    });
-}
-
 async function checkByUserEndpoint(path: string, walletPublicKey: PublicKey) {
     console.log('[refreg] one-shot by-user check request', {
         path,
@@ -1316,14 +1127,6 @@ export async function pollConnectWalletConsistency(args: {
         referralKind: args.referralAttribution.referralKind,
         referralSourceValue: args.referralAttribution.sourceValue,
     });
-    if (isConversionDetectedLocally(args.walletPublicKey)) {
-        console.info(
-            '[refreg] pollConnectWalletConsistency short-circuited: conversion already latched',
-        );
-        return [];
-    }
-
-    startBackgroundConversionStatusPolling(args.walletPublicKey);
 
     const results: RefregTxPollResult[] = [];
 
@@ -1374,16 +1177,6 @@ export async function pollTradeConsistency(args: {
         includesCompleteConversion: args.includesCompleteConversion,
         hasReferralAttribution: Boolean(args.referralAttribution),
     });
-    if (isConversionDetectedLocally(args.walletPublicKey)) {
-        console.info(
-            '[refreg] pollTradeConsistency short-circuited: conversion already latched',
-        );
-        return [];
-    }
-
-    if (args.referralAttribution) {
-        startBackgroundConversionStatusPolling(args.walletPublicKey);
-    }
 
     const checks: Promise<RefregTxPollResult>[] = [];
 
