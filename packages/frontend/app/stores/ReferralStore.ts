@@ -7,11 +7,20 @@ export interface RefCodeCacheIF {
     isCodeApprovedByInvitee: boolean | undefined;
 }
 
+export interface UserReferrerResponse {
+    user_identifier: string;
+    referrer_identifier: string | null;
+    referrer_name: string | null;
+    referrer_code: string | null;
+    referrer_user_rebate_rate: number | null;
+}
+
 export interface ReferralStoreIF {
     cached: string;
     cached2: RefCodeCacheIF;
     totVolume: number | undefined;
     convertedWallets: string[];
+    fetchUserReferrer: (address: string) => Promise<UserReferrerResponse[]>;
     checkForConversion: (address: string) => Promise<boolean>;
     cache(refCode: string): void;
     cache2(refCode: string): void;
@@ -110,18 +119,23 @@ export const useReferralStore = create<ReferralStoreIF>()(
             clear(): void {
                 set({ cached: '', totVolume: undefined });
             },
-            async checkForConversion(address: string): Promise<boolean> {
-                const persisted_wallets = get().convertedWallets;
-                // return `true` without any fetch requests if indicated by persisted data
-                if (persisted_wallets.includes(address)) return true;
+            async fetchUserReferrer(
+                address: string,
+            ): Promise<UserReferrerResponse[]> {
+                console.log(
+                    '🚀 [ReferralStore] fetchUserReferrer called with address:',
+                    address,
+                );
                 // API keys for the two programs (program-specific keys route requests)
                 const REFERRALS_API_KEY =
                     '459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661';
                 const AFFILIATES_API_KEY =
                     '5d1e8bc550b40b178e383343e74e90c98df063472abeb8fa697843a1c3ca1f32';
                 const PROGRAM_KEYS = [AFFILIATES_API_KEY, REFERRALS_API_KEY];
-                // reusable fn to send a query to FUUL for user's conversion status
-                const queryFuul = async (key: string) => {
+                // reusable fn to send a query to FUUL for user's referrer data
+                const queryFuul = async (
+                    key: string,
+                ): Promise<UserReferrerResponse> => {
                     const options = {
                         method: 'GET',
                         headers: {
@@ -145,6 +159,19 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     results[0],
                 );
                 console.log('🔍 [ReferralStore] referrals result:', results[1]);
+
+                return results;
+            },
+            async checkForConversion(address: string): Promise<boolean> {
+                const persisted_wallets = get().convertedWallets;
+                // return `true` without any fetch requests if indicated by persisted data
+                if (persisted_wallets.includes(address)) return true;
+
+                const results = await get().fetchUserReferrer(address);
+                console.log(
+                    '🔍 [ReferralStore] checkForConversion received results:',
+                    results,
+                );
 
                 // user is converted if either query returns a positive result
                 const isConverted = results.some(
