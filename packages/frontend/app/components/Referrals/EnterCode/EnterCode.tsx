@@ -117,23 +117,38 @@ export default function EnterCode(props: PropsIF) {
                     onChange={(e) => setUserInputRefCode(e.target.value)}
                 />
                 {userInputRefCode.length >= 2 &&
-                    (isInputSolanaAddress ? (
-                        <p style={{ color: 'var(--text2)' }}>
+                    (isInputSolanaAddress && !isUserInputRefCodeSelfOwned ? (
+                        <p
+                            style={{
+                                color: 'var(--text2)',
+                                fontSize: 'var(--font-size-xs)',
+                            }}
+                        >
                             This appears to be a wallet address. Please confirm
                             with your referrer that it is correct.
                         </p>
                     ) : (
                         userInputRefCode.length <= 30 &&
                         (isCheckingCode ? (
-                            <p style={{ color: 'var(--text2)' }}>
+                            <p
+                                style={{
+                                    color: 'var(--text2)',
+                                    fontSize: 'var(--font-size-xs)',
+                                }}
+                            >
                                 Checking code...
                             </p>
                         ) : isUserRefCodeClaimed ? (
-                            <p style={{ color: 'var(--positive)' }}>
+                            <p
+                                style={{
+                                    color: 'var(--positive)',
+                                    fontSize: 'var(--font-size-xs)',
+                                }}
+                            >
                                 Code is valid!
                             </p>
                         ) : (
-                            <p>
+                            <p style={{ fontSize: 'var(--font-size-xs)' }}>
                                 <Trans
                                     i18nKey='referrals.referralCodeNotValidPleaseConfirm'
                                     values={{ invalidCode: userInputRefCode }}
@@ -147,7 +162,7 @@ export default function EnterCode(props: PropsIF) {
                         ))
                     ))}
                 {isUserInputRefCodeSelfOwned && (
-                    <p>
+                    <p style={{ fontSize: 'var(--font-size-xs)' }}>
                         <Trans
                             i18nKey='referrals.doNotSelfRefer'
                             values={{ refCode: userInputRefCode }}
