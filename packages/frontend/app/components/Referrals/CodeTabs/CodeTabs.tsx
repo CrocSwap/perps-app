@@ -22,7 +22,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useFuul } from '~/contexts/FuulContext';
 import EnterCode from '~/components/Referrals/EnterCode/EnterCode';
 import CreateCode from '../CreateCode/CreateCode';
-import { checkForPermittedCharacters, checkIfOwnRefCode } from '../functions';
+import { checkForPermittedCharacters } from '../functions';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { debugLog } from '~/utils/debugLog';
@@ -124,13 +124,11 @@ export default function CodeTabs(props: PropsIF) {
     useEffect(() => {
         if (referralStore.cached && referrerAddress) {
             (async () => {
-                const isOwnedByUser: boolean | undefined =
-                    await checkIfOwnRefCode(
-                        referralStore.cached,
-                        referrerAddress,
-                    );
-                isOwnedByUser === false &&
-                    setRefCodeToConsume(referralStore.cached);
+                const userCodeData =
+                    await referralStore.getRefCodeByPubKey(referrerAddress);
+                const isOwnedByUser =
+                    userCodeData?.code === referralStore.cached;
+                !isOwnedByUser && setRefCodeToConsume(referralStore.cached);
             })();
         } else if (!referralStore.cached) {
             setRefCodeToConsume(undefined);
@@ -322,13 +320,13 @@ export default function CodeTabs(props: PropsIF) {
         }
         if (debouncedUserInputRefCode && referrerAddress) {
             setIsUserInputRefCodeSelfOwned(undefined);
-            checkIfOwnRefCode(
-                debouncedUserInputRefCode,
-                referrerAddress.toString(),
-            )
-                .then((isSelfOwned: boolean | undefined) =>
-                    setIsUserInputRefCodeSelfOwned(isSelfOwned),
-                )
+            referralStore
+                .getRefCodeByPubKey(referrerAddress.toString())
+                .then((userCodeData) => {
+                    const isSelfOwned =
+                        userCodeData?.code === debouncedUserInputRefCode;
+                    setIsUserInputRefCodeSelfOwned(isSelfOwned);
+                })
                 .catch((err) => {
                     setIsUserInputRefCodeSelfOwned(undefined);
                     console.error(err);
