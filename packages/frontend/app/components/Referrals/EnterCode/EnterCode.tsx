@@ -117,7 +117,7 @@ export default function EnterCode(props: PropsIF) {
                     onChange={(e) => setUserInputRefCode(e.target.value)}
                 />
                 {userInputRefCode.length >= 2 &&
-                    (isInputSolanaAddress ? (
+                    (isInputSolanaAddress && !isUserInputRefCodeSelfOwned ? (
                         <p style={{ color: 'var(--text2)' }}>
                             This appears to be a wallet address. Please confirm
                             with your referrer that it is correct.

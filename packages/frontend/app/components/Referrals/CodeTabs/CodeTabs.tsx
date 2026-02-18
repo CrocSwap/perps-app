@@ -304,8 +304,8 @@ export default function CodeTabs(props: PropsIF) {
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
     const debouncedUserInputRefCode = useDebounce(userInputRefCode, 500);
     const isInputSolanaAddress = useMemo<boolean>(
-        () => checkAddressFormat(userInputRefCode),
-        [userInputRefCode],
+        () => checkAddressFormat(debouncedUserInputRefCode),
+        [debouncedUserInputRefCode],
     );
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
         boolean | undefined
@@ -315,28 +315,33 @@ export default function CodeTabs(props: PropsIF) {
 
     // when the user manually enters a refCode, check if the code is owned by their wallet
     useEffect(() => {
-        if (isInputSolanaAddress) {
+        if (!debouncedUserInputRefCode || !referrerAddress) {
             setIsUserInputRefCodeSelfOwned(undefined);
             return;
         }
-        if (debouncedUserInputRefCode && referrerAddress) {
-            setIsUserInputRefCodeSelfOwned(undefined);
-            referralStore
-                .getRefCodeByPubKey(referrerAddress.toString())
-                .then((userCodeData) => {
-                    const isSelfOwned =
-                        userCodeData?.code === debouncedUserInputRefCode ||
-                        debouncedUserInputRefCode ===
-                            referrerAddress.toString();
-                    setIsUserInputRefCodeSelfOwned(isSelfOwned);
-                })
-                .catch((err) => {
-                    setIsUserInputRefCodeSelfOwned(undefined);
-                    console.error(err);
-                });
-        } else {
-            setIsUserInputRefCodeSelfOwned(undefined);
+        // check if input matches user's public key directly
+        if (debouncedUserInputRefCode === referrerAddress.toString()) {
+            setIsUserInputRefCodeSelfOwned(true);
+            return;
         }
+        // skip FUUL lookup for Solana addresses (they won't match a ref code)
+        if (isInputSolanaAddress) {
+            setIsUserInputRefCodeSelfOwned(false);
+            return;
+        }
+        // check if input matches user's registered FUUL code
+        setIsUserInputRefCodeSelfOwned(undefined);
+        referralStore
+            .getRefCodeByPubKey(referrerAddress.toString())
+            .then((userCodeData) => {
+                const isSelfOwned =
+                    userCodeData?.code === debouncedUserInputRefCode;
+                setIsUserInputRefCodeSelfOwned(isSelfOwned);
+            })
+            .catch((err) => {
+                setIsUserInputRefCodeSelfOwned(undefined);
+                console.error(err);
+            });
     }, [debouncedUserInputRefCode, referrerAddress, isInputSolanaAddress]);
 
     // when the user manually enters a refCode, make sure it exists
