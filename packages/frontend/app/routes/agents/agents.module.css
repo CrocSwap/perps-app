@@ -57,6 +57,8 @@
     cursor: pointer;
     font-size: var(--font-size-m);
     font-weight: 500;
+    display: inline-block;
+    width: fit-content;
 }
 
 /* top-level JSX element */
