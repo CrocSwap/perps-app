@@ -62,3 +62,37 @@
 .info > div > p:first-child {
     color: var(--text2);
 }
+
+/* Agent transfer mode styles */
+.agent_info_section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    padding: var(--padding-s);
+    background-color: var(--bg-dark4);
+    border-radius: var(--radius-s);
+    margin-bottom: var(--gap-xs);
+}
+
+.agent_info_row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-s);
+    gap: var(--gap-s);
+}
+
+.agent_info_label {
+    color: var(--text2);
+    flex-shrink: 0;
+}
+
+.agent_info_value {
+    color: var(--text1);
+    font-family: var(--font-family-mono);
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
