@@ -1,4 +1,4 @@
-import { LuChevronLeft, LuCopy, LuFilter, LuX } from 'react-icons/lu';
+import { LuChevronLeft, LuCopy, LuFilter, LuX, LuCheck } from 'react-icons/lu';
 import styles from './AgentDetail.module.css';
 import { useNavigate, useParams } from 'react-router';
 import {
@@ -12,6 +12,7 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TransferModal from '~/components/TransferModal/TransferModal';
 import AgentDetailChart from './AgentDetailChart';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 const AGENTS_BASE_PATH = '/v2/agents';
 
@@ -51,9 +52,25 @@ export default function AgentDetail() {
     // logic to control the transfer modal
     const transferModalCtrl = useModal();
 
+    // state for copy feedback
+    const [copied, setCopied] = useState(false);
+
     const statusLabel = strategy?.isPaused
         ? t('agents.overview.paused')
         : t('agents.overview.running');
+
+    // copy address to clipboard with feedback
+    const handleCopyAddress = async () => {
+        if (!strategy?.address) return;
+
+        try {
+            await navigator.clipboard.writeText(strategy.address);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+        } catch (err) {
+            console.error('Failed to copy address:', err);
+        }
+    };
 
     return (
         <div className={styles.strategy_detail_page}>
@@ -74,18 +91,21 @@ export default function AgentDetail() {
                             </h2>
                         </div>
                         <div className={styles.address_row}>
-                            <p>{strategy?.address}</p>
                             <button
                                 type='button'
-                                className={styles.copy_address}
-                                onClick={() => {
-                                    if (!strategy?.address) return;
-                                    void navigator.clipboard.writeText(
-                                        strategy.address,
-                                    );
-                                }}
+                                className={styles.address_button}
+                                onClick={handleCopyAddress}
+                                disabled={!strategy?.address}
                             >
-                                <LuCopy size={12} />
+                                <span>{strategy?.address}</span>
+                                {copied ? (
+                                    <LuCheck
+                                        size={12}
+                                        className={styles.check_icon}
+                                    />
+                                ) : (
+                                    <LuCopy size={12} />
+                                )}
                             </button>
                         </div>
                     </div>
