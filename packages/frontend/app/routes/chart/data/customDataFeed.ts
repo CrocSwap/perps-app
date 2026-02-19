@@ -50,6 +50,16 @@ export const createDataFeed = (
     let userFillsInterval: NodeJS.Timeout | null = null;
     let lastResolution: ResolutionString | undefined = undefined;
     let onMarksCallback: ((marks: Mark[]) => void) | undefined = undefined;
+    let marksSymbol: string | undefined = undefined;
+
+    const normalizeSymbolForMarks = (symbol?: string): string => {
+        if (!symbol) return '';
+        const baseSymbol = symbol.split('-')[0];
+        const kTokenPattern = /^k[A-Z]+$/;
+        return kTokenPattern.test(baseSymbol)
+            ? baseSymbol
+            : baseSymbol.toUpperCase();
+    };
 
     const updateUserFills = (fills: UserFillIF[]) => {
         userFills = fills;
@@ -77,9 +87,17 @@ export const createDataFeed = (
         const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
         const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
-        userFills.sort((a, b) => b.time - a.time);
+        const normalizedMarksSymbol = normalizeSymbolForMarks(marksSymbol);
+        const symbolFills = userFills
+            .filter((fill) => {
+                if (!normalizedMarksSymbol) return true;
+                return (
+                    normalizeSymbolForMarks(fill.coin) === normalizedMarksSymbol
+                );
+            })
+            .sort((a, b) => b.time - a.time);
 
-        userFills.forEach((fill) => {
+        symbolFills.forEach((fill) => {
             const isBuy = fill.side === 'B' || fill.side === 'buy';
             const markerColor = isBuy ? chartTheme.buy : chartTheme.sell;
             const markData = {
@@ -228,6 +246,7 @@ export const createDataFeed = (
         ) => {
             onMarksCallback = onDataCallback;
             lastResolution = resolution;
+            marksSymbol = symbolInfo.ticker || symbolInfo.name;
 
             // if (userFillsInterval) {
             //     clearInterval(userFillsInterval);
