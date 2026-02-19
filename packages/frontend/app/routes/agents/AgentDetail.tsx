@@ -301,6 +301,24 @@ export default function AgentDetail() {
                                 <LuX size={18} />
                             </button>
                             <h3>{t('agents.overview.removeTitle')}</h3>
+                            <div className={styles.remove_agent_info}>
+                                <div className={styles.remove_agent_row}>
+                                    <span className={styles.remove_agent_label}>
+                                        {t('forms.name')}
+                                    </span>
+                                    <span className={styles.remove_agent_value}>
+                                        {strategy?.name}
+                                    </span>
+                                </div>
+                                <div className={styles.remove_agent_row}>
+                                    <span className={styles.remove_agent_label}>
+                                        {t('forms.address')}
+                                    </span>
+                                    <span className={styles.remove_agent_value}>
+                                        {strategy?.address}
+                                    </span>
+                                </div>
+                            </div>
                             <p>{t('agents.overview.removeMessage')}</p>
                             <div className={styles.remove_actions}>
                                 <SimpleButton
