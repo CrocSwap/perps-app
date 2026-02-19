@@ -48,7 +48,10 @@ const COPY_PER_SCREEN_WIDTH = {
     },
 };
 
-const REFERRER_EDIT_VOLUME_THRESHOLD = 1_000_000;
+// volume thresholds for referral eligibility
+const REFERRER_EDIT_VOLUME_THRESHOLD = 1_000_000; // referrers can customize code after $1M volume
+const INVITEE_MAX_VOLUME_THRESHOLD = 10_000; // invitees can only enter codes if below $10k volume
+
 const DEFAULT_REFERRER_CODE_LENGTH = 6;
 
 // fee amounts for referrer and the invitee
@@ -186,7 +189,7 @@ export default function CodeTabs(props: PropsIF) {
         if (
             !referralStore.cached &&
             referralStore.totVolume !== undefined &&
-            referralStore.totVolume < 10000
+            referralStore.totVolume < INVITEE_MAX_VOLUME_THRESHOLD
         ) {
             setEditModeInvitee(true);
         }
@@ -731,6 +734,7 @@ export default function CodeTabs(props: PropsIF) {
                         isSessionEstablished={isSessionEstablished}
                         totVolume={referralStore.totVolume}
                         totVolumeFormatted={totVolumeFormatted}
+                        inviteeMaxVolumeThreshold={INVITEE_MAX_VOLUME_THRESHOLD}
                         cached={referralStore.cached}
                         isCachedValueValid={isCachedValueValid}
                         refCodeToConsume={refCodeToConsume}

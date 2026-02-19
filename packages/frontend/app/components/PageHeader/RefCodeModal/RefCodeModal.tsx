@@ -40,13 +40,16 @@ export default function RefCodeModal() {
     // when the session transitions through NotEstablished before Established
     const [hasSessionResolved, setHasSessionResolved] = useState(false);
     const [userRefCode, setUserRefCode] = useState<string | null>(null);
+    const [isUserRefCodeLoading, setIsUserRefCodeLoading] = useState(false);
     const [isOwnCode, setIsOwnCode] = useState<boolean>(false);
 
     // fetch user's own ref code when public key changes
     useEffect(() => {
         if (userPublicKey) {
+            setIsUserRefCodeLoading(true);
             referralStore.getRefCodeByPubKey(userPublicKey).then((res) => {
                 setUserRefCode(res?.code ?? null);
+                setIsUserRefCodeLoading(false);
                 console.log(
                     '🔑 [RefCodeModal] userRefCode set to:',
                     res?.code ?? null,
@@ -54,6 +57,7 @@ export default function RefCodeModal() {
             });
         } else {
             setUserRefCode(null);
+            setIsUserRefCodeLoading(false);
         }
     }, [userPublicKey]);
     useEffect(() => {
@@ -85,6 +89,16 @@ export default function RefCodeModal() {
             ) {
                 return;
             }
+            // check if this is the user's own code
+            if (isUserConnected && userPublicKey) {
+                const isOwnPubKey = codeToCheck === userPublicKey;
+                const isOwnRegisteredCode = userRefCode === codeToCheck;
+                if (isOwnPubKey || isOwnRegisteredCode) {
+                    refCodeModal.open('ownCode');
+                    setWasRefCodeModalShown(true);
+                    return;
+                }
+            }
             const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
             if (!wasRefCodeModalShown) {
                 if (isUserConnected) {
@@ -103,7 +117,13 @@ export default function RefCodeModal() {
                 }
             }
         };
-        if (isInitialized && referralCodeFromURL.value && hasSessionResolved) {
+        // wait for userRefCode to load before running modal logic
+        if (
+            isInitialized &&
+            referralCodeFromURL.value &&
+            hasSessionResolved &&
+            !isUserRefCodeLoading
+        ) {
             runLogic(referralCodeFromURL.value);
         }
     }, [
@@ -112,11 +132,22 @@ export default function RefCodeModal() {
         userPublicKey,
         isUserConnected,
         hasSessionResolved,
+        isUserRefCodeLoading,
+        userRefCode,
     ]);
 
     // logic to open modal when triggered from store (e.g., from EnterCode confirm button)
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
+            // check if this is the user's own code
+            if (userPublicKey) {
+                const isOwnPubKey = codeToCheck === userPublicKey;
+                const isOwnRegisteredCode = userRefCode === codeToCheck;
+                if (isOwnPubKey || isOwnRegisteredCode) {
+                    refCodeModal.open('ownCode');
+                    return;
+                }
+            }
             const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
             if (isCodeSVM) {
                 refCodeModal.open('address');
@@ -130,26 +161,24 @@ export default function RefCodeModal() {
         };
         if (
             refCodeModalStore.shouldOpenModal &&
-            refCodeModalStore.codeToConfirm
+            refCodeModalStore.codeToConfirm &&
+            !isUserRefCodeLoading
         ) {
             runLogic(refCodeModalStore.codeToConfirm);
         }
-    }, [refCodeModalStore.shouldOpenModal, refCodeModalStore.codeToConfirm]);
+    }, [
+        refCodeModalStore.shouldOpenModal,
+        refCodeModalStore.codeToConfirm,
+        userPublicKey,
+        userRefCode,
+        isUserRefCodeLoading,
+    ]);
 
     // logic to ingest a ref code from the URL
     useEffect(() => {
-        const handleRefCodeFromURL = async (): Promise<void> => {
-            if (referralCodeFromURL.value) {
-                referralStore.cache(referralCodeFromURL.value);
-                if (
-                    referralCodeFromURL.value !== referralStore.cached2.code &&
-                    !referralStore.cached2.isCodeApprovedByInvitee
-                ) {
-                    referralStore.cache2(referralCodeFromURL.value);
-                }
-            }
-        };
-        handleRefCodeFromURL();
+        if (referralCodeFromURL.value) {
+            referralStore.cache(referralCodeFromURL.value);
+        }
     }, [referralCodeFromURL.value]);
 
     // use code from store if available, otherwise fall back to URL param

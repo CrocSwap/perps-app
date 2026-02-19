@@ -8,6 +8,7 @@ interface PropsIF {
     isSessionEstablished: boolean;
     totVolume: number | undefined;
     totVolumeFormatted: string;
+    inviteeMaxVolumeThreshold: number;
     cached: string;
     isCachedValueValid: boolean | undefined;
     refCodeToConsume: string | undefined;
@@ -28,6 +29,7 @@ export default function EnterCode(props: PropsIF) {
         isSessionEstablished,
         totVolume,
         totVolumeFormatted,
+        inviteeMaxVolumeThreshold,
         cached,
         isCachedValueValid,
         refCodeToConsume,
@@ -89,16 +91,18 @@ export default function EnterCode(props: PropsIF) {
                     <h6>{t('referrals.enterCode')}</h6>
                 )}
             </div>
-            {cached && totVolume !== undefined && totVolume < 10000 && (
-                <div className={styles.refferal_code_buttons}>
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => setEditModeInvitee(true)}
-                    >
-                        {t('common.edit')}
-                    </SimpleButton>
-                </div>
-            )}
+            {cached &&
+                totVolume !== undefined &&
+                totVolume < inviteeMaxVolumeThreshold && (
+                    <div className={styles.refferal_code_buttons}>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => setEditModeInvitee(true)}
+                        >
+                            {t('common.edit')}
+                        </SimpleButton>
+                    </div>
+                )}
         </section>
     );
 
@@ -224,7 +228,7 @@ export default function EnterCode(props: PropsIF) {
     }
 
     // Only show content/error when volume is available
-    if (totVolume && totVolume > 10000) {
+    if (totVolume && totVolume >= inviteeMaxVolumeThreshold) {
         return (
             <div
                 style={{
@@ -248,7 +252,7 @@ export default function EnterCode(props: PropsIF) {
     const shouldShowInput =
         (editModeInvitee || !cached || isCachedValueValid === false) &&
         totVolume !== undefined &&
-        totVolume < 10000;
+        totVolume < inviteeMaxVolumeThreshold;
 
     return shouldShowInput ? enterNewCodeElem : currentCodeElem;
 }
