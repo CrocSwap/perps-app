@@ -228,15 +228,15 @@
 }
 
 .remove_strategy_modal > h3 {
-    font-size: 64px;
+    font-size: clamp(20px, 2.4vw, 28px);
     font-weight: 300;
     line-height: 1;
     text-align: center;
 }
 
 .remove_strategy_modal > p {
-    font-size: 46px;
-    line-height: 1.15;
+    font-size: clamp(12px, 1.4vw, 18px);
+    line-height: 1.2;
     text-align: center;
 }
 
@@ -323,10 +323,10 @@
     }
 
     .remove_strategy_modal > h3 {
-        font-size: 48px;
+        font-size: 24px;
     }
 
     .remove_strategy_modal > p {
-        font-size: 30px;
+        font-size: 16px;
     }
 }

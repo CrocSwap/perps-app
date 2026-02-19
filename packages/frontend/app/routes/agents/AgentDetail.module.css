@@ -272,14 +272,14 @@
 }
 
 .remove_strategy_modal > h3 {
-    font-size: clamp(24px, 2.8vw, 36px);
+    font-size: clamp(20px, 2.4vw, 28px);
     font-weight: 300;
     line-height: 1;
     text-align: center;
 }
 
 .remove_strategy_modal > p {
-    font-size: clamp(14px, 1.6vw, 22px);
+    font-size: clamp(12px, 1.4vw, 18px);
     line-height: 1.2;
     text-align: center;
 }
@@ -363,11 +363,11 @@
     }
 
     .remove_strategy_modal > h3 {
-        font-size: 28px;
+        font-size: 24px;
     }
 
     .remove_strategy_modal > p {
-        font-size: 18px;
+        font-size: 16px;
     }
 }
 
