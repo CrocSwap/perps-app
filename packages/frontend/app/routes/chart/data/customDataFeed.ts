@@ -248,6 +248,8 @@ export const createDataFeed = (
             lastResolution = resolution;
             marksSymbol = symbolInfo.ticker || symbolInfo.name;
 
+            processUserFills(userFills, lastResolution, onMarksCallback);
+
             // if (userFillsInterval) {
             //     clearInterval(userFillsInterval);
             //     userFillsInterval = null;
