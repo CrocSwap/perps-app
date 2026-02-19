@@ -282,7 +282,55 @@
     },
     "strategies": {
         "newStrategy": "Nueva estrategia",
-        "editStrategy": "Editar estrategia"
+        "editStrategy": "Editar estrategia",
+        "form": {
+            "labels": {
+                "name": "Nombre de estrategia",
+                "market": "Mercado",
+                "distance": "Distancia",
+                "distanceType": "Tipo de distancia",
+                "side": "Lado",
+                "totalSize": "Tamaño total",
+                "orderSize": "Tamaño de orden"
+            },
+            "placeholders": {
+                "name": "Nombre",
+                "distance": "Distancia",
+                "totalSize": "Tamaño total",
+                "orderSize": "Tamaño de orden"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Ticks",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "Ambos",
+                    "above": "Arriba",
+                    "below": "Abajo"
+                }
+            },
+            "blurbs": {
+                "name": "Elige un nombre descriptivo para tu estrategia de trading. Esto te ayudará a identificar y gestionar tus estrategias de forma eficaz.",
+                "market": "Selecciona el mercado donde deseas desplegar esta estrategia. Distintos mercados tienen diferentes características de volatilidad y liquidez.",
+                "distance": "Define el parámetro de distancia para tu estrategia. Esto determina qué tan lejos del precio actual se colocarán tus órdenes.",
+                "distanceType": "Elige cómo se mide la distancia. Los ticks ofrecen control preciso, mientras que el porcentaje ofrece escalado proporcional con el movimiento del precio.",
+                "side": "Especifica si la estrategia debe colocar órdenes de compra, de venta o ambas. \"Ambos\" habilita market making en ambos lados del libro de órdenes.",
+                "totalSize": "Define el capital total a asignar a esta estrategia. Esto representa la exposición máxima entre todas las órdenes activas.",
+                "orderSize": "Define el tamaño de las órdenes individuales. Órdenes más pequeñas ofrecen mejor granularidad, pero pueden aumentar los costes de transacción."
+            },
+            "validation": {
+                "nameRequired": "El nombre de la estrategia es obligatorio",
+                "marketRequired": "El mercado es obligatorio",
+                "distanceRequired": "La distancia es obligatoria",
+                "distanceTypeRequired": "El tipo de distancia es obligatorio",
+                "sideRequired": "El lado es obligatorio",
+                "totalSizeRequired": "El tamaño total es obligatorio",
+                "orderSizeRequired": "El tamaño de orden es obligatorio",
+                "positiveNumber": "Introduce un número válido mayor que 0",
+                "orderSizeExceedsTotal": "El tamaño de orden no puede superar el tamaño total"
+            }
+        }
     },
     "margin": {
         "cross": {

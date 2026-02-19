@@ -282,7 +282,55 @@
     },
     "strategies": {
         "newStrategy": "新策略",
-        "editStrategy": "编辑策略"
+        "editStrategy": "编辑策略",
+        "form": {
+            "labels": {
+                "name": "策略名称",
+                "market": "市场",
+                "distance": "距离",
+                "distanceType": "距离类型",
+                "side": "方向",
+                "totalSize": "总规模",
+                "orderSize": "订单规模"
+            },
+            "placeholders": {
+                "name": "名称",
+                "distance": "距离",
+                "totalSize": "总规模",
+                "orderSize": "订单规模"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Tick",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "双向",
+                    "above": "上方",
+                    "below": "下方"
+                }
+            },
+            "blurbs": {
+                "name": "为你的交易策略设置一个清晰的名称，便于后续识别和管理。",
+                "market": "选择你希望部署该策略的市场。不同市场在波动性和流动性上存在差异。",
+                "distance": "设置策略的距离参数，用于决定订单与当前价格之间的偏离程度。",
+                "distanceType": "选择距离的计量方式。Tick 提供更精细的控制，百分比会随价格变化按比例调整。",
+                "side": "指定策略应下买单、卖单或双向下单。\"双向\"可在订单簿两侧进行做市。",
+                "totalSize": "设置该策略可分配的总资金规模，表示所有活动订单的最大总敞口。",
+                "orderSize": "设置单笔订单规模。较小的订单可提高颗粒度，但可能增加交易成本。"
+            },
+            "validation": {
+                "nameRequired": "策略名称为必填项",
+                "marketRequired": "市场为必填项",
+                "distanceRequired": "距离为必填项",
+                "distanceTypeRequired": "距离类型为必填项",
+                "sideRequired": "方向为必填项",
+                "totalSizeRequired": "总规模为必填项",
+                "orderSizeRequired": "订单规模为必填项",
+                "positiveNumber": "请输入大于 0 的有效数字",
+                "orderSizeExceedsTotal": "订单规模不能大于总规模"
+            }
+        }
     },
     "margin": {
         "cross": {

@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { LuX } from 'react-icons/lu';
+import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import Tabs from '~/components/Tabs/Tabs';
 import SortIcon from '~/components/Vault/SortIcon';
 import {
     useStrategiesStore,
@@ -46,12 +46,24 @@ const tableHeaders: headerItemIF[] = [
         key: 'pnl',
         sortable: true,
     },
+    {
+        name: '',
+        key: 'actions',
+        sortable: false,
+    },
 ];
+
+function parseAmount(value: string): number {
+    const numeric = Number(value.replace(/[^0-9.-]+/g, ''));
+    return Number.isNaN(numeric) ? 0 : numeric;
+}
+
+const STRATEGIES_BASE_PATH = '/v2/strategies';
 
 export default function Strategies() {
     const navigate = useNavigate();
 
-    const { data } = useStrategiesStore();
+    const { data, togglePause, remove } = useStrategiesStore();
 
     // data structure for the active sort methodology, putting both values
     // ... in a unified structure allows them to update concurrently
@@ -92,10 +104,23 @@ export default function Strategies() {
             );
         } else if (sortBy.cell === 'collateral') {
             output = [...data].sort(
-                (a: strategyDecoratedIF, b: strategyDecoratedIF) =>
-                    a.collateral
-                        ?.toLowerCase()
-                        .localeCompare(b.collateral.toLocaleLowerCase()),
+                (a: strategyDecoratedIF, b: strategyDecoratedIF) => {
+                    return (
+                        parseAmount(a.collateral) - parseAmount(b.collateral)
+                    );
+                },
+            );
+        } else if (sortBy.cell === 'volume') {
+            output = [...data].sort(
+                (a: strategyDecoratedIF, b: strategyDecoratedIF) => {
+                    return parseAmount(a.volume) - parseAmount(b.volume);
+                },
+            );
+        } else if (sortBy.cell === 'pnl') {
+            output = [...data].sort(
+                (a: strategyDecoratedIF, b: strategyDecoratedIF) => {
+                    return parseAmount(a.pnl) - parseAmount(b.pnl);
+                },
             );
         } else {
             output = data;
@@ -120,14 +145,18 @@ export default function Strategies() {
         return output;
     }
 
+    const [strategyToRemove, setStrategyToRemove] =
+        useState<strategyDecoratedIF | null>(null);
+
     return (
         <div className={styles.strategies_page}>
             <header>
                 <div className={styles.title_row}>
                     <h2>Strategies</h2>
                     <SimpleButton
-                        onClick={() => navigate('/strategies/new')}
+                        onClick={() => navigate(`${STRATEGIES_BASE_PATH}/new`)}
                         hoverBg='accent1'
+                        className={styles.create_button}
                     >
                         Create Strategy
                     </SimpleButton>
@@ -145,26 +174,19 @@ export default function Strategies() {
                 </a>
             </header>
             <div className={styles.table_wrapper}>
-                <Tabs
-                    tabs={['Strategies']}
-                    defaultTab={'Strategies'}
-                    onTabChange={() => null}
-                    rightContent={<></>}
-                    wrapperId={'strategies_table'}
-                />
-                <motion.div
-                    className={styles.table_content}
-                    key={'Strategies'}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                >
+                <div className={styles.table_tab}>Strategies</div>
+                <div className={styles.table_content}>
                     <div className={styles.col_headers_row}>
                         {tableHeaders.map((header: headerItemIF) => (
                             <div
                                 key={header.key}
+                                style={{
+                                    cursor: header.sortable
+                                        ? 'pointer'
+                                        : 'default',
+                                }}
                                 onClick={() => {
+                                    if (!header.sortable) return;
                                     let output: null | sortByIF = null;
                                     if (sortBy) {
                                         output = {
@@ -194,9 +216,11 @@ export default function Strategies() {
                     <ol className={styles.table_body}>
                         {sorted.map((strat: strategyDecoratedIF) => (
                             <li
-                                key={JSON.stringify(strat)}
+                                key={strat.address}
                                 onClick={() =>
-                                    navigate('/strategies/' + strat.address)
+                                    navigate(
+                                        `${STRATEGIES_BASE_PATH}/${strat.address}`,
+                                    )
                                 }
                             >
                                 <div>{strat.name}</div>
@@ -205,23 +229,102 @@ export default function Strategies() {
                                 </div>
                                 <div>{strat.collateral}</div>
                                 <div>{strat.volume}</div>
-                                <div>{strat.pnl}</div>
+                                <div className={styles.pnl_cell}>
+                                    {strat.pnl} <span>(+12.0%)</span>
+                                </div>
+                                <div className={styles.actions_cell}>
+                                    <button
+                                        type='button'
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            togglePause(strat.address);
+                                        }}
+                                    >
+                                        {strat.isPaused ? 'Unpause' : 'Pause'}
+                                    </button>
+                                    <button
+                                        type='button'
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            navigate(
+                                                `${STRATEGIES_BASE_PATH}/${strat.address}/edit`,
+                                                {
+                                                    state: {
+                                                        strategy: strat,
+                                                        address: strat.address,
+                                                    },
+                                                },
+                                            );
+                                        }}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        type='button'
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                        }}
+                                    >
+                                        Transfer
+                                    </button>
+                                    <button
+                                        type='button'
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            setStrategyToRemove(strat);
+                                        }}
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
                             </li>
                         ))}
                         {sorted.length === 0 && (
-                            <div
-                                className={styles.container}
-                                style={{
-                                    justifyContent: 'center',
-                                    padding: '2rem 0',
-                                }}
-                            >
+                            <div className={styles.empty_state}>
                                 No data to display
                             </div>
                         )}
                     </ol>
-                </motion.div>
+                </div>
             </div>
+            {strategyToRemove && (
+                <Modal
+                    title='Remove Strategy'
+                    close={() => setStrategyToRemove(null)}
+                    noHeader
+                >
+                    <section className={styles.remove_strategy_modal}>
+                        <button
+                            type='button'
+                            className={styles.modal_close}
+                            onClick={() => setStrategyToRemove(null)}
+                        >
+                            <LuX size={18} />
+                        </button>
+                        <h3>Remove Strategy</h3>
+                        <p>Are you sure you want to remove this strategy?</p>
+                        <div className={styles.remove_actions}>
+                            <SimpleButton
+                                bg='dark4'
+                                hoverBg='dark2'
+                                onClick={() => setStrategyToRemove(null)}
+                            >
+                                Cancel
+                            </SimpleButton>
+                            <SimpleButton
+                                bg='accent1'
+                                hoverBg='accent1'
+                                onClick={() => {
+                                    remove(strategyToRemove.address);
+                                    setStrategyToRemove(null);
+                                }}
+                            >
+                                Remove
+                            </SimpleButton>
+                        </div>
+                    </section>
+                </Modal>
+            )}
         </div>
     );
 }

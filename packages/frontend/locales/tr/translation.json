@@ -282,7 +282,55 @@
     },
     "strategies": {
         "newStrategy": "Yeni Strateji",
-        "editStrategy": "Stratejiyi Düzenle"
+        "editStrategy": "Stratejiyi Düzenle",
+        "form": {
+            "labels": {
+                "name": "Strateji Adı",
+                "market": "Piyasa",
+                "distance": "Mesafe",
+                "distanceType": "Mesafe Türü",
+                "side": "Yön",
+                "totalSize": "Toplam Büyüklük",
+                "orderSize": "Emir Büyüklüğü"
+            },
+            "placeholders": {
+                "name": "Ad",
+                "distance": "Mesafe",
+                "totalSize": "Toplam Büyüklük",
+                "orderSize": "Emir Büyüklüğü"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Tick",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "Her İkisi",
+                    "above": "Yukarı",
+                    "below": "Aşağı"
+                }
+            },
+            "blurbs": {
+                "name": "İşlem stratejin için açıklayıcı bir ad seç. Bu, stratejilerini tanımlamana ve yönetmene yardımcı olur.",
+                "market": "Bu stratejiyi uygulamak istediğin piyasayı seç. Farklı piyasaların volatilite ve likidite özellikleri farklıdır.",
+                "distance": "Stratejin için mesafe parametresini tanımla. Bu, emirlerin mevcut fiyattan ne kadar uzakta yerleştirileceğini belirler.",
+                "distanceType": "Mesafenin nasıl ölçüleceğini seç. Tick daha hassas kontrol sağlar, yüzde ise fiyat hareketleriyle orantılı ölçekleme sunar.",
+                "side": "Stratejinin alış emri, satış emri veya her ikisini birden verip vermeyeceğini belirt. \"Her İkisi\" seçeneği emir defterinin iki tarafında da market making yapmayı sağlar.",
+                "totalSize": "Bu stratejiye ayrılacak toplam sermayeyi belirle. Bu, tüm aktif emirler için maksimum maruziyeti temsil eder.",
+                "orderSize": "Tekil emirlerin boyutunu belirle. Daha küçük emirler daha iyi ayrıntı sağlar ancak işlem maliyetini artırabilir."
+            },
+            "validation": {
+                "nameRequired": "Strateji adı zorunludur",
+                "marketRequired": "Piyasa zorunludur",
+                "distanceRequired": "Mesafe zorunludur",
+                "distanceTypeRequired": "Mesafe türü zorunludur",
+                "sideRequired": "Yön zorunludur",
+                "totalSizeRequired": "Toplam büyüklük zorunludur",
+                "orderSizeRequired": "Emir büyüklüğü zorunludur",
+                "positiveNumber": "0'dan büyük geçerli bir sayı girin",
+                "orderSizeExceedsTotal": "Emir büyüklüğü toplam büyüklüğü aşamaz"
+            }
+        }
     },
     "margin": {
         "cross": {

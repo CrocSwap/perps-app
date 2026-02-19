@@ -1,202 +1,371 @@
-/* top-level JSX elem at the `/strategies/:address` route */
 .strategy_detail_page {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
-    padding: var(--padding-xxl);
+    height: auto;
+    min-height: 100%;
+    padding: var(--padding-xl) var(--padding-xxl);
     justify-content: flex-start;
-    align-items: center;
     user-select: none;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-/* elem wrapping actual content on the page */
-.strategy_detail_page > div {
+.strategy_shell {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-m);
-    /* Figma used magic number of 1166px which I assume is arbitrary */
-    width: 1200px;
+    gap: 10px;
+    width: 100%;
 }
 
-/* header row, has information and buttons */
-.strategy_detail_page > div > header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+.section_label {
+    display: inline-flex;
     align-items: center;
+    gap: 6px;
+    color: color-mix(in srgb, var(--accent4) 76%, white);
+    font-size: var(--font-size-s);
 }
 
-/* left side of <header> elem on this page */
-/* contains strategy name, backnav clickable, and address */
+.page_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--gap-s);
+}
+
 .header_left {
     display: flex;
     flex-direction: column;
+    gap: 6px;
+}
+
+.back_and_title {
+    display: flex;
+    align-items: center;
     gap: var(--gap-s);
 }
 
-/* wrapper for strategy name and backnav button */
-.back_and_title {
-    display: flex;
-    flex-direction: row;
-    gap: var(--gap-m);
-    /* Figma uses magic number */
-    --back-and-title-height: 45px;
-}
-
-/* clickable for backnav action */
-.back_and_title > div {
-    /* needed to keep height in sync with parent */
-    height: var(--back-and-title-height);
-    /* this keeps the elem square */
-    aspect-ratio: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: var(--radius-m);
+.back_button {
+    height: 36px;
+    width: 36px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text2);
+    border-radius: var(--radius-s);
     cursor: pointer;
 }
 
-/* hover state for backnav clickable */
-.back_and_title > div:hover {
+.back_button:hover {
     background-color: var(--bg-dark4);
 }
 
-/* title text for strategy name */
 .back_and_title > h2 {
+    font-size: clamp(30px, 2.8vw, 40px);
     font-weight: 300;
-    font-size: var(--font-size-xl);
     color: var(--text1);
+    line-height: 1;
 }
 
-.address_clickable {
-    margin-left: 61px;
+.address_row {
     display: flex;
-    flex-direction: row;
-    gap: var(--gap-s);
+    align-items: center;
+    gap: var(--gap-xs);
+    margin-left: 36px;
+}
+
+.address_row > p {
+    font-size: 10px;
     color: var(--text2);
-    background-color: var(--dark3);
-}
-
-/* text display of contract address for strategy */
-.address_clickable > p {
-    font-size: var(--font-size-s);
     font-family: var(--font-family-mono);
-    vertical-align: bottom;
 }
 
-/* clickable elem to copy strategy address to clipboard */
-.address_clickable > div {
+.copy_address {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text2);
     cursor: pointer;
 }
 
-/* bank of buttons to modify strategy */
 .header_right {
-    align-self: start;
     display: flex;
-    flex-direction: row;
     align-items: center;
     gap: var(--gap-s);
 }
 
-/* readout of strategy status (running vs paused) */
-.header_right > div {
-    /* magic number is from Figma */
-    /* large width prevents layout shift when text changes*/
-    width: 160px;
+.status_label {
     color: var(--text1);
+    width: auto;
+    font-size: var(--font-size-s);
 }
 
-/* styles to apply to each individual `<button>` elem */
-.header_right > button {
-    /* width not specified in Figma, @miyu requested equal-widths */
-    width: 110px;
-    border-radius: var(--radius-m);
-    background-color: var(--bg-dark3);
+.header_action {
+    width: auto !important;
+    min-width: 70px;
+    height: 34px !important;
+    font-size: var(--font-size-s) !important;
 }
 
-/* hover state for `<button>` elems in header */
-.header_right > button:hover {
-    background-color: var(--accent1);
-}
-
-/* row on page with tables and chart for strategy information */
 .strategy_details {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-areas: 'parameters performance chart';
-    gap: var(--gap-m);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-s);
 }
 
-/* styles for individual strategy detail tables */
-.strategy_details_table {
+.detail_table,
+.strategy_details_graph,
+.order_history_card {
+    background: color-mix(in srgb, var(--bg-dark2) 96%, black);
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--bg-dark4) 78%, transparent);
+}
+
+.detail_table {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-xs);
     padding: 8px 0;
-    font-size: var(--font-size-s);
-    background-color: var(--bg-dark2);
-    border-radius: 16px;
 }
 
-/* these two parts create the grey-purple underline effect */
-.strategy_details_table > header {
+.detail_header {
     border-bottom: 1px solid var(--bg-dark4);
-    --strategy-details-table-header-bottom-padding: var(--padding-xs);
-    padding-bottom: var(--strategy-details-table-header-bottom-padding);
-    margin-bottom: -1px;
+    padding-bottom: var(--padding-xs);
 }
-.strategy_details_table > header > span {
-    padding: var(--strategy-details-table-header-bottom-padding) 16px;
+
+.detail_header > span {
+    padding: var(--padding-xs) 16px;
     border-bottom: 1px solid var(--accent1);
     color: var(--accent1);
-    margin-bottom: -1px;
+    font-size: var(--font-size-s);
 }
 
-/* table body of strategy details tables */
-.strategy_details_table > section {
+.detail_rows {
     display: flex;
     flex-direction: column;
     gap: var(--gap-xs);
-    padding: 4px 16px;
+    padding: 6px 12px;
 }
 
-/* individual row in a data table */
-.strategy_details_table > section > div {
+.detail_row {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
+    font-size: var(--font-size-s);
 }
 
-/* apply differential color to the label text in the row */
-.strategy_details_table > section > div > div:first-child {
+.detail_row > div:first-child {
     color: var(--text2);
 }
 
-/* later on this element will be a chart */
 .strategy_details_graph {
-    background-color: var(--bg-dark2);
-    border-radius: 16px;
-    justify-content: start;
-    align-items: start;
+    padding: 6px;
+    overflow: hidden;
 }
 
-/* top-level JSX for content in the strategy removal modal */
-.remove_strategy_modal {
+.order_history_card {
     display: flex;
     flex-direction: column;
-    padding: var(--padding-m);
-    gap: var(--gap-l);
+    padding-bottom: 10px;
+    overflow: hidden;
 }
 
-/* message text for the user in the strategy removal modal */
-.remove_strategy_modal > p {
+.history_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid var(--bg-dark4);
+}
+
+.history_tab {
+    color: var(--accent1);
+    border-bottom: 1px solid var(--accent1);
+    padding: 0 0 6px;
+    font-size: var(--font-size-s);
+}
+
+.filter_button,
+.view_all {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text1);
+    cursor: pointer;
+    font-size: var(--font-size-s);
+}
+
+.filter_button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.history_table {
+    overflow-x: auto;
+    padding: 6px 8px;
+}
+
+.history_row_header,
+.history_row {
+    min-width: 1080px;
+    display: grid;
+    grid-template-columns:
+        1.8fr 0.9fr 0.7fr 0.9fr 0.8fr 0.9fr 0.9fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr
+        1fr;
+    gap: var(--gap-s);
+    align-items: center;
+    font-size: 11px;
+}
+
+.history_row_header {
+    color: var(--text2);
+    margin-bottom: 6px;
+}
+
+.history_row {
+    color: var(--text1);
+}
+
+.long_value {
+    color: #20d6b0;
+}
+
+.view_all {
+    align-self: flex-start;
+    margin: 4px 10px 0;
+    color: var(--accent1);
+}
+
+.remove_strategy_modal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    min-width: 680px;
+    padding: 20px 24px 24px;
+}
+
+.modal_close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+}
+
+.remove_strategy_modal > h3 {
+    font-size: clamp(24px, 2.8vw, 36px);
+    font-weight: 300;
+    line-height: 1;
     text-align: center;
 }
 
-/* CTA buttons in the strategy removal modal */
-.remove_strat_modal_buttons {
-    display: flex;
-    flex-direction: row;
+.remove_strategy_modal > p {
+    font-size: clamp(14px, 1.6vw, 22px);
+    line-height: 1.2;
+    text-align: center;
+}
+
+.remove_actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--gap-m);
+}
+
+@media (max-width: 1100px) {
+    .page_header {
+        flex-direction: column;
+    }
+
+    .header_right {
+        flex-wrap: wrap;
+    }
+
+    .strategy_details {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 960px) {
+    .strategy_detail_page {
+        padding: 12px 12px calc(96px + env(safe-area-inset-bottom));
+    }
+
+    .back_and_title > h2 {
+        font-size: 28px;
+    }
+
+    .address_row {
+        margin-left: 0;
+        flex-wrap: wrap;
+    }
+
+    .header_right {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .status_label {
+        grid-column: 1 / -1;
+    }
+
+    .header_action {
+        width: 100% !important;
+        min-width: 0;
+    }
+
+    .detail_row {
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .detail_row > div:first-child,
+    .detail_row > div:last-child {
+        font-size: 12px;
+    }
+
+    .history_header {
+        padding: 8px 10px;
+    }
+
+    .history_tab,
+    .filter_button,
+    .view_all {
+        font-size: 12px;
+    }
+
+    .history_table {
+        padding: 6px;
+    }
+
+    .remove_strategy_modal {
+        min-width: min(92vw, 680px);
+    }
+
+    .remove_strategy_modal > h3 {
+        font-size: 28px;
+    }
+
+    .remove_strategy_modal > p {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 640px) {
+    .header_right {
+        grid-template-columns: 1fr;
+    }
+
+    .history_row_header,
+    .history_row {
+        min-width: 900px;
+    }
+
+    .remove_actions {
+        grid-template-columns: 1fr;
+    }
 }

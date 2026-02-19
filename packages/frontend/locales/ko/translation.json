@@ -282,7 +282,55 @@
     },
     "strategies": {
         "newStrategy": "새 전략",
-        "editStrategy": "전략 수정"
+        "editStrategy": "전략 수정",
+        "form": {
+            "labels": {
+                "name": "전략 이름",
+                "market": "마켓",
+                "distance": "거리",
+                "distanceType": "거리 유형",
+                "side": "방향",
+                "totalSize": "총 수량",
+                "orderSize": "주문 수량"
+            },
+            "placeholders": {
+                "name": "이름",
+                "distance": "거리",
+                "totalSize": "총 수량",
+                "orderSize": "주문 수량"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "틱",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "양방향",
+                    "above": "위",
+                    "below": "아래"
+                }
+            },
+            "blurbs": {
+                "name": "전략을 쉽게 식별할 수 있도록 설명적인 이름을 입력하세요. 전략을 관리할 때 도움이 됩니다.",
+                "market": "이 전략을 배포할 마켓을 선택하세요. 마켓마다 변동성과 유동성 특성이 다릅니다.",
+                "distance": "전략의 거리 파라미터를 설정하세요. 현재 가격에서 얼마나 떨어진 위치에 주문을 배치할지 결정합니다.",
+                "distanceType": "거리를 측정하는 방식을 선택하세요. 틱은 정밀한 제어를 제공하고, 퍼센트는 가격 변동에 비례한 스케일링을 제공합니다.",
+                "side": "전략이 매수 주문, 매도 주문 또는 둘 다 배치할지 지정하세요. \"양방향\"은 오더북 양쪽에서 마켓메이킹을 가능하게 합니다.",
+                "totalSize": "이 전략에 배정할 총 자본을 설정하세요. 이는 활성 주문 전체에 대한 최대 익스포저를 의미합니다.",
+                "orderSize": "개별 주문의 크기를 설정하세요. 더 작은 주문은 세밀한 제어가 가능하지만 거래 비용이 증가할 수 있습니다."
+            },
+            "validation": {
+                "nameRequired": "전략 이름은 필수입니다",
+                "marketRequired": "마켓은 필수입니다",
+                "distanceRequired": "거리는 필수입니다",
+                "distanceTypeRequired": "거리 유형은 필수입니다",
+                "sideRequired": "방향은 필수입니다",
+                "totalSizeRequired": "총 수량은 필수입니다",
+                "orderSizeRequired": "주문 수량은 필수입니다",
+                "positiveNumber": "0보다 큰 유효한 숫자를 입력하세요",
+                "orderSizeExceedsTotal": "주문 수량은 총 수량보다 클 수 없습니다"
+            }
+        }
     },
     "margin": {
         "cross": {

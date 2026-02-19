@@ -3,8 +3,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    padding: var(--padding-xxl);
+    justify-content: center;
+    padding: 18px 24px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     /* this value is referenced by children to fix z-index issues */
     --create-strategy-page-z-index: 1;
@@ -14,68 +17,136 @@
 .create_strategy {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-l);
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 1320px;
 }
 
 .create_strategy > header {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
-    gap: var(--gap-m);
+    align-items: flex-start;
+    align-self: center;
+    width: min(100%, 1120px);
+    gap: 4px;
 }
 
-.create_strategy > header > div {
+.heading_row {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+.back_button {
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: var(--radius-s);
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text1);
     cursor: pointer;
-    height: 45px;
+    height: 36px;
     aspect-ratio: 1/1;
 }
 
-.create_strategy > header > div:hover {
+.back_button:hover {
     background-color: var(--bg-dark4);
 }
 
-.create_strategy > header > h2 {
-    font-size: var(--font-size-xl);
-    /* font-weight is from Figma not centralized */
+.heading_row > h2 {
+    font-size: clamp(30px, 2.6vw, 40px);
     font-weight: 300;
     color: var(--text1);
+    line-height: 1;
 }
 
 .create_strategy > div {
     display: flex;
     flex-direction: column;
-    padding: var(--padding-m);
-    width: 900px;
-    gap: var(--gap-m);
+    padding: 20px 24px 20px;
+    width: min(100%, 1120px);
+    gap: 12px;
     border-radius: var(--radius-m);
     background-color: var(--bg-dark2);
+    border: 1px solid color-mix(in srgb, var(--bg-dark4) 78%, transparent);
 }
 
 .create_strategy_inputs {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-m);
+    gap: 10px;
 }
 
 .create_strategy_buttons {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     font-size: var(--font-size-m);
     user-select: none;
 }
 
 .create_strategy_buttons button {
-    padding: 12px 16px;
+    padding: 10px 16px;
+    min-width: 80px;
+    white-space: nowrap;
 }
 
 .buttons_right {
     display: flex;
     flex-direction: row;
-    gap: var(--gap-s);
+    gap: var(--gap-xs);
+}
+
+@media (max-width: 1024px) {
+    .heading_row > h2 {
+        font-size: 30px;
+    }
+
+    .create_strategy_buttons {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--gap-s);
+    }
+
+    .buttons_right {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .create_strategy_page {
+        padding: 12px;
+        justify-content: flex-start;
+        padding-bottom: calc(104px + env(safe-area-inset-bottom));
+    }
+
+    .heading_row {
+        gap: var(--gap-s);
+    }
+
+    .heading_row > h2 {
+        font-size: 26px;
+    }
+
+    .create_strategy > div {
+        padding: 14px;
+        gap: 12px;
+    }
+
+    .buttons_right {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .buttons_right > button {
+        width: 100%;
+    }
 }

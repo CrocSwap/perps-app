@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import LineChart from '~/components/LineChart/LineChart';
 
 const StrategyDetailChart: React.FC = () => {
@@ -25,17 +25,58 @@ const StrategyDetailChart: React.FC = () => {
         { time: 1745088000000, value: 102.4 },
     ];
 
-    const [chartWidth, setChartWidth] = useState<number>(370);
-    const [chartHeight, setChartHeight] = useState<number>(230);
+    const chartContainerRef = useRef<HTMLDivElement>(null);
+    const [chartSize, setChartSize] = useState<{
+        width: number;
+        height: number;
+    }>({
+        width: 370,
+        height: 230,
+    });
+
+    useEffect(() => {
+        const chartContainer = chartContainerRef.current;
+        if (!chartContainer) return;
+
+        const updateChartSize = (): void => {
+            const nextWidth = Math.max(
+                260,
+                Math.floor(chartContainer.clientWidth - 8),
+            );
+            const nextHeight = Math.max(
+                180,
+                Math.min(260, Math.floor(nextWidth * 0.6)),
+            );
+
+            setChartSize((prev) => {
+                if (prev.width === nextWidth && prev.height === nextHeight) {
+                    return prev;
+                }
+                return {
+                    width: nextWidth,
+                    height: nextHeight,
+                };
+            });
+        };
+
+        updateChartSize();
+
+        const resizeObserver = new ResizeObserver(updateChartSize);
+        resizeObserver.observe(chartContainer);
+
+        return () => resizeObserver.disconnect();
+    }, []);
 
     return (
-        <LineChart
-            lineData={lineData}
-            curve={'step'}
-            chartName={'strategy'}
-            width={chartWidth}
-            height={chartHeight}
-        />
+        <div ref={chartContainerRef} style={{ width: '100%', minHeight: 190 }}>
+            <LineChart
+                lineData={lineData}
+                curve={'step'}
+                chartName={'strategy'}
+                width={chartSize.width}
+                height={chartSize.height}
+            />
+        </div>
     );
 };
 

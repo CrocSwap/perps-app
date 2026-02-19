@@ -282,7 +282,55 @@
     },
     "strategies": {
         "newStrategy": "New Strategy",
-        "editStrategy": "Edit Strategy"
+        "editStrategy": "Edit Strategy",
+        "form": {
+            "labels": {
+                "name": "Strategy Name",
+                "market": "Market",
+                "distance": "Distance",
+                "distanceType": "Distance Type",
+                "side": "Side",
+                "totalSize": "Total Size",
+                "orderSize": "Order Size"
+            },
+            "placeholders": {
+                "name": "Name",
+                "distance": "Distance",
+                "totalSize": "Total Size",
+                "orderSize": "Order Size"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Ticks",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "Both",
+                    "above": "Above",
+                    "below": "Below"
+                }
+            },
+            "blurbs": {
+                "name": "Choose a descriptive name for your trading strategy. This will help you identify and manage your strategies effectively.",
+                "market": "Select the market where you want to deploy this trading strategy. Different markets have varying volatility and liquidity characteristics.",
+                "distance": "Define the distance parameter for your strategy. This determines how far from the current price your orders will be placed.",
+                "distanceType": "Choose how the distance is measured. Ticks provide precise control, while percentage offers proportional scaling with price movements.",
+                "side": "Specify whether the strategy should place buy orders, sell orders, or both. \"Both\" enables market making on both sides of the order book.",
+                "totalSize": "Set the total amount of capital to allocate to this strategy. This represents the maximum exposure across all active orders.",
+                "orderSize": "Define the size of individual orders. Smaller orders provide better granularity but may increase transaction costs."
+            },
+            "validation": {
+                "nameRequired": "Strategy name is required",
+                "marketRequired": "Market is required",
+                "distanceRequired": "Distance is required",
+                "distanceTypeRequired": "Distance type is required",
+                "sideRequired": "Side is required",
+                "totalSizeRequired": "Total size is required",
+                "orderSizeRequired": "Order size is required",
+                "positiveNumber": "Enter a valid number greater than 0",
+                "orderSizeExceedsTotal": "Order size cannot exceed total size"
+            }
+        }
     },
     "margin": {
         "cross": {

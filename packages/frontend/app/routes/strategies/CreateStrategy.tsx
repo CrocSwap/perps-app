@@ -12,52 +12,38 @@ import {
     useNotificationStore,
 } from '~/stores/NotificationStore';
 import { useState, useMemo } from 'react';
-import { FaChevronLeft } from 'react-icons/fa';
-import { t } from 'i18next';
+import { LuChevronLeft } from 'react-icons/lu';
+import { useTranslation } from 'react-i18next';
+
+type strategyFieldKey =
+    | 'name'
+    | 'market'
+    | 'distance'
+    | 'distanceType'
+    | 'side'
+    | 'totalSize'
+    | 'orderSize';
+
+export interface strategyOptionIF {
+    value: string;
+    label: string;
+}
 
 export interface textInputIF {
+    key: strategyFieldKey;
     label: string;
-    input: string | string[];
+    input: string | strategyOptionIF[];
     blurb: string;
 }
 
-const inputData = {
-    name: {
-        label: 'Strategy Name',
-        input: 'Name',
-        blurb: 'Choose a descriptive name for your trading strategy. This will help you identify and manage your strategies effectively.',
-    },
-    market: {
-        label: 'Market',
-        input: ['BTC', 'ETH', 'SOL'],
-        blurb: 'Select the market where you want to deploy this trading  strategy. Different markets have varying volatility and liquidity characteristics.',
-    },
-    distance: {
-        label: 'Distance',
-        input: 'Distance',
-        blurb: 'Define the distance parameter for your strategy. This determines how far from the current price your orders will be placed.',
-    },
-    distanceType: {
-        label: 'Distance Type',
-        input: ['Ticks', '%'],
-        blurb: 'Choose how the distance is measured. Ticks provide precise control, while percentage offers proportional scaling with price movements.',
-    },
-    side: {
-        label: 'Side',
-        input: ['Both', 'Above', 'Below'],
-        blurb: 'Specify whether the strategy should place buy orders, sell orders, or  both. "Both" enables market making on both sides of the order book.',
-    },
-    totalSize: {
-        label: 'Total Size',
-        input: 'Total Size',
-        blurb: 'Set the total amount of capital to allocate to this strategy. This represents the maximum exposure across all active orders.',
-    },
-    orderSize: {
-        label: 'Order Size',
-        input: 'Order Size',
-        blurb: 'Define the size of individual orders. Smaller orders provide better granularity but may increase transaction costs.',
-    },
-};
+function parseNumericInput(value: string): number {
+    const normalized = value
+        .replace(/[$,%\s_]/g, '')
+        .replace(/,/g, '')
+        .trim();
+    if (!normalized) return NaN;
+    return Number(normalized);
+}
 
 interface basePropsIF {
     page: 'new' | 'edit';
@@ -75,7 +61,10 @@ interface editStrategyPropsIF extends basePropsIF {
 
 type propsT = newStrategyPropsIF | editStrategyPropsIF;
 
+const STRATEGIES_BASE_PATH = '/v2/strategies';
+
 export default function CreateStrategy(props: propsT) {
+    const { t } = useTranslation();
     const { page, submitFn } = props;
     const navigate = useNavigate();
 
@@ -99,39 +88,209 @@ export default function CreateStrategy(props: propsT) {
     const [totalSize, setTotalSize] = useState(strategy.totalSize);
     const [orderSize, setOrderSize] = useState(strategy.orderSize);
 
+    const [touched, setTouched] = useState<Record<strategyFieldKey, boolean>>({
+        name: false,
+        market: false,
+        distance: false,
+        distanceType: false,
+        side: false,
+        totalSize: false,
+        orderSize: false,
+    });
+
+    const inputData: Record<strategyFieldKey, textInputIF> = useMemo(
+        () => ({
+            name: {
+                key: 'name',
+                label: t('strategies.form.labels.name'),
+                input: t('strategies.form.placeholders.name'),
+                blurb: t('strategies.form.blurbs.name'),
+            },
+            market: {
+                key: 'market',
+                label: t('strategies.form.labels.market'),
+                input: [
+                    { value: 'BTC', label: 'BTC' },
+                    { value: 'ETH', label: 'ETH' },
+                    { value: 'SOL', label: 'SOL' },
+                ],
+                blurb: t('strategies.form.blurbs.market'),
+            },
+            distance: {
+                key: 'distance',
+                label: t('strategies.form.labels.distance'),
+                input: t('strategies.form.placeholders.distance'),
+                blurb: t('strategies.form.blurbs.distance'),
+            },
+            distanceType: {
+                key: 'distanceType',
+                label: t('strategies.form.labels.distanceType'),
+                input: [
+                    {
+                        value: 'Ticks',
+                        label: t('strategies.form.options.distanceType.ticks'),
+                    },
+                    {
+                        value: '%',
+                        label: t(
+                            'strategies.form.options.distanceType.percentage',
+                        ),
+                    },
+                ],
+                blurb: t('strategies.form.blurbs.distanceType'),
+            },
+            side: {
+                key: 'side',
+                label: t('strategies.form.labels.side'),
+                input: [
+                    {
+                        value: 'Both',
+                        label: t('strategies.form.options.side.both'),
+                    },
+                    {
+                        value: 'Above',
+                        label: t('strategies.form.options.side.above'),
+                    },
+                    {
+                        value: 'Below',
+                        label: t('strategies.form.options.side.below'),
+                    },
+                ],
+                blurb: t('strategies.form.blurbs.side'),
+            },
+            totalSize: {
+                key: 'totalSize',
+                label: t('strategies.form.labels.totalSize'),
+                input: t('strategies.form.placeholders.totalSize'),
+                blurb: t('strategies.form.blurbs.totalSize'),
+            },
+            orderSize: {
+                key: 'orderSize',
+                label: t('strategies.form.labels.orderSize'),
+                input: t('strategies.form.placeholders.orderSize'),
+                blurb: t('strategies.form.blurbs.orderSize'),
+            },
+        }),
+        [t],
+    );
+
+    const errors = useMemo(() => {
+        const nextErrors: Partial<Record<strategyFieldKey, string>> = {};
+
+        if (!name.trim()) {
+            nextErrors.name = t('strategies.form.validation.nameRequired');
+        }
+
+        if (!market.trim()) {
+            nextErrors.market = t('strategies.form.validation.marketRequired');
+        }
+
+        const parsedDistance = parseNumericInput(distance);
+        if (!distance.trim()) {
+            nextErrors.distance = t(
+                'strategies.form.validation.distanceRequired',
+            );
+        } else if (Number.isNaN(parsedDistance) || parsedDistance <= 0) {
+            nextErrors.distance = t(
+                'strategies.form.validation.positiveNumber',
+            );
+        }
+
+        if (!distanceType.trim()) {
+            nextErrors.distanceType = t(
+                'strategies.form.validation.distanceTypeRequired',
+            );
+        }
+
+        if (!side.trim()) {
+            nextErrors.side = t('strategies.form.validation.sideRequired');
+        }
+
+        const parsedTotalSize = parseNumericInput(totalSize);
+        if (!totalSize.trim()) {
+            nextErrors.totalSize = t(
+                'strategies.form.validation.totalSizeRequired',
+            );
+        } else if (Number.isNaN(parsedTotalSize) || parsedTotalSize <= 0) {
+            nextErrors.totalSize = t(
+                'strategies.form.validation.positiveNumber',
+            );
+        }
+
+        const parsedOrderSize = parseNumericInput(orderSize);
+        if (!orderSize.trim()) {
+            nextErrors.orderSize = t(
+                'strategies.form.validation.orderSizeRequired',
+            );
+        } else if (Number.isNaN(parsedOrderSize) || parsedOrderSize <= 0) {
+            nextErrors.orderSize = t(
+                'strategies.form.validation.positiveNumber',
+            );
+        } else if (
+            !Number.isNaN(parsedTotalSize) &&
+            parsedTotalSize > 0 &&
+            parsedOrderSize > parsedTotalSize
+        ) {
+            nextErrors.orderSize = t(
+                'strategies.form.validation.orderSizeExceedsTotal',
+            );
+        }
+
+        return nextErrors;
+    }, [distance, distanceType, market, name, orderSize, side, t, totalSize]);
+
     const isValid = useMemo(() => {
-        if (!name || name.trim() === '') return false;
-        if (!market || market.trim() === '') return false;
-        if (!distance || isNaN(Number(distance)) || Number(distance) <= 0)
-            return false;
-        if (!totalSize || isNaN(Number(totalSize)) || Number(totalSize) <= 0)
-            return false;
-        if (!orderSize || isNaN(Number(orderSize)) || Number(orderSize) <= 0)
-            return false;
-        return true;
-    }, [name, market, distance, totalSize, orderSize]);
+        return Object.keys(errors).length === 0;
+    }, [errors]);
+
+    const setFieldTouched = (field: strategyFieldKey) => {
+        setTouched((prev) => ({
+            ...prev,
+            [field]: true,
+        }));
+    };
+
+    const markAllTouched = () => {
+        setTouched({
+            name: true,
+            market: true,
+            distance: true,
+            distanceType: true,
+            side: true,
+            totalSize: true,
+            orderSize: true,
+        });
+    };
 
     return (
         <div className={styles.create_strategy_page}>
             <div className={styles.create_strategy}>
                 <header>
-                    <div
-                        onClick={() => {
-                            // base URL destination for backnav
-                            let destination = '/strategies';
-                            // if user is on edit page, add address param to URL
-                            if (params.address) {
-                                destination += `/${params.address}`;
-                            }
-                            // navigate user to the correct destination
-                            // note that this is a forward nav action
-                            navigate(destination);
-                        }}
-                    >
-                        <FaChevronLeft />
+                    <div className={styles.heading_row}>
+                        <button
+                            type='button'
+                            onClick={() => {
+                                // base URL destination for backnav
+                                let destination = STRATEGIES_BASE_PATH;
+                                // if user is on edit page, add address param to URL
+                                if (params.strategy_hash) {
+                                    destination += `/${params.strategy_hash}`;
+                                }
+                                // navigate user to the correct destination
+                                // note that this is a forward nav action
+                                navigate(destination);
+                            }}
+                            className={styles.back_button}
+                        >
+                            <LuChevronLeft />
+                        </button>
+                        {page === 'new' && (
+                            <h2>{t('strategies.newStrategy')}</h2>
+                        )}
+                        {page === 'edit' && (
+                            <h2>{t('strategies.editStrategy')}</h2>
+                        )}
                     </div>
-                    {page === 'new' && <h2>{t('strategies.newStrategy')}</h2>}
-                    {page === 'edit' && <h2>{t('strategies.editStrategy')}</h2>}
                 </header>
                 <div>
                     <section className={styles.create_strategy_inputs}>
@@ -139,16 +298,24 @@ export default function CreateStrategy(props: propsT) {
                             initial={name}
                             data={inputData.name}
                             handleChange={(text: string) => setName(text)}
+                            onBlur={() => setFieldTouched('name')}
+                            error={touched.name ? errors.name : undefined}
                         />
                         <InputText
                             initial={market}
                             data={inputData.market}
                             handleChange={(text: string) => setMarket(text)}
+                            onBlur={() => setFieldTouched('market')}
+                            error={touched.market ? errors.market : undefined}
                         />
                         <InputText
                             initial={distance}
                             data={inputData.distance}
                             handleChange={(text: string) => setDistance(text)}
+                            onBlur={() => setFieldTouched('distance')}
+                            error={
+                                touched.distance ? errors.distance : undefined
+                            }
                         />
                         <InputText
                             initial={distanceType}
@@ -156,28 +323,43 @@ export default function CreateStrategy(props: propsT) {
                             handleChange={(text: string) =>
                                 setDistanceType(text)
                             }
+                            onBlur={() => setFieldTouched('distanceType')}
+                            error={
+                                touched.distanceType
+                                    ? errors.distanceType
+                                    : undefined
+                            }
                         />
                         <InputText
                             initial={side}
                             data={inputData.side}
                             handleChange={(text: string) => setSide(text)}
+                            onBlur={() => setFieldTouched('side')}
+                            error={touched.side ? errors.side : undefined}
                         />
                         <InputText
                             initial={totalSize}
                             data={inputData.totalSize}
                             handleChange={(text: string) => setTotalSize(text)}
+                            onBlur={() => setFieldTouched('totalSize')}
+                            error={
+                                touched.totalSize ? errors.totalSize : undefined
+                            }
                         />
                         <InputText
                             initial={orderSize}
                             data={inputData.orderSize}
                             handleChange={(text: string) => setOrderSize(text)}
+                            onBlur={() => setFieldTouched('orderSize')}
+                            error={
+                                touched.orderSize ? errors.orderSize : undefined
+                            }
                         />
                     </section>
                     <section className={styles.create_strategy_buttons}>
                         <Button
                             size={100}
                             onClick={() => {
-                                console.log(strategy.name);
                                 setName(strategy.name);
                                 setMarket(strategy.market);
                                 setDistance(strategy.distance);
@@ -185,6 +367,15 @@ export default function CreateStrategy(props: propsT) {
                                 setSide(strategy.side);
                                 setTotalSize(strategy.totalSize);
                                 setOrderSize(strategy.orderSize);
+                                setTouched({
+                                    name: false,
+                                    market: false,
+                                    distance: false,
+                                    distanceType: false,
+                                    side: false,
+                                    totalSize: false,
+                                    orderSize: false,
+                                });
                             }}
                         >
                             {t('common.reset')}
@@ -195,8 +386,8 @@ export default function CreateStrategy(props: propsT) {
                                 onClick={() =>
                                     navigate(
                                         location.state
-                                            ? `/strategies/${location.state.address}`
-                                            : '/strategies',
+                                            ? `${STRATEGIES_BASE_PATH}/${location.state.address}`
+                                            : STRATEGIES_BASE_PATH,
                                     )
                                 }
                             >
@@ -204,14 +395,19 @@ export default function CreateStrategy(props: propsT) {
                             </Button>
                             <Button
                                 onClick={() => {
+                                    if (!isValid) {
+                                        markAllTouched();
+                                        return;
+                                    }
+
                                     const values = {
-                                        name,
+                                        name: name.trim(),
                                         market,
-                                        distance,
+                                        distance: distance.trim(),
                                         distanceType,
                                         side,
-                                        totalSize,
-                                        orderSize,
+                                        totalSize: totalSize.trim(),
+                                        orderSize: orderSize.trim(),
                                         isPaused: false,
                                     };
                                     if (page === 'edit' && location.state) {
@@ -237,7 +433,7 @@ export default function CreateStrategy(props: propsT) {
                                             icon: 'check',
                                         });
                                     }
-                                    navigate('/strategies');
+                                    navigate(STRATEGIES_BASE_PATH);
                                 }}
                                 size={100}
                                 selected

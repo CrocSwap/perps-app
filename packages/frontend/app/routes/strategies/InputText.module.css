@@ -1,11 +1,24 @@
 .text_input {
     display: grid;
-    --create-strategy-input-width: 200px;
-    grid-template-columns: 200px var(--create-strategy-input-width) 1fr;
-    align-items: center;
-    gap: var(--gap-m);
-    height: 32px;
+    --create-strategy-input-width: 240px;
+    grid-template-columns: 150px var(--create-strategy-input-width) minmax(
+            0,
+            1fr
+        );
+    align-items: flex-start;
+    gap: 20px;
+    min-height: 48px;
     user-select: none;
+}
+
+.text_input > label {
+    font-size: clamp(12px, 1.1vw, 20px);
+    line-height: 1.2;
+    padding-top: 6px;
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    min-height: 1.2em;
 }
 
 .text_input > input,
@@ -15,7 +28,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 4px 8px;
+    padding: 10px 12px;
     background-color: var(--bg-dark3);
     font-size: var(--font-size-s);
     border: none;
@@ -52,8 +65,50 @@
 }
 
 .text_input > p {
-    font-size: var(--font-size-s);
+    font-size: clamp(10px, 0.8vw, 13px);
+    line-height: 1.35;
     color: var(--text2);
     user-select: none;
-    text-align: justify;
+    text-align: left;
+    padding-top: 6px;
+}
+
+.input_error {
+    grid-column: 2 / 4;
+    margin-top: 2px;
+    color: var(--red);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+@media (max-width: 1250px) {
+    .text_input {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        align-items: flex-start;
+        min-height: auto;
+    }
+
+    .text_input > label {
+        font-size: var(--font-size-s);
+        white-space: normal;
+        overflow: visible;
+        padding-top: 0;
+    }
+
+    .text_input > p {
+        font-size: var(--font-size-s);
+        line-height: 1.35;
+        padding-top: 0;
+    }
+
+    .input_error {
+        grid-column: 1;
+    }
+
+    .text_input > input,
+    .dropdown > button,
+    .dropdown > ul {
+        width: min(100%, 360px);
+    }
 }

@@ -282,7 +282,55 @@
     },
     "strategies": {
         "newStrategy": "新しい戦略",
-        "editStrategy": "戦略を編集"
+        "editStrategy": "戦略を編集",
+        "form": {
+            "labels": {
+                "name": "戦略名",
+                "market": "マーケット",
+                "distance": "距離",
+                "distanceType": "距離タイプ",
+                "side": "サイド",
+                "totalSize": "合計サイズ",
+                "orderSize": "注文サイズ"
+            },
+            "placeholders": {
+                "name": "名前",
+                "distance": "距離",
+                "totalSize": "合計サイズ",
+                "orderSize": "注文サイズ"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "ティック",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "両方",
+                    "above": "上",
+                    "below": "下"
+                }
+            },
+            "blurbs": {
+                "name": "取引戦略に分かりやすい名前を付けてください。戦略の識別と管理がしやすくなります。",
+                "market": "この戦略を実行するマーケットを選択してください。マーケットごとにボラティリティや流動性の特性が異なります。",
+                "distance": "戦略の距離パラメータを設定します。現在価格からどれだけ離れた位置に注文を置くかを決定します。",
+                "distanceType": "距離の測定方法を選択します。ティックは精密な調整に適し、パーセンテージは価格変動に応じた比例スケーリングを提供します。",
+                "side": "戦略で買い注文・売り注文のどちらを出すかを指定します。\"両方\"を選ぶと板の両側でマーケットメイクできます。",
+                "totalSize": "この戦略に割り当てる合計資本を設定します。すべての有効注文に対する最大エクスポージャーを表します。",
+                "orderSize": "個別注文のサイズを設定します。小さい注文は粒度が高くなりますが、取引コストが増える場合があります。"
+            },
+            "validation": {
+                "nameRequired": "戦略名は必須です",
+                "marketRequired": "マーケットは必須です",
+                "distanceRequired": "距離は必須です",
+                "distanceTypeRequired": "距離タイプは必須です",
+                "sideRequired": "サイドは必須です",
+                "totalSizeRequired": "合計サイズは必須です",
+                "orderSizeRequired": "注文サイズは必須です",
+                "positiveNumber": "0より大きい有効な数値を入力してください",
+                "orderSizeExceedsTotal": "注文サイズは合計サイズを超えることはできません"
+            }
+        }
     },
     "margin": {
         "cross": {

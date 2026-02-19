@@ -117,7 +117,7 @@ const router = createBrowserRouter([
                 },
             },
             {
-                path: 'v2/strategies/:address?',
+                path: 'v2/strategies/:strategy_hash',
                 lazy: async () => {
                     const { default: Component } =
                         await import('./routes/strategies/StrategyDetail');
@@ -125,7 +125,7 @@ const router = createBrowserRouter([
                 },
             },
             {
-                path: 'v2/strategies/:address/edit',
+                path: 'v2/strategies/:strategy_hash/edit',
                 lazy: async () => {
                     const { default: Component } =
                         await import('./routes/strategies/editStrategy');
