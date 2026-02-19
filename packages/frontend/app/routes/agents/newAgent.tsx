@@ -2,16 +2,13 @@ import {
     type useStrategiesStoreIF,
     useStrategiesStore,
     type strategyIF,
-} from '~/stores/StrategiesStore';
-import CreateStrategy from './CreateStrategy';
+} from '~/stores/AgentsStore';
+import CreateAgent from './CreateAgent';
 
 export default function NewAgent() {
     const agents: useStrategiesStoreIF = useStrategiesStore();
 
     return (
-        <CreateStrategy
-            page='new'
-            submitFn={(s: strategyIF) => agents.add(s)}
-        />
+        <CreateAgent page='new' submitFn={(s: strategyIF) => agents.add(s)} />
     );
 }

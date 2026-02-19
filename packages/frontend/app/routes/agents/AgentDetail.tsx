@@ -1,16 +1,16 @@
 import { LuChevronLeft, LuCopy, LuFilter, LuX } from 'react-icons/lu';
-import styles from './StrategyDetail.module.css';
+import styles from './AgentDetail.module.css';
 import { useNavigate, useParams } from 'react-router';
 import {
     useStrategiesStore,
     type strategyDecoratedIF,
     type useStrategiesStoreIF,
-} from '~/stores/StrategiesStore';
+} from '~/stores/AgentsStore';
 import { useModal } from '~/hooks/useModal';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TransferModal from '~/components/TransferModal/TransferModal';
-import StrategyDetailChart from './StrategyDetailChart';
+import AgentDetailChart from './AgentDetailChart';
 import { useTranslation } from 'react-i18next';
 
 const AGENTS_BASE_PATH = '/v2/agents';
@@ -211,7 +211,7 @@ export default function AgentDetail() {
                         </section>
                     </div>
                     <div className={styles.strategy_details_graph}>
-                        <StrategyDetailChart />
+                        <AgentDetailChart />
                     </div>
                 </div>
                 <div className={styles.order_history_card}>

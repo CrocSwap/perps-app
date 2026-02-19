@@ -1,10 +1,7 @@
 import Button from '~/components/Button/Button';
-import styles from './CreateStrategy.module.css';
+import styles from './CreateAgent.module.css';
 import InputText from './InputText';
-import {
-    NEW_STRATEGY_DEFAULTS,
-    type strategyIF,
-} from '~/stores/StrategiesStore';
+import { NEW_STRATEGY_DEFAULTS, type strategyIF } from '~/stores/AgentsStore';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { type useAccountsIF, useAccounts } from '~/stores/AccountsStore';
 import {
@@ -63,7 +60,7 @@ type propsT = newAgentPropsIF | editAgentPropsIF;
 
 const AGENTS_BASE_PATH = '/v2/agents';
 
-export default function CreateStrategy(props: propsT) {
+export default function CreateAgent(props: propsT) {
     const { t } = useTranslation();
     const { page, submitFn } = props;
     const navigate = useNavigate();

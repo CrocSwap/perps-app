@@ -8,9 +8,9 @@ import { useTranslation } from 'react-i18next';
 import {
     useStrategiesStore,
     type strategyDecoratedIF,
-} from '~/stores/StrategiesStore';
+} from '~/stores/AgentsStore';
 import { externalResources } from '~/utils/Constants';
-import styles from './strategies.module.css';
+import styles from './agents.module.css';
 
 // interface for table column header metadata
 export interface headerItemIF {

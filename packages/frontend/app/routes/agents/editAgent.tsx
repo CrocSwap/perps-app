@@ -2,8 +2,8 @@ import {
     useStrategiesStore,
     type strategyIF,
     type useStrategiesStoreIF,
-} from '~/stores/StrategiesStore';
-import CreateStrategy from './CreateStrategy';
+} from '~/stores/AgentsStore';
+import CreateAgent from './CreateAgent';
 
 export default function EditAgent() {
     const agents: useStrategiesStoreIF = useStrategiesStore();
@@ -12,5 +12,5 @@ export default function EditAgent() {
         agents.update(s, addr);
     }
 
-    return <CreateStrategy page='edit' submitFn={editAgent} />;
+    return <CreateAgent page='edit' submitFn={editAgent} />;
 }
