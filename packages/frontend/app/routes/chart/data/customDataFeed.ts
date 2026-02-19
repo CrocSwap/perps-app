@@ -27,7 +27,7 @@ import {
     supportedResolutions,
 } from './utils/utils';
 import { useChartStore } from '~/stores/TradingviewChartStore';
-import { useAppStateStore } from '~/stores/AppStateStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { UserFillIF } from '~/utils/UserDataIFs';
 
 const subscriptions = new Map<string, { unsubscribe: () => void }>();
@@ -61,6 +61,10 @@ export const createDataFeed = (
             : baseSymbol.toUpperCase();
     };
 
+    const getActiveSymbolForMarks = (): string => {
+        return normalizeSymbolForMarks(useTradeDataStore.getState().symbol);
+    };
+
     const updateUserFills = (fills: UserFillIF[]) => {
         userFills = fills;
 
@@ -87,10 +91,17 @@ export const createDataFeed = (
         const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
         const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
-        const normalizedMarksSymbol = normalizeSymbolForMarks(marksSymbol);
+        const normalizedMarksSymbol =
+            getActiveSymbolForMarks() || normalizeSymbolForMarks(marksSymbol);
+        if (!normalizedMarksSymbol) {
+            if (ocb) {
+                ocb([]);
+            }
+            return;
+        }
+
         const symbolFills = userFills
             .filter((fill) => {
-                if (!normalizedMarksSymbol) return true;
                 return (
                     normalizeSymbolForMarks(fill.coin) === normalizedMarksSymbol
                 );
@@ -244,6 +255,15 @@ export const createDataFeed = (
             onDataCallback: (marks: Mark[]) => void,
             resolution: ResolutionString,
         ) => {
+            const requestedSymbol = normalizeSymbolForMarks(
+                symbolInfo.ticker || symbolInfo.name,
+            );
+            const activeSymbol = getActiveSymbolForMarks();
+            if (activeSymbol && requestedSymbol !== activeSymbol) {
+                onDataCallback([]);
+                return;
+            }
+
             onMarksCallback = onDataCallback;
             lastResolution = resolution;
             marksSymbol = symbolInfo.ticker || symbolInfo.name;
