@@ -276,16 +276,40 @@
         "createSubAccountPH": "ej: Mi subcuenta 1",
         "created": {
             "title": "Subcuenta creada",
-            "message": "Nueva subcuenta de estrategia creada: {{name}}",
+            "message": "Nueva subcuenta de agente creada: {{name}}",
             "message2": "Nueva subcuenta discrecional creada: {{name}}"
         }
     },
-    "strategies": {
-        "newStrategy": "Nueva estrategia",
-        "editStrategy": "Editar estrategia",
+    "agents": {
+        "newAgent": "Nuevo agente",
+        "editAgent": "Editar agente",
+        "overview": {
+            "create": "Crear agente",
+            "blurb": "Ejecuta un agente automatizado de market making en Ambient Perps",
+            "paused": "Pausado",
+            "running": "En ejecución",
+            "pause": "Pausar",
+            "unpause": "Reanudar",
+            "remove": "Eliminar",
+            "emptyState": "No hay datos para mostrar",
+            "removeTitle": "Eliminar agente",
+            "removeMessage": "¿Seguro que deseas eliminar este agente?"
+        },
+        "details": {
+            "noAgentFound": "No se encontró el agente",
+            "status": "Estado",
+            "parameters": "Parámetros",
+            "performance": "Rendimiento",
+            "ordersPlaced": "Órdenes colocadas",
+            "runtime": "Tiempo de ejecución",
+            "hours": "Horas",
+            "orderHistory": "Historial de órdenes",
+            "filter": "Filtrar",
+            "viewAll": "Ver todo"
+        },
         "form": {
             "labels": {
-                "name": "Nombre de estrategia",
+                "name": "Nombre del agente",
                 "market": "Mercado",
                 "distance": "Distancia",
                 "distanceType": "Tipo de distancia",
@@ -311,16 +335,16 @@
                 }
             },
             "blurbs": {
-                "name": "Elige un nombre descriptivo para tu estrategia de trading. Esto te ayudará a identificar y gestionar tus estrategias de forma eficaz.",
-                "market": "Selecciona el mercado donde deseas desplegar esta estrategia. Distintos mercados tienen diferentes características de volatilidad y liquidez.",
-                "distance": "Define el parámetro de distancia para tu estrategia. Esto determina qué tan lejos del precio actual se colocarán tus órdenes.",
+                "name": "Elige un nombre descriptivo para tu agente de trading. Esto te ayudará a identificar y gestionar tus agentes de forma eficaz.",
+                "market": "Selecciona el mercado donde deseas desplegar este agente. Distintos mercados tienen diferentes características de volatilidad y liquidez.",
+                "distance": "Define el parámetro de distancia para tu agente. Esto determina qué tan lejos del precio actual se colocarán tus órdenes.",
                 "distanceType": "Elige cómo se mide la distancia. Los ticks ofrecen control preciso, mientras que el porcentaje ofrece escalado proporcional con el movimiento del precio.",
-                "side": "Especifica si la estrategia debe colocar órdenes de compra, de venta o ambas. \"Ambos\" habilita market making en ambos lados del libro de órdenes.",
-                "totalSize": "Define el capital total a asignar a esta estrategia. Esto representa la exposición máxima entre todas las órdenes activas.",
+                "side": "Especifica si el agente debe colocar órdenes de compra, de venta o ambas. \"Ambos\" habilita market making en ambos lados del libro de órdenes.",
+                "totalSize": "Define el capital total a asignar a este agente. Esto representa la exposición máxima entre todas las órdenes activas.",
                 "orderSize": "Define el tamaño de las órdenes individuales. Órdenes más pequeñas ofrecen mejor granularidad, pero pueden aumentar los costes de transacción."
             },
             "validation": {
-                "nameRequired": "El nombre de la estrategia es obligatorio",
+                "nameRequired": "El nombre del agente es obligatorio",
                 "marketRequired": "El mercado es obligatorio",
                 "distanceRequired": "La distancia es obligatoria",
                 "distanceTypeRequired": "El tipo de distancia es obligatorio",
@@ -801,10 +825,10 @@
         "referrals": "Referidos",
         "points": "Puntos",
         "leaderboard": "Clasificación",
-        "newStrategy": "Nueva Estrategia",
-        "editStrategy": "Editar Estrategia",
-        "strategy": "Estrategia",
-        "strategies": "Estrategias",
+        "newAgent": "Nuevo Agente",
+        "editAgent": "Editar Agente",
+        "agent": "Agente",
+        "agents": "Agentes",
         "vault": "Bóveda",
         "vaults": "Bóvedas",
         "subAccounts": "Subcuentas",

@@ -11,8 +11,9 @@ import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TransferModal from '~/components/TransferModal/TransferModal';
 import StrategyDetailChart from './StrategyDetailChart';
+import { useTranslation } from 'react-i18next';
 
-const STRATEGIES_BASE_PATH = '/v2/strategies';
+const AGENTS_BASE_PATH = '/v2/agents';
 
 const mockOrderRows = Array.from({ length: 4 }, () => ({
     time: '2025/02/24 - 16:51:12',
@@ -30,26 +31,29 @@ const mockOrderRows = Array.from({ length: 4 }, () => ({
     orderId: '1234567890',
 }));
 
-export default function Strategies() {
+export default function AgentDetail() {
     // hook to manage navigation actions from this page
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
-    // address of the strategy from URL params
-    const { strategy_hash } = useParams();
+    // address of the agent from URL params
+    const { agent_hash } = useParams();
 
-    // strategy data to populate in this page
+    // agent data to populate in this page
     const strategies: useStrategiesStoreIF = useStrategiesStore();
     const strategy: strategyDecoratedIF | undefined = strategies.data.find(
-        (s: strategyDecoratedIF) => s.address === strategy_hash,
+        (s: strategyDecoratedIF) => s.address === agent_hash,
     );
 
-    // logic to control the strategy removal modal
+    // logic to control the agent removal modal
     const removeStratModalCtrl = useModal();
 
     // logic to control the transfer modal
     const transferModalCtrl = useModal();
 
-    const statusLabel = strategy?.isPaused ? 'Paused' : 'Running';
+    const statusLabel = strategy?.isPaused
+        ? t('agents.overview.paused')
+        : t('agents.overview.running');
 
     return (
         <div className={styles.strategy_detail_page}>
@@ -60,11 +64,14 @@ export default function Strategies() {
                             <button
                                 type='button'
                                 className={styles.back_button}
-                                onClick={() => navigate(STRATEGIES_BASE_PATH)}
+                                onClick={() => navigate(AGENTS_BASE_PATH)}
                             >
                                 <LuChevronLeft />
                             </button>
-                            <h2>{strategy?.name ?? 'No Strategy Found'}</h2>
+                            <h2>
+                                {strategy?.name ??
+                                    t('agents.details.noAgentFound')}
+                            </h2>
                         </div>
                         <div className={styles.address_row}>
                             <p>{strategy?.address}</p>
@@ -84,7 +91,7 @@ export default function Strategies() {
                     </div>
                     <div className={styles.header_right}>
                         <div className={styles.status_label}>
-                            Status: {statusLabel}
+                            {t('agents.details.status')}: {statusLabel}
                         </div>
                         <SimpleButton
                             onClick={() =>
@@ -95,16 +102,18 @@ export default function Strategies() {
                             hoverBg='dark4'
                             className={styles.header_action}
                         >
-                            {strategy?.isPaused ? 'Unpause' : 'Pause'}
+                            {strategy?.isPaused
+                                ? t('agents.overview.unpause')
+                                : t('agents.overview.pause')}
                         </SimpleButton>
                         <SimpleButton
                             onClick={() =>
                                 navigate(
-                                    `${STRATEGIES_BASE_PATH}/${strategy_hash}/edit`,
+                                    `${AGENTS_BASE_PATH}/${agent_hash}/edit`,
                                     {
                                         state: {
-                                            strategy,
-                                            address: strategy_hash,
+                                            agent: strategy,
+                                            address: agent_hash,
                                         },
                                     },
                                 )
@@ -113,7 +122,7 @@ export default function Strategies() {
                             hoverBg='dark4'
                             className={styles.header_action}
                         >
-                            Edit
+                            {t('common.edit')}
                         </SimpleButton>
                         <SimpleButton
                             onClick={() => transferModalCtrl.open()}
@@ -121,7 +130,7 @@ export default function Strategies() {
                             hoverBg='dark4'
                             className={styles.header_action}
                         >
-                            Transfer
+                            {t('common.transfer')}
                         </SimpleButton>
                         <SimpleButton
                             onClick={() => removeStratModalCtrl.open()}
@@ -129,49 +138,51 @@ export default function Strategies() {
                             hoverBg='dark4'
                             className={styles.header_action}
                         >
-                            Remove
+                            {t('agents.overview.remove')}
                         </SimpleButton>
                     </div>
                 </header>
                 <div className={styles.strategy_details}>
                     <div className={styles.detail_table}>
                         <header className={styles.detail_header}>
-                            <span>Parameters</span>
+                            <span>{t('agents.details.parameters')}</span>
                         </header>
                         <section className={styles.detail_rows}>
                             <div className={styles.detail_row}>
-                                <div>Market</div>
+                                <div>{t('agents.form.labels.market')}</div>
                                 <div>{strategy?.market ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
-                                <div>Distance</div>
+                                <div>{t('agents.form.labels.distance')}</div>
                                 <div>{strategy?.distance ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
-                                <div>Distance Type</div>
+                                <div>
+                                    {t('agents.form.labels.distanceType')}
+                                </div>
                                 <div>{strategy?.distanceType ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
-                                <div>Side</div>
+                                <div>{t('agents.form.labels.side')}</div>
                                 <div>{strategy?.side ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
-                                <div>Total Size</div>
+                                <div>{t('agents.form.labels.totalSize')}</div>
                                 <div>{strategy?.totalSize ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
-                                <div>Order Size</div>
+                                <div>{t('agents.form.labels.orderSize')}</div>
                                 <div>{strategy?.orderSize ?? '-'}</div>
                             </div>
                         </section>
                     </div>
                     <div className={styles.detail_table}>
                         <header className={styles.detail_header}>
-                            <span>Performance</span>
+                            <span>{t('agents.details.performance')}</span>
                         </header>
                         <section className={styles.detail_rows}>
                             <div className={styles.detail_row}>
-                                <div>Collateral</div>
+                                <div>{t('portfolio.collateral')}</div>
                                 <div>{strategy?.collateral ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
@@ -179,20 +190,23 @@ export default function Strategies() {
                                 <div>{strategy?.pnl ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
-                                <div>Volume</div>
+                                <div>{t('portfolio.volume')}</div>
                                 <div>{strategy?.volume ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
-                                <div>Max Drawdown</div>
+                                <div>{t('portfolio.maxDrawdown')}</div>
                                 <div>{strategy?.maxDrawdown ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
-                                <div>Orders Placed</div>
+                                <div>{t('agents.details.ordersPlaced')}</div>
                                 <div>{strategy?.ordersPlaced ?? '-'}</div>
                             </div>
                             <div className={styles.detail_row}>
-                                <div>Runtime</div>
-                                <div>{strategy?.runtime ?? '-'} Hours</div>
+                                <div>{t('agents.details.runtime')}</div>
+                                <div>
+                                    {strategy?.runtime ?? '-'}{' '}
+                                    {t('agents.details.hours')}
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -203,27 +217,27 @@ export default function Strategies() {
                 <div className={styles.order_history_card}>
                     <div className={styles.history_header}>
                         <span className={styles.history_tab}>
-                            Order History
+                            {t('agents.details.orderHistory')}
                         </span>
                         <button type='button' className={styles.filter_button}>
-                            Filter <LuFilter size={14} />
+                            {t('agents.details.filter')} <LuFilter size={14} />
                         </button>
                     </div>
                     <div className={styles.history_table}>
                         <div className={styles.history_row_header}>
-                            <span>Time</span>
-                            <span>Type</span>
-                            <span>Coin</span>
-                            <span>Direction</span>
-                            <span>Size</span>
-                            <span>Filled Size</span>
-                            <span>Order Value</span>
-                            <span>Price</span>
-                            <span>Reduce Only</span>
-                            <span>Trigger Conditions</span>
-                            <span>TP/SL</span>
-                            <span>Status</span>
-                            <span>Order ID</span>
+                            <span>{t('tradeTable.time')}</span>
+                            <span>{t('tradeTable.type')}</span>
+                            <span>{t('tradeTable.coin')}</span>
+                            <span>{t('tradeTable.direction')}</span>
+                            <span>{t('tradeTable.size')}</span>
+                            <span>{t('tradeTable.filledSize')}</span>
+                            <span>{t('tradeTable.orderValue')}</span>
+                            <span>{t('tradeTable.price')}</span>
+                            <span>{t('tradeTable.reduceOnly')}</span>
+                            <span>{t('tradeTable.triggerConditions')}</span>
+                            <span>{t('tradeTable.tpsl')}</span>
+                            <span>{t('tradeTable.status')}</span>
+                            <span>{t('tradeTable.orderId')}</span>
                         </div>
                         {mockOrderRows.map((row) => (
                             <div
@@ -249,12 +263,12 @@ export default function Strategies() {
                         ))}
                     </div>
                     <button type='button' className={styles.view_all}>
-                        View All
+                        {t('agents.details.viewAll')}
                     </button>
                 </div>
                 {removeStratModalCtrl.isOpen && (
                     <Modal
-                        title='Remove Strategy'
+                        title={t('agents.overview.removeTitle')}
                         close={removeStratModalCtrl.close}
                         noHeader
                     >
@@ -266,29 +280,27 @@ export default function Strategies() {
                             >
                                 <LuX size={18} />
                             </button>
-                            <h3>Remove Strategy</h3>
-                            <p>
-                                Are you sure you want to remove this strategy?
-                            </p>
+                            <h3>{t('agents.overview.removeTitle')}</h3>
+                            <p>{t('agents.overview.removeMessage')}</p>
                             <div className={styles.remove_actions}>
                                 <SimpleButton
                                     onClick={removeStratModalCtrl.close}
                                     bg='dark4'
                                     hoverBg='dark2'
                                 >
-                                    Cancel
+                                    {t('common.cancel')}
                                 </SimpleButton>
                                 <SimpleButton
                                     onClick={() => {
                                         if (strategy?.address) {
                                             strategies.remove(strategy.address);
                                             removeStratModalCtrl.close();
-                                            navigate(STRATEGIES_BASE_PATH);
+                                            navigate(AGENTS_BASE_PATH);
                                         }
                                     }}
                                     bg='accent1'
                                 >
-                                    Remove
+                                    {t('agents.overview.remove')}
                                 </SimpleButton>
                             </div>
                         </section>

@@ -5,13 +5,13 @@ import {
 } from '~/stores/StrategiesStore';
 import CreateStrategy from './CreateStrategy';
 
-export default function newStrategy() {
-    const strategies: useStrategiesStoreIF = useStrategiesStore();
+export default function NewAgent() {
+    const agents: useStrategiesStoreIF = useStrategiesStore();
 
     return (
         <CreateStrategy
             page='new'
-            submitFn={(s: strategyIF) => strategies.add(s)}
+            submitFn={(s: strategyIF) => agents.add(s)}
         />
     );
 }

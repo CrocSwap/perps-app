@@ -4,6 +4,7 @@ import { LuX } from 'react-icons/lu';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import SortIcon from '~/components/Vault/SortIcon';
+import { useTranslation } from 'react-i18next';
 import {
     useStrategiesStore,
     type strategyDecoratedIF,
@@ -58,10 +59,11 @@ function parseAmount(value: string): number {
     return Number.isNaN(numeric) ? 0 : numeric;
 }
 
-const STRATEGIES_BASE_PATH = '/v2/strategies';
+const AGENTS_BASE_PATH = '/v2/agents';
 
-export default function Strategies() {
+export default function Agents() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const { data, togglePause, remove } = useStrategiesStore();
 
@@ -145,36 +147,34 @@ export default function Strategies() {
         return output;
     }
 
-    const [strategyToRemove, setStrategyToRemove] =
+    const [agentToRemove, setAgentToRemove] =
         useState<strategyDecoratedIF | null>(null);
 
     return (
         <div className={styles.strategies_page}>
             <header>
                 <div className={styles.title_row}>
-                    <h2>Strategies</h2>
+                    <h2>{t('pageTitles.agents')}</h2>
                     <SimpleButton
-                        onClick={() => navigate(`${STRATEGIES_BASE_PATH}/new`)}
+                        onClick={() => navigate(`${AGENTS_BASE_PATH}/new`)}
                         hoverBg='accent1'
                         className={styles.create_button}
                     >
-                        Create Strategy
+                        {t('agents.overview.create')}
                     </SimpleButton>
                 </div>
-                <p className={styles.blurb}>
-                    Run an automated market making strategy on Ambient Perps
-                </p>
+                <p className={styles.blurb}>{t('agents.overview.blurb')}</p>
                 <a
                     href={externalResources.perpsDocs}
                     target='_blank'
                     rel='noopener noreferrer me'
                     className={styles.learn_more}
                 >
-                    Learn more
+                    {t('common.learnMore')}
                 </a>
             </header>
             <div className={styles.table_wrapper}>
-                <div className={styles.table_tab}>Strategies</div>
+                <div className={styles.table_tab}>{t('pageTitles.agents')}</div>
                 <div className={styles.table_content}>
                     <div className={styles.col_headers_row}>
                         {tableHeaders.map((header: headerItemIF) => (
@@ -202,7 +202,14 @@ export default function Strategies() {
                                     setSortBy(output);
                                 }}
                             >
-                                {header.name}
+                                {header.key === 'name' && t('forms.name')}
+                                {header.key === 'status' &&
+                                    t('tradeTable.status')}
+                                {header.key === 'collateral' &&
+                                    t('portfolio.collateral')}
+                                {header.key === 'volume' &&
+                                    t('portfolio.volume')}
+                                {header.key === 'pnl' && t('portfolio.pnl')}
                                 {header.sortable && (
                                     <SortIcon
                                         sortDirection={checkSortDirection(
@@ -219,13 +226,15 @@ export default function Strategies() {
                                 key={strat.address}
                                 onClick={() =>
                                     navigate(
-                                        `${STRATEGIES_BASE_PATH}/${strat.address}`,
+                                        `${AGENTS_BASE_PATH}/${strat.address}`,
                                     )
                                 }
                             >
                                 <div>{strat.name}</div>
                                 <div>
-                                    {strat.isPaused ? 'Paused' : 'Running'}
+                                    {strat.isPaused
+                                        ? t('agents.overview.paused')
+                                        : t('agents.overview.running')}
                                 </div>
                                 <div>{strat.collateral}</div>
                                 <div>{strat.volume}</div>
@@ -240,24 +249,26 @@ export default function Strategies() {
                                             togglePause(strat.address);
                                         }}
                                     >
-                                        {strat.isPaused ? 'Unpause' : 'Pause'}
+                                        {strat.isPaused
+                                            ? t('agents.overview.unpause')
+                                            : t('agents.overview.pause')}
                                     </button>
                                     <button
                                         type='button'
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             navigate(
-                                                `${STRATEGIES_BASE_PATH}/${strat.address}/edit`,
+                                                `${AGENTS_BASE_PATH}/${strat.address}/edit`,
                                                 {
                                                     state: {
-                                                        strategy: strat,
+                                                        agent: strat,
                                                         address: strat.address,
                                                     },
                                                 },
                                             );
                                         }}
                                     >
-                                        Edit
+                                        {t('common.edit')}
                                     </button>
                                     <button
                                         type='button'
@@ -265,61 +276,61 @@ export default function Strategies() {
                                             event.stopPropagation();
                                         }}
                                     >
-                                        Transfer
+                                        {t('common.transfer')}
                                     </button>
                                     <button
                                         type='button'
                                         onClick={(event) => {
                                             event.stopPropagation();
-                                            setStrategyToRemove(strat);
+                                            setAgentToRemove(strat);
                                         }}
                                     >
-                                        Remove
+                                        {t('agents.overview.remove')}
                                     </button>
                                 </div>
                             </li>
                         ))}
                         {sorted.length === 0 && (
                             <div className={styles.empty_state}>
-                                No data to display
+                                {t('agents.overview.emptyState')}
                             </div>
                         )}
                     </ol>
                 </div>
             </div>
-            {strategyToRemove && (
+            {agentToRemove && (
                 <Modal
-                    title='Remove Strategy'
-                    close={() => setStrategyToRemove(null)}
+                    title={t('agents.overview.removeTitle')}
+                    close={() => setAgentToRemove(null)}
                     noHeader
                 >
                     <section className={styles.remove_strategy_modal}>
                         <button
                             type='button'
                             className={styles.modal_close}
-                            onClick={() => setStrategyToRemove(null)}
+                            onClick={() => setAgentToRemove(null)}
                         >
                             <LuX size={18} />
                         </button>
-                        <h3>Remove Strategy</h3>
-                        <p>Are you sure you want to remove this strategy?</p>
+                        <h3>{t('agents.overview.removeTitle')}</h3>
+                        <p>{t('agents.overview.removeMessage')}</p>
                         <div className={styles.remove_actions}>
                             <SimpleButton
                                 bg='dark4'
                                 hoverBg='dark2'
-                                onClick={() => setStrategyToRemove(null)}
+                                onClick={() => setAgentToRemove(null)}
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </SimpleButton>
                             <SimpleButton
                                 bg='accent1'
                                 hoverBg='accent1'
                                 onClick={() => {
-                                    remove(strategyToRemove.address);
-                                    setStrategyToRemove(null);
+                                    remove(agentToRemove.address);
+                                    setAgentToRemove(null);
                                 }}
                             >
-                                Remove
+                                {t('agents.overview.remove')}
                             </SimpleButton>
                         </div>
                     </section>

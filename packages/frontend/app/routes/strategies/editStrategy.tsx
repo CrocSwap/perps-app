@@ -5,12 +5,12 @@ import {
 } from '~/stores/StrategiesStore';
 import CreateStrategy from './CreateStrategy';
 
-export default function editStrategy() {
-    const strategies: useStrategiesStoreIF = useStrategiesStore();
+export default function EditAgent() {
+    const agents: useStrategiesStoreIF = useStrategiesStore();
 
-    function editStrategy(s: strategyIF, addr: string): void {
-        strategies.update(s, addr);
+    function editAgent(s: strategyIF, addr: string): void {
+        agents.update(s, addr);
     }
 
-    return <CreateStrategy page='edit' submitFn={editStrategy} />;
+    return <CreateStrategy page='edit' submitFn={editAgent} />;
 }

@@ -49,19 +49,19 @@ interface basePropsIF {
     page: 'new' | 'edit';
 }
 
-interface newStrategyPropsIF extends basePropsIF {
+interface newAgentPropsIF extends basePropsIF {
     page: 'new';
     submitFn: (s: strategyIF) => void;
 }
 
-interface editStrategyPropsIF extends basePropsIF {
+interface editAgentPropsIF extends basePropsIF {
     page: 'edit';
     submitFn: (s: strategyIF, addr: string) => void;
 }
 
-type propsT = newStrategyPropsIF | editStrategyPropsIF;
+type propsT = newAgentPropsIF | editAgentPropsIF;
 
-const STRATEGIES_BASE_PATH = '/v2/strategies';
+const AGENTS_BASE_PATH = '/v2/agents';
 
 export default function CreateStrategy(props: propsT) {
     const { t } = useTranslation();
@@ -76,17 +76,17 @@ export default function CreateStrategy(props: propsT) {
     const subAccounts: useAccountsIF = useAccounts();
 
     const location = useLocation();
-    const strategy: strategyIF = location.state
-        ? location.state.strategy
+    const agent: strategyIF = location.state
+        ? (location.state.agent ?? location.state.strategy)
         : NEW_STRATEGY_DEFAULTS;
 
-    const [name, setName] = useState(strategy.name);
-    const [market, setMarket] = useState(strategy.market);
-    const [distance, setDistance] = useState(strategy.distance);
-    const [distanceType, setDistanceType] = useState(strategy.distanceType);
-    const [side, setSide] = useState(strategy.side);
-    const [totalSize, setTotalSize] = useState(strategy.totalSize);
-    const [orderSize, setOrderSize] = useState(strategy.orderSize);
+    const [name, setName] = useState(agent.name);
+    const [market, setMarket] = useState(agent.market);
+    const [distance, setDistance] = useState(agent.distance);
+    const [distanceType, setDistanceType] = useState(agent.distanceType);
+    const [side, setSide] = useState(agent.side);
+    const [totalSize, setTotalSize] = useState(agent.totalSize);
+    const [orderSize, setOrderSize] = useState(agent.orderSize);
 
     const [touched, setTouched] = useState<Record<strategyFieldKey, boolean>>({
         name: false,
@@ -102,73 +102,71 @@ export default function CreateStrategy(props: propsT) {
         () => ({
             name: {
                 key: 'name',
-                label: t('strategies.form.labels.name'),
-                input: t('strategies.form.placeholders.name'),
-                blurb: t('strategies.form.blurbs.name'),
+                label: t('agents.form.labels.name'),
+                input: t('agents.form.placeholders.name'),
+                blurb: t('agents.form.blurbs.name'),
             },
             market: {
                 key: 'market',
-                label: t('strategies.form.labels.market'),
+                label: t('agents.form.labels.market'),
                 input: [
                     { value: 'BTC', label: 'BTC' },
                     { value: 'ETH', label: 'ETH' },
                     { value: 'SOL', label: 'SOL' },
                 ],
-                blurb: t('strategies.form.blurbs.market'),
+                blurb: t('agents.form.blurbs.market'),
             },
             distance: {
                 key: 'distance',
-                label: t('strategies.form.labels.distance'),
-                input: t('strategies.form.placeholders.distance'),
-                blurb: t('strategies.form.blurbs.distance'),
+                label: t('agents.form.labels.distance'),
+                input: t('agents.form.placeholders.distance'),
+                blurb: t('agents.form.blurbs.distance'),
             },
             distanceType: {
                 key: 'distanceType',
-                label: t('strategies.form.labels.distanceType'),
+                label: t('agents.form.labels.distanceType'),
                 input: [
                     {
                         value: 'Ticks',
-                        label: t('strategies.form.options.distanceType.ticks'),
+                        label: t('agents.form.options.distanceType.ticks'),
                     },
                     {
                         value: '%',
-                        label: t(
-                            'strategies.form.options.distanceType.percentage',
-                        ),
+                        label: t('agents.form.options.distanceType.percentage'),
                     },
                 ],
-                blurb: t('strategies.form.blurbs.distanceType'),
+                blurb: t('agents.form.blurbs.distanceType'),
             },
             side: {
                 key: 'side',
-                label: t('strategies.form.labels.side'),
+                label: t('agents.form.labels.side'),
                 input: [
                     {
                         value: 'Both',
-                        label: t('strategies.form.options.side.both'),
+                        label: t('agents.form.options.side.both'),
                     },
                     {
                         value: 'Above',
-                        label: t('strategies.form.options.side.above'),
+                        label: t('agents.form.options.side.above'),
                     },
                     {
                         value: 'Below',
-                        label: t('strategies.form.options.side.below'),
+                        label: t('agents.form.options.side.below'),
                     },
                 ],
-                blurb: t('strategies.form.blurbs.side'),
+                blurb: t('agents.form.blurbs.side'),
             },
             totalSize: {
                 key: 'totalSize',
-                label: t('strategies.form.labels.totalSize'),
-                input: t('strategies.form.placeholders.totalSize'),
-                blurb: t('strategies.form.blurbs.totalSize'),
+                label: t('agents.form.labels.totalSize'),
+                input: t('agents.form.placeholders.totalSize'),
+                blurb: t('agents.form.blurbs.totalSize'),
             },
             orderSize: {
                 key: 'orderSize',
-                label: t('strategies.form.labels.orderSize'),
-                input: t('strategies.form.placeholders.orderSize'),
-                blurb: t('strategies.form.blurbs.orderSize'),
+                label: t('agents.form.labels.orderSize'),
+                input: t('agents.form.placeholders.orderSize'),
+                blurb: t('agents.form.blurbs.orderSize'),
             },
         }),
         [t],
@@ -178,61 +176,53 @@ export default function CreateStrategy(props: propsT) {
         const nextErrors: Partial<Record<strategyFieldKey, string>> = {};
 
         if (!name.trim()) {
-            nextErrors.name = t('strategies.form.validation.nameRequired');
+            nextErrors.name = t('agents.form.validation.nameRequired');
         }
 
         if (!market.trim()) {
-            nextErrors.market = t('strategies.form.validation.marketRequired');
+            nextErrors.market = t('agents.form.validation.marketRequired');
         }
 
         const parsedDistance = parseNumericInput(distance);
         if (!distance.trim()) {
-            nextErrors.distance = t(
-                'strategies.form.validation.distanceRequired',
-            );
+            nextErrors.distance = t('agents.form.validation.distanceRequired');
         } else if (Number.isNaN(parsedDistance) || parsedDistance <= 0) {
-            nextErrors.distance = t(
-                'strategies.form.validation.positiveNumber',
-            );
+            nextErrors.distance = t('agents.form.validation.positiveNumber');
         }
 
         if (!distanceType.trim()) {
             nextErrors.distanceType = t(
-                'strategies.form.validation.distanceTypeRequired',
+                'agents.form.validation.distanceTypeRequired',
             );
         }
 
         if (!side.trim()) {
-            nextErrors.side = t('strategies.form.validation.sideRequired');
+            nextErrors.side = t('agents.form.validation.sideRequired');
         }
 
         const parsedTotalSize = parseNumericInput(totalSize);
         if (!totalSize.trim()) {
             nextErrors.totalSize = t(
-                'strategies.form.validation.totalSizeRequired',
+                'agents.form.validation.totalSizeRequired',
             );
         } else if (Number.isNaN(parsedTotalSize) || parsedTotalSize <= 0) {
-            nextErrors.totalSize = t(
-                'strategies.form.validation.positiveNumber',
-            );
+            nextErrors.totalSize = t('agents.form.validation.positiveNumber');
         }
 
         const parsedOrderSize = parseNumericInput(orderSize);
         if (!orderSize.trim()) {
             nextErrors.orderSize = t(
-                'strategies.form.validation.orderSizeRequired',
+                'agents.form.validation.orderSizeRequired',
             );
         } else if (Number.isNaN(parsedOrderSize) || parsedOrderSize <= 0) {
-            nextErrors.orderSize = t(
-                'strategies.form.validation.positiveNumber',
-            );
+            nextErrors.orderSize = t('agents.form.validation.positiveNumber');
         } else if (
             !Number.isNaN(parsedTotalSize) &&
             parsedTotalSize > 0 &&
             parsedOrderSize > parsedTotalSize
         ) {
             nextErrors.orderSize = t(
-                'strategies.form.validation.orderSizeExceedsTotal',
+                'agents.form.validation.orderSizeExceedsTotal',
             );
         }
 
@@ -271,10 +261,10 @@ export default function CreateStrategy(props: propsT) {
                             type='button'
                             onClick={() => {
                                 // base URL destination for backnav
-                                let destination = STRATEGIES_BASE_PATH;
+                                let destination = AGENTS_BASE_PATH;
                                 // if user is on edit page, add address param to URL
-                                if (params.strategy_hash) {
-                                    destination += `/${params.strategy_hash}`;
+                                if (params.agent_hash) {
+                                    destination += `/${params.agent_hash}`;
                                 }
                                 // navigate user to the correct destination
                                 // note that this is a forward nav action
@@ -284,12 +274,8 @@ export default function CreateStrategy(props: propsT) {
                         >
                             <LuChevronLeft />
                         </button>
-                        {page === 'new' && (
-                            <h2>{t('strategies.newStrategy')}</h2>
-                        )}
-                        {page === 'edit' && (
-                            <h2>{t('strategies.editStrategy')}</h2>
-                        )}
+                        {page === 'new' && <h2>{t('agents.newAgent')}</h2>}
+                        {page === 'edit' && <h2>{t('agents.editAgent')}</h2>}
                     </div>
                 </header>
                 <div>
@@ -360,13 +346,13 @@ export default function CreateStrategy(props: propsT) {
                         <Button
                             size={100}
                             onClick={() => {
-                                setName(strategy.name);
-                                setMarket(strategy.market);
-                                setDistance(strategy.distance);
-                                setDistanceType(strategy.distanceType);
-                                setSide(strategy.side);
-                                setTotalSize(strategy.totalSize);
-                                setOrderSize(strategy.orderSize);
+                                setName(agent.name);
+                                setMarket(agent.market);
+                                setDistance(agent.distance);
+                                setDistanceType(agent.distanceType);
+                                setSide(agent.side);
+                                setTotalSize(agent.totalSize);
+                                setOrderSize(agent.orderSize);
                                 setTouched({
                                     name: false,
                                     market: false,
@@ -386,8 +372,8 @@ export default function CreateStrategy(props: propsT) {
                                 onClick={() =>
                                     navigate(
                                         location.state
-                                            ? `${STRATEGIES_BASE_PATH}/${location.state.address}`
-                                            : STRATEGIES_BASE_PATH,
+                                            ? `${AGENTS_BASE_PATH}/${location.state.address}`
+                                            : AGENTS_BASE_PATH,
                                     )
                                 }
                             >
@@ -421,7 +407,7 @@ export default function CreateStrategy(props: propsT) {
                                         (submitFn as (s: strategyIF) => void)(
                                             values,
                                         );
-                                        subAccounts.create(name, 'strategy');
+                                        subAccounts.create(name, 'agent');
                                         notifications.add({
                                             title: t(
                                                 'subaccounts.created.title',
@@ -433,7 +419,7 @@ export default function CreateStrategy(props: propsT) {
                                             icon: 'check',
                                         });
                                     }
-                                    navigate(STRATEGIES_BASE_PATH);
+                                    navigate(AGENTS_BASE_PATH);
                                 }}
                                 size={100}
                                 selected

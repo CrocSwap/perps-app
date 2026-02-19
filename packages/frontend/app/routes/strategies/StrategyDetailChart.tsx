@@ -72,7 +72,7 @@ const StrategyDetailChart: React.FC = () => {
             <LineChart
                 lineData={lineData}
                 curve={'step'}
-                chartName={'strategy'}
+                chartName={'agent'}
                 width={chartSize.width}
                 height={chartSize.height}
             />

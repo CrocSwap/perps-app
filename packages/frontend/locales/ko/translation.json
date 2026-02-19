@@ -276,16 +276,40 @@
         "createSubAccountPH": "예: 내 서브계정1",
         "created": {
             "title": "서브계정 생성 완료",
-            "message": "신규 전략 서브계정 {{name}} 생성 완료",
+            "message": "신규 에이전트 서브계정 {{name}} 생성 완료",
             "message2": "신규 내맘대로 서브계정 {{name}} 생성 완료"
         }
     },
-    "strategies": {
-        "newStrategy": "새 전략",
-        "editStrategy": "전략 수정",
+    "agents": {
+        "newAgent": "새 에이전트",
+        "editAgent": "에이전트 수정",
+        "overview": {
+            "create": "에이전트 생성",
+            "blurb": "Ambient Perps에서 자동 마켓메이킹 에이전트를 실행하세요",
+            "paused": "일시중지됨",
+            "running": "실행 중",
+            "pause": "일시중지",
+            "unpause": "재개",
+            "remove": "제거",
+            "emptyState": "표시할 데이터가 없습니다",
+            "removeTitle": "에이전트 제거",
+            "removeMessage": "이 에이전트를 제거하시겠습니까?"
+        },
+        "details": {
+            "noAgentFound": "에이전트를 찾을 수 없습니다",
+            "status": "상태",
+            "parameters": "파라미터",
+            "performance": "성과",
+            "ordersPlaced": "주문 수",
+            "runtime": "실행 시간",
+            "hours": "시간",
+            "orderHistory": "주문 내역",
+            "filter": "필터",
+            "viewAll": "모두 보기"
+        },
         "form": {
             "labels": {
-                "name": "전략 이름",
+                "name": "에이전트 이름",
                 "market": "마켓",
                 "distance": "거리",
                 "distanceType": "거리 유형",
@@ -311,16 +335,16 @@
                 }
             },
             "blurbs": {
-                "name": "전략을 쉽게 식별할 수 있도록 설명적인 이름을 입력하세요. 전략을 관리할 때 도움이 됩니다.",
-                "market": "이 전략을 배포할 마켓을 선택하세요. 마켓마다 변동성과 유동성 특성이 다릅니다.",
-                "distance": "전략의 거리 파라미터를 설정하세요. 현재 가격에서 얼마나 떨어진 위치에 주문을 배치할지 결정합니다.",
+                "name": "에이전트를 쉽게 식별할 수 있도록 설명적인 이름을 입력하세요. 에이전트를 관리할 때 도움이 됩니다.",
+                "market": "이 에이전트를 배포할 마켓을 선택하세요. 마켓마다 변동성과 유동성 특성이 다릅니다.",
+                "distance": "에이전트의 거리 파라미터를 설정하세요. 현재 가격에서 얼마나 떨어진 위치에 주문을 배치할지 결정합니다.",
                 "distanceType": "거리를 측정하는 방식을 선택하세요. 틱은 정밀한 제어를 제공하고, 퍼센트는 가격 변동에 비례한 스케일링을 제공합니다.",
-                "side": "전략이 매수 주문, 매도 주문 또는 둘 다 배치할지 지정하세요. \"양방향\"은 오더북 양쪽에서 마켓메이킹을 가능하게 합니다.",
-                "totalSize": "이 전략에 배정할 총 자본을 설정하세요. 이는 활성 주문 전체에 대한 최대 익스포저를 의미합니다.",
+                "side": "에이전트가 매수 주문, 매도 주문 또는 둘 다 배치할지 지정하세요. \"양방향\"은 오더북 양쪽에서 마켓메이킹을 가능하게 합니다.",
+                "totalSize": "이 에이전트에 배정할 총 자본을 설정하세요. 이는 활성 주문 전체에 대한 최대 익스포저를 의미합니다.",
                 "orderSize": "개별 주문의 크기를 설정하세요. 더 작은 주문은 세밀한 제어가 가능하지만 거래 비용이 증가할 수 있습니다."
             },
             "validation": {
-                "nameRequired": "전략 이름은 필수입니다",
+                "nameRequired": "에이전트 이름은 필수입니다",
                 "marketRequired": "마켓은 필수입니다",
                 "distanceRequired": "거리는 필수입니다",
                 "distanceTypeRequired": "거리 유형은 필수입니다",
@@ -801,10 +825,10 @@
         "referrals": "추천",
         "points": "포인트",
         "leaderboard": "리더보드",
-        "newStrategy": "새 전략",
-        "editStrategy": "전략 편집",
-        "strategy": "전략",
-        "strategies": "전략 목록",
+        "newAgent": "새 에이전트",
+        "editAgent": "에이전트 편집",
+        "agent": "에이전트",
+        "agents": "에이전트 목록",
         "vault": "볼트",
         "vaults": "볼트 목록",
         "subAccounts": "서브계정",
