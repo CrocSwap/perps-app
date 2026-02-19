@@ -104,7 +104,7 @@ const router = createBrowserRouter([
                 path: 'v2/agents',
                 lazy: async () => {
                     const { default: Component } =
-                        await import('./routes/strategies/strategies');
+                        await import('./routes/agents/agents');
                     return { Component };
                 },
             },
@@ -112,7 +112,7 @@ const router = createBrowserRouter([
                 path: 'v2/agents/new',
                 lazy: async () => {
                     const { default: Component } =
-                        await import('./routes/strategies/newStrategy');
+                        await import('./routes/agents/newAgent');
                     return { Component };
                 },
             },
@@ -120,7 +120,7 @@ const router = createBrowserRouter([
                 path: 'v2/agents/:agent_hash',
                 lazy: async () => {
                     const { default: Component } =
-                        await import('./routes/strategies/StrategyDetail');
+                        await import('./routes/agents/AgentDetail');
                     return { Component };
                 },
             },
@@ -128,7 +128,7 @@ const router = createBrowserRouter([
                 path: 'v2/agents/:agent_hash/edit',
                 lazy: async () => {
                     const { default: Component } =
-                        await import('./routes/strategies/editStrategy');
+                        await import('./routes/agents/editAgent');
                     return { Component };
                 },
             },
