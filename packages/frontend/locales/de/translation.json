@@ -307,6 +307,19 @@
             "filter": "Filter",
             "viewAll": "Alle anzeigen"
         },
+        "transfer": {
+            "agentTitle": "Agent übertragen",
+            "selectAccounts": "Bitte Konten auswählen",
+            "title": "Übertragung",
+            "from": "Von",
+            "to": "Zu",
+            "asset": "Asset",
+            "amount": "Betrag",
+            "available": "Verfügbar für Einzahlung",
+            "enterAllFields": "Bitte alle Felder ausfüllen",
+            "selectAccount": "Bitte wählen Sie ein Konto",
+            "selectAsset": "Bitte wählen Sie ein Asset"
+        },
         "form": {
             "labels": {
                 "name": "Agentname",

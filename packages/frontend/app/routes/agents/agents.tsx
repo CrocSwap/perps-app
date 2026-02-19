@@ -4,6 +4,7 @@ import { LuX } from 'react-icons/lu';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import SortIcon from '~/components/Vault/SortIcon';
+import TransferModal from '~/components/TransferModal/TransferModal';
 import { useTranslation } from 'react-i18next';
 import {
     useStrategiesStore,
@@ -149,6 +150,8 @@ export default function Agents() {
 
     const [agentToRemove, setAgentToRemove] =
         useState<strategyDecoratedIF | null>(null);
+    const [agentToTransfer, setAgentToTransfer] =
+        useState<strategyDecoratedIF | null>(null);
 
     return (
         <div className={styles.strategies_page}>
@@ -274,6 +277,7 @@ export default function Agents() {
                                         type='button'
                                         onClick={(event) => {
                                             event.stopPropagation();
+                                            setAgentToTransfer(strat);
                                         }}
                                     >
                                         {t('common.transfer')}
@@ -335,6 +339,12 @@ export default function Agents() {
                         </div>
                     </section>
                 </Modal>
+            )}
+            {agentToTransfer && (
+                <TransferModal
+                    agent={agentToTransfer}
+                    closeModal={() => setAgentToTransfer(null)}
+                />
             )}
         </div>
     );

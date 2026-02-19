@@ -307,6 +307,19 @@
             "filter": "Filtre",
             "viewAll": "Tümünü Gör"
         },
+        "transfer": {
+            "agentTitle": "Ajanı Transfer Et",
+            "selectAccounts": "Lütfen hesap seçin",
+            "title": "Transfer",
+            "from": "Gönderen",
+            "to": "Alıcı",
+            "asset": "Varlık",
+            "amount": "Miktar",
+            "available": "Yatırılabilir Bakiye",
+            "enterAllFields": "Lütfen tüm alanları doldurun",
+            "selectAccount": "Lütfen bir hesap seçin",
+            "selectAsset": "Lütfen bir varlık seçin"
+        },
         "form": {
             "labels": {
                 "name": "Ajan Adı",

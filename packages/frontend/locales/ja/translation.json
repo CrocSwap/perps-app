@@ -307,6 +307,19 @@
             "filter": "フィルター",
             "viewAll": "すべて表示"
         },
+        "transfer": {
+            "agentTitle": "エージェントを転送",
+            "selectAccounts": "アカウントを選択してください",
+            "title": "転送",
+            "from": "から",
+            "to": "へ",
+            "asset": "資産",
+            "amount": "金額",
+            "available": "入金可能額",
+            "enterAllFields": "すべての項目を入力してください",
+            "selectAccount": "アカウントを選択してください",
+            "selectAsset": "資産を選択してください"
+        },
         "form": {
             "labels": {
                 "name": "エージェント名",

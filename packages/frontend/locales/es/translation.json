@@ -307,6 +307,19 @@
             "filter": "Filtrar",
             "viewAll": "Ver todo"
         },
+        "transfer": {
+            "agentTitle": "Transferir agente",
+            "selectAccounts": "Por favor seleccione cuentas",
+            "title": "Transferir",
+            "from": "Desde",
+            "to": "Hacia",
+            "asset": "Activo",
+            "amount": "Cantidad",
+            "available": "Disponible para depositar",
+            "enterAllFields": "Por favor complete todos los campos",
+            "selectAccount": "Por favor seleccione una cuenta",
+            "selectAsset": "Por favor seleccione un activo"
+        },
         "form": {
             "labels": {
                 "name": "Nombre del agente",
@@ -314,12 +327,6 @@
                 "distance": "Distancia",
                 "distanceType": "Tipo de distancia",
                 "side": "Lado",
-                "totalSize": "Tamaño total",
-                "orderSize": "Tamaño de orden"
-            },
-            "placeholders": {
-                "name": "Nombre",
-                "distance": "Distancia",
                 "totalSize": "Tamaño total",
                 "orderSize": "Tamaño de orden"
             },

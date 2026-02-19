@@ -307,6 +307,19 @@
             "filter": "Filter",
             "viewAll": "View All"
         },
+        "transfer": {
+            "agentTitle": "Transfer Agent",
+            "selectAccounts": "Please select accounts",
+            "title": "Transfer",
+            "from": "From",
+            "to": "To",
+            "asset": "Asset",
+            "amount": "Amount",
+            "available": "Available to Deposit",
+            "enterAllFields": "Please enter all fields",
+            "selectAccount": "Please select an account",
+            "selectAsset": "Please select an asset"
+        },
         "form": {
             "labels": {
                 "name": "Agent Name",

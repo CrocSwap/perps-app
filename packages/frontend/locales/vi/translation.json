@@ -307,6 +307,19 @@
             "filter": "Lọc",
             "viewAll": "Xem tất cả"
         },
+        "transfer": {
+            "agentTitle": "Chuyển giao đại lý",
+            "selectAccounts": "Vui lòng chọn tài khoản",
+            "title": "Chuyển giao",
+            "from": "Từ",
+            "to": "Đến",
+            "asset": "Tài sản",
+            "amount": "Số lượng",
+            "available": "Số dư khả dụng",
+            "enterAllFields": "Vui lòng nhập đầy đủ thông tin",
+            "selectAccount": "Vui lòng chọn tài khoản",
+            "selectAsset": "Vui lòng chọn tài sản"
+        },
         "form": {
             "labels": {
                 "name": "Tên tác nhân",

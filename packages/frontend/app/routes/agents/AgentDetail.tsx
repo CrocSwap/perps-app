@@ -327,7 +327,10 @@ export default function AgentDetail() {
                     </Modal>
                 )}
                 {transferModalCtrl.isOpen && (
-                    <TransferModal closeModal={transferModalCtrl.close} />
+                    <TransferModal
+                        agent={strategy}
+                        closeModal={transferModalCtrl.close}
+                    />
                 )}
             </div>
         </div>

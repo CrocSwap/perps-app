@@ -307,6 +307,19 @@
             "filter": "Filtrer",
             "viewAll": "Voir tout"
         },
+        "transfer": {
+            "agentTitle": "Transférer l'agent",
+            "selectAccounts": "Sélectionner des comptes",
+            "title": "Transférer",
+            "from": "De",
+            "to": "Vers",
+            "asset": "Actif",
+            "amount": "Montant",
+            "available": "Disponible pour dépôt",
+            "enterAllFields": "Veuillez remplir tous les champs",
+            "selectAccount": "Veuillez sélectionner un compte",
+            "selectAsset": "Veuillez sélectionner un actif"
+        },
         "form": {
             "labels": {
                 "name": "Nom de l'agent",

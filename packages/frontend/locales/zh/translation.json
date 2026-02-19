@@ -307,6 +307,19 @@
             "filter": "筛选",
             "viewAll": "查看全部"
         },
+        "transfer": {
+            "agentTitle": "转移代理",
+            "selectAccounts": "请选择账户",
+            "title": "转账",
+            "from": "从",
+            "to": "到",
+            "asset": "资产",
+            "amount": "金额",
+            "available": "可存入余额",
+            "enterAllFields": "请填写所有字段",
+            "selectAccount": "请选择账户",
+            "selectAsset": "请选择资产"
+        },
         "form": {
             "labels": {
                 "name": "智能体名称",
