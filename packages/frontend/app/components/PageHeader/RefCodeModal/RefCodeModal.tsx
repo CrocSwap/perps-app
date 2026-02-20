@@ -40,16 +40,21 @@ export default function RefCodeModal() {
     // when the session transitions through NotEstablished before Established
     const [hasSessionResolved, setHasSessionResolved] = useState(false);
     const [userRefCode, setUserRefCode] = useState<string | null>(null);
-    const [isUserRefCodeLoading, setIsUserRefCodeLoading] = useState(false);
+    const [userRefCodeFetchedFor, setUserRefCodeFetchedFor] = useState<
+        string | null
+    >(null);
     const [isOwnCode, setIsOwnCode] = useState<boolean>(false);
+
+    // true when we need to wait for userRefCode to load for the current user
+    const isUserRefCodePending =
+        isUserConnected && userPublicKey !== userRefCodeFetchedFor;
 
     // fetch user's own ref code when public key changes
     useEffect(() => {
         if (userPublicKey) {
-            setIsUserRefCodeLoading(true);
             referralStore.getRefCodeByPubKey(userPublicKey).then((res) => {
                 setUserRefCode(res?.code ?? null);
-                setIsUserRefCodeLoading(false);
+                setUserRefCodeFetchedFor(userPublicKey);
                 console.log(
                     '🔑 [RefCodeModal] userRefCode set to:',
                     res?.code ?? null,
@@ -57,7 +62,7 @@ export default function RefCodeModal() {
             });
         } else {
             setUserRefCode(null);
-            setIsUserRefCodeLoading(false);
+            setUserRefCodeFetchedFor(null);
         }
     }, [userPublicKey]);
     useEffect(() => {
@@ -122,7 +127,7 @@ export default function RefCodeModal() {
             isInitialized &&
             referralCodeFromURL.value &&
             hasSessionResolved &&
-            !isUserRefCodeLoading
+            !isUserRefCodePending
         ) {
             runLogic(referralCodeFromURL.value);
         }
@@ -132,7 +137,7 @@ export default function RefCodeModal() {
         userPublicKey,
         isUserConnected,
         hasSessionResolved,
-        isUserRefCodeLoading,
+        isUserRefCodePending,
         userRefCode,
     ]);
 
@@ -162,7 +167,7 @@ export default function RefCodeModal() {
         if (
             refCodeModalStore.shouldOpenModal &&
             refCodeModalStore.codeToConfirm &&
-            !isUserRefCodeLoading
+            !isUserRefCodePending
         ) {
             runLogic(refCodeModalStore.codeToConfirm);
         }
@@ -171,7 +176,7 @@ export default function RefCodeModal() {
         refCodeModalStore.codeToConfirm,
         userPublicKey,
         userRefCode,
-        isUserRefCodeLoading,
+        isUserRefCodePending,
     ]);
 
     // logic to ingest a ref code from the URL
