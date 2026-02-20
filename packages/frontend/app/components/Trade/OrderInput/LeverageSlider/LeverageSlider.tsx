@@ -332,8 +332,9 @@ export default function LeverageSlider({
 
         const boundedPosition = Math.max(0, Math.min(100, position));
 
-        let lowerStop = colorStops[0];
-        let upperStop = colorStops[colorStops.length - 1];
+        let lowerStop: (typeof colorStops)[number] = colorStops[0];
+        let upperStop: (typeof colorStops)[number] =
+            colorStops[colorStops.length - 1];
 
         for (let i = 0; i < colorStops.length - 1; i++) {
             if (
@@ -390,25 +391,37 @@ export default function LeverageSlider({
     };
 
     // Event handlers
-    const announceValueChange = (value: number) => {
+    const announceValueChange = useCallback((value: number) => {
         const formattedValue = formatValue(value);
         setAnnounceText('');
         setTimeout(() => {
             setAnnounceText(`Leverage ${formattedValue}x`);
         }, 100);
         setTimeout(() => setAnnounceText(''), 1500);
-    };
+    }, []);
 
-    const handleLeverageChange = (newLeverage: number) => {
-        const newLeverageOrMinAllowedForUser = Math.max(
-            newLeverage,
-            minimumValue || 1,
-        );
+    const handleLeverageChange = useCallback(
+        (newLeverage: number) => {
+            const newLeverageOrMinAllowedForUser = Math.max(
+                newLeverage,
+                minimumValue || 1,
+            );
 
-        setPreferredLeverage(newLeverageOrMinAllowedForUser);
-        onChange(newLeverageOrMinAllowedForUser);
-        announceValueChange(newLeverageOrMinAllowedForUser);
-    };
+            setPreferredLeverage(newLeverageOrMinAllowedForUser);
+            onChange(newLeverageOrMinAllowedForUser);
+            announceValueChange(newLeverageOrMinAllowedForUser);
+        },
+        [announceValueChange, minimumValue, onChange, setPreferredLeverage],
+    );
+
+    useEffect(() => {
+        if (minimumValue === undefined) return;
+        if (isDragging) return;
+
+        if (currentValue < minimumValue) {
+            handleLeverageChange(minimumValue);
+        }
+    }, [currentValue, handleLeverageChange, isDragging, minimumValue]);
 
     const handleSmoothLeverageChange = (newLeverage: number) => {
         onChange(newLeverage);
@@ -534,10 +547,10 @@ export default function LeverageSlider({
                 break;
             case 'ArrowLeft':
             case 'ArrowDown':
-                newValue = Math.max(minimumInputValue, currentValue - step);
+                newValue = Math.max(effectiveMinimum, currentValue - step);
                 break;
             case 'Home':
-                newValue = minimumInputValue;
+                newValue = effectiveMinimum;
                 break;
             case 'End':
                 newValue = maximumInputValue;
@@ -549,10 +562,7 @@ export default function LeverageSlider({
                 );
                 break;
             case 'PageDown':
-                newValue = Math.max(
-                    minimumInputValue,
-                    currentValue - step * 10,
-                );
+                newValue = Math.max(effectiveMinimum, currentValue - step * 10);
                 break;
             default:
                 return;
@@ -663,7 +673,7 @@ export default function LeverageSlider({
             const validatedLeverage = validateAndApplyLeverageForMarket(
                 effectiveSymbol,
                 currentMaxLeverage,
-                minimumInputValue,
+                effectiveMinimum,
             );
 
             onChange(validatedLeverage);
@@ -679,13 +689,14 @@ export default function LeverageSlider({
                 const validatedLeverage = validateAndApplyLeverageForMarket(
                     effectiveSymbol,
                     currentMaxLeverage,
-                    minimumInputValue,
+                    effectiveMinimum,
                 );
 
                 onChange(validatedLeverage);
             }
         }
     }, [
+        effectiveMinimum,
         symbolInfo?.coin,
         symbolInfo?.maxLeverage,
         currentMarket,
@@ -717,12 +728,9 @@ export default function LeverageSlider({
     }, [maximumInputValue]);
 
     useEffect(() => {
-        const ticks = getLeverageIntervals(
-            maximumInputValue,
-            minimumInputValue,
-        );
+        const ticks = getLeverageIntervals(maximumInputValue, effectiveMinimum);
         setTickMarks(ticks);
-    }, [minimumInputValue, maximumInputValue]);
+    }, [effectiveMinimum, maximumInputValue]);
 
     // Dragging effect
     useEffect(() => {
