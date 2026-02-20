@@ -332,8 +332,9 @@ export default function LeverageSlider({
 
         const boundedPosition = Math.max(0, Math.min(100, position));
 
-        let lowerStop = colorStops[0];
-        let upperStop = colorStops[colorStops.length - 1];
+        let lowerStop: (typeof colorStops)[number] = colorStops[0];
+        let upperStop: (typeof colorStops)[number] =
+            colorStops[colorStops.length - 1];
 
         for (let i = 0; i < colorStops.length - 1; i++) {
             if (
