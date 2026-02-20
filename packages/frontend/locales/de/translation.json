@@ -276,13 +276,98 @@
         "createSubAccountPH": "z.B.: Mein Unterkonto 1",
         "created": {
             "title": "Unterkonto erstellt",
-            "message": "Neues Strategie-Unterkonto {{name}} erstellt",
+            "message": "Neues Agent-Unterkonto {{name}} erstellt",
             "message2": "Neues diskretionäres Unterkonto {{name}} erstellt"
         }
     },
-    "strategies": {
-        "newStrategy": "Neue Strategie",
-        "editStrategy": "Strategie bearbeiten"
+    "agents": {
+        "newAgent": "Neuer Agent",
+        "editAgent": "Agent bearbeiten",
+        "overview": {
+            "create": "Agent erstellen",
+            "blurb": "Führen Sie einen automatisierten Market-Making-Agenten auf Ambient Perps aus",
+            "paused": "Pausiert",
+            "running": "Läuft",
+            "pause": "Pausieren",
+            "unpause": "Fortsetzen",
+            "remove": "Entfernen",
+            "emptyState": "Keine Daten zum Anzeigen",
+            "removeTitle": "Agent entfernen",
+            "removeMessage": "Sind Sie sicher, dass Sie diesen Agenten entfernen möchten?"
+        },
+        "details": {
+            "noAgentFound": "Kein Agent gefunden",
+            "status": "Status",
+            "parameters": "Parameter",
+            "performance": "Performance",
+            "ordersPlaced": "Platzierte Orders",
+            "runtime": "Laufzeit",
+            "hours": "Stunden",
+            "orderHistory": "Orderverlauf",
+            "filter": "Filter",
+            "viewAll": "Alle anzeigen"
+        },
+        "transfer": {
+            "agentTitle": "Agent übertragen",
+            "selectAccounts": "Bitte Konten auswählen",
+            "title": "Übertragung",
+            "from": "Von",
+            "to": "Zu",
+            "asset": "Asset",
+            "amount": "Betrag",
+            "available": "Verfügbar für Einzahlung",
+            "enterAllFields": "Bitte alle Felder ausfüllen",
+            "selectAccount": "Bitte wählen Sie ein Konto",
+            "selectAsset": "Bitte wählen Sie ein Asset"
+        },
+        "form": {
+            "labels": {
+                "name": "Agentname",
+                "market": "Markt",
+                "distance": "Abstand",
+                "distanceType": "Abstandstyp",
+                "side": "Seite",
+                "totalSize": "Gesamtgröße",
+                "orderSize": "Ordergröße"
+            },
+            "placeholders": {
+                "name": "Name",
+                "distance": "Abstand",
+                "totalSize": "Gesamtgröße",
+                "orderSize": "Ordergröße"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Ticks",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "Beide",
+                    "above": "Oberhalb",
+                    "below": "Unterhalb"
+                }
+            },
+            "blurbs": {
+                "name": "Wählen Sie einen aussagekräftigen Namen für Ihren Trading-Agenten. So können Sie Ihre Agenten einfacher identifizieren und verwalten.",
+                "market": "Wählen Sie den Markt, auf dem Sie diesen Agenten einsetzen möchten. Verschiedene Märkte haben unterschiedliche Volatilitäts- und Liquiditätsprofile.",
+                "distance": "Definieren Sie den Distanzparameter für Ihren Agenten. Er bestimmt, wie weit Ihre Orders vom aktuellen Preis entfernt platziert werden.",
+                "distanceType": "Wählen Sie, wie die Distanz gemessen wird. Ticks bieten präzise Kontrolle, während Prozent eine proportionale Skalierung mit Preisbewegungen ermöglicht.",
+                "side": "Legen Sie fest, ob der Agent Kauforders, Verkaufsorders oder beides platzieren soll. \"Beide\" ermöglicht Market Making auf beiden Seiten des Orderbuchs.",
+                "totalSize": "Legen Sie den Gesamtbetrag fest, den Sie diesem Agenten zuweisen möchten. Das entspricht dem maximalen Exposure über alle aktiven Orders.",
+                "orderSize": "Definieren Sie die Größe einzelner Orders. Kleinere Orders bieten bessere Granularität, können aber die Transaktionskosten erhöhen."
+            },
+            "validation": {
+                "nameRequired": "Agentname ist erforderlich",
+                "marketRequired": "Markt ist erforderlich",
+                "distanceRequired": "Abstand ist erforderlich",
+                "distanceTypeRequired": "Abstandstyp ist erforderlich",
+                "sideRequired": "Seite ist erforderlich",
+                "totalSizeRequired": "Gesamtgröße ist erforderlich",
+                "orderSizeRequired": "Ordergröße ist erforderlich",
+                "positiveNumber": "Geben Sie eine gültige Zahl größer als 0 ein",
+                "orderSizeExceedsTotal": "Ordergröße darf die Gesamtgröße nicht überschreiten"
+            }
+        }
     },
     "margin": {
         "cross": {
@@ -753,10 +838,10 @@
         "referrals": "Empfehlungen",
         "points": "Punkte",
         "leaderboard": "Rangliste",
-        "newStrategy": "Neue Strategie",
-        "editStrategy": "Strategie bearbeiten",
-        "strategy": "Strategie",
-        "strategies": "Strategien",
+        "newAgent": "Neuer Agent",
+        "editAgent": "Agent bearbeiten",
+        "agent": "Agent",
+        "agents": "Agenten",
         "vault": "Tresor",
         "vaults": "Tresore",
         "subAccounts": "Unterkonten",

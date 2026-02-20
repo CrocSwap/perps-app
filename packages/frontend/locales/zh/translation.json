@@ -276,13 +276,98 @@
         "createSubAccountPH": "例如：我的子账户1",
         "created": {
             "title": "子账户已创建",
-            "message": "已创建新策略子账户{{name}}",
+            "message": "已创建新智能体子账户{{name}}",
             "message2": "已创建新自主管理子账户{{name}}"
         }
     },
-    "strategies": {
-        "newStrategy": "新策略",
-        "editStrategy": "编辑策略"
+    "agents": {
+        "newAgent": "新智能体",
+        "editAgent": "编辑智能体",
+        "overview": {
+            "create": "创建智能体",
+            "blurb": "在 Ambient Perps 上运行自动化做市智能体",
+            "paused": "已暂停",
+            "running": "运行中",
+            "pause": "暂停",
+            "unpause": "恢复",
+            "remove": "移除",
+            "emptyState": "暂无可显示的数据",
+            "removeTitle": "移除智能体",
+            "removeMessage": "确定要移除此智能体吗？"
+        },
+        "details": {
+            "noAgentFound": "未找到智能体",
+            "status": "状态",
+            "parameters": "参数",
+            "performance": "表现",
+            "ordersPlaced": "已下单数",
+            "runtime": "运行时长",
+            "hours": "小时",
+            "orderHistory": "订单历史",
+            "filter": "筛选",
+            "viewAll": "查看全部"
+        },
+        "transfer": {
+            "agentTitle": "转移代理",
+            "selectAccounts": "请选择账户",
+            "title": "转账",
+            "from": "从",
+            "to": "到",
+            "asset": "资产",
+            "amount": "金额",
+            "available": "可存入余额",
+            "enterAllFields": "请填写所有字段",
+            "selectAccount": "请选择账户",
+            "selectAsset": "请选择资产"
+        },
+        "form": {
+            "labels": {
+                "name": "智能体名称",
+                "market": "市场",
+                "distance": "距离",
+                "distanceType": "距离类型",
+                "side": "方向",
+                "totalSize": "总规模",
+                "orderSize": "订单规模"
+            },
+            "placeholders": {
+                "name": "名称",
+                "distance": "距离",
+                "totalSize": "总规模",
+                "orderSize": "订单规模"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Tick",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "双向",
+                    "above": "上方",
+                    "below": "下方"
+                }
+            },
+            "blurbs": {
+                "name": "为你的交易智能体设置一个清晰的名称，便于后续识别和管理。",
+                "market": "选择你希望部署该智能体的市场。不同市场在波动性和流动性上存在差异。",
+                "distance": "设置智能体的距离参数，用于决定订单与当前价格之间的偏离程度。",
+                "distanceType": "选择距离的计量方式。Tick 提供更精细的控制，百分比会随价格变化按比例调整。",
+                "side": "指定智能体应下买单、卖单或双向下单。\"双向\"可在订单簿两侧进行做市。",
+                "totalSize": "设置该智能体可分配的总资金规模，表示所有活动订单的最大总敞口。",
+                "orderSize": "设置单笔订单规模。较小的订单可提高颗粒度，但可能增加交易成本。"
+            },
+            "validation": {
+                "nameRequired": "智能体名称为必填项",
+                "marketRequired": "市场为必填项",
+                "distanceRequired": "距离为必填项",
+                "distanceTypeRequired": "距离类型为必填项",
+                "sideRequired": "方向为必填项",
+                "totalSizeRequired": "总规模为必填项",
+                "orderSizeRequired": "订单规模为必填项",
+                "positiveNumber": "请输入大于 0 的有效数字",
+                "orderSizeExceedsTotal": "订单规模不能大于总规模"
+            }
+        }
     },
     "margin": {
         "cross": {
@@ -753,10 +838,10 @@
         "referrals": "推荐",
         "points": "积分",
         "leaderboard": "排行榜",
-        "newStrategy": "新建策略",
-        "editStrategy": "编辑策略",
-        "strategy": "策略",
-        "strategies": "策略列表",
+        "newAgent": "新建智能体",
+        "editAgent": "编辑智能体",
+        "agent": "智能体",
+        "agents": "智能体列表",
         "vault": "金库",
         "vaults": "金库列表",
         "subAccounts": "子账户",
