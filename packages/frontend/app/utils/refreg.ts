@@ -357,6 +357,18 @@ type RefregApiError = {
     };
 };
 
+class RefregHttpError extends Error {
+    readonly path: string;
+    readonly status: number;
+
+    constructor(path: string, status: number) {
+        super(`[refreg] API ${path} failed: HTTP ${status}`);
+        this.name = 'RefregHttpError';
+        this.path = path;
+        this.status = status;
+    }
+}
+
 function isApiErrorResponse(value: unknown): value is RefregApiError {
     if (!value || typeof value !== 'object') {
         return false;
@@ -398,9 +410,7 @@ async function fetchRefregJson<T>(
         });
 
         if (!response.ok) {
-            throw new Error(
-                `[refreg] API ${path} failed: HTTP ${response.status}`,
-            );
+            throw new RefregHttpError(path, response.status);
         }
 
         return json;
@@ -1112,6 +1122,15 @@ async function checkByUserEndpointOnce(
     try {
         return await checkByUserEndpoint(path, walletPublicKey);
     } catch (error) {
+        if (error instanceof RefregHttpError && error.status === 404) {
+            console.info(
+                `[refreg] ${path} one-shot check pending indexing (HTTP 404)`,
+                {
+                    walletPublicKey: walletPublicKey.toBase58(),
+                },
+            );
+            return false;
+        }
         console.info(`[refreg] ${path} one-shot check failed:`, error);
         return false;
     }
