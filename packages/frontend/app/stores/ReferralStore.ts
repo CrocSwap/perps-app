@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+export interface CachedRefCodeIF {
+    code: string;
+    isApproved: boolean;
+}
+
 export interface RefCodeCacheIF {
     code: string;
     isCodeRegistered: boolean | undefined;
@@ -31,7 +36,7 @@ export interface AffiliateCodeResponse {
 }
 
 export interface ReferralStoreIF {
-    cached: string;
+    cached: CachedRefCodeIF;
     cached2: RefCodeCacheIF;
     totVolume: number | undefined;
     convertedWallets: string[];
@@ -40,7 +45,7 @@ export interface ReferralStoreIF {
         userIdentifier: string,
     ) => Promise<AffiliateCodeResponse | null>;
     checkForConversion: (address: string) => Promise<boolean>;
-    cache(refCode: string): void;
+    cache(refCode: string, isApproved?: boolean): void;
     cache2(refCode: string): void;
     markCodeRegistered(refCode: string, isRegistered?: boolean): void;
     markCodeApproved(refCode: string): void;
@@ -65,7 +70,7 @@ const ssrSafeStorage = () =>
 export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set, get) => ({
-            cached: '',
+            cached: { code: '', isApproved: false },
             cached2: {
                 code: '',
                 isCodeRegistered: undefined,
@@ -73,8 +78,13 @@ export const useReferralStore = create<ReferralStoreIF>()(
             },
             convertedWallets: [],
             totVolume: undefined,
-            cache(refCode: string): void {
-                set({ cached: refCode });
+            cache(refCode: string, isApproved: boolean = false): void {
+                const current = get().cached;
+                // Don't overwrite if current code is approved and new code is different
+                if (current.isApproved && current.code !== refCode) {
+                    return;
+                }
+                set({ cached: { code: refCode, isApproved } });
             },
             cache2(refCode: string): void {
                 set({
@@ -111,6 +121,12 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 }
             },
             markCodeApproved(refCode: string): void {
+                // Update cached with approval
+                const currentCached = get().cached;
+                if (refCode === currentCached.code) {
+                    set({ cached: { code: refCode, isApproved: true } });
+                }
+                // Also update cached2 for backwards compatibility
                 const codeFromCache: string = get().cached2.code;
                 if (refCode === codeFromCache) {
                     set({
@@ -135,7 +151,10 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 set({ totVolume: volume });
             },
             clear(): void {
-                set({ cached: '', totVolume: undefined });
+                set({
+                    cached: { code: '', isApproved: false },
+                    totVolume: undefined,
+                });
             },
             async fetchUserReferrer(
                 address: string,
@@ -254,7 +273,37 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 cached2: state.cached2,
                 convertedWallets: state.convertedWallets,
             }),
-            version: 1,
+            version: 2,
+            migrate: (persistedState: unknown, version: number) => {
+                if (version < 2) {
+                    const state = persistedState as {
+                        cached?: string | CachedRefCodeIF;
+                        cached2?: RefCodeCacheIF;
+                        convertedWallets?: string[];
+                    };
+                    // Migrate cached from string to object
+                    let newCached: CachedRefCodeIF;
+                    if (typeof state.cached === 'string') {
+                        // If cached2 has an approved code, use that; otherwise use the string value
+                        const isApproved =
+                            state.cached2?.isCodeApprovedByInvitee === true &&
+                            state.cached2?.code === state.cached;
+                        newCached = { code: state.cached, isApproved };
+                    } else if (
+                        state.cached &&
+                        typeof state.cached === 'object'
+                    ) {
+                        newCached = state.cached;
+                    } else {
+                        newCached = { code: '', isApproved: false };
+                    }
+                    return {
+                        ...state,
+                        cached: newCached,
+                    };
+                }
+                return persistedState ?? {};
+            },
         },
     ),
 );

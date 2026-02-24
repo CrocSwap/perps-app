@@ -125,19 +125,20 @@ export default function CodeTabs(props: PropsIF) {
 
     // update refCodeToConsume whenever the cached value changes
     useEffect(() => {
-        if (referralStore.cached && referrerAddress) {
+        if (referralStore.cached.code && referrerAddress) {
             (async () => {
                 const userCodeData =
                     await referralStore.getRefCodeByPubKey(referrerAddress);
                 const isOwnedByUser =
-                    userCodeData?.code === referralStore.cached ||
-                    referralStore.cached === referrerAddress;
-                !isOwnedByUser && setRefCodeToConsume(referralStore.cached);
+                    userCodeData?.code === referralStore.cached.code ||
+                    referralStore.cached.code === referrerAddress;
+                !isOwnedByUser &&
+                    setRefCodeToConsume(referralStore.cached.code);
             })();
-        } else if (!referralStore.cached) {
+        } else if (!referralStore.cached.code) {
             setRefCodeToConsume(undefined);
         }
-    }, [referralStore.cached, referrerAddress]);
+    }, [referralStore.cached.code, referrerAddress]);
 
     // run the FUUL context
     const {
@@ -187,13 +188,13 @@ export default function CodeTabs(props: PropsIF) {
 
     useEffect(() => {
         if (
-            !referralStore.cached &&
+            !referralStore.cached.code &&
             referralStore.totVolume !== undefined &&
             referralStore.totVolume < INVITEE_MAX_VOLUME_THRESHOLD
         ) {
             setEditModeInvitee(true);
         }
-    }, [referralStore.cached, referralStore.totVolume]);
+    }, [referralStore.cached.code, referralStore.totVolume]);
 
     useEffect(() => {
         if (justCopied) {
@@ -213,7 +214,7 @@ export default function CodeTabs(props: PropsIF) {
     useEffect(() => {
         if (
             handleReferralURLParam.value &&
-            handleReferralURLParam.value !== referralStore.cached
+            handleReferralURLParam.value !== referralStore.cached.code
         ) {
             // Reset validation state so the validation effect will re-run
             setIsCachedValueValid(undefined);
@@ -235,9 +236,9 @@ export default function CodeTabs(props: PropsIF) {
         const isCodeAvailable: boolean =
             await checkIfCodeIsAvailableForInviteeToUse(r);
 
-        // Always cache the code and set URL param
+        // Always cache the code and set URL param (user explicitly entered, so mark as approved)
         handleReferralURLParam.set(r);
-        referralStore.cache(r);
+        referralStore.cache(r, true);
 
         if (!isCodeAvailable) {
             // code does not exist or has no remaining uses
@@ -384,7 +385,7 @@ export default function CodeTabs(props: PropsIF) {
     // Validate cached referral code when it changes (e.g., from URL)
     useEffect(() => {
         // Don't validate if there's no cached code
-        if (!referralStore.cached) {
+        if (!referralStore.cached.code) {
             setIsCachedValueValid(undefined);
             setLastValidatedCode('');
             return;
@@ -393,13 +394,13 @@ export default function CodeTabs(props: PropsIF) {
         // Don't re-validate if we already have a validation result for this specific code
         if (
             isCachedValueValid !== undefined &&
-            lastValidatedCode === referralStore.cached
+            lastValidatedCode === referralStore.cached.code
         ) {
             return;
         }
 
         (async () => {
-            const codeToValidate = referralStore.cached;
+            const codeToValidate = referralStore.cached.code;
             try {
                 const isCodeAvailable: boolean =
                     await checkIfCodeIsAvailableForInviteeToUse(codeToValidate);
@@ -424,7 +425,7 @@ export default function CodeTabs(props: PropsIF) {
                 setLastValidatedCode(codeToValidate);
             }
         })();
-    }, [referralStore.cached, isCachedValueValid, lastValidatedCode]);
+    }, [referralStore.cached.code, isCachedValueValid, lastValidatedCode]);
 
     const isCheckingCode = useMemo<boolean>(() => {
         if (userInputRefCode.length < 2) return false;
@@ -735,7 +736,7 @@ export default function CodeTabs(props: PropsIF) {
                         totVolume={referralStore.totVolume}
                         totVolumeFormatted={totVolumeFormatted}
                         inviteeMaxVolumeThreshold={INVITEE_MAX_VOLUME_THRESHOLD}
-                        cached={referralStore.cached}
+                        cached={referralStore.cached.code}
                         isCachedValueValid={isCachedValueValid}
                         refCodeToConsume={refCodeToConsume}
                         editModeInvitee={editModeInvitee}
