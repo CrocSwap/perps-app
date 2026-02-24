@@ -132,7 +132,7 @@ export default function RefCodeModal() {
         refCodeModalStore.closeModal();
     }
 
-    function mockAcceptRefCode(refCode: string): void {
+    function acceptRefCode(refCode: string): void {
         trackPageView();
         if (referralStore.cached2.code !== refCode) {
             referralStore.cache2(refCode);
@@ -188,7 +188,7 @@ export default function RefCodeModal() {
                                 if (!activeRefCode) {
                                     return;
                                 }
-                                mockAcceptRefCode(activeRefCode);
+                                acceptRefCode(activeRefCode);
                                 handleClose();
                             }}
                         >
@@ -214,7 +214,7 @@ export default function RefCodeModal() {
                                 if (!activeRefCode) {
                                     return;
                                 }
-                                mockAcceptRefCode(activeRefCode);
+                                acceptRefCode(activeRefCode);
                                 handleClose();
                             }}
                         >
