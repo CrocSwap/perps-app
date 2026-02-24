@@ -100,6 +100,7 @@ export default function CreateReferralCodeForm({
                 }),
             });
 
+            window.dispatchEvent(new CustomEvent('affiliateDataUpdate'));
             onSuccess();
         } catch (err) {
             const errorMessage =

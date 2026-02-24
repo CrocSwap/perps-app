@@ -81,6 +81,7 @@ export default function EditCommissionSplitForm({
                 userRebateRate: Number((inviteeAmount / 100).toFixed(2)),
             });
 
+            window.dispatchEvent(new CustomEvent('affiliateDataUpdate'));
             onSuccess();
         } catch (err) {
             const errorMessage =
