@@ -1,16 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useReferralStore } from './ReferralStore';
-import type { CachedRefCodeIF, RefCodeCacheIF } from './ReferralStore';
+import type { CachedRefCodeIF } from './ReferralStore';
 
 // Helper to reset Zustand store state between tests
 function resetStore() {
     useReferralStore.setState({
         cached: { code: '', isApproved: false },
-        cached2: {
-            code: '',
-            isCodeRegistered: undefined,
-            isCodeApprovedByInvitee: undefined,
-        },
         convertedWallets: [],
         totVolume: undefined,
     });
@@ -128,15 +123,6 @@ describe('ReferralStore – cached refactoring', () => {
         expect(useReferralStore.getState().cached.isApproved).toBe(false);
     });
 
-    it('markCodeApproved also updates cached2 for backwards compat', () => {
-        useReferralStore.getState().cache2('ben1234');
-        useReferralStore.getState().markCodeApproved('ben1234');
-
-        expect(
-            useReferralStore.getState().cached2.isCodeApprovedByInvitee,
-        ).toBe(true);
-    });
-
     // ─── clear() ──────────────────────────────────────────────
 
     it('clear() resets cached to empty object', () => {
@@ -168,11 +154,6 @@ describe('ReferralStore – cached refactoring', () => {
         // Simulate old localStorage format
         const oldState = {
             cached: 'ben1234',
-            cached2: {
-                code: 'ben1234',
-                isCodeRegistered: undefined,
-                isCodeApprovedByInvitee: undefined,
-            },
             convertedWallets: [],
         };
 
@@ -186,55 +167,9 @@ describe('ReferralStore – cached refactoring', () => {
         });
     });
 
-    it('migration: string cached with cached2 approval → object cached with isApproved=true', () => {
-        const oldState = {
-            cached: 'ben1234',
-            cached2: {
-                code: 'ben1234',
-                isCodeRegistered: true,
-                isCodeApprovedByInvitee: true,
-            },
-            convertedWallets: [],
-        };
-
-        const persistOptions = (useReferralStore as any).persist;
-        const migrateResult = persistOptions.getOptions().migrate(oldState, 1);
-
-        expect(migrateResult.cached).toEqual({
-            code: 'ben1234',
-            isApproved: true,
-        });
-    });
-
-    it('migration: mismatched cached/cached2 codes → isApproved=false', () => {
-        const oldState = {
-            cached: 'ben4',
-            cached2: {
-                code: 'ben1234',
-                isCodeRegistered: true,
-                isCodeApprovedByInvitee: true,
-            },
-            convertedWallets: [],
-        };
-
-        const persistOptions = (useReferralStore as any).persist;
-        const migrateResult = persistOptions.getOptions().migrate(oldState, 1);
-
-        // cached2 approved code doesn't match cached, so isApproved=false
-        expect(migrateResult.cached).toEqual({
-            code: 'ben4',
-            isApproved: false,
-        });
-    });
-
     it('migration: empty string cached → empty object', () => {
         const oldState = {
             cached: '',
-            cached2: {
-                code: '',
-                isCodeRegistered: undefined,
-                isCodeApprovedByInvitee: undefined,
-            },
             convertedWallets: [],
         };
 
@@ -247,7 +182,7 @@ describe('ReferralStore – cached refactoring', () => {
         });
     });
 
-    it('migration: version 2 state is returned as-is', () => {
+    it('migration: version 2 state has cached2 stripped', () => {
         const v2State = {
             cached: { code: 'ben1234', isApproved: true },
             cached2: {
@@ -261,7 +196,57 @@ describe('ReferralStore – cached refactoring', () => {
         const persistOptions = (useReferralStore as any).persist;
         const migrateResult = persistOptions.getOptions().migrate(v2State, 2);
 
+        expect(migrateResult.cached2).toBeUndefined();
+        expect(migrateResult.cached).toEqual({
+            code: 'ben1234',
+            isApproved: true,
+        });
+    });
+
+    it('migration: version 2 state without cached2 passes through cleanly', () => {
+        const v2State = {
+            cached: { code: 'ben1234', isApproved: true },
+            convertedWallets: [],
+        };
+
+        const persistOptions = (useReferralStore as any).persist;
+        const migrateResult = persistOptions.getOptions().migrate(v2State, 2);
+
+        expect(migrateResult.cached2).toBeUndefined();
         expect(migrateResult).toEqual(v2State);
+    });
+
+    it('migration: version 3 state is returned as-is', () => {
+        const v3State = {
+            cached: { code: 'ben1234', isApproved: true },
+            convertedWallets: [],
+        };
+
+        const persistOptions = (useReferralStore as any).persist;
+        const migrateResult = persistOptions.getOptions().migrate(v3State, 3);
+
+        expect(migrateResult).toEqual(v3State);
+    });
+
+    it('migration: v1 state with cached2 has it stripped', () => {
+        const oldState = {
+            cached: 'ben1234',
+            cached2: {
+                code: 'ben1234',
+                isCodeRegistered: true,
+                isCodeApprovedByInvitee: true,
+            },
+            convertedWallets: [],
+        };
+
+        const persistOptions = (useReferralStore as any).persist;
+        const migrateResult = persistOptions.getOptions().migrate(oldState, 1);
+
+        expect(migrateResult.cached2).toBeUndefined();
+        expect(migrateResult.cached).toEqual({
+            code: 'ben1234',
+            isApproved: false,
+        });
     });
 
     // ─── Full workflow simulation ─────────────────────────────

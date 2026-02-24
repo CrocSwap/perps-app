@@ -2,14 +2,10 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface CachedRefCodeIF {
+    // ref code created for referral use
     code: string;
+    // indicates the invitee wants to use this code
     isApproved: boolean;
-}
-
-export interface RefCodeCacheIF {
-    code: string;
-    isCodeRegistered: boolean | undefined;
-    isCodeApprovedByInvitee: boolean | undefined;
 }
 
 export interface UserReferrerResponse {
@@ -37,7 +33,6 @@ export interface AffiliateCodeResponse {
 
 export interface ReferralStoreIF {
     cached: CachedRefCodeIF;
-    cached2: RefCodeCacheIF;
     totVolume: number | undefined;
     convertedWallets: string[];
     fetchUserReferrer: (address: string) => Promise<UserReferrerResponse[]>;
@@ -46,8 +41,6 @@ export interface ReferralStoreIF {
     ) => Promise<AffiliateCodeResponse | null>;
     checkForConversion: (address: string) => Promise<boolean>;
     cache(refCode: string, isApproved?: boolean): void;
-    cache2(refCode: string): void;
-    markCodeRegistered(refCode: string, isRegistered?: boolean): void;
     markCodeApproved(refCode: string): void;
     setTotVolume(volume: number | undefined): void;
     clear(): void;
@@ -70,12 +63,7 @@ const ssrSafeStorage = () =>
 export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set, get) => ({
-            cached: { code: '', isApproved: false },
-            cached2: {
-                code: '',
-                isCodeRegistered: undefined,
-                isCodeApprovedByInvitee: undefined,
-            },
+            cached: { code: '', isApproved: false } as CachedRefCodeIF,
             convertedWallets: [],
             totVolume: undefined,
             cache(refCode: string, isApproved: boolean = false): void {
@@ -86,65 +74,11 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 }
                 set({ cached: { code: refCode, isApproved } });
             },
-            cache2(refCode: string): void {
-                set({
-                    cached2: {
-                        code: refCode,
-                        isCodeRegistered: undefined,
-                        isCodeApprovedByInvitee: undefined,
-                    },
-                });
-            },
-            markCodeRegistered(
-                refCode: string,
-                isRegistered: boolean = true,
-            ): void {
-                const codeFromCache: string = get().cached2.code;
-                if (refCode === codeFromCache) {
-                    set({
-                        cached2: {
-                            code: codeFromCache,
-                            isCodeRegistered: isRegistered,
-                            isCodeApprovedByInvitee:
-                                get().cached2.isCodeApprovedByInvitee,
-                        },
-                    });
-                } else {
-                    const dataForError = {
-                        cached: codeFromCache,
-                        approvalReceivedFor: refCode,
-                    };
-                    console.error(
-                        'Code in LS cache does not match code queried for registration.',
-                        dataForError,
-                    );
-                }
-            },
             markCodeApproved(refCode: string): void {
                 // Update cached with approval
                 const currentCached = get().cached;
                 if (refCode === currentCached.code) {
                     set({ cached: { code: refCode, isApproved: true } });
-                }
-                // Also update cached2 for backwards compatibility
-                const codeFromCache: string = get().cached2.code;
-                if (refCode === codeFromCache) {
-                    set({
-                        cached2: {
-                            code: codeFromCache,
-                            isCodeRegistered: get().cached2.isCodeRegistered,
-                            isCodeApprovedByInvitee: true,
-                        },
-                    });
-                } else {
-                    const dataForError = {
-                        cached: codeFromCache,
-                        approvalReceivedFor: refCode,
-                    };
-                    console.error(
-                        'Code in LS cache does not match code queried for approval.',
-                        dataForError,
-                    );
                 }
             },
             setTotVolume(volume: number | undefined): void {
@@ -270,25 +204,18 @@ export const useReferralStore = create<ReferralStoreIF>()(
             storage: createJSONStorage(ssrSafeStorage),
             partialize: (state) => ({
                 cached: state.cached,
-                cached2: state.cached2,
                 convertedWallets: state.convertedWallets,
             }),
-            version: 2,
+            version: 3,
             migrate: (persistedState: unknown, version: number) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                let state = (persistedState ?? {}) as Record<string, any>;
+
                 if (version < 2) {
-                    const state = persistedState as {
-                        cached?: string | CachedRefCodeIF;
-                        cached2?: RefCodeCacheIF;
-                        convertedWallets?: string[];
-                    };
                     // Migrate cached from string to object
                     let newCached: CachedRefCodeIF;
                     if (typeof state.cached === 'string') {
-                        // If cached2 has an approved code, use that; otherwise use the string value
-                        const isApproved =
-                            state.cached2?.isCodeApprovedByInvitee === true &&
-                            state.cached2?.code === state.cached;
-                        newCached = { code: state.cached, isApproved };
+                        newCached = { code: state.cached, isApproved: false };
                     } else if (
                         state.cached &&
                         typeof state.cached === 'object'
@@ -297,12 +224,16 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     } else {
                         newCached = { code: '', isApproved: false };
                     }
-                    return {
-                        ...state,
-                        cached: newCached,
-                    };
+                    state = { ...state, cached: newCached };
                 }
-                return persistedState ?? {};
+
+                if (version < 3) {
+                    // Remove deprecated cached2 from persisted state
+                    const { cached2, ...rest } = state;
+                    state = rest;
+                }
+
+                return state;
             },
         },
     ),
