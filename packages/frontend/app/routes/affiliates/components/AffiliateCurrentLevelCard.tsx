@@ -89,7 +89,13 @@ export function AffiliateCurrentLevelCard() {
                     type='button'
                     className={`${styles.btn} ${styles['btn-secondary']}`}
                     onClick={() =>
-                        setSearchParams({ view: DashboardTab.Links })
+                        setSearchParams(
+                            (prev) => {
+                                prev.set('view', DashboardTab.Links);
+                                return prev;
+                            },
+                            { replace: true },
+                        )
                     }
                 >
                     Manage referral codes
