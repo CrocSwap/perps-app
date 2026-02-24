@@ -425,7 +425,9 @@ export const TradingViewProvider: React.FC<{
             fullscreen: false,
             autosize: true,
             datafeed: dataFeedRef.current as IBasicDataFeed,
-            interval: (chartState?.interval || '60') as ResolutionString,
+            interval: (chartIntervalRef.current ||
+                chartState?.interval ||
+                '60') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
                 'header_symbol_search',
@@ -686,7 +688,7 @@ export const TradingViewProvider: React.FC<{
 
             setChart(tvWidget);
         });
-    }, [chartState, info, tradingviewLib, marketId]);
+    }, [chartState, info, tradingviewLib]);
 
     useEffect(() => {
         setIsChartReady(false);

@@ -27,7 +27,7 @@ import {
     supportedResolutions,
 } from './utils/utils';
 import { useChartStore } from '~/stores/TradingviewChartStore';
-import { useAppStateStore } from '~/stores/AppStateStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { UserFillIF } from '~/utils/UserDataIFs';
 
 const subscriptions = new Map<string, { unsubscribe: () => void }>();
@@ -50,6 +50,20 @@ export const createDataFeed = (
     let userFillsInterval: NodeJS.Timeout | null = null;
     let lastResolution: ResolutionString | undefined = undefined;
     let onMarksCallback: ((marks: Mark[]) => void) | undefined = undefined;
+    let marksSymbol: string | undefined = undefined;
+
+    const normalizeSymbolForMarks = (symbol?: string): string => {
+        if (!symbol) return '';
+        const baseSymbol = symbol.split('-')[0];
+        const kTokenPattern = /^k[A-Z]+$/;
+        return kTokenPattern.test(baseSymbol)
+            ? baseSymbol
+            : baseSymbol.toUpperCase();
+    };
+
+    const getActiveSymbolForMarks = (): string => {
+        return normalizeSymbolForMarks(useTradeDataStore.getState().symbol);
+    };
 
     const updateUserFills = (fills: UserFillIF[]) => {
         userFills = fills;
@@ -77,9 +91,24 @@ export const createDataFeed = (
         const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
         const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
-        userFills.sort((a, b) => b.time - a.time);
+        const normalizedMarksSymbol =
+            getActiveSymbolForMarks() || normalizeSymbolForMarks(marksSymbol);
+        if (!normalizedMarksSymbol) {
+            if (ocb) {
+                ocb([]);
+            }
+            return;
+        }
 
-        userFills.forEach((fill) => {
+        const symbolFills = userFills
+            .filter((fill) => {
+                return (
+                    normalizeSymbolForMarks(fill.coin) === normalizedMarksSymbol
+                );
+            })
+            .sort((a, b) => b.time - a.time);
+
+        symbolFills.forEach((fill) => {
             const isBuy = fill.side === 'B' || fill.side === 'buy';
             const markerColor = isBuy ? chartTheme.buy : chartTheme.sell;
             const markData = {
@@ -226,8 +255,20 @@ export const createDataFeed = (
             onDataCallback: (marks: Mark[]) => void,
             resolution: ResolutionString,
         ) => {
+            const requestedSymbol = normalizeSymbolForMarks(
+                symbolInfo.ticker || symbolInfo.name,
+            );
+            const activeSymbol = getActiveSymbolForMarks();
+            if (activeSymbol && requestedSymbol !== activeSymbol) {
+                onDataCallback([]);
+                return;
+            }
+
             onMarksCallback = onDataCallback;
             lastResolution = resolution;
+            marksSymbol = symbolInfo.ticker || symbolInfo.name;
+
+            processUserFills(userFills, lastResolution, onMarksCallback);
 
             // if (userFillsInterval) {
             //     clearInterval(userFillsInterval);

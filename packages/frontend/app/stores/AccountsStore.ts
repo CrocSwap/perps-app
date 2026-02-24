@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { generateSolanaAddress } from '~/utils/functions/makeAddress';
 
-type subaccountGroupT = 'strategy' | 'discretionary';
+type subaccountGroupT = 'agent' | 'strategy' | 'discretionary';
 
 export interface accountIF {
     name: string;
@@ -55,7 +55,7 @@ const MOCK_ACCOUNTS: allAccountsIF = {
             'Sub-Account 5',
             generateSolanaAddress(),
             ZERO_DOLLARS,
-            'strategy',
+            'agent',
         ),
         new Account(
             'Sub-Account 3',
@@ -67,7 +67,7 @@ const MOCK_ACCOUNTS: allAccountsIF = {
             'Sub-Account 4',
             generateSolanaAddress(),
             ZERO_DOLLARS,
-            'strategy',
+            'agent',
         ),
     ],
 };
