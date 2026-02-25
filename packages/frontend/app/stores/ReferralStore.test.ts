@@ -61,12 +61,12 @@ describe('ReferralStore – cached refactoring', () => {
         expect(useReferralStore.getState().cached.isApproved).toBe(true);
     });
 
-    it('approved code CANNOT be overwritten by a different approved code', () => {
+    it('approved code CAN be overwritten by a different explicitly approved code', () => {
         useReferralStore.getState().cache('ben1234', true);
 
         useReferralStore.getState().cache('ben4', true);
-        // Protection: approved code stays
-        expect(useReferralStore.getState().cached.code).toBe('ben1234');
+        // Explicit approval wins
+        expect(useReferralStore.getState().cached.code).toBe('ben4');
         expect(useReferralStore.getState().cached.isApproved).toBe(true);
     });
 
@@ -247,6 +247,24 @@ describe('ReferralStore – cached refactoring', () => {
             code: 'ben1234',
             isApproved: false,
         });
+    });
+
+    // ─── Modal accept with pre-existing approved code ─────────
+
+    it('accepting a new URL code in modal overwrites a previously approved code', () => {
+        // User previously approved "oldCode"
+        useReferralStore.getState().cache('oldCode', true);
+        expect(useReferralStore.getState().cached.code).toBe('oldCode');
+        expect(useReferralStore.getState().cached.isApproved).toBe(true);
+
+        // User visits ?af=ben1234 — passive cache is blocked
+        useReferralStore.getState().cache('ben1234');
+        expect(useReferralStore.getState().cached.code).toBe('oldCode');
+
+        // User clicks "Accept" in modal → cache(ben1234, true)
+        useReferralStore.getState().cache('ben1234', true);
+        expect(useReferralStore.getState().cached.code).toBe('ben1234');
+        expect(useReferralStore.getState().cached.isApproved).toBe(true);
     });
 
     // ─── Full workflow simulation ─────────────────────────────
