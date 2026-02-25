@@ -1,4 +1,4 @@
-import { LuChevronLeft, LuCopy, LuFilter, LuX, LuCheck } from 'react-icons/lu';
+import { LuChevronLeft, LuCopy, LuFilter, LuCheck } from 'react-icons/lu';
 import styles from './AgentDetail.module.css';
 import { useNavigate, useParams } from 'react-router';
 import {
@@ -89,6 +89,14 @@ export default function AgentDetail() {
                                 {strategy?.name ??
                                     t('agents.details.noAgentFound')}
                             </h2>
+                            <div
+                                className={styles.status_badge}
+                                data-paused={String(
+                                    strategy?.isPaused ?? false,
+                                )}
+                            >
+                                {statusLabel}
+                            </div>
                         </div>
                         <div className={styles.address_row}>
                             <button
@@ -157,6 +165,56 @@ export default function AgentDetail() {
                             bg='dark3'
                             hoverBg='dark4'
                             className={styles.header_action}
+                        >
+                            {t('agents.overview.remove')}
+                        </SimpleButton>
+                    </div>
+                    {/* Mobile-only horizontal action strip */}
+                    <div className={styles.mobile_actions}>
+                        <SimpleButton
+                            onClick={() =>
+                                strategy &&
+                                strategies.togglePause(strategy.address)
+                            }
+                            bg='dark3'
+                            hoverBg='dark4'
+                            className={styles.mobile_action_btn}
+                        >
+                            {strategy?.isPaused
+                                ? t('agents.overview.unpause')
+                                : t('agents.overview.pause')}
+                        </SimpleButton>
+                        <SimpleButton
+                            onClick={() =>
+                                navigate(
+                                    `${AGENTS_BASE_PATH}/${agent_hash}/edit`,
+                                    {
+                                        state: {
+                                            agent: strategy,
+                                            address: agent_hash,
+                                        },
+                                    },
+                                )
+                            }
+                            bg='dark3'
+                            hoverBg='dark4'
+                            className={styles.mobile_action_btn}
+                        >
+                            {t('common.edit')}
+                        </SimpleButton>
+                        <SimpleButton
+                            onClick={() => transferModalCtrl.open()}
+                            bg='dark3'
+                            hoverBg='dark4'
+                            className={styles.mobile_action_btn}
+                        >
+                            {t('common.transfer')}
+                        </SimpleButton>
+                        <SimpleButton
+                            onClick={() => removeStratModalCtrl.open()}
+                            bg='dark3'
+                            hoverBg='dark4'
+                            className={`${styles.mobile_action_btn} ${styles.mobile_action_danger}`}
                         >
                             {t('agents.overview.remove')}
                         </SimpleButton>
@@ -290,17 +348,8 @@ export default function AgentDetail() {
                     <Modal
                         title={t('agents.overview.removeTitle')}
                         close={removeStratModalCtrl.close}
-                        noHeader
                     >
                         <section className={styles.remove_strategy_modal}>
-                            <button
-                                type='button'
-                                className={styles.modal_close}
-                                onClick={removeStratModalCtrl.close}
-                            >
-                                <LuX size={18} />
-                            </button>
-                            <h3>{t('agents.overview.removeTitle')}</h3>
                             <div className={styles.remove_agent_info}>
                                 <div className={styles.remove_agent_row}>
                                     <span className={styles.remove_agent_label}>

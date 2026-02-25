@@ -1,7 +1,6 @@
 .transfer_dropdown {
     display: flex;
     flex-direction: column;
-    /* magic number for width is specified in Figma */
     --transfer-dropdown-width: 375px;
     width: var(--transfer-dropdown-width);
     gap: var(--gap-s);
