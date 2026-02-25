@@ -75,7 +75,7 @@ export default function EnterCode(props: PropsIF) {
                 {cached ? (
                     <>
                         <div className={styles.current_ref_code}>
-                            <h6>{t('referrals.usingAffiliateCode')}</h6>
+                            <h6>{t('referrals.pendingRefCode')}</h6>
                             {isCachedValueValid && <p>{refCodeToConsume}</p>}
                         </div>
                         <p className={styles.ref_code_blurb}>
