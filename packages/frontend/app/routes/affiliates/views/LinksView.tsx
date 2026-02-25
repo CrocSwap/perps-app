@@ -7,6 +7,7 @@ import {
     IoEllipsisVertical,
     IoCopy,
     IoCreate,
+    IoPencil,
 } from 'react-icons/io5';
 import { ConnectWalletCard } from '../components/ConnectWalletCard';
 import { TableErrorState } from '../components/TableErrorState';
@@ -19,14 +20,22 @@ import {
 import { formatUSD } from '../utils/format-numbers';
 import { getCommissionByAudienceId } from '../utils/affiliate-levels';
 import { useUserDataStore } from '~/stores/UserDataStore';
+import { EditCommissionSplitModal } from '../components/EditCommissionSplit/EditCommissionSplitModal';
+import { CreateReferralCodeModal } from '../components/CreateReferralCode/CreateReferralCodeModal';
 import styles from '../affiliates.module.css';
 
 export function LinksView() {
+    const allowMultipleAffiliateCodes = false;
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const { userAddress } = useUserDataStore();
     const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
+    const [editingCode, setEditingCode] = useState<{
+        code: string;
+        currentSplit: number;
+    } | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -127,9 +136,47 @@ export function LinksView() {
     }
 
     const hasNoData = data.length === 0;
+    const hasCreatedCode = data.length > 0;
+    const canCreateCode = allowMultipleAffiliateCodes || !hasCreatedCode;
+    const createCodeDisabledMessage =
+        'Creating multiple referral codes is currently disabled. You can only have one code per wallet.';
 
     return (
         <ViewLayout title='Links'>
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    marginBottom: '1rem',
+                }}
+            >
+                <span title={!canCreateCode ? createCodeDisabledMessage : ''}>
+                    <button
+                        onClick={() => {
+                            if (canCreateCode) {
+                                setIsCreateModalOpen(true);
+                            }
+                        }}
+                        className={styles.submitButton}
+                        disabled={!canCreateCode}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            background: 'var(--accent1)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: canCreateCode ? 'pointer' : 'not-allowed',
+                            opacity: canCreateCode ? 1 : 0.6,
+                        }}
+                    >
+                        <IoAdd size={16} />
+                        Create Code
+                    </button>
+                </span>
+            </div>
             <div className={styles['table-container']}>
                 <div style={{ overflowX: 'auto' }}>
                     <table className={styles.table}>
@@ -307,6 +354,49 @@ export function LinksView() {
                                                             <IoCopy size={14} />
                                                             Copy Link
                                                         </button>
+                                                        <button
+                                                            style={{
+                                                                display: 'flex',
+                                                                alignItems:
+                                                                    'center',
+                                                                gap: '0.5rem',
+                                                                width: '100%',
+                                                                padding:
+                                                                    '0.5rem 0.75rem',
+                                                                fontSize:
+                                                                    '0.875rem',
+                                                                color: '#f0f0f8',
+                                                                background:
+                                                                    'transparent',
+                                                                border: 'none',
+                                                                borderRadius:
+                                                                    '4px',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                            onMouseEnter={(e) =>
+                                                                (e.currentTarget.style.background =
+                                                                    'rgba(255, 255, 255, 0.1)')
+                                                            }
+                                                            onMouseLeave={(e) =>
+                                                                (e.currentTarget.style.background =
+                                                                    'transparent')
+                                                            }
+                                                            onClick={() => {
+                                                                setEditingCode({
+                                                                    code: entry.code,
+                                                                    currentSplit:
+                                                                        entry.invitee_percentage,
+                                                                });
+                                                                setDropdownOpen(
+                                                                    null,
+                                                                );
+                                                            }}
+                                                        >
+                                                            <IoPencil
+                                                                size={14}
+                                                            />
+                                                            Edit Commission
+                                                        </button>
                                                     </div>,
                                                     document.body,
                                                 )}
@@ -324,6 +414,24 @@ export function LinksView() {
                         description='Create your first referral link to start tracking performance'
                     />
                 )}
+
+                {editingCode && (
+                    <EditCommissionSplitModal
+                        open={true}
+                        onClose={() => setEditingCode(null)}
+                        onSuccess={() => refetch()}
+                        code={editingCode.code}
+                        currentSplit={editingCode.currentSplit}
+                        commissionRate={commissionRatePercent}
+                    />
+                )}
+
+                <CreateReferralCodeModal
+                    open={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onSuccess={() => refetch()}
+                    commissionRate={commissionRatePercent}
+                />
             </div>
         </ViewLayout>
     );

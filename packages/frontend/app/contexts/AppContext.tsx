@@ -50,7 +50,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const { setUserAddress, userAddress } = useUserDataStore();
     const cachedReferralCode = useReferralStore((state) => state.cached);
     const isCachedReferralCodeApproved = useReferralStore(
-        (state) => state.cached2.isCodeApprovedByInvitee === true,
+        (state) => state.cached.isApproved === true,
     );
 
     const { resetUserData } = useTradeDataStore();
@@ -145,7 +145,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         console.info('[refreg] connect_wallet effect triggered', {
             path: location.pathname,
             userAddress,
-            hasCachedReferralCode: Boolean(cachedReferralCode),
+            hasCachedReferralCode: Boolean(cachedReferralCode.code),
             isCachedReferralCodeApproved,
             isSessionEstablished: isEstablished(sessionState),
         });
@@ -180,11 +180,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             );
             return;
         }
-        if (!cachedReferralCode || !isCachedReferralCodeApproved) {
+        if (!cachedReferralCode.code || !isCachedReferralCodeApproved) {
             console.info(
                 '[refreg] connect_wallet effect skipped: referral not approved by invitee',
                 {
-                    hasCachedReferralCode: Boolean(cachedReferralCode),
+                    hasCachedReferralCode: Boolean(cachedReferralCode.code),
                     isCachedReferralCodeApproved,
                 },
             );
@@ -276,7 +276,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                     walletPublicKey: walletPublicKey.toBase58(),
                     txHash,
                     signature: txHash,
-                    confirmed: transactionResult?.confirmed ?? null,
                     submitDurationMs,
                     hasTransactionError,
                     transactionResult,

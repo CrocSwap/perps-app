@@ -71,7 +71,7 @@ export default function Referrals() {
     const referralStore = useReferralStore();
 
     const handleOpenRefCodeModal = () => {
-        const code = referralStore.cached;
+        const code = referralStore.cached.code;
         if (code) {
             refCodeModalStore.openModal(code);
         }

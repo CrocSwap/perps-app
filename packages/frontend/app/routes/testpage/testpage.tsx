@@ -21,7 +21,7 @@ export default function testpage() {
 
         console.info('[refreg] frontend FUUL event posting is disabled', {
             wallet: userWalletKey.toString(),
-            referralCode: referralStore.cached,
+            referralCode: referralStore.cached.code,
         });
     };
 
