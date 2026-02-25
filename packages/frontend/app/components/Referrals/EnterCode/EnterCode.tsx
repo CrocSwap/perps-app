@@ -21,6 +21,8 @@ interface PropsIF {
     isUserRefCodeClaimed: boolean | undefined;
     isUserInputRefCodeSelfOwned: boolean | undefined;
     handleUpdateReferralCode: (code: string) => void;
+    handleOverwriteReferralCode: (code: string) => void;
+    openConfirmModal: () => void;
     setInvalidCode: (value: string) => void;
 }
 
@@ -42,6 +44,8 @@ export default function EnterCode(props: PropsIF) {
         isUserRefCodeClaimed,
         isUserInputRefCodeSelfOwned,
         handleUpdateReferralCode,
+        handleOverwriteReferralCode,
+        openConfirmModal,
         setInvalidCode,
     } = props;
 
@@ -100,6 +104,12 @@ export default function EnterCode(props: PropsIF) {
                             onClick={() => setEditModeInvitee(true)}
                         >
                             {t('common.edit')}
+                        </SimpleButton>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => openConfirmModal()}
+                        >
+                            {t('common.confirm')}
                         </SimpleButton>
                     </div>
                 )}
@@ -189,10 +199,10 @@ export default function EnterCode(props: PropsIF) {
                         isUserInputRefCodeSelfOwned
                     }
                     onClick={(): void => {
-                        handleUpdateReferralCode(userInputRefCode);
+                        handleOverwriteReferralCode(userInputRefCode);
                     }}
                 >
-                    {t('common.confirm')}
+                    Overwrite
                 </SimpleButton>
                 {cached && isCachedValueValid && (
                     <SimpleButton

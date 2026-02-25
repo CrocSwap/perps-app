@@ -257,6 +257,19 @@ export default function CodeTabs(props: PropsIF) {
         setLastValidatedCode(r);
     }
 
+    // fn to update referral code state without opening modal
+    function handleOverwriteReferralCode(r: string): void {
+        if (!r || !r.trim()) {
+            return;
+        }
+        handleReferralURLParam.set(r);
+        referralStore.cache(r, true);
+        invalidCode && setInvalidCode('');
+        setIsCachedValueValid(true);
+        setEditModeInvitee(false);
+        setLastValidatedCode(r);
+    }
+
     // pixel-width breakpoint to toggle shorter copy
     const NARROW_SCREEN_COPY_BREAKPOINT = 900;
     // boolean tracking whether the screen is "narrow"
@@ -750,6 +763,14 @@ export default function CodeTabs(props: PropsIF) {
                             isUserInputRefCodeSelfOwned
                         }
                         handleUpdateReferralCode={handleUpdateReferralCode}
+                        handleOverwriteReferralCode={
+                            handleOverwriteReferralCode
+                        }
+                        openConfirmModal={() =>
+                            refCodeModalStore.openModal(
+                                referralStore.cached.code,
+                            )
+                        }
                         setInvalidCode={setInvalidCode}
                     />
                 );
