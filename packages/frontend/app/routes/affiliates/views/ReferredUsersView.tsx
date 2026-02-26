@@ -11,11 +11,8 @@ import { TableErrorState } from '../components/TableErrorState';
 import { ViewLayout } from '../components/ViewLayout';
 import { EmptyState } from '../components/EmptyState';
 import { usePayoutsByReferrer } from '../hooks/useAffiliateData';
-import {
-    maskUserAddress,
-    formatLargeNumber,
-    formatTokenAmount,
-} from '../utils/format-numbers';
+import { maskUserAddress } from '../utils/format-numbers';
+import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from '../affiliates.module.css';
 
@@ -23,6 +20,7 @@ export function ReferredUsersView() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const { userAddress } = useUserDataStore();
+    const { currency } = useNumFormatter();
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState('');
@@ -153,7 +151,7 @@ export function ReferredUsersView() {
                                         (e) => e.currency?.address === null,
                                     );
                                     const earningsAmount =
-                                        usdEarning?.amount ?? 0;
+                                        usdEarning?.amount ?? null;
 
                                     return (
                                         <tr
@@ -188,9 +186,9 @@ export function ReferredUsersView() {
                                             <td
                                                 className={styles['table-cell']}
                                             >
-                                                $
-                                                {formatLargeNumber(
+                                                {currency(
                                                     userData.volume,
+                                                    true,
                                                 )}
                                             </td>
                                             <td
@@ -201,10 +199,12 @@ export function ReferredUsersView() {
                                                     fontWeight: 600,
                                                 }}
                                             >
-                                                $
-                                                {formatLargeNumber(
-                                                    earningsAmount,
-                                                )}
+                                                {earningsAmount != null
+                                                    ? currency(
+                                                          earningsAmount,
+                                                          true,
+                                                      )
+                                                    : '$?'}
                                             </td>
                                         </tr>
                                     );

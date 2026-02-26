@@ -47,9 +47,13 @@ export function AffiliateCurrentLevelCard() {
         return commission * 100;
     }, [audienceId]);
 
-    const inviteePercent = (affiliateCode?.user_rebate_rate ?? 0) * 100;
+    const inviteePercent =
+        affiliateCode?.user_rebate_rate != null
+            ? affiliateCode.user_rebate_rate * 100
+            : null;
     const youPercent = useMemo(() => {
-        if (commissionRatePercent === null) return null;
+        if (commissionRatePercent === null || inviteePercent === null)
+            return null;
         const raw = commissionRatePercent - inviteePercent;
         return raw < 0 ? 0 : raw;
     }, [commissionRatePercent, inviteePercent]);
@@ -81,7 +85,7 @@ export function AffiliateCurrentLevelCard() {
                         Affiliate Current Level
                     </div>
                     <div className={styles['current-level-subtitle']}>
-                        {level?.name ?? '-'}
+                        {level?.name ?? '?'}
                     </div>
                 </div>
 
@@ -110,7 +114,7 @@ export function AffiliateCurrentLevelCard() {
                     <div className={styles['current-level-metric-value']}>
                         {commissionRatePercent !== null
                             ? `${commissionRatePercent.toFixed(0)}%`
-                            : '-'}
+                            : '?'}
                     </div>
                 </div>
 
@@ -119,9 +123,9 @@ export function AffiliateCurrentLevelCard() {
                         Commission Split
                     </div>
                     <div className={styles['current-level-metric-value']}>
-                        {youPercent !== null
+                        {youPercent !== null && inviteePercent !== null
                             ? `${youPercent.toFixed(0)}% / ${inviteePercent.toFixed(0)}%`
-                            : '-'}
+                            : '?'}
                     </div>
                     <div className={styles['current-level-metric-hint']}>
                         For you / For invitee
