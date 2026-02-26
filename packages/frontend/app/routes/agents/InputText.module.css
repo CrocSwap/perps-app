@@ -113,6 +113,40 @@
     }
 }
 
+/* 2-column label | input layout for tablet / small desktop */
+@media (min-width: 769px) and (max-width: 1300px) {
+    .text_input {
+        grid-template-columns: 160px 1fr;
+        gap: 6px 24px;
+        min-height: 48px;
+        align-items: flex-start;
+    }
+
+    .text_input > label {
+        font-size: var(--font-size-s);
+        padding-top: 10px;
+        white-space: normal;
+        overflow: visible;
+    }
+
+    .text_input > input,
+    .dropdown > button,
+    .dropdown > ul {
+        width: 100%;
+    }
+
+    .text_input > p {
+        grid-column: 2;
+        font-size: var(--font-size-s);
+        line-height: 1.35;
+        padding-top: 4px;
+    }
+
+    .input_error {
+        grid-column: 2;
+    }
+}
+
 @media (max-width: 768px) {
     .text_input {
         grid-template-columns: 1fr;

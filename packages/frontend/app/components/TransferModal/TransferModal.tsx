@@ -93,20 +93,22 @@ export default function TransferModal(props: propsIF) {
                         </div>
                     </div>
                 )}
-                <TransferDropdown
-                    idForDOM='transfer_dropdown_field_from'
-                    labelText={t('agents.transfer.from')}
-                    active={fromAccount ?? ACCOUNT_DROPDOWN_INITIAL_TEXT}
-                    options={accountNames}
-                    handleChange={setFromAccount}
-                />
-                <TransferDropdown
-                    idForDOM='transfer_dropdown_field_to'
-                    labelText={t('agents.transfer.to')}
-                    active={toAccount ?? ACCOUNT_DROPDOWN_INITIAL_TEXT}
-                    options={accountNames}
-                    handleChange={setToAccount}
-                />
+                <div className={styles.from_to_row}>
+                    <TransferDropdown
+                        idForDOM='transfer_dropdown_field_from'
+                        labelText={t('agents.transfer.from')}
+                        active={fromAccount ?? ACCOUNT_DROPDOWN_INITIAL_TEXT}
+                        options={accountNames}
+                        handleChange={setFromAccount}
+                    />
+                    <TransferDropdown
+                        idForDOM='transfer_dropdown_field_to'
+                        labelText={t('agents.transfer.to')}
+                        active={toAccount ?? ACCOUNT_DROPDOWN_INITIAL_TEXT}
+                        options={accountNames}
+                        handleChange={setToAccount}
+                    />
+                </div>
                 {!isAgentTransfer && (
                     <>
                         <TransferDropdown

@@ -56,3 +56,23 @@
     user-select: none;
     text-align: justify;
 }
+
+@media (min-width: 480px) and (max-width: 768px) {
+    .transfer_dropdown {
+        width: 100%;
+    }
+
+    .dropdown > ul {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .transfer_dropdown {
+        width: 100%;
+    }
+
+    .dropdown > ul {
+        width: 100%;
+    }
+}
