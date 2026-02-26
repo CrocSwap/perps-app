@@ -16,8 +16,7 @@ type BackgroundColor =
     | 'dark5'
     | 'dark6';
 
-export interface SimpleButtonProps
-    extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface SimpleButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     bg?: BackgroundColor;
     hoverBg?: BackgroundColor;
 }

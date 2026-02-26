@@ -7,18 +7,21 @@ import React, {
     createContext,
     useContext,
     useEffect,
-    useState,
+    useRef,
     type Dispatch,
     type SetStateAction,
 } from 'react';
-import { useCallback } from 'react';
 import { useLocation } from 'react-router';
 import { useDebugStore } from '~/stores/DebugStore';
+import { useReferralStore } from '~/stores/ReferralStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { initializePythPriceService } from '~/stores/PythPriceStore';
-import { debugWallets } from '~/utils/Constants';
+import {
+    buildConnectWalletIx,
+    pollConnectWalletConsistency,
+} from '~/utils/refreg';
 
 interface AppContextType {
     isUserConnected: boolean;
@@ -37,24 +40,27 @@ export interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-    const [isUserConnected, setIsUserConnected] = useState(false);
-
     const {
         isDebugWalletActive,
         debugWallet,
-        setDebugWallet,
         manualAddressEnabled,
         manualAddress,
-        setManualAddressEnabled,
-        setManualAddress,
     } = useDebugStore();
 
     const { setUserAddress, userAddress } = useUserDataStore();
+    const cachedReferralCode = useReferralStore((state) => state.cached);
+    const isCachedReferralCodeApproved = useReferralStore(
+        (state) => state.cached.isApproved === true,
+    );
+    const cachedReferralApprovalNonce = useReferralStore(
+        (state) => state.cached.approvalNonce,
+    );
 
     const { resetUserData } = useTradeDataStore();
 
     const sessionState = useSession();
     const location = useLocation();
+    const lastConnectWalletKeyRef = useRef<string | null>(null);
 
     const isSessionReestablishing = useAppStateStore(
         (state) => state.isSessionReestablishing,
@@ -137,6 +143,212 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     useEffect(() => {
         initializePythPriceService();
     }, []);
+
+    useEffect(() => {
+        console.info('[refreg] connect_wallet effect triggered', {
+            path: location.pathname,
+            userAddress,
+            hasCachedReferralCode: Boolean(cachedReferralCode.code),
+            isCachedReferralCodeApproved,
+            cachedReferralApprovalNonce,
+            isSessionEstablished: isEstablished(sessionState),
+        });
+
+        if (!isEstablished(sessionState)) {
+            console.info(
+                '[refreg] connect_wallet effect skipped: session not established',
+            );
+            lastConnectWalletKeyRef.current = null;
+            return;
+        }
+
+        if (typeof sessionState.sendTransaction !== 'function') {
+            console.info(
+                '[refreg] connect_wallet effect skipped: sendTransaction unavailable',
+            );
+            return;
+        }
+
+        const walletPublicKey = sessionState.walletPublicKey;
+        const sessionPublicKey = sessionState.sessionPublicKey;
+        const payerPublicKey = sessionState.payer;
+        if (!walletPublicKey || !sessionPublicKey) {
+            console.info(
+                '[refreg] connect_wallet effect skipped: missing wallet/session pubkey',
+            );
+            return;
+        }
+        if (!payerPublicKey) {
+            console.info(
+                '[refreg] connect_wallet effect skipped: missing payer/sponsor pubkey',
+            );
+            return;
+        }
+        if (!cachedReferralCode.code || !isCachedReferralCodeApproved) {
+            console.info(
+                '[refreg] connect_wallet effect skipped: referral not approved by invitee',
+                {
+                    hasCachedReferralCode: Boolean(cachedReferralCode.code),
+                    isCachedReferralCodeApproved,
+                },
+            );
+            lastConnectWalletKeyRef.current = null;
+            return;
+        }
+
+        void (async () => {
+            console.info('[refreg] building connect_wallet instruction', {
+                walletPublicKey: walletPublicKey.toBase58(),
+                sessionPublicKey: sessionPublicKey.toBase58(),
+                payerPublicKey: payerPublicKey.toBase58(),
+            });
+
+            const connectWallet = await buildConnectWalletIx({
+                sessionPublicKey,
+                walletPublicKey,
+                payerPublicKey,
+            });
+
+            if (!connectWallet) {
+                console.info(
+                    '[refreg] connect_wallet instruction build returned null',
+                );
+                lastConnectWalletKeyRef.current = null;
+                return;
+            }
+
+            console.log('[refreg] connect_wallet instruction ready', {
+                fingerprint: connectWallet.fingerprint,
+                walletPublicKey: walletPublicKey.toBase58(),
+                trackingIdLength: connectWallet.trackingId.length,
+                trackingIdPreview: Array.from(connectWallet.trackingId)
+                    .slice(0, 4)
+                    .map((byte) => byte.toString(16).padStart(2, '0'))
+                    .join(''),
+                referralKind: connectWallet.referralAttribution.referralKind,
+                referralSourceValue:
+                    connectWallet.referralAttribution.sourceValue,
+            });
+
+            const connectWalletSubmissionKey = `${connectWallet.fingerprint}:${cachedReferralApprovalNonce}`;
+
+            if (
+                lastConnectWalletKeyRef.current === connectWalletSubmissionKey
+            ) {
+                console.info(
+                    '[refreg] connect_wallet skipped: fingerprint+approval nonce already sent in this session',
+                    {
+                        fingerprint: connectWallet.fingerprint,
+                        cachedReferralApprovalNonce,
+                    },
+                );
+                return;
+            }
+            lastConnectWalletKeyRef.current = connectWalletSubmissionKey;
+
+            try {
+                const submitStartedAt = Date.now();
+                const instruction = connectWallet.instruction;
+                const instructionTag =
+                    instruction.data.length > 0 ? instruction.data[0] : null;
+
+                console.info('[refreg] sending connect_wallet tx', {
+                    fingerprint: connectWallet.fingerprint,
+                    walletPublicKey: walletPublicKey.toBase58(),
+                    sessionPublicKey: sessionPublicKey.toBase58(),
+                    referralKind:
+                        connectWallet.referralAttribution.referralKind,
+                    referralSourceValue:
+                        connectWallet.referralAttribution.sourceValue,
+                    instructionProgramId:
+                        connectWallet.instruction.programId.toBase58(),
+                    instructionTag,
+                    instructionDataLength: instruction.data.length,
+                    instructionKeyCount: instruction.keys.length,
+                    instructionKeys: instruction.keys.map((key, index) => ({
+                        index,
+                        pubkey: key.pubkey.toBase58(),
+                        isSigner: key.isSigner,
+                        isWritable: key.isWritable,
+                    })),
+                });
+                const transactionResult = await sessionState.sendTransaction([
+                    connectWallet.instruction,
+                ]);
+                const submitDurationMs = Date.now() - submitStartedAt;
+                const txHash = transactionResult?.signature ?? null;
+                const hasTransactionError =
+                    Boolean(transactionResult) &&
+                    typeof transactionResult === 'object' &&
+                    'error' in transactionResult;
+
+                console.info('[refreg] connect_wallet tx submission resolved', {
+                    fingerprint: connectWallet.fingerprint,
+                    walletPublicKey: walletPublicKey.toBase58(),
+                    txHash,
+                    signature: txHash,
+                    submitDurationMs,
+                    hasTransactionError,
+                    transactionResult,
+                });
+                if (transactionResult?.signature) {
+                    console.info('[refreg] connect_wallet tx hash received', {
+                        txHash: transactionResult.signature,
+                        signature: transactionResult.signature,
+                        walletPublicKey: walletPublicKey.toBase58(),
+                        submitDurationMs,
+                    });
+
+                    void pollConnectWalletConsistency({
+                        walletPublicKey,
+                        referralAttribution: connectWallet.referralAttribution,
+                    })
+                        .then((results) => {
+                            console.log(
+                                '[refreg] connect_wallet consistency checks finished',
+                                {
+                                    signature: transactionResult.signature,
+                                    walletPublicKey: walletPublicKey.toBase58(),
+                                    results,
+                                },
+                            );
+                        })
+                        .catch((error) => {
+                            console.info(
+                                '[refreg] connect_wallet polling failed:',
+                                error,
+                            );
+                        });
+                } else {
+                    console.log(
+                        '[refreg] connect_wallet tx returned without tx hash/signature; consistency checks skipped',
+                        {
+                            fingerprint: connectWallet.fingerprint,
+                            walletPublicKey: walletPublicKey.toBase58(),
+                            submitDurationMs,
+                            hasTransactionError,
+                            transactionResult,
+                        },
+                    );
+                }
+            } catch (error) {
+                console.info('[refreg] connect_wallet sendTransaction threw:', {
+                    fingerprint: connectWallet.fingerprint,
+                    walletPublicKey: walletPublicKey.toBase58(),
+                    sessionPublicKey: sessionPublicKey.toBase58(),
+                    error,
+                });
+                lastConnectWalletKeyRef.current = null;
+            }
+        })();
+    }, [
+        sessionState,
+        location.pathname,
+        userAddress,
+        cachedReferralCode,
+        isCachedReferralCodeApproved,
+        cachedReferralApprovalNonce,
+    ]);
 
     return (
         <AppContext.Provider

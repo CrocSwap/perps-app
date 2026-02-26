@@ -8,6 +8,11 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { MARKET_ORDER_PRICE_OFFSET_USD } from '~/utils/Constants';
 import { marketOrderLogManager } from './MarketOrderLogManager';
 import { t } from 'i18next';
+import {
+    buildTradeRefregInstructions,
+    pollTradeConsistency,
+    sendStandaloneRefregTransactions,
+} from '~/utils/refreg';
 
 export interface MarketOrderResult {
     success: boolean;
@@ -235,7 +240,7 @@ export class MarketOrderService {
             );
 
             // Extract instructions from the transaction
-            const instructions = transaction.instructions;
+            const instructions = [...transaction.instructions];
 
             console.log('📤 Sending market order transaction:');
             console.log('  - Instructions to send:', instructions.length);
@@ -266,6 +271,75 @@ export class MarketOrderService {
                     '✅ Order transaction successful:',
                     transactionResult.signature,
                 );
+                void (async () => {
+                    if (!rentPayer) {
+                        console.log(
+                            '[refreg] market trade follow-up skipped: missing payer/sponsor pubkey',
+                            {
+                                walletPublicKey: userWalletKey.toBase58(),
+                                signature: transactionResult.signature,
+                            },
+                        );
+                        return;
+                    }
+
+                    const refregResult = await buildTradeRefregInstructions({
+                        sessionPublicKey,
+                        walletPublicKey: userWalletKey,
+                        payerPublicKey: rentPayer,
+                    });
+                    console.log(
+                        '[refreg] market order buildTradeRefregInstructions',
+                        {
+                            walletPublicKey: userWalletKey.toBase58(),
+                            instructionCount: refregResult.instructions.length,
+                            includesFirstTrade: refregResult.includesFirstTrade,
+                            includesCompleteConversion:
+                                refregResult.includesCompleteConversion,
+                            hasReferralAttribution: Boolean(
+                                refregResult.referralAttribution,
+                            ),
+                        },
+                    );
+
+                    await sendStandaloneRefregTransactions({
+                        context: 'market_order',
+                        walletPublicKey: userWalletKey,
+                        instructions: refregResult.instructions,
+                        sendTransaction,
+                        parentTransactionSignature: transactionResult.signature,
+                    });
+
+                    console.log(
+                        '[refreg] market trade triggering consistency checks',
+                        {
+                            signature: transactionResult.signature,
+                            walletPublicKey: userWalletKey.toBase58(),
+                        },
+                    );
+
+                    const results = await pollTradeConsistency({
+                        walletPublicKey: userWalletKey,
+                        includesFirstTrade: refregResult.includesFirstTrade,
+                        includesCompleteConversion:
+                            refregResult.includesCompleteConversion,
+                        referralAttribution: refregResult.referralAttribution,
+                    });
+
+                    console.log(
+                        '[refreg] market trade consistency checks finished',
+                        {
+                            signature: transactionResult.signature,
+                            walletPublicKey: userWalletKey.toBase58(),
+                            results,
+                        },
+                    );
+                })().catch((error) => {
+                    console.info(
+                        '[refreg] market trade follow-up flow failed:',
+                        error,
+                    );
+                });
 
                 return {
                     success: true,
@@ -278,6 +352,13 @@ export class MarketOrderService {
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
                         : t('transactions.marketTxFailedFallbackMessage');
+                console.log(
+                    '[refreg] market trade consistency checks skipped: transaction missing valid signature',
+                    {
+                        walletPublicKey: userWalletKey.toBase58(),
+                        transactionResult,
+                    },
+                );
                 return {
                     success: false,
                     error: errorMessage,
