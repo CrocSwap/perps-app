@@ -102,7 +102,6 @@
         "closePosition": "Cerrar posición",
         "closeAtCurrentPrice": "Cerrar al precio actual",
         "closeAtAPriceYouSet": "Cerrar a un precio que establezcas",
-
         "price": "Precio",
         "size": "Cantidad",
         "time": "Hora",
@@ -305,7 +304,8 @@
             "hours": "Horas",
             "orderHistory": "Historial de órdenes",
             "filter": "Filtrar",
-            "viewAll": "Ver todo"
+            "viewAll": "Ver todo",
+            "chart": "Gráfico"
         },
         "transfer": {
             "agentTitle": "Transferir agente",
@@ -657,7 +657,6 @@
         "copyLinkCTA": "Copiar enlace",
         "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora",
         "sharePosition": "Compartir posición con PnL {{pnl}}",
-
         "pnl": "PnL",
         "details": "Detalles",
         "copyImageCTA": "Copiar imagen",

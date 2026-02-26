@@ -55,6 +55,11 @@ export default function AgentDetail() {
     // state for copy feedback
     const [copied, setCopied] = useState(false);
 
+    // mobile tab state for the detail panels
+    const [detailTab, setDetailTab] = useState<
+        'parameters' | 'performance' | 'chart'
+    >('parameters');
+
     const statusLabel = strategy?.isPaused
         ? t('agents.overview.paused')
         : t('agents.overview.running');
@@ -220,8 +225,34 @@ export default function AgentDetail() {
                         </SimpleButton>
                     </div>
                 </header>
+                {/* Mobile-only tab bar */}
+                <div className={styles.detail_tabs}>
+                    <button
+                        type='button'
+                        className={`${styles.detail_tab_btn} ${detailTab === 'parameters' ? styles.detail_tab_active : ''}`}
+                        onClick={() => setDetailTab('parameters')}
+                    >
+                        {t('agents.details.parameters')}
+                    </button>
+                    <button
+                        type='button'
+                        className={`${styles.detail_tab_btn} ${detailTab === 'performance' ? styles.detail_tab_active : ''}`}
+                        onClick={() => setDetailTab('performance')}
+                    >
+                        {t('agents.details.performance')}
+                    </button>
+                    <button
+                        type='button'
+                        className={`${styles.detail_tab_btn} ${detailTab === 'chart' ? styles.detail_tab_active : ''}`}
+                        onClick={() => setDetailTab('chart')}
+                    >
+                        {t('agents.details.chart')}
+                    </button>
+                </div>
                 <div className={styles.strategy_details}>
-                    <div className={styles.detail_table}>
+                    <div
+                        className={`${styles.detail_table} ${detailTab !== 'parameters' ? styles.detail_panel_hidden : ''}`}
+                    >
                         <header className={styles.detail_header}>
                             <span>{t('agents.details.parameters')}</span>
                         </header>
@@ -254,7 +285,9 @@ export default function AgentDetail() {
                             </div>
                         </section>
                     </div>
-                    <div className={styles.detail_table}>
+                    <div
+                        className={`${styles.detail_table} ${detailTab !== 'performance' ? styles.detail_panel_hidden : ''}`}
+                    >
                         <header className={styles.detail_header}>
                             <span>{t('agents.details.performance')}</span>
                         </header>
@@ -288,7 +321,9 @@ export default function AgentDetail() {
                             </div>
                         </section>
                     </div>
-                    <div className={styles.strategy_details_graph}>
+                    <div
+                        className={`${styles.strategy_details_graph} ${detailTab !== 'chart' ? styles.detail_panel_hidden : ''}`}
+                    >
                         <AgentDetailChart />
                     </div>
                 </div>

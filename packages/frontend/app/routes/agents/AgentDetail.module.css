@@ -328,6 +328,19 @@
     gap: var(--gap-m);
 }
 
+/* Detail tabs - mobile only, hidden on desktop */
+.detail_tabs {
+    display: none;
+}
+
+.detail_tab_btn {
+    display: none;
+}
+
+/* detail_panel_hidden is a no-op on desktop — all panels always visible */
+.detail_panel_hidden {
+}
+
 /* Status badge - mobile only, hidden on desktop */
 .status_badge {
     display: none;
@@ -438,6 +451,57 @@
 
     .strategy_shell {
         gap: 10px;
+    }
+
+    /* Tab bar */
+    .detail_tabs {
+        display: flex;
+        flex-direction: row;
+        background: color-mix(in srgb, var(--bg-dark2) 96%, black);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid color-mix(in srgb, var(--bg-dark4) 78%, transparent);
+    }
+
+    .detail_tab_btn {
+        display: block;
+        flex: 1;
+        padding: 10px 6px;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--text2);
+        font-size: 12px;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition:
+            color 0.15s ease,
+            border-color 0.15s ease;
+        white-space: nowrap;
+    }
+
+    .detail_tab_btn:hover {
+        color: var(--text1);
+    }
+
+    .detail_tab_active {
+        color: var(--accent1);
+        border-bottom-color: var(--accent1);
+    }
+
+    /* Hide inactive panels */
+    .detail_panel_hidden {
+        display: none !important;
+    }
+
+    /* Active panel takes full width */
+    .strategy_details {
+        grid-template-columns: 1fr;
+    }
+
+    /* Tab bar replaces the panel headers on mobile */
+    .detail_header {
+        display: none;
     }
 
     /* Show status badge next to title on mobile */
