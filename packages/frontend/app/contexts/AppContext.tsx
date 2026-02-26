@@ -1,4 +1,8 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import {
+    isEstablished,
+    useSession,
+    SessionStateType,
+} from '@fogo/sessions-sdk-react';
 import React, {
     createContext,
     useContext,
@@ -12,6 +16,7 @@ import { useLocation } from 'react-router';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
+import { useAppStateStore } from '~/stores/AppStateStore';
 import { initializePythPriceService } from '~/stores/PythPriceStore';
 import { debugWallets } from '~/utils/Constants';
 
@@ -50,6 +55,25 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     const sessionState = useSession();
     const location = useLocation();
+
+    const isSessionReestablishing = useAppStateStore(
+        (state) => state.isSessionReestablishing,
+    );
+    const setIsSessionReestablishing = useAppStateStore(
+        (state) => state.setIsSessionReestablishing,
+    );
+    const isReestablishing = [
+        SessionStateType.Initializing,
+        SessionStateType.CheckingStoredSession,
+        SessionStateType.RequestingLimits,
+        SessionStateType.SettingLimits,
+        SessionStateType.WalletConnecting,
+        SessionStateType.SelectingWallet,
+    ].includes(sessionState.type);
+
+    if (isSessionReestablishing !== isReestablishing) {
+        setIsSessionReestablishing(isReestablishing);
+    }
 
     // Drive userAddress from URL parameter, session, or debug settings
     useEffect(() => {

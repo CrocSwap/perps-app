@@ -60,7 +60,7 @@ const MOCK_STRATEGIES: strategyDecoratedIF[] = [
     },
     {
         address: 'Hfdarm6DDC8t141wvqvPVHLE5ZGBfUvB2LjkyZCbwASo',
-        name: 'My First Strategy',
+        name: 'My First Agent',
         market: 'BTC',
         distance: '2',
         distanceType: 'Ticks',

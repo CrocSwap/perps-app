@@ -276,13 +276,98 @@
         "createSubAccountPH": "例如：我的子账户1",
         "created": {
             "title": "子账户已创建",
-            "message": "已创建新策略子账户{{name}}",
+            "message": "已创建新智能体子账户{{name}}",
             "message2": "已创建新自主管理子账户{{name}}"
         }
     },
-    "strategies": {
-        "newStrategy": "新策略",
-        "editStrategy": "编辑策略"
+    "agents": {
+        "newAgent": "新智能体",
+        "editAgent": "编辑智能体",
+        "overview": {
+            "create": "创建智能体",
+            "blurb": "在 Ambient Perps 上运行自动化做市智能体",
+            "paused": "已暂停",
+            "running": "运行中",
+            "pause": "暂停",
+            "unpause": "恢复",
+            "remove": "移除",
+            "emptyState": "暂无可显示的数据",
+            "removeTitle": "移除智能体",
+            "removeMessage": "确定要移除此智能体吗？"
+        },
+        "details": {
+            "noAgentFound": "未找到智能体",
+            "status": "状态",
+            "parameters": "参数",
+            "performance": "表现",
+            "ordersPlaced": "已下单数",
+            "runtime": "运行时长",
+            "hours": "小时",
+            "orderHistory": "订单历史",
+            "filter": "筛选",
+            "viewAll": "查看全部"
+        },
+        "transfer": {
+            "agentTitle": "转移代理",
+            "selectAccounts": "请选择账户",
+            "title": "转账",
+            "from": "从",
+            "to": "到",
+            "asset": "资产",
+            "amount": "金额",
+            "available": "可存入余额",
+            "enterAllFields": "请填写所有字段",
+            "selectAccount": "请选择账户",
+            "selectAsset": "请选择资产"
+        },
+        "form": {
+            "labels": {
+                "name": "智能体名称",
+                "market": "市场",
+                "distance": "距离",
+                "distanceType": "距离类型",
+                "side": "方向",
+                "totalSize": "总规模",
+                "orderSize": "订单规模"
+            },
+            "placeholders": {
+                "name": "名称",
+                "distance": "距离",
+                "totalSize": "总规模",
+                "orderSize": "订单规模"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Tick",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "双向",
+                    "above": "上方",
+                    "below": "下方"
+                }
+            },
+            "blurbs": {
+                "name": "为你的交易智能体设置一个清晰的名称，便于后续识别和管理。",
+                "market": "选择你希望部署该智能体的市场。不同市场在波动性和流动性上存在差异。",
+                "distance": "设置智能体的距离参数，用于决定订单与当前价格之间的偏离程度。",
+                "distanceType": "选择距离的计量方式。Tick 提供更精细的控制，百分比会随价格变化按比例调整。",
+                "side": "指定智能体应下买单、卖单或双向下单。\"双向\"可在订单簿两侧进行做市。",
+                "totalSize": "设置该智能体可分配的总资金规模，表示所有活动订单的最大总敞口。",
+                "orderSize": "设置单笔订单规模。较小的订单可提高颗粒度，但可能增加交易成本。"
+            },
+            "validation": {
+                "nameRequired": "智能体名称为必填项",
+                "marketRequired": "市场为必填项",
+                "distanceRequired": "距离为必填项",
+                "distanceTypeRequired": "距离类型为必填项",
+                "sideRequired": "方向为必填项",
+                "totalSizeRequired": "总规模为必填项",
+                "orderSizeRequired": "订单规模为必填项",
+                "positiveNumber": "请输入大于 0 的有效数字",
+                "orderSizeExceedsTotal": "订单规模不能大于总规模"
+            }
+        }
     },
     "margin": {
         "cross": {
@@ -443,14 +528,14 @@
     },
     "referrals": {
         "title": "邀请",
-        "description": "邀请用户以获得奖励。合作伙伴可获得更高的奖励。",
+        "description": "邀请用户可获得奖励。推荐人可获得更高奖励。",
         "tradersReferred": "已邀请的交易员",
         "rewardsEarned": "已获得的奖励",
         "rewardHistory": "奖励记录",
         "enterCode": "输入代码",
         "claim": "领取",
         "createCode": "创建代码",
-        "usingAffiliateCode": "使用推广码",
+        "pendingRefCode": "推荐码（待处理）",
         "overwriteCurrentReferralCode": "覆盖当前推荐码",
         "enterReferralCode": "输入推荐码",
         "referralCodeNotValidPleaseConfirm": "该代码 <0>{{invalidCode}}</0> 尚未在推荐计划中注册。请确认代码是否正确。",
@@ -662,6 +747,25 @@
     "chart": {
         "liqPrice": "清算价格"
     },
+    "quickTrade": {
+        "title": "快速交易模式",
+        "quick": "快速",
+        "quickWithType": "快速 {{tradeType}}",
+        "sizeTooltip": "数量：{{size}} {{currency}}",
+        "clickToEnable": "点击启用快速交易模式",
+        "sellAtLimit": "限价卖出 @ {{price}}",
+        "buyAtLimit": "限价买入 @ {{price}}",
+        "buyAtStop": "止损买入 @ {{price}}",
+        "sellAtStop": "止损卖出 @ {{price}}",
+        "sellSizeAtLimit": "限价卖出 {{size}} @ {{price}}",
+        "buySizeAtLimit": "限价买入 {{size}} @ {{price}}",
+        "buySizeAtStop": "止损买入 {{size}} @ {{price}}",
+        "sellSizeAtStop": "止损卖出 {{size}} @ {{price}}",
+        "infoText": "点击图表即可下单预配置订单",
+        "description": "快速交易会在点击价格和所选数量下填充订单表单。勾选下方选项后，左键点击会绕过订单确认并立即发送订单。右键菜单和加号按钮菜单即使在关闭时也提供无需确认的快速交易选项。",
+        "enableConfirmationBypass": "跳过确认并点击发送订单",
+        "saveAndEnable": "保存并启用"
+    },
     "meta": {
         "title": "Ambient Finance | Fogo永续合约",
         "description": "在Ambient Finance上交易Fogo永续合约。零Taker费用，最高100倍杠杆，极速成交。",
@@ -734,10 +838,10 @@
         "referrals": "推荐",
         "points": "积分",
         "leaderboard": "排行榜",
-        "newStrategy": "新建策略",
-        "editStrategy": "编辑策略",
-        "strategy": "策略",
-        "strategies": "策略列表",
+        "newAgent": "新建智能体",
+        "editAgent": "编辑智能体",
+        "agent": "智能体",
+        "agents": "智能体列表",
         "vault": "金库",
         "vaults": "金库列表",
         "subAccounts": "子账户",

@@ -276,13 +276,98 @@
         "createSubAccountPH": "ex : Mon sous-compte 1",
         "created": {
             "title": "Sous-compte créé",
-            "message": "Nouveau sous-compte stratégie créé : {{name}}",
+            "message": "Nouveau sous-compte agent créé : {{name}}",
             "message2": "Nouveau sous-compte discrétionnaire créé : {{name}}"
         }
     },
-    "strategies": {
-        "newStrategy": "Nouvelle stratégie",
-        "editStrategy": "Modifier la stratégie"
+    "agents": {
+        "newAgent": "Nouvel agent",
+        "editAgent": "Modifier l'agent",
+        "overview": {
+            "create": "Créer un agent",
+            "blurb": "Exécutez un agent automatisé de market making sur Ambient Perps",
+            "paused": "En pause",
+            "running": "En cours",
+            "pause": "Mettre en pause",
+            "unpause": "Reprendre",
+            "remove": "Supprimer",
+            "emptyState": "Aucune donnée à afficher",
+            "removeTitle": "Supprimer l'agent",
+            "removeMessage": "Êtes-vous sûr de vouloir supprimer cet agent ?"
+        },
+        "details": {
+            "noAgentFound": "Aucun agent trouvé",
+            "status": "Statut",
+            "parameters": "Paramètres",
+            "performance": "Performance",
+            "ordersPlaced": "Ordres placés",
+            "runtime": "Durée d'exécution",
+            "hours": "Heures",
+            "orderHistory": "Historique des ordres",
+            "filter": "Filtrer",
+            "viewAll": "Voir tout"
+        },
+        "transfer": {
+            "agentTitle": "Transférer l'agent",
+            "selectAccounts": "Sélectionner des comptes",
+            "title": "Transférer",
+            "from": "De",
+            "to": "Vers",
+            "asset": "Actif",
+            "amount": "Montant",
+            "available": "Disponible pour dépôt",
+            "enterAllFields": "Veuillez remplir tous les champs",
+            "selectAccount": "Veuillez sélectionner un compte",
+            "selectAsset": "Veuillez sélectionner un actif"
+        },
+        "form": {
+            "labels": {
+                "name": "Nom de l'agent",
+                "market": "Marché",
+                "distance": "Distance",
+                "distanceType": "Type de distance",
+                "side": "Côté",
+                "totalSize": "Taille totale",
+                "orderSize": "Taille d'ordre"
+            },
+            "placeholders": {
+                "name": "Nom",
+                "distance": "Distance",
+                "totalSize": "Taille totale",
+                "orderSize": "Taille d'ordre"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Ticks",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "Les deux",
+                    "above": "Au-dessus",
+                    "below": "En dessous"
+                }
+            },
+            "blurbs": {
+                "name": "Choisissez un nom descriptif pour votre agent de trading. Cela vous aidera à identifier et gérer vos agents efficacement.",
+                "market": "Sélectionnez le marché sur lequel vous souhaitez déployer cet agent. Les marchés ont des profils de volatilité et de liquidité différents.",
+                "distance": "Définissez le paramètre de distance de votre agent. Il détermine à quelle distance du prix actuel vos ordres seront placés.",
+                "distanceType": "Choisissez comment la distance est mesurée. Les ticks offrent un contrôle précis, tandis que le pourcentage offre une mise à l'échelle proportionnelle aux mouvements du prix.",
+                "side": "Indiquez si l'agent doit placer des ordres d'achat, de vente, ou les deux. \"Les deux\" permet de faire du market making des deux côtés du carnet d'ordres.",
+                "totalSize": "Définissez le capital total à allouer à cet agent. Cela représente l'exposition maximale sur l'ensemble des ordres actifs.",
+                "orderSize": "Définissez la taille des ordres individuels. Des ordres plus petits offrent une meilleure granularité, mais peuvent augmenter les coûts de transaction."
+            },
+            "validation": {
+                "nameRequired": "Le nom de l'agent est requis",
+                "marketRequired": "Le marché est requis",
+                "distanceRequired": "La distance est requise",
+                "distanceTypeRequired": "Le type de distance est requis",
+                "sideRequired": "Le côté est requis",
+                "totalSizeRequired": "La taille totale est requise",
+                "orderSizeRequired": "La taille d'ordre est requise",
+                "positiveNumber": "Entrez un nombre valide supérieur à 0",
+                "orderSizeExceedsTotal": "La taille d'ordre ne peut pas dépasser la taille totale"
+            }
+        }
     },
     "margin": {
         "cross": {
@@ -443,13 +528,13 @@
     },
     "referrals": {
         "title": "Parrainages",
-        "description": "Parrainez des utilisateurs pour gagner des récompenses. Les affiliés obtiennent des récompenses plus élevées.",
+        "description": "Parrainez des utilisateurs pour gagner des récompenses. Les parrains obtiennent des récompenses plus élevées.",
         "tradersReferred": "Traders parrainés",
         "rewardsEarned": "Récompenses obtenues",
         "rewardHistory": "Historique des récompenses",
         "enterCode": "Saisir le code",
         "createCode": "Créer un code",
-        "usingAffiliateCode": "Code d'affiliation utilisé",
+        "pendingRefCode": "Code de parrainage (en attente)",
         "overwriteCurrentReferralCode": "Remplacer le code de parrainage actuel",
         "enterReferralCode": "Entrer un code de parrainage",
         "referralCodeNotValidPleaseConfirm": "Le code <0>{{invalidCode}}</0> n'est pas enregistré dans le programme de parrainage. Veuillez confirmer que le code est correct.",
@@ -661,6 +746,25 @@
     "chart": {
         "liqPrice": "Prix de liq."
     },
+    "quickTrade": {
+        "title": "Mode de trading rapide",
+        "quick": "Rapide",
+        "quickWithType": "Rapide {{tradeType}}",
+        "sizeTooltip": "Taille : {{size}} {{currency}}",
+        "clickToEnable": "Cliquez pour activer le mode de trading rapide",
+        "sellAtLimit": "Vendre @ {{price}} limite",
+        "buyAtLimit": "Acheter @ {{price}} limite",
+        "buyAtStop": "Acheter @ {{price}} stop",
+        "sellAtStop": "Vendre @ {{price}} stop",
+        "sellSizeAtLimit": "Vendre {{size}} @ {{price}} limite",
+        "buySizeAtLimit": "Acheter {{size}} @ {{price}} limite",
+        "buySizeAtStop": "Acheter {{size}} @ {{price}} stop",
+        "sellSizeAtStop": "Vendre {{size}} @ {{price}} stop",
+        "infoText": "Cliquez sur le graphique pour placer des ordres préconfigurés",
+        "description": "Les transactions rapides remplissent le formulaire d’ordre au prix cliqué et à la taille sélectionnée. Cochez la case ci-dessous pour envoyer l’ordre immédiatement d’un clic gauche en contournant la confirmation du formulaire. Le menu clic droit et le menu du bouton plus proposent aussi des options de trading rapide sans confirmation même lorsqu’il est désactivé.",
+        "enableConfirmationBypass": "Ignorer la confirmation et envoyer l’ordre au clic",
+        "saveAndEnable": "Enregistrer et activer"
+    },
     "meta": {
         "title": "Ambient Finance | Contrats perpétuels sur Fogo",
         "description": "Tradez des contrats perpétuels sur Fogo avec Ambient Finance. Zéro frais taker, jusqu'à 100x de levier et exécution ultra-rapide.",
@@ -733,10 +837,10 @@
         "referrals": "Parrainages",
         "points": "Points",
         "leaderboard": "Classement",
-        "newStrategy": "Nouvelle Stratégie",
-        "editStrategy": "Modifier la Stratégie",
-        "strategy": "Stratégie",
-        "strategies": "Stratégies",
+        "newAgent": "Nouvel Agent",
+        "editAgent": "Modifier l'Agent",
+        "agent": "Agent",
+        "agents": "Agents",
         "vault": "Coffre",
         "vaults": "Coffres",
         "subAccounts": "Sous-comptes",

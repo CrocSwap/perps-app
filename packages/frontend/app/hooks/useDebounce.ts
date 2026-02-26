@@ -47,6 +47,15 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     // Use useRef to store the timeout ID between renders
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    // Clean up pending timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+
     return useCallback(
         (...args: Parameters<T>) => {
             // Clear the previous timeout

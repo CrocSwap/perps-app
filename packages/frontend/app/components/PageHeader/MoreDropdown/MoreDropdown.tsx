@@ -18,7 +18,7 @@ export default function MoreDropdown(props: propsIF) {
         { name: 'Funding Comparison', path: '/funding-comparison' },
         { name: 'Stats', path: '/stats' },
         { name: 'Docs', path: '/docs' },
-        { name: 'Strategies', path: '/strategies' },
+        { name: 'Agents', path: '/v2/agents' },
     ];
 
     return (

@@ -2,6 +2,7 @@
 
 import type { Info } from '@perps-app/sdk';
 import type {
+    Bar,
     IDatafeedChartApi,
     LibrarySymbolInfo,
     Mark,
@@ -26,6 +27,7 @@ import {
     supportedResolutions,
 } from './utils/utils';
 import { useChartStore } from '~/stores/TradingviewChartStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { UserFillIF } from '~/utils/UserDataIFs';
 
 const subscriptions = new Map<string, { unsubscribe: () => void }>();
@@ -48,6 +50,20 @@ export const createDataFeed = (
     let userFillsInterval: NodeJS.Timeout | null = null;
     let lastResolution: ResolutionString | undefined = undefined;
     let onMarksCallback: ((marks: Mark[]) => void) | undefined = undefined;
+    let marksSymbol: string | undefined = undefined;
+
+    const normalizeSymbolForMarks = (symbol?: string): string => {
+        if (!symbol) return '';
+        const baseSymbol = symbol.split('-')[0];
+        const kTokenPattern = /^k[A-Z]+$/;
+        return kTokenPattern.test(baseSymbol)
+            ? baseSymbol
+            : baseSymbol.toUpperCase();
+    };
+
+    const getActiveSymbolForMarks = (): string => {
+        return normalizeSymbolForMarks(useTradeDataStore.getState().symbol);
+    };
 
     const updateUserFills = (fills: UserFillIF[]) => {
         userFills = fills;
@@ -75,9 +91,24 @@ export const createDataFeed = (
         const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
         const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
-        userFills.sort((a, b) => b.time - a.time);
+        const normalizedMarksSymbol =
+            getActiveSymbolForMarks() || normalizeSymbolForMarks(marksSymbol);
+        if (!normalizedMarksSymbol) {
+            if (ocb) {
+                ocb([]);
+            }
+            return;
+        }
 
-        userFills.forEach((fill) => {
+        const symbolFills = userFills
+            .filter((fill) => {
+                return (
+                    normalizeSymbolForMarks(fill.coin) === normalizedMarksSymbol
+                );
+            })
+            .sort((a, b) => b.time - a.time);
+
+        symbolFills.forEach((fill) => {
             const isBuy = fill.side === 'B' || fill.side === 'buy';
             const markerColor = isBuy ? chartTheme.buy : chartTheme.sell;
             const markData = {
@@ -224,8 +255,20 @@ export const createDataFeed = (
             onDataCallback: (marks: Mark[]) => void,
             resolution: ResolutionString,
         ) => {
+            const requestedSymbol = normalizeSymbolForMarks(
+                symbolInfo.ticker || symbolInfo.name,
+            );
+            const activeSymbol = getActiveSymbolForMarks();
+            if (activeSymbol && requestedSymbol !== activeSymbol) {
+                onDataCallback([]);
+                return;
+            }
+
             onMarksCallback = onDataCallback;
             lastResolution = resolution;
+            marksSymbol = symbolInfo.ticker || symbolInfo.name;
+
+            processUserFills(userFills, lastResolution, onMarksCallback);
 
             // if (userFillsInterval) {
             //     clearInterval(userFillsInterval);
@@ -387,13 +430,18 @@ export const createDataFeed = (
             const intervalParam = convertResolutionToIntervalParam(resolution);
             let isFetching = false;
             let abortController: AbortController | null = null;
+            let lastBarTime = 0;
 
-            const poller = setInterval(() => {
+            const fetchLatestCandle = () => {
                 if (isFetching) return;
-
                 isFetching = true;
                 abortController = new AbortController();
                 const currentTime = new Date().getTime();
+                // Use lastBarTime to anchor the fetch window so small gaps
+                // are always back-filled even after brief network hiccups.
+                const startTime = lastBarTime
+                    ? lastBarTime - 1000
+                    : currentTime - 1000 * 10;
                 fetch(`${POLLING_API_URL}/info`, {
                     method: 'POST',
                     headers: {
@@ -405,27 +453,39 @@ export const createDataFeed = (
                             coin: symbolInfo.ticker,
                             interval: intervalParam,
                             endTime: currentTime,
-                            startTime: currentTime - 1000 * 10,
+                            startTime,
                         },
                     }),
                     signal: abortController.signal,
                 })
                     .then((res) => res.json())
                     .then((data) => {
-                        const candleData = data[0];
                         if (
-                            symbolInfo.ticker &&
-                            candleData &&
-                            candleData.s === symbolInfo.ticker
-                        ) {
-                            const tick = processWSCandleMessage(candleData);
+                            !symbolInfo.ticker ||
+                            !Array.isArray(data) ||
+                            data.length === 0
+                        )
+                            return;
+
+                        // Process all returned candles so gaps are filled
+                        const bars = data
+                            .filter((c: any) => c && c.s === symbolInfo.ticker)
+                            .map((c: any) => processWSCandleMessage(c))
+                            .sort((a: Bar, b: Bar) => a.time - b.time);
+
+                        for (const tick of bars) {
                             onTick(tick);
-                            useChartStore.getState().setLastCandle(tick);
                             updateCandleCache(
-                                symbolInfo.ticker,
+                                symbolInfo.ticker!,
                                 resolution,
                                 tick,
                             );
+                        }
+
+                        if (bars.length > 0) {
+                            const latest = bars[bars.length - 1];
+                            lastBarTime = latest.time;
+                            useChartStore.getState().setLastCandle(latest);
                         }
                     })
                     .catch((error) => {
@@ -436,7 +496,20 @@ export const createDataFeed = (
                     .finally(() => {
                         isFetching = false;
                     });
+            };
+
+            const poller = setInterval(() => {
+                // Skip polling when tab is hidden to prevent the chart
+                // from silently auto-scrolling right over hours of idle,
+                // which compresses all candles into a thin sliver.
+                // Gap-fill on tab resume is handled by TradingviewContext
+                // via refreshStaleCache (cache updated in-place, no resetData).
+                if (document.hidden) {
+                    return;
+                }
+                fetchLatestCandle();
             }, TIMEOUT_CANDLE_POLLING);
+
             const unsubscribe = () => {
                 clearInterval(poller);
                 if (abortController) {

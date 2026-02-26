@@ -52,4 +52,5 @@ export type OrderInputChangeType =
     | 'obClick'
     | 'inputChange'
     | 'midPriceChange'
+    | 'quickTradeMode'
     | 'reset';

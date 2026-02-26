@@ -26,7 +26,7 @@ export default function testpage() {
         try {
             // Create a dynamic message with current date
             const currentDate = new Date().toISOString().split('T')[0];
-            const message = `Accept affiliate code ${referralStore.cached} on ${currentDate}`;
+            const message = `Accept affiliate code ${referralStore.cached.code} on ${currentDate}`;
 
             // Convert message to Uint8Array
             const messageBytes = new TextEncoder().encode(message);

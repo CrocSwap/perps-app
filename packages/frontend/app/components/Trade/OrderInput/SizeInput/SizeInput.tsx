@@ -94,6 +94,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         <div
             className={`${styles.sizeInputContainer} ${isModal && styles.modalContainer}`}
             onClick={handleContainerClick}
+            id='trade-module-size-input-container'
         >
             <span>
                 {useTotalSize
