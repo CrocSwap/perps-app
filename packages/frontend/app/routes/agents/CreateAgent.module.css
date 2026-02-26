@@ -136,7 +136,7 @@
         top: 0;
         background: var(--bg-dark1, #09090f);
         z-index: 10;
-        padding: 14px 14px 12px;
+        padding: 14px 4px 12px;
         width: 100%;
         border-bottom: 1px solid
             color-mix(in srgb, var(--bg-dark4) 55%, transparent);
@@ -160,7 +160,7 @@
     }
 
     .create_strategy_inputs {
-        padding: 12px 14px;
+        padding: 12px 4px;
         gap: 0;
     }
 
@@ -169,7 +169,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 14px;
+        padding: 12px 4px;
         background: color-mix(
             in srgb,
             var(--bg-dark2, #0e0e14) 96%,

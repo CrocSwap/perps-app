@@ -527,7 +527,7 @@
 
 @media (max-width: 640px) {
     .strategies_page {
-        padding: 12px 12px calc(96px + env(safe-area-inset-bottom));
+        padding: 12px 4px calc(96px + env(safe-area-inset-bottom));
         gap: 16px;
     }
 

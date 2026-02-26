@@ -37,6 +37,10 @@
     color: var(--text1);
 }
 
+.dropdown {
+    position: relative;
+}
+
 .dropdown > ul {
     position: absolute;
     display: flex;

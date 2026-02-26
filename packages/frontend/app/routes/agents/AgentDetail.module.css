@@ -433,7 +433,7 @@
 
 @media (max-width: 768px) {
     .strategy_detail_page {
-        padding: 12px 12px calc(96px + env(safe-area-inset-bottom));
+        padding: 12px 4px calc(96px + env(safe-area-inset-bottom));
     }
 
     .strategy_shell {
