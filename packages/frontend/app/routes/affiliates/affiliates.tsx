@@ -106,7 +106,7 @@ export default function AffiliatesPage() {
                     Affiliate Dashboard
                 </h1>
                 <p style={{ color: 'var(--aff-text-muted)' }}>
-                    Track your earnings as they grow with every Ambeint user you
+                    Track your earnings as they grow with every Ambient user you
                     refer.
                 </p>
             </section>
