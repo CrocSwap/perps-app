@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useMemo,
+    useState,
+    useEffect,
+} from 'react';
 import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
 
@@ -10,7 +17,8 @@ interface FuulContextType {
         identifierType: UserIdentifierType,
         eventName: string,
     ) => Promise<void>;
-    isRefCodeFree: (code: string) => Promise<boolean>;
+    checkIfCodeExists: (code: string) => Promise<boolean>;
+    checkIfCodeIsAvailableForInviteeToUse: (code: string) => Promise<boolean>;
     getRefCode: (
         userIdentifier: string,
         identifierType: UserIdentifierType,
@@ -21,7 +29,8 @@ const FuulContext = createContext<FuulContextType>({
     isInitialized: false,
     trackPageView: () => {},
     sendConversionEvent: () => Promise.resolve(),
-    isRefCodeFree: () => Promise.resolve(false),
+    checkIfCodeExists: () => Promise.resolve(false),
+    checkIfCodeIsAvailableForInviteeToUse: () => Promise.resolve(false),
     getRefCode: () => Promise.resolve(null),
 });
 
@@ -32,6 +41,12 @@ export const useFuul = () => {
     }
     return context;
 };
+
+// just for pageview tracking
+const FUUL_PROJECTS = [
+    '3b31ebc0-f09d-4880-9c8c-04769701ef9a',
+    '0303273c-c574-4a64-825c-b67091ec6813',
+];
 
 export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
@@ -54,53 +69,55 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }, [FUUL_API_KEY]);
 
-    // just for pageview tracking
-    const projects = [
-        '3b31ebc0-f09d-4880-9c8c-04769701ef9a',
-        '0303273c-c574-4a64-825c-b67091ec6813',
-    ];
-
-    function trackPageView(): void {
+    const trackPageView = useCallback((): void => {
         if (isInitialized) {
-            Fuul.sendPageview(undefined, projects);
+            Fuul.sendPageview(undefined, FUUL_PROJECTS);
         } else {
             console.warn(
                 'Cannot send pageview before Fuul system is initialized',
             );
         }
-    }
+    }, [isInitialized]);
 
-    async function sendConversionEvent(
-        userIdentifier: string,
-        identifierType: UserIdentifierType,
-        eventName: string,
-    ): Promise<void> {
-        if (!isInitialized) {
-            console.warn(
-                'Cannot send conversion event before Fuul system is initialized',
-            );
-            return;
-        }
-        try {
-            await Fuul.sendEvent(eventName, {
-                user_id: userIdentifier,
-                user_id_type: identifierType,
-            });
-        } catch (error) {
-            console.error('Failed to send conversion event:', error);
-        }
-    }
+    const sendConversionEvent = useCallback(
+        async (
+            userIdentifier: string,
+            identifierType: UserIdentifierType,
+            eventName: string,
+        ): Promise<void> => {
+            if (!isInitialized) {
+                console.warn(
+                    'Cannot send conversion event before Fuul system is initialized',
+                );
+                return;
+            }
+            try {
+                await Fuul.sendEvent(eventName, {
+                    user_id: userIdentifier,
+                    user_id_type: identifierType,
+                });
+            } catch (error) {
+                console.error('Failed to send conversion event:', error);
+            }
+        },
+        [isInitialized],
+    );
+
+    const contextValue = useMemo(
+        () => ({
+            isInitialized,
+            trackPageView,
+            sendConversionEvent,
+            checkIfCodeExists: Fuul.isAffiliateCodeFree,
+            checkIfCodeIsAvailableForInviteeToUse:
+                Fuul.isAffiliateCodeAvailable,
+            getRefCode: Fuul.getAffiliateCode,
+        }),
+        [isInitialized, trackPageView, sendConversionEvent],
+    );
 
     return (
-        <FuulContext.Provider
-            value={{
-                isInitialized,
-                trackPageView,
-                sendConversionEvent,
-                isRefCodeFree: Fuul.isAffiliateCodeFree,
-                getRefCode: Fuul.getAffiliateCode,
-            }}
-        >
+        <FuulContext.Provider value={contextValue}>
             {children}
         </FuulContext.Provider>
     );

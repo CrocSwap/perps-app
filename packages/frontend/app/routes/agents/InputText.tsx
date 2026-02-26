@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import styles from './InputText.module.css';
 import { LuChevronDown } from 'react-icons/lu';
-import type { textInputIF } from './CreateStrategy';
+import type { strategyOptionIF, textInputIF } from './CreateAgent';
 
 interface propsIF {
     initial: string;
     data: textInputIF;
     handleChange: (text: string) => void;
+    onBlur?: () => void;
+    error?: string;
 }
 
 export default function InputText(props: propsIF) {
-    const { initial, data, handleChange } = props;
+    const { initial, data, handleChange, onBlur, error } = props;
 
     const idForDOM: string =
         'CREATE_STRATEGY_' + data.label.toUpperCase().replace(' ', '_');
@@ -45,25 +47,35 @@ export default function InputText(props: propsIF) {
                         handleChange(e.currentTarget.value)
                     }
                     autoComplete='off'
+                    onBlur={onBlur}
                 />
             )}
             {Array.isArray(data.input) && (
                 <div className={styles.dropdown} ref={dropdownRef}>
-                    <button onClick={() => setIsOpen(!isOpen)}>
-                        <output id={idForDOM}>{initial}</output>
+                    <button
+                        type='button'
+                        onClick={() => setIsOpen(!isOpen)}
+                        onBlur={onBlur}
+                    >
+                        <output id={idForDOM}>
+                            {data.input.find(
+                                (option: strategyOptionIF) =>
+                                    option.value === initial,
+                            )?.label ?? initial}
+                        </output>
                         <LuChevronDown />
                     </button>
                     {isOpen && (
                         <ul>
-                            {data.input.map((inp: string) => (
+                            {data.input.map((inp: strategyOptionIF) => (
                                 <li
-                                    key={inp}
+                                    key={inp.value}
                                     onClick={() => {
-                                        handleChange(inp);
+                                        handleChange(inp.value);
                                         setIsOpen(false);
                                     }}
                                 >
-                                    {inp}
+                                    {inp.label}
                                 </li>
                             ))}
                         </ul>
@@ -71,6 +83,7 @@ export default function InputText(props: propsIF) {
                 </div>
             )}
             <p>{data.blurb}</p>
+            {error && <span className={styles.input_error}>{error}</span>}
         </div>
     );
 }

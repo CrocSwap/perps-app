@@ -276,13 +276,98 @@
         "createSubAccountPH": "ör: Alt Hesabım 1",
         "created": {
             "title": "Alt Hesap Oluşturuldu",
-            "message": "{{name}} strateji alt hesabı oluşturuldu",
+            "message": "{{name}} ajan alt hesabı oluşturuldu",
             "message2": "{{name}} kendi karar alt hesabı oluşturuldu"
         }
     },
-    "strategies": {
-        "newStrategy": "Yeni Strateji",
-        "editStrategy": "Stratejiyi Düzenle"
+    "agents": {
+        "newAgent": "Yeni Ajan",
+        "editAgent": "Ajanı Düzenle",
+        "overview": {
+            "create": "Ajan Oluştur",
+            "blurb": "Ambient Perps üzerinde otomatik bir piyasa yapıcı ajan çalıştırın",
+            "paused": "Duraklatıldı",
+            "running": "Çalışıyor",
+            "pause": "Duraklat",
+            "unpause": "Devam Et",
+            "remove": "Kaldır",
+            "emptyState": "Gösterilecek veri yok",
+            "removeTitle": "Ajanı Kaldır",
+            "removeMessage": "Bu ajanı kaldırmak istediğinizden emin misiniz?"
+        },
+        "details": {
+            "noAgentFound": "Ajan bulunamadı",
+            "status": "Durum",
+            "parameters": "Parametreler",
+            "performance": "Performans",
+            "ordersPlaced": "Yerleştirilen Emirler",
+            "runtime": "Çalışma Süresi",
+            "hours": "Saat",
+            "orderHistory": "Emir Geçmişi",
+            "filter": "Filtre",
+            "viewAll": "Tümünü Gör"
+        },
+        "transfer": {
+            "agentTitle": "Ajanı Transfer Et",
+            "selectAccounts": "Lütfen hesap seçin",
+            "title": "Transfer",
+            "from": "Gönderen",
+            "to": "Alıcı",
+            "asset": "Varlık",
+            "amount": "Miktar",
+            "available": "Yatırılabilir Bakiye",
+            "enterAllFields": "Lütfen tüm alanları doldurun",
+            "selectAccount": "Lütfen bir hesap seçin",
+            "selectAsset": "Lütfen bir varlık seçin"
+        },
+        "form": {
+            "labels": {
+                "name": "Ajan Adı",
+                "market": "Piyasa",
+                "distance": "Mesafe",
+                "distanceType": "Mesafe Türü",
+                "side": "Yön",
+                "totalSize": "Toplam Büyüklük",
+                "orderSize": "Emir Büyüklüğü"
+            },
+            "placeholders": {
+                "name": "Ad",
+                "distance": "Mesafe",
+                "totalSize": "Toplam Büyüklük",
+                "orderSize": "Emir Büyüklüğü"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Tick",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "Her İkisi",
+                    "above": "Yukarı",
+                    "below": "Aşağı"
+                }
+            },
+            "blurbs": {
+                "name": "İşlem ajanın için açıklayıcı bir ad seç. Bu, ajanlarını tanımlamana ve yönetmene yardımcı olur.",
+                "market": "Bu ajanı uygulamak istediğin piyasayı seç. Farklı piyasaların volatilite ve likidite özellikleri farklıdır.",
+                "distance": "Ajanın için mesafe parametresini tanımla. Bu, emirlerin mevcut fiyattan ne kadar uzakta yerleştirileceğini belirler.",
+                "distanceType": "Mesafenin nasıl ölçüleceğini seç. Tick daha hassas kontrol sağlar, yüzde ise fiyat hareketleriyle orantılı ölçekleme sunar.",
+                "side": "Ajanın alış emri, satış emri veya her ikisini birden verip vermeyeceğini belirt. \"Her İkisi\" seçeneği emir defterinin iki tarafında da market making yapmayı sağlar.",
+                "totalSize": "Bu ajana ayrılacak toplam sermayeyi belirle. Bu, tüm aktif emirler için maksimum maruziyeti temsil eder.",
+                "orderSize": "Tekil emirlerin boyutunu belirle. Daha küçük emirler daha iyi ayrıntı sağlar ancak işlem maliyetini artırabilir."
+            },
+            "validation": {
+                "nameRequired": "Ajan adı zorunludur",
+                "marketRequired": "Piyasa zorunludur",
+                "distanceRequired": "Mesafe zorunludur",
+                "distanceTypeRequired": "Mesafe türü zorunludur",
+                "sideRequired": "Yön zorunludur",
+                "totalSizeRequired": "Toplam büyüklük zorunludur",
+                "orderSizeRequired": "Emir büyüklüğü zorunludur",
+                "positiveNumber": "0'dan büyük geçerli bir sayı girin",
+                "orderSizeExceedsTotal": "Emir büyüklüğü toplam büyüklüğü aşamaz"
+            }
+        }
     },
     "margin": {
         "cross": {
@@ -443,13 +528,13 @@
     },
     "referrals": {
         "title": "Referanslar",
-        "description": "Kullanıcıları davet ederek ödüller kazanın. İş ortakları daha yüksek ödüller kazanır.",
+        "description": "Kullanıcıları davet ederek ödüller kazanın. Referans verenler daha yüksek ödüller kazanır.",
         "tradersReferred": "Yönlendirilen traderlar",
         "rewardsEarned": "Kazanılan ödüller",
         "rewardHistory": "Ödül geçmişi",
         "enterCode": "Kodu girin",
         "createCode": "Kod oluştur",
-        "usingAffiliateCode": "Ortaklık Kodu Kullanılıyor",
+        "pendingRefCode": "Referans Kodu (Beklemede)",
         "overwriteCurrentReferralCode": "Mevcut referans kodunun üzerine yaz",
         "enterReferralCode": "Bir referans kodu girin",
         "referralCodeNotValidPleaseConfirm": "Kod <0>{{invalidCode}}</0> referans programında talep edilmemiş. Lütfen kodun doğru olduğunu onaylayın.",
@@ -662,6 +747,25 @@
     "chart": {
         "liqPrice": "Lik. fiyatı"
     },
+    "quickTrade": {
+        "title": "Hızlı İşlem Modu",
+        "quick": "Hızlı",
+        "quickWithType": "Hızlı {{tradeType}}",
+        "sizeTooltip": "Boyut: {{size}} {{currency}}",
+        "clickToEnable": "Hızlı işlem modunu etkinleştirmek için tıklayın",
+        "sellAtLimit": "{{price}} Limit Sat",
+        "buyAtLimit": "{{price}} Limit Al",
+        "buyAtStop": "{{price}} Stop Al",
+        "sellAtStop": "{{price}} Stop Sat",
+        "sellSizeAtLimit": "{{size}} {{price}} Limit Sat",
+        "buySizeAtLimit": "{{size}} {{price}} Limit Al",
+        "buySizeAtStop": "{{size}} {{price}} Stop Al",
+        "sellSizeAtStop": "{{size}} {{price}} Stop Sat",
+        "infoText": "Grafiğe tıklayarak önceden yapılandırılmış emirler verin",
+        "description": "Hızlı işlemler, tıkladığınız fiyat ve seçtiğiniz boyutla emir formunu doldurur. Aşağıdaki kutuyu işaretleyerek sol tıklamada onay adımını atlayıp emri hemen gönderebilirsiniz. Sağ tık menüsü ve artı düğmesi menüsü, devre dışıyken bile onaysız hızlı işlem seçenekleri sunar.",
+        "enableConfirmationBypass": "Onayı atla ve tıklamayla emri gönder",
+        "saveAndEnable": "Kaydet ve Etkinleştir"
+    },
     "meta": {
         "title": "Ambient Finance | Fogo Süresiz Vadeli İşlemler",
         "description": "Ambient Finance ile Fogo'da süresiz vadeli işlem yapın. Taker ücreti yok, 100x kaldıraç imkanı ve yıldırım hızında işlem.",
@@ -734,10 +838,10 @@
         "referrals": "Referanslar",
         "points": "Puanlar",
         "leaderboard": "Sıralama",
-        "newStrategy": "Yeni Strateji",
-        "editStrategy": "Stratejiyi Düzenle",
-        "strategy": "Strateji",
-        "strategies": "Stratejiler",
+        "newAgent": "Yeni Ajan",
+        "editAgent": "Ajanı Düzenle",
+        "agent": "Ajan",
+        "agents": "Ajanlar",
         "vault": "Kasa",
         "vaults": "Kasalar",
         "subAccounts": "Alt Hesaplar",

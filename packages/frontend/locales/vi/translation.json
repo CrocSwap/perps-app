@@ -276,13 +276,98 @@
         "createSubAccountPH": "vd: Tài khoản phụ của tôi 1",
         "created": {
             "title": "Tài khoản phụ đã tạo",
-            "message": "Đã tạo tài khoản phụ chiến lược mới {{name}}",
+            "message": "Đã tạo tài khoản phụ tác nhân mới {{name}}",
             "message2": "Đã tạo tài khoản phụ tự quản mới {{name}}"
         }
     },
-    "strategies": {
-        "newStrategy": "Chiến lược mới",
-        "editStrategy": "Chỉnh sửa chiến lược"
+    "agents": {
+        "newAgent": "Tác nhân mới",
+        "editAgent": "Chỉnh sửa tác nhân",
+        "overview": {
+            "create": "Tạo tác nhân",
+            "blurb": "Chạy một tác nhân tạo lập thị trường tự động trên Ambient Perps",
+            "paused": "Đã tạm dừng",
+            "running": "Đang chạy",
+            "pause": "Tạm dừng",
+            "unpause": "Tiếp tục",
+            "remove": "Xóa",
+            "emptyState": "Không có dữ liệu để hiển thị",
+            "removeTitle": "Xóa tác nhân",
+            "removeMessage": "Bạn có chắc chắn muốn xóa tác nhân này không?"
+        },
+        "details": {
+            "noAgentFound": "Không tìm thấy tác nhân",
+            "status": "Trạng thái",
+            "parameters": "Tham số",
+            "performance": "Hiệu suất",
+            "ordersPlaced": "Số lệnh đã đặt",
+            "runtime": "Thời gian chạy",
+            "hours": "Giờ",
+            "orderHistory": "Lịch sử lệnh",
+            "filter": "Lọc",
+            "viewAll": "Xem tất cả"
+        },
+        "transfer": {
+            "agentTitle": "Chuyển giao đại lý",
+            "selectAccounts": "Vui lòng chọn tài khoản",
+            "title": "Chuyển giao",
+            "from": "Từ",
+            "to": "Đến",
+            "asset": "Tài sản",
+            "amount": "Số lượng",
+            "available": "Số dư khả dụng",
+            "enterAllFields": "Vui lòng nhập đầy đủ thông tin",
+            "selectAccount": "Vui lòng chọn tài khoản",
+            "selectAsset": "Vui lòng chọn tài sản"
+        },
+        "form": {
+            "labels": {
+                "name": "Tên tác nhân",
+                "market": "Thị trường",
+                "distance": "Khoảng cách",
+                "distanceType": "Loại khoảng cách",
+                "side": "Phía",
+                "totalSize": "Quy mô tổng",
+                "orderSize": "Quy mô lệnh"
+            },
+            "placeholders": {
+                "name": "Tên",
+                "distance": "Khoảng cách",
+                "totalSize": "Quy mô tổng",
+                "orderSize": "Quy mô lệnh"
+            },
+            "options": {
+                "distanceType": {
+                    "ticks": "Ticks",
+                    "percentage": "%"
+                },
+                "side": {
+                    "both": "Cả hai",
+                    "above": "Phía trên",
+                    "below": "Phía dưới"
+                }
+            },
+            "blurbs": {
+                "name": "Chọn một tên mô tả cho tác nhân giao dịch của bạn. Điều này giúp bạn nhận diện và quản lý các tác nhân hiệu quả hơn.",
+                "market": "Chọn thị trường nơi bạn muốn triển khai tác nhân này. Mỗi thị trường có đặc điểm biến động và thanh khoản khác nhau.",
+                "distance": "Đặt tham số khoảng cách cho tác nhân. Giá trị này quyết định mức độ đặt lệnh cách giá hiện tại bao xa.",
+                "distanceType": "Chọn cách đo khoảng cách. Tick cho phép kiểm soát chính xác, còn phần trăm cho phép tỷ lệ theo biến động giá.",
+                "side": "Chỉ định tác nhân nên đặt lệnh mua, lệnh bán hay cả hai. \"Cả hai\" cho phép tạo lập thị trường ở cả hai phía sổ lệnh.",
+                "totalSize": "Đặt tổng lượng vốn phân bổ cho tác nhân này. Đây là mức phơi nhiễm tối đa trên toàn bộ các lệnh đang hoạt động.",
+                "orderSize": "Đặt kích thước cho từng lệnh. Lệnh nhỏ hơn giúp tinh chỉnh tốt hơn nhưng có thể làm tăng chi phí giao dịch."
+            },
+            "validation": {
+                "nameRequired": "Tên tác nhân là bắt buộc",
+                "marketRequired": "Thị trường là bắt buộc",
+                "distanceRequired": "Khoảng cách là bắt buộc",
+                "distanceTypeRequired": "Loại khoảng cách là bắt buộc",
+                "sideRequired": "Phía là bắt buộc",
+                "totalSizeRequired": "Quy mô tổng là bắt buộc",
+                "orderSizeRequired": "Quy mô lệnh là bắt buộc",
+                "positiveNumber": "Nhập số hợp lệ lớn hơn 0",
+                "orderSizeExceedsTotal": "Quy mô lệnh không được vượt quá quy mô tổng"
+            }
+        }
     },
     "margin": {
         "cross": {
@@ -443,14 +528,14 @@
     },
     "referrals": {
         "title": "Giới thiệu",
-        "description": "Giới thiệu người dùng để nhận phần thưởng. Đối tác nhận được phần thưởng cao hơn.",
+        "description": "Giới thiệu người dùng để nhận phần thưởng. Người giới thiệu nhận phần thưởng cao hơn.",
         "tradersReferred": "Người giao dịch đã giới thiệu",
         "rewardsEarned": "Phần thưởng đã nhận",
         "rewardHistory": "Lịch sử phần thưởng",
         "enterCode": "Nhập mã",
         "claim": "Nhận",
         "createCode": "Tạo mã",
-        "usingAffiliateCode": "Đang dùng mã giới thiệu",
+        "pendingRefCode": "Mã giới thiệu (đang chờ)",
         "overwriteCurrentReferralCode": "Ghi đè mã giới thiệu hiện tại",
         "enterReferralCode": "Nhập mã giới thiệu",
         "referralCodeNotValidPleaseConfirm": "Mã <0>{{invalidCode}}</0> chưa được đăng ký trong chương trình giới thiệu. Vui lòng kiểm tra lại mã.",
@@ -662,6 +747,25 @@
     "chart": {
         "liqPrice": "Giá thanh lý"
     },
+    "quickTrade": {
+        "title": "Chế độ giao dịch nhanh",
+        "quick": "Nhanh",
+        "quickWithType": "Nhanh {{tradeType}}",
+        "sizeTooltip": "Khối lượng: {{size}} {{currency}}",
+        "clickToEnable": "Nhấp để bật chế độ giao dịch nhanh",
+        "sellAtLimit": "Bán @ {{price}} giới hạn",
+        "buyAtLimit": "Mua @ {{price}} giới hạn",
+        "buyAtStop": "Mua @ {{price}} dừng",
+        "sellAtStop": "Bán @ {{price}} dừng",
+        "sellSizeAtLimit": "Bán {{size}} @ {{price}} giới hạn",
+        "buySizeAtLimit": "Mua {{size}} @ {{price}} giới hạn",
+        "buySizeAtStop": "Mua {{size}} @ {{price}} dừng",
+        "sellSizeAtStop": "Bán {{size}} @ {{price}} dừng",
+        "infoText": "Nhấp vào biểu đồ để đặt lệnh đã cấu hình sẵn",
+        "description": "Giao dịch nhanh sẽ điền biểu mẫu lệnh với mức giá đã nhấp và khối lượng bạn chọn. Chọn ô bên dưới để gửi lệnh ngay khi nhấp chuột trái, bỏ qua bước xác nhận trên biểu mẫu. Menu chuột phải và menu nút dấu cộng cũng có các tùy chọn giao dịch nhanh không cần xác nhận ngay cả khi đang tắt.",
+        "enableConfirmationBypass": "Bỏ qua xác nhận và gửi lệnh khi nhấp",
+        "saveAndEnable": "Lưu và bật"
+    },
     "meta": {
         "title": "Ambient Finance | Hợp đồng vĩnh viễn trên Fogo",
         "description": "Giao dịch hợp đồng vĩnh viễn trên Fogo với Ambient Finance. Không phí taker, đòn bẩy lên đến 100x và khớp lệnh siêu nhanh.",
@@ -722,7 +826,7 @@
         "amountGreaterThanZero": "Số tiền phải lớn hơn 0",
         "minDepositAmount": "Số tiền nạp tối thiểu là {{amount}}",
         "exceedsAvailableBalance": "Số tiền vượt quá số dư khả dụng {{balance}}",
-        "strategies": "Danh sách chiến lược",
+        "agents": "Danh sách tác nhân",
         "vault": "Kho bạc",
         "vaults": "Danh sách kho bạc",
         "subAccounts": "Tài khoản phụ",
@@ -749,10 +853,10 @@
         "referrals": "Giới thiệu",
         "points": "Điểm",
         "leaderboard": "Bảng xếp hạng",
-        "newStrategy": "Chiến lược mới",
-        "editStrategy": "Chỉnh sửa chiến lược",
-        "strategy": "Chiến lược",
-        "strategies": "Các chiến lược",
+        "newAgent": "Tác nhân mới",
+        "editAgent": "Chỉnh sửa tác nhân",
+        "agent": "Tác nhân",
+        "agents": "Các tác nhân",
         "vault": "Kho",
         "vaults": "Các kho",
         "subAccounts": "Tài khoản phụ",

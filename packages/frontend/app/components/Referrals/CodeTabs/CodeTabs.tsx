@@ -22,7 +22,12 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useFuul } from '~/contexts/FuulContext';
 import EnterCode from '~/components/Referrals/EnterCode/EnterCode';
 import CreateCode from '../CreateCode/CreateCode';
-import { checkForPermittedCharacters, checkIfOwnRefCode } from '../functions';
+import { checkForPermittedCharacters } from '../functions';
+import { useAppStateStore } from '~/stores/AppStateStore';
+import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
+import { debugLog } from '~/utils/debugLog';
+import { useDebounce } from '~/hooks/useDebounce';
+import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
 
 interface PropsIF {
     initialTab?: string;
@@ -43,7 +48,10 @@ const COPY_PER_SCREEN_WIDTH = {
     },
 };
 
-const REFERRER_EDIT_VOLUME_THRESHOLD = 1_000_000;
+// volume thresholds for referral eligibility
+const REFERRER_EDIT_VOLUME_THRESHOLD = 1_000_000; // referrers can customize code after $1M volume
+const INVITEE_MAX_VOLUME_THRESHOLD = 10_000; // invitees can only enter codes if below $10k volume
+
 const DEFAULT_REFERRER_CODE_LENGTH = 6;
 
 // fee amounts for referrer and the invitee
@@ -51,6 +59,20 @@ const REFERRER_PERCENT = '10%';
 const INVITEE_PERCENT = '4%';
 
 export default function CodeTabs(props: PropsIF) {
+    const { isSessionReestablishing } = useAppStateStore();
+    const refCodeModalStore = useRefCodeModalStore();
+
+    const sessionState = useSession();
+
+    const isSessionEstablished = useMemo<boolean>(
+        () => isEstablished(sessionState),
+        [sessionState],
+    );
+
+    useEffect(() => {
+        debugLog({ isSessionReestablishing, isSessionEstablished });
+    }, [isSessionReestablishing, isSessionEstablished]);
+
     // tab which should be open by default on page load
     const { initialTab = 'referrals.enterCode' } = props;
     // tab which is currently open
@@ -63,7 +85,6 @@ export default function CodeTabs(props: PropsIF) {
     // referrer code for use (not temporary during edit mode)
     const [referrerCode, setReferrerCode] = useState('');
     // we need this for FOGO sessions
-    const sessionState = useSession();
     // data on the current user (mainly wallet address)
     const userDataStore = useUserDataStore();
     const referrerAddress = userDataStore.userAddress;
@@ -104,20 +125,27 @@ export default function CodeTabs(props: PropsIF) {
 
     // update refCodeToConsume whenever the cached value changes
     useEffect(() => {
-        if (referralStore.cached && referrerAddress) {
+        if (referralStore.cached.code && referrerAddress) {
             (async () => {
-                const isOwnedByUser: boolean | undefined =
-                    await checkIfOwnRefCode(
-                        referralStore.cached,
-                        referrerAddress,
-                    );
-                isOwnedByUser === false &&
-                    setRefCodeToConsume(referralStore.cached);
+                const userCodeData =
+                    await referralStore.getRefCodeByPubKey(referrerAddress);
+                const isOwnedByUser =
+                    userCodeData?.code === referralStore.cached.code ||
+                    referralStore.cached.code === referrerAddress;
+                !isOwnedByUser &&
+                    setRefCodeToConsume(referralStore.cached.code);
             })();
-        } else if (!referralStore.cached) {
+        } else if (!referralStore.cached.code) {
             setRefCodeToConsume(undefined);
         }
-    }, [referralStore.cached, referrerAddress]);
+    }, [referralStore.cached.code, referrerAddress]);
+
+    // run the FUUL context
+    const {
+        checkIfCodeExists,
+        checkIfCodeIsAvailableForInviteeToUse,
+        getRefCode,
+    } = useFuul();
 
     const [isRefCodeClaimed, setIsRefCodeClaimed] = useState<
         boolean | undefined
@@ -126,8 +154,10 @@ export default function CodeTabs(props: PropsIF) {
         if (refCodeToConsume === undefined || !refCodeToConsume.length) {
             setIsRefCodeClaimed(undefined);
         } else {
-            isRefCodeFree(refCodeToConsume)
-                .then((isFree: boolean) => setIsRefCodeClaimed(!isFree))
+            checkIfCodeIsAvailableForInviteeToUse(refCodeToConsume)
+                .then((isAvailable: boolean) =>
+                    setIsRefCodeClaimed(isAvailable),
+                )
                 .catch((err) => {
                     setIsRefCodeClaimed(undefined);
                     console.error(err);
@@ -158,13 +188,13 @@ export default function CodeTabs(props: PropsIF) {
 
     useEffect(() => {
         if (
-            !referralStore.cached &&
+            !referralStore.cached.code &&
             referralStore.totVolume !== undefined &&
-            referralStore.totVolume < 10000
+            referralStore.totVolume < INVITEE_MAX_VOLUME_THRESHOLD
         ) {
             setEditModeInvitee(true);
         }
-    }, [referralStore.cached, referralStore.totVolume]);
+    }, [referralStore.cached.code, referralStore.totVolume]);
 
     useEffect(() => {
         if (justCopied) {
@@ -175,13 +205,8 @@ export default function CodeTabs(props: PropsIF) {
         }
     }, [justCopied]);
 
-    const isSessionEstablished = useMemo<boolean>(
-        () => isEstablished(sessionState),
-        [sessionState],
-    );
-
     // run the FUUL context
-    const { isRefCodeFree, getRefCode } = useFuul();
+    // const { isRefCodeFree, getRefCode } = useFuul();
 
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
@@ -189,7 +214,7 @@ export default function CodeTabs(props: PropsIF) {
     useEffect(() => {
         if (
             handleReferralURLParam.value &&
-            handleReferralURLParam.value !== referralStore.cached
+            handleReferralURLParam.value !== referralStore.cached.code
         ) {
             // Reset validation state so the validation effect will re-run
             setIsCachedValueValid(undefined);
@@ -207,26 +232,41 @@ export default function CodeTabs(props: PropsIF) {
             return;
         }
 
-        // check FUUL API to see if code is claimed or free
-        const codeIsFree: boolean = await isRefCodeFree(r);
+        // check FUUL API to see if code exists and is available for use
+        const isCodeAvailable: boolean =
+            await checkIfCodeIsAvailableForInviteeToUse(r);
 
-        // Always cache the code and set URL param
+        // Always cache the code and set URL param (user explicitly entered, so mark as approved)
         handleReferralURLParam.set(r);
-        referralStore.cache(r);
+        referralStore.cache(r, true);
 
-        // if code is unclaimed, show in edit mode with error
-        if (!codeIsFree) {
+        if (!isCodeAvailable) {
+            // code does not exist or has no remaining uses
             setInvalidCode(r);
             setIsCachedValueValid(false);
             setEditModeInvitee(true);
             setUserInputRefCode(r);
         } else {
-            // code is valid and claimed
+            // code is valid and claimed - open the confirmation modal
             invalidCode && setInvalidCode('');
             setIsCachedValueValid(true);
             setEditModeInvitee(false);
+            refCodeModalStore.openModal(r);
         }
         // Update lastValidatedCode to prevent the useEffect from re-validating
+        setLastValidatedCode(r);
+    }
+
+    // fn to update referral code state without opening modal
+    function handleOverwriteReferralCode(r: string): void {
+        if (!r || !r.trim()) {
+            return;
+        }
+        handleReferralURLParam.set(r);
+        referralStore.cache(r, true);
+        invalidCode && setInvalidCode('');
+        setIsCachedValueValid(true);
+        setEditModeInvitee(false);
         setLastValidatedCode(r);
     }
 
@@ -279,6 +319,11 @@ export default function CodeTabs(props: PropsIF) {
     }, [referrerAddress]);
 
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
+    const debouncedUserInputRefCode = useDebounce(userInputRefCode, 500);
+    const isInputSolanaAddress = useMemo<boolean>(
+        () => checkAddressFormat(debouncedUserInputRefCode),
+        [debouncedUserInputRefCode],
+    );
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
         boolean | undefined
     >(undefined);
@@ -287,37 +332,59 @@ export default function CodeTabs(props: PropsIF) {
 
     // when the user manually enters a refCode, check if the code is owned by their wallet
     useEffect(() => {
-        if (userInputRefCode && referrerAddress) {
-            checkIfOwnRefCode(userInputRefCode, referrerAddress.toString())
-                .then((isSelfOwned: boolean | undefined) =>
-                    setIsUserInputRefCodeSelfOwned(isSelfOwned),
-                )
-                .catch((err) => {
-                    setIsUserInputRefCodeSelfOwned(undefined);
-                    console.error(err);
-                });
-        } else {
+        if (!debouncedUserInputRefCode || !referrerAddress) {
             setIsUserInputRefCodeSelfOwned(undefined);
+            return;
         }
-    }, [userInputRefCode, referrerAddress]);
+        // check if input matches user's public key directly
+        if (debouncedUserInputRefCode === referrerAddress.toString()) {
+            setIsUserInputRefCodeSelfOwned(true);
+            return;
+        }
+        // skip FUUL lookup for Solana addresses (they won't match a ref code)
+        if (isInputSolanaAddress) {
+            setIsUserInputRefCodeSelfOwned(false);
+            return;
+        }
+        // check if input matches user's registered FUUL code
+        setIsUserInputRefCodeSelfOwned(undefined);
+        referralStore
+            .getRefCodeByPubKey(referrerAddress.toString())
+            .then((userCodeData) => {
+                const isSelfOwned =
+                    userCodeData?.code === debouncedUserInputRefCode;
+                setIsUserInputRefCodeSelfOwned(isSelfOwned);
+            })
+            .catch((err) => {
+                setIsUserInputRefCodeSelfOwned(undefined);
+                console.error(err);
+            });
+    }, [debouncedUserInputRefCode, referrerAddress, isInputSolanaAddress]);
 
     // when the user manually enters a refCode, make sure it exists
     useEffect(() => {
-        if (userInputRefCode.length) {
+        if (isInputSolanaAddress) {
+            setIsUserRefCodeClaimed(true);
+            return;
+        }
+        if (debouncedUserInputRefCode.length) {
+            setIsUserRefCodeClaimed(undefined);
             (async () => {
                 try {
                     // check with FUUL to determine if ref code is claimed
-                    const isCodeFree: boolean =
-                        await isRefCodeFree(userInputRefCode);
-                    // normally `isCodeFree === true` means the code is available
-                    // right now the API is returning `false` when the code is available
-                    setIsUserRefCodeClaimed(isCodeFree);
+                    // isAffiliateCodeAvailable returns true when the code
+                    // exists and has remaining uses (i.e. is a valid referral)
+                    const isCodeClaimed: boolean =
+                        await checkIfCodeIsAvailableForInviteeToUse(
+                            debouncedUserInputRefCode,
+                        );
+                    setIsUserRefCodeClaimed(isCodeClaimed);
                 } catch (error) {
                     setIsUserRefCodeClaimed(false);
                 }
             })();
         }
-    }, [userInputRefCode]);
+    }, [debouncedUserInputRefCode, isInputSolanaAddress]);
 
     // determines whether the value in zustand cache passes validation
     // legal characters, length, and format checks
@@ -331,7 +398,7 @@ export default function CodeTabs(props: PropsIF) {
     // Validate cached referral code when it changes (e.g., from URL)
     useEffect(() => {
         // Don't validate if there's no cached code
-        if (!referralStore.cached) {
+        if (!referralStore.cached.code) {
             setIsCachedValueValid(undefined);
             setLastValidatedCode('');
             return;
@@ -340,20 +407,19 @@ export default function CodeTabs(props: PropsIF) {
         // Don't re-validate if we already have a validation result for this specific code
         if (
             isCachedValueValid !== undefined &&
-            lastValidatedCode === referralStore.cached
+            lastValidatedCode === referralStore.cached.code
         ) {
             return;
         }
 
         (async () => {
-            const codeToValidate = referralStore.cached;
+            const codeToValidate = referralStore.cached.code;
             try {
-                const isCachedCodeFree: boolean =
-                    await isRefCodeFree(codeToValidate);
-                console.log('isCodeFree: ', isCachedCodeFree);
+                const isCodeAvailable: boolean =
+                    await checkIfCodeIsAvailableForInviteeToUse(codeToValidate);
 
-                if (isCachedCodeFree) {
-                    // Code is not claimed - show in edit mode with error
+                if (!isCodeAvailable) {
+                    // Code does not exist or has no remaining uses
                     setInvalidCode(codeToValidate);
                     setIsCachedValueValid(false);
                     setEditModeInvitee(true);
@@ -372,7 +438,18 @@ export default function CodeTabs(props: PropsIF) {
                 setLastValidatedCode(codeToValidate);
             }
         })();
-    }, [referralStore.cached, isCachedValueValid, lastValidatedCode]);
+    }, [referralStore.cached.code, isCachedValueValid, lastValidatedCode]);
+
+    const isCheckingCode = useMemo<boolean>(() => {
+        if (userInputRefCode.length < 2) return false;
+        if (userInputRefCode !== debouncedUserInputRefCode) return true;
+        if (
+            debouncedUserInputRefCode.length >= 2 &&
+            isUserRefCodeClaimed === undefined
+        )
+            return true;
+        return false;
+    }, [userInputRefCode, debouncedUserInputRefCode, isUserRefCodeClaimed]);
 
     const tempRefCodeCharsValidate = useMemo<boolean>(() => {
         return checkForPermittedCharacters(temporaryReferrerCode);
@@ -445,7 +522,9 @@ export default function CodeTabs(props: PropsIF) {
         const timer = setTimeout(async () => {
             console.log('Starting validation for code:', temporaryReferrerCode);
             try {
-                const codeIsFree = await isRefCodeFree(temporaryReferrerCode);
+                const codeIsFree = await checkIfCodeExists(
+                    temporaryReferrerCode,
+                );
                 console.log('codeIsFree: ', codeIsFree);
                 const options = {
                     method: 'GET',
@@ -669,18 +748,29 @@ export default function CodeTabs(props: PropsIF) {
                         isSessionEstablished={isSessionEstablished}
                         totVolume={referralStore.totVolume}
                         totVolumeFormatted={totVolumeFormatted}
-                        cached={referralStore.cached}
+                        inviteeMaxVolumeThreshold={INVITEE_MAX_VOLUME_THRESHOLD}
+                        cached={referralStore.cached.code}
                         isCachedValueValid={isCachedValueValid}
                         refCodeToConsume={refCodeToConsume}
                         editModeInvitee={editModeInvitee}
                         setEditModeInvitee={setEditModeInvitee}
                         userInputRefCode={userInputRefCode}
                         setUserInputRefCode={setUserInputRefCode}
+                        isCheckingCode={isCheckingCode}
+                        isInputSolanaAddress={isInputSolanaAddress}
                         isUserRefCodeClaimed={isUserRefCodeClaimed}
                         isUserInputRefCodeSelfOwned={
                             isUserInputRefCodeSelfOwned
                         }
                         handleUpdateReferralCode={handleUpdateReferralCode}
+                        handleOverwriteReferralCode={
+                            handleOverwriteReferralCode
+                        }
+                        openConfirmModal={() =>
+                            refCodeModalStore.openModal(
+                                referralStore.cached.code,
+                            )
+                        }
                         setInvalidCode={setInvalidCode}
                     />
                 );

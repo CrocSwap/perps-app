@@ -148,28 +148,36 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
     iframeDoc: Document | null;
     paneCanvas: HTMLCanvasElement | null;
 } {
-    const chartDiv = document.getElementById('tv_chart');
-    const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
-    const iframeDoc =
-        iframe?.contentDocument || iframe?.contentWindow?.document;
+    try {
+        const chartDiv = document.getElementById('tv_chart');
+        const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
+        const iframeDoc =
+            iframe?.contentDocument || iframe?.contentWindow?.document;
 
-    if (!iframeDoc) {
+        if (!iframeDoc) {
+            return { iframeDoc: null, paneCanvas: null };
+        }
+
+        const paneCanvases = iframeDoc.querySelectorAll<HTMLCanvasElement>(
+            'canvas[data-name="pane-canvas"]',
+        );
+
+        const paneIndex = getMainSeriesPaneIndex(chart);
+        if (paneIndex === null || paneIndex === undefined) {
+            return { iframeDoc, paneCanvas: null };
+        }
+
+        return {
+            iframeDoc,
+            paneCanvas: paneCanvases[paneIndex] ?? null,
+        };
+    } catch (error) {
+        console.error(
+            '[Chart] Failed to access pane canvas from TradingView iframe',
+            error,
+        );
         return { iframeDoc: null, paneCanvas: null };
     }
-
-    const paneCanvases = iframeDoc.querySelectorAll<HTMLCanvasElement>(
-        'canvas[data-name="pane-canvas"]',
-    );
-
-    const paneIndex = getMainSeriesPaneIndex(chart);
-    if (paneIndex === null || paneIndex === undefined) {
-        return { iframeDoc, paneCanvas: null };
-    }
-
-    return {
-        iframeDoc,
-        paneCanvas: paneCanvases[paneIndex] ?? null,
-    };
 }
 
 export function getPriceAxisContainer(chart: IChartingLibraryWidget): {

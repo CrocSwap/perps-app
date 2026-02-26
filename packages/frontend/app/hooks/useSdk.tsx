@@ -316,8 +316,9 @@ export const SdkProvider: React.FC<{
                 setIsWsStashed(true);
             }, WS_SLEEP_MODE_STASH_CONNECTION);
         } else {
+            let reconnectCheckTimeout: NodeJS.Timeout | null = null;
             if (info) {
-                setTimeout(() => {
+                reconnectCheckTimeout = setTimeout(() => {
                     if (!info.multiSocketInfo) {
                         // [22-07-2025] was a mechanism for single socket mode
                         if (!info.wsManager?.isWsReady()) {
@@ -330,6 +331,12 @@ export const SdkProvider: React.FC<{
                 clearTimeout(stashTimeoutRef.current);
             }
             setIsWsStashed(false);
+
+            return () => {
+                if (reconnectCheckTimeout) {
+                    clearTimeout(reconnectCheckTimeout);
+                }
+            };
         }
 
         return () => {

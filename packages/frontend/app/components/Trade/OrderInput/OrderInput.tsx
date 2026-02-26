@@ -38,6 +38,7 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
+import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import {
     BTC_MAX_LEVERAGE,
     MIN_ORDER_VALUE,
@@ -76,6 +77,7 @@ import type {
 import { useTranslation } from 'react-i18next';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { useMobile } from '~/hooks/useMediaQuery';
+import { triggerPulseAnimation } from '~/utils/orderbook/OrderBookUtils';
 
 const useOnlyMarket = false;
 
@@ -194,6 +196,7 @@ function OrderInput({
         setMarginMode,
         setOrderInputPriceValue,
         orderInputPriceValue,
+        orderInputSizeValue,
         tradeDirection,
         setTradeDirection,
         setIsMidModeActive,
@@ -225,6 +228,10 @@ function OrderInput({
     const isUserLoggedIn = useMemo(() => {
         return isEstablished(sessionState);
     }, [sessionState]);
+
+    const isUnifiedMarginLoading = useUnifiedMarginStore(
+        (state) => state.isLoading,
+    );
 
     // Market order service hook
     const { executeMarketOrder, isLoading: isMarketOrderLoading } =
@@ -624,16 +631,22 @@ function OrderInput({
     }, [maxTradeSizeInUsd]);
 
     const displayNumAvailableToTrade = useMemo(() => {
+        if (isUnifiedMarginLoading || !marginBucket) return '-';
+
         return maxTradeSizeLessThanMinPositionSize
             ? formatNum(0, 2, false, true)
             : formatNum(usdAvailableToTrade, 2, false, true);
     }, [
+        isUnifiedMarginLoading,
+        marginBucket,
         usdAvailableToTrade,
         maxTradeSizeLessThanMinPositionSize,
         activeGroupSeparator,
     ]);
 
     const displayNumCurrentPosition = useMemo(() => {
+        if (isUnifiedMarginLoading || !marginBucket) return '-';
+
         return currentPositionLessThanMinPositionSize
             ? formatNum(0, 2)
             : formatNum(
@@ -646,7 +659,12 @@ function OrderInput({
                   10000,
                   true,
               );
-    }, [currentPositionNotionalSize, activeGroupSeparator]);
+    }, [
+        isUnifiedMarginLoading,
+        marginBucket,
+        currentPositionNotionalSize,
+        activeGroupSeparator,
+    ]);
 
     const isMarginInsufficientDebounced = useDebounceOnTrue(
         isMarginInsufficient,
@@ -948,22 +966,58 @@ function OrderInput({
                 }
             }
 
+            if (orderInputPriceValue.changeType === 'quickTradeMode') {
+                triggerPulseAnimation(
+                    'trade-module-price-input-container',
+                    'divPulseNeon',
+                    'pulsed-quick-trade',
+                );
+                triggerPulseAnimation(
+                    'trade-module-size-input-container',
+                    'divPulseNeon',
+                    'pulsed-quick-trade',
+                );
+                return;
+            }
+
             if (
                 isMidModeActiveRef.current ||
                 orderInputPriceValue.changeType !== 'dragEnd'
             )
                 return;
-            const orderElem = document.getElementById(
+            triggerPulseAnimation(
                 'trade-module-price-input-container',
+                'divPulseNeon',
+                'pulsed',
             );
-            if (orderElem?.classList.contains('pulsed')) return;
-            orderElem?.classList.add('divPulseNeon');
-            orderElem?.classList.add('pulsed');
-            setTimeout(() => {
-                orderElem?.classList.remove('divPulseNeon');
-            }, 800);
         }
     }, [orderInputPriceValue.value, usualResolution]);
+
+    useEffect(() => {
+        if (orderInputSizeValue.value > 0) {
+            let convertedValue = orderInputSizeValue.value;
+
+            // Convert if denominations don't match
+            if (orderInputSizeValue.denom !== selectedDenom && markPx) {
+                if (
+                    orderInputSizeValue.denom === 'usd' &&
+                    selectedDenom === 'symbol'
+                ) {
+                    // USD to Symbol: divide by markPx
+                    convertedValue = orderInputSizeValue.value / markPx;
+                } else if (
+                    orderInputSizeValue.denom === 'symbol' &&
+                    selectedDenom === 'usd'
+                ) {
+                    // Symbol to USD: multiply by markPx
+                    convertedValue = orderInputSizeValue.value * markPx;
+                }
+            }
+
+            setSizeDisplay(formatNumWithOnlyDecimals(convertedValue, 6, true));
+            setIsEditingSizeInput(false);
+        }
+    }, [orderInputSizeValue, selectedDenom, markPx]);
 
     // Set direction when price input value changes (already debounced via assignPrice)
     useEffect(() => {
@@ -2417,7 +2471,10 @@ function OrderInput({
                 tooltipLabel: t('transactions.currentPositionTooltip', {
                     symbol,
                 }),
-                value: `${displayNumCurrentPosition} ${symbol}`,
+                value:
+                    displayNumCurrentPosition === '-'
+                        ? '-'
+                        : `${displayNumCurrentPosition} ${symbol}`,
             },
         ],
         [
