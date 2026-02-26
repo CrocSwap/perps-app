@@ -262,10 +262,16 @@ function readPersistedReferralCode(): string | null {
             state?: { cached?: unknown };
         };
         const cached = parsed?.state?.cached;
-        if (typeof cached !== 'string') {
+        const referralCode =
+            typeof cached === 'string'
+                ? cached
+                : cached && typeof cached === 'object'
+                  ? (cached as { code?: unknown }).code
+                  : null;
+        if (typeof referralCode !== 'string') {
             return null;
         }
-        const trimmed = cached.trim();
+        const trimmed = referralCode.trim();
         return trimmed.length > 0 ? trimmed : null;
     } catch {
         return null;

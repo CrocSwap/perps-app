@@ -52,6 +52,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const isCachedReferralCodeApproved = useReferralStore(
         (state) => state.cached.isApproved === true,
     );
+    const cachedReferralApprovalNonce = useReferralStore(
+        (state) => state.cached.approvalNonce,
+    );
 
     const { resetUserData } = useTradeDataStore();
 
@@ -147,6 +150,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             userAddress,
             hasCachedReferralCode: Boolean(cachedReferralCode.code),
             isCachedReferralCodeApproved,
+            cachedReferralApprovalNonce,
             isSessionEstablished: isEstablished(sessionState),
         });
 
@@ -226,14 +230,21 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                     connectWallet.referralAttribution.sourceValue,
             });
 
-            if (lastConnectWalletKeyRef.current === connectWallet.fingerprint) {
+            const connectWalletSubmissionKey = `${connectWallet.fingerprint}:${cachedReferralApprovalNonce}`;
+
+            if (
+                lastConnectWalletKeyRef.current === connectWalletSubmissionKey
+            ) {
                 console.info(
-                    '[refreg] connect_wallet skipped: fingerprint already sent in this session',
-                    { fingerprint: connectWallet.fingerprint },
+                    '[refreg] connect_wallet skipped: fingerprint+approval nonce already sent in this session',
+                    {
+                        fingerprint: connectWallet.fingerprint,
+                        cachedReferralApprovalNonce,
+                    },
                 );
                 return;
             }
-            lastConnectWalletKeyRef.current = connectWallet.fingerprint;
+            lastConnectWalletKeyRef.current = connectWalletSubmissionKey;
 
             try {
                 const submitStartedAt = Date.now();
@@ -336,6 +347,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         userAddress,
         cachedReferralCode,
         isCachedReferralCodeApproved,
+        cachedReferralApprovalNonce,
     ]);
 
     return (
