@@ -7,18 +7,15 @@ import React, {
     createContext,
     useContext,
     useEffect,
-    useState,
     type Dispatch,
     type SetStateAction,
 } from 'react';
-import { useCallback } from 'react';
 import { useLocation } from 'react-router';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { initializePythPriceService } from '~/stores/PythPriceStore';
-import { debugWallets } from '~/utils/Constants';
 
 interface AppContextType {
     isUserConnected: boolean;
@@ -37,8 +34,6 @@ export interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-    const [isUserConnected, setIsUserConnected] = useState(false);
-
     const {
         isDebugWalletActive,
         debugWallet,
@@ -136,6 +131,70 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // Initialize Pyth price service on mount
     useEffect(() => {
         initializePythPriceService();
+    }, []);
+
+    // Workaround for Nightly wallet bug: after a soft refresh (Cmd-R), the session
+    // may be restored with a cached wallet address that differs from the currently
+    // selected address in the wallet extension. This effect detects the mismatch
+    // by checking the wallet's connection state and triggers session end if needed.
+    const sessionStateRef = React.useRef(sessionState);
+    useEffect(() => {
+        sessionStateRef.current = sessionState;
+    }, [sessionState]);
+
+    useEffect(() => {
+        const checkSessionHealth = () => {
+            const currentSessionState = sessionStateRef.current;
+            if (!isEstablished(currentSessionState)) {
+                return;
+            }
+
+            const sessionAddress =
+                currentSessionState.walletPublicKey.toString();
+            const wallet = currentSessionState.solanaWallet;
+
+            try {
+                const isWalletConnected = wallet?.connected;
+                const walletPublicKey = wallet?.publicKey?.toBase58?.();
+
+                // Only treat it as an error if the underlying wallet is actually
+                // disconnected / has no active public key while the session claims
+                // to be established (the "stuck" state after Cmd-R).
+                if (isWalletConnected === false || !walletPublicKey) {
+                    console.warn(
+                        '[AppContext] Session established but wallet is disconnected or missing publicKey. Ending session.',
+                        {
+                            sessionAddress,
+                            isWalletConnected,
+                            walletPublicKey,
+                        },
+                    );
+                    currentSessionState.endSession();
+                }
+            } catch {
+                // Best-effort only
+            }
+        };
+
+        const timeoutId = setTimeout(checkSessionHealth, 500);
+        const intervalId = setInterval(checkSessionHealth, 1000);
+
+        const handleVisibilityOrFocus = () => {
+            checkSessionHealth();
+        };
+
+        window.addEventListener('focus', handleVisibilityOrFocus);
+        document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+
+        return () => {
+            clearTimeout(timeoutId);
+            clearInterval(intervalId);
+            window.removeEventListener('focus', handleVisibilityOrFocus);
+            document.removeEventListener(
+                'visibilitychange',
+                handleVisibilityOrFocus,
+            );
+        };
     }, []);
 
     return (
