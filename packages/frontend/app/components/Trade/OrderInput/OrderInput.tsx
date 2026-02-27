@@ -197,6 +197,7 @@ function OrderInput({
         setOrderInputPriceValue,
         orderInputPriceValue,
         orderInputSizeValue,
+        setOrderInputSizeValue,
         tradeDirection,
         setTradeDirection,
         setIsMidModeActive,
@@ -1016,8 +1017,12 @@ function OrderInput({
 
             setSizeDisplay(formatNumWithOnlyDecimals(convertedValue, 6, true));
             setIsEditingSizeInput(false);
+            setOrderInputSizeValue({
+                value: 0,
+                denom: orderInputSizeValue.denom,
+            });
         }
-    }, [orderInputSizeValue, selectedDenom, markPx]);
+    }, [orderInputSizeValue, selectedDenom, markPx, setOrderInputSizeValue]);
 
     // Set direction when price input value changes (already debounced via assignPrice)
     useEffect(() => {
