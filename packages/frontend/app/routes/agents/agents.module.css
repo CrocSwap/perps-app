@@ -369,7 +369,7 @@
     /* Agent card */
     .table_body > li {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr auto;
         gap: 0;
         padding: 14px;
         background-color: var(--bg-dark3);

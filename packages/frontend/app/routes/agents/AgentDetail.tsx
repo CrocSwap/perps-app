@@ -12,15 +12,15 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TransferModal from '~/components/TransferModal/TransferModal';
 import AgentDetailChart from './AgentDetailChart';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const AGENTS_BASE_PATH = '/v2/agents';
 
-const mockOrderRows = Array.from({ length: 4 }, () => ({
+const mockOrderRows = Array.from({ length: 20 }, (_, i) => ({
     time: '2025/02/24 - 16:51:12',
-    type: 'Limit',
-    coin: 'ETH',
-    direction: 'Long',
+    type: i % 3 === 0 ? 'Market' : 'Limit',
+    coin: ['ETH', 'BTC', 'SOL'][i % 3],
+    direction: i % 2 === 0 ? 'Long' : 'Short',
     size: '0.0001',
     filledSize: '0.0001',
     orderValue: '$10.49',
@@ -28,8 +28,8 @@ const mockOrderRows = Array.from({ length: 4 }, () => ({
     reduceOnly: 'No',
     triggerConditions: 'N/A',
     tpSl: '-- / --',
-    status: 'Open',
-    orderId: '1234567890',
+    status: i % 4 === 0 ? 'Filled' : 'Open',
+    orderId: `123456789${i}`,
 }));
 
 export default function AgentDetail() {
@@ -59,6 +59,45 @@ export default function AgentDetail() {
     const [detailTab, setDetailTab] = useState<
         'parameters' | 'performance' | 'chart'
     >('parameters');
+
+    // infinite scroll for order history
+    const ROWS_PER_PAGE = 8;
+    const [visibleCount, setVisibleCount] = useState(ROWS_PER_PAGE);
+    const [isAtBottom, setIsAtBottom] = useState(false);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+    const tableRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    setVisibleCount((prev) =>
+                        Math.min(prev + ROWS_PER_PAGE, mockOrderRows.length),
+                    );
+                }
+            },
+            { root: tableRef.current, threshold: 0.1 },
+        );
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, []);
+
+    // re-check scroll position whenever rows are added
+    useEffect(() => {
+        const el = tableRef.current;
+        if (el) {
+            setIsAtBottom(
+                el.scrollHeight - el.scrollTop - el.clientHeight < 20,
+            );
+        }
+    }, [visibleCount]);
+
+    const handleTableScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const el = e.currentTarget;
+        setIsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 20);
+    };
 
     const statusLabel = strategy?.isPaused
         ? t('agents.overview.paused')
@@ -336,48 +375,58 @@ export default function AgentDetail() {
                             {t('agents.details.filter')} <LuFilter size={14} />
                         </button>
                     </div>
-                    <div className={styles.history_table}>
-                        <div className={styles.history_row_header}>
-                            <span>{t('tradeTable.time')}</span>
-                            <span>{t('tradeTable.type')}</span>
-                            <span>{t('tradeTable.coin')}</span>
-                            <span>{t('tradeTable.direction')}</span>
-                            <span>{t('tradeTable.size')}</span>
-                            <span>{t('tradeTable.filledSize')}</span>
-                            <span>{t('tradeTable.orderValue')}</span>
-                            <span>{t('tradeTable.price')}</span>
-                            <span>{t('tradeTable.reduceOnly')}</span>
-                            <span>{t('tradeTable.triggerConditions')}</span>
-                            <span>{t('tradeTable.tpsl')}</span>
-                            <span>{t('tradeTable.status')}</span>
-                            <span>{t('tradeTable.orderId')}</span>
-                        </div>
-                        {mockOrderRows.map((row) => (
-                            <div
-                                key={`${row.time}-${row.orderId}`}
-                                className={styles.history_row}
-                            >
-                                <span>{row.time}</span>
-                                <span>{row.type}</span>
-                                <span>{row.coin}</span>
-                                <span className={styles.long_value}>
-                                    {row.direction}
-                                </span>
-                                <span>{row.size}</span>
-                                <span>{row.filledSize}</span>
-                                <span>{row.orderValue}</span>
-                                <span>{row.price}</span>
-                                <span>{row.reduceOnly}</span>
-                                <span>{row.triggerConditions}</span>
-                                <span>{row.tpSl}</span>
-                                <span>{row.status}</span>
-                                <span>{row.orderId}</span>
+                    <div className={styles.history_table_wrap}>
+                        <div
+                            className={styles.history_table}
+                            ref={tableRef}
+                            onScroll={handleTableScroll}
+                        >
+                            <div className={styles.history_row_header}>
+                                <span>{t('tradeTable.time')}</span>
+                                <span>{t('tradeTable.type')}</span>
+                                <span>{t('tradeTable.coin')}</span>
+                                <span>{t('tradeTable.direction')}</span>
+                                <span>{t('tradeTable.size')}</span>
+                                <span>{t('tradeTable.filledSize')}</span>
+                                <span>{t('tradeTable.orderValue')}</span>
+                                <span>{t('tradeTable.price')}</span>
+                                <span>{t('tradeTable.reduceOnly')}</span>
+                                <span>{t('tradeTable.triggerConditions')}</span>
+                                <span>{t('tradeTable.tpsl')}</span>
+                                <span>{t('tradeTable.status')}</span>
+                                <span>{t('tradeTable.orderId')}</span>
                             </div>
-                        ))}
+                            {mockOrderRows.slice(0, visibleCount).map((row) => (
+                                <div
+                                    key={`${row.time}-${row.orderId}`}
+                                    className={styles.history_row}
+                                >
+                                    <span>{row.time}</span>
+                                    <span>{row.type}</span>
+                                    <span>{row.coin}</span>
+                                    <span className={styles.long_value}>
+                                        {row.direction}
+                                    </span>
+                                    <span>{row.size}</span>
+                                    <span>{row.filledSize}</span>
+                                    <span>{row.orderValue}</span>
+                                    <span>{row.price}</span>
+                                    <span>{row.reduceOnly}</span>
+                                    <span>{row.triggerConditions}</span>
+                                    <span>{row.tpSl}</span>
+                                    <span>{row.status}</span>
+                                    <span>{row.orderId}</span>
+                                </div>
+                            ))}
+                            {visibleCount < mockOrderRows.length && (
+                                <div
+                                    ref={sentinelRef}
+                                    className={styles.scroll_sentinel}
+                                />
+                            )}
+                        </div>
+                        {!isAtBottom && <div className={styles.history_fade} />}
                     </div>
-                    <button type='button' className={styles.view_all}>
-                        {t('agents.details.viewAll')}
-                    </button>
                 </div>
                 {removeStratModalCtrl.isOpen && (
                     <Modal

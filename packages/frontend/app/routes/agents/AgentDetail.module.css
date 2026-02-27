@@ -199,25 +199,47 @@
     font-size: var(--font-size-s);
 }
 
-.filter_button,
-.view_all {
+.filter_button {
     border: none;
     outline: none;
     background: transparent;
     color: var(--text1);
     cursor: pointer;
     font-size: var(--font-size-s);
-}
-
-.filter_button {
     display: inline-flex;
     align-items: center;
     gap: 4px;
 }
 
+.scroll_sentinel {
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.history_table_wrap {
+    position: relative;
+    overflow: hidden;
+}
+
 .history_table {
+    max-height: 350px;
+    overflow-y: auto;
     overflow-x: auto;
     padding: 6px 8px;
+}
+
+.history_fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        color-mix(in srgb, var(--bg-dark2) 96%, black)
+    );
+    pointer-events: none;
 }
 
 .history_row_header,
@@ -243,12 +265,6 @@
 
 .long_value {
     color: #20d6b0;
-}
-
-.view_all {
-    align-self: flex-start;
-    margin: 4px 10px 0;
-    color: var(--accent1);
 }
 
 .remove_strategy_modal {
@@ -422,13 +438,13 @@
     }
 
     .history_tab,
-    .filter_button,
-    .view_all {
+    .filter_button {
         font-size: 12px;
     }
 
     .history_table {
         padding: 6px;
+        max-height: 350px;
     }
 
     .remove_strategy_modal {
@@ -513,8 +529,7 @@
         font-weight: 500;
         padding: 3px 10px 3px 8px;
         border-radius: 999px;
-        margin-left: auto;
-        flex-shrink: 0;
+        flex: 0 0 auto;
         white-space: nowrap;
     }
 
@@ -572,9 +587,16 @@
     }
 
     /* Title row on mobile: name + status badge on same line */
+    /* Anchor the width chain so flex: 1 on h2 has a real container to work with */
+    .header_left {
+        width: 100%;
+        min-width: 0;
+    }
+
     .back_and_title {
         align-items: center;
         width: 100%;
+        min-width: 0;
     }
 
     .back_and_title > h2 {
@@ -618,7 +640,9 @@
     }
 
     .history_table {
+        max-height: 300px;
         overflow-x: hidden;
+        overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 8px;
