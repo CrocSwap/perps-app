@@ -110,10 +110,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text1);
+    color: var(--text2);
 }
 
 .label {
     font-size: 12px;
+    color: var(--text2);
+}
+
+.active .icon {
+    color: var(--text1);
+}
+
+.active .label {
     color: var(--text1);
 }
