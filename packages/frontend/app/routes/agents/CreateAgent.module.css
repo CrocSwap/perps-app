@@ -108,45 +108,104 @@
     }
 
     .create_strategy_buttons {
-        flex-direction: column;
-        align-items: stretch;
-        gap: var(--gap-s);
+        flex-direction: row;
+        align-items: center;
     }
 
     .buttons_right {
-        width: 100%;
         justify-content: flex-end;
     }
 }
 
 @media (max-width: 768px) {
     .create_strategy_page {
-        padding: 12px;
+        padding: 0 0 calc(96px + env(safe-area-inset-bottom));
         justify-content: flex-start;
-        padding-bottom: calc(104px + env(safe-area-inset-bottom));
+        align-items: stretch;
+        overflow-y: auto;
+    }
+
+    .create_strategy {
+        align-items: stretch;
+        gap: 0;
+        max-width: none;
+    }
+
+    .create_strategy > header {
+        position: sticky;
+        top: 0;
+        background: var(--bg-dark1, #09090f);
+        z-index: 10;
+        padding: 14px 4px 12px;
+        width: 100%;
+        border-bottom: 1px solid
+            color-mix(in srgb, var(--bg-dark4) 55%, transparent);
     }
 
     .heading_row {
-        gap: var(--gap-s);
+        gap: 10px;
     }
 
     .heading_row > h2 {
-        font-size: 26px;
+        font-size: 22px;
     }
 
+    /* Main form card */
     .create_strategy > div {
-        padding: 14px;
-        gap: 12px;
+        padding: 0;
+        gap: 0;
+        border-radius: 0;
+        border: none;
+        background: transparent;
     }
 
-    .buttons_right {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+    .create_strategy_inputs {
+        padding: 12px 4px;
+        gap: 0;
+    }
+
+    /* Button footer bar - in normal flow at the bottom */
+    .create_strategy_buttons {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 4px;
+        background: color-mix(
+            in srgb,
+            var(--bg-dark2, #0e0e14) 96%,
+            transparent
+        );
+        border-top: 1px solid
+            color-mix(in srgb, var(--bg-dark4) 60%, transparent);
         gap: 8px;
     }
 
+    .create_strategy_buttons > button:first-child {
+        /* Reset button - secondary */
+        min-width: 70px;
+        flex-shrink: 0;
+        padding: 10px 14px;
+        font-size: 13px;
+        opacity: 0.8;
+    }
+
+    .buttons_right {
+        flex: 1;
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
     .buttons_right > button {
-        width: 100%;
+        flex: 1;
+        max-width: 160px;
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .heading_row > h2 {
+        font-size: 20px;
     }
 }

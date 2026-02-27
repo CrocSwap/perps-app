@@ -7,6 +7,24 @@
     --transfer-modal-input-height: 32px;
 }
 
+/* From + To: side-by-side only on large phones / small tablets */
+.from_to_row {
+    display: contents;
+}
+
+@media (min-width: 480px) and (max-width: 768px) {
+    .from_to_row {
+        display: flex;
+        flex-direction: row;
+        gap: var(--gap-s);
+    }
+
+    .from_to_row > * {
+        flex: 1;
+        width: 100%;
+    }
+}
+
 .asset_qty_input_wrapper {
     display: flex;
     flex-direction: row;

@@ -102,7 +102,6 @@
         "closePosition": "平仓",
         "closeAtCurrentPrice": "按当前价格平仓",
         "closeAtAPriceYouSet": "按你设定的价格平仓",
-
         "price": "价格",
         "size": "数量",
         "time": "时间",
@@ -305,7 +304,8 @@
             "hours": "小时",
             "orderHistory": "订单历史",
             "filter": "筛选",
-            "viewAll": "查看全部"
+            "viewAll": "查看全部",
+            "chart": "图表"
         },
         "transfer": {
             "agentTitle": "转移代理",
@@ -663,7 +663,6 @@
         "copyLinkCTA": "复制链接",
         "textPlaceholder": "立即在{{fogo}} Testnet通过{{twitter}}交易{{coin}}合约",
         "sharePosition": "分享PnL {{pnl}}的持仓",
-
         "pnl": "PnL",
         "details": "详情",
         "copyImageCTA": "复制图片",

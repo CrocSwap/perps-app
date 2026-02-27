@@ -1,4 +1,4 @@
-import { LuChevronLeft, LuCopy, LuFilter, LuX, LuCheck } from 'react-icons/lu';
+import { LuChevronLeft, LuCopy, LuFilter, LuCheck } from 'react-icons/lu';
 import styles from './AgentDetail.module.css';
 import { useNavigate, useParams } from 'react-router';
 import {
@@ -12,15 +12,15 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TransferModal from '~/components/TransferModal/TransferModal';
 import AgentDetailChart from './AgentDetailChart';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const AGENTS_BASE_PATH = '/v2/agents';
 
-const mockOrderRows = Array.from({ length: 4 }, () => ({
+const mockOrderRows = Array.from({ length: 20 }, (_, i) => ({
     time: '2025/02/24 - 16:51:12',
-    type: 'Limit',
-    coin: 'ETH',
-    direction: 'Long',
+    type: i % 3 === 0 ? 'Market' : 'Limit',
+    coin: ['ETH', 'BTC', 'SOL'][i % 3],
+    direction: i % 2 === 0 ? 'Long' : 'Short',
     size: '0.0001',
     filledSize: '0.0001',
     orderValue: '$10.49',
@@ -28,8 +28,8 @@ const mockOrderRows = Array.from({ length: 4 }, () => ({
     reduceOnly: 'No',
     triggerConditions: 'N/A',
     tpSl: '-- / --',
-    status: 'Open',
-    orderId: '1234567890',
+    status: i % 4 === 0 ? 'Filled' : 'Open',
+    orderId: `123456789${i}`,
 }));
 
 export default function AgentDetail() {
@@ -54,6 +54,50 @@ export default function AgentDetail() {
 
     // state for copy feedback
     const [copied, setCopied] = useState(false);
+
+    // mobile tab state for the detail panels
+    const [detailTab, setDetailTab] = useState<
+        'parameters' | 'performance' | 'chart'
+    >('parameters');
+
+    // infinite scroll for order history
+    const ROWS_PER_PAGE = 8;
+    const [visibleCount, setVisibleCount] = useState(ROWS_PER_PAGE);
+    const [isAtBottom, setIsAtBottom] = useState(false);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+    const tableRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    setVisibleCount((prev) =>
+                        Math.min(prev + ROWS_PER_PAGE, mockOrderRows.length),
+                    );
+                }
+            },
+            { root: tableRef.current, threshold: 0.1 },
+        );
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, []);
+
+    // re-check scroll position whenever rows are added
+    useEffect(() => {
+        const el = tableRef.current;
+        if (el) {
+            setIsAtBottom(
+                el.scrollHeight - el.scrollTop - el.clientHeight < 20,
+            );
+        }
+    }, [visibleCount]);
+
+    const handleTableScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const el = e.currentTarget;
+        setIsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 20);
+    };
 
     const statusLabel = strategy?.isPaused
         ? t('agents.overview.paused')
@@ -81,7 +125,7 @@ export default function AgentDetail() {
                             <button
                                 type='button'
                                 className={styles.back_button}
-                                onClick={() => navigate(AGENTS_BASE_PATH)}
+                                onClick={() => navigate(-1)}
                             >
                                 <LuChevronLeft />
                             </button>
@@ -89,6 +133,14 @@ export default function AgentDetail() {
                                 {strategy?.name ??
                                     t('agents.details.noAgentFound')}
                             </h2>
+                            <div
+                                className={styles.status_badge}
+                                data-paused={String(
+                                    strategy?.isPaused ?? false,
+                                )}
+                            >
+                                {statusLabel}
+                            </div>
                         </div>
                         <div className={styles.address_row}>
                             <button
@@ -161,9 +213,85 @@ export default function AgentDetail() {
                             {t('agents.overview.remove')}
                         </SimpleButton>
                     </div>
+                    {/* Mobile-only horizontal action strip */}
+                    <div className={styles.mobile_actions}>
+                        <SimpleButton
+                            onClick={() =>
+                                strategy &&
+                                strategies.togglePause(strategy.address)
+                            }
+                            bg='dark3'
+                            hoverBg='dark4'
+                            className={styles.mobile_action_btn}
+                        >
+                            {strategy?.isPaused
+                                ? t('agents.overview.unpause')
+                                : t('agents.overview.pause')}
+                        </SimpleButton>
+                        <SimpleButton
+                            onClick={() =>
+                                navigate(
+                                    `${AGENTS_BASE_PATH}/${agent_hash}/edit`,
+                                    {
+                                        state: {
+                                            agent: strategy,
+                                            address: agent_hash,
+                                        },
+                                    },
+                                )
+                            }
+                            bg='dark3'
+                            hoverBg='dark4'
+                            className={styles.mobile_action_btn}
+                        >
+                            {t('common.edit')}
+                        </SimpleButton>
+                        <SimpleButton
+                            onClick={() => transferModalCtrl.open()}
+                            bg='dark3'
+                            hoverBg='dark4'
+                            className={styles.mobile_action_btn}
+                        >
+                            {t('common.transfer')}
+                        </SimpleButton>
+                        <SimpleButton
+                            onClick={() => removeStratModalCtrl.open()}
+                            bg='dark3'
+                            hoverBg='dark4'
+                            className={`${styles.mobile_action_btn} ${styles.mobile_action_danger}`}
+                        >
+                            {t('agents.overview.remove')}
+                        </SimpleButton>
+                    </div>
                 </header>
+                {/* Mobile-only tab bar */}
+                <div className={styles.detail_tabs}>
+                    <button
+                        type='button'
+                        className={`${styles.detail_tab_btn} ${detailTab === 'parameters' ? styles.detail_tab_active : ''}`}
+                        onClick={() => setDetailTab('parameters')}
+                    >
+                        {t('agents.details.parameters')}
+                    </button>
+                    <button
+                        type='button'
+                        className={`${styles.detail_tab_btn} ${detailTab === 'performance' ? styles.detail_tab_active : ''}`}
+                        onClick={() => setDetailTab('performance')}
+                    >
+                        {t('agents.details.performance')}
+                    </button>
+                    <button
+                        type='button'
+                        className={`${styles.detail_tab_btn} ${detailTab === 'chart' ? styles.detail_tab_active : ''}`}
+                        onClick={() => setDetailTab('chart')}
+                    >
+                        {t('agents.details.chart')}
+                    </button>
+                </div>
                 <div className={styles.strategy_details}>
-                    <div className={styles.detail_table}>
+                    <div
+                        className={`${styles.detail_table} ${detailTab !== 'parameters' ? styles.detail_panel_hidden : ''}`}
+                    >
                         <header className={styles.detail_header}>
                             <span>{t('agents.details.parameters')}</span>
                         </header>
@@ -196,7 +324,9 @@ export default function AgentDetail() {
                             </div>
                         </section>
                     </div>
-                    <div className={styles.detail_table}>
+                    <div
+                        className={`${styles.detail_table} ${detailTab !== 'performance' ? styles.detail_panel_hidden : ''}`}
+                    >
                         <header className={styles.detail_header}>
                             <span>{t('agents.details.performance')}</span>
                         </header>
@@ -230,7 +360,9 @@ export default function AgentDetail() {
                             </div>
                         </section>
                     </div>
-                    <div className={styles.strategy_details_graph}>
+                    <div
+                        className={`${styles.strategy_details_graph} ${detailTab !== 'chart' ? styles.detail_panel_hidden : ''}`}
+                    >
                         <AgentDetailChart />
                     </div>
                 </div>
@@ -243,64 +375,65 @@ export default function AgentDetail() {
                             {t('agents.details.filter')} <LuFilter size={14} />
                         </button>
                     </div>
-                    <div className={styles.history_table}>
-                        <div className={styles.history_row_header}>
-                            <span>{t('tradeTable.time')}</span>
-                            <span>{t('tradeTable.type')}</span>
-                            <span>{t('tradeTable.coin')}</span>
-                            <span>{t('tradeTable.direction')}</span>
-                            <span>{t('tradeTable.size')}</span>
-                            <span>{t('tradeTable.filledSize')}</span>
-                            <span>{t('tradeTable.orderValue')}</span>
-                            <span>{t('tradeTable.price')}</span>
-                            <span>{t('tradeTable.reduceOnly')}</span>
-                            <span>{t('tradeTable.triggerConditions')}</span>
-                            <span>{t('tradeTable.tpsl')}</span>
-                            <span>{t('tradeTable.status')}</span>
-                            <span>{t('tradeTable.orderId')}</span>
-                        </div>
-                        {mockOrderRows.map((row) => (
-                            <div
-                                key={`${row.time}-${row.orderId}`}
-                                className={styles.history_row}
-                            >
-                                <span>{row.time}</span>
-                                <span>{row.type}</span>
-                                <span>{row.coin}</span>
-                                <span className={styles.long_value}>
-                                    {row.direction}
-                                </span>
-                                <span>{row.size}</span>
-                                <span>{row.filledSize}</span>
-                                <span>{row.orderValue}</span>
-                                <span>{row.price}</span>
-                                <span>{row.reduceOnly}</span>
-                                <span>{row.triggerConditions}</span>
-                                <span>{row.tpSl}</span>
-                                <span>{row.status}</span>
-                                <span>{row.orderId}</span>
+                    <div className={styles.history_table_wrap}>
+                        <div
+                            className={styles.history_table}
+                            ref={tableRef}
+                            onScroll={handleTableScroll}
+                        >
+                            <div className={styles.history_row_header}>
+                                <span>{t('tradeTable.time')}</span>
+                                <span>{t('tradeTable.type')}</span>
+                                <span>{t('tradeTable.coin')}</span>
+                                <span>{t('tradeTable.direction')}</span>
+                                <span>{t('tradeTable.size')}</span>
+                                <span>{t('tradeTable.filledSize')}</span>
+                                <span>{t('tradeTable.orderValue')}</span>
+                                <span>{t('tradeTable.price')}</span>
+                                <span>{t('tradeTable.reduceOnly')}</span>
+                                <span>{t('tradeTable.triggerConditions')}</span>
+                                <span>{t('tradeTable.tpsl')}</span>
+                                <span>{t('tradeTable.status')}</span>
+                                <span>{t('tradeTable.orderId')}</span>
                             </div>
-                        ))}
+                            {mockOrderRows.slice(0, visibleCount).map((row) => (
+                                <div
+                                    key={`${row.time}-${row.orderId}`}
+                                    className={styles.history_row}
+                                >
+                                    <span>{row.time}</span>
+                                    <span>{row.type}</span>
+                                    <span>{row.coin}</span>
+                                    <span className={styles.long_value}>
+                                        {row.direction}
+                                    </span>
+                                    <span>{row.size}</span>
+                                    <span>{row.filledSize}</span>
+                                    <span>{row.orderValue}</span>
+                                    <span>{row.price}</span>
+                                    <span>{row.reduceOnly}</span>
+                                    <span>{row.triggerConditions}</span>
+                                    <span>{row.tpSl}</span>
+                                    <span>{row.status}</span>
+                                    <span>{row.orderId}</span>
+                                </div>
+                            ))}
+                            {visibleCount < mockOrderRows.length && (
+                                <div
+                                    ref={sentinelRef}
+                                    className={styles.scroll_sentinel}
+                                />
+                            )}
+                        </div>
+                        {!isAtBottom && <div className={styles.history_fade} />}
                     </div>
-                    <button type='button' className={styles.view_all}>
-                        {t('agents.details.viewAll')}
-                    </button>
                 </div>
                 {removeStratModalCtrl.isOpen && (
                     <Modal
                         title={t('agents.overview.removeTitle')}
                         close={removeStratModalCtrl.close}
-                        noHeader
                     >
                         <section className={styles.remove_strategy_modal}>
-                            <button
-                                type='button'
-                                className={styles.modal_close}
-                                onClick={removeStratModalCtrl.close}
-                            >
-                                <LuX size={18} />
-                            </button>
-                            <h3>{t('agents.overview.removeTitle')}</h3>
                             <div className={styles.remove_agent_info}>
                                 <div className={styles.remove_agent_row}>
                                     <span className={styles.remove_agent_label}>

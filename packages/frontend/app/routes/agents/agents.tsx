@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { LuX } from 'react-icons/lu';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import SortIcon from '~/components/Vault/SortIcon';
@@ -234,14 +233,30 @@ export default function Agents() {
                                 }
                             >
                                 <div>{strat.name}</div>
-                                <div>
+                                <div
+                                    data-status={
+                                        strat.isPaused ? 'paused' : 'running'
+                                    }
+                                    className={styles.status_cell}
+                                >
                                     {strat.isPaused
                                         ? t('agents.overview.paused')
                                         : t('agents.overview.running')}
                                 </div>
-                                <div>{strat.collateral}</div>
-                                <div>{strat.volume}</div>
-                                <div className={styles.pnl_cell}>
+                                <div
+                                    data-mobile-label={t(
+                                        'portfolio.collateral',
+                                    )}
+                                >
+                                    {strat.collateral}
+                                </div>
+                                <div data-mobile-label={t('portfolio.volume')}>
+                                    {strat.volume}
+                                </div>
+                                <div
+                                    className={styles.pnl_cell}
+                                    data-mobile-label='PnL'
+                                >
                                     {strat.pnl} <span>(+12.0%)</span>
                                 </div>
                                 <div className={styles.actions_cell}>
@@ -306,17 +321,8 @@ export default function Agents() {
                 <Modal
                     title={t('agents.overview.removeTitle')}
                     close={() => setAgentToRemove(null)}
-                    noHeader
                 >
                     <section className={styles.remove_strategy_modal}>
-                        <button
-                            type='button'
-                            className={styles.modal_close}
-                            onClick={() => setAgentToRemove(null)}
-                        >
-                            <LuX size={18} />
-                        </button>
-                        <h3>{t('agents.overview.removeTitle')}</h3>
                         <div className={styles.remove_agent_info}>
                             <div className={styles.remove_agent_row}>
                                 <span className={styles.remove_agent_label}>
