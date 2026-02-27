@@ -698,14 +698,56 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [referrerCode]);
 
+    const claimsData = referralStore.claims;
+    console.log('🎁 [CodeTabs] claimsData from store:', claimsData);
+    const claimableAmount = useMemo(() => {
+        console.log(
+            '🎁 [CodeTabs] calculating claimableAmount, claimsData:',
+            claimsData,
+        );
+        if (!claimsData || claimsData.length === 0) return '$0.00';
+        // Sum all claim amounts (amounts are in smallest unit, e.g., lamports or token decimals)
+        const totalAmount = claimsData.reduce((sum, claim) => {
+            console.log('🎁 [CodeTabs] claim amount:', claim.amount);
+            return sum + BigInt(claim.amount);
+        }, BigInt(0));
+        console.log('🎁 [CodeTabs] totalAmount (raw):', totalAmount.toString());
+        // Convert to human-readable format (assuming 6 decimals for USDC-like tokens)
+        const decimals = 6;
+        const divisor = BigInt(10 ** decimals);
+        const wholePart = totalAmount / divisor;
+        const fractionalPart = totalAmount % divisor;
+        const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
+        // Show full precision, then trim trailing zeros but keep at least 2 decimal places
+        const trimmed = fractionalStr.replace(/0+$/, '') || '00';
+        const displayDecimals = trimmed.length < 2 ? '00' : trimmed;
+        const formatted = `${wholePart}.${displayDecimals}`;
+        // If amount is less than 0.01, show raw smallest units instead
+        if (wholePart === BigInt(0) && totalAmount > BigInt(0)) {
+            return `${totalAmount.toString()} units`;
+        }
+        return `$${formatted}`;
+    }, [claimsData]);
+
+    const handleClaimClick = () => {
+        console.log('🎁 [Claim] Button clicked');
+        console.log('🎁 [Claim] User address:', referrerAddress);
+        console.log('🎁 [Claim] Claims data:', claimsData);
+        console.log('🎁 [Claim] Claimable amount:', claimableAmount);
+    };
+
     const claimElem = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
             <div className={styles.claimContent}>
                 <p>
-                    {t('referrals.claimRewardsWithAmount', { amount: '$0.00' })}
+                    {t('referrals.claimRewardsWithAmount', {
+                        amount: claimableAmount,
+                    })}
                 </p>
             </div>
-            <SimpleButton bg='accent1'>{t('common.claim')}</SimpleButton>
+            <SimpleButton bg='accent1' onClick={handleClaimClick}>
+                {t('common.claim')}
+            </SimpleButton>
         </section>
     ) : (
         <section className={styles.sectionWithButton}>
