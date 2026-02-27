@@ -8,6 +8,10 @@
     user-select: none;
 }
 
+.dropdown {
+    position: relative;
+}
+
 .dropdown > button {
     display: flex;
     flex-direction: row;
@@ -57,22 +61,15 @@
     text-align: justify;
 }
 
-@media (min-width: 480px) and (max-width: 768px) {
+@media (max-width: 768px) {
     .transfer_dropdown {
         width: 100%;
     }
 
     .dropdown > ul {
+        position: static;
         width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .transfer_dropdown {
-        width: 100%;
-    }
-
-    .dropdown > ul {
-        width: 100%;
+        margin-top: 4px;
+        border-radius: 10px;
     }
 }

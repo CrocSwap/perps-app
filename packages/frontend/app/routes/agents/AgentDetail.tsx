@@ -125,7 +125,7 @@ export default function AgentDetail() {
                             <button
                                 type='button'
                                 className={styles.back_button}
-                                onClick={() => navigate(AGENTS_BASE_PATH)}
+                                onClick={() => navigate(-1)}
                             >
                                 <LuChevronLeft />
                             </button>

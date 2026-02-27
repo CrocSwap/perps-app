@@ -256,17 +256,7 @@ export default function CreateAgent(props: propsT) {
                     <div className={styles.heading_row}>
                         <button
                             type='button'
-                            onClick={() => {
-                                // base URL destination for backnav
-                                let destination = AGENTS_BASE_PATH;
-                                // if user is on edit page, add address param to URL
-                                if (params.agent_hash) {
-                                    destination += `/${params.agent_hash}`;
-                                }
-                                // navigate user to the correct destination
-                                // note that this is a forward nav action
-                                navigate(destination);
-                            }}
+                            onClick={() => navigate(-1)}
                             className={styles.back_button}
                         >
                             <LuChevronLeft />

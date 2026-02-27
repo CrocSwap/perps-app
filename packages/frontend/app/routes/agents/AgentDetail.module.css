@@ -2,13 +2,11 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: auto;
-    min-height: 100%;
+    height: 100%;
     padding: var(--padding-xl) var(--padding-xxl);
     justify-content: flex-start;
     user-select: none;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .strategy_shell {
@@ -16,6 +14,8 @@
     flex-direction: column;
     gap: 10px;
     width: 100%;
+    height: 100%;
+    min-height: 0;
 }
 
 .section_label {
@@ -64,7 +64,7 @@
     font-size: clamp(30px, 2.8vw, 40px);
     font-weight: 300;
     color: var(--text1);
-    line-height: 1;
+    line-height: 1.3;
 }
 
 .address_row {
@@ -180,6 +180,8 @@
 .order_history_card {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
     padding-bottom: 10px;
     overflow: hidden;
 }
@@ -218,11 +220,16 @@
 
 .history_table_wrap {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     overflow: hidden;
 }
 
 .history_table {
-    max-height: 350px;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: auto;
     padding: 6px 8px;
@@ -444,7 +451,6 @@
 
     .history_table {
         padding: 6px;
-        max-height: 350px;
     }
 
     .remove_strategy_modal {
@@ -601,6 +607,7 @@
 
     .back_and_title > h2 {
         font-size: 22px;
+        line-height: 1.3;
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -640,7 +647,8 @@
     }
 
     .history_table {
-        max-height: 300px;
+        flex: 1;
+        min-height: 0;
         overflow-x: hidden;
         overflow-y: auto;
         display: flex;
