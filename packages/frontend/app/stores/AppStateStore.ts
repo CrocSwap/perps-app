@@ -22,6 +22,8 @@ type AppStateStore = {
     setIsTabActive: (isTabActive: boolean) => void;
     chartRefreshing: boolean;
     setChartRefreshing: (chartRefreshing: boolean) => void;
+    isSessionReestablishing: boolean;
+    setIsSessionReestablishing: (isSessionReestablishing: boolean) => void;
 };
 
 export const useAppStateStore = create<AppStateStore>()(
@@ -59,6 +61,9 @@ export const useAppStateStore = create<AppStateStore>()(
             chartRefreshing: false,
             setChartRefreshing: (chartRefreshing: boolean) =>
                 set({ chartRefreshing }),
+            isSessionReestablishing: true,
+            setIsSessionReestablishing: (isSessionReestablishing: boolean) =>
+                set({ isSessionReestablishing }),
         }),
         {
             name: 'APP_STATE',

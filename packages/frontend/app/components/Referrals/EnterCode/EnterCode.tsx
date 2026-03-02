@@ -8,6 +8,7 @@ interface PropsIF {
     isSessionEstablished: boolean;
     totVolume: number | undefined;
     totVolumeFormatted: string;
+    inviteeMaxVolumeThreshold: number;
     cached: string;
     isCachedValueValid: boolean | undefined;
     refCodeToConsume: string | undefined;
@@ -15,9 +16,13 @@ interface PropsIF {
     setEditModeInvitee: (value: boolean) => void;
     userInputRefCode: string;
     setUserInputRefCode: (value: string) => void;
+    isCheckingCode: boolean;
+    isInputSolanaAddress: boolean;
     isUserRefCodeClaimed: boolean | undefined;
     isUserInputRefCodeSelfOwned: boolean | undefined;
     handleUpdateReferralCode: (code: string) => void;
+    handleOverwriteReferralCode: (code: string) => void;
+    openConfirmModal: () => void;
     setInvalidCode: (value: string) => void;
 }
 
@@ -26,6 +31,7 @@ export default function EnterCode(props: PropsIF) {
         isSessionEstablished,
         totVolume,
         totVolumeFormatted,
+        inviteeMaxVolumeThreshold,
         cached,
         isCachedValueValid,
         refCodeToConsume,
@@ -33,9 +39,13 @@ export default function EnterCode(props: PropsIF) {
         setEditModeInvitee,
         userInputRefCode,
         setUserInputRefCode,
+        isCheckingCode,
+        isInputSolanaAddress,
         isUserRefCodeClaimed,
         isUserInputRefCodeSelfOwned,
         handleUpdateReferralCode,
+        handleOverwriteReferralCode,
+        openConfirmModal,
         setInvalidCode,
     } = props;
 
@@ -65,7 +75,7 @@ export default function EnterCode(props: PropsIF) {
                 {cached ? (
                     <>
                         <div className={styles.current_ref_code}>
-                            <h6>{t('referrals.usingAffiliateCode')}</h6>
+                            <h6>{t('referrals.pendingRefCode')}</h6>
                             {isCachedValueValid && <p>{refCodeToConsume}</p>}
                         </div>
                         <p className={styles.ref_code_blurb}>
@@ -85,16 +95,24 @@ export default function EnterCode(props: PropsIF) {
                     <h6>{t('referrals.enterCode')}</h6>
                 )}
             </div>
-            {cached && totVolume !== undefined && totVolume < 10000 && (
-                <div className={styles.refferal_code_buttons}>
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => setEditModeInvitee(true)}
-                    >
-                        {t('common.edit')}
-                    </SimpleButton>
-                </div>
-            )}
+            {cached &&
+                totVolume !== undefined &&
+                totVolume < inviteeMaxVolumeThreshold && (
+                    <div className={styles.refferal_code_buttons}>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => setEditModeInvitee(true)}
+                        >
+                            {t('common.edit')}
+                        </SimpleButton>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => openConfirmModal()}
+                        >
+                            {t('common.confirm')}
+                        </SimpleButton>
+                    </div>
+                )}
         </section>
     );
 
@@ -112,23 +130,53 @@ export default function EnterCode(props: PropsIF) {
                     value={userInputRefCode}
                     onChange={(e) => setUserInputRefCode(e.target.value)}
                 />
-                {!isUserRefCodeClaimed &&
-                    userInputRefCode.length <= 30 &&
-                    userInputRefCode.length >= 2 && (
-                        <p>
-                            <Trans
-                                i18nKey='referrals.referralCodeNotValidPleaseConfirm'
-                                values={{ invalidCode: userInputRefCode }}
-                                components={[
-                                    <span
-                                        style={{ color: 'var(--accent2)' }}
-                                    />,
-                                ]}
-                            />
+                {userInputRefCode.length >= 2 &&
+                    (isInputSolanaAddress && !isUserInputRefCodeSelfOwned ? (
+                        <p
+                            style={{
+                                color: 'var(--text2)',
+                                fontSize: 'var(--font-size-xs)',
+                            }}
+                        >
+                            This appears to be a wallet address. Please confirm
+                            with your referrer that it is correct.
                         </p>
-                    )}
+                    ) : (
+                        userInputRefCode.length <= 30 &&
+                        (isCheckingCode ? (
+                            <p
+                                style={{
+                                    color: 'var(--text2)',
+                                    fontSize: 'var(--font-size-xs)',
+                                }}
+                            >
+                                Checking code...
+                            </p>
+                        ) : isUserRefCodeClaimed ? (
+                            <p
+                                style={{
+                                    color: 'var(--positive)',
+                                    fontSize: 'var(--font-size-xs)',
+                                }}
+                            >
+                                Code is valid!
+                            </p>
+                        ) : (
+                            <p style={{ fontSize: 'var(--font-size-xs)' }}>
+                                <Trans
+                                    i18nKey='referrals.referralCodeNotValidPleaseConfirm'
+                                    values={{ invalidCode: userInputRefCode }}
+                                    components={[
+                                        <span
+                                            style={{ color: 'var(--accent2)' }}
+                                        />,
+                                    ]}
+                                />
+                            </p>
+                        ))
+                    ))}
                 {isUserInputRefCodeSelfOwned && (
-                    <p>
+                    <p style={{ fontSize: 'var(--font-size-xs)' }}>
                         <Trans
                             i18nKey='referrals.doNotSelfRefer'
                             values={{ refCode: userInputRefCode }}
@@ -144,15 +192,17 @@ export default function EnterCode(props: PropsIF) {
                     bg='accent1'
                     disabled={
                         userInputRefCode.length < 2 ||
-                        userInputRefCode.length > 30 ||
+                        (!isInputSolanaAddress &&
+                            userInputRefCode.length > 30) ||
+                        isCheckingCode ||
                         !isUserRefCodeClaimed ||
                         isUserInputRefCodeSelfOwned
                     }
                     onClick={(): void => {
-                        handleUpdateReferralCode(userInputRefCode);
+                        handleOverwriteReferralCode(userInputRefCode);
                     }}
                 >
-                    {t('common.confirm')}
+                    Overwrite
                 </SimpleButton>
                 {cached && isCachedValueValid && (
                     <SimpleButton
@@ -188,7 +238,7 @@ export default function EnterCode(props: PropsIF) {
     }
 
     // Only show content/error when volume is available
-    if (totVolume && totVolume > 10000) {
+    if (totVolume && totVolume >= inviteeMaxVolumeThreshold) {
         return (
             <div
                 style={{
@@ -212,7 +262,7 @@ export default function EnterCode(props: PropsIF) {
     const shouldShowInput =
         (editModeInvitee || !cached || isCachedValueValid === false) &&
         totVolume !== undefined &&
-        totVolume < 10000;
+        totVolume < inviteeMaxVolumeThreshold;
 
     return shouldShowInput ? enterNewCodeElem : currentCodeElem;
 }

@@ -254,8 +254,6 @@ Pre-Implementation Checklist:
 1. Special subscriptions handling - userEvents and orderUpdates have singleton behavior. Which socket should handle these?
 2. WebData2 placement - This provides comprehensive user data. Should it stay with user socket?
 3. Migration approach - Should we:
-
-
     - Build parallel system with feature flag?
     - Direct replacement with fallback?
     - Gradual component-by-component migration?
@@ -388,23 +386,17 @@ data type.
 Original 3-Phase Plan:
 
 1. Phase 1 (Completed): Create multi-socket infrastructure
-
-
     - Refactor WebsocketManager into reusable WebSocketInstance class
     - Create WebSocketPool to manage multiple sockets
     - Route subscriptions to appropriate sockets based on channel type
     - Maintain backward compatibility
 
 2. Phase 2 (Not Started): Update SDK usage patterns
-
-
     - Update all components to use new patterns
     - Remove direct WebsocketManager dependencies
     - Update subscription management
 
 3. Phase 3 (Not Started): Remove legacy code
-
-
     - Remove old WebsocketManager
     - Clean up backward compatibility layers
     - Full migration to multi-socket architecture
@@ -412,8 +404,6 @@ Original 3-Phase Plan:
 What Was Completed
 
 1. Created Multi-Socket Infrastructure:
-
-
     - /packages/sdk/src/websocket-instance.ts - Refactored WebsocketManager into reusable class
     - /packages/sdk/src/websocket-pool.ts - New pool manager for multiple sockets
     - Channel routing map separating market vs user data
@@ -424,31 +414,23 @@ What Was Completed
    userNonFundingLedgerUpdates, webData2, userHistoricalOrders,
    userTwapSliceFills, userTwapHistory, notification
 3. React Integration:
-
-
     - Updated useSdk.tsx to use multi-socket mode
     - Added endpoint configuration support via props
     - Environment variable support for endpoints
 
 4. Developer Tools:
-
-
     - WebSocket debug panel (Ctrl+Shift+W)
-    - Console debugging via __perps_websockets__
+    - Console debugging via **perps_websockets**
     - Connection status monitoring
 
 Implementation Details
 
 1. Backward Compatibility:
-
-
     - MultiSocketInfo wrapper maintains Info class interface
     - useMultiSocket flag in Info constructor
     - Existing components work without modification
 
 2. Connection Management:
-
-
     - Added isConnecting flag to prevent race conditions
     - Parallel socket initialization for faster startup
     - Proper reconnection logic with configurable delays
@@ -464,56 +446,40 @@ Implementation Details
 Lessons Learned (Not in Original Plan)
 
 1. Race Condition Issues:
-
-
     - Multiple reconnection attempts caused WebSocket 1006 errors
     - Solution: Added connection state management and checks
 
 2. Duplicate Subscriptions:
-
-
     - Components could subscribe multiple times to same channel
     - Solution: Added duplicate detection logic
 
 3. Performance Considerations:
-
-
     - Sequential socket creation caused slow initial load
     - Solution: Parallel initialization with autoConnect option
 
 4. Reconnection Timing:
-
-
     - Initial 2s delay too slow, 100ms too fast (caused races)
     - Solution: 500ms provides good balance
 
 5. Server Compatibility:
-
-
     - Hyperliquid server supports multiple WebSocket connections per IP
     - No rate limiting issues with 2 concurrent connections
 
 What Remains To Be Done
 
 1. Phase 2 - Update SDK Usage Patterns:
-
-
     - Audit all components using info.subscribe()
     - Update to use new subscription patterns
     - Remove direct wsManager references
     - Standardize error handling
 
 2. Phase 3 - Remove Legacy Code:
-
-
     - Delete /packages/sdk/src/ws.ts (old WebsocketManager)
     - Remove useMultiSocket flag and make multi-socket default
     - Remove backward compatibility layers
     - Clean up Info class to only support multi-socket
 
 3. Additional Improvements:
-
-
     - Add connection health monitoring
     - Implement exponential backoff for reconnections
     - Add metrics/telemetry for socket performance
@@ -521,8 +487,6 @@ What Remains To Be Done
     - Add unit tests for WebSocketPool and WebSocketInstance
 
 4. Documentation:
-
-
     - Document new WebSocket architecture
     - Migration guide for external SDK users
     - Configuration examples for different deployment scenarios

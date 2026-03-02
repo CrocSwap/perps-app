@@ -140,6 +140,12 @@ export function useAffiliateAudience(userIdentifier: string, enabled = true) {
         fetchData();
     }, [fetchData]);
 
+    useEffect(() => {
+        window.addEventListener('affiliateDataUpdate', fetchData);
+        return () =>
+            window.removeEventListener('affiliateDataUpdate', fetchData);
+    }, [fetchData]);
+
     return { data, isLoading, error, refetch: fetchData };
 }
 
@@ -275,6 +281,12 @@ export function useAffiliateStats(userIdentifier: string, enabled = true) {
         fetchData();
     }, [fetchData]);
 
+    useEffect(() => {
+        window.addEventListener('affiliateDataUpdate', fetchData);
+        return () =>
+            window.removeEventListener('affiliateDataUpdate', fetchData);
+    }, [fetchData]);
+
     return { data, isLoading, error, refetch: fetchData };
 }
 
@@ -367,6 +379,12 @@ export function usePayoutsByReferrer(userIdentifier: string, enabled = true) {
         fetchData();
     }, [fetchData]);
 
+    useEffect(() => {
+        window.addEventListener('affiliateDataUpdate', fetchData);
+        return () =>
+            window.removeEventListener('affiliateDataUpdate', fetchData);
+    }, [fetchData]);
+
     return { data, isLoading, error, refetch: fetchData };
 }
 
@@ -441,6 +459,12 @@ export function useUserReferrer(userIdentifier: string, enabled = true) {
 
     useEffect(() => {
         fetchData();
+    }, [fetchData]);
+
+    useEffect(() => {
+        window.addEventListener('affiliateDataUpdate', fetchData);
+        return () =>
+            window.removeEventListener('affiliateDataUpdate', fetchData);
     }, [fetchData]);
 
     return { data, isLoading, error, refetch: fetchData };
@@ -526,6 +550,12 @@ export function useUserPayoutMovements(userIdentifier: string, enabled = true) {
         fetchData();
     }, [fetchData]);
 
+    useEffect(() => {
+        window.addEventListener('affiliateDataUpdate', fetchData);
+        return () =>
+            window.removeEventListener('affiliateDataUpdate', fetchData);
+    }, [fetchData]);
+
     return { data, isLoading, error, refetch: fetchData };
 }
 
@@ -593,6 +623,12 @@ export function useAffiliateCode(userIdentifier: string, enabled = true) {
 
     useEffect(() => {
         fetchData();
+    }, [fetchData]);
+
+    useEffect(() => {
+        window.addEventListener('affiliateCodeUpdated', fetchData);
+        return () =>
+            window.removeEventListener('affiliateCodeUpdated', fetchData);
     }, [fetchData]);
 
     return { data, isLoading, error, refetch: fetchData };

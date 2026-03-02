@@ -1,0 +1,115 @@
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    color: var(--text1);
+}
+
+.headerSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.label {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.subtext {
+    font-size: 0.75rem;
+    color: var(--text2);
+    margin: 0;
+}
+
+.sliderSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.slider {
+    width: 100%;
+    accent-color: var(--accent1);
+}
+
+.sliderLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--text1);
+}
+
+.inputSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--dark1);
+    border: 1px solid var(--border1);
+    border-radius: 4px;
+    color: var(--text1);
+    font-size: 0.875rem;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent1);
+}
+
+.input::placeholder {
+    color: var(--text2);
+}
+
+.errorText {
+    color: var(--negative);
+    font-size: 0.875rem;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+}
+
+.cancelButton,
+.submitButton {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancelButton {
+    background: transparent;
+    border: 1px solid var(--border1);
+    color: var(--text2);
+}
+
+.cancelButton:hover {
+    background: var(--dark2);
+    color: var(--text1);
+}
+
+.submitButton {
+    background: var(--accent1);
+    border: none;
+    color: var(--text-inverse, white);
+}
+
+.submitButton:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.submitButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

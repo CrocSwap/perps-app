@@ -10,6 +10,8 @@ import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackgrou
 import useNumFormatter from '~/hooks/useNumFormatter';
 import ReferralsExtra from '~/components/Referrals/ReferralsExtra/ReferralsExtra';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
+import { useReferralStore } from '~/stores/ReferralStore';
 
 export function meta() {
     return [
@@ -65,6 +67,15 @@ export type PayoutByReferrerT = {
 export default function Referrals() {
     const { t } = useTranslation();
     const userDataStore = useUserDataStore();
+    const refCodeModalStore = useRefCodeModalStore();
+    const referralStore = useReferralStore();
+
+    const handleOpenRefCodeModal = () => {
+        const code = referralStore.cached.code;
+        if (code) {
+            refCodeModalStore.openModal(code);
+        }
+    };
 
     const [referralData, setReferralData] = useState<any>(null);
 
@@ -198,7 +209,7 @@ export default function Referrals() {
                         </a>
                     </p>
                 </div>
-                <SimpleButton bg={'dark2'}>
+                <SimpleButton bg={'dark2'} onClick={handleOpenRefCodeModal}>
                     Register for the Referral Program
                 </SimpleButton>
             </header>

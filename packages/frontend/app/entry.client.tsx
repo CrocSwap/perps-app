@@ -6,7 +6,11 @@ import {
     useRouteError,
     isRouteErrorResponse,
 } from 'react-router';
+import { Buffer } from 'buffer';
 import Root from './root';
+
+// Force a consistent Buffer implementation before any app code runs
+globalThis.Buffer = Buffer;
 
 // Check if error is a chunk/module loading failure (typically happens offline)
 function isChunkLoadError(error: unknown): boolean {
@@ -97,34 +101,34 @@ const router = createBrowserRouter([
                 },
             },
             {
-                path: 'v2/strategies',
+                path: 'v2/agents',
                 lazy: async () => {
                     const { default: Component } =
-                        await import('./routes/strategies/strategies');
+                        await import('./routes/agents/agents');
                     return { Component };
                 },
             },
             {
-                path: 'v2/strategies/new',
+                path: 'v2/agents/new',
                 lazy: async () => {
                     const { default: Component } =
-                        await import('./routes/strategies/newStrategy');
+                        await import('./routes/agents/newAgent');
                     return { Component };
                 },
             },
             {
-                path: 'v2/strategies/:address?',
+                path: 'v2/agents/:agent_hash',
                 lazy: async () => {
                     const { default: Component } =
-                        await import('./routes/strategies/StrategyDetail');
+                        await import('./routes/agents/AgentDetail');
                     return { Component };
                 },
             },
             {
-                path: 'v2/strategies/:address/edit',
+                path: 'v2/agents/:agent_hash/edit',
                 lazy: async () => {
                     const { default: Component } =
-                        await import('./routes/strategies/editStrategy');
+                        await import('./routes/agents/editAgent');
                     return { Component };
                 },
             },

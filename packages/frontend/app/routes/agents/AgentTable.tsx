@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import Tabs from '~/components/Tabs/Tabs';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { accountIF } from '~/stores/AccountsStore';
-import styles from './StrategyTable.module.css';
+import styles from './AgentTable.module.css';
 import { t } from 'i18next';
 
 // interface for table column header metadata

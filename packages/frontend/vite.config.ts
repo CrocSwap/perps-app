@@ -41,7 +41,9 @@ export default defineConfig(({ mode }) => ({
             compress: {
                 drop_console: true, // Remove console.logs in production
                 drop_debugger: true,
-                pure_funcs: ['console.log', 'console.debug'], // Remove specific console methods
+                pure_funcs: ['console.debug'], // Remove console.debug only
+                // Note: For logs that need to persist in production (like CodeTabs session debugging),
+                // use the debugLog utility from ~/utils/debugLog.ts instead of console.log
             },
         },
         cssCodeSplit: true, // Enable CSS code splitting

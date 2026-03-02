@@ -4,17 +4,9 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useRef, useState } from 'react';
-import { Fuul } from '@fuul/sdk';
-import { useFuul } from '~/contexts/FuulContext';
-// import { AiOutlineQuestionCircle } from 'react-icons/ai';
-// import {
-//     DFLT_EMBER_MARKET,
-//     getUserMarginBucket,
-//     USD_MINT,
-// } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation, useSearchParams, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import useMediaQuery, { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -26,20 +18,14 @@ import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
-// import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
-// import WalletDropdown from './WalletDropdown/WalletDropdown';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
-import {
-    URL_PARAMS,
-    useUrlParams,
-    type UrlParamMethodsIF,
-} from '~/hooks/useURLParams';
+import RefCodeModal from './RefCodeModal/RefCodeModal';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
 import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
@@ -58,16 +44,9 @@ export default function PageHeader() {
     // Feedback modal state
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
-    // run the FUUL context
-    const { trackPageView } = useFuul();
-
     const handleFeedbackClose = () => {
         setIsFeedbackOpen(false);
     };
-
-    const referralCodeFromURL: UrlParamMethodsIF = useUrlParams(
-        URL_PARAMS.referralCode,
-    );
 
     const userDataStore = useUserDataStore();
 
@@ -106,10 +85,8 @@ export default function PageHeader() {
         })();
     }, [userDataStore.userAddress]);
 
-    const { isInitialized: isFuulInitialized } = useFuul();
-
     const sessionButtonRef = useRef<HTMLSpanElement>(null);
-    const { notifications, latestTx } = useNotificationStore();
+    const notificationStore = useNotificationStore();
     const { navigationKeyboardShortcutsEnabled } = useAppSettings();
 
     useEffect(() => {
@@ -314,7 +291,7 @@ export default function PageHeader() {
                 matchesShortcutEvent(e, latestTxShortcut.keys)
             ) {
                 e.preventDefault();
-                const latest = latestTx;
+                const latest = notificationStore.latestTx;
                 if (latest?.txLink) {
                     window.open(latest.txLink, '_blank', 'noopener,noreferrer');
                 }
@@ -346,7 +323,7 @@ export default function PageHeader() {
         isKeyboardShortcutsOpen,
         openDepositModal,
         openWithdrawModal,
-        latestTx,
+        notificationStore.latestTx,
         t,
     ]);
 
@@ -391,22 +368,6 @@ export default function PageHeader() {
 
     const { totVolume } = useReferralStore();
 
-    // track page views with Fuul
-    useEffect(() => {
-        if (
-            isFuulInitialized &&
-            totVolume !== undefined &&
-            !Number.isNaN(totVolume) &&
-            // totVolume < 10000 &&
-            userDataStore.userAddress
-        ) {
-            console.log('sending pageview for: ', location.pathname);
-            trackPageView();
-        } else {
-            localStorage.removeItem('fuul.sent_pageview');
-        }
-    }, [location, isFuulInitialized, totVolume, userDataStore.userAddress]);
-
     const showDepositSlot = isUserConnected || !isShortScreen;
     const navigate = useNavigate();
     const isHomePage = location.pathname === '/';
@@ -430,29 +391,6 @@ export default function PageHeader() {
             navigate('/');
         }
     };
-
-    const invalidRefCodeModal = useModal('closed');
-
-    // run the FUUL context
-    const { isRefCodeFree } = useFuul();
-
-    useEffect(() => {
-        const checkRefCode = async (): Promise<void> => {
-            if (referralCodeFromURL.value) {
-                // const isCodeClaimed: boolean = await isRefCodeFree(
-                //     referralCodeFromURL.value,
-                // );
-                // isCodeClaimed
-                //     ? referralStore.cache(referralCodeFromURL.value)
-                //     : invalidRefCodeModal.open();
-                referralStore.cache(referralCodeFromURL.value);
-            }
-        };
-        checkRefCode();
-    }, [
-        referralCodeFromURL.value,
-        // isRefCodeFree,
-    ]);
 
     return (
         <>
@@ -731,26 +669,7 @@ export default function PageHeader() {
                     <AppOptions closePanel={() => appSettingsModal.close()} />
                 </Modal>
             )}
-            {invalidRefCodeModal.isOpen && (
-                <Modal
-                    close={invalidRefCodeModal.close}
-                    position='center'
-                    title='Unknown Referral Code'
-                >
-                    <div className={styles.invalid_ref_code_modal}>
-                        <p>
-                            The referral code you entered is not recognized.
-                            Please check the code and try again.
-                        </p>
-                        <Link
-                            to='/v2/referrals'
-                            onClick={invalidRefCodeModal.close}
-                        >
-                            Go to Referrals
-                        </Link>
-                    </div>
-                </Modal>
-            )}
+            <RefCodeModal />
             {PortfolioModalsRenderer}
             <FeedbackModal
                 isOpen={isFeedbackOpen}

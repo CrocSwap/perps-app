@@ -296,17 +296,17 @@ export default function App() {
             translatedPart = t('pageTitles.points');
         } else if (pathname.startsWith('/v2/leaderboard')) {
             translatedPart = t('pageTitles.leaderboard');
-        } else if (pathname.startsWith('/v2/strategies/new')) {
-            translatedPart = t('pageTitles.newStrategy');
+        } else if (pathname.startsWith('/v2/agents/new')) {
+            translatedPart = t('pageTitles.newAgent');
         } else if (
-            pathname.startsWith('/v2/strategies/') &&
+            pathname.startsWith('/v2/agents/') &&
             pathname.endsWith('/edit')
         ) {
-            translatedPart = t('pageTitles.editStrategy');
-        } else if (pathname.startsWith('/v2/strategies/')) {
-            translatedPart = t('pageTitles.strategy');
-        } else if (pathname.startsWith('/v2/strategies')) {
-            translatedPart = t('pageTitles.strategies');
+            translatedPart = t('pageTitles.editAgent');
+        } else if (pathname.startsWith('/v2/agents/')) {
+            translatedPart = t('pageTitles.agent');
+        } else if (pathname.startsWith('/v2/agents')) {
+            translatedPart = t('pageTitles.agents');
         } else if (pathname.startsWith('/v2/vaults/')) {
             translatedPart = t('pageTitles.vault');
         } else if (pathname.startsWith('/v2/vaults')) {
