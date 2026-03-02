@@ -31,8 +31,10 @@ export default function RefCodeModal() {
     const referralCodeFromURL = useUrlParams(URL_PARAMS.referralCode);
 
     const isUserConnected = isEstablished(sessionState);
-    const userPublicKey: string | null = isUserConnected
-        ? sessionState.walletPublicKey?.toString()
+    const userPublicKey = isUserConnected
+        ? ((
+              sessionState.walletPublicKey || sessionState.sessionPublicKey
+          )?.toString() ?? null)
         : null;
 
     // track whether the session has completed its initial resolution
@@ -84,65 +86,66 @@ export default function RefCodeModal() {
     >('closed');
     const [wasRefCodeModalShown, setWasRefCodeModalShown] = useState(false);
 
-    const refCodeFromURL =
-        // logic to open the ref code modal when relevant
-        useEffect(() => {
-            const runLogic = async (codeToCheck: string): Promise<void> => {
-                if (
-                    isUserConnected &&
-                    userPublicKey &&
-                    (await referralStore.checkForConversion(userPublicKey))
-                ) {
+    // logic to open the ref code modal when relevant
+    useEffect(() => {
+        const runLogic = async (codeToCheck: string): Promise<void> => {
+            if (
+                isUserConnected &&
+                userPublicKey &&
+                (await referralStore.checkForConversion(userPublicKey))
+            ) {
+                return;
+            }
+
+            // check if this is the user's own code
+            if (isUserConnected && userPublicKey) {
+                const isOwnPubKey = codeToCheck === userPublicKey;
+                const isOwnRegisteredCode = userRefCode === codeToCheck;
+                if (isOwnPubKey || isOwnRegisteredCode) {
+                    refCodeModal.open('ownCode');
+                    setWasRefCodeModalShown(true);
                     return;
                 }
-                // check if this is the user's own code
-                if (isUserConnected && userPublicKey) {
-                    const isOwnPubKey = codeToCheck === userPublicKey;
-                    const isOwnRegisteredCode = userRefCode === codeToCheck;
-                    if (isOwnPubKey || isOwnRegisteredCode) {
-                        refCodeModal.open('ownCode');
-                        setWasRefCodeModalShown(true);
-                        return;
-                    }
-                }
-                const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
-                if (!wasRefCodeModalShown) {
-                    if (isUserConnected) {
-                        if (isCodeSVM) {
-                            refCodeModal.open('address');
-                        } else if (
-                            await checkIfCodeIsAvailableForInviteeToUse(
-                                codeToCheck,
-                            )
-                        ) {
-                            refCodeModal.open('goodCode');
-                        } else {
-                            refCodeModal.open('badCode');
-                        }
-                        setWasRefCodeModalShown(true);
-                    } else if (hasSessionResolved) {
-                        refCodeModal.open('noWallet');
-                    }
-                }
-            };
-            // wait for userRefCode to load before running modal logic
-            if (
-                isInitialized &&
-                referralCodeFromURL.value &&
-                hasSessionResolved &&
-                !isUserRefCodePending
-            ) {
-                runLogic(referralCodeFromURL.value);
             }
-        }, [
-            isInitialized,
-            referralCodeFromURL.value,
-            userPublicKey,
-            isUserConnected,
-            hasSessionResolved,
-            isUserRefCodePending,
-            userRefCode,
-        ]);
+
+            const isCodeSVM: boolean = checkAddressFormat(codeToCheck);
+            if (!wasRefCodeModalShown) {
+                if (isUserConnected) {
+                    if (isCodeSVM) {
+                        refCodeModal.open('address');
+                    } else if (
+                        await checkIfCodeIsAvailableForInviteeToUse(codeToCheck)
+                    ) {
+                        refCodeModal.open('goodCode');
+                    } else {
+                        refCodeModal.open('badCode');
+                    }
+                    setWasRefCodeModalShown(true);
+                } else if (hasSessionResolved) {
+                    refCodeModal.open('noWallet');
+                }
+            }
+        };
+
+        // wait for userRefCode to load before running modal logic
+        if (
+            isInitialized &&
+            referralCodeFromURL.value &&
+            hasSessionResolved &&
+            !isUserRefCodePending
+        ) {
+            runLogic(referralCodeFromURL.value);
+        }
+    }, [
+        isInitialized,
+        referralCodeFromURL.value,
+        userPublicKey,
+        isUserConnected,
+        hasSessionResolved,
+        isUserRefCodePending,
+        userRefCode,
+        wasRefCodeModalShown,
+    ]);
 
     // logic to open modal when triggered from store (e.g., from EnterCode confirm button)
     useEffect(() => {
@@ -216,7 +219,7 @@ export default function RefCodeModal() {
         refCodeModalStore.closeModal();
     }
 
-    function mockAcceptRefCode(refCode: string): void {
+    function acceptRefCode(refCode: string): void {
         trackPageView();
         referralStore.cache(refCode, true);
         notificationStore.add({
@@ -269,7 +272,7 @@ export default function RefCodeModal() {
                                 if (!activeRefCode) {
                                     return;
                                 }
-                                mockAcceptRefCode(activeRefCode);
+                                acceptRefCode(activeRefCode);
                                 handleClose();
                             }}
                         >
@@ -295,7 +298,7 @@ export default function RefCodeModal() {
                                 if (!activeRefCode) {
                                     return;
                                 }
-                                mockAcceptRefCode(activeRefCode);
+                                acceptRefCode(activeRefCode);
                                 handleClose();
                             }}
                         >
