@@ -1,11 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useReferralStore } from './ReferralStore';
-import type { CachedRefCodeIF } from './ReferralStore';
 
 // Helper to reset Zustand store state between tests
 function resetStore() {
     useReferralStore.setState({
-        cached: { code: '', isApproved: false },
+        cached: { code: '', isApproved: false, approvalNonce: 0 },
         convertedWallets: [],
         totVolume: undefined,
     });
@@ -23,6 +22,7 @@ describe('ReferralStore – cached refactoring', () => {
         const cached = useReferralStore.getState().cached;
         expect(cached.code).toBe('ben1234');
         expect(cached.isApproved).toBe(false);
+        expect(cached.approvalNonce).toBe(0);
     });
 
     it('cache() stores code with isApproved=true when explicitly set', () => {
@@ -30,6 +30,7 @@ describe('ReferralStore – cached refactoring', () => {
         const cached = useReferralStore.getState().cached;
         expect(cached.code).toBe('ben1234');
         expect(cached.isApproved).toBe(true);
+        expect(cached.approvalNonce).toBe(1);
     });
 
     it('cache() with empty code stores empty string', () => {
@@ -37,6 +38,7 @@ describe('ReferralStore – cached refactoring', () => {
         const cached = useReferralStore.getState().cached;
         expect(cached.code).toBe('');
         expect(cached.isApproved).toBe(false);
+        expect(cached.approvalNonce).toBe(0);
     });
 
     // ─── Protection logic ─────────────────────────────────────
@@ -164,6 +166,7 @@ describe('ReferralStore – cached refactoring', () => {
         expect(migrateResult.cached).toEqual({
             code: 'ben1234',
             isApproved: false,
+            approvalNonce: 0,
         });
     });
 
@@ -179,6 +182,7 @@ describe('ReferralStore – cached refactoring', () => {
         expect(migrateResult.cached).toEqual({
             code: '',
             isApproved: false,
+            approvalNonce: 0,
         });
     });
 
@@ -200,10 +204,11 @@ describe('ReferralStore – cached refactoring', () => {
         expect(migrateResult.cached).toEqual({
             code: 'ben1234',
             isApproved: true,
+            approvalNonce: 0,
         });
     });
 
-    it('migration: version 2 state without cached2 passes through cleanly', () => {
+    it('migration: version 2 state without cached2 gets normalized for approvalNonce', () => {
         const v2State = {
             cached: { code: 'ben1234', isApproved: true },
             convertedWallets: [],
@@ -213,10 +218,17 @@ describe('ReferralStore – cached refactoring', () => {
         const migrateResult = persistOptions.getOptions().migrate(v2State, 2);
 
         expect(migrateResult.cached2).toBeUndefined();
-        expect(migrateResult).toEqual(v2State);
+        expect(migrateResult).toEqual({
+            ...v2State,
+            cached: {
+                code: 'ben1234',
+                isApproved: true,
+                approvalNonce: 0,
+            },
+        });
     });
 
-    it('migration: version 3 state is returned as-is', () => {
+    it('migration: version 3 state gets normalized for approvalNonce', () => {
         const v3State = {
             cached: { code: 'ben1234', isApproved: true },
             convertedWallets: [],
@@ -225,7 +237,14 @@ describe('ReferralStore – cached refactoring', () => {
         const persistOptions = (useReferralStore as any).persist;
         const migrateResult = persistOptions.getOptions().migrate(v3State, 3);
 
-        expect(migrateResult).toEqual(v3State);
+        expect(migrateResult).toEqual({
+            ...v3State,
+            cached: {
+                code: 'ben1234',
+                isApproved: true,
+                approvalNonce: 0,
+            },
+        });
     });
 
     it('migration: v1 state with cached2 has it stripped', () => {
@@ -246,6 +265,7 @@ describe('ReferralStore – cached refactoring', () => {
         expect(migrateResult.cached).toEqual({
             code: 'ben1234',
             isApproved: false,
+            approvalNonce: 0,
         });
     });
 
@@ -275,6 +295,7 @@ describe('ReferralStore – cached refactoring', () => {
         expect(useReferralStore.getState().cached).toEqual({
             code: 'ben1234',
             isApproved: false,
+            approvalNonce: 0,
         });
 
         // Step 2: User clicks "Accept" in modal → markCodeApproved
@@ -282,6 +303,7 @@ describe('ReferralStore – cached refactoring', () => {
         expect(useReferralStore.getState().cached).toEqual({
             code: 'ben1234',
             isApproved: true,
+            approvalNonce: 1,
         });
 
         // Step 3: User visits with ?af=ben4 (their own code in URL)
@@ -290,6 +312,7 @@ describe('ReferralStore – cached refactoring', () => {
         expect(useReferralStore.getState().cached).toEqual({
             code: 'ben1234',
             isApproved: true,
+            approvalNonce: 1,
         });
     });
 
@@ -303,6 +326,7 @@ describe('ReferralStore – cached refactoring', () => {
         expect(useReferralStore.getState().cached).toEqual({
             code: 'codeB',
             isApproved: true,
+            approvalNonce: 1,
         });
     });
 
@@ -314,6 +338,7 @@ describe('ReferralStore – cached refactoring', () => {
         expect(useReferralStore.getState().cached).toEqual({
             code: '',
             isApproved: false,
+            approvalNonce: 0,
         });
 
         // Can now cache a new code

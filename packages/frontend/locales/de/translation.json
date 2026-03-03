@@ -102,7 +102,6 @@
         "closePosition": "Position schließen",
         "closeAtCurrentPrice": "Zum aktuellen Preis schließen",
         "closeAtAPriceYouSet": "Zu einem festgelegten Preis schließen",
-
         "price": "Preis",
         "size": "Größe",
         "time": "Zeit",
@@ -305,7 +304,8 @@
             "hours": "Stunden",
             "orderHistory": "Orderverlauf",
             "filter": "Filter",
-            "viewAll": "Alle anzeigen"
+            "viewAll": "Alle anzeigen",
+            "chart": "Diagramm"
         },
         "transfer": {
             "agentTitle": "Agent übertragen",
@@ -663,7 +663,6 @@
         "copyLinkCTA": "Link kopieren",
         "textPlaceholder": "Handeln Sie jetzt {{coin}}-Perps auf {{twitter}} im {{fogo}} Testnet",
         "sharePosition": "Position mit PnL {{pnl}} teilen",
-
         "pnl": "PnL",
         "details": "Details",
         "copyImageCTA": "Bild kopieren",
@@ -671,7 +670,6 @@
         "copied": "Kopiert!",
         "shareHint": "Teilen auf X kopiert das Bild auch in die Zwischenablage"
     },
-
     "colors": {
         "default": "Standard",
         "opposite": "Gegensatz",

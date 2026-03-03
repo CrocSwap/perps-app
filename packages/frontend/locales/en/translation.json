@@ -300,6 +300,7 @@
             "status": "Status",
             "parameters": "Parameters",
             "performance": "Performance",
+            "chart": "Chart",
             "ordersPlaced": "Orders Placed",
             "runtime": "Runtime",
             "hours": "Hours",

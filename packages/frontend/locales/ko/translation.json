@@ -102,7 +102,6 @@
         "closePosition": "포지션 청산",
         "closeAtCurrentPrice": "현재 가격으로 청산",
         "closeAtAPriceYouSet": "지정한 가격으로 청산",
-
         "price": "가격",
         "size": "수량",
         "time": "시간",
@@ -305,7 +304,8 @@
             "hours": "시간",
             "orderHistory": "주문 내역",
             "filter": "필터",
-            "viewAll": "모두 보기"
+            "viewAll": "모두 보기",
+            "chart": "차트"
         },
         "transfer": {
             "agentTitle": "에이전트 전송",
@@ -663,7 +663,6 @@
         "copyLinkCTA": "링크 복사",
         "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요",
         "sharePosition": "PnL {{pnl}} 포지션 공유",
-
         "pnl": "PnL",
         "details": "세부 정보",
         "copyImageCTA": "이미지 복사",

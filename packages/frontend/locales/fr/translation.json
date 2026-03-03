@@ -102,7 +102,6 @@
         "closePosition": "Clôturer la position",
         "closeAtCurrentPrice": "Clôturer au prix actuel",
         "closeAtAPriceYouSet": "Clôturer à un prix défini",
-
         "price": "Prix",
         "size": "Taille",
         "time": "Heure",
@@ -305,7 +304,8 @@
             "hours": "Heures",
             "orderHistory": "Historique des ordres",
             "filter": "Filtrer",
-            "viewAll": "Voir tout"
+            "viewAll": "Voir tout",
+            "chart": "Graphique"
         },
         "transfer": {
             "agentTitle": "Transférer l'agent",

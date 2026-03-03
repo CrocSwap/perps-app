@@ -102,7 +102,6 @@
         "closePosition": "Pozisyonu kapat",
         "closeAtCurrentPrice": "Mevcut fiyattan kapat",
         "closeAtAPriceYouSet": "Belirlediğin fiyattan kapat",
-
         "price": "Fiyat",
         "size": "Büyüklük",
         "time": "Zaman",
@@ -305,7 +304,8 @@
             "hours": "Saat",
             "orderHistory": "Emir Geçmişi",
             "filter": "Filtre",
-            "viewAll": "Tümünü Gör"
+            "viewAll": "Tümünü Gör",
+            "chart": "Grafik"
         },
         "transfer": {
             "agentTitle": "Ajanı Transfer Et",
@@ -663,7 +663,6 @@
         "copyLinkCTA": "Bağlantıyı kopyala",
         "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap",
         "sharePosition": "PnL {{pnl}} pozisyonunu paylaş",
-
         "pnl": "PnL",
         "details": "Detaylar",
         "copyImageCTA": "Görseli kopyala",

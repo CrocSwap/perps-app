@@ -102,7 +102,6 @@
         "closePosition": "Đóng vị thế",
         "closeAtCurrentPrice": "Đóng tại giá hiện tại",
         "closeAtAPriceYouSet": "Đóng tại mức giá bạn đặt",
-
         "price": "Giá",
         "size": "Kích thước",
         "time": "Thời gian",
@@ -305,7 +304,8 @@
             "hours": "Giờ",
             "orderHistory": "Lịch sử lệnh",
             "filter": "Lọc",
-            "viewAll": "Xem tất cả"
+            "viewAll": "Xem tất cả",
+            "chart": "Biểu đồ"
         },
         "transfer": {
             "agentTitle": "Chuyển giao đại lý",
@@ -663,7 +663,6 @@
         "copyLinkCTA": "Sao chép liên kết",
         "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay",
         "sharePosition": "Chia sẻ vị thế với PnL {{pnl}}",
-
         "pnl": "PnL",
         "details": "Chi tiết",
         "copyImageCTA": "Sao chép hình ảnh",

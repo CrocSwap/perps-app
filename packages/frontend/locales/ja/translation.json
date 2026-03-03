@@ -102,7 +102,6 @@
         "closePosition": "ポジションを決済",
         "closeAtCurrentPrice": "現在の価格で決済",
         "closeAtAPriceYouSet": "指定した価格で決済",
-
         "price": "価格",
         "size": "サイズ",
         "time": "時間",
@@ -305,7 +304,8 @@
             "hours": "時間",
             "orderHistory": "注文履歴",
             "filter": "フィルター",
-            "viewAll": "すべて表示"
+            "viewAll": "すべて表示",
+            "chart": "チャート"
         },
         "transfer": {
             "agentTitle": "エージェントを転送",
@@ -663,7 +663,6 @@
         "copyLinkCTA": "リンクをコピー",
         "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう",
         "sharePosition": "PnL {{pnl}}のポジションを共有",
-
         "pnl": "PnL",
         "details": "詳細",
         "copyImageCTA": "画像をコピー",

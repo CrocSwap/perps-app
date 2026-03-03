@@ -37,6 +37,10 @@
     color: var(--text1);
 }
 
+.dropdown {
+    position: relative;
+}
+
 .dropdown > ul {
     position: absolute;
     display: flex;
@@ -110,5 +114,112 @@
     .dropdown > button,
     .dropdown > ul {
         width: min(100%, 360px);
+    }
+}
+
+/* 2-column label | input layout for tablet / small desktop */
+@media (min-width: 769px) and (max-width: 1300px) {
+    .text_input {
+        grid-template-columns: 160px 1fr;
+        gap: 6px 24px;
+        min-height: 48px;
+        align-items: flex-start;
+    }
+
+    .text_input > label {
+        font-size: var(--font-size-s);
+        padding-top: 10px;
+        white-space: normal;
+        overflow: visible;
+    }
+
+    .text_input > input,
+    .dropdown > button,
+    .dropdown > ul {
+        width: 100%;
+    }
+
+    .text_input > p {
+        grid-column: 2;
+        font-size: var(--font-size-s);
+        line-height: 1.35;
+        padding-top: 4px;
+    }
+
+    .input_error {
+        grid-column: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .text_input {
+        grid-template-columns: 1fr;
+        gap: 0;
+        min-height: auto;
+        padding: 14px 0;
+        border-bottom: 1px solid
+            color-mix(in srgb, var(--bg-dark4) 40%, transparent);
+    }
+
+    .text_input:last-of-type {
+        border-bottom: none;
+    }
+
+    .text_input > label {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text2);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding-top: 0;
+        margin-bottom: 6px;
+    }
+
+    .text_input > input,
+    .dropdown > button {
+        width: 100%;
+        padding: 12px 14px;
+        background-color: color-mix(in srgb, var(--bg-dark3) 80%, transparent);
+        border-radius: 10px;
+        font-size: 15px;
+        border: 1px solid transparent;
+        transition: border-color 0.15s ease;
+    }
+
+    .text_input > input:focus {
+        outline: none;
+        border-color: color-mix(in srgb, var(--accent1) 40%, transparent);
+        background-color: var(--bg-dark3);
+    }
+
+    .dropdown > button {
+        border: 1px solid transparent;
+    }
+
+    .dropdown > ul {
+        width: 100%;
+        border-radius: 10px;
+        padding: 6px;
+        margin-top: 4px;
+    }
+
+    .dropdown > ul > li {
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 8px;
+        color: var(--text1);
+    }
+
+    .text_input > p {
+        font-size: 11px;
+        line-height: 1.4;
+        color: var(--text2);
+        padding-top: 6px;
+        margin-top: 0;
+    }
+
+    .input_error {
+        font-size: 11px;
+        margin-top: 4px;
     }
 }
