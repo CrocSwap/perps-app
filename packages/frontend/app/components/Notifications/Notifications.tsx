@@ -164,7 +164,7 @@ export default function Notifications() {
             const notificationConfig = {
                 handler: (data: any) => {
                     // WsContext passes msg.data directly to handler
-                    postNotification({ data });
+                    postNotification({ channel: 'notification', data });
                 },
                 payload: { user: userAddress },
             };
