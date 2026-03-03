@@ -21,6 +21,60 @@ export interface ReferralAttribution {
     sourceValue: string;
 }
 
+export async function fetchReferralCount(params: {
+    referralKind: ReferralKind;
+    referralIdText: string;
+}): Promise<number | null> {
+    try {
+        logRefregConfigOnce();
+        const referralIdBase58 = deriveReferralIdFromText(
+            params.referralIdText,
+        );
+        const response = await fetchRefregJson<
+            ReferralCountResponse | RefregApiError
+        >('/v1/referrals/count', {
+            dapp_id: getDappIdBase58(),
+            referral_kind: String(params.referralKind),
+            referral_id: referralIdBase58,
+        });
+
+        if (isApiErrorResponse(response)) {
+            console.info('[refreg] referral-count returned API error payload', {
+                referralKind: params.referralKind,
+                referralIdText: params.referralIdText,
+                referralIdBase58,
+                response,
+            });
+            return null;
+        }
+
+        const count = parseReferralCount(response.count);
+        if (count === null) {
+            console.info(
+                '[refreg] referral-count response missing numeric count',
+                {
+                    referralKind: params.referralKind,
+                    referralIdText: params.referralIdText,
+                    referralIdBase58,
+                    response,
+                },
+            );
+            return null;
+        }
+
+        console.info('[refreg] referral-count response', {
+            referralKind: params.referralKind,
+            referralIdText: params.referralIdText,
+            referralIdBase58,
+            count,
+        });
+        return count;
+    } catch (error) {
+        console.info('[refreg] referral-count fetch failed:', error);
+        return null;
+    }
+}
+
 export interface ConnectWalletBuildResult {
     instruction: TransactionInstruction;
     fingerprint: string;
@@ -331,9 +385,13 @@ function getTrackingIdBytes(): Uint8Array | null {
     return trackingId;
 }
 
-function id32ToBase58(id32: Uint8Array): string {
+export function id32ToBase58(id32: Uint8Array): string {
     assertLen32('id32', id32);
     return new PublicKey(id32).toBase58();
+}
+
+export function deriveReferralIdFromText(value: string): string {
+    return id32ToBase58(paddedStringToId32(value));
 }
 
 function getDappIdBytes(): Uint8Array {
@@ -428,6 +486,25 @@ async function fetchRefregJson<T>(
 interface ReferralStatsResponse {
     pending_count: number;
     converted_count: number;
+}
+
+interface ReferralCountResponse {
+    count?: unknown;
+}
+
+function parseReferralCount(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+        return Math.max(0, Math.trunc(value));
+    }
+
+    if (typeof value === 'string') {
+        const parsed = Number.parseInt(value, 10);
+        if (Number.isFinite(parsed)) {
+            return Math.max(0, parsed);
+        }
+    }
+
+    return null;
 }
 
 interface ConnectWalletByUserRecord {
