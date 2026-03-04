@@ -6,7 +6,8 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { UserIdentifierType } from '@fuul/sdk';
-import { Connection } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
+import * as anchor from '@coral-xyz/anchor';
 import { FuulSdk, Network } from '@fuul/sdk-solana';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
@@ -32,9 +33,19 @@ import { debugLog } from '~/utils/debugLog';
 import { useDebounce } from '~/hooks/useDebounce';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
 
-// --- Claim fee from GlobalConfig ---
-async function getClaimFee(connection: Connection): Promise<bigint | null> {
-    const sdk = new FuulSdk(connection, Network.FOGO_TESTNET);
+// --- Fuul claim helpers ---
+// Fuul contracts are deployed on Fogo mainnet, separate from app's testnet
+const FOGO_MAINNET_RPC = 'https://mainnet.fogo.io';
+
+function getFuulConnection(): Connection {
+    return new Connection(FOGO_MAINNET_RPC, {
+        commitment: 'confirmed',
+    });
+}
+
+async function getClaimFee(): Promise<bigint | null> {
+    const connection = getFuulConnection();
+    const sdk = new FuulSdk(connection, Network.FOGO_MAINNET);
     const globalConfig = await sdk.getGlobalConfig();
     if (!globalConfig) {
         console.warn('[CodeTabs] GlobalConfig not found');
@@ -42,7 +53,37 @@ async function getClaimFee(connection: Connection): Promise<bigint | null> {
     }
     return BigInt(globalConfig.feeManagement.userNativeClaimFee.toString());
 }
-// --- End claim fee ---
+
+async function fetchClaimRequirements(sdk: FuulSdk, projectAddress: PublicKey) {
+    const program = sdk.getProgram();
+    console.log('hey');
+    // Fetch project account to get nonce
+    const projectAccount = await program.account.project.fetch(projectAddress);
+    const projectNonce = projectAccount.nonce as anchor.BN;
+
+    // Fetch global config to get authorized signer
+    const globalConfig = await sdk.getGlobalConfig();
+    if (!globalConfig) {
+        throw new Error('Global config not found');
+    }
+
+    const signers = globalConfig.rolesMapping.roles
+        .filter(
+            (r: { role: Record<string, unknown>; account: PublicKey }) =>
+                Object.keys(r.role)[0] === 'signer',
+        )
+        .map(
+            (r: { role: Record<string, unknown>; account: PublicKey }) =>
+                r.account,
+        );
+
+    if (signers.length === 0) {
+        throw new Error('No authorized signers found');
+    }
+
+    return { projectNonce, signer: signers[0], program };
+}
+// --- End Fuul claim helpers ---
 
 interface PropsIF {
     initialTab?: string;
@@ -751,14 +792,56 @@ export default function CodeTabs(props: PropsIF) {
         console.log('🎁 [Claim] Claims data:', claimsData);
         console.log('🎁 [Claim] Claimable amount:', claimableAmount);
 
-        const claimFee = await getClaimFee(connection);
-        console.log(
-            '🎁 [Claim] Claim fee (lamports):',
-            claimFee?.toString() ?? 'null',
-        );
-        if (claimFee !== null) {
-            const solFee = Number(claimFee) / 1e9;
-            console.log('🎁 [Claim] Claim fee (SOL):', solFee);
+        if (!claimsData || claimsData.length === 0) {
+            console.warn('🎁 [Claim] No claims data available');
+            return;
+        }
+
+        console.log('🎁 [Claim] Claims check passed, proceeding...');
+
+        try {
+            // Use Fogo mainnet connection for Fuul contracts
+            console.log('🎁 [Claim] Initializing Fuul SDK (Fogo mainnet)...');
+            const fuulConnection = getFuulConnection();
+            const sdk = new FuulSdk(fuulConnection, Network.FOGO_MAINNET);
+            console.log('🎁 [Claim] SDK initialized');
+
+            // Get claim fee
+            console.log('🎁 [Claim] Fetching claim fee...');
+            const claimFee = await getClaimFee();
+            console.log(
+                '🎁 [Claim] Claim fee (lamports):',
+                claimFee?.toString() ?? 'null',
+            );
+            if (claimFee !== null) {
+                const solFee = Number(claimFee) / 1e9;
+                console.log('🎁 [Claim] Claim fee (SOL):', solFee);
+            }
+
+            // Fetch claim requirements using first claim's project address
+            const firstClaim = claimsData[0];
+            const projectAddress = new PublicKey(firstClaim.project_address);
+            console.log(
+                '🎁 [Claim] Project address:',
+                projectAddress.toBase58(),
+            );
+
+            console.log('🎁 [Claim] Fetching claim requirements...');
+            const requirements = await fetchClaimRequirements(
+                sdk,
+                projectAddress,
+            );
+            console.log(
+                '🎁 [Claim] Project nonce:',
+                requirements.projectNonce.toString(),
+            );
+            console.log('🎁 [Claim] Signer:', requirements.signer.toBase58());
+            console.log(
+                '🎁 [Claim] Program ID:',
+                requirements.program.programId.toBase58(),
+            );
+        } catch (error) {
+            console.error('🎁 [Claim] Error:', error);
         }
     };
 
