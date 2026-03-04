@@ -6,6 +6,8 @@ export interface CachedRefCodeIF {
     code: string;
     // indicates the invitee wants to use this code
     isApproved: boolean;
+    // increments on explicit approvals to allow one-shot downstream triggers
+    approvalNonce: number;
 }
 
 export interface UserReferrerResponse {
@@ -63,7 +65,11 @@ const ssrSafeStorage = () =>
 export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set, get) => ({
-            cached: { code: '', isApproved: false } as CachedRefCodeIF,
+            cached: {
+                code: '',
+                isApproved: false,
+                approvalNonce: 0,
+            } as CachedRefCodeIF,
             convertedWallets: [],
             totVolume: undefined,
             cache(refCode: string, isApproved: boolean = false): void {
@@ -76,13 +82,27 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 ) {
                     return;
                 }
-                set({ cached: { code: refCode, isApproved } });
+                set({
+                    cached: {
+                        code: refCode,
+                        isApproved,
+                        approvalNonce: isApproved
+                            ? current.approvalNonce + 1
+                            : current.approvalNonce,
+                    },
+                });
             },
             markCodeApproved(refCode: string): void {
                 // Update cached with approval
                 const currentCached = get().cached;
                 if (refCode === currentCached.code) {
-                    set({ cached: { code: refCode, isApproved: true } });
+                    set({
+                        cached: {
+                            code: refCode,
+                            isApproved: true,
+                            approvalNonce: currentCached.approvalNonce + 1,
+                        },
+                    });
                 }
             },
             setTotVolume(volume: number | undefined): void {
@@ -90,7 +110,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
             },
             clear(): void {
                 set({
-                    cached: { code: '', isApproved: false },
+                    cached: { code: '', isApproved: false, approvalNonce: 0 },
                     totVolume: undefined,
                 });
             },
@@ -210,7 +230,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 cached: state.cached,
                 convertedWallets: state.convertedWallets,
             }),
-            version: 3,
+            version: 4,
             migrate: (persistedState: unknown, version: number) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 let state = (persistedState ?? {}) as Record<string, any>;
@@ -219,14 +239,32 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     // Migrate cached from string to object
                     let newCached: CachedRefCodeIF;
                     if (typeof state.cached === 'string') {
-                        newCached = { code: state.cached, isApproved: false };
+                        newCached = {
+                            code: state.cached,
+                            isApproved: false,
+                            approvalNonce: 0,
+                        };
                     } else if (
                         state.cached &&
                         typeof state.cached === 'object'
                     ) {
-                        newCached = state.cached;
+                        newCached = {
+                            code:
+                                typeof state.cached.code === 'string'
+                                    ? state.cached.code
+                                    : '',
+                            isApproved: state.cached.isApproved === true,
+                            approvalNonce:
+                                typeof state.cached.approvalNonce === 'number'
+                                    ? state.cached.approvalNonce
+                                    : 0,
+                        };
                     } else {
-                        newCached = { code: '', isApproved: false };
+                        newCached = {
+                            code: '',
+                            isApproved: false,
+                            approvalNonce: 0,
+                        };
                     }
                     state = { ...state, cached: newCached };
                 }
@@ -235,6 +273,27 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     // Remove deprecated cached2 from persisted state
                     const { cached2, ...rest } = state;
                     state = rest;
+                }
+
+                if (version < 4) {
+                    const cached =
+                        state.cached && typeof state.cached === 'object'
+                            ? state.cached
+                            : { code: '', isApproved: false };
+                    state = {
+                        ...state,
+                        cached: {
+                            code:
+                                typeof cached.code === 'string'
+                                    ? cached.code
+                                    : '',
+                            isApproved: cached.isApproved === true,
+                            approvalNonce:
+                                typeof cached.approvalNonce === 'number'
+                                    ? cached.approvalNonce
+                                    : 0,
+                        },
+                    };
                 }
 
                 return state;

@@ -786,22 +786,47 @@ export default function Trade() {
         )
             return;
 
-        const shouldIgnoreDueToTyping = (target: HTMLElement | null) => {
-            if (!target) return false;
+        const isTypingInEditableField = (el: Element | null) => {
+            if (!(el instanceof HTMLElement)) return false;
 
-            const isOptedInField = !!target.closest?.(
+            const isOptedInField = !!el.closest?.(
                 '[data-allow-keyboard-shortcuts="true"]',
             );
             if (isOptedInField) return false;
 
-            if (target.tagName === 'TEXTAREA' || target.isContentEditable) {
+            if (
+                el.tagName === 'TEXTAREA' ||
+                el.tagName === 'SELECT' ||
+                el.isContentEditable
+            ) {
                 return true;
             }
 
-            if (target.tagName === 'INPUT') {
-                const input = target as HTMLInputElement;
-                const isNumericInput = input.inputMode === 'numeric';
+            if (el.tagName === 'INPUT') {
+                const input = el as HTMLInputElement;
+                const isNumericInput =
+                    input.inputMode === 'numeric' || input.type === 'number';
                 return !isNumericInput;
+            }
+
+            return false;
+        };
+
+        const shouldIgnoreDueToTyping = (target: EventTarget | null) => {
+            const targetEl = target instanceof Element ? target : null;
+            if (isTypingInEditableField(targetEl)) return true;
+
+            const activeEl = document.activeElement;
+            if (isTypingInEditableField(activeEl)) return true;
+
+            if (activeEl instanceof HTMLIFrameElement) {
+                try {
+                    const iframeActiveEl =
+                        activeEl.contentDocument?.activeElement ?? null;
+                    if (isTypingInEditableField(iframeActiveEl)) return true;
+                } catch {
+                    // Ignore cross-origin iframe access failures.
+                }
             }
 
             return false;
@@ -814,7 +839,7 @@ export default function Trade() {
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
-            const target = e.target as HTMLElement | null;
+            const target = e.target;
             if (shouldIgnoreDueToTyping(target)) return;
 
             const categories = getKeyboardShortcutCategories(t);

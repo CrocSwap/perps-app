@@ -16,7 +16,6 @@ This guide provides standardized media query breakpoints to ensure consistent an
 ### 1. **Mobile Devices**
 
 - **Mobile Portrait**
-
     - **CSS Query:**
         ```css
         @media (max-width: 599px) and (orientation: portrait) {
@@ -37,7 +36,6 @@ This guide provides standardized media query breakpoints to ensure consistent an
 ### 2. **Tablet Devices**
 
 - **Tablet Portrait**
-
     - **CSS Query:**
         ```css
         @media (min-width: 600px) and (max-width: 1366px) and (orientation: portrait) {
@@ -58,7 +56,6 @@ This guide provides standardized media query breakpoints to ensure consistent an
 ### 3. **Desktop Devices**
 
 - **Standard Desktop**
-
     - **CSS Query:**
         ```css
         @media (min-width: 1367px) {
