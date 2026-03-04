@@ -163,7 +163,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
 }
 
 .direction_account {
@@ -175,6 +175,15 @@
     gap: 3px;
 }
 
+/* Push content away from the swap button overlap zone */
+.direction_account:first-child {
+    padding-bottom: 24px;
+}
+
+.direction_account:last-child {
+    padding-top: 24px;
+}
+
 .direction_label {
     font-size: 11px;
     color: var(--text2);
@@ -184,6 +193,7 @@
     font-size: var(--font-size-s);
     color: var(--text1);
     font-weight: 500;
+    word-break: break-word;
 }
 
 .swap_btn {

@@ -214,9 +214,13 @@
 
 .empty_state {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    gap: var(--gap-m);
     padding: 2rem 0;
     color: var(--text2);
+    font-size: var(--font-size-s);
 }
 
 .remove_strategy_modal {

@@ -1,6 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeftRight } from 'react-icons/lu';
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useDepositService } from '~/hooks/useDepositService';
 import { useWithdrawService } from '~/hooks/useWithdrawService';
 import {
@@ -18,10 +23,13 @@ import styles from './TransferModal.module.css';
  * Set to `false` to revert to mock/offline behaviour (no real blockchain calls).
  * Balance will show 1000 and confirmation will just close the modal.
  */
-const USE_REAL_TRANSFER = true;
+const USE_REAL_TRANSFER = false;
 
 /** Fallback balance used when USE_REAL_TRANSFER = false or session unavailable */
 const MOCK_BALANCE = 1000;
+
+/** Placeholder subaccount balance until backend query is implemented */
+const MOCK_SUBACCOUNT_BALANCE = 10;
 
 interface propsIF {
     closeModal: () => void;
@@ -65,16 +73,19 @@ export default function TransferModal(props: propsIF) {
     // shared amount input
     const [qty, setQty] = useState<string>('');
 
+    const sessionState = useSession();
+    const isLoggedIn = isEstablished(sessionState);
+
     // Real transfer services — hooks must always be called (React rules of hooks)
     const depositSvc = useDepositService();
     const withdrawSvc = useWithdrawService();
 
-    // Agent available balance: real or mock depending on USE_REAL_TRANSFER and direction
-    const agentAvailableBalance = USE_REAL_TRANSFER
-        ? isReversed
-            ? (withdrawSvc.availableBalance?.decimalized ?? 0)
-            : (depositSvc.balance?.decimalized ?? 0)
-        : MOCK_BALANCE;
+    // Agent available balance:
+    // Master → Agent: real master wallet balance (always fetched via depositSvc)
+    // Agent → Master: placeholder until subaccount balance query is implemented
+    const agentAvailableBalance = isReversed
+        ? MOCK_SUBACCOUNT_BALANCE
+        : (depositSvc.balance?.decimalized ?? 0);
 
     const isTransferLoading = USE_REAL_TRANSFER
         ? isReversed
@@ -155,7 +166,9 @@ export default function TransferModal(props: propsIF) {
         <Modal
             title={
                 isAgentTransfer
-                    ? t('agents.transfer.agentTitle')
+                    ? isReversed
+                        ? t('agents.transfer.fromAgentTitle')
+                        : t('agents.transfer.toAgentTitle')
                     : t('agents.transfer.title')
             }
             close={closeModal}
@@ -216,7 +229,10 @@ export default function TransferModal(props: propsIF) {
                                     onClick={() => setIsReversed((r) => !r)}
                                     aria-label='Swap transfer direction'
                                 >
-                                    <LuArrowLeftRight size={15} />
+                                    <LuArrowLeftRight
+                                        size={15}
+                                        style={{ transform: 'rotate(90deg)' }}
+                                    />
                                 </button>
                             )}
 
@@ -326,9 +342,19 @@ export default function TransferModal(props: propsIF) {
                             id='transfer_agent_balance'
                         >
                             <div>
-                                <p>{t('agents.transfer.available')}</p>
                                 <p>
-                                    {isTransferLoading && !agentAvailableBalance
+                                    {isReversed
+                                        ? t(
+                                              'agents.transfer.availableToWithdraw',
+                                          )
+                                        : t(
+                                              'agents.transfer.availableToDeposit',
+                                          )}
+                                </p>
+                                <p>
+                                    {!isReversed &&
+                                    depositSvc.isLoading &&
+                                    !agentAvailableBalance
                                         ? '...'
                                         : formattedAgentBalance}
                                 </p>
@@ -452,22 +478,26 @@ export default function TransferModal(props: propsIF) {
                     </p>
                 )}
 
-                <SimpleButton
-                    onClick={handleConfirm}
-                    style={{
-                        cursor:
-                            isValid && !isTransferLoading
-                                ? 'pointer'
-                                : 'not-allowed',
-                    }}
-                    bg={isValid && !isTransferLoading ? 'accent1' : 'dark2'}
-                >
-                    {isAgentTransfer
-                        ? agentCtaText
-                        : isValid
-                          ? t('common.confirm')
-                          : t('agents.transfer.enterAllFields')}
-                </SimpleButton>
+                {isLoggedIn ? (
+                    <SimpleButton
+                        onClick={handleConfirm}
+                        style={{
+                            cursor:
+                                isValid && !isTransferLoading
+                                    ? 'pointer'
+                                    : 'not-allowed',
+                        }}
+                        bg={isValid && !isTransferLoading ? 'accent1' : 'dark2'}
+                    >
+                        {isAgentTransfer
+                            ? agentCtaText
+                            : isValid
+                              ? t('common.confirm')
+                              : t('agents.transfer.enterAllFields')}
+                    </SimpleButton>
+                ) : (
+                    <SessionButton />
+                )}
             </div>
         </Modal>
     );
