@@ -2,9 +2,12 @@ import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import {
     isEstablished,
     SessionButton,
+    useConnection,
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { UserIdentifierType } from '@fuul/sdk';
+import { Connection } from '@solana/web3.js';
+import { FuulSdk, Network } from '@fuul/sdk-solana';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
@@ -28,6 +31,18 @@ import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { debugLog } from '~/utils/debugLog';
 import { useDebounce } from '~/hooks/useDebounce';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
+
+// --- Claim fee from GlobalConfig ---
+async function getClaimFee(connection: Connection): Promise<bigint | null> {
+    const sdk = new FuulSdk(connection, Network.FOGO_TESTNET);
+    const globalConfig = await sdk.getGlobalConfig();
+    if (!globalConfig) {
+        console.warn('[CodeTabs] GlobalConfig not found');
+        return null;
+    }
+    return BigInt(globalConfig.feeManagement.userNativeClaimFee.toString());
+}
+// --- End claim fee ---
 
 interface PropsIF {
     initialTab?: string;
@@ -63,6 +78,7 @@ export default function CodeTabs(props: PropsIF) {
     const refCodeModalStore = useRefCodeModalStore();
 
     const sessionState = useSession();
+    const connection = useConnection();
 
     const isSessionEstablished = useMemo<boolean>(
         () => isEstablished(sessionState),
@@ -729,11 +745,21 @@ export default function CodeTabs(props: PropsIF) {
         return `$${formatted}`;
     }, [claimsData]);
 
-    const handleClaimClick = () => {
+    const handleClaimClick = async () => {
         console.log('🎁 [Claim] Button clicked');
         console.log('🎁 [Claim] User address:', referrerAddress);
         console.log('🎁 [Claim] Claims data:', claimsData);
         console.log('🎁 [Claim] Claimable amount:', claimableAmount);
+
+        const claimFee = await getClaimFee(connection);
+        console.log(
+            '🎁 [Claim] Claim fee (lamports):',
+            claimFee?.toString() ?? 'null',
+        );
+        if (claimFee !== null) {
+            const solFee = Number(claimFee) / 1e9;
+            console.log('🎁 [Claim] Claim fee (SOL):', solFee);
+        }
     };
 
     const claimElem = isSessionEstablished ? (

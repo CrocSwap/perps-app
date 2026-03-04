@@ -8,6 +8,8 @@ import {
 } from 'react';
 import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
+import { Connection } from '@solana/web3.js';
+import { FuulSdk, Network } from '@fuul/sdk-solana';
 
 interface FuulContextType {
     isInitialized: boolean;
@@ -52,6 +54,14 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const [isInitialized, setIsInitialized] = useState(false);
+
+    const connection = new Connection('https://testnet.fogo.io', {
+        commitment: 'confirmed',
+        confirmTransactionInitialTimeout: 60000,
+    });
+
+    const sdk = new FuulSdk(connection, Network.FOGO_TESTNET);
+    console.log('sdk: ', sdk);
 
     useEffect(() => {
         console.log('[fuul] init effect', {
