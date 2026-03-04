@@ -8,7 +8,15 @@ import {
 import { UserIdentifierType } from '@fuul/sdk';
 import { Connection, PublicKey } from '@solana/web3.js';
 import * as anchor from '@coral-xyz/anchor';
-import { FuulSdk, Network } from '@fuul/sdk-solana';
+import {
+    FuulSdk,
+    Network,
+    ClaimMessage,
+    ClaimMessageData,
+    MessageDomain,
+    TokenType,
+    ClaimReason,
+} from '@fuul/sdk-solana';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
@@ -82,6 +90,64 @@ async function fetchClaimRequirements(sdk: FuulSdk, projectAddress: PublicKey) {
     }
 
     return { projectNonce, signer: signers[0], program };
+}
+
+async function buildClaimInstructions(
+    sdk: FuulSdk,
+    walletPublicKey: PublicKey,
+    claim: {
+        projectAddress: PublicKey;
+        recipient: PublicKey;
+        tokenMint: PublicKey;
+        amount: bigint;
+        deadline: number;
+        reasonCode: number;
+        proof: Uint8Array;
+        signature: Uint8Array;
+    },
+) {
+    const { projectNonce, signer, program } = await fetchClaimRequirements(
+        sdk,
+        claim.projectAddress,
+    );
+
+    // Build message domain
+    const domain = new MessageDomain({
+        programId: program.programId,
+        version: 1,
+        deadline: BigInt(claim.deadline),
+    });
+
+    // Build claim data
+    const claimData = new ClaimMessageData({
+        amount: claim.amount,
+        project: claim.projectAddress,
+        recipient: claim.recipient,
+        tokenType: TokenType.FungibleSpl,
+        tokenMint: claim.tokenMint,
+        proof: Buffer.from(claim.proof),
+        reason:
+            claim.reasonCode === 0
+                ? ClaimReason.AffiliatePayout
+                : ClaimReason.EndUserPayout,
+    });
+
+    const claimMessage = new ClaimMessage({ data: claimData, domain });
+
+    // SDK handles ATA creation and PDA derivation internally
+    const instructions = await sdk.claim({
+        authority: walletPublicKey,
+        projectNonce,
+        message: claimMessage,
+        signatures: [
+            {
+                signature: claim.signature,
+                signer: signer,
+            },
+        ],
+    });
+
+    return instructions;
 }
 // --- End Fuul claim helpers ---
 
@@ -839,6 +905,64 @@ export default function CodeTabs(props: PropsIF) {
             console.log(
                 '🎁 [Claim] Program ID:',
                 requirements.program.programId.toBase58(),
+            );
+
+            // Build claim instructions
+            console.log('🎁 [Claim] Building claim instructions...');
+
+            // Get wallet public key from session
+            if (!isEstablished(sessionState)) {
+                console.error('🎁 [Claim] Session not established');
+                return;
+            }
+            const walletPublicKey =
+                sessionState.walletPublicKey || sessionState.sessionPublicKey;
+            if (!walletPublicKey) {
+                console.error('🎁 [Claim] No wallet public key found');
+                return;
+            }
+            console.log(
+                '🎁 [Claim] Wallet public key:',
+                walletPublicKey.toBase58(),
+            );
+
+            // Decode proof and signature from hex (0x-prefixed)
+            const hexToBytes = (hex: string): Uint8Array => {
+                const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex;
+                const bytes = new Uint8Array(cleanHex.length / 2);
+                for (let i = 0; i < bytes.length; i++) {
+                    bytes[i] = parseInt(cleanHex.substr(i * 2, 2), 16);
+                }
+                return bytes;
+            };
+
+            const proofBytes = hexToBytes(firstClaim.proof);
+            const signatureBytes = hexToBytes(firstClaim.signatures[0]);
+            console.log('🎁 [Claim] Proof bytes length:', proofBytes.length);
+            console.log(
+                '🎁 [Claim] Signature bytes length:',
+                signatureBytes.length,
+            );
+
+            const instructions = await buildClaimInstructions(
+                sdk,
+                walletPublicKey,
+                {
+                    projectAddress,
+                    recipient: new PublicKey(firstClaim.to),
+                    tokenMint: new PublicKey(firstClaim.currency),
+                    amount: BigInt(firstClaim.amount),
+                    deadline: firstClaim.deadline,
+                    reasonCode: firstClaim.reason,
+                    proof: proofBytes,
+                    signature: signatureBytes,
+                },
+            );
+
+            console.log('🎁 [Claim] Instructions built:', instructions);
+            console.log(
+                '🎁 [Claim] Number of instructions:',
+                instructions.length,
             );
         } catch (error) {
             console.error('🎁 [Claim] Error:', error);
