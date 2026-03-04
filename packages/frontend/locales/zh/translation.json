@@ -318,7 +318,11 @@
             "available": "可存入余额",
             "enterAllFields": "请填写所有字段",
             "selectAccount": "请选择账户",
-            "selectAsset": "请选择资产"
+            "selectAsset": "请选择资产",
+            "fundAgent": "充值代理",
+            "withdrawToMaster": "提取到主账户",
+            "enterAmount": "输入金额",
+            "selectAgent": "选择代理"
         },
         "form": {
             "labels": {

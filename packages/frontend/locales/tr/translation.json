@@ -318,7 +318,11 @@
             "available": "Yatırılabilir Bakiye",
             "enterAllFields": "Lütfen tüm alanları doldurun",
             "selectAccount": "Lütfen bir hesap seçin",
-            "selectAsset": "Lütfen bir varlık seçin"
+            "selectAsset": "Lütfen bir varlık seçin",
+            "fundAgent": "Aracıyı Fonla",
+            "withdrawToMaster": "Master'a Çek",
+            "enterAmount": "Miktar girin",
+            "selectAgent": "Aracı seçin"
         },
         "form": {
             "labels": {

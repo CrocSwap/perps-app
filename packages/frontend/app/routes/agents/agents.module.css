@@ -41,10 +41,22 @@
     color: var(--text1);
 }
 
+.header_actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
 .create_button {
     width: 300px;
     max-width: 300px;
     padding: 14px 16px;
+}
+
+.transfer_button {
+    padding: 14px 20px;
+    white-space: nowrap;
 }
 
 .blurb {

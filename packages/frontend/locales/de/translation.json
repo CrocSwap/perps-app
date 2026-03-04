@@ -318,7 +318,11 @@
             "available": "Verfügbar für Einzahlung",
             "enterAllFields": "Bitte alle Felder ausfüllen",
             "selectAccount": "Bitte wählen Sie ein Konto",
-            "selectAsset": "Bitte wählen Sie ein Asset"
+            "selectAsset": "Bitte wählen Sie ein Asset",
+            "fundAgent": "Agent finanzieren",
+            "withdrawToMaster": "An Master zurückziehen",
+            "enterAmount": "Betrag eingeben",
+            "selectAgent": "Agent auswählen"
         },
         "form": {
             "labels": {

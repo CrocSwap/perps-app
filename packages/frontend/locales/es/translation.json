@@ -318,7 +318,11 @@
             "available": "Disponible para depositar",
             "enterAllFields": "Por favor complete todos los campos",
             "selectAccount": "Por favor seleccione una cuenta",
-            "selectAsset": "Por favor seleccione un activo"
+            "selectAsset": "Por favor seleccione un activo",
+            "fundAgent": "Financiar agente",
+            "withdrawToMaster": "Retirar al master",
+            "enterAmount": "Ingrese monto",
+            "selectAgent": "Seleccionar agente"
         },
         "form": {
             "labels": {

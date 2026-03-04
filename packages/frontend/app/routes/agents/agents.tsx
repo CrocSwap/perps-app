@@ -151,19 +151,31 @@ export default function Agents() {
         useState<strategyDecoratedIF | null>(null);
     const [agentToTransfer, setAgentToTransfer] =
         useState<strategyDecoratedIF | null>(null);
+    const [isGlobalTransferOpen, setIsGlobalTransferOpen] = useState(false);
 
     return (
         <div className={styles.strategies_page}>
             <header>
                 <div className={styles.title_row}>
                     <h2>{t('pageTitles.agents')}</h2>
-                    <SimpleButton
-                        onClick={() => navigate(`${AGENTS_BASE_PATH}/new`)}
-                        hoverBg='accent1'
-                        className={styles.create_button}
-                    >
-                        {t('agents.overview.create')}
-                    </SimpleButton>
+                    <div className={styles.header_actions}>
+                        {data.length > 0 && (
+                            <SimpleButton
+                                onClick={() => setIsGlobalTransferOpen(true)}
+                                hoverBg='dark4'
+                                className={styles.transfer_button}
+                            >
+                                {t('common.transfer')}
+                            </SimpleButton>
+                        )}
+                        <SimpleButton
+                            onClick={() => navigate(`${AGENTS_BASE_PATH}/new`)}
+                            hoverBg='accent1'
+                            className={styles.create_button}
+                        >
+                            {t('agents.overview.create')}
+                        </SimpleButton>
+                    </div>
                 </div>
                 <p className={styles.blurb}>{t('agents.overview.blurb')}</p>
                 <a
@@ -368,6 +380,12 @@ export default function Agents() {
                 <TransferModal
                     agent={agentToTransfer}
                     closeModal={() => setAgentToTransfer(null)}
+                />
+            )}
+            {isGlobalTransferOpen && (
+                <TransferModal
+                    agents={data}
+                    closeModal={() => setIsGlobalTransferOpen(false)}
                 />
             )}
         </div>

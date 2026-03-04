@@ -102,7 +102,6 @@
         "closePosition": "Close Position",
         "closeAtCurrentPrice": "Close at Current Price",
         "closeAtAPriceYouSet": "Close at a Price You Set",
-
         "price": "Price",
         "size": "Size",
         "time": "Time",
@@ -319,7 +318,11 @@
             "available": "Available to Deposit",
             "enterAllFields": "Please enter all fields",
             "selectAccount": "Please select an account",
-            "selectAsset": "Please select an asset"
+            "selectAsset": "Please select an asset",
+            "fundAgent": "Fund Agent",
+            "withdrawToMaster": "Withdraw to Master",
+            "enterAmount": "Enter amount",
+            "selectAgent": "Select an agent"
         },
         "form": {
             "labels": {
