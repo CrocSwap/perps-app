@@ -6,7 +6,7 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { UserIdentifierType } from '@fuul/sdk';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import * as anchor from '@coral-xyz/anchor';
 import {
     FuulSdk,
@@ -964,6 +964,57 @@ export default function CodeTabs(props: PropsIF) {
                 '🎁 [Claim] Number of instructions:',
                 instructions.length,
             );
+
+            // Step 5: Sign and send directly to mainnet (not via FOGO Sessions)
+            console.log('🎁 [Claim] Building transaction for mainnet...');
+
+            const transaction = new Transaction();
+            transaction.add(...instructions);
+
+            // Get blockhash from mainnet
+            const { blockhash, lastValidBlockHeight } =
+                await fuulConnection.getLatestBlockhash('confirmed');
+            transaction.recentBlockhash = blockhash;
+            transaction.lastValidBlockHeight = lastValidBlockHeight;
+            transaction.feePayer = walletPublicKey;
+
+            console.log('🎁 [Claim] Blockhash:', blockhash);
+
+            // Sign with wallet
+            console.log('🎁 [Claim] Signing transaction...');
+            if (!sessionState.solanaWallet?.signTransaction) {
+                throw new Error('signTransaction not available on wallet');
+            }
+            const signedTx =
+                await sessionState.solanaWallet.signTransaction(transaction);
+            console.log('🎁 [Claim] Transaction signed');
+
+            // Send directly to mainnet
+            console.log('🎁 [Claim] Sending to mainnet...');
+            const txSignature = await fuulConnection.sendRawTransaction(
+                signedTx.serialize(),
+                {
+                    skipPreflight: false,
+                    preflightCommitment: 'confirmed',
+                },
+            );
+            console.log('🎁 [Claim] Transaction sent:', txSignature);
+
+            // Confirm
+            console.log('🎁 [Claim] Confirming...');
+            await fuulConnection.confirmTransaction(
+                { signature: txSignature, blockhash, lastValidBlockHeight },
+                'confirmed',
+            );
+
+            console.log('🎁 [Claim] Transaction confirmed!');
+            console.log(
+                '🎁 [Claim] Explorer:',
+                `https://explorer.fogo.io/tx/${txSignature}`,
+            );
+
+            // Refresh claims data
+            referralStore.fetchClaims(referrerAddress);
         } catch (error) {
             console.error('🎁 [Claim] Error:', error);
         }
