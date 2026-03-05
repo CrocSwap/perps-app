@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LuArrowLeftRight } from 'react-icons/lu';
+import { LuArrowLeftRight, LuCheck, LuCopy } from 'react-icons/lu';
 import {
     isEstablished,
     SessionButton,
@@ -73,6 +73,8 @@ export default function TransferModal(props: propsIF) {
     // shared amount input
     const [qty, setQty] = useState<string>('');
 
+    const [addressCopied, setAddressCopied] = useState(false);
+
     const sessionState = useSession();
     const isLoggedIn = isEstablished(sessionState);
 
@@ -81,11 +83,11 @@ export default function TransferModal(props: propsIF) {
     const withdrawSvc = useWithdrawService();
 
     // Agent available balance:
-    // Master → Agent: real master wallet balance (always fetched via depositSvc)
+    // Master → Agent: master margin balance (same as Withdraw modal) via withdrawSvc
     // Agent → Master: placeholder until subaccount balance query is implemented
     const agentAvailableBalance = isReversed
         ? MOCK_SUBACCOUNT_BALANCE
-        : (depositSvc.balance?.decimalized ?? 0);
+        : (withdrawSvc.availableBalance?.decimalized ?? 0);
 
     const isTransferLoading = USE_REAL_TRANSFER
         ? isReversed
@@ -191,6 +193,32 @@ export default function TransferModal(props: propsIF) {
                             </span>
                             <span className={styles.agent_info_value}>
                                 {agent.address}
+                                <button
+                                    type='button'
+                                    className={styles.copy_btn}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(
+                                            agent.address,
+                                        );
+                                        setAddressCopied(true);
+                                        setTimeout(
+                                            () => setAddressCopied(false),
+                                            2000,
+                                        );
+                                    }}
+                                    aria-label='Copy address'
+                                >
+                                    {addressCopied ? (
+                                        <LuCheck
+                                            size={12}
+                                            style={{
+                                                color: 'var(--positive1)',
+                                            }}
+                                        />
+                                    ) : (
+                                        <LuCopy size={12} />
+                                    )}
+                                </button>
                             </span>
                         </div>
                         <div className={styles.agent_info_row}>
@@ -226,7 +254,27 @@ export default function TransferModal(props: propsIF) {
                                 <button
                                     type='button'
                                     className={styles.swap_btn}
-                                    onClick={() => setIsReversed((r) => !r)}
+                                    onClick={() => {
+                                        setIsReversed((r) => {
+                                            const newReversed = !r;
+                                            const newBalance = newReversed
+                                                ? MOCK_SUBACCOUNT_BALANCE
+                                                : (withdrawSvc.availableBalance
+                                                      ?.decimalized ?? 0);
+                                            const newQty =
+                                                (sliderPct / 100) * newBalance;
+                                            setQty(
+                                                newQty === 0
+                                                    ? ''
+                                                    : String(
+                                                          parseFloat(
+                                                              newQty.toFixed(2),
+                                                          ),
+                                                      ),
+                                            );
+                                            return newReversed;
+                                        });
+                                    }}
                                     aria-label='Swap transfer direction'
                                 >
                                     <LuArrowLeftRight
@@ -353,7 +401,7 @@ export default function TransferModal(props: propsIF) {
                                 </p>
                                 <p>
                                     {!isReversed &&
-                                    depositSvc.isLoading &&
+                                    withdrawSvc.isLoading &&
                                     !agentAvailableBalance
                                         ? '...'
                                         : formattedAgentBalance}

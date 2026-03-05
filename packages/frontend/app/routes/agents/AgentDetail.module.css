@@ -465,10 +465,6 @@
         padding: 6px;
     }
 
-    .remove_strategy_modal {
-        min-width: min(92vw, 680px);
-    }
-
     .remove_strategy_modal > h3 {
         font-size: 24px;
     }

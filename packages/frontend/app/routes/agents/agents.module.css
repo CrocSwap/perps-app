@@ -228,7 +228,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap-m);
-    min-width: 680px;
+    width: 375px;
+    max-width: 90vw;
     padding: 24px 28px 28px;
 }
 
@@ -529,7 +530,7 @@
     }
 
     .remove_strategy_modal {
-        min-width: min(92vw, 680px);
+        width: 375px;
     }
 
     .remove_strategy_modal > h3 {

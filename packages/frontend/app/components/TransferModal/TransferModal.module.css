@@ -67,6 +67,7 @@
     flex-direction: column;
     gap: 6px;
     padding: 8 2px;
+    padding-top: 4px;
 }
 
 .amount_slider {
@@ -122,6 +123,7 @@
     border: none;
     outline: none;
     font-size: 10px;
+    font-weight: 600;
     color: var(--text2);
     cursor: pointer;
     padding: 2px 4px;
@@ -135,7 +137,6 @@
 
 .slider_label_active {
     color: var(--accent1);
-    font-weight: 600;
 }
 
 .info {
@@ -273,4 +274,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.copy_btn {
+    background: none;
+    border: none;
+    outline: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: color 0.15s ease;
+}
+
+.copy_btn:hover {
+    color: var(--text1);
 }
