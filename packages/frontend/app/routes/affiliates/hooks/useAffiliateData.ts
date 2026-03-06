@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReferrerPayoutData } from '@fuul/sdk';
 import { fetchAttributedReferralCount } from '../../../utils/refreg';
+import { FUUL_GET_API_KEY } from '~/utils/Constants';
 
 interface UserReferralCode {
     code?: string | null;
@@ -11,13 +12,35 @@ interface ListUserReferralCodesResponse {
     next_page?: number | null;
 }
 
-const FUUL_PORTAL_API_KEY =
-    'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
-const FUUL_PORTAL_HEADERS = {
-    accept: 'application/json',
-    authorization: `Bearer ${FUUL_PORTAL_API_KEY}`,
-};
+const FUUL_LEGACY_REFERRAL_CODES_API_KEY =
+    '74c36d38cf3f44ae2e90991a7e2857a0b035a623791a096e06c54b0c7f81354d';
+const FUUL_REFERRAL_CODES_AUTH_KEYS = [
+    FUUL_GET_API_KEY,
+    FUUL_LEGACY_REFERRAL_CODES_API_KEY,
+];
 const FUUL_REFERRAL_CODES_PAGE_SIZE = 100;
+
+async function fetchReferralCodesPage(url: string): Promise<Response> {
+    for (let i = 0; i < FUUL_REFERRAL_CODES_AUTH_KEYS.length; i += 1) {
+        const apiKey = FUUL_REFERRAL_CODES_AUTH_KEYS[i];
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                authorization: `Bearer ${apiKey}`,
+            },
+        });
+
+        if (
+            response.status !== 403 ||
+            i === FUUL_REFERRAL_CODES_AUTH_KEYS.length - 1
+        ) {
+            return response;
+        }
+    }
+
+    throw new Error('Failed to fetch referral codes');
+}
 
 async function fetchAffiliateReferralCodes(
     userIdentifier: string,
@@ -29,10 +52,7 @@ async function fetchAffiliateReferralCodes(
         const url = `https://api.fuul.xyz/api/v1/referral_codes?user_identifier=${userIdentifier}&user_identifier_type=solana_address&page=${page}&page_size=${FUUL_REFERRAL_CODES_PAGE_SIZE}`;
         console.log('FUUL listUserReferralCodes request:', { url });
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: FUUL_PORTAL_HEADERS,
-        });
+        const response = await fetchReferralCodesPage(url);
         console.log('FUUL listUserReferralCodes response status:', {
             page,
             status: response.status,
