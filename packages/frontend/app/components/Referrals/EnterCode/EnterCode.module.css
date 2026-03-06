@@ -76,6 +76,50 @@
     font-size: var(--font-size-s);
 }
 
+.codeWithIcon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-xs, 6px);
+}
+
+.codeWithIcon > p {
+    font-size: var(--font-size-s);
+    color: var(--accent3);
+    margin: 0;
+}
+
+.codeWithIcon > input {
+    flex: 1;
+    height: 28px;
+    padding: 0 var(--padding-xs, 8px);
+    border-radius: var(--radius-xs, 6px);
+    background: var(--bg-dark4, #27272c);
+    color: var(--text1, #f0f0f8);
+    font-size: var(--font-size-s, 12px);
+    border: 1px solid transparent;
+    outline: none;
+    transition:
+        border-color 120ms ease,
+        box-shadow 120ms ease;
+}
+
+.codeWithIcon > input::placeholder {
+    color: var(--text3, #707080);
+    font-style: italic;
+}
+
+.codeWithIcon > input:focus {
+    border-color: color-mix(in oklab, var(--accent1, #7371fc) 70%, #ffffff 30%);
+    box-shadow: 0 0 0 2px
+        color-mix(in oklab, var(--accent1, #7371fc) 55%, transparent);
+}
+
+.placeholder {
+    color: var(--text3, #707080) !important;
+    font-style: italic;
+}
+
 .ref_code_blurb {
     font-size: var(--font-size-s);
     color: var(--text2);
@@ -149,4 +193,45 @@
     .enterCodeContent input {
         transition: none;
     }
+}
+
+/* Icon buttons for inline edit */
+.iconButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-xs, 6px);
+    color: var(--text2, #a0a0b0);
+    cursor: pointer;
+    transition:
+        color 120ms ease,
+        background 120ms ease;
+}
+
+.iconButton:hover {
+    color: var(--text1, #f0f0f8);
+    background: var(--bg-dark4, #27272c);
+}
+
+.iconButton:active {
+    transform: scale(0.95);
+}
+
+.iconButton:focus-visible {
+    outline: 2px solid var(--accent1, #7371fc);
+    outline-offset: 2px;
+}
+
+.iconButton:disabled {
+    color: var(--text3, #707080);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.iconButton:disabled:hover {
+    background: transparent;
+    color: var(--text3, #707080);
 }
