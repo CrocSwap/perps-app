@@ -11,7 +11,7 @@ import {
     buildConnectWalletIx,
     buildConnectWalletInstruction,
     buildFirstTradeInstruction,
-    fetchPendingReferralCount,
+    fetchAttributedReferralCount,
     paddedStringToId32,
     sendStandaloneRefregTransactions,
 } from './refreg';
@@ -390,16 +390,16 @@ describe('refreg instruction builders', () => {
         expect(sendTransaction).toHaveBeenCalledTimes(2);
     });
 
-    it('fetchPendingReferralCount batches front-padded referral ids for pending users', async () => {
+    it('fetchAttributedReferralCount batches front-padded referral ids for attributed users', async () => {
         const fetchMock = vi.fn<typeof fetch>().mockResolvedValue({
             ok: true,
             status: 200,
-            json: async () => ({ pending_count: '7' }),
+            json: async () => ({ attributed_count: '7' }),
         } as Response);
 
         globalThis.fetch = fetchMock;
 
-        const count = await fetchPendingReferralCount({
+        const count = await fetchAttributedReferralCount({
             referralKind: 1,
             referralIdTexts: ['ben1234', 'ben1234', 'code-two'],
         });
@@ -410,7 +410,7 @@ describe('refreg instruction builders', () => {
         const [url] = fetchMock.mock.calls[0] ?? [];
         const requestUrl = new URL(String(url));
 
-        expect(requestUrl.pathname).toBe('/v1/referrals/pending-count');
+        expect(requestUrl.pathname).toBe('/v1/referrals/attributed-count');
         expect(requestUrl.searchParams.get('referral_kind')).toBe('1');
         expect(requestUrl.searchParams.get('dapp_id')).toBe(
             'ambi3LHRUzmU187u4rP46rX6wrYrLtU1Bmi5U2yCTGE',
@@ -423,11 +423,11 @@ describe('refreg instruction builders', () => {
         );
     });
 
-    it('fetchPendingReferralCount skips the network when no referral ids are provided', async () => {
+    it('fetchAttributedReferralCount skips the network when no referral ids are provided', async () => {
         const fetchMock = vi.fn<typeof fetch>();
         globalThis.fetch = fetchMock;
 
-        const count = await fetchPendingReferralCount({
+        const count = await fetchAttributedReferralCount({
             referralKind: 1,
             referralIdTexts: ['   ', ''],
         });

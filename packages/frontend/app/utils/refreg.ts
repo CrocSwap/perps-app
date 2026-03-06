@@ -75,7 +75,7 @@ export async function fetchReferralCount(params: {
     }
 }
 
-export async function fetchPendingReferralCount(params: {
+export async function fetchAttributedReferralCount(params: {
     referralKind: ReferralKind;
     referralIdTexts: string[];
 }): Promise<number | null> {
@@ -95,8 +95,8 @@ export async function fetchPendingReferralCount(params: {
             deriveReferralIdFromText(value),
         );
         const response = await fetchRefregJson<
-            PendingReferralCountResponse | RefregApiError
-        >('/v1/referrals/pending-count', {
+            AttributedReferralCountResponse | RefregApiError
+        >('/v1/referrals/attributed-count', {
             dapp_id: getDappIdBase58(),
             referral_kind: String(params.referralKind),
             referral_ids: referralIdsBase58.join(','),
@@ -104,7 +104,7 @@ export async function fetchPendingReferralCount(params: {
 
         if (isApiErrorResponse(response)) {
             console.info(
-                '[refreg] pending-referral-count returned API error payload',
+                '[refreg] attributed-referral-count returned API error payload',
                 {
                     referralKind: params.referralKind,
                     referralIdTexts,
@@ -115,10 +115,10 @@ export async function fetchPendingReferralCount(params: {
             return null;
         }
 
-        const count = parsePendingReferralCount(response);
+        const count = parseAttributedReferralCount(response);
         if (count === null) {
             console.info(
-                '[refreg] pending-referral-count response missing numeric count',
+                '[refreg] attributed-referral-count response missing numeric count',
                 {
                     referralKind: params.referralKind,
                     referralIdTexts,
@@ -129,7 +129,7 @@ export async function fetchPendingReferralCount(params: {
             return null;
         }
 
-        console.info('[refreg] pending-referral-count response', {
+        console.info('[refreg] attributed-referral-count response', {
             referralKind: params.referralKind,
             referralIdTexts,
             referralIdsBase58,
@@ -137,7 +137,7 @@ export async function fetchPendingReferralCount(params: {
         });
         return count;
     } catch (error) {
-        console.info('[refreg] pending-referral-count fetch failed:', error);
+        console.info('[refreg] attributed-referral-count fetch failed:', error);
         return null;
     }
 }
@@ -550,8 +550,9 @@ interface ReferralCountResponse {
     count?: unknown;
 }
 
-interface PendingReferralCountResponse {
+interface AttributedReferralCountResponse {
     count?: unknown;
+    attributed_count?: unknown;
     pending_count?: unknown;
 }
 
@@ -570,10 +571,12 @@ function parseReferralCount(value: unknown): number | null {
     return null;
 }
 
-function parsePendingReferralCount(
-    response: PendingReferralCountResponse,
+function parseAttributedReferralCount(
+    response: AttributedReferralCountResponse,
 ): number | null {
-    return parseReferralCount(response.pending_count ?? response.count);
+    return parseReferralCount(
+        response.attributed_count ?? response.count ?? response.pending_count,
+    );
 }
 
 interface ConnectWalletByUserRecord {

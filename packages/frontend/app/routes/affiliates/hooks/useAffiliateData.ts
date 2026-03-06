@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReferrerPayoutData } from '@fuul/sdk';
-import { fetchPendingReferralCount } from '../../../utils/refreg';
+import { fetchAttributedReferralCount } from '../../../utils/refreg';
 
 interface UserReferralCode {
     code?: string | null;
@@ -246,7 +246,7 @@ export function useAffiliateInviteeCount(
                 return;
             }
 
-            const count = await fetchPendingReferralCount({
+            const count = await fetchAttributedReferralCount({
                 referralKind: 1,
                 referralIdTexts: referralCodes,
             });
