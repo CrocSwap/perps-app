@@ -165,16 +165,7 @@ export default function TransferModal(props: propsIF) {
     );
 
     return (
-        <Modal
-            title={
-                isAgentTransfer
-                    ? isReversed
-                        ? t('agents.transfer.fromAgentTitle')
-                        : t('agents.transfer.toAgentTitle')
-                    : t('agents.transfer.title')
-            }
-            close={closeModal}
-        >
+        <Modal title={t('agents.transfer.title')} close={closeModal}>
             <div className={styles.transfer_modal}>
                 {/* Pre-selected agent info (single-agent mode only) */}
                 {agent && (
@@ -192,7 +183,7 @@ export default function TransferModal(props: propsIF) {
                                 {t('forms.address')}
                             </span>
                             <span className={styles.agent_info_value}>
-                                {agent.address}
+                                {`${agent.address.slice(0, 6)}...${agent.address.slice(-4)}`}
                                 <button
                                     type='button'
                                     className={styles.copy_btn}
@@ -337,7 +328,15 @@ export default function TransferModal(props: propsIF) {
                             />
                             <button
                                 type='button'
-                                onClick={() => setQty(String(activeBalance))}
+                                onClick={() =>
+                                    setQty(
+                                        String(
+                                            parseFloat(
+                                                activeBalance.toFixed(2),
+                                            ),
+                                        ),
+                                    )
+                                }
                                 aria-label={t('aria.setMaxAmount')}
                             >
                                 {t('common.max')}
@@ -455,7 +454,15 @@ export default function TransferModal(props: propsIF) {
                             />
                             <button
                                 type='button'
-                                onClick={() => setQty(String(activeBalance))}
+                                onClick={() =>
+                                    setQty(
+                                        String(
+                                            parseFloat(
+                                                activeBalance.toFixed(2),
+                                            ),
+                                        ),
+                                    )
+                                }
                                 aria-label={t('aria.setMaxAmount')}
                             >
                                 {t('common.max')}
