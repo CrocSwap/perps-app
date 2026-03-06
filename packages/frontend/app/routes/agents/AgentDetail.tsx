@@ -2,6 +2,11 @@ import { LuChevronLeft, LuCopy, LuFilter, LuCheck } from 'react-icons/lu';
 import styles from './AgentDetail.module.css';
 import { useNavigate, useParams } from 'react-router';
 import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
+import {
     useStrategiesStore,
     type strategyDecoratedIF,
     type useStrategiesStoreIF,
@@ -51,6 +56,8 @@ export default function AgentDetail() {
 
     // logic to control the transfer modal
     const transferModalCtrl = useModal();
+
+    const isLoggedIn = isEstablished(useSession());
 
     // state for copy feedback
     const [copied, setCopied] = useState(false);
@@ -165,103 +172,113 @@ export default function AgentDetail() {
                         <div className={styles.status_label}>
                             {t('agents.details.status')}: {statusLabel}
                         </div>
-                        <SimpleButton
-                            onClick={() =>
-                                strategy &&
-                                strategies.togglePause(strategy.address)
-                            }
-                            bg='dark3'
-                            hoverBg='dark4'
-                            className={styles.header_action}
-                        >
-                            {strategy?.isPaused
-                                ? t('agents.overview.unpause')
-                                : t('agents.overview.pause')}
-                        </SimpleButton>
-                        <SimpleButton
-                            onClick={() =>
-                                navigate(
-                                    `${AGENTS_BASE_PATH}/${agent_hash}/edit`,
-                                    {
-                                        state: {
-                                            agent: strategy,
-                                            address: agent_hash,
-                                        },
-                                    },
-                                )
-                            }
-                            bg='dark3'
-                            hoverBg='dark4'
-                            className={styles.header_action}
-                        >
-                            {t('common.edit')}
-                        </SimpleButton>
-                        <SimpleButton
-                            onClick={() => transferModalCtrl.open()}
-                            bg='dark3'
-                            hoverBg='dark4'
-                            className={styles.header_action}
-                        >
-                            {t('common.transfer')}
-                        </SimpleButton>
-                        <SimpleButton
-                            onClick={() => removeStratModalCtrl.open()}
-                            bg='dark3'
-                            hoverBg='dark4'
-                            className={styles.header_action}
-                        >
-                            {t('agents.overview.remove')}
-                        </SimpleButton>
+                        {isLoggedIn && (
+                            <>
+                                <SimpleButton
+                                    onClick={() =>
+                                        strategy &&
+                                        strategies.togglePause(strategy.address)
+                                    }
+                                    bg='dark3'
+                                    hoverBg='dark4'
+                                    className={styles.header_action}
+                                >
+                                    {strategy?.isPaused
+                                        ? t('agents.overview.unpause')
+                                        : t('agents.overview.pause')}
+                                </SimpleButton>
+                                <SimpleButton
+                                    onClick={() =>
+                                        navigate(
+                                            `${AGENTS_BASE_PATH}/${agent_hash}/edit`,
+                                            {
+                                                state: {
+                                                    agent: strategy,
+                                                    address: agent_hash,
+                                                },
+                                            },
+                                        )
+                                    }
+                                    bg='dark3'
+                                    hoverBg='dark4'
+                                    className={styles.header_action}
+                                >
+                                    {t('common.edit')}
+                                </SimpleButton>
+                                <SimpleButton
+                                    onClick={() => transferModalCtrl.open()}
+                                    bg='dark3'
+                                    hoverBg='dark4'
+                                    className={styles.header_action}
+                                >
+                                    {t('common.transfer')}
+                                </SimpleButton>
+                                <SimpleButton
+                                    onClick={() => removeStratModalCtrl.open()}
+                                    bg='dark3'
+                                    hoverBg='dark4'
+                                    className={styles.header_action}
+                                >
+                                    {t('agents.overview.remove')}
+                                </SimpleButton>
+                            </>
+                        )}
                     </div>
                     {/* Mobile-only horizontal action strip */}
                     <div className={styles.mobile_actions}>
-                        <SimpleButton
-                            onClick={() =>
-                                strategy &&
-                                strategies.togglePause(strategy.address)
-                            }
-                            bg='dark3'
-                            hoverBg='dark4'
-                            className={styles.mobile_action_btn}
-                        >
-                            {strategy?.isPaused
-                                ? t('agents.overview.unpause')
-                                : t('agents.overview.pause')}
-                        </SimpleButton>
-                        <SimpleButton
-                            onClick={() =>
-                                navigate(
-                                    `${AGENTS_BASE_PATH}/${agent_hash}/edit`,
-                                    {
-                                        state: {
-                                            agent: strategy,
-                                            address: agent_hash,
-                                        },
-                                    },
-                                )
-                            }
-                            bg='dark3'
-                            hoverBg='dark4'
-                            className={styles.mobile_action_btn}
-                        >
-                            {t('common.edit')}
-                        </SimpleButton>
-                        <SimpleButton
-                            onClick={() => transferModalCtrl.open()}
-                            bg='dark3'
-                            hoverBg='dark4'
-                            className={styles.mobile_action_btn}
-                        >
-                            {t('common.transfer')}
-                        </SimpleButton>
-                        <SimpleButton
-                            onClick={() => removeStratModalCtrl.open()}
-                            bg='dark3'
-                            hoverBg='dark4'
-                            className={`${styles.mobile_action_btn} ${styles.mobile_action_danger}`}
-                        >
-                            {t('agents.overview.remove')}
-                        </SimpleButton>
+                        {isLoggedIn ? (
+                            <>
+                                <SimpleButton
+                                    onClick={() =>
+                                        strategy &&
+                                        strategies.togglePause(strategy.address)
+                                    }
+                                    bg='dark3'
+                                    hoverBg='dark4'
+                                    className={styles.mobile_action_btn}
+                                >
+                                    {strategy?.isPaused
+                                        ? t('agents.overview.unpause')
+                                        : t('agents.overview.pause')}
+                                </SimpleButton>
+                                <SimpleButton
+                                    onClick={() =>
+                                        navigate(
+                                            `${AGENTS_BASE_PATH}/${agent_hash}/edit`,
+                                            {
+                                                state: {
+                                                    agent: strategy,
+                                                    address: agent_hash,
+                                                },
+                                            },
+                                        )
+                                    }
+                                    bg='dark3'
+                                    hoverBg='dark4'
+                                    className={styles.mobile_action_btn}
+                                >
+                                    {t('common.edit')}
+                                </SimpleButton>
+                                <SimpleButton
+                                    onClick={() => transferModalCtrl.open()}
+                                    bg='dark3'
+                                    hoverBg='dark4'
+                                    className={styles.mobile_action_btn}
+                                >
+                                    {t('common.transfer')}
+                                </SimpleButton>
+                                <SimpleButton
+                                    onClick={() => removeStratModalCtrl.open()}
+                                    bg='dark3'
+                                    hoverBg='dark4'
+                                    className={`${styles.mobile_action_btn} ${styles.mobile_action_danger}`}
+                                >
+                                    {t('agents.overview.remove')}
+                                </SimpleButton>
+                            </>
+                        ) : (
+                            <SessionButton />
+                        )}
                     </div>
                 </header>
                 {/* Mobile-only tab bar */}
@@ -376,56 +393,83 @@ export default function AgentDetail() {
                         </button>
                     </div>
                     <div className={styles.history_table_wrap}>
-                        <div
-                            className={styles.history_table}
-                            ref={tableRef}
-                            onScroll={handleTableScroll}
-                        >
-                            <div className={styles.history_row_header}>
-                                <span>{t('tradeTable.time')}</span>
-                                <span>{t('tradeTable.type')}</span>
-                                <span>{t('tradeTable.coin')}</span>
-                                <span>{t('tradeTable.direction')}</span>
-                                <span>{t('tradeTable.size')}</span>
-                                <span>{t('tradeTable.filledSize')}</span>
-                                <span>{t('tradeTable.orderValue')}</span>
-                                <span>{t('tradeTable.price')}</span>
-                                <span>{t('tradeTable.reduceOnly')}</span>
-                                <span>{t('tradeTable.triggerConditions')}</span>
-                                <span>{t('tradeTable.tpsl')}</span>
-                                <span>{t('tradeTable.status')}</span>
-                                <span>{t('tradeTable.orderId')}</span>
-                            </div>
-                            {mockOrderRows.slice(0, visibleCount).map((row) => (
+                        {isLoggedIn ? (
+                            <>
                                 <div
-                                    key={`${row.time}-${row.orderId}`}
-                                    className={styles.history_row}
+                                    className={styles.history_table}
+                                    ref={tableRef}
+                                    onScroll={handleTableScroll}
                                 >
-                                    <span>{row.time}</span>
-                                    <span>{row.type}</span>
-                                    <span>{row.coin}</span>
-                                    <span className={styles.long_value}>
-                                        {row.direction}
-                                    </span>
-                                    <span>{row.size}</span>
-                                    <span>{row.filledSize}</span>
-                                    <span>{row.orderValue}</span>
-                                    <span>{row.price}</span>
-                                    <span>{row.reduceOnly}</span>
-                                    <span>{row.triggerConditions}</span>
-                                    <span>{row.tpSl}</span>
-                                    <span>{row.status}</span>
-                                    <span>{row.orderId}</span>
+                                    <div className={styles.history_row_header}>
+                                        <span>{t('tradeTable.time')}</span>
+                                        <span>{t('tradeTable.type')}</span>
+                                        <span>{t('tradeTable.coin')}</span>
+                                        <span>{t('tradeTable.direction')}</span>
+                                        <span>{t('tradeTable.size')}</span>
+                                        <span>
+                                            {t('tradeTable.filledSize')}
+                                        </span>
+                                        <span>
+                                            {t('tradeTable.orderValue')}
+                                        </span>
+                                        <span>{t('tradeTable.price')}</span>
+                                        <span>
+                                            {t('tradeTable.reduceOnly')}
+                                        </span>
+                                        <span>
+                                            {t('tradeTable.triggerConditions')}
+                                        </span>
+                                        <span>{t('tradeTable.tpsl')}</span>
+                                        <span>{t('tradeTable.status')}</span>
+                                        <span>{t('tradeTable.orderId')}</span>
+                                    </div>
+                                    {mockOrderRows
+                                        .slice(0, visibleCount)
+                                        .map((row) => (
+                                            <div
+                                                key={`${row.time}-${row.orderId}`}
+                                                className={styles.history_row}
+                                            >
+                                                <span>{row.time}</span>
+                                                <span>{row.type}</span>
+                                                <span>{row.coin}</span>
+                                                <span
+                                                    className={
+                                                        styles.long_value
+                                                    }
+                                                >
+                                                    {row.direction}
+                                                </span>
+                                                <span>{row.size}</span>
+                                                <span>{row.filledSize}</span>
+                                                <span>{row.orderValue}</span>
+                                                <span>{row.price}</span>
+                                                <span>{row.reduceOnly}</span>
+                                                <span>
+                                                    {row.triggerConditions}
+                                                </span>
+                                                <span>{row.tpSl}</span>
+                                                <span>{row.status}</span>
+                                                <span>{row.orderId}</span>
+                                            </div>
+                                        ))}
+                                    {visibleCount < mockOrderRows.length && (
+                                        <div
+                                            ref={sentinelRef}
+                                            className={styles.scroll_sentinel}
+                                        />
+                                    )}
                                 </div>
-                            ))}
-                            {visibleCount < mockOrderRows.length && (
-                                <div
-                                    ref={sentinelRef}
-                                    className={styles.scroll_sentinel}
-                                />
-                            )}
-                        </div>
-                        {!isAtBottom && <div className={styles.history_fade} />}
+                                {!isAtBottom && (
+                                    <div className={styles.history_fade} />
+                                )}
+                            </>
+                        ) : (
+                            <div className={styles.connect_prompt}>
+                                <p>Connect your wallet to view order history</p>
+                                <SessionButton />
+                            </div>
+                        )}
                     </div>
                 </div>
                 {removeStratModalCtrl.isOpen && (

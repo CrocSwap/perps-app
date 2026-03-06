@@ -41,10 +41,22 @@
     color: var(--text1);
 }
 
+.header_actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
 .create_button {
     width: 300px;
     max-width: 300px;
     padding: 14px 16px;
+}
+
+.transfer_button {
+    padding: 14px 20px;
+    white-space: nowrap;
 }
 
 .blurb {
@@ -202,9 +214,13 @@
 
 .empty_state {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    gap: var(--gap-m);
     padding: 2rem 0;
     color: var(--text2);
+    font-size: var(--font-size-s);
 }
 
 .remove_strategy_modal {
@@ -212,7 +228,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap-m);
-    min-width: 680px;
+    width: 375px;
+    max-width: 90vw;
     padding: 24px 28px 28px;
 }
 
@@ -513,7 +530,7 @@
     }
 
     .remove_strategy_modal {
-        min-width: min(92vw, 680px);
+        width: 375px;
     }
 
     .remove_strategy_modal > h3 {
