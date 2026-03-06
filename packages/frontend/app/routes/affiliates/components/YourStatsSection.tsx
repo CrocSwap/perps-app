@@ -4,7 +4,6 @@ import { StatCard, StatCardSkeleton } from './StatCard';
 import { RebateRateCard, RebateRateCardSkeleton } from './RebateRateCard';
 import { AffiliateCurrentLevelCard } from './AffiliateCurrentLevelCard';
 import {
-    useAffiliateCode,
     useAffiliateInviteeCount,
     useAffiliateStats,
     useUserReferrer,
@@ -34,14 +33,10 @@ export function YourStatsSection() {
         refetch,
     } = useAffiliateStats(userAddress || '', isConnected && !!userAddress);
 
-    const { data: affiliateCode, isLoading: isLoadingAffiliateCode } =
-        useAffiliateCode(userAddress || '', isConnected && !!userAddress);
-
     const { data: inviteeCount, isLoading: isLoadingInviteeCount } =
         useAffiliateInviteeCount(
             userAddress || '',
-            affiliateCode?.code || '',
-            isConnected && !!userAddress && Boolean(affiliateCode?.code),
+            isConnected && !!userAddress,
         );
 
     const { data: referrerData } = useUserReferrer(
@@ -109,9 +104,7 @@ export function YourStatsSection() {
         : '-';
     const invitees = isConnected ? formatLargeNumber(inviteeCount ?? 0) : '-';
     const isInviteesLoading =
-        isLoading ||
-        isLoadingAffiliateCode ||
-        (isLoadingInviteeCount && inviteeCount === null);
+        isLoading || (isLoadingInviteeCount && inviteeCount === null);
 
     return (
         <section

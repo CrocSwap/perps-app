@@ -75,6 +75,73 @@ export async function fetchReferralCount(params: {
     }
 }
 
+export async function fetchPendingReferralCount(params: {
+    referralKind: ReferralKind;
+    referralIdTexts: string[];
+}): Promise<number | null> {
+    const referralIdTexts = Array.from(
+        new Set(
+            params.referralIdTexts.map((value) => value.trim()).filter(Boolean),
+        ),
+    );
+
+    if (referralIdTexts.length === 0) {
+        return 0;
+    }
+
+    try {
+        logRefregConfigOnce();
+        const referralIdsBase58 = referralIdTexts.map((value) =>
+            deriveReferralIdFromText(value),
+        );
+        const response = await fetchRefregJson<
+            PendingReferralCountResponse | RefregApiError
+        >('/v1/referrals/pending-count', {
+            dapp_id: getDappIdBase58(),
+            referral_kind: String(params.referralKind),
+            referral_ids: referralIdsBase58.join(','),
+        });
+
+        if (isApiErrorResponse(response)) {
+            console.info(
+                '[refreg] pending-referral-count returned API error payload',
+                {
+                    referralKind: params.referralKind,
+                    referralIdTexts,
+                    referralIdsBase58,
+                    response,
+                },
+            );
+            return null;
+        }
+
+        const count = parsePendingReferralCount(response);
+        if (count === null) {
+            console.info(
+                '[refreg] pending-referral-count response missing numeric count',
+                {
+                    referralKind: params.referralKind,
+                    referralIdTexts,
+                    referralIdsBase58,
+                    response,
+                },
+            );
+            return null;
+        }
+
+        console.info('[refreg] pending-referral-count response', {
+            referralKind: params.referralKind,
+            referralIdTexts,
+            referralIdsBase58,
+            count,
+        });
+        return count;
+    } catch (error) {
+        console.info('[refreg] pending-referral-count fetch failed:', error);
+        return null;
+    }
+}
+
 export interface ConnectWalletBuildResult {
     instruction: TransactionInstruction;
     fingerprint: string;
@@ -175,15 +242,6 @@ function readLocalStorage(key: string): string | null {
     } catch (error) {
         console.info('[refreg] localStorage access failed:', error);
         return null;
-    }
-}
-
-function writeLocalStorage(key: string, value: string): void {
-    if (typeof window === 'undefined') return;
-    try {
-        window.localStorage.setItem(key, value);
-    } catch (error) {
-        console.info('[refreg] localStorage write failed:', error);
     }
 }
 
@@ -492,6 +550,11 @@ interface ReferralCountResponse {
     count?: unknown;
 }
 
+interface PendingReferralCountResponse {
+    count?: unknown;
+    pending_count?: unknown;
+}
+
 function parseReferralCount(value: unknown): number | null {
     if (typeof value === 'number' && Number.isFinite(value)) {
         return Math.max(0, Math.trunc(value));
@@ -505,6 +568,12 @@ function parseReferralCount(value: unknown): number | null {
     }
 
     return null;
+}
+
+function parsePendingReferralCount(
+    response: PendingReferralCountResponse,
+): number | null {
+    return parseReferralCount(response.pending_count ?? response.count);
 }
 
 interface ConnectWalletByUserRecord {
