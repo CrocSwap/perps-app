@@ -26,11 +26,13 @@
         "test:ci": "vitest run"
     },
     "dependencies": {
+        "@coral-xyz/anchor": "^0.32.1",
         "@crocswap-libs/ambient-ember": "^0.1.59",
         "@fogo/sessions-idls": "^0.1.2",
         "@fogo/sessions-sdk": "^0.1.8",
         "@fogo/sessions-sdk-react": "^0.1.15",
         "@fuul/sdk": "^7.16.0",
+        "@fuul/sdk-solana": "^0.5.7",
         "@perps-app/sdk": "workspace:*",
         "@plausible-analytics/tracker": "0.4.4",
         "@pythnetwork/hermes-client": "^2.1.0",

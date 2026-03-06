@@ -2,9 +2,21 @@ import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import {
     isEstablished,
     SessionButton,
+    useConnection,
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { UserIdentifierType } from '@fuul/sdk';
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
+import * as anchor from '@coral-xyz/anchor';
+import {
+    FuulSdk,
+    Network,
+    ClaimMessage,
+    ClaimMessageData,
+    MessageDomain,
+    TokenType,
+    ClaimReason,
+} from '@fuul/sdk-solana';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
@@ -28,6 +40,116 @@ import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { debugLog } from '~/utils/debugLog';
 import { useDebounce } from '~/hooks/useDebounce';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
+
+// --- Fuul claim helpers ---
+// Fuul contracts are deployed on Fogo mainnet, separate from app's testnet
+const FOGO_MAINNET_RPC = 'https://mainnet.fogo.io';
+
+function getFuulConnection(): Connection {
+    return new Connection(FOGO_MAINNET_RPC, {
+        commitment: 'confirmed',
+    });
+}
+
+async function getClaimFee(): Promise<bigint | null> {
+    const connection = getFuulConnection();
+    const sdk = new FuulSdk(connection, Network.FOGO_MAINNET);
+    const globalConfig = await sdk.getGlobalConfig();
+    if (!globalConfig) {
+        console.warn('[CodeTabs] GlobalConfig not found');
+        return null;
+    }
+    return BigInt(globalConfig.feeManagement.userNativeClaimFee.toString());
+}
+
+async function fetchClaimRequirements(sdk: FuulSdk, projectAddress: PublicKey) {
+    const program = sdk.getProgram();
+    console.log('hey');
+    // Fetch project account to get nonce
+    const projectAccount = await program.account.project.fetch(projectAddress);
+    const projectNonce = projectAccount.nonce as anchor.BN;
+
+    // Fetch global config to get authorized signer
+    const globalConfig = await sdk.getGlobalConfig();
+    if (!globalConfig) {
+        throw new Error('Global config not found');
+    }
+
+    const signers = globalConfig.rolesMapping.roles
+        .filter(
+            (r: { role: Record<string, unknown>; account: PublicKey }) =>
+                Object.keys(r.role)[0] === 'signer',
+        )
+        .map(
+            (r: { role: Record<string, unknown>; account: PublicKey }) =>
+                r.account,
+        );
+
+    if (signers.length === 0) {
+        throw new Error('No authorized signers found');
+    }
+
+    return { projectNonce, signer: signers[0], program };
+}
+
+async function buildClaimInstructions(
+    sdk: FuulSdk,
+    walletPublicKey: PublicKey,
+    claim: {
+        projectAddress: PublicKey;
+        recipient: PublicKey;
+        tokenMint: PublicKey;
+        amount: bigint;
+        deadline: number;
+        reasonCode: number;
+        proof: Uint8Array;
+        signature: Uint8Array;
+    },
+) {
+    const { projectNonce, signer, program } = await fetchClaimRequirements(
+        sdk,
+        claim.projectAddress,
+    );
+
+    // Build message domain
+    const domain = new MessageDomain({
+        programId: program.programId,
+        version: 1,
+        deadline: BigInt(claim.deadline),
+    });
+
+    // Build claim data
+    const claimData = new ClaimMessageData({
+        amount: claim.amount,
+        project: claim.projectAddress,
+        recipient: claim.recipient,
+        tokenType: TokenType.FungibleSpl,
+        tokenMint: claim.tokenMint,
+        proof: Buffer.from(claim.proof),
+        reason:
+            claim.reasonCode === 0
+                ? ClaimReason.AffiliatePayout
+                : ClaimReason.EndUserPayout,
+    });
+
+    const claimMessage = new ClaimMessage({ data: claimData, domain });
+
+    // SDK handles ATA creation and PDA derivation internally
+    const instructions = await sdk.claim({
+        authority: walletPublicKey,
+        projectNonce,
+        message: claimMessage,
+        signatures: [
+            {
+                signature: claim.signature,
+                signer: signer,
+            },
+        ],
+    });
+
+    return instructions;
+}
+// --- End Fuul claim helpers ---
 
 interface PropsIF {
     initialTab?: string;
@@ -63,6 +185,7 @@ export default function CodeTabs(props: PropsIF) {
     const refCodeModalStore = useRefCodeModalStore();
 
     const sessionState = useSession();
+    const connection = useConnection();
 
     const isSessionEstablished = useMemo<boolean>(
         () => isEstablished(sessionState),
@@ -698,14 +821,217 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [referrerCode]);
 
+    const claimsData = referralStore.claims;
+    console.log('🎁 [CodeTabs] claimsData from store:', claimsData);
+    const claimableAmount = useMemo(() => {
+        console.log(
+            '🎁 [CodeTabs] calculating claimableAmount, claimsData:',
+            claimsData,
+        );
+        if (!claimsData || claimsData.length === 0) return '$0.00';
+        // Sum all claim amounts (amounts are in smallest unit, e.g., lamports or token decimals)
+        const totalAmount = claimsData.reduce((sum, claim) => {
+            console.log('🎁 [CodeTabs] claim amount:', claim.amount);
+            return sum + BigInt(claim.amount);
+        }, BigInt(0));
+        console.log('🎁 [CodeTabs] totalAmount (raw):', totalAmount.toString());
+        // Convert to human-readable format (assuming 6 decimals for USDC-like tokens)
+        const decimals = 6;
+        const divisor = BigInt(10 ** decimals);
+        const wholePart = totalAmount / divisor;
+        const fractionalPart = totalAmount % divisor;
+        const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
+        // Show full precision, then trim trailing zeros but keep at least 2 decimal places
+        const trimmed = fractionalStr.replace(/0+$/, '') || '00';
+        const displayDecimals = trimmed.length < 2 ? '00' : trimmed;
+        const formatted = `${wholePart}.${displayDecimals}`;
+        // If amount is less than 0.01, show raw smallest units instead
+        if (wholePart === BigInt(0) && totalAmount > BigInt(0)) {
+            return `${totalAmount.toString()} units`;
+        }
+        return `$${formatted}`;
+    }, [claimsData]);
+
+    const handleClaimClick = async () => {
+        console.log('🎁 [Claim] Button clicked');
+        console.log('🎁 [Claim] User address:', referrerAddress);
+        console.log('🎁 [Claim] Claims data:', claimsData);
+        console.log('🎁 [Claim] Claimable amount:', claimableAmount);
+
+        if (!claimsData || claimsData.length === 0) {
+            console.warn('🎁 [Claim] No claims data available');
+            return;
+        }
+
+        console.log('🎁 [Claim] Claims check passed, proceeding...');
+
+        try {
+            // Use Fogo mainnet connection for Fuul contracts
+            console.log('🎁 [Claim] Initializing Fuul SDK (Fogo mainnet)...');
+            const fuulConnection = getFuulConnection();
+            const sdk = new FuulSdk(fuulConnection, Network.FOGO_MAINNET);
+            console.log('🎁 [Claim] SDK initialized');
+
+            // Get claim fee
+            console.log('🎁 [Claim] Fetching claim fee...');
+            const claimFee = await getClaimFee();
+            console.log(
+                '🎁 [Claim] Claim fee (lamports):',
+                claimFee?.toString() ?? 'null',
+            );
+            if (claimFee !== null) {
+                const solFee = Number(claimFee) / 1e9;
+                console.log('🎁 [Claim] Claim fee (SOL):', solFee);
+            }
+
+            // Fetch claim requirements using first claim's project address
+            const firstClaim = claimsData[0];
+            const projectAddress = new PublicKey(firstClaim.project_address);
+            console.log(
+                '🎁 [Claim] Project address:',
+                projectAddress.toBase58(),
+            );
+
+            console.log('🎁 [Claim] Fetching claim requirements...');
+            const requirements = await fetchClaimRequirements(
+                sdk,
+                projectAddress,
+            );
+            console.log(
+                '🎁 [Claim] Project nonce:',
+                requirements.projectNonce.toString(),
+            );
+            console.log('🎁 [Claim] Signer:', requirements.signer.toBase58());
+            console.log(
+                '🎁 [Claim] Program ID:',
+                requirements.program.programId.toBase58(),
+            );
+
+            // Build claim instructions
+            console.log('🎁 [Claim] Building claim instructions...');
+
+            // Get wallet public key from session
+            if (!isEstablished(sessionState)) {
+                console.error('🎁 [Claim] Session not established');
+                return;
+            }
+            const walletPublicKey =
+                sessionState.walletPublicKey || sessionState.sessionPublicKey;
+            if (!walletPublicKey) {
+                console.error('🎁 [Claim] No wallet public key found');
+                return;
+            }
+            console.log(
+                '🎁 [Claim] Wallet public key:',
+                walletPublicKey.toBase58(),
+            );
+
+            // Decode proof and signature from hex (0x-prefixed)
+            const hexToBytes = (hex: string): Uint8Array => {
+                const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex;
+                const bytes = new Uint8Array(cleanHex.length / 2);
+                for (let i = 0; i < bytes.length; i++) {
+                    bytes[i] = parseInt(cleanHex.substr(i * 2, 2), 16);
+                }
+                return bytes;
+            };
+
+            const proofBytes = hexToBytes(firstClaim.proof);
+            const signatureBytes = hexToBytes(firstClaim.signatures[0]);
+            console.log('🎁 [Claim] Proof bytes length:', proofBytes.length);
+            console.log(
+                '🎁 [Claim] Signature bytes length:',
+                signatureBytes.length,
+            );
+
+            const instructions = await buildClaimInstructions(
+                sdk,
+                walletPublicKey,
+                {
+                    projectAddress,
+                    recipient: new PublicKey(firstClaim.to),
+                    tokenMint: new PublicKey(firstClaim.currency),
+                    amount: BigInt(firstClaim.amount),
+                    deadline: firstClaim.deadline,
+                    reasonCode: firstClaim.reason,
+                    proof: proofBytes,
+                    signature: signatureBytes,
+                },
+            );
+
+            console.log('🎁 [Claim] Instructions built:', instructions);
+            console.log(
+                '🎁 [Claim] Number of instructions:',
+                instructions.length,
+            );
+
+            // Step 5: Sign and send directly to mainnet (not via FOGO Sessions)
+            console.log('🎁 [Claim] Building transaction for mainnet...');
+
+            const transaction = new Transaction();
+            transaction.add(...instructions);
+
+            // Get blockhash from mainnet
+            const { blockhash, lastValidBlockHeight } =
+                await fuulConnection.getLatestBlockhash('confirmed');
+            transaction.recentBlockhash = blockhash;
+            transaction.lastValidBlockHeight = lastValidBlockHeight;
+            transaction.feePayer = walletPublicKey;
+
+            console.log('🎁 [Claim] Blockhash:', blockhash);
+
+            // Sign with wallet
+            console.log('🎁 [Claim] Signing transaction...');
+            if (!sessionState.solanaWallet?.signTransaction) {
+                throw new Error('signTransaction not available on wallet');
+            }
+            const signedTx =
+                await sessionState.solanaWallet.signTransaction(transaction);
+            console.log('🎁 [Claim] Transaction signed');
+
+            // Send directly to mainnet
+            console.log('🎁 [Claim] Sending to mainnet...');
+            const txSignature = await fuulConnection.sendRawTransaction(
+                signedTx.serialize(),
+                {
+                    skipPreflight: false,
+                    preflightCommitment: 'confirmed',
+                },
+            );
+            console.log('🎁 [Claim] Transaction sent:', txSignature);
+
+            // Confirm
+            console.log('🎁 [Claim] Confirming...');
+            await fuulConnection.confirmTransaction(
+                { signature: txSignature, blockhash, lastValidBlockHeight },
+                'confirmed',
+            );
+
+            console.log('🎁 [Claim] Transaction confirmed!');
+            console.log(
+                '🎁 [Claim] Explorer:',
+                `https://explorer.fogo.io/tx/${txSignature}`,
+            );
+
+            // Refresh claims data
+            referralStore.fetchClaims(referrerAddress);
+        } catch (error) {
+            console.error('🎁 [Claim] Error:', error);
+        }
+    };
+
     const claimElem = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
             <div className={styles.claimContent}>
                 <p>
-                    {t('referrals.claimRewardsWithAmount', { amount: '$0.00' })}
+                    {t('referrals.claimRewardsWithAmount', {
+                        amount: claimableAmount,
+                    })}
                 </p>
             </div>
-            <SimpleButton bg='accent1'>{t('common.claim')}</SimpleButton>
+            <SimpleButton bg='accent1' onClick={handleClaimClick}>
+                {t('common.claim')}
+            </SimpleButton>
         </section>
     ) : (
         <section className={styles.sectionWithButton}>
