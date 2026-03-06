@@ -1,7 +1,7 @@
 import { SessionButton } from '@fogo/sessions-sdk-react';
 import { Trans, useTranslation } from 'react-i18next';
 import { FiEdit2 } from 'react-icons/fi';
-import { IoCheckmark, IoClose } from 'react-icons/io5';
+import { IoClose } from 'react-icons/io5';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import styles from './EnterCode.module.css';
 
@@ -145,22 +145,6 @@ export default function EnterCode(props: PropsIF) {
                                     })}
                                     autoFocus
                                 />
-                                <button
-                                    type='button'
-                                    className={styles.iconButton}
-                                    onClick={() => {
-                                        if (!isConfirmDisabled) {
-                                            handleOverwriteReferralCode(
-                                                userInputRefCode,
-                                            );
-                                            setEditModeInvitee(false);
-                                        }
-                                    }}
-                                    disabled={isConfirmDisabled}
-                                    aria-label={t('common.save')}
-                                >
-                                    <IoCheckmark size={16} />
-                                </button>
                                 <button
                                     type='button'
                                     className={styles.iconButton}
