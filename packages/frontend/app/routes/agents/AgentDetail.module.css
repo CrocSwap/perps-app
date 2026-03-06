@@ -227,6 +227,18 @@
     overflow: hidden;
 }
 
+.connect_prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-m);
+    flex: 1;
+    padding: 2rem;
+    color: var(--text2);
+    font-size: var(--font-size-s);
+}
+
 .history_table {
     flex: 1;
     min-height: 0;
@@ -451,10 +463,6 @@
 
     .history_table {
         padding: 6px;
-    }
-
-    .remove_strategy_modal {
-        min-width: min(92vw, 680px);
     }
 
     .remove_strategy_modal > h3 {
