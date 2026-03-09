@@ -4,6 +4,7 @@ import { StatCard, StatCardSkeleton } from './StatCard';
 import { RebateRateCard, RebateRateCardSkeleton } from './RebateRateCard';
 import { AffiliateCurrentLevelCard } from './AffiliateCurrentLevelCard';
 import {
+    useAffiliateInviteeCount,
     useAffiliateStats,
     useUserReferrer,
     useUserPayoutMovements,
@@ -31,6 +32,12 @@ export function YourStatsSection() {
         error,
         refetch,
     } = useAffiliateStats(userAddress || '', isConnected && !!userAddress);
+
+    const { data: inviteeCount, isLoading: isLoadingInviteeCount } =
+        useAffiliateInviteeCount(
+            userAddress || '',
+            isConnected && !!userAddress,
+        );
 
     const { data: referrerData } = useUserReferrer(
         userAddress || '',
@@ -95,9 +102,9 @@ export function YourStatsSection() {
     const activeTraders = isConnected
         ? formatLargeNumber(stats?.activeTraders ?? 0)
         : '-';
-    const invitees = isConnected
-        ? formatLargeNumber(stats?.referred_users ?? 0)
-        : '-';
+    const invitees = isConnected ? formatLargeNumber(inviteeCount ?? 0) : '-';
+    const isInviteesLoading =
+        isLoading || (isLoadingInviteeCount && inviteeCount === null);
 
     return (
         <section
@@ -186,7 +193,7 @@ export function YourStatsSection() {
                         />
                     )}
 
-                    {isLoading ? (
+                    {isInviteesLoading ? (
                         <StatCardSkeleton label={STATS_LABELS.INVITEES} />
                     ) : (
                         <StatCard

@@ -1,6 +1,77 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Fuul, UserIdentifierType } from '@fuul/sdk';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReferrerPayoutData } from '@fuul/sdk';
+import { fetchAttributedReferralCount } from '../../../utils/refreg';
+
+interface UserReferralCode {
+    code?: string | null;
+}
+
+interface ListUserReferralCodesResponse {
+    results?: UserReferralCode[];
+    next_page?: number | null;
+}
+
+const FUUL_LEGACY_REFERRAL_CODES_API_KEY =
+    '74c36d38cf3f44ae2e90991a7e2857a0b035a623791a096e06c54b0c7f81354d';
+const FUUL_REFERRAL_CODES_PAGE_SIZE = 100;
+
+async function fetchReferralCodesPage(url: string): Promise<Response> {
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            accept: 'application/json',
+            authorization: `Bearer ${FUUL_LEGACY_REFERRAL_CODES_API_KEY}`,
+        },
+    });
+
+    return response;
+}
+
+async function fetchAffiliateReferralCodes(
+    userIdentifier: string,
+): Promise<string[]> {
+    const codes = new Set<string>();
+    let page: number | null = 1;
+
+    while (page !== null) {
+        const url = `https://api.fuul.xyz/api/v1/referral_codes?user_identifier=${userIdentifier}&user_identifier_type=solana_address&page=${page}&page_size=${FUUL_REFERRAL_CODES_PAGE_SIZE}`;
+        console.log('FUUL listUserReferralCodes request:', { url });
+
+        const response = await fetchReferralCodesPage(url);
+        console.log('FUUL listUserReferralCodes response status:', {
+            page,
+            status: response.status,
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                return [];
+            }
+
+            const text = await response.text();
+            console.error('FUUL listUserReferralCodes error:', text);
+            throw new Error(text);
+        }
+
+        const payload =
+            (await response.json()) as ListUserReferralCodesResponse;
+        console.log('FUUL listUserReferralCodes success:', {
+            page,
+            count: payload.results?.length ?? 0,
+            next_page: payload.next_page,
+        });
+
+        payload.results?.forEach((result) => {
+            if (typeof result.code === 'string' && result.code.trim()) {
+                codes.add(result.code.trim());
+            }
+        });
+
+        page = typeof payload.next_page === 'number' ? payload.next_page : null;
+    }
+
+    return Array.from(codes);
+}
 
 function isNotFoundError(err: unknown): boolean {
     if (err instanceof Error) {
@@ -71,6 +142,8 @@ export interface AffiliateStats {
     isRegistered: boolean;
 }
 
+const INVITEE_COUNT_POLL_MS = 30_000;
+
 // Hook for affiliate audience check
 export function useAffiliateAudience(userIdentifier: string, enabled = true) {
     const [data, setData] = useState<{
@@ -139,6 +212,76 @@ export function useAffiliateAudience(userIdentifier: string, enabled = true) {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    useEffect(() => {
+        window.addEventListener('affiliateDataUpdate', fetchData);
+        return () =>
+            window.removeEventListener('affiliateDataUpdate', fetchData);
+    }, [fetchData]);
+
+    return { data, isLoading, error, refetch: fetchData };
+}
+
+export function useAffiliateInviteeCount(
+    walletAddress: string,
+    enabled = true,
+) {
+    const [data, setData] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+    const inFlightRef = useRef(false);
+    const hasLoadedOnceRef = useRef(false);
+
+    const fetchData = useCallback(async () => {
+        if (!enabled || !walletAddress) return;
+        if (inFlightRef.current) return;
+
+        inFlightRef.current = true;
+        if (!hasLoadedOnceRef.current) {
+            setIsLoading(true);
+        }
+        setError(null);
+
+        try {
+            const referralCodes =
+                await fetchAffiliateReferralCodes(walletAddress);
+
+            if (referralCodes.length === 0) {
+                setData(0);
+                return;
+            }
+
+            const count = await fetchAttributedReferralCount({
+                referralKind: 1,
+                referralIdTexts: referralCodes,
+            });
+
+            setData(count ?? 0);
+        } catch (err) {
+            setError(
+                err instanceof Error
+                    ? err
+                    : new Error('Failed to fetch invitee count'),
+            );
+        } finally {
+            inFlightRef.current = false;
+            hasLoadedOnceRef.current = true;
+            setIsLoading(false);
+        }
+    }, [enabled, walletAddress]);
+
+    useEffect(() => {
+        if (!enabled || !walletAddress) return;
+
+        void fetchData();
+        const intervalId = window.setInterval(() => {
+            void fetchData();
+        }, INVITEE_COUNT_POLL_MS);
+
+        return () => {
+            window.clearInterval(intervalId);
+        };
+    }, [enabled, fetchData, walletAddress]);
 
     useEffect(() => {
         window.addEventListener('affiliateDataUpdate', fetchData);
