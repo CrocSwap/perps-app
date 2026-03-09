@@ -257,7 +257,7 @@ export default function CodeTabs(props: PropsIF) {
         setLastValidatedCode(r);
     }
 
-    // fn to update referral code state without opening modal
+    // fn to update referral code state and open modal
     function handleOverwriteReferralCode(r: string): void {
         if (!r || !r.trim()) {
             return;
@@ -268,6 +268,7 @@ export default function CodeTabs(props: PropsIF) {
         setIsCachedValueValid(true);
         setEditModeInvitee(false);
         setLastValidatedCode(r);
+        refCodeModalStore.openModal(r);
     }
 
     // pixel-width breakpoint to toggle shorter copy
