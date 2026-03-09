@@ -12,6 +12,7 @@ interface PropsIF {
     inviteeMaxVolumeThreshold: number;
     cached: string;
     isApproved: boolean;
+    isAttributed: boolean;
     isCachedValueValid: boolean | undefined;
     refCodeToConsume: string | undefined;
     editModeInvitee: boolean;
@@ -36,6 +37,7 @@ export default function EnterCode(props: PropsIF) {
         inviteeMaxVolumeThreshold,
         cached,
         isApproved,
+        isAttributed,
         isCachedValueValid,
         refCodeToConsume,
         editModeInvitee,
@@ -55,7 +57,9 @@ export default function EnterCode(props: PropsIF) {
     const { t } = useTranslation();
 
     const isEligibleToEdit =
-        totVolume !== undefined && totVolume < inviteeMaxVolumeThreshold;
+        !isAttributed &&
+        totVolume !== undefined &&
+        totVolume < inviteeMaxVolumeThreshold;
 
     const handleCancelEdit = () => {
         setEditModeInvitee(false);
@@ -133,7 +137,7 @@ export default function EnterCode(props: PropsIF) {
             <div className={styles.enterCodeContent}>
                 <div className={styles.current_ref_code}>
                     <h6>
-                        {isApproved
+                        {isApproved || isAttributed
                             ? t('referrals.refCode')
                             : t('referrals.pendingRefCode')}
                     </h6>

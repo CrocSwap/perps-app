@@ -123,6 +123,21 @@ export default function CodeTabs(props: PropsIF) {
         string | undefined
     >(undefined);
 
+    // tracks whether the user's wallet is already attributed to a referrer on-chain
+    const [isAttributed, setIsAttributed] = useState<boolean>(false);
+
+    // check if user is already attributed when wallet connects
+    useEffect(() => {
+        if (referrerAddress) {
+            referralStore
+                .checkForConversion(referrerAddress.toString())
+                .then((converted) => setIsAttributed(converted))
+                .catch(() => setIsAttributed(false));
+        } else {
+            setIsAttributed(false);
+        }
+    }, [referrerAddress]);
+
     // update refCodeToConsume whenever the cached value changes
     useEffect(() => {
         if (referralStore.cached.code && referrerAddress) {
@@ -752,6 +767,7 @@ export default function CodeTabs(props: PropsIF) {
                         inviteeMaxVolumeThreshold={INVITEE_MAX_VOLUME_THRESHOLD}
                         cached={referralStore.cached.code}
                         isApproved={referralStore.cached.isApproved}
+                        isAttributed={isAttributed}
                         isCachedValueValid={isCachedValueValid}
                         refCodeToConsume={refCodeToConsume}
                         editModeInvitee={editModeInvitee}
