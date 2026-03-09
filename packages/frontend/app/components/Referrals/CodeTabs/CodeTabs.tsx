@@ -6,17 +6,14 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { UserIdentifierType } from '@fuul/sdk';
-import { Connection, PublicKey, Transaction } from '@solana/web3.js';
-import * as anchor from '@coral-xyz/anchor';
+import { PublicKey, Transaction } from '@solana/web3.js';
+import { FuulSdk, Network } from '@fuul/sdk-solana';
 import {
-    FuulSdk,
-    Network,
-    ClaimMessage,
-    ClaimMessageData,
-    MessageDomain,
-    TokenType,
-    ClaimReason,
-} from '@fuul/sdk-solana';
+    getFuulConnection,
+    getClaimFee,
+    fetchClaimRequirements,
+    buildClaimInstructions,
+} from '~/utils/claimRewards';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
