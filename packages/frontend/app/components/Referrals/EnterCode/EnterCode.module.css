@@ -56,20 +56,16 @@
 }
 
 .current_ref_code {
-    width: 100%;
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--gap-s, 10px);
-    font-family: var(--font-size-s);
-    color: var(--accent3);
+    flex-direction: column;
+    gap: var(--gap-xs, 6px);
 }
 
 .current_ref_code h6 {
     color: var(--base-text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     margin: 0;
+    line-height: 1;
 }
 
 .current_ref_code > p {
@@ -81,27 +77,40 @@
     flex-direction: row;
     align-items: center;
     gap: var(--gap-xs, 6px);
+    height: 28px;
 }
 
-.codeWithIcon > p {
-    font-size: var(--font-size-s);
+.codeValue {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 var(--padding-xs, 8px);
+    font-size: var(--font-size-s, 12px);
     color: var(--accent3);
     margin: 0;
+    border-radius: var(--radius-xs, 6px);
+    border: 1px solid transparent;
+    background: transparent;
+}
+
+.codeValue.placeholder {
+    color: var(--text3, #707080);
+    font-style: italic;
 }
 
 .codeWithIcon > input {
-    flex: 1;
     height: 28px;
+    min-width: 120px;
     padding: 0 var(--padding-xs, 8px);
     border-radius: var(--radius-xs, 6px);
-    background: var(--bg-dark4, #27272c);
-    color: var(--text1, #f0f0f8);
+    background: transparent;
+    color: var(--accent3);
     font-size: var(--font-size-s, 12px);
     border: 1px solid transparent;
     outline: none;
     transition:
         border-color 120ms ease,
-        box-shadow 120ms ease;
+        background 120ms ease;
 }
 
 .codeWithIcon > input::placeholder {
@@ -109,15 +118,10 @@
     font-style: italic;
 }
 
+.codeWithIcon > input:hover,
 .codeWithIcon > input:focus {
-    border-color: color-mix(in oklab, var(--accent1, #7371fc) 70%, #ffffff 30%);
-    box-shadow: 0 0 0 2px
-        color-mix(in oklab, var(--accent1, #7371fc) 55%, transparent);
-}
-
-.placeholder {
-    color: var(--text3, #707080) !important;
-    font-style: italic;
+    background: var(--bg-dark4, #27272c);
+    border-color: var(--text3, #707080);
 }
 
 .ref_code_blurb {

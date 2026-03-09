@@ -157,13 +157,17 @@ export default function EnterCode(props: PropsIF) {
                         ) : (
                             <>
                                 {cached && isCachedValueValid ? (
-                                    <p>{refCodeToConsume}</p>
+                                    <span className={styles.codeValue}>
+                                        {refCodeToConsume}
+                                    </span>
                                 ) : (
-                                    <p className={styles.placeholder}>
+                                    <span
+                                        className={`${styles.codeValue} ${styles.placeholder}`}
+                                    >
                                         {t('referrals.clickToType', {
                                             defaultValue: 'click to type',
                                         })}
-                                    </p>
+                                    </span>
                                 )}
                                 {isEligibleToEdit && (
                                     <button
