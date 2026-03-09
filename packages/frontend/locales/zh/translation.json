@@ -535,6 +535,7 @@
         "enterCode": "输入代码",
         "claim": "领取",
         "createCode": "创建代码",
+        "refCode": "推荐码",
         "pendingRefCode": "推荐码（待处理）",
         "overwriteCurrentReferralCode": "覆盖当前推荐码",
         "enterReferralCode": "输入推荐码",

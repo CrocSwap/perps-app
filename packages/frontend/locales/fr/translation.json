@@ -534,6 +534,7 @@
         "rewardHistory": "Historique des récompenses",
         "enterCode": "Saisir le code",
         "createCode": "Créer un code",
+        "refCode": "Code de parrainage",
         "pendingRefCode": "Code de parrainage (en attente)",
         "overwriteCurrentReferralCode": "Remplacer le code de parrainage actuel",
         "enterReferralCode": "Entrer un code de parrainage",

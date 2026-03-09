@@ -751,6 +751,7 @@ export default function CodeTabs(props: PropsIF) {
                         totVolumeFormatted={totVolumeFormatted}
                         inviteeMaxVolumeThreshold={INVITEE_MAX_VOLUME_THRESHOLD}
                         cached={referralStore.cached.code}
+                        isApproved={referralStore.cached.isApproved}
                         isCachedValueValid={isCachedValueValid}
                         refCodeToConsume={refCodeToConsume}
                         editModeInvitee={editModeInvitee}

@@ -534,6 +534,7 @@
         "rewardHistory": "報酬履歴",
         "enterCode": "コードを入力",
         "createCode": "コードを作成",
+        "refCode": "紹介コード",
         "pendingRefCode": "紹介コード（保留中）",
         "overwriteCurrentReferralCode": "現在の紹介コードを上書き",
         "enterReferralCode": "紹介コードを入力してください",

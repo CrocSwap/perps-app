@@ -11,6 +11,7 @@ interface PropsIF {
     totVolumeFormatted: string;
     inviteeMaxVolumeThreshold: number;
     cached: string;
+    isApproved: boolean;
     isCachedValueValid: boolean | undefined;
     refCodeToConsume: string | undefined;
     editModeInvitee: boolean;
@@ -34,6 +35,7 @@ export default function EnterCode(props: PropsIF) {
         totVolumeFormatted,
         inviteeMaxVolumeThreshold,
         cached,
+        isApproved,
         isCachedValueValid,
         refCodeToConsume,
         editModeInvitee,
@@ -130,7 +132,11 @@ export default function EnterCode(props: PropsIF) {
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <div className={styles.current_ref_code}>
-                    <h6>{t('referrals.pendingRefCode')}</h6>
+                    <h6>
+                        {isApproved
+                            ? t('referrals.refCode')
+                            : t('referrals.pendingRefCode')}
+                    </h6>
                     <div className={styles.codeWithIcon}>
                         {editModeInvitee ? (
                             <>

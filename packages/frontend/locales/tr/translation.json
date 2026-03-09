@@ -534,6 +534,7 @@
         "rewardHistory": "Ödül geçmişi",
         "enterCode": "Kodu girin",
         "createCode": "Kod oluştur",
+        "refCode": "Referans Kodu",
         "pendingRefCode": "Referans Kodu (Beklemede)",
         "overwriteCurrentReferralCode": "Mevcut referans kodunun üzerine yaz",
         "enterReferralCode": "Bir referans kodu girin",
