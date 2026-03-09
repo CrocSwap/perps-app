@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReferrerPayoutData } from '@fuul/sdk';
 import { fetchAttributedReferralCount } from '../../../utils/refreg';
-import { FUUL_GET_API_KEY } from '~/utils/Constants';
 
 interface UserReferralCode {
     code?: string | null;
@@ -14,32 +13,18 @@ interface ListUserReferralCodesResponse {
 
 const FUUL_LEGACY_REFERRAL_CODES_API_KEY =
     '74c36d38cf3f44ae2e90991a7e2857a0b035a623791a096e06c54b0c7f81354d';
-const FUUL_REFERRAL_CODES_AUTH_KEYS = [
-    FUUL_GET_API_KEY,
-    FUUL_LEGACY_REFERRAL_CODES_API_KEY,
-];
 const FUUL_REFERRAL_CODES_PAGE_SIZE = 100;
 
 async function fetchReferralCodesPage(url: string): Promise<Response> {
-    for (let i = 0; i < FUUL_REFERRAL_CODES_AUTH_KEYS.length; i += 1) {
-        const apiKey = FUUL_REFERRAL_CODES_AUTH_KEYS[i];
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                accept: 'application/json',
-                authorization: `Bearer ${apiKey}`,
-            },
-        });
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            accept: 'application/json',
+            authorization: `Bearer ${FUUL_LEGACY_REFERRAL_CODES_API_KEY}`,
+        },
+    });
 
-        if (
-            response.status !== 403 ||
-            i === FUUL_REFERRAL_CODES_AUTH_KEYS.length - 1
-        ) {
-            return response;
-        }
-    }
-
-    throw new Error('Failed to fetch referral codes');
+    return response;
 }
 
 async function fetchAffiliateReferralCodes(
