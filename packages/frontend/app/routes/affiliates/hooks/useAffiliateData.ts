@@ -833,6 +833,7 @@ export function useAffiliateClaims(userIdentifier: string, enabled = true) {
             }
 
             const response = await res.json();
+            console.log('FUUL getAffiliateClaims response:', response);
             setData(
                 Array.isArray(response)
                     ? response
