@@ -11,6 +11,7 @@ import {
     buildConnectWalletIx,
     buildConnectWalletInstruction,
     buildFirstTradeInstruction,
+    fetchAttributedReferralCount,
     paddedStringToId32,
     sendStandaloneRefregTransactions,
 } from './refreg';
@@ -50,6 +51,7 @@ function createLocalStorageMock(initial: Record<string, string> = {}): Storage {
 }
 
 const originalWindow = (globalThis as { window?: unknown }).window;
+const originalFetch = globalThis.fetch;
 
 function installWindowWithLocalStorage(initial: Record<string, string>): void {
     (globalThis as { window?: unknown }).window = {
@@ -72,11 +74,20 @@ describe('refreg instruction builders', () => {
     });
 
     afterEach(() => {
+        vi.restoreAllMocks();
+
         if (originalWindow === undefined) {
             delete (globalThis as { window?: unknown }).window;
+        } else {
+            (globalThis as { window?: unknown }).window = originalWindow;
+        }
+
+        if (originalFetch === undefined) {
+            delete (globalThis as { fetch?: unknown }).fetch;
             return;
         }
-        (globalThis as { window?: unknown }).window = originalWindow;
+
+        globalThis.fetch = originalFetch;
     });
 
     it('encodes connect_wallet with tag=1, length=98, canonical-wallet PDA seed, and account order', () => {
@@ -377,5 +388,51 @@ describe('refreg instruction builders', () => {
         });
 
         expect(sendTransaction).toHaveBeenCalledTimes(2);
+    });
+
+    it('fetchAttributedReferralCount batches front-padded referral ids for attributed users', async () => {
+        const fetchMock = vi.fn<typeof fetch>().mockResolvedValue({
+            ok: true,
+            status: 200,
+            json: async () => ({ attributed_count: '7' }),
+        } as Response);
+
+        globalThis.fetch = fetchMock;
+
+        const count = await fetchAttributedReferralCount({
+            referralKind: 1,
+            referralIdTexts: ['ben1234', 'ben1234', 'code-two'],
+        });
+
+        expect(count).toBe(7);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+
+        const [url] = fetchMock.mock.calls[0] ?? [];
+        const requestUrl = new URL(String(url));
+
+        expect(requestUrl.pathname).toBe('/v1/referrals/attributed-count');
+        expect(requestUrl.searchParams.get('referral_kind')).toBe('1');
+        expect(requestUrl.searchParams.get('dapp_id')).toBe(
+            'ambi3LHRUzmU187u4rP46rX6wrYrLtU1Bmi5U2yCTGE',
+        );
+        expect(requestUrl.searchParams.get('referral_ids')).toBe(
+            [
+                '11111111111111111111111114jGbqdC3qM',
+                new PublicKey(paddedStringToId32('code-two')).toBase58(),
+            ].join(','),
+        );
+    });
+
+    it('fetchAttributedReferralCount skips the network when no referral ids are provided', async () => {
+        const fetchMock = vi.fn<typeof fetch>();
+        globalThis.fetch = fetchMock;
+
+        const count = await fetchAttributedReferralCount({
+            referralKind: 1,
+            referralIdTexts: ['   ', ''],
+        });
+
+        expect(count).toBe(0);
+        expect(fetchMock).not.toHaveBeenCalled();
     });
 });
