@@ -85,11 +85,14 @@
     border-radius: var(--radius-s, 12px);
     cursor: pointer;
     color: var(--text2);
+    min-width: 0;
+    overflow: hidden;
 }
 
 .with_copy_clipboard > svg {
     cursor: pointer;
     color: var(--text3);
+    flex-shrink: 0;
 }
 
 .createCodeContent {
@@ -105,6 +108,10 @@
     display: flex;
     align-items: center;
     gap: var(--gap-m, 16px);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .createCodeContent a {
@@ -162,6 +169,13 @@
     }
     .enterCodeContent input {
         height: 34px;
+    }
+}
+
+/* Small phones — stack action buttons vertically */
+@media (max-width: 380px) {
+    .refferal_code_buttons {
+        flex-direction: column;
     }
 }
 

@@ -141,6 +141,13 @@
     }
 }
 
+/* Small phones — stack action buttons vertically */
+@media (max-width: 380px) {
+    .refferal_code_buttons {
+        flex-direction: column;
+    }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .sectionWithButton button {

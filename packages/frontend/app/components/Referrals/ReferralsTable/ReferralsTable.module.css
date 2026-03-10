@@ -124,6 +124,16 @@
 }
 
 @media (max-width: 768px) {
+    .tableWrapper {
+        height: auto;
+        min-height: 220px;
+    }
+
+    .tableBody {
+        height: auto;
+        max-height: 200px;
+    }
+
     .rowContainer,
     .headerContainer {
         grid-template-columns: 1.5fr 1fr 1fr 1fr;

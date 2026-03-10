@@ -172,8 +172,8 @@
 /* Phone */
 @media (max-width: 768px) {
     .tableWrapper {
-        height: 200px !important;
-        min-height: 0;
+        height: auto;
+        min-height: 300px;
 
         border-radius: var(--radius-s, 12px);
     }
