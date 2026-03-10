@@ -114,6 +114,10 @@ export default function Referrals() {
     >([]);
 
     useEffect(() => {
+        referralStore.fetchClaims(userDataStore.userAddress ?? '');
+    }, [userDataStore.userAddress]);
+
+    useEffect(() => {
         const options = {
             method: 'GET',
             headers: {

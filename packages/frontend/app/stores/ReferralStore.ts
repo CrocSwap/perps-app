@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { Fuul, UserIdentifierType } from '@fuul/sdk';
 
 export interface CachedRefCodeIF {
     // ref code created for referral use
@@ -33,15 +34,30 @@ export interface AffiliateCodeResponse {
     user_rebate_rate: number | null;
 }
 
+export interface ClaimCheckIF {
+    project_address: string;
+    to: string;
+    currency: string;
+    currency_type: number;
+    amount: string;
+    reason: number;
+    token_id: string;
+    deadline: number;
+    proof: string;
+    signatures: string[];
+}
+
 export interface ReferralStoreIF {
     cached: CachedRefCodeIF;
     totVolume: number | undefined;
     convertedWallets: string[];
+    claims: ClaimCheckIF[] | null;
     fetchUserReferrer: (address: string) => Promise<UserReferrerResponse[]>;
     getRefCodeByPubKey: (
         userIdentifier: string,
     ) => Promise<AffiliateCodeResponse | null>;
     checkForConversion: (address: string) => Promise<boolean>;
+    fetchClaims: (address: string) => Promise<void>;
     cache(refCode: string, isApproved?: boolean): void;
     markCodeApproved(refCode: string): void;
     setTotVolume(volume: number | undefined): void;
@@ -72,6 +88,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
             } as CachedRefCodeIF,
             convertedWallets: [],
             totVolume: undefined,
+            claims: null,
             cache(refCode: string, isApproved: boolean = false): void {
                 const current = get().cached;
                 // Don't overwrite if current code is approved and new code is different
@@ -112,7 +129,59 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 set({
                     cached: { code: '', isApproved: false, approvalNonce: 0 },
                     totVolume: undefined,
+                    claims: null,
                 });
+            },
+            async fetchClaims(address: string): Promise<void> {
+                // Clear existing claims data immediately
+                set({ claims: null });
+
+                if (!address) {
+                    return;
+                }
+
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        accept: 'application/json',
+                        'content-type': 'application/json',
+                        authorization:
+                            'Bearer 459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661',
+                    },
+                    body: JSON.stringify({
+                        userIdentifierType: 'solana_address',
+                        userIdentifier: address,
+                    }),
+                };
+
+                try {
+                    console.log(
+                        '🔍 [ReferralStore] fetchClaims calling API for address:',
+                        address,
+                    );
+                    const res = await fetch(
+                        'https://api.fuul.xyz/api/v1/claim-checks/claim',
+                        options,
+                    );
+                    console.log(
+                        '🔍 [ReferralStore] fetchClaims response status:',
+                        res.status,
+                    );
+                    const data = await res.json();
+                    console.log('🔍 [ReferralStore] fetchClaims result:', data);
+                    console.log(
+                        '🔍 [ReferralStore] fetchClaims is array:',
+                        Array.isArray(data),
+                    );
+                    set({
+                        claims: Array.isArray(data)
+                            ? data
+                            : (data?.claims ?? data?.data ?? []),
+                    });
+                } catch (err) {
+                    console.error('❌ [ReferralStore] fetchClaims error:', err);
+                    set({ claims: [] });
+                }
             },
             async fetchUserReferrer(
                 address: string,
