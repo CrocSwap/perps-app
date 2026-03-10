@@ -8,6 +8,7 @@
     height: 100px;
     padding: var(--padding-m);
     background-color: var(--bg-dark3);
+    color: var(--text1);
     border-radius: var(--radius-m);
     user-select: none;
 }
@@ -36,6 +37,7 @@
 /* headline in the <header> elem */
 .header_content > h2 {
     font-size: var(--font-size-m);
+    color: var(--text1);
 }
 
 /* smaller font size for long titles that might wrap */
@@ -47,6 +49,7 @@
 .notification > p {
     margin-top: var(--gap-s);
     font-size: var(--font-size-s);
+    color: var(--text2);
 }
 
 /* clickable to close the notification (remove elem from DOM) */

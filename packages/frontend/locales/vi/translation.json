@@ -171,9 +171,9 @@
         "withdrawalSuccessful": "Rút tiền thành công",
         "successfullyWithdrawn": "Đã rút thành công {{amount}} {{unit}}",
         "withdrawFailed": "Rút tiền thất bại",
-        "availableToDeposit": "Có thể nạp",
+        "availableToDeposit": "Available to deposit",
         "availableToDepositTooltip": "Khả dụng để nạp dựa trên dung lượng vault và số dư ví",
-        "availableToWithdraw": "Có thể rút",
+        "availableToWithdraw": "Available to withdraw",
         "availableToWithdrawTooltip": "Tổng số tiền bạn có thể rút từ danh mục",
         "invalidAmount": "Số tiền không hợp lệ",
         "depositToVault": "Nạp {{unitValue}} vào {{vaultName}}",
@@ -308,7 +308,6 @@
             "chart": "Biểu đồ"
         },
         "transfer": {
-            "agentTitle": "Chuyển giao đại lý",
             "selectAccounts": "Vui lòng chọn tài khoản",
             "title": "Chuyển giao",
             "from": "Từ",
@@ -318,7 +317,15 @@
             "available": "Số dư khả dụng",
             "enterAllFields": "Vui lòng nhập đầy đủ thông tin",
             "selectAccount": "Vui lòng chọn tài khoản",
-            "selectAsset": "Vui lòng chọn tài sản"
+            "selectAsset": "Vui lòng chọn tài sản",
+            "fundAgent": "Nạp tiền cho agent",
+            "withdrawToMaster": "Rút về Master",
+            "enterAmount": "Nhập số tiền",
+            "selectAgent": "Chọn agent",
+            "toAgentTitle": "Transfer to Agent",
+            "fromAgentTitle": "Transfer from Agent",
+            "availableToDeposit": "Available to deposit",
+            "availableToWithdraw": "Available to withdraw"
         },
         "form": {
             "labels": {
@@ -559,12 +566,12 @@
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",
         "input_prompt": "Nhập số tiền (tối thiểu ${{MIN_DEPOSIT_AMOUNT}})",
-        "availableToDeposit": "Sẵn sàng để nạp"
+        "availableToDeposit": "Available to deposit"
     },
     "withdraw": {
         "prompt": "Rút {{token}} về Fogo",
         "explanation": "{{token}} sẽ được gửi tới địa chỉ của bạn.",
-        "availableToWithdraw": "Sẵn sàng để rút",
+        "availableToWithdraw": "Available to withdraw",
         "input_prompt": "Nhập số tiền (tối thiểu ${{MIN_WITHDRAW_AMOUNT}})"
     },
     "orderBook": {

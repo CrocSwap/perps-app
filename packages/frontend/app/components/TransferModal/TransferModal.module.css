@@ -3,6 +3,7 @@
     flex-direction: column;
     margin: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
     gap: var(--gap-s);
+    min-width: 375px;
     /* magic number for height is specified in Figma */
     --transfer-modal-input-height: 32px;
 }
@@ -61,6 +62,83 @@
     cursor: pointer;
 }
 
+.slider_wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8 2px;
+    padding-top: 4px;
+}
+
+.amount_slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(
+        to right,
+        var(--accent1) 0%,
+        var(--accent1) var(--slider-pct, 0%),
+        var(--bg-dark4) var(--slider-pct, 0%),
+        var(--bg-dark4) 100%
+    );
+    outline: none;
+    cursor: pointer;
+}
+
+.amount_slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent1);
+    cursor: pointer;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent1) 20%, transparent);
+    transition: box-shadow 0.15s ease;
+}
+
+.amount_slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent1) 25%, transparent);
+}
+
+.amount_slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent1);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent1) 20%, transparent);
+}
+
+.slider_labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1px;
+}
+
+.slider_label_btn {
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.15s ease;
+}
+
+.slider_label_btn:hover {
+    color: var(--text1);
+}
+
+.slider_label_active {
+    color: var(--accent1);
+}
+
 .info {
     display: flex;
     flex-direction: column;
@@ -79,6 +157,89 @@
 
 .info > div > p:first-child {
     color: var(--text2);
+}
+
+/* Agent transfer: direction stack (From / swap / To) */
+.direction_stack {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.direction_account {
+    background: var(--bg-dark4);
+    border-radius: var(--radius-s);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* Push content away from the swap button overlap zone */
+.direction_account:first-child {
+    padding-bottom: 24px;
+}
+
+.direction_account:last-child {
+    padding-top: 24px;
+}
+
+.direction_label {
+    font-size: 11px;
+    color: var(--text2);
+}
+
+.direction_value {
+    font-size: var(--font-size-s);
+    color: var(--text1);
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.swap_btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-dark3);
+    background: var(--bg-dark5);
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1;
+    transition:
+        color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.swap_btn:hover {
+    color: var(--text1);
+    background: var(--bg-dark4);
+}
+
+.agent_inline_select {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    font-family: inherit;
+    cursor: pointer;
+    padding: 0;
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.agent_inline_select option {
+    background: var(--bg-dark5);
+    color: var(--text1);
 }
 
 /* Agent transfer mode styles */
@@ -113,4 +274,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.copy_btn {
+    background: none;
+    border: none;
+    outline: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: color 0.15s ease;
+}
+
+.copy_btn:hover {
+    color: var(--text1);
 }

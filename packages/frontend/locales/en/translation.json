@@ -102,7 +102,6 @@
         "closePosition": "Close Position",
         "closeAtCurrentPrice": "Close at Current Price",
         "closeAtAPriceYouSet": "Close at a Price You Set",
-
         "price": "Price",
         "size": "Size",
         "time": "Time",
@@ -172,9 +171,9 @@
         "withdrawalSuccessful": "Withdrawal Successful",
         "successfullyWithdrawn": "Successfully withdrew {{amount}} {{unit}}",
         "withdrawFailed": "Withdrawal Failed",
-        "availableToDeposit": "Available to Deposit",
+        "availableToDeposit": "Available to deposit",
         "availableToDepositTooltip": "Available to deposit based on vault capacity and wallet balance",
-        "availableToWithdraw": "Available to Withdraw",
+        "availableToWithdraw": "Available to withdraw",
         "availableToWithdrawTooltip": "The total amount you have available to withdraw from your portfolio",
         "invalidAmount": "Invalid Amount",
         "depositToVault": "Deposit {{unitValue}} to {{vaultName}}",
@@ -309,7 +308,6 @@
             "viewAll": "View All"
         },
         "transfer": {
-            "agentTitle": "Transfer Agent",
             "selectAccounts": "Please select accounts",
             "title": "Transfer",
             "from": "From",
@@ -319,7 +317,15 @@
             "available": "Available to Deposit",
             "enterAllFields": "Please enter all fields",
             "selectAccount": "Please select an account",
-            "selectAsset": "Please select an asset"
+            "selectAsset": "Please select an asset",
+            "fundAgent": "Fund Agent",
+            "withdrawToMaster": "Withdraw to Master",
+            "enterAmount": "Enter amount",
+            "selectAgent": "Select an agent",
+            "toAgentTitle": "Transfer to Agent",
+            "fromAgentTitle": "Transfer from Agent",
+            "availableToDeposit": "Available to deposit",
+            "availableToWithdraw": "Available to withdraw"
         },
         "form": {
             "labels": {
@@ -560,12 +566,12 @@
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",
         "input_prompt": "Enter amount (min ${{MIN_DEPOSIT_AMOUNT}})",
-        "availableToDeposit": "Available to Deposit"
+        "availableToDeposit": "Available to deposit"
     },
     "withdraw": {
         "prompt": "Withdraw {{token}} to Fogo",
         "explanation": "{{token}} will be sent to your address.",
-        "availableToWithdraw": "Available for Withdrawal",
+        "availableToWithdraw": "Available to withdraw",
         "input_prompt": "Enter amount (min ${{MIN_WITHDRAW_AMOUNT}})"
     },
     "orderBook": {

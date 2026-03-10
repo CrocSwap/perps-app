@@ -171,9 +171,9 @@
         "withdrawalSuccessful": "Auszahlung erfolgreich",
         "successfullyWithdrawn": "{{amount}} {{unit}} erfolgreich ausgezahlt",
         "withdrawFailed": "Auszahlung fehlgeschlagen",
-        "availableToDeposit": "Verfügbar zum Einzahlen",
+        "availableToDeposit": "Available to deposit",
         "availableToDepositTooltip": "Verfügbare Summe basierend auf Tresorkapazität und Wallet-Guthaben",
-        "availableToWithdraw": "Verfügbar zum Auszahlen",
+        "availableToWithdraw": "Available to withdraw",
         "availableToWithdrawTooltip": "Verfügbarer Auszahlungsbetrag aus Ihrem Portfolio",
         "invalidAmount": "Ungültiger Betrag",
         "depositToVault": "{{unitValue}} auf {{vaultName}} einzahlen",
@@ -308,7 +308,6 @@
             "chart": "Diagramm"
         },
         "transfer": {
-            "agentTitle": "Agent übertragen",
             "selectAccounts": "Bitte Konten auswählen",
             "title": "Übertragung",
             "from": "Von",
@@ -318,7 +317,15 @@
             "available": "Verfügbar für Einzahlung",
             "enterAllFields": "Bitte alle Felder ausfüllen",
             "selectAccount": "Bitte wählen Sie ein Konto",
-            "selectAsset": "Bitte wählen Sie ein Asset"
+            "selectAsset": "Bitte wählen Sie ein Asset",
+            "fundAgent": "Agent finanzieren",
+            "withdrawToMaster": "An Master zurückziehen",
+            "enterAmount": "Betrag eingeben",
+            "selectAgent": "Agent auswählen",
+            "toAgentTitle": "Transfer to Agent",
+            "fromAgentTitle": "Transfer from Agent",
+            "availableToDeposit": "Available to deposit",
+            "availableToWithdraw": "Available to withdraw"
         },
         "form": {
             "labels": {
@@ -559,12 +566,12 @@
     "deposit": {
         "prompt": "{{token}} von Fogo einzahlen",
         "input_prompt": "Betrag eingeben (min ${{MIN_DEPOSIT_AMOUNT}})",
-        "availableToDeposit": "Verfügbar zum Einzahlen"
+        "availableToDeposit": "Available to deposit"
     },
     "withdraw": {
         "prompt": "{{token}} zu Fogo auszahlen",
         "explanation": "{{token}} wird an Ihre Adresse gesendet.",
-        "availableToWithdraw": "Verfügbar zum Auszahlen",
+        "availableToWithdraw": "Available to withdraw",
         "input_prompt": "Betrag eingeben (min ${{MIN_WITHDRAW_AMOUNT}})"
     },
     "orderBook": {

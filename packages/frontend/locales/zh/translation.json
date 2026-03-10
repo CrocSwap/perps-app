@@ -171,9 +171,9 @@
         "withdrawalSuccessful": "提现成功",
         "successfullyWithdrawn": "成功提现{{amount}} {{unit}}",
         "withdrawFailed": "提现失败",
-        "availableToDeposit": "可充值金额",
+        "availableToDeposit": "Available to deposit",
         "availableToDepositTooltip": "基于保险库容量和钱包余额的可充值金额",
-        "availableToWithdraw": "可提现金额",
+        "availableToWithdraw": "Available to withdraw",
         "availableToWithdrawTooltip": "您的资产组合可提现总金额",
         "invalidAmount": "金额无效",
         "depositToVault": "存入{{unitValue}}到{{vaultName}}",
@@ -308,7 +308,6 @@
             "chart": "图表"
         },
         "transfer": {
-            "agentTitle": "转移代理",
             "selectAccounts": "请选择账户",
             "title": "转账",
             "from": "从",
@@ -318,7 +317,15 @@
             "available": "可存入余额",
             "enterAllFields": "请填写所有字段",
             "selectAccount": "请选择账户",
-            "selectAsset": "请选择资产"
+            "selectAsset": "请选择资产",
+            "fundAgent": "充值代理",
+            "withdrawToMaster": "提取到主账户",
+            "enterAmount": "输入金额",
+            "selectAgent": "选择代理",
+            "toAgentTitle": "Transfer to Agent",
+            "fromAgentTitle": "Transfer from Agent",
+            "availableToDeposit": "Available to deposit",
+            "availableToWithdraw": "Available to withdraw"
         },
         "form": {
             "labels": {
@@ -559,12 +566,12 @@
     "deposit": {
         "prompt": "从Fogo充值{{token}}",
         "input_prompt": "输入金额（最低${{MIN_DEPOSIT_AMOUNT}}）",
-        "availableToDeposit": "可充值"
+        "availableToDeposit": "Available to deposit"
     },
     "withdraw": {
         "prompt": "提取{{token}}到Fogo",
         "explanation": "{{token}}将发送到您的地址。",
-        "availableToWithdraw": "可提现",
+        "availableToWithdraw": "Available to withdraw",
         "input_prompt": "输入金额（最低${{MIN_WITHDRAW_AMOUNT}}）"
     },
     "orderBook": {

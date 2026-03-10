@@ -1,6 +1,7 @@
 import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 import { AnimatePresence, motion } from 'framer-motion'; // <-- Import Framer Motion
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { MdClose } from 'react-icons/md';
 import { useSdk } from '~/hooks/useSdk';
 import { useVersionCheck } from '~/hooks/useVersionCheck';
@@ -163,7 +164,7 @@ export default function Notifications() {
             const notificationConfig = {
                 handler: (data: any) => {
                     // WsContext passes msg.data directly to handler
-                    postNotification({ data });
+                    postNotification({ channel: 'notification', data });
                 },
                 payload: { user: userAddress },
             };
@@ -270,7 +271,7 @@ export default function Notifications() {
 
     const [userClosedNews, setUserClosedNews] = useState<boolean>(false);
 
-    return (
+    const notificationLayer = (
         <div
             className={styles.notifications}
             role='region'
@@ -405,4 +406,10 @@ export default function Notifications() {
             )}
         </div>
     );
+
+    if (typeof document === 'undefined') {
+        return notificationLayer;
+    }
+
+    return createPortal(notificationLayer, document.body);
 }

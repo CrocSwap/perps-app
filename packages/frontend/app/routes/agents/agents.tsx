@@ -1,5 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import SortIcon from '~/components/Vault/SortIcon';
@@ -66,6 +71,8 @@ export default function Agents() {
     const { t } = useTranslation();
 
     const { data, togglePause, remove } = useStrategiesStore();
+
+    const isLoggedIn = isEstablished(useSession());
 
     // data structure for the active sort methodology, putting both values
     // ... in a unified structure allows them to update concurrently
@@ -151,19 +158,41 @@ export default function Agents() {
         useState<strategyDecoratedIF | null>(null);
     const [agentToTransfer, setAgentToTransfer] =
         useState<strategyDecoratedIF | null>(null);
+    const [isGlobalTransferOpen, setIsGlobalTransferOpen] = useState(false);
 
     return (
         <div className={styles.strategies_page}>
             <header>
                 <div className={styles.title_row}>
                     <h2>{t('pageTitles.agents')}</h2>
-                    <SimpleButton
-                        onClick={() => navigate(`${AGENTS_BASE_PATH}/new`)}
-                        hoverBg='accent1'
-                        className={styles.create_button}
-                    >
-                        {t('agents.overview.create')}
-                    </SimpleButton>
+                    <div className={styles.header_actions}>
+                        {isLoggedIn ? (
+                            <>
+                                {/* TODO: wire up agent transfer — uncomment when ready
+                                {data.length > 0 && (
+                                    <SimpleButton
+                                        onClick={() =>
+                                            setIsGlobalTransferOpen(true)
+                                        }
+                                        hoverBg='dark4'
+                                        className={styles.transfer_button}
+                                    >
+                                        {t('common.transfer')}
+                                    </SimpleButton>
+                                )}
+                                */}
+                                <SimpleButton
+                                    onClick={() =>
+                                        navigate(`${AGENTS_BASE_PATH}/new`)
+                                    }
+                                    hoverBg='accent1'
+                                    className={styles.create_button}
+                                >
+                                    {t('agents.overview.create')}
+                                </SimpleButton>
+                            </>
+                        ) : null}
+                    </div>
                 </div>
                 <p className={styles.blurb}>{t('agents.overview.blurb')}</p>
                 <a
@@ -178,143 +207,168 @@ export default function Agents() {
             <div className={styles.table_wrapper}>
                 <div className={styles.table_tab}>{t('pageTitles.agents')}</div>
                 <div className={styles.table_content}>
-                    <div className={styles.col_headers_row}>
-                        {tableHeaders.map((header: headerItemIF) => (
-                            <div
-                                key={header.key}
-                                style={{
-                                    cursor: header.sortable
-                                        ? 'pointer'
-                                        : 'default',
-                                }}
-                                onClick={() => {
-                                    if (!header.sortable) return;
-                                    let output: null | sortByIF = null;
-                                    if (sortBy) {
-                                        output = {
-                                            cell: header.key,
-                                            reverse: !sortBy.reverse,
-                                        };
-                                    } else {
-                                        output = {
-                                            cell: header.key,
-                                            reverse: false,
-                                        };
-                                    }
-                                    setSortBy(output);
-                                }}
-                            >
-                                {header.key === 'name' && t('forms.name')}
-                                {header.key === 'status' &&
-                                    t('tradeTable.status')}
-                                {header.key === 'collateral' &&
-                                    t('portfolio.collateral')}
-                                {header.key === 'volume' &&
-                                    t('portfolio.volume')}
-                                {header.key === 'pnl' && t('portfolio.pnl')}
-                                {header.sortable && (
-                                    <SortIcon
-                                        sortDirection={checkSortDirection(
-                                            header.key,
+                    {!isLoggedIn ? (
+                        <div className={styles.empty_state}>
+                            <p>
+                                Connect your wallet to view and manage your
+                                agents
+                            </p>
+                            <SessionButton />
+                        </div>
+                    ) : (
+                        <>
+                            <div className={styles.col_headers_row}>
+                                {tableHeaders.map((header: headerItemIF) => (
+                                    <div
+                                        key={header.key}
+                                        style={{
+                                            cursor: header.sortable
+                                                ? 'pointer'
+                                                : 'default',
+                                        }}
+                                        onClick={() => {
+                                            if (!header.sortable) return;
+                                            let output: null | sortByIF = null;
+                                            if (sortBy) {
+                                                output = {
+                                                    cell: header.key,
+                                                    reverse: !sortBy.reverse,
+                                                };
+                                            } else {
+                                                output = {
+                                                    cell: header.key,
+                                                    reverse: false,
+                                                };
+                                            }
+                                            setSortBy(output);
+                                        }}
+                                    >
+                                        {header.key === 'name' &&
+                                            t('forms.name')}
+                                        {header.key === 'status' &&
+                                            t('tradeTable.status')}
+                                        {header.key === 'collateral' &&
+                                            t('portfolio.collateral')}
+                                        {header.key === 'volume' &&
+                                            t('portfolio.volume')}
+                                        {header.key === 'pnl' &&
+                                            t('portfolio.pnl')}
+                                        {header.sortable && (
+                                            <SortIcon
+                                                sortDirection={checkSortDirection(
+                                                    header.key,
+                                                )}
+                                            />
                                         )}
-                                    />
-                                )}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                    <ol className={styles.table_body}>
-                        {sorted.map((strat: strategyDecoratedIF) => (
-                            <li
-                                key={strat.address}
-                                onClick={() =>
-                                    navigate(
-                                        `${AGENTS_BASE_PATH}/${strat.address}`,
-                                    )
-                                }
-                            >
-                                <div>{strat.name}</div>
-                                <div
-                                    data-status={
-                                        strat.isPaused ? 'paused' : 'running'
-                                    }
-                                    className={styles.status_cell}
-                                >
-                                    {strat.isPaused
-                                        ? t('agents.overview.paused')
-                                        : t('agents.overview.running')}
-                                </div>
-                                <div
-                                    data-mobile-label={t(
-                                        'portfolio.collateral',
-                                    )}
-                                >
-                                    {strat.collateral}
-                                </div>
-                                <div data-mobile-label={t('portfolio.volume')}>
-                                    {strat.volume}
-                                </div>
-                                <div
-                                    className={styles.pnl_cell}
-                                    data-mobile-label='PnL'
-                                >
-                                    {strat.pnl} <span>(+12.0%)</span>
-                                </div>
-                                <div className={styles.actions_cell}>
-                                    <button
-                                        type='button'
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            togglePause(strat.address);
-                                        }}
-                                    >
-                                        {strat.isPaused
-                                            ? t('agents.overview.unpause')
-                                            : t('agents.overview.pause')}
-                                    </button>
-                                    <button
-                                        type='button'
-                                        onClick={(event) => {
-                                            event.stopPropagation();
+                            <ol className={styles.table_body}>
+                                {sorted.map((strat: strategyDecoratedIF) => (
+                                    <li
+                                        key={strat.address}
+                                        onClick={() =>
                                             navigate(
-                                                `${AGENTS_BASE_PATH}/${strat.address}/edit`,
-                                                {
-                                                    state: {
-                                                        agent: strat,
-                                                        address: strat.address,
-                                                    },
-                                                },
-                                            );
-                                        }}
+                                                `${AGENTS_BASE_PATH}/${strat.address}`,
+                                            )
+                                        }
                                     >
-                                        {t('common.edit')}
-                                    </button>
-                                    <button
-                                        type='button'
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            setAgentToTransfer(strat);
-                                        }}
-                                    >
-                                        {t('common.transfer')}
-                                    </button>
-                                    <button
-                                        type='button'
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            setAgentToRemove(strat);
-                                        }}
-                                    >
-                                        {t('agents.overview.remove')}
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                        {sorted.length === 0 && (
-                            <div className={styles.empty_state}>
-                                {t('agents.overview.emptyState')}
-                            </div>
-                        )}
-                    </ol>
+                                        <div>{strat.name}</div>
+                                        <div
+                                            data-status={
+                                                strat.isPaused
+                                                    ? 'paused'
+                                                    : 'running'
+                                            }
+                                            className={styles.status_cell}
+                                        >
+                                            {strat.isPaused
+                                                ? t('agents.overview.paused')
+                                                : t('agents.overview.running')}
+                                        </div>
+                                        <div
+                                            data-mobile-label={t(
+                                                'portfolio.collateral',
+                                            )}
+                                        >
+                                            {strat.collateral}
+                                        </div>
+                                        <div
+                                            data-mobile-label={t(
+                                                'portfolio.volume',
+                                            )}
+                                        >
+                                            {strat.volume}
+                                        </div>
+                                        <div
+                                            className={styles.pnl_cell}
+                                            data-mobile-label='PnL'
+                                        >
+                                            {strat.pnl} <span>(+12.0%)</span>
+                                        </div>
+                                        <div className={styles.actions_cell}>
+                                            <button
+                                                type='button'
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    togglePause(strat.address);
+                                                }}
+                                            >
+                                                {strat.isPaused
+                                                    ? t(
+                                                          'agents.overview.unpause',
+                                                      )
+                                                    : t(
+                                                          'agents.overview.pause',
+                                                      )}
+                                            </button>
+                                            <button
+                                                type='button'
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    navigate(
+                                                        `${AGENTS_BASE_PATH}/${strat.address}/edit`,
+                                                        {
+                                                            state: {
+                                                                agent: strat,
+                                                                address:
+                                                                    strat.address,
+                                                            },
+                                                        },
+                                                    );
+                                                }}
+                                            >
+                                                {t('common.edit')}
+                                            </button>
+                                            <button
+                                                type='button'
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    setAgentToTransfer(strat);
+                                                }}
+                                            >
+                                                {t('common.transfer')}
+                                            </button>
+                                            <button
+                                                type='button'
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    setAgentToRemove(strat);
+                                                }}
+                                            >
+                                                {t('agents.overview.remove')}
+                                            </button>
+                                        </div>
+                                    </li>
+                                ))}
+                                {sorted.length === 0 && (
+                                    <div className={styles.empty_state}>
+                                        {t('agents.overview.emptyState')}
+                                    </div>
+                                )}
+                            </ol>
+                        </>
+                    )}
                 </div>
             </div>
             {agentToRemove && (
@@ -368,6 +422,12 @@ export default function Agents() {
                 <TransferModal
                     agent={agentToTransfer}
                     closeModal={() => setAgentToTransfer(null)}
+                />
+            )}
+            {isGlobalTransferOpen && (
+                <TransferModal
+                    agents={data}
+                    closeModal={() => setIsGlobalTransferOpen(false)}
                 />
             )}
         </div>
