@@ -39,7 +39,7 @@ export default function ReferralsTabs(props: PropsIF) {
                     />
                 );
             case 'referrals.rewardHistory':
-                return <div>enter code</div>;
+                return <div className={styles.emptyState}>enter code</div>;
             default:
                 return (
                     <div className={styles.emptyState}>

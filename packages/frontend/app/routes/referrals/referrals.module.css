@@ -251,7 +251,7 @@
     }
 
     .container header > button {
-        width: 100%;
+        display: none;
     }
 }
 
