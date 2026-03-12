@@ -113,6 +113,17 @@
     gap: var(--gap-m);
 }
 
+.sectionCentered {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--padding-m, 16px);
+    gap: var(--gap-m, 16px);
+    text-align: center;
+}
+
 .sessionButtonWrapper {
     width: 100%;
     display: flex;

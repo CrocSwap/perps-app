@@ -12,7 +12,7 @@
 }
 .tableContent {
     padding: var(--padding-s) var(--padding-s) 0px var(--padding-s);
-    height: 100%;
+    flex: 1;
     display: flex;
     flex-direction: column;
 }
@@ -32,4 +32,45 @@
     display: flex;
     align-items: center;
     gap: var(--gap-m);
+}
+
+.collapseBtn {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .tableWrapper {
+        height: 100%;
+        min-height: 0;
+        transition: flex 200ms ease;
+    }
+
+    .tableWrapper.collapsed {
+        flex: 0 0 auto;
+        height: auto;
+        cursor: pointer;
+    }
+
+    .tableContent.hidden {
+        display: none;
+    }
+
+    .collapseBtn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        color: var(--text2);
+        cursor: pointer;
+        padding: 4px;
+        flex-shrink: 0;
+    }
+
+    .tabsRow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 8px;
+    }
 }

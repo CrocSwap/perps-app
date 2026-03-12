@@ -223,14 +223,9 @@ export default function EnterCode(props: PropsIF) {
     // Not connected state
     if (!isSessionEstablished) {
         return (
-            <section className={styles.sectionWithButton}>
-                <div className={styles.enterCodeContent}>
-                    <h6>{t('referrals.connectYourWallet.enterCode')}</h6>
-                </div>
-                <div
-                    className={styles.sessionButtonWrapper}
-                    style={{ height: '100%' }}
-                >
+            <section className={styles.sectionCentered}>
+                <h6>{t('referrals.connectYourWallet.enterCode')}</h6>
+                <div className={styles.sessionButtonWrapper}>
                     <SessionButton />
                 </div>
             </section>

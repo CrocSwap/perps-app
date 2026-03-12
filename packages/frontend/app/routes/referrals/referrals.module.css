@@ -182,37 +182,34 @@
 @media (max-width: 768px) {
     .container {
         margin-top: 0;
-        /* main.content owns the scroll; this is just spacing */
-        gap: clamp(20px, 5vw, 28px);
+        gap: clamp(16px, 4vw, 20px);
         padding-top: calc(env(safe-area-inset-top) + 12px);
-        padding-left: clamp(12px, 4vw, 16px);
-        padding-right: clamp(12px, 4vw, 16px);
-        padding-bottom: calc(
-            env(safe-area-inset-bottom) + var(--footer-h, 56px)
+        padding-left: 0;
+        padding-right: 0;
+        padding-bottom: 0;
+        height: calc(
+            100vh - var(--footer-h, 56px) - env(safe-area-inset-bottom, 0px) -
+                70px
         );
-        /* ensure zero clamps */
-        height: auto;
-        max-height: none;
-        overflow: visible;
+        height: calc(
+            100dvh - var(--footer-h, 56px) - env(safe-area-inset-bottom, 0px) -
+                70px
+        );
+        overflow: hidden;
         min-height: 0;
-    }
-    .container::-webkit-scrollbar {
-        display: none !important; /* Chrome, Safari, and Opera */
     }
 
     .tableContainer {
         display: flex;
         flex-direction: column;
         gap: var(--gap-s);
-        height: auto;
-        max-height: none;
+        flex: 1;
         min-height: 0;
     }
 
     .tableContainer > div {
-        min-height: 220px;
-        margin-bottom: 12px;
-        transition: transform 0.15s ease;
+        flex: 1;
+        min-height: 0;
         min-width: 0;
     }
     .tableContainer > div:active {
