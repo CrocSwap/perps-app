@@ -1050,14 +1050,9 @@ export default function CodeTabs(props: PropsIF) {
             </SimpleButton>
         </section>
     ) : (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.enterCodeContent}>
-                <h6>{t('referrals.connectYourWallet.claim')}</h6>
-            </div>
-            <div
-                className={styles.sessionButtonWrapper}
-                style={{ height: '100%' }}
-            >
+        <section className={styles.sectionCentered}>
+            <h6>{t('referrals.connectYourWallet.claim')}</h6>
+            <div className={styles.sessionButtonWrapper}>
                 <SessionButton />
             </div>
         </section>

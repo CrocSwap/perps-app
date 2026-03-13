@@ -9,7 +9,7 @@ export default function ReferralsExtra() {
                     // navigate to /v2/affiliates
                     onClick={() => (window.location.href = '/v2/affiliates')}
                 >
-                    Click to Become an Affiliate
+                    Become a Partner
                 </button>
             </div>
         </section>
