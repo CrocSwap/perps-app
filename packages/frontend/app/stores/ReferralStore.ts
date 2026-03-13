@@ -99,10 +99,13 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 ) {
                     return;
                 }
+                const nextIsApproved =
+                    isApproved ||
+                    (current.isApproved && current.code === refCode);
                 set({
                     cached: {
                         code: refCode,
-                        isApproved,
+                        isApproved: nextIsApproved,
                         approvalNonce: isApproved
                             ? current.approvalNonce + 1
                             : current.approvalNonce,

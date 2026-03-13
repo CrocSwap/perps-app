@@ -72,14 +72,14 @@ describe('ReferralStore – cached refactoring', () => {
         expect(useReferralStore.getState().cached.isApproved).toBe(true);
     });
 
-    it('approved code CAN be re-cached with the SAME code (no-op)', () => {
+    it('approved code re-cached with the SAME code stays approved', () => {
         useReferralStore.getState().cache('ben1234', true);
 
-        // Same code, unapproved — allowed but downgrades approval
+        // Same code, unapproved — should preserve prior approval state
         useReferralStore.getState().cache('ben1234');
         expect(useReferralStore.getState().cached.code).toBe('ben1234');
-        // Note: isApproved becomes false because same code is allowed through
-        expect(useReferralStore.getState().cached.isApproved).toBe(false);
+        expect(useReferralStore.getState().cached.isApproved).toBe(true);
+        expect(useReferralStore.getState().cached.approvalNonce).toBe(1);
     });
 
     it('approved code re-cached with same code and isApproved=true stays approved', () => {
@@ -309,6 +309,19 @@ describe('ReferralStore – cached refactoring', () => {
         // Step 3: User visits with ?af=ben4 (their own code in URL)
         useReferralStore.getState().cache('ben4'); // isApproved=false
         // Protection: ben1234 is approved, ben4 is different → blocked
+        expect(useReferralStore.getState().cached).toEqual({
+            code: 'ben1234',
+            isApproved: true,
+            approvalNonce: 1,
+        });
+    });
+
+    it('full workflow: approved code stays approved when same code appears in URL again', () => {
+        useReferralStore.getState().cache('ben1234');
+        useReferralStore.getState().markCodeApproved('ben1234');
+
+        useReferralStore.getState().cache('ben1234');
+
         expect(useReferralStore.getState().cached).toEqual({
             code: 'ben1234',
             isApproved: true,

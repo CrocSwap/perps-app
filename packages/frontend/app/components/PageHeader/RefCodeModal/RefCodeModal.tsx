@@ -90,6 +90,13 @@ export default function RefCodeModal() {
     useEffect(() => {
         const runLogic = async (codeToCheck: string): Promise<void> => {
             if (
+                referralStore.cached.isApproved &&
+                referralStore.cached.code === codeToCheck
+            ) {
+                return;
+            }
+
+            if (
                 isUserConnected &&
                 userPublicKey &&
                 (await referralStore.checkForConversion(userPublicKey))
@@ -145,6 +152,8 @@ export default function RefCodeModal() {
         isUserRefCodePending,
         userRefCode,
         wasRefCodeModalShown,
+        referralStore.cached.code,
+        referralStore.cached.isApproved,
     ]);
 
     // logic to open modal when triggered from store (e.g., from EnterCode confirm button)
