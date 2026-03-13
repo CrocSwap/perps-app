@@ -56,31 +56,33 @@ function ReferralsTable(props: PropsIF) {
                 )}
             </div>
 
-            <div className={styles.paginationContainer}>
-                <div className={styles.pageInfo}>
-                    {totalItems > 0
-                        ? `${startIndex + 1}-${Math.min(endIndex + 1, totalItems)} of ${totalItems}`
-                        : '0-0 of 0'}
-                </div>
+            {payoutsByReferrer.length > 0 && (
+                <div className={styles.paginationContainer}>
+                    <div className={styles.pageInfo}>
+                        {totalItems > 0
+                            ? `${startIndex + 1}-${Math.min(endIndex + 1, totalItems)} of ${totalItems}`
+                            : '0-0 of 0'}
+                    </div>
 
-                <div className={styles.pageButtons}>
-                    <button
-                        className={styles.pageButton}
-                        onClick={goToPreviousPage}
-                        disabled={isPrevButtonDisabled}
-                    >
-                        <BiChevronLeft size={16} />
-                    </button>
+                    <div className={styles.pageButtons}>
+                        <button
+                            className={styles.pageButton}
+                            onClick={goToPreviousPage}
+                            disabled={isPrevButtonDisabled}
+                        >
+                            <BiChevronLeft size={16} />
+                        </button>
 
-                    <button
-                        className={styles.pageButton}
-                        onClick={goToNextPage}
-                        disabled={isNextButtonDisabled}
-                    >
-                        <BiChevronRight size={16} />
-                    </button>
+                        <button
+                            className={styles.pageButton}
+                            onClick={goToNextPage}
+                            disabled={isNextButtonDisabled}
+                        >
+                            <BiChevronRight size={16} />
+                        </button>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
