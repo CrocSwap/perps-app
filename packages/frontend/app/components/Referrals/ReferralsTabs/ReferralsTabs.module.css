@@ -38,6 +38,10 @@
     display: none;
 }
 
+.collapsedHint {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .tableWrapper {
         height: 100%;
@@ -48,6 +52,7 @@
     .tableWrapper.collapsed {
         flex: 0 0 auto;
         height: auto;
+        min-height: 80px;
         cursor: pointer;
     }
 
@@ -72,5 +77,13 @@
         align-items: center;
         justify-content: space-between;
         padding-right: 8px;
+    }
+
+    .collapsedHint {
+        display: block;
+        padding: 8px var(--padding-s);
+        font-size: 12px;
+        color: var(--text2);
+        opacity: 0.6;
     }
 }

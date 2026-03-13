@@ -1,0 +1,8 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(python3 -c \"import json; d=json.load\\(open\\(''packages/frontend/locales/en/translation.json''\\)\\); print\\(d[''referrals''][''description'']\\)\")",
+            "Bash(python3 -c \":*)"
+        ]
+    }
+}

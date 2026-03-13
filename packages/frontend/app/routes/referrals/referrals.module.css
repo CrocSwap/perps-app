@@ -47,6 +47,42 @@
     color: var(--accent1, #7371fc);
 }
 
+.description_row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-m);
+    flex-wrap: wrap;
+}
+
+/* shown on tablet/mobile where ReferralsExtra panel is hidden */
+.partner_link {
+    display: none;
+    white-space: nowrap;
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    text-decoration: none;
+    border: 1px solid var(--bg-dark3);
+    border-radius: var(--radius-s, 12px);
+    padding: 4px 12px;
+    background: var(--bg-dark3);
+    transition:
+        color 120ms ease,
+        border-color 120ms ease;
+}
+
+.partner_link:hover {
+    color: var(--text1);
+    border-color: var(--accent1);
+}
+
+@media (max-width: 1080px) {
+    .partner_link {
+        display: inline-flex;
+        align-items: center;
+    }
+}
+
 .detailsContainer {
     display: flex;
     flex-direction: row;
@@ -212,9 +248,6 @@
         min-height: 0;
         min-width: 0;
     }
-    .tableContainer > div:active {
-        transform: scale(0.99);
-    }
 
     .detailsContainer {
         flex-direction: column;
@@ -245,10 +278,35 @@
         align-items: flex-start;
         gap: var(--gap-s);
         font-size: var(--font-size-l);
+        width: 100%;
+    }
+
+    .header_text {
+        width: 100%;
     }
 
     .container header > button {
         display: none;
+    }
+
+    .description_row {
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: var(--gap-s);
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .container header p {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .partner_link {
+        font-size: 11px;
+        padding: 3px 10px;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 }
 

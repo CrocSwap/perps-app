@@ -79,6 +79,11 @@ export default function ReferralsTabs(props: PropsIF) {
                     )}
                 </button>
             </div>
+            {isCollapsed && (
+                <div className={styles.collapsedHint}>
+                    No data to display · tap to expand
+                </div>
+            )}
             <motion.div
                 className={`${styles.tableContent}${isCollapsed ? ` ${styles.hidden}` : ''}`}
                 key={activeTab}

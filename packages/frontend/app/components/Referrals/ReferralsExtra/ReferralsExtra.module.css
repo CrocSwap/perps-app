@@ -35,25 +35,3 @@
         display: none;
     }
 }
-
-@media (max-width: 768px) {
-    .referrals_extra {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: var(--radius-s, 12px);
-        padding: 10px var(--padding-s);
-        flex-shrink: 0;
-    }
-
-    .referrals_extra > h4 {
-        height: auto;
-        text-align: left;
-        font-size: var(--font-size-s);
-    }
-
-    .referrals_extra > div {
-        flex-grow: 0;
-    }
-}
