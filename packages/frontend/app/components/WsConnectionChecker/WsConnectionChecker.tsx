@@ -34,11 +34,7 @@ export default function WsConnectionChecker() {
     const { page } = usePage();
 
     useEffect(() => {
-        if (page === Pages.HOME) {
-            setHideReconnectIndicator(true);
-        } else {
-            setHideReconnectIndicator(false);
-        }
+        setHideReconnectIndicator(page !== Pages.TRADE);
     }, [page]);
 
     useEffect(() => {

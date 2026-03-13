@@ -535,7 +535,7 @@
     },
     "referrals": {
         "title": "Referrals",
-        "description": "Refer users to earn rewards. Referrers earn higher rewards.",
+        "description": "Refer users to earn rewards.",
         "tradersReferred": "Traders Referred",
         "rewardsEarned": "Rewards Earned",
         "rewardHistory": "Reward History",
