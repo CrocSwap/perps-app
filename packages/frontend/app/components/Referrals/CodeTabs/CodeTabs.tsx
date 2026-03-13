@@ -6,17 +6,14 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { UserIdentifierType } from '@fuul/sdk';
-import { Connection, PublicKey, Transaction } from '@solana/web3.js';
-import * as anchor from '@coral-xyz/anchor';
+import { PublicKey, Transaction } from '@solana/web3.js';
+import { FuulSdk, Network } from '@fuul/sdk-solana';
 import {
-    FuulSdk,
-    Network,
-    ClaimMessage,
-    ClaimMessageData,
-    MessageDomain,
-    TokenType,
-    ClaimReason,
-} from '@fuul/sdk-solana';
+    getFuulConnection,
+    getClaimFee,
+    fetchClaimRequirements,
+    buildClaimInstructions,
+} from '~/utils/claimRewards';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
@@ -40,116 +37,6 @@ import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { debugLog } from '~/utils/debugLog';
 import { useDebounce } from '~/hooks/useDebounce';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
-
-// --- Fuul claim helpers ---
-// Fuul contracts are deployed on Fogo mainnet, separate from app's testnet
-const FOGO_MAINNET_RPC = 'https://mainnet.fogo.io';
-
-function getFuulConnection(): Connection {
-    return new Connection(FOGO_MAINNET_RPC, {
-        commitment: 'confirmed',
-    });
-}
-
-async function getClaimFee(): Promise<bigint | null> {
-    const connection = getFuulConnection();
-    const sdk = new FuulSdk(connection, Network.FOGO_MAINNET);
-    const globalConfig = await sdk.getGlobalConfig();
-    if (!globalConfig) {
-        console.warn('[CodeTabs] GlobalConfig not found');
-        return null;
-    }
-    return BigInt(globalConfig.feeManagement.userNativeClaimFee.toString());
-}
-
-async function fetchClaimRequirements(sdk: FuulSdk, projectAddress: PublicKey) {
-    const program = sdk.getProgram();
-    console.log('hey');
-    // Fetch project account to get nonce
-    const projectAccount = await program.account.project.fetch(projectAddress);
-    const projectNonce = projectAccount.nonce as anchor.BN;
-
-    // Fetch global config to get authorized signer
-    const globalConfig = await sdk.getGlobalConfig();
-    if (!globalConfig) {
-        throw new Error('Global config not found');
-    }
-
-    const signers = globalConfig.rolesMapping.roles
-        .filter(
-            (r: { role: Record<string, unknown>; account: PublicKey }) =>
-                Object.keys(r.role)[0] === 'signer',
-        )
-        .map(
-            (r: { role: Record<string, unknown>; account: PublicKey }) =>
-                r.account,
-        );
-
-    if (signers.length === 0) {
-        throw new Error('No authorized signers found');
-    }
-
-    return { projectNonce, signer: signers[0], program };
-}
-
-async function buildClaimInstructions(
-    sdk: FuulSdk,
-    walletPublicKey: PublicKey,
-    claim: {
-        projectAddress: PublicKey;
-        recipient: PublicKey;
-        tokenMint: PublicKey;
-        amount: bigint;
-        deadline: number;
-        reasonCode: number;
-        proof: Uint8Array;
-        signature: Uint8Array;
-    },
-) {
-    const { projectNonce, signer, program } = await fetchClaimRequirements(
-        sdk,
-        claim.projectAddress,
-    );
-
-    // Build message domain
-    const domain = new MessageDomain({
-        programId: program.programId,
-        version: 1,
-        deadline: BigInt(claim.deadline),
-    });
-
-    // Build claim data
-    const claimData = new ClaimMessageData({
-        amount: claim.amount,
-        project: claim.projectAddress,
-        recipient: claim.recipient,
-        tokenType: TokenType.FungibleSpl,
-        tokenMint: claim.tokenMint,
-        proof: Buffer.from(claim.proof),
-        reason:
-            claim.reasonCode === 0
-                ? ClaimReason.AffiliatePayout
-                : ClaimReason.EndUserPayout,
-    });
-
-    const claimMessage = new ClaimMessage({ data: claimData, domain });
-
-    // SDK handles ATA creation and PDA derivation internally
-    const instructions = await sdk.claim({
-        authority: walletPublicKey,
-        projectNonce,
-        message: claimMessage,
-        signatures: [
-            {
-                signature: claim.signature,
-                signer: signer,
-            },
-        ],
-    });
-
-    return instructions;
-}
-// --- End Fuul claim helpers ---
 
 interface PropsIF {
     initialTab?: string;
@@ -853,24 +740,103 @@ export default function CodeTabs(props: PropsIF) {
     }, [claimsData]);
 
     const handleClaimClick = async () => {
-        console.log('🎁 [Claim] Button clicked');
-        console.log('🎁 [Claim] User address:', referrerAddress);
-        console.log('🎁 [Claim] Claims data:', claimsData);
-        console.log('🎁 [Claim] Claimable amount:', claimableAmount);
-
-        if (!claimsData || claimsData.length === 0) {
-            console.warn('🎁 [Claim] No claims data available');
-            return;
-        }
-
-        console.log('🎁 [Claim] Claims check passed, proceeding...');
-
         try {
+            console.log('🎁 [Claim] ===== CLAIM PROCESS START =====');
+            console.log('🎁 [Claim] Button clicked - handler is running');
+            console.log('🎁 [Claim] User address:', referrerAddress);
+            console.log('🎁 [Claim] Claims data:', claimsData);
+            console.log('🎁 [Claim] Claimable amount:', claimableAmount);
+            console.log('🎁 [Claim] Session state:', {
+                isEstablished: isEstablished(sessionState),
+                walletPublicKey: (
+                    sessionState as any
+                ).walletPublicKey?.toBase58(),
+                sessionPublicKey: (
+                    sessionState as any
+                ).sessionPublicKey?.toBase58(),
+                solanaWallet: !!(sessionState as any).solanaWallet,
+            });
+
+            if (!claimsData || claimsData.length === 0) {
+                console.warn('🎁 [Claim] No claims data available');
+                return;
+            }
+
+            console.log('🎁 [Claim] Claims check passed, proceeding...');
+
+            // Detailed claim data analysis
+            const firstClaim = claimsData[0];
+            console.log('🎁 [Claim] First claim details:', {
+                project_address: firstClaim.project_address,
+                to: firstClaim.to,
+                currency: firstClaim.currency,
+                currency_type: firstClaim.currency_type,
+                amount: firstClaim.amount,
+                amountBigInt: BigInt(firstClaim.amount).toString(),
+                reason: firstClaim.reason,
+                token_id: firstClaim.token_id,
+                deadline: firstClaim.deadline,
+                deadlineDate: new Date(
+                    firstClaim.deadline * 1000,
+                ).toISOString(),
+                isExpired: firstClaim.deadline * 1000 < Date.now(),
+                proof: firstClaim.proof,
+                proofLength: firstClaim.proof.length,
+                signatures: firstClaim.signatures,
+                signatureCount: firstClaim.signatures.length,
+                firstSignature: firstClaim.signatures[0],
+            });
+
+            console.log(
+                '🎁 [Claim] ===== STEP 1: NETWORK & SDK INITIALIZATION =====',
+            );
+
+            // Test network connectivity first
+            console.log('🎁 [Claim] Testing network connectivity...');
+            const fuulConnection = getFuulConnection();
+            console.log(
+                '🎁 [Claim] Connection RPC endpoint:',
+                fuulConnection.rpcEndpoint,
+            );
+
+            try {
+                const slot = await fuulConnection.getSlot();
+                console.log(
+                    '🎁 [Claim] Network connectivity OK - Current slot:',
+                    slot,
+                );
+            } catch (networkError: any) {
+                console.error(
+                    '🎁 [Claim] Network connectivity FAILED:',
+                    networkError,
+                );
+                throw new Error(
+                    `Network connectivity failed: ${networkError?.message || networkError}`,
+                );
+            }
+
             // Use Fogo mainnet connection for Fuul contracts
             console.log('🎁 [Claim] Initializing Fuul SDK (Fogo mainnet)...');
-            const fuulConnection = getFuulConnection();
             const sdk = new FuulSdk(fuulConnection, Network.FOGO_MAINNET);
-            console.log('🎁 [Claim] SDK initialized');
+            console.log('🎁 [Claim] SDK initialized successfully');
+
+            // Test SDK functionality
+            try {
+                const globalConfig = await sdk.getGlobalConfig();
+                console.log(
+                    '🎁 [Claim] SDK test OK - Global config found:',
+                    !!globalConfig,
+                );
+            } catch (sdkError: any) {
+                console.error('🎁 [Claim] SDK test FAILED:', sdkError);
+                throw new Error(
+                    `SDK initialization failed: ${sdkError?.message || sdkError}`,
+                );
+            }
+
+            console.log(
+                '🎁 [Claim] ===== STEP 2: CLAIM FEE & VALIDATION =====',
+            );
 
             // Get claim fee
             console.log('🎁 [Claim] Fetching claim fee...');
@@ -884,13 +850,140 @@ export default function CodeTabs(props: PropsIF) {
                 console.log('🎁 [Claim] Claim fee (SOL):', solFee);
             }
 
+            console.log('🎁 [Claim] Checking user balance...');
+            // Get wallet public key from session first
+            if (!isEstablished(sessionState)) {
+                console.error('🎁 [Claim] Session not established');
+                return;
+            }
+            const walletPublicKey =
+                (sessionState as any).walletPublicKey ||
+                (sessionState as any).sessionPublicKey;
+            if (!walletPublicKey) {
+                console.error('🎁 [Claim] No wallet public key found');
+                return;
+            }
+            console.log(
+                '🎁 [Claim] Wallet public key:',
+                walletPublicKey.toBase58(),
+            );
+
+            let balance = 0;
+            let recipientExists = false;
+            try {
+                // Check native balance (for account creation fees)
+                balance = await fuulConnection.getBalance(walletPublicKey);
+                const balanceSol = balance / 1e9;
+                console.log(
+                    '🎁 [Claim] Native balance:',
+                    balance,
+                    'lamports (' + balanceSol + ' FOGO)',
+                );
+
+                // Check if recipient account exists
+                const recipientInfo =
+                    await fuulConnection.getAccountInfo(walletPublicKey);
+                recipientExists = !!recipientInfo;
+                console.log(
+                    '🎁 [Claim] Recipient account exists:',
+                    recipientExists,
+                );
+
+                // Also check token balance if we know the token mint
+                try {
+                    console.log(
+                        '🎁 [Claim] Checking all token accounts for wallet...',
+                    );
+                    const allTokenAccounts =
+                        await fuulConnection.getParsedTokenAccountsByOwner(
+                            walletPublicKey,
+                            {
+                                programId: new PublicKey(
+                                    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+                                ), // SPL Token Program
+                            },
+                        );
+                    console.log(
+                        '🎁 [Claim] Total token accounts found:',
+                        allTokenAccounts.value.length,
+                    );
+
+                    if (allTokenAccounts.value.length > 0) {
+                        allTokenAccounts.value.forEach((account, index) => {
+                            const info = account.account.data.parsed.info;
+                            console.log(`🎁 [Claim] Token ${index}:`, {
+                                mint: info.mint,
+                                amount: info.tokenAmount.uiAmount || 0,
+                                decimals: info.tokenAmount.decimals,
+                            });
+                        });
+                    }
+
+                    // Now check specifically for FOGO tokens
+                    const tokenMint = new PublicKey(
+                        'uSd2czE61Evaf76RNbq4KPpXnkiL3irdzgLFUMe3NoG',
+                    ); // FOGO token mint
+                    const tokenAccounts =
+                        await fuulConnection.getParsedTokenAccountsByOwner(
+                            walletPublicKey,
+                            {
+                                mint: tokenMint,
+                            },
+                        );
+
+                    if (tokenAccounts.value.length > 0) {
+                        const tokenAccount = tokenAccounts.value[0];
+                        const tokenBalance =
+                            tokenAccount.account.data.parsed.info.tokenAmount
+                                .uiAmount || 0;
+                        console.log(
+                            '🎁 [Claim] FOGO token balance:',
+                            tokenBalance,
+                            'tokens',
+                        );
+
+                        if (tokenBalance > 0 && !recipientExists) {
+                            console.log(
+                                '🎁 [Claim] User has FOGO tokens but no native account - needs account creation',
+                            );
+                        }
+                    } else {
+                        console.log(
+                            '🎁 [Claim] No FOGO token accounts found for mint:',
+                            tokenMint.toBase58(),
+                        );
+                    }
+                } catch (tokenError: any) {
+                    console.log(
+                        '🎁 [Claim] Token balance check failed:',
+                        tokenError.message,
+                    );
+                }
+
+                if (claimFee && balance < claimFee) {
+                    throw new Error(
+                        `Insufficient balance: Need ${claimFee} lamports for claim fee, but only have ${balance} lamports`,
+                    );
+                }
+            } catch (balanceError: any) {
+                console.error('🎁 [Claim] Balance check failed:', balanceError);
+            }
+
+            console.log('🎁 [Claim] ===== STEP 3: CLAIM REQUIREMENTS =====');
+
             // Fetch claim requirements using first claim's project address
-            const firstClaim = claimsData[0];
             const projectAddress = new PublicKey(firstClaim.project_address);
             console.log(
                 '🎁 [Claim] Project address:',
                 projectAddress.toBase58(),
             );
+
+            // Validate project address
+            if (!PublicKey.isOnCurve(projectAddress.toBytes())) {
+                console.log(
+                    '🎁 [Claim] Project address is not on curve (might be a PDA)',
+                );
+            }
 
             console.log('🎁 [Claim] Fetching claim requirements...');
             const requirements = await fetchClaimRequirements(
@@ -907,116 +1000,335 @@ export default function CodeTabs(props: PropsIF) {
                 requirements.program.programId.toBase58(),
             );
 
+            console.log(
+                '🎁 [Claim] ===== STEP 4: BUILDING CLAIM INSTRUCTIONS =====',
+            );
+
             // Build claim instructions
             console.log('🎁 [Claim] Building claim instructions...');
 
-            // Get wallet public key from session
-            if (!isEstablished(sessionState)) {
-                console.error('🎁 [Claim] Session not established');
-                return;
-            }
-            const walletPublicKey =
-                sessionState.walletPublicKey || sessionState.sessionPublicKey;
-            if (!walletPublicKey) {
-                console.error('🎁 [Claim] No wallet public key found');
-                return;
-            }
-            console.log(
-                '🎁 [Claim] Wallet public key:',
-                walletPublicKey.toBase58(),
-            );
-
             // Decode proof and signature from hex (0x-prefixed)
+            console.log('🎁 [Claim] ===== STEP 4a: HEX CONVERSION =====');
             const hexToBytes = (hex: string): Uint8Array => {
+                console.log('🎁 [Claim] Converting hex string:', hex);
+                console.log('🎁 [Claim] Hex length:', hex.length);
+
                 const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex;
+                console.log('🎁 [Claim] Clean hex length:', cleanHex.length);
+
+                // Validate hex string
+                if (cleanHex.length % 2 !== 0) {
+                    throw new Error(
+                        `Invalid hex string length: ${cleanHex.length} (must be even)`,
+                    );
+                }
+
+                if (!/^[0-9A-Fa-f]*$/.test(cleanHex)) {
+                    throw new Error(
+                        `Invalid hex string contains non-hex characters`,
+                    );
+                }
+
                 const bytes = new Uint8Array(cleanHex.length / 2);
                 for (let i = 0; i < bytes.length; i++) {
                     bytes[i] = parseInt(cleanHex.substr(i * 2, 2), 16);
                 }
+                console.log('🎁 [Claim] Converted to', bytes.length, 'bytes');
                 return bytes;
             };
 
-            const proofBytes = hexToBytes(firstClaim.proof);
-            const signatureBytes = hexToBytes(firstClaim.signatures[0]);
-            console.log('🎁 [Claim] Proof bytes length:', proofBytes.length);
-            console.log(
-                '🎁 [Claim] Signature bytes length:',
-                signatureBytes.length,
-            );
+            try {
+                console.log('🎁 [Claim] Converting proof...');
+                const proofBytes = hexToBytes(firstClaim.proof);
+                console.log(
+                    '🎁 [Claim] Proof bytes length:',
+                    proofBytes.length,
+                );
 
-            const instructions = await buildClaimInstructions(
-                sdk,
-                walletPublicKey,
-                {
-                    projectAddress,
-                    recipient: new PublicKey(firstClaim.to),
-                    tokenMint: new PublicKey(firstClaim.currency),
-                    amount: BigInt(firstClaim.amount),
-                    deadline: firstClaim.deadline,
-                    reasonCode: firstClaim.reason,
-                    proof: proofBytes,
-                    signature: signatureBytes,
-                },
-            );
+                console.log('🎁 [Claim] Converting signature...');
+                const signatureBytes = hexToBytes(firstClaim.signatures[0]);
+                console.log(
+                    '🎁 [Claim] Signature bytes length:',
+                    signatureBytes.length,
+                );
 
-            console.log('🎁 [Claim] Instructions built:', instructions);
-            console.log(
-                '🎁 [Claim] Number of instructions:',
-                instructions.length,
-            );
+                console.log(
+                    '🎁 [Claim] ===== STEP 4b: BUILDING INSTRUCTIONS =====',
+                );
+                const instructions = await buildClaimInstructions(
+                    sdk,
+                    walletPublicKey,
+                    {
+                        projectAddress,
+                        recipient: new PublicKey(firstClaim.to),
+                        tokenMint: new PublicKey(firstClaim.currency),
+                        amount: BigInt(firstClaim.amount),
+                        deadline: firstClaim.deadline,
+                        reasonCode: firstClaim.reason,
+                        proof: proofBytes,
+                        signature: signatureBytes,
+                    },
+                );
 
-            // Step 5: Sign and send directly to mainnet (not via FOGO Sessions)
-            console.log('🎁 [Claim] Building transaction for mainnet...');
+                console.log(
+                    '🎁 [Claim] Instructions built successfully:',
+                    instructions,
+                );
+                console.log(
+                    '🎁 [Claim] Number of instructions:',
+                    instructions.length,
+                );
 
-            const transaction = new Transaction();
-            transaction.add(...instructions);
+                // Log each instruction for debugging
+                instructions.forEach((instruction, index) => {
+                    console.log(`🎁 [Claim] Instruction ${index}:`, {
+                        programId: instruction.programId.toBase58(),
+                        keys: instruction.keys.map((key) => ({
+                            pubkey: key.pubkey.toBase58(),
+                            isSigner: key.isSigner,
+                            isWritable: key.isWritable,
+                        })),
+                        dataLength: instruction.data.length,
+                    });
+                });
 
-            // Get blockhash from mainnet
-            const { blockhash, lastValidBlockHeight } =
-                await fuulConnection.getLatestBlockhash('confirmed');
-            transaction.recentBlockhash = blockhash;
-            transaction.lastValidBlockHeight = lastValidBlockHeight;
-            transaction.feePayer = walletPublicKey;
+                console.log(
+                    '🎁 [Claim] ===== STEP 5: TRANSACTION BUILDING & SIMULATION =====',
+                );
 
-            console.log('🎁 [Claim] Blockhash:', blockhash);
+                // Step 5: Sign and send directly to mainnet (not via FOGO Sessions)
+                console.log('🎁 [Claim] Building transaction for mainnet...');
 
-            // Sign with wallet
-            console.log('🎁 [Claim] Signing transaction...');
-            if (!sessionState.solanaWallet?.signTransaction) {
-                throw new Error('signTransaction not available on wallet');
+                const transaction = new Transaction();
+                transaction.add(...instructions);
+
+                // Get blockhash from mainnet
+                console.log('🎁 [Claim] Getting latest blockhash...');
+                const { blockhash, lastValidBlockHeight } =
+                    await fuulConnection.getLatestBlockhash('confirmed');
+                transaction.recentBlockhash = blockhash;
+                transaction.lastValidBlockHeight = lastValidBlockHeight;
+                transaction.feePayer = walletPublicKey;
+
+                console.log('🎁 [Claim] Blockhash:', blockhash);
+                console.log('🎁 [Claim] Transaction details:', {
+                    instructions: instructions.length,
+                    feePayer: transaction.feePayer?.toBase58() || 'undefined',
+                    recentBlockhash: transaction.recentBlockhash,
+                    lastValidBlockHeight: transaction.lastValidBlockHeight,
+                });
+
+                // REMOVED SIMULATION: Skip simulation entirely (like original working version)
+                console.log(
+                    '🎁 [Claim] Skipping simulation - sending transaction directly',
+                );
+                console.log(
+                    '🎁 [Claim] Note: This matches the original working version behavior',
+                );
+
+                console.log(
+                    '🎁 [Claim] ===== STEP 7: TRANSACTION SIGNING =====',
+                );
+
+                // Debug transaction details before signing
+                console.log('🎁 [Claim] Transaction details for signing:');
+                console.log(
+                    '🎁 [Claim] - Instructions count:',
+                    instructions.length,
+                );
+                console.log(
+                    '🎁 [Claim] - Fee payer:',
+                    transaction.feePayer?.toBase58(),
+                );
+                console.log(
+                    '🎁 [Claim] - Recent blockhash:',
+                    transaction.recentBlockhash,
+                );
+                console.log(
+                    '🎁 [Claim] - Last valid block height:',
+                    transaction.lastValidBlockHeight,
+                );
+
+                // Log each instruction for debugging
+                console.log(
+                    '🎁 [Claim] ===== DETAILED INSTRUCTION ANALYSIS =====',
+                );
+                instructions.forEach((instruction, index) => {
+                    console.log(`🎁 [Claim] Instruction ${index}:`);
+                    console.log(
+                        `🎁 [Claim] - Program ID: ${instruction.programId.toBase58()}`,
+                    );
+                    console.log(
+                        `🎁 [Claim] - Keys count: ${instruction.keys.length}`,
+                    );
+
+                    instruction.keys.forEach((key: any, keyIndex: any) => {
+                        const keyAddr = key.pubkey.toBase58();
+                        const isSigner = key.isSigner;
+                        const isWritable = key.isWritable;
+                        console.log(
+                            `🎁 [Claim] - Key ${keyIndex}: ${keyAddr} (signer: ${isSigner}, writable: ${isWritable})`,
+                        );
+
+                        // Check for missing signer
+                        if (
+                            keyAddr ===
+                            '2kK1QECQvtavj5VZkQazdWK9d5q7QDz51UvoZq5dbebi'
+                        ) {
+                            console.log(
+                                `🎁 [Claim] *** FOUND MISSING SIGNER ACCOUNT ***`,
+                            );
+                            console.log(
+                                `🎁 [Claim] *** In instruction ${index}, key ${keyIndex} ***`,
+                            );
+                            console.log(
+                                `🎁 [Claim] *** Address: ${keyAddr} ***`,
+                            );
+                            console.log(
+                                `🎁 [Claim] *** Is signer: ${isSigner} ***`,
+                            );
+                            console.log(
+                                `🎁 [Claim] *** Is writable: ${isWritable} ***`,
+                            );
+                        }
+                    });
+
+                    console.log(
+                        `🎁 [Claim] - Data length: ${instruction.data.length}`,
+                    );
+                    console.log('---');
+                });
+
+                // Sign with wallet
+                console.log('🎁 [Claim] Signing transaction...');
+
+                // Check signer account existence before signing
+                const signerAccount =
+                    '2kK1QECQvtavj5VZkQazdWK9d5q7QDz51UvoZq5dbebi';
+                console.log('🎁 [Claim] Checking signer account existence...');
+                const signerAccountInfo = await fuulConnection.getAccountInfo(
+                    new PublicKey(signerAccount),
+                );
+                console.log(
+                    '🎁 [Claim] Signer account exists:',
+                    signerAccountInfo !== null,
+                );
+                if (!signerAccountInfo) {
+                    console.log(
+                        '🎁 [Claim] ⚠️ SIGNER ACCOUNT DOES NOT EXIST ON-CHAIN',
+                    );
+                    console.log('🎁 [Claim] Signer address:', signerAccount);
+                    console.log(
+                        '🎁 [Claim] This is likely causing the wallet simulation to fail',
+                    );
+                    console.log(
+                        '🎁 [Claim] The claim program requires this signer to validate the signature',
+                    );
+                }
+
+                if (!(sessionState as any).solanaWallet?.signTransaction) {
+                    throw new Error('signTransaction not available on wallet');
+                }
+                const signedTx = await (
+                    sessionState as any
+                ).solanaWallet.signTransaction(transaction);
+                console.log('🎁 [Claim] Transaction signed');
+
+                console.log(
+                    '🎁 [Claim] ===== STEP 8: TRANSACTION SENDING =====',
+                );
+
+                // Send directly to mainnet
+                console.log('🎁 [Claim] Sending to mainnet...');
+                const txSignature = await fuulConnection.sendRawTransaction(
+                    signedTx.serialize(),
+                    {
+                        skipPreflight: false,
+                        preflightCommitment: 'confirmed',
+                    },
+                );
+                console.log('🎁 [Claim] Transaction sent:', txSignature);
+
+                console.log(
+                    '🎁 [Claim] ===== STEP 9: TRANSACTION CONFIRMATION =====',
+                );
+
+                // Confirm
+                console.log('🎁 [Claim] Confirming...');
+                await fuulConnection.confirmTransaction(
+                    { signature: txSignature, blockhash, lastValidBlockHeight },
+                    'confirmed',
+                );
+
+                console.log('🎁 [Claim] Transaction confirmed!');
+                console.log(
+                    '🎁 [Claim] Explorer:',
+                    `https://explorer.fogo.io/tx/${txSignature}`,
+                );
+
+                // Refresh claims data
+                referralStore.fetchClaims(referrerAddress);
+            } catch (hexError: any) {
+                console.error(
+                    '🎁 [Claim] Hex conversion or instruction building failed:',
+                    hexError,
+                );
+                throw new Error(
+                    `Instruction building failed: ${hexError.message}`,
+                );
             }
-            const signedTx =
-                await sessionState.solanaWallet.signTransaction(transaction);
-            console.log('🎁 [Claim] Transaction signed');
+        } catch (error: any) {
+            console.error('🎁 [Claim] ===== CLAIM PROCESS FAILED =====');
+            console.error('🎁 [Claim] Error type:', error?.constructor?.name);
+            console.error('🎁 [Claim] Error message:', error?.message);
+            console.error('🎁 [Claim] Error stack:', error?.stack);
 
-            // Send directly to mainnet
-            console.log('🎁 [Claim] Sending to mainnet...');
-            const txSignature = await fuulConnection.sendRawTransaction(
-                signedTx.serialize(),
-                {
-                    skipPreflight: false,
-                    preflightCommitment: 'confirmed',
-                },
-            );
-            console.log('🎁 [Claim] Transaction sent:', txSignature);
+            // Categorize error types for better debugging
+            if (error?.message?.includes('Network connectivity failed')) {
+                console.error(
+                    '🎁 [Claim] CATEGORY: Network connectivity issue',
+                );
+            } else if (error?.message?.includes('SDK initialization failed')) {
+                console.error('🎁 [Claim] CATEGORY: SDK initialization issue');
+            } else if (error?.message?.includes('Insufficient balance')) {
+                console.error('🎁 [Claim] CATEGORY: Balance issue');
+            } else if (error?.message?.includes('Global config not found')) {
+                console.error('🎁 [Claim] CATEGORY: Fuul program config issue');
+            } else if (
+                error?.message?.includes('No authorized signers found')
+            ) {
+                console.error('🎁 [Claim] CATEGORY: Fuul program signer issue');
+            } else if (error?.message?.includes('Invalid hex string')) {
+                console.error('🎁 [Claim] CATEGORY: Claim data format issue');
+            } else if (
+                error?.message?.includes('Instruction building failed')
+            ) {
+                console.error(
+                    '🎁 [Claim] CATEGORY: Instruction building issue',
+                );
+            } else if (
+                error?.message?.includes('Transaction simulation failed')
+            ) {
+                console.error(
+                    '🎁 [Claim] CATEGORY: Transaction simulation issue',
+                );
+            } else if (
+                error?.message?.includes('Transaction simulation error')
+            ) {
+                console.error(
+                    '🎁 [Claim] CATEGORY: Transaction simulation error',
+                );
+            } else if (
+                error?.message?.includes('signTransaction not available')
+            ) {
+                console.error('🎁 [Claim] CATEGORY: Wallet signing issue');
+            } else if (error?.message?.includes('Account Creation Required')) {
+                console.error('🎁 [Claim] CATEGORY: Account creation required');
+            } else {
+                console.error('🎁 [Claim] CATEGORY: Unknown error');
+            }
 
-            // Confirm
-            console.log('🎁 [Claim] Confirming...');
-            await fuulConnection.confirmTransaction(
-                { signature: txSignature, blockhash, lastValidBlockHeight },
-                'confirmed',
-            );
-
-            console.log('🎁 [Claim] Transaction confirmed!');
-            console.log(
-                '🎁 [Claim] Explorer:',
-                `https://explorer.fogo.io/tx/${txSignature}`,
-            );
-
-            // Refresh claims data
-            referralStore.fetchClaims(referrerAddress);
-        } catch (error) {
-            console.error('🎁 [Claim] Error:', error);
+            console.error('🎁 [Claim] Full error object:', error);
         }
     };
 

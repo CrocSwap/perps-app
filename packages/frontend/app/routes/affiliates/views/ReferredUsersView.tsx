@@ -7,6 +7,7 @@ import {
     IoPeople,
 } from 'react-icons/io5';
 import { ConnectWalletCard } from '../components/ConnectWalletCard';
+import { ClaimRewardsCard } from '../components/ClaimRewardsCard';
 import { TableErrorState } from '../components/TableErrorState';
 import { ViewLayout } from '../components/ViewLayout';
 import { EmptyState } from '../components/EmptyState';
@@ -97,6 +98,7 @@ export function ReferredUsersView() {
 
     return (
         <ViewLayout title='Affiliate History'>
+            <ClaimRewardsCard />
             <div className={styles['table-container']}>
                 {/* Search Input */}
                 <div
