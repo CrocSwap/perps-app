@@ -206,12 +206,23 @@ export default function Referrals() {
             <header>
                 <div className={styles.header_text}>
                     {t('referrals.title')}
-                    <p>
-                        {t('referrals.description')}{' '}
-                        <a href='https://docs.ambient.finance/' target='_blank'>
-                            {t('common.learnMore')}
+                    <div className={styles.description_row}>
+                        <p>
+                            {t('referrals.description')}{' '}
+                            <a
+                                href='https://docs.ambient.finance/'
+                                target='_blank'
+                            >
+                                {t('common.learnMore')}
+                            </a>
+                        </p>
+                        <a
+                            href='/v2/affiliates'
+                            className={styles.partner_link}
+                        >
+                            Become a Partner
                         </a>
-                    </p>
+                    </div>
                 </div>
                 <SimpleButton bg={'dark2'} onClick={handleOpenRefCodeModal}>
                     Register for the Referral Program
