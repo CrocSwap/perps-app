@@ -166,7 +166,9 @@ export default function EnterCode(props: PropsIF) {
                             </>
                         ) : (
                             <>
-                                {cached && isCachedValueValid ? (
+                                {cached &&
+                                isCachedValueValid &&
+                                refCodeToConsume ? (
                                     <span className={styles.codeValue}>
                                         {refCodeToConsume}
                                     </span>
@@ -175,7 +177,8 @@ export default function EnterCode(props: PropsIF) {
                                         className={`${styles.codeValue} ${styles.placeholder}`}
                                     >
                                         {t('referrals.clickToType', {
-                                            defaultValue: 'click to type',
+                                            defaultValue:
+                                                'Click the pencil icon to enter a referral code',
                                         })}
                                     </span>
                                 )}
