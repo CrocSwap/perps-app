@@ -91,12 +91,8 @@ export const useReferralStore = create<ReferralStoreIF>()(
             claims: null,
             cache(refCode: string, isApproved: boolean = false): void {
                 const current = get().cached;
-                // Don't overwrite if current code is approved and new code is different
-                if (
-                    current.isApproved &&
-                    !isApproved &&
-                    current.code !== refCode
-                ) {
+                // Don't overwrite if current code is approved and new code is unapproved
+                if (current.isApproved && !isApproved) {
                     return;
                 }
                 const nextIsApproved =

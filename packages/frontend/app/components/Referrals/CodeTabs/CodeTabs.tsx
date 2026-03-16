@@ -364,7 +364,7 @@ export default function CodeTabs(props: PropsIF) {
             // Reset validation state so the validation effect will re-run
             setIsCachedValueValid(undefined);
             setLastValidatedCode('');
-            referralStore.cache(handleReferralURLParam.value);
+            referralStore.cache(handleReferralURLParam.value, false);
         }
     }, [handleReferralURLParam.value]);
 
@@ -547,6 +547,13 @@ export default function CodeTabs(props: PropsIF) {
         if (!referralStore.cached.code) {
             setIsCachedValueValid(undefined);
             setLastValidatedCode('');
+            return;
+        }
+
+        // Don't validate if the cached code is already approved
+        if (referralStore.cached.isApproved) {
+            setIsCachedValueValid(true);
+            setEditModeInvitee(false);
             return;
         }
 
