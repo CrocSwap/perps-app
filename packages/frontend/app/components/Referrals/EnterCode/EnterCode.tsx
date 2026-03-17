@@ -214,7 +214,7 @@ export default function EnterCode(props: PropsIF) {
                     </p>
                 )}
             </div>
-            {isEligibleToEdit && (
+            {isEligibleToEdit && !isApproved && (
                 <SimpleButton
                     bg='accent1'
                     disabled={
