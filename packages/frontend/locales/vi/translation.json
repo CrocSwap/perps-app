@@ -542,6 +542,7 @@
         "enterCode": "Nhập mã",
         "claim": "Nhận",
         "createCode": "Tạo mã",
+        "refCode": "Mã giới thiệu",
         "pendingRefCode": "Mã giới thiệu (đang chờ)",
         "overwriteCurrentReferralCode": "Ghi đè mã giới thiệu hiện tại",
         "enterReferralCode": "Nhập mã giới thiệu",

@@ -535,6 +535,7 @@
         "rewardHistory": "Historial de recompensas",
         "enterCode": "Ingresar código",
         "createCode": "Crear código",
+        "refCode": "Código de referido",
         "pendingRefCode": "Código de referido (pendiente)",
         "overwriteCurrentReferralCode": "Sobrescribir código de referido actual",
         "enterReferralCode": "Ingresar un código de referido",
