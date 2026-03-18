@@ -541,6 +541,7 @@
         "rewardHistory": "Reward History",
         "enterCode": "Enter Code",
         "createCode": "Create Code",
+        "refCode": "Referral Code",
         "pendingRefCode": "Referral Code (Pending)",
         "overwriteCurrentReferralCode": "Overwrite current referral code",
         "enterReferralCode": "Enter a referral code",
