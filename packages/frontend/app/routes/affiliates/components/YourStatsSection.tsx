@@ -142,6 +142,15 @@ export function YourStatsSection() {
                             label={STATS_LABELS.FEES_EARNED}
                             value={affiliateEarnings}
                             tooltip={'Commission earned from your invitees'}
+                            breakdown={{
+                                claimed: '$0.00',
+                                unclaimed: '$0.00',
+                            }}
+                            actionButton={{
+                                text: 'Claim',
+                                onClick: () =>
+                                    console.log('Claim button clicked'),
+                            }}
                         />
                     )}
 

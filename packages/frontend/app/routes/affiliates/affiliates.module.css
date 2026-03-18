@@ -281,6 +281,53 @@
     color: var(--aff-text-primary);
 }
 
+/* Enhanced stat card with breakdown */
+.stat-card-with-breakdown {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stat-card-with-breakdown .stat-value {
+    font-size: 1.25rem; /* Slightly smaller to make room */
+    margin-bottom: 0.25rem;
+}
+
+.stat-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0.5rem 0;
+}
+
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.breakdown-label {
+    color: var(--aff-text-tertiary);
+    font-weight: 500;
+}
+
+.breakdown-value {
+    color: var(--aff-text-secondary);
+    font-weight: 600;
+}
+
+.stat-action {
+    margin-top: 0.5rem;
+}
+
+.stat-button {
+    width: 100%;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    height: auto;
+}
+
 /* Table styles */
 .table-container {
     background: var(--aff-surface);
