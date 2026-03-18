@@ -541,6 +541,7 @@
         "rewardHistory": "보상 내역",
         "enterCode": "코드 입력",
         "createCode": "코드 생성",
+        "refCode": "추천 코드",
         "pendingRefCode": "추천 코드(대기 중)",
         "overwriteCurrentReferralCode": "현재 추천 코드 덮어쓰기",
         "enterReferralCode": "추천 코드 입력",

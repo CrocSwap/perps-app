@@ -541,6 +541,7 @@
         "rewardHistory": "Belohnungsverlauf",
         "enterCode": "Code eingeben",
         "createCode": "Code erstellen",
+        "refCode": "Empfehlungscode",
         "pendingRefCode": "Empfehlungscode (ausstehend)",
         "overwriteCurrentReferralCode": "Aktuellen Empfehlungscode überschreiben",
         "enterReferralCode": "Empfehlungscode eingeben",
