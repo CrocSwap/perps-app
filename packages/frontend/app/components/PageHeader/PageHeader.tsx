@@ -39,6 +39,7 @@ import {
     matchesShortcutEvent,
 } from '~/utils/keyboardShortcuts';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useAffiliateClaims } from '~/routes/affiliates/hooks/useAffiliateData';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -56,6 +57,20 @@ export default function PageHeader() {
     const sessionState = useSession();
 
     const isUserConnected = isEstablished(sessionState);
+
+    // DEBUG: log affiliate claims data
+    const { data: affiliateClaimsDebug } = useAffiliateClaims(
+        userDataStore.userAddress ?? '',
+        isUserConnected && !!userDataStore.userAddress,
+    );
+    useEffect(() => {
+        if (affiliateClaimsDebug) {
+            console.log(
+                '🔍 [PageHeader] Affiliate claims data:',
+                affiliateClaimsDebug,
+            );
+        }
+    }, [affiliateClaimsDebug]);
 
     // Fetch user's total volume for FUUL tracking
     useEffect(() => {

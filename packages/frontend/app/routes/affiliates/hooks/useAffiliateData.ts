@@ -776,3 +776,93 @@ export function useAffiliateCode(userIdentifier: string, enabled = true) {
 
     return { data, isLoading, error, refetch: fetchData };
 }
+
+// Hook for affiliate claim checks
+export interface AffiliateClaim {
+    project_address: string;
+    to: string;
+    currency: string;
+    currency_type: number;
+    amount: string;
+    reason: number;
+    token_id: string;
+    deadline: number;
+    proof: string;
+    signatures: string[];
+}
+
+const AFFILIATES_CLAIMS_API_KEY =
+    '5d1e8bc550b40b178e383343e74e90c98df063472abeb8fa697843a1c3ca1f32';
+
+export function useAffiliateClaims(userIdentifier: string, enabled = true) {
+    const [data, setData] = useState<AffiliateClaim[] | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const fetchData = useCallback(async () => {
+        if (!enabled || !userIdentifier) return;
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const res = await fetch(
+                'https://api.fuul.xyz/api/v1/claim-checks/claim',
+                {
+                    method: 'POST',
+                    headers: {
+                        accept: 'application/json',
+                        'content-type': 'application/json',
+                        authorization: `Bearer ${AFFILIATES_CLAIMS_API_KEY}`,
+                    },
+                    body: JSON.stringify({
+                        userIdentifierType: 'solana_address',
+                        userIdentifier,
+                    }),
+                },
+            );
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setData([]);
+                    return;
+                }
+                const text = await res.text();
+                console.error('FUUL getAffiliateClaims error:', text);
+                throw new Error(text);
+            }
+
+            const response = await res.json();
+            console.log('FUUL getAffiliateClaims response:', response);
+            setData(
+                Array.isArray(response)
+                    ? response
+                    : (response?.claims ?? response?.data ?? []),
+            );
+        } catch (err) {
+            if (isNotFoundError(err)) {
+                setData([]);
+            } else {
+                setError(
+                    err instanceof Error
+                        ? err
+                        : new Error('Failed to fetch affiliate claims'),
+                );
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, [userIdentifier, enabled]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    useEffect(() => {
+        window.addEventListener('affiliateDataUpdate', fetchData);
+        return () =>
+            window.removeEventListener('affiliateDataUpdate', fetchData);
+    }, [fetchData]);
+
+    return { data, isLoading, error, refetch: fetchData };
+}
