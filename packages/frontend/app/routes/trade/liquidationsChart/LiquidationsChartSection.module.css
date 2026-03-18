@@ -1,0 +1,92 @@
+.liqChartTabContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.liqChartSectionContainer {
+    width: 100%;
+    height: 100%;
+    font-size: 0.8rem;
+    display: flex;
+}
+
+.liqChartControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: var(--gap-xs);
+    margin: var(--margin-xs) 0;
+    padding: 0 var(--padding-xs);
+    color: var(--text3);
+    flex-shrink: 0;
+}
+
+.tabContent {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.startGap {
+    display: flex;
+    width: 100%;
+
+    gap: var(--gap-xs);
+    margin: var(--margin-xs) 0;
+    padding: 0 var(--padding-xs);
+    color: var(--text3);
+
+    align-items: center;
+    justify-content: center;
+}
+
+.chartWrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.modeButton {
+    position: absolute;
+    top: 50%;
+    right: var(--padding-sm);
+    transform: translateY(-50%);
+    font-family: var(--font-family);
+    border: var(--border-width) solid var(--dark3);
+    border-radius: var(--border-radius);
+    color: var(--text2);
+    padding: var(--padding-xs) var(--padding-sm);
+    cursor: pointer;
+    font-size: var(--font-size-body);
+    transition: all 0.2s ease;
+    z-index: 10;
+    background-color: var(--bg-dark2);
+    right: auto;
+    left: 0;
+    padding-left: var(--padding-m);
+    padding-right: var(--padding-m);
+}
+
+.modeButton:hover {
+    border-color: var(--accent1);
+    color: var(--text1);
+}
+
+.emptyStateCenter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text3);
+    font-family: var(--font-family);
+    font-size: var(--font-size-body);
+    z-index: 5;
+}
