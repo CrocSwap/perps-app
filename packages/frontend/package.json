@@ -1,7 +1,7 @@
 {
     "$schema": "https://json.schemastore.org/package.json",
     "name": "@perps-app/frontend",
-    "version": "0.6.5-Mar-3",
+    "version": "0.6.6-Mar-23",
     "private": true,
     "type": "module",
     "scripts": {
