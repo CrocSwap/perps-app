@@ -2,7 +2,7 @@
 .notifications {
     --notification-layer-width: 380px;
     /* remove the element from the normal layout flow */
-    position: absolute;
+    position: fixed;
     /* render element slightly up and left from bottom-right corner */
     bottom: 10px;
     right: 10px;
@@ -11,8 +11,8 @@
     flex-direction: column;
     /* slight vertical gap between elements */
     gap: 15px;
-    /* added to show notifications above other elements on trade page */
-    z-index: var(--z-index-notification, 1000) !important;
+    /* keep notifications above app and third-party modal overlays/backdrops */
+    z-index: 2147483647 !important;
 
     max-width: var(--notification-layer-width);
 }

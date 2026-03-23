@@ -1,11 +1,14 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { Fuul, UserIdentifierType } from '@fuul/sdk';
 
 export interface CachedRefCodeIF {
     // ref code created for referral use
     code: string;
     // indicates the invitee wants to use this code
     isApproved: boolean;
+    // increments on explicit approvals to allow one-shot downstream triggers
+    approvalNonce: number;
 }
 
 export interface UserReferrerResponse {
@@ -31,15 +34,30 @@ export interface AffiliateCodeResponse {
     user_rebate_rate: number | null;
 }
 
+export interface ClaimCheckIF {
+    project_address: string;
+    to: string;
+    currency: string;
+    currency_type: number;
+    amount: string;
+    reason: number;
+    token_id: string;
+    deadline: number;
+    proof: string;
+    signatures: string[];
+}
+
 export interface ReferralStoreIF {
     cached: CachedRefCodeIF;
     totVolume: number | undefined;
     convertedWallets: string[];
+    claims: ClaimCheckIF[] | null;
     fetchUserReferrer: (address: string) => Promise<UserReferrerResponse[]>;
     getRefCodeByPubKey: (
         userIdentifier: string,
     ) => Promise<AffiliateCodeResponse | null>;
     checkForConversion: (address: string) => Promise<boolean>;
+    fetchClaims: (address: string) => Promise<void>;
     cache(refCode: string, isApproved?: boolean): void;
     markCodeApproved(refCode: string): void;
     setTotVolume(volume: number | undefined): void;
@@ -63,26 +81,44 @@ const ssrSafeStorage = () =>
 export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set, get) => ({
-            cached: { code: '', isApproved: false } as CachedRefCodeIF,
+            cached: {
+                code: '',
+                isApproved: false,
+                approvalNonce: 0,
+            } as CachedRefCodeIF,
             convertedWallets: [],
             totVolume: undefined,
+            claims: null,
             cache(refCode: string, isApproved: boolean = false): void {
                 const current = get().cached;
-                // Don't overwrite if current code is approved and new code is different
-                if (
-                    current.isApproved &&
-                    !isApproved &&
-                    current.code !== refCode
-                ) {
+                // Don't overwrite if current code is approved and new code is unapproved
+                if (current.isApproved && !isApproved) {
                     return;
                 }
-                set({ cached: { code: refCode, isApproved } });
+                const nextIsApproved =
+                    isApproved ||
+                    (current.isApproved && current.code === refCode);
+                set({
+                    cached: {
+                        code: refCode,
+                        isApproved: nextIsApproved,
+                        approvalNonce: isApproved
+                            ? current.approvalNonce + 1
+                            : current.approvalNonce,
+                    },
+                });
             },
             markCodeApproved(refCode: string): void {
                 // Update cached with approval
                 const currentCached = get().cached;
                 if (refCode === currentCached.code) {
-                    set({ cached: { code: refCode, isApproved: true } });
+                    set({
+                        cached: {
+                            code: refCode,
+                            isApproved: true,
+                            approvalNonce: currentCached.approvalNonce + 1,
+                        },
+                    });
                 }
             },
             setTotVolume(volume: number | undefined): void {
@@ -90,9 +126,61 @@ export const useReferralStore = create<ReferralStoreIF>()(
             },
             clear(): void {
                 set({
-                    cached: { code: '', isApproved: false },
+                    cached: { code: '', isApproved: false, approvalNonce: 0 },
                     totVolume: undefined,
+                    claims: null,
                 });
+            },
+            async fetchClaims(address: string): Promise<void> {
+                // Clear existing claims data immediately
+                set({ claims: null });
+
+                if (!address) {
+                    return;
+                }
+
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        accept: 'application/json',
+                        'content-type': 'application/json',
+                        authorization:
+                            'Bearer 459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661',
+                    },
+                    body: JSON.stringify({
+                        userIdentifierType: 'solana_address',
+                        userIdentifier: address,
+                    }),
+                };
+
+                try {
+                    console.log(
+                        '🔍 [ReferralStore] fetchClaims calling API for address:',
+                        address,
+                    );
+                    const res = await fetch(
+                        'https://api.fuul.xyz/api/v1/claim-checks/claim',
+                        options,
+                    );
+                    console.log(
+                        '🔍 [ReferralStore] fetchClaims response status:',
+                        res.status,
+                    );
+                    const data = await res.json();
+                    console.log('🔍 [ReferralStore] fetchClaims result:', data);
+                    console.log(
+                        '🔍 [ReferralStore] fetchClaims is array:',
+                        Array.isArray(data),
+                    );
+                    set({
+                        claims: Array.isArray(data)
+                            ? data
+                            : (data?.claims ?? data?.data ?? []),
+                    });
+                } catch (err) {
+                    console.error('❌ [ReferralStore] fetchClaims error:', err);
+                    set({ claims: [] });
+                }
             },
             async fetchUserReferrer(
                 address: string,
@@ -210,7 +298,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 cached: state.cached,
                 convertedWallets: state.convertedWallets,
             }),
-            version: 3,
+            version: 4,
             migrate: (persistedState: unknown, version: number) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 let state = (persistedState ?? {}) as Record<string, any>;
@@ -219,14 +307,32 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     // Migrate cached from string to object
                     let newCached: CachedRefCodeIF;
                     if (typeof state.cached === 'string') {
-                        newCached = { code: state.cached, isApproved: false };
+                        newCached = {
+                            code: state.cached,
+                            isApproved: false,
+                            approvalNonce: 0,
+                        };
                     } else if (
                         state.cached &&
                         typeof state.cached === 'object'
                     ) {
-                        newCached = state.cached;
+                        newCached = {
+                            code:
+                                typeof state.cached.code === 'string'
+                                    ? state.cached.code
+                                    : '',
+                            isApproved: state.cached.isApproved === true,
+                            approvalNonce:
+                                typeof state.cached.approvalNonce === 'number'
+                                    ? state.cached.approvalNonce
+                                    : 0,
+                        };
                     } else {
-                        newCached = { code: '', isApproved: false };
+                        newCached = {
+                            code: '',
+                            isApproved: false,
+                            approvalNonce: 0,
+                        };
                     }
                     state = { ...state, cached: newCached };
                 }
@@ -235,6 +341,27 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     // Remove deprecated cached2 from persisted state
                     const { cached2, ...rest } = state;
                     state = rest;
+                }
+
+                if (version < 4) {
+                    const cached =
+                        state.cached && typeof state.cached === 'object'
+                            ? state.cached
+                            : { code: '', isApproved: false };
+                    state = {
+                        ...state,
+                        cached: {
+                            code:
+                                typeof cached.code === 'string'
+                                    ? cached.code
+                                    : '',
+                            isApproved: cached.isApproved === true,
+                            approvalNonce:
+                                typeof cached.approvalNonce === 'number'
+                                    ? cached.approvalNonce
+                                    : 0,
+                        },
+                    };
                 }
 
                 return state;

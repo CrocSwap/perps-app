@@ -85,11 +85,14 @@
     border-radius: var(--radius-s, 12px);
     cursor: pointer;
     color: var(--text2);
+    min-width: 0;
+    overflow: hidden;
 }
 
 .with_copy_clipboard > svg {
     cursor: pointer;
     color: var(--text3);
+    flex-shrink: 0;
 }
 
 .createCodeContent {
@@ -105,6 +108,10 @@
     display: flex;
     align-items: center;
     gap: var(--gap-m, 16px);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .createCodeContent a {
@@ -137,6 +144,17 @@
     gap: var(--gap-m);
 }
 
+.sectionCentered {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--padding-m, 16px);
+    gap: var(--gap-m, 16px);
+    text-align: center;
+}
+
 .sessionButtonWrapper {
     width: 100%;
     display: flex;
@@ -158,10 +176,27 @@
 /* Phone */
 @media (max-width: 768px) {
     .sectionWithButton {
+        height: 100%;
+        overflow-y: auto;
         gap: var(--gap-s, 10px);
+        padding: 12px;
     }
     .enterCodeContent input {
         height: 34px;
+    }
+    .createCodeContent {
+        gap: var(--gap-s, 10px);
+    }
+    .trackingLinkExplanation {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* Small phones — stack action buttons vertically */
+@media (max-width: 380px) {
+    .refferal_code_buttons {
+        flex-direction: column;
     }
 }
 

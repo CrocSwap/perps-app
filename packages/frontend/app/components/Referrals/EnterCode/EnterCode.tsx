@@ -1,6 +1,7 @@
 import { SessionButton } from '@fogo/sessions-sdk-react';
 import { Trans, useTranslation } from 'react-i18next';
-import { FaSpinner } from 'react-icons/fa';
+import { FiEdit2 } from 'react-icons/fi';
+import { IoClose } from 'react-icons/io5';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import styles from './EnterCode.module.css';
 
@@ -10,6 +11,8 @@ interface PropsIF {
     totVolumeFormatted: string;
     inviteeMaxVolumeThreshold: number;
     cached: string;
+    isApproved: boolean;
+    isAttributed: boolean;
     isCachedValueValid: boolean | undefined;
     refCodeToConsume: string | undefined;
     editModeInvitee: boolean;
@@ -33,6 +36,8 @@ export default function EnterCode(props: PropsIF) {
         totVolumeFormatted,
         inviteeMaxVolumeThreshold,
         cached,
+        isApproved,
+        isAttributed,
         isCachedValueValid,
         refCodeToConsume,
         editModeInvitee,
@@ -51,186 +56,192 @@ export default function EnterCode(props: PropsIF) {
 
     const { t } = useTranslation();
 
-    // const spinner = (
-    //     <div
-    //         style={{
-    //             display: 'flex',
-    //             justifyContent: 'center',
-    //             alignItems: 'center',
-    //             height: '100%',
-    //         }}
-    //     >
-    //         <FaSpinner
-    //             style={{
-    //                 color: 'var(--accent1)',
-    //                 animation: 'spin 0.6s linear infinite',
-    //             }}
-    //         />
-    //     </div>
-    // );
+    const isEligibleToEdit =
+        !isAttributed &&
+        totVolume !== undefined &&
+        totVolume < inviteeMaxVolumeThreshold;
 
-    const currentCodeElem = (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.enterCodeContent}>
-                {cached ? (
-                    <>
-                        <div className={styles.current_ref_code}>
-                            <h6>{t('referrals.pendingRefCode')}</h6>
-                            {isCachedValueValid && <p>{refCodeToConsume}</p>}
-                        </div>
-                        <p className={styles.ref_code_blurb}>
-                            Associating a code with your wallet address will
-                            register you to earn rewards on your transactions.
-                            Rewards will also be paid to the user who created
-                            the code.
-                        </p>
-                        {isCachedValueValid === false && (
-                            <p>
-                                This code does not appear to be registered in
-                                the referral system.
-                            </p>
-                        )}
-                    </>
+    const handleCancelEdit = () => {
+        setEditModeInvitee(false);
+        setUserInputRefCode('');
+        setInvalidCode('');
+    };
+
+    const isConfirmDisabled =
+        userInputRefCode.length < 2 ||
+        (!isInputSolanaAddress && userInputRefCode.length > 30) ||
+        isCheckingCode ||
+        !isUserRefCodeClaimed ||
+        isUserInputRefCodeSelfOwned;
+
+    const validationFeedback = userInputRefCode.length >= 2 && (
+        <>
+            {isInputSolanaAddress && !isUserInputRefCodeSelfOwned ? (
+                <p
+                    style={{
+                        color: 'var(--text2)',
+                        fontSize: 'var(--font-size-xs)',
+                    }}
+                >
+                    This appears to be a wallet address. Please confirm with
+                    your referrer that it is correct.
+                </p>
+            ) : (
+                userInputRefCode.length <= 30 &&
+                (isCheckingCode ? (
+                    <p
+                        style={{
+                            color: 'var(--text2)',
+                            fontSize: 'var(--font-size-xs)',
+                        }}
+                    >
+                        Checking code...
+                    </p>
+                ) : isUserRefCodeClaimed ? (
+                    <p
+                        style={{
+                            color: 'var(--positive)',
+                            fontSize: 'var(--font-size-xs)',
+                        }}
+                    >
+                        Code is valid!
+                    </p>
                 ) : (
-                    <h6>{t('referrals.enterCode')}</h6>
-                )}
-            </div>
-            {cached &&
-                totVolume !== undefined &&
-                totVolume < inviteeMaxVolumeThreshold && (
-                    <div className={styles.refferal_code_buttons}>
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={() => setEditModeInvitee(true)}
-                        >
-                            {t('common.edit')}
-                        </SimpleButton>
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={() => openConfirmModal()}
-                        >
-                            {t('common.confirm')}
-                        </SimpleButton>
-                    </div>
-                )}
-        </section>
-    );
-
-    const enterNewCodeElem = (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.enterCodeContent}>
-                <h6>
-                    {cached
-                        ? t('referrals.overwriteCurrentReferralCode') + ': '
-                        : t('referrals.enterReferralCode') + ': '}
-                    <span style={{ color: 'var(--accent3)' }}>{cached}</span>
-                </h6>
-                <input
-                    type='text'
-                    value={userInputRefCode}
-                    onChange={(e) => setUserInputRefCode(e.target.value)}
-                />
-                {userInputRefCode.length >= 2 &&
-                    (isInputSolanaAddress && !isUserInputRefCodeSelfOwned ? (
-                        <p
-                            style={{
-                                color: 'var(--text2)',
-                                fontSize: 'var(--font-size-xs)',
-                            }}
-                        >
-                            This appears to be a wallet address. Please confirm
-                            with your referrer that it is correct.
-                        </p>
-                    ) : (
-                        userInputRefCode.length <= 30 &&
-                        (isCheckingCode ? (
-                            <p
-                                style={{
-                                    color: 'var(--text2)',
-                                    fontSize: 'var(--font-size-xs)',
-                                }}
-                            >
-                                Checking code...
-                            </p>
-                        ) : isUserRefCodeClaimed ? (
-                            <p
-                                style={{
-                                    color: 'var(--positive)',
-                                    fontSize: 'var(--font-size-xs)',
-                                }}
-                            >
-                                Code is valid!
-                            </p>
-                        ) : (
-                            <p style={{ fontSize: 'var(--font-size-xs)' }}>
-                                <Trans
-                                    i18nKey='referrals.referralCodeNotValidPleaseConfirm'
-                                    values={{ invalidCode: userInputRefCode }}
-                                    components={[
-                                        <span
-                                            style={{ color: 'var(--accent2)' }}
-                                        />,
-                                    ]}
-                                />
-                            </p>
-                        ))
-                    ))}
-                {isUserInputRefCodeSelfOwned && (
                     <p style={{ fontSize: 'var(--font-size-xs)' }}>
                         <Trans
-                            i18nKey='referrals.doNotSelfRefer'
-                            values={{ refCode: userInputRefCode }}
+                            i18nKey='referrals.referralCodeNotValidPleaseConfirm'
+                            values={{ invalidCode: userInputRefCode }}
                             components={[
                                 <span style={{ color: 'var(--accent2)' }} />,
                             ]}
                         />
                     </p>
+                ))
+            )}
+            {isUserInputRefCodeSelfOwned && (
+                <p style={{ fontSize: 'var(--font-size-xs)' }}>
+                    <Trans
+                        i18nKey='referrals.doNotSelfRefer'
+                        values={{ refCode: userInputRefCode }}
+                        components={[
+                            <span style={{ color: 'var(--accent2)' }} />,
+                        ]}
+                    />
+                </p>
+            )}
+        </>
+    );
+
+    const currentCodeElem = (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <div className={styles.current_ref_code}>
+                    <h6>
+                        {isApproved || isAttributed
+                            ? t('referrals.refCode')
+                            : t('referrals.pendingRefCode')}
+                    </h6>
+                    <div className={styles.codeWithIcon}>
+                        {editModeInvitee ? (
+                            <>
+                                <input
+                                    type='text'
+                                    value={userInputRefCode}
+                                    onChange={(e) =>
+                                        setUserInputRefCode(e.target.value)
+                                    }
+                                    placeholder={t('referrals.clickToType', {
+                                        defaultValue: 'click to type',
+                                    })}
+                                    autoFocus
+                                />
+                                <button
+                                    type='button'
+                                    className={styles.iconButton}
+                                    onClick={handleCancelEdit}
+                                    aria-label={t('common.cancel')}
+                                >
+                                    <IoClose size={16} />
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                {cached &&
+                                isCachedValueValid &&
+                                refCodeToConsume ? (
+                                    <span className={styles.codeValue}>
+                                        {refCodeToConsume}
+                                    </span>
+                                ) : (
+                                    <span
+                                        className={`${styles.codeValue} ${styles.placeholder}`}
+                                    >
+                                        {t('referrals.clickToType', {
+                                            defaultValue:
+                                                'Click the pencil icon to enter a referral code',
+                                        })}
+                                    </span>
+                                )}
+                                {isEligibleToEdit && (
+                                    <button
+                                        type='button'
+                                        className={styles.iconButton}
+                                        onClick={() => {
+                                            if (cached) {
+                                                setUserInputRefCode(cached);
+                                            }
+                                            setEditModeInvitee(true);
+                                        }}
+                                        aria-label={t('common.edit')}
+                                    >
+                                        <FiEdit2 size={14} />
+                                    </button>
+                                )}
+                            </>
+                        )}
+                    </div>
+                </div>
+                <p className={styles.ref_code_blurb}>
+                    Associating a code with your wallet address will register
+                    you to earn rewards on your transactions. Rewards will also
+                    be paid to the user who created the code.
+                </p>
+                {editModeInvitee && validationFeedback}
+                {!editModeInvitee && isCachedValueValid === false && (
+                    <p>
+                        This code does not appear to be registered in the
+                        referral system.
+                    </p>
                 )}
             </div>
-            <div className={styles.refferal_code_buttons}>
+            {isEligibleToEdit && (!isApproved || editModeInvitee) && (
                 <SimpleButton
                     bg='accent1'
                     disabled={
-                        userInputRefCode.length < 2 ||
-                        (!isInputSolanaAddress &&
-                            userInputRefCode.length > 30) ||
-                        isCheckingCode ||
-                        !isUserRefCodeClaimed ||
-                        isUserInputRefCodeSelfOwned
+                        editModeInvitee
+                            ? isConfirmDisabled
+                            : !(cached && isCachedValueValid)
                     }
-                    onClick={(): void => {
-                        handleOverwriteReferralCode(userInputRefCode);
+                    onClick={() => {
+                        if (editModeInvitee && !isConfirmDisabled) {
+                            handleOverwriteReferralCode(userInputRefCode);
+                        } else {
+                            openConfirmModal();
+                        }
                     }}
                 >
-                    Overwrite
+                    {t('common.confirm')}
                 </SimpleButton>
-                {cached && isCachedValueValid && (
-                    <SimpleButton
-                        bg='dark3'
-                        hoverBg='accent1'
-                        onClick={() => {
-                            setEditModeInvitee(false);
-                            setInvalidCode('');
-                        }}
-                    >
-                        {t('common.cancel')}
-                    </SimpleButton>
-                )}
-            </div>
+            )}
         </section>
     );
 
     // Not connected state
     if (!isSessionEstablished) {
         return (
-            <section className={styles.sectionWithButton}>
-                <div className={styles.enterCodeContent}>
-                    <h6>{t('referrals.connectYourWallet.enterCode')}</h6>
-                </div>
-                <div
-                    className={styles.sessionButtonWrapper}
-                    style={{ height: '100%' }}
-                >
+            <section className={styles.sectionCentered}>
+                <h6>{t('referrals.connectYourWallet.enterCode')}</h6>
+                <div className={styles.sessionButtonWrapper}>
                     <SessionButton />
                 </div>
             </section>
@@ -259,10 +270,5 @@ export default function EnterCode(props: PropsIF) {
         );
     }
 
-    const shouldShowInput =
-        (editModeInvitee || !cached || isCachedValueValid === false) &&
-        totVolume !== undefined &&
-        totVolume < inviteeMaxVolumeThreshold;
-
-    return shouldShowInput ? enterNewCodeElem : currentCodeElem;
+    return currentCodeElem;
 }

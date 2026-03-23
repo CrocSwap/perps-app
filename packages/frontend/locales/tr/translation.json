@@ -102,7 +102,6 @@
         "closePosition": "Pozisyonu kapat",
         "closeAtCurrentPrice": "Mevcut fiyattan kapat",
         "closeAtAPriceYouSet": "Belirlediğin fiyattan kapat",
-
         "price": "Fiyat",
         "size": "Büyüklük",
         "time": "Zaman",
@@ -172,9 +171,9 @@
         "withdrawalSuccessful": "Çekim Başarılı",
         "successfullyWithdrawn": "{{amount}} {{unit}} başarılı şekilde çekildi",
         "withdrawFailed": "Çekim Başarısız",
-        "availableToDeposit": "Yatırılabilir Tutar",
+        "availableToDeposit": "Available to deposit",
         "availableToDepositTooltip": "Kasadaki kapasite ve cüzdan bakiyesine göre yatırılabilir tutar",
-        "availableToWithdraw": "Çekilebilir Tutar",
+        "availableToWithdraw": "Available to withdraw",
         "availableToWithdrawTooltip": "Portföyünüzden çekebileceğiniz toplam tutar",
         "invalidAmount": "Geçersiz Tutar",
         "depositToVault": "{{vaultName}}'a {{unitValue}} yatır",
@@ -305,10 +304,10 @@
             "hours": "Saat",
             "orderHistory": "Emir Geçmişi",
             "filter": "Filtre",
-            "viewAll": "Tümünü Gör"
+            "viewAll": "Tümünü Gör",
+            "chart": "Grafik"
         },
         "transfer": {
-            "agentTitle": "Ajanı Transfer Et",
             "selectAccounts": "Lütfen hesap seçin",
             "title": "Transfer",
             "from": "Gönderen",
@@ -318,7 +317,15 @@
             "available": "Yatırılabilir Bakiye",
             "enterAllFields": "Lütfen tüm alanları doldurun",
             "selectAccount": "Lütfen bir hesap seçin",
-            "selectAsset": "Lütfen bir varlık seçin"
+            "selectAsset": "Lütfen bir varlık seçin",
+            "fundAgent": "Aracıyı Fonla",
+            "withdrawToMaster": "Master'a Çek",
+            "enterAmount": "Miktar girin",
+            "selectAgent": "Aracı seçin",
+            "toAgentTitle": "Transfer to Agent",
+            "fromAgentTitle": "Transfer from Agent",
+            "availableToDeposit": "Available to deposit",
+            "availableToWithdraw": "Available to withdraw"
         },
         "form": {
             "labels": {
@@ -534,6 +541,7 @@
         "rewardHistory": "Ödül geçmişi",
         "enterCode": "Kodu girin",
         "createCode": "Kod oluştur",
+        "refCode": "Referans Kodu",
         "pendingRefCode": "Referans Kodu (Beklemede)",
         "overwriteCurrentReferralCode": "Mevcut referans kodunun üzerine yaz",
         "enterReferralCode": "Bir referans kodu girin",
@@ -558,12 +566,12 @@
     "deposit": {
         "prompt": "Fogo'dan {{token}} yatır",
         "input_prompt": "Miktarı girin (min ${{MIN_DEPOSIT_AMOUNT}})",
-        "availableToDeposit": "Yatırmak için müsait"
+        "availableToDeposit": "Available to deposit"
     },
     "withdraw": {
         "prompt": "Fogo'ya {{token}} çek",
         "explanation": "{{token}} adresinize gönderilecek.",
-        "availableToWithdraw": "Çekim için müsait",
+        "availableToWithdraw": "Available to withdraw",
         "input_prompt": "Miktarı girin (min ${{MIN_WITHDRAW_AMOUNT}})"
     },
     "orderBook": {
@@ -663,7 +671,6 @@
         "copyLinkCTA": "Bağlantıyı kopyala",
         "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap",
         "sharePosition": "PnL {{pnl}} pozisyonunu paylaş",
-
         "pnl": "PnL",
         "details": "Detaylar",
         "copyImageCTA": "Görseli kopyala",

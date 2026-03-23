@@ -29,6 +29,7 @@ interface PropsIF {
     inviteePercent: string;
     createRefCode: () => Promise<void>;
     updateRefCode: () => Promise<void>;
+    isVolumeDataLoaded: boolean;
 }
 
 export default function CreateCode(props: PropsIF) {
@@ -54,20 +55,16 @@ export default function CreateCode(props: PropsIF) {
         inviteePercent,
         createRefCode,
         updateRefCode,
+        isVolumeDataLoaded,
     } = props;
 
     const { t } = useTranslation();
 
     if (!isSessionEstablished) {
         return (
-            <section className={styles.sectionWithButton}>
-                <div className={styles.enterCodeContent}>
-                    <h6>{t('referrals.connectYourWallet.affiliate')}</h6>
-                </div>
-                <div
-                    className={styles.sessionButtonWrapper}
-                    style={{ height: '100%' }}
-                >
+            <section className={styles.sectionCentered}>
+                <h6>{t('referrals.connectYourWallet.affiliate')}</h6>
+                <div className={styles.sessionButtonWrapper}>
                     <SessionButton />
                 </div>
             </section>
@@ -133,7 +130,7 @@ export default function CreateCode(props: PropsIF) {
                         {t('common.seeDocsForMore')}
                     </p>
                 </div>
-                {
+                {canEditReferrerCode === true && isVolumeDataLoaded && (
                     <SimpleButton
                         bg='accent1'
                         onClick={() => {
@@ -143,7 +140,7 @@ export default function CreateCode(props: PropsIF) {
                     >
                         {t('common.edit')}
                     </SimpleButton>
-                }
+                )}
             </section>
         );
     }
@@ -151,7 +148,7 @@ export default function CreateCode(props: PropsIF) {
     return (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
-                {canEditReferrerCode ? (
+                {canEditReferrerCode === true ? (
                     <>
                         <h6>{t('referrals.createAnAffiliateCode')}</h6>
                         <input

@@ -25,3 +25,9 @@
     height: 100%;
     background-color: var(--accent1, #7371fc);
 }
+
+@media (max-width: 768px) {
+    .volume_progress_bar_body {
+        height: 12px;
+    }
+}

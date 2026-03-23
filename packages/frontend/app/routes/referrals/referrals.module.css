@@ -20,6 +20,12 @@
     font-size: var(--font-size-xl, 36px);
 }
 
+.header_text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+}
+
 .container header > button {
     display: none;
     align-items: center;
@@ -39,6 +45,42 @@
 
 .container header p a {
     color: var(--accent1, #7371fc);
+}
+
+.description_row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-m);
+    flex-wrap: wrap;
+}
+
+/* shown on tablet/mobile where ReferralsExtra panel is hidden */
+.partner_link {
+    display: none;
+    white-space: nowrap;
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    text-decoration: none;
+    border: 1px solid var(--bg-dark3);
+    border-radius: var(--radius-s, 12px);
+    padding: 4px 12px;
+    background: var(--bg-dark3);
+    transition:
+        color 120ms ease,
+        border-color 120ms ease;
+}
+
+.partner_link:hover {
+    color: var(--text1);
+    border-color: var(--accent1);
+}
+
+@media (max-width: 1080px) {
+    .partner_link {
+        display: inline-flex;
+        align-items: center;
+    }
 }
 
 .detailsContainer {
@@ -162,13 +204,10 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     }
 
-    /* children (CodeTabs / ReferralsTabs) may overflow; allow scrolling */
+    /* children (CodeTabs / ReferralsTabs) — allow shrink but let each component handle its own scroll */
     .tableContainer > div > * {
         min-width: 0;
         min-height: 0;
-        overflow: auto;
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
     }
 }
 
@@ -176,41 +215,40 @@
 @media (max-width: 768px) {
     .container {
         margin-top: 0;
-        /* main.content owns the scroll; this is just spacing */
-        gap: clamp(20px, 5vw, 28px);
+        gap: clamp(16px, 4vw, 20px);
         padding-top: calc(env(safe-area-inset-top) + 12px);
-        padding-left: clamp(12px, 4vw, 16px);
-        padding-right: clamp(12px, 4vw, 16px);
-        padding-bottom: calc(
-            env(safe-area-inset-bottom) + var(--footer-h, 56px)
+        padding-left: 0;
+        padding-right: 0;
+        padding-bottom: 0;
+        height: calc(
+            100vh - var(--footer-h, 56px) - env(safe-area-inset-bottom, 0px) -
+                70px
         );
-        /* ensure zero clamps */
-        height: auto;
-        max-height: none;
-        overflow: visible;
+        height: calc(
+            100dvh - var(--footer-h, 56px) - env(safe-area-inset-bottom, 0px) -
+                70px
+        );
+        overflow: hidden;
         min-height: 0;
     }
-    .container::-webkit-scrollbar {
-        display: none !important; /* Chrome, Safari, and Opera */
+
+    /* When keyboard opens (input focused), unlock scroll without changing height to avoid layout jump */
+    .container:focus-within {
+        overflow-y: auto;
     }
 
     .tableContainer {
         display: flex;
         flex-direction: column;
         gap: var(--gap-s);
-        height: auto;
-        max-height: none;
+        flex: 1;
         min-height: 0;
     }
 
     .tableContainer > div {
-        min-height: 220px;
-        margin-bottom: 12px;
-        transition: transform 0.15s ease;
+        flex: 1;
+        min-height: 0;
         min-width: 0;
-    }
-    .tableContainer > div:active {
-        transform: scale(0.99);
     }
 
     .detailsContainer {
@@ -235,6 +273,45 @@
 
     .detailsContent a {
         font-size: var(--font-size-s);
+    }
+
+    .container header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--gap-s);
+        font-size: var(--font-size-l);
+        width: 100%;
+    }
+
+    .header_text {
+        width: 100%;
+    }
+
+    .container header > button {
+        display: none;
+    }
+
+    .description_row {
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: var(--gap-s);
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .container header p {
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+    }
+
+    .partner_link {
+        font-size: 11px;
+        padding: 8px 12px;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 }
 

@@ -18,7 +18,7 @@
 }
 
 .tableContent {
-    height: 100%;
+    flex: 1;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
@@ -151,6 +151,17 @@
     text-align: center;
 }
 
+.sectionCentered {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--padding-m, 16px);
+    gap: var(--gap-m, 16px);
+    text-align: center;
+}
+
 .sessionButtonWrapper {
     width: 100%;
     display: flex;
@@ -172,9 +183,9 @@
 /* Phone */
 @media (max-width: 768px) {
     .tableWrapper {
-        height: 200px !important;
+        flex: 1;
         min-height: 0;
-
+        transition: flex 200ms ease;
         border-radius: var(--radius-s, 12px);
     }
     .tableControls {

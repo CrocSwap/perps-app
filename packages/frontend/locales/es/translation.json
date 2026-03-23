@@ -102,7 +102,6 @@
         "closePosition": "Cerrar posición",
         "closeAtCurrentPrice": "Cerrar al precio actual",
         "closeAtAPriceYouSet": "Cerrar a un precio que establezcas",
-
         "price": "Precio",
         "size": "Cantidad",
         "time": "Hora",
@@ -172,9 +171,9 @@
         "withdrawalSuccessful": "Retiro exitoso",
         "successfullyWithdrawn": "Retiro exitoso de {{amount}} {{unit}}",
         "withdrawFailed": "Retiro fallido",
-        "availableToDeposit": "Disponible para depositar",
+        "availableToDeposit": "Available to deposit",
         "availableToDepositTooltip": "Disponible para depósito según capacidad del vault y saldo de cartera",
-        "availableToWithdraw": "Disponible para retirar",
+        "availableToWithdraw": "Available to withdraw",
         "availableToWithdrawTooltip": "Cantidad total disponible para retirar de su portafolio",
         "invalidAmount": "Cantidad inválida",
         "depositToVault": "Depositar {{unitValue}} en {{vaultName}}",
@@ -305,10 +304,10 @@
             "hours": "Horas",
             "orderHistory": "Historial de órdenes",
             "filter": "Filtrar",
-            "viewAll": "Ver todo"
+            "viewAll": "Ver todo",
+            "chart": "Gráfico"
         },
         "transfer": {
-            "agentTitle": "Transferir agente",
             "selectAccounts": "Por favor seleccione cuentas",
             "title": "Transferir",
             "from": "Desde",
@@ -318,7 +317,15 @@
             "available": "Disponible para depositar",
             "enterAllFields": "Por favor complete todos los campos",
             "selectAccount": "Por favor seleccione una cuenta",
-            "selectAsset": "Por favor seleccione un activo"
+            "selectAsset": "Por favor seleccione un activo",
+            "fundAgent": "Financiar agente",
+            "withdrawToMaster": "Retirar al master",
+            "enterAmount": "Ingrese monto",
+            "selectAgent": "Seleccionar agente",
+            "toAgentTitle": "Transfer to Agent",
+            "fromAgentTitle": "Transfer from Agent",
+            "availableToDeposit": "Available to deposit",
+            "availableToWithdraw": "Available to withdraw"
         },
         "form": {
             "labels": {
@@ -528,6 +535,7 @@
         "rewardHistory": "Historial de recompensas",
         "enterCode": "Ingresar código",
         "createCode": "Crear código",
+        "refCode": "Código de referido",
         "pendingRefCode": "Código de referido (pendiente)",
         "overwriteCurrentReferralCode": "Sobrescribir código de referido actual",
         "enterReferralCode": "Ingresar un código de referido",
@@ -552,12 +560,12 @@
     "deposit": {
         "prompt": "Deposita {{token}} desde Fogo",
         "input_prompt": "Introduce la cantidad (mín ${{MIN_DEPOSIT_AMOUNT}})",
-        "availableToDeposit": "Disponible para depositar"
+        "availableToDeposit": "Available to deposit"
     },
     "withdraw": {
         "prompt": "Retira {{token}} a Fogo",
         "explanation": "{{token}} será enviado a tu dirección.",
-        "availableToWithdraw": "Disponible para retirar",
+        "availableToWithdraw": "Available to withdraw",
         "input_prompt": "Introduce la cantidad (mín ${{MIN_WITHDRAW_AMOUNT}})"
     },
     "orderBook": {
@@ -657,7 +665,6 @@
         "copyLinkCTA": "Copiar enlace",
         "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora",
         "sharePosition": "Compartir posición con PnL {{pnl}}",
-
         "pnl": "PnL",
         "details": "Detalles",
         "copyImageCTA": "Copiar imagen",

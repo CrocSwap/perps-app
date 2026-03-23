@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import styles from './ReferralsTabs.module.css';
 
 import { motion } from 'framer-motion';
@@ -24,6 +25,10 @@ export default function ReferralsTabs(props: PropsIF) {
         payoutsByReferrer,
     } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
+    const hasData =
+        (payoutMovements?.length ?? 0) > 0 ||
+        (payoutsByReferrer?.length ?? 0) > 0;
+    const [isCollapsed, setIsCollapsed] = useState(!hasData);
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
@@ -39,7 +44,7 @@ export default function ReferralsTabs(props: PropsIF) {
                     />
                 );
             case 'referrals.rewardHistory':
-                return <div>enter code</div>;
+                return <div className={styles.emptyState}>enter code</div>;
             default:
                 return (
                     <div className={styles.emptyState}>
@@ -50,16 +55,37 @@ export default function ReferralsTabs(props: PropsIF) {
     };
 
     return (
-        <div className={styles.tableWrapper}>
-            <Tabs
-                tabs={availableTabs}
-                defaultTab={activeTab}
-                onTabChange={handleTabChange}
-                wrapperId='referralsTabs'
-                layoutIdPrefix='referralsTabIndicator'
-            />
+        <div
+            className={`${styles.tableWrapper}${isCollapsed ? ` ${styles.collapsed}` : ''}`}
+            onClick={isCollapsed ? () => setIsCollapsed(false) : undefined}
+        >
+            <div className={styles.tabsRow}>
+                <Tabs
+                    tabs={availableTabs}
+                    defaultTab={activeTab}
+                    onTabChange={handleTabChange}
+                    wrapperId='referralsTabs'
+                    layoutIdPrefix='referralsTabIndicator'
+                />
+                <button
+                    className={styles.collapseBtn}
+                    onClick={() => setIsCollapsed((v) => !v)}
+                    aria-label={isCollapsed ? 'Expand' : 'Collapse'}
+                >
+                    {isCollapsed ? (
+                        <FaChevronDown size={12} />
+                    ) : (
+                        <FaChevronUp size={12} />
+                    )}
+                </button>
+            </div>
+            {isCollapsed && !hasData && (
+                <div className={styles.collapsedHint}>
+                    No data to display · tap to expand
+                </div>
+            )}
             <motion.div
-                className={styles.tableContent}
+                className={`${styles.tableContent}${isCollapsed ? ` ${styles.hidden}` : ''}`}
                 key={activeTab}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

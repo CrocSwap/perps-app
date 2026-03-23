@@ -102,7 +102,6 @@
         "closePosition": "ポジションを決済",
         "closeAtCurrentPrice": "現在の価格で決済",
         "closeAtAPriceYouSet": "指定した価格で決済",
-
         "price": "価格",
         "size": "サイズ",
         "time": "時間",
@@ -172,9 +171,9 @@
         "withdrawalSuccessful": "出金成功",
         "successfullyWithdrawn": "{{amount}} {{unit}}出金完了",
         "withdrawFailed": "出金失敗",
-        "availableToDeposit": "入金可能額",
+        "availableToDeposit": "Available to deposit",
         "availableToDepositTooltip": "ボールト容量・ウォレット残高に基づく入金可能額",
-        "availableToWithdraw": "出金可能額",
+        "availableToWithdraw": "Available to withdraw",
         "availableToWithdrawTooltip": "ポートフォリオから出金可能な総額",
         "invalidAmount": "無効な金額",
         "depositToVault": "{{vaultName}}に{{unitValue}}を入金",
@@ -305,10 +304,10 @@
             "hours": "時間",
             "orderHistory": "注文履歴",
             "filter": "フィルター",
-            "viewAll": "すべて表示"
+            "viewAll": "すべて表示",
+            "chart": "チャート"
         },
         "transfer": {
-            "agentTitle": "エージェントを転送",
             "selectAccounts": "アカウントを選択してください",
             "title": "転送",
             "from": "から",
@@ -318,7 +317,15 @@
             "available": "入金可能額",
             "enterAllFields": "すべての項目を入力してください",
             "selectAccount": "アカウントを選択してください",
-            "selectAsset": "資産を選択してください"
+            "selectAsset": "資産を選択してください",
+            "fundAgent": "エージェントに送金",
+            "withdrawToMaster": "マスターに引き出す",
+            "enterAmount": "金額を入力",
+            "selectAgent": "エージェントを選択",
+            "toAgentTitle": "Transfer to Agent",
+            "fromAgentTitle": "Transfer from Agent",
+            "availableToDeposit": "Available to deposit",
+            "availableToWithdraw": "Available to withdraw"
         },
         "form": {
             "labels": {
@@ -534,6 +541,7 @@
         "rewardHistory": "報酬履歴",
         "enterCode": "コードを入力",
         "createCode": "コードを作成",
+        "refCode": "紹介コード",
         "pendingRefCode": "紹介コード（保留中）",
         "overwriteCurrentReferralCode": "現在の紹介コードを上書き",
         "enterReferralCode": "紹介コードを入力してください",
@@ -558,12 +566,12 @@
     "deposit": {
         "prompt": "Fogoから{{token}}を入金",
         "input_prompt": "金額を入力（最小${{MIN_DEPOSIT_AMOUNT}}）",
-        "availableToDeposit": "入金可能"
+        "availableToDeposit": "Available to deposit"
     },
     "withdraw": {
         "prompt": "Fogoに{{token}}を出金",
         "explanation": "{{token}}はあなたのアドレスに送信されます。",
-        "availableToWithdraw": "出金可能",
+        "availableToWithdraw": "Available to withdraw",
         "input_prompt": "金額を入力（最小${{MIN_WITHDRAW_AMOUNT}}）"
     },
     "orderBook": {
@@ -663,7 +671,6 @@
         "copyLinkCTA": "リンクをコピー",
         "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう",
         "sharePosition": "PnL {{pnl}}のポジションを共有",
-
         "pnl": "PnL",
         "details": "詳細",
         "copyImageCTA": "画像をコピー",
