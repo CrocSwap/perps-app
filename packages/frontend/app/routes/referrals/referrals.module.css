@@ -204,13 +204,10 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     }
 
-    /* children (CodeTabs / ReferralsTabs) may overflow; allow scrolling */
+    /* children (CodeTabs / ReferralsTabs) — allow shrink but let each component handle its own scroll */
     .tableContainer > div > * {
         min-width: 0;
         min-height: 0;
-        overflow: auto;
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
     }
 }
 
@@ -233,6 +230,11 @@
         );
         overflow: hidden;
         min-height: 0;
+    }
+
+    /* When keyboard opens (input focused), unlock scroll without changing height to avoid layout jump */
+    .container:focus-within {
+        overflow-y: auto;
     }
 
     .tableContainer {
@@ -299,12 +301,15 @@
 
     .container header p {
         font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
+        min-width: 0;
     }
 
     .partner_link {
         font-size: 11px;
-        padding: 3px 10px;
+        padding: 8px 12px;
         white-space: nowrap;
         flex-shrink: 0;
     }

@@ -176,12 +176,20 @@
 /* Phone */
 @media (max-width: 768px) {
     .sectionWithButton {
-        height: auto;
-        min-height: 100%;
+        height: 100%;
+        overflow-y: auto;
         gap: var(--gap-s, 10px);
+        padding: 12px;
     }
     .enterCodeContent input {
         height: 34px;
+    }
+    .createCodeContent {
+        gap: var(--gap-s, 10px);
+    }
+    .trackingLinkExplanation {
+        font-size: 11px;
+        line-height: 1.4;
     }
 }
 

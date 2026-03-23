@@ -79,7 +79,7 @@ export default function ReferralsTabs(props: PropsIF) {
                     )}
                 </button>
             </div>
-            {isCollapsed && (
+            {isCollapsed && !hasData && (
                 <div className={styles.collapsedHint}>
                     No data to display · tap to expand
                 </div>
