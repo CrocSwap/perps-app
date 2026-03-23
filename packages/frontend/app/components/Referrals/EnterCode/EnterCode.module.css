@@ -198,6 +198,18 @@
     .enterCodeContent input {
         height: 34px;
     }
+    .iconButton {
+        padding: 10px;
+    }
+    .codeWithIcon {
+        height: 36px;
+    }
+    .codeValue {
+        height: 36px;
+    }
+    .codeWithIcon > input {
+        height: 36px;
+    }
 }
 
 /* Small phones — stack action buttons vertically */

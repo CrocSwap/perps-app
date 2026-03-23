@@ -183,9 +183,9 @@
 /* Phone */
 @media (max-width: 768px) {
     .tableWrapper {
-        height: 100%;
+        flex: 1;
         min-height: 0;
-
+        transition: flex 200ms ease;
         border-radius: var(--radius-s, 12px);
     }
     .tableControls {
