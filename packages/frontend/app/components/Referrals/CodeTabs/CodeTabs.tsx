@@ -110,11 +110,18 @@ export default function CodeTabs(props: PropsIF) {
 
     // boolean representing whether referrer code has enough volume to be changed
     const canEditReferrerCode = useMemo<boolean>(() => {
-        return (
+        // Explicitly handle undefined and ensure proper boolean logic
+        const hasVolume =
             referralStore.totVolume !== undefined &&
-            referralStore.totVolume >= REFERRER_EDIT_VOLUME_THRESHOLD
-        );
+            !Number.isNaN(referralStore.totVolume);
+        const meetsThreshold =
+            hasVolume &&
+            referralStore.totVolume! >= REFERRER_EDIT_VOLUME_THRESHOLD;
+        return meetsThreshold;
     }, [referralStore.totVolume]);
+
+    // Add loading state to prevent flashing during initial data load
+    const isVolumeDataLoaded = referralStore.totVolume !== undefined;
 
     // user-facing copy from translation files
     const { t } = useTranslation();
@@ -132,6 +139,21 @@ export default function CodeTabs(props: PropsIF) {
     const [refCodeToConsume, setRefCodeToConsume] = useState<
         string | undefined
     >(undefined);
+
+    // tracks whether the user's wallet is already attributed to a referrer on-chain
+    const [isAttributed, setIsAttributed] = useState<boolean>(false);
+
+    // check if user is already attributed when wallet connects
+    useEffect(() => {
+        if (referrerAddress) {
+            referralStore
+                .checkForConversion(referrerAddress.toString())
+                .then((converted) => setIsAttributed(converted))
+                .catch(() => setIsAttributed(false));
+        } else {
+            setIsAttributed(false);
+        }
+    }, [referrerAddress]);
 
     // update refCodeToConsume whenever the cached value changes
     useEffect(() => {
@@ -229,7 +251,7 @@ export default function CodeTabs(props: PropsIF) {
             // Reset validation state so the validation effect will re-run
             setIsCachedValueValid(undefined);
             setLastValidatedCode('');
-            referralStore.cache(handleReferralURLParam.value);
+            referralStore.cache(handleReferralURLParam.value, false);
         }
     }, [handleReferralURLParam.value]);
 
@@ -267,7 +289,7 @@ export default function CodeTabs(props: PropsIF) {
         setLastValidatedCode(r);
     }
 
-    // fn to update referral code state without opening modal
+    // fn to update referral code state and open modal
     function handleOverwriteReferralCode(r: string): void {
         if (!r || !r.trim()) {
             return;
@@ -278,6 +300,7 @@ export default function CodeTabs(props: PropsIF) {
         setIsCachedValueValid(true);
         setEditModeInvitee(false);
         setLastValidatedCode(r);
+        refCodeModalStore.openModal(r);
     }
 
     // pixel-width breakpoint to toggle shorter copy
@@ -414,6 +437,13 @@ export default function CodeTabs(props: PropsIF) {
             return;
         }
 
+        // Don't validate if the cached code is already approved
+        if (referralStore.cached.isApproved) {
+            setIsCachedValueValid(true);
+            setEditModeInvitee(false);
+            return;
+        }
+
         // Don't re-validate if we already have a validation result for this specific code
         if (
             isCachedValueValid !== undefined &&
@@ -504,16 +534,27 @@ export default function CodeTabs(props: PropsIF) {
     }, [sessionState]);
 
     useEffect(() => {
-        if (!canEditReferrerCode) {
+        // Only reset temporary code if user loses edit capability AND they're not currently editing
+        if (!canEditReferrerCode && !editModeReferrer) {
             setTemporaryReferrerCode(defaultReferrerCode);
         }
-    }, [canEditReferrerCode, defaultReferrerCode]);
+    }, [canEditReferrerCode, defaultReferrerCode, editModeReferrer]);
 
     useEffect(() => {
-        if (!canEditReferrerCode && editModeReferrer) {
+        // Only exit edit mode if user loses edit capability while not actively editing
+        if (
+            !canEditReferrerCode &&
+            editModeReferrer &&
+            temporaryReferrerCode === defaultReferrerCode
+        ) {
             setEditModeReferrer(false);
         }
-    }, [canEditReferrerCode, editModeReferrer]);
+    }, [
+        canEditReferrerCode,
+        editModeReferrer,
+        temporaryReferrerCode,
+        defaultReferrerCode,
+    ]);
 
     useEffect(() => {
         // If no temporary code, immediately set as valid
@@ -1383,6 +1424,8 @@ export default function CodeTabs(props: PropsIF) {
                         totVolumeFormatted={totVolumeFormatted}
                         inviteeMaxVolumeThreshold={INVITEE_MAX_VOLUME_THRESHOLD}
                         cached={referralStore.cached.code}
+                        isApproved={referralStore.cached.isApproved}
+                        isAttributed={isAttributed}
                         isCachedValueValid={isCachedValueValid}
                         refCodeToConsume={refCodeToConsume}
                         editModeInvitee={editModeInvitee}
@@ -1449,6 +1492,7 @@ export default function CodeTabs(props: PropsIF) {
                         inviteePercent={INVITEE_PERCENT}
                         createRefCode={createRefCode}
                         updateRefCode={updateRefCode}
+                        isVolumeDataLoaded={isVolumeDataLoaded}
                     />
                 );
             // handlers for claiming rewards
@@ -1470,10 +1514,16 @@ export default function CodeTabs(props: PropsIF) {
                 tabs={avTabs}
                 defaultTab={activeTab}
                 onTabChange={(tab: string) => {
-                    if (referrerCode) {
+                    // Only reset edit mode when switching away from create tab, to preserve user's edit state
+                    const isLeavingCreateTab =
+                        activeTab.includes('create') && !tab.includes('create');
+                    if (isLeavingCreateTab && referrerCode) {
                         setEditModeReferrer(false);
                     }
-                    setTemporaryReferrerCode('');
+                    // Only reset temporary code when switching to a different tab type
+                    if (!tab.includes('create')) {
+                        setTemporaryReferrerCode('');
+                    }
                     setActiveTab(tab);
                 }}
                 wrapperId='codeTabs'
