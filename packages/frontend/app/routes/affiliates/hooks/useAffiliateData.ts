@@ -247,43 +247,21 @@ export function useAffiliateInviteeCount(
         setError(null);
 
         try {
-            console.log(
-                'useAffiliateInviteeCount: Starting fetch for wallet:',
-                walletAddress,
-            );
-            console.log(
-                'useAffiliateInviteeCount: Affiliate code data:',
-                affiliateCodeData,
-            );
-
             // Use the affiliate code (affiliateCodeData?.code) instead of fetching from separate referral codes endpoint
             const affiliateCode = affiliateCodeData?.code;
 
             if (!affiliateCode) {
-                console.log(
-                    'useAffiliateInviteeCount: No affiliate code found, setting count to 0',
-                );
                 setData(0);
                 return;
             }
-
-            console.log(
-                'useAffiliateInviteeCount: Using affiliate code:',
-                affiliateCode,
-            );
 
             const count = await fetchAttributedReferralCount({
                 referralKind: 1,
                 referralIdTexts: [affiliateCode],
             });
 
-            console.log('useAffiliateInviteeCount: Fetched count:', count);
             setData(count ?? 0);
         } catch (err) {
-            console.error(
-                'useAffiliateInviteeCount: Error fetching count:',
-                err,
-            );
             setError(
                 err instanceof Error
                     ? err
@@ -299,10 +277,6 @@ export function useAffiliateInviteeCount(
     useEffect(() => {
         if (!enabled || !walletAddress || isAffiliateCodeLoading) return;
 
-        console.log(
-            'useAffiliateInviteeCount: Setting up interval for wallet:',
-            walletAddress,
-        );
         void fetchData();
         const intervalId = window.setInterval(() => {
             void fetchData();
