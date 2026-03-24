@@ -8,6 +8,7 @@ import {
     useAffiliateStats,
     useUserReferrer,
     useUserPayoutMovements,
+    useAffiliateClaims,
 } from '../hooks/useAffiliateData';
 import { formatLargeNumber, formatTokenAmount } from '../utils/format-numbers';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -55,6 +56,36 @@ export function YourStatsSection() {
         userAddress || '',
         isConnected && !!userAddress,
     );
+
+    // Use the same API key as the referrals page to show claimable fees
+    const { data: claimsData, isLoading: isClaimsLoading } = useAffiliateClaims(
+        userAddress || '',
+        '459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661', // Referrals API key
+        isConnected && !!userAddress,
+    );
+
+    const claimableAmount = useMemo(() => {
+        if (!claimsData || claimsData.length === 0) return '$0.00';
+        // Sum all claim amounts (amounts are in smallest unit, e.g., lamports or token decimals)
+        const totalAmount = claimsData.reduce((sum, claim) => {
+            return sum + BigInt(claim.amount);
+        }, BigInt(0));
+        // Convert to human-readable format (assuming 6 decimals for USDC-like tokens)
+        const decimals = 6;
+        const divisor = BigInt(10 ** decimals);
+        const wholePart = totalAmount / divisor;
+        const fractionalPart = totalAmount % divisor;
+        const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
+        // Show full precision, then trim trailing zeros but keep at least 2 decimal places
+        const trimmed = fractionalStr.replace(/0+$/, '') || '00';
+        const displayDecimals = trimmed.length < 2 ? '00' : trimmed;
+        const formatted = `${wholePart}.${displayDecimals}`;
+        // If amount is less than 0.01, show raw smallest units instead
+        if (wholePart === BigInt(0) && totalAmount > BigInt(0)) {
+            return `${totalAmount.toString()} units`;
+        }
+        return `$${formatted}`;
+    }, [claimsData]);
 
     const endUserMovements = useMemo(
         () =>
@@ -135,7 +166,7 @@ export function YourStatsSection() {
                 </div>
             ) : (
                 <div className={styles['stats-grid']}>
-                    {isLoading ? (
+                    {isLoading || isClaimsLoading ? (
                         <StatCardSkeleton label={STATS_LABELS.FEES_EARNED} />
                     ) : (
                         <StatCard
@@ -144,7 +175,7 @@ export function YourStatsSection() {
                             tooltip={'Commission earned from your invitees'}
                             breakdown={{
                                 claimed: '$0.00',
-                                unclaimed: '$0.00',
+                                unclaimed: claimableAmount,
                             }}
                             actionButton={{
                                 text: 'Claim',
