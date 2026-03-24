@@ -232,6 +232,10 @@ export function useAffiliateInviteeCount(
     const inFlightRef = useRef(false);
     const hasLoadedOnceRef = useRef(false);
 
+    // Import and use useAffiliateCode hook to fetch the affiliate's actual referral code
+    const { data: affiliateCodeData, isLoading: isAffiliateCodeLoading } =
+        useAffiliateCode(walletAddress, enabled);
+
     const fetchData = useCallback(async () => {
         if (!enabled || !walletAddress) return;
         if (inFlightRef.current) return;
@@ -243,21 +247,43 @@ export function useAffiliateInviteeCount(
         setError(null);
 
         try {
-            const referralCodes =
-                await fetchAffiliateReferralCodes(walletAddress);
+            console.log(
+                'useAffiliateInviteeCount: Starting fetch for wallet:',
+                walletAddress,
+            );
+            console.log(
+                'useAffiliateInviteeCount: Affiliate code data:',
+                affiliateCodeData,
+            );
 
-            if (referralCodes.length === 0) {
+            // Use the affiliate code (affiliateCodeData?.code) instead of fetching from separate referral codes endpoint
+            const affiliateCode = affiliateCodeData?.code;
+
+            if (!affiliateCode) {
+                console.log(
+                    'useAffiliateInviteeCount: No affiliate code found, setting count to 0',
+                );
                 setData(0);
                 return;
             }
 
+            console.log(
+                'useAffiliateInviteeCount: Using affiliate code:',
+                affiliateCode,
+            );
+
             const count = await fetchAttributedReferralCount({
                 referralKind: 1,
-                referralIdTexts: referralCodes,
+                referralIdTexts: [affiliateCode],
             });
 
+            console.log('useAffiliateInviteeCount: Fetched count:', count);
             setData(count ?? 0);
         } catch (err) {
+            console.error(
+                'useAffiliateInviteeCount: Error fetching count:',
+                err,
+            );
             setError(
                 err instanceof Error
                     ? err
@@ -268,11 +294,15 @@ export function useAffiliateInviteeCount(
             hasLoadedOnceRef.current = true;
             setIsLoading(false);
         }
-    }, [enabled, walletAddress]);
+    }, [enabled, walletAddress, affiliateCodeData?.code]);
 
     useEffect(() => {
-        if (!enabled || !walletAddress) return;
+        if (!enabled || !walletAddress || isAffiliateCodeLoading) return;
 
+        console.log(
+            'useAffiliateInviteeCount: Setting up interval for wallet:',
+            walletAddress,
+        );
         void fetchData();
         const intervalId = window.setInterval(() => {
             void fetchData();
@@ -281,7 +311,7 @@ export function useAffiliateInviteeCount(
         return () => {
             window.clearInterval(intervalId);
         };
-    }, [enabled, fetchData, walletAddress]);
+    }, [enabled, fetchData, walletAddress, isAffiliateCodeLoading]);
 
     useEffect(() => {
         window.addEventListener('affiliateDataUpdate', fetchData);
