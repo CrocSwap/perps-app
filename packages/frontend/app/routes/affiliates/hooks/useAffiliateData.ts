@@ -791,10 +791,11 @@ export interface AffiliateClaim {
     signatures: string[];
 }
 
-const AFFILIATES_CLAIMS_API_KEY =
-    '5d1e8bc550b40b178e383343e74e90c98df063472abeb8fa697843a1c3ca1f32';
-
-export function useAffiliateClaims(userIdentifier: string, enabled = true) {
+export function useAffiliateClaims(
+    userIdentifier: string,
+    apiKey: string,
+    enabled = true,
+) {
     const [data, setData] = useState<AffiliateClaim[] | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -813,7 +814,7 @@ export function useAffiliateClaims(userIdentifier: string, enabled = true) {
                     headers: {
                         accept: 'application/json',
                         'content-type': 'application/json',
-                        authorization: `Bearer ${AFFILIATES_CLAIMS_API_KEY}`,
+                        authorization: `Bearer ${apiKey}`,
                     },
                     body: JSON.stringify({
                         userIdentifierType: 'solana_address',
@@ -852,7 +853,7 @@ export function useAffiliateClaims(userIdentifier: string, enabled = true) {
         } finally {
             setIsLoading(false);
         }
-    }, [userIdentifier, enabled]);
+    }, [userIdentifier, apiKey, enabled]);
 
     useEffect(() => {
         fetchData();

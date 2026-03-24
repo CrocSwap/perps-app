@@ -61,6 +61,7 @@ export default function PageHeader() {
     // DEBUG: log affiliate claims data
     const { data: affiliateClaimsDebug } = useAffiliateClaims(
         userDataStore.userAddress ?? '',
+        '5d1e8bc550b40b178e383343e74e90c98df063472abeb8fa697843a1c3ca1f32',
         isUserConnected && !!userDataStore.userAddress,
     );
     useEffect(() => {
