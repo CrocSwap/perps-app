@@ -232,6 +232,10 @@ export function useAffiliateInviteeCount(
     const inFlightRef = useRef(false);
     const hasLoadedOnceRef = useRef(false);
 
+    // Import and use useAffiliateCode hook to fetch the affiliate's actual referral code
+    const { data: affiliateCodeData, isLoading: isAffiliateCodeLoading } =
+        useAffiliateCode(walletAddress, enabled);
+
     const fetchData = useCallback(async () => {
         if (!enabled || !walletAddress) return;
         if (inFlightRef.current) return;
@@ -243,17 +247,17 @@ export function useAffiliateInviteeCount(
         setError(null);
 
         try {
-            const referralCodes =
-                await fetchAffiliateReferralCodes(walletAddress);
+            // Use the affiliate code (affiliateCodeData?.code) instead of fetching from separate referral codes endpoint
+            const affiliateCode = affiliateCodeData?.code;
 
-            if (referralCodes.length === 0) {
+            if (!affiliateCode) {
                 setData(0);
                 return;
             }
 
             const count = await fetchAttributedReferralCount({
                 referralKind: 1,
-                referralIdTexts: referralCodes,
+                referralIdTexts: [affiliateCode],
             });
 
             setData(count ?? 0);
@@ -268,10 +272,10 @@ export function useAffiliateInviteeCount(
             hasLoadedOnceRef.current = true;
             setIsLoading(false);
         }
-    }, [enabled, walletAddress]);
+    }, [enabled, walletAddress, affiliateCodeData?.code]);
 
     useEffect(() => {
-        if (!enabled || !walletAddress) return;
+        if (!enabled || !walletAddress || isAffiliateCodeLoading) return;
 
         void fetchData();
         const intervalId = window.setInterval(() => {
@@ -281,7 +285,7 @@ export function useAffiliateInviteeCount(
         return () => {
             window.clearInterval(intervalId);
         };
-    }, [enabled, fetchData, walletAddress]);
+    }, [enabled, fetchData, walletAddress, isAffiliateCodeLoading]);
 
     useEffect(() => {
         window.addEventListener('affiliateDataUpdate', fetchData);
