@@ -142,7 +142,7 @@ export interface AffiliateStats {
     isRegistered: boolean;
 }
 
-const INVITEE_COUNT_POLL_MS = 30_000;
+const INVITEE_COUNT_POLL_MS = 120_000;
 
 // Hook for affiliate audience check
 export function useAffiliateAudience(userIdentifier: string, enabled = true) {
@@ -272,7 +272,7 @@ export function useAffiliateInviteeCount(
             hasLoadedOnceRef.current = true;
             setIsLoading(false);
         }
-    }, [enabled, walletAddress, affiliateCodeData?.code]);
+    }, [enabled, walletAddress, affiliateCodeData]);
 
     useEffect(() => {
         if (!enabled || !walletAddress || isAffiliateCodeLoading) return;
