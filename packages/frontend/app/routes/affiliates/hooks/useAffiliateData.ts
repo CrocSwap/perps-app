@@ -834,6 +834,56 @@ function hexToBytes(hex: string): Uint8Array {
     return bytes;
 }
 
+function collectErrorText(error: unknown): string {
+    if (typeof error === 'string') {
+        return error;
+    }
+
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    if (typeof error === 'object' && error !== null) {
+        const errRecord = error as Record<string, unknown>;
+        const message = errRecord.message;
+        if (typeof message === 'string') {
+            return message;
+        }
+
+        const logs = errRecord.logs;
+        if (Array.isArray(logs)) {
+            return logs
+                .filter((line): line is string => typeof line === 'string')
+                .join(' ');
+        }
+
+        try {
+            return JSON.stringify(error);
+        } catch {
+            return 'Unknown claim failure';
+        }
+    }
+
+    return 'Unknown claim failure';
+}
+
+export function getAffiliateClaimErrorMessage(error: unknown): string {
+    const text = collectErrorText(error);
+    const normalized = text.toLowerCase();
+
+    const isInsufficientNativeToken =
+        /insufficient\s+(funds?|balance|lamports?|native)/.test(normalized) ||
+        /fee\s*payer/.test(normalized) ||
+        /rent\s*exempt/.test(normalized) ||
+        /custom\s+program\s+error:\s*0x1/.test(normalized);
+
+    if (isInsufficientNativeToken) {
+        return 'Insufficient native token to pay network fees. Please top up and try again.';
+    }
+
+    return text;
+}
+
 export async function executeAffiliateClaim(params: {
     claim: AffiliateClaim;
     sessionState: unknown;

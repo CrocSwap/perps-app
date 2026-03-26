@@ -9,6 +9,7 @@ import {
     useUserReferrer,
     useUserPayoutMovements,
     executeAffiliateClaim,
+    getAffiliateClaimErrorMessage,
     useAffiliateClaims,
 } from '../hooks/useAffiliateData';
 import { formatLargeNumber, formatTokenAmount } from '../utils/format-numbers';
@@ -178,12 +179,10 @@ export function YourStatsSection() {
             await refetchClaims();
         } catch (error) {
             console.error('🎁 [Affiliates Claim] Claim failed:', error);
+            const message = getAffiliateClaimErrorMessage(error);
             notificationStore.add({
                 title: 'Claim failed',
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : 'Unable to process your affiliate rewards claim.',
+                message,
                 icon: 'error',
                 removeAfter: 10000,
             });
