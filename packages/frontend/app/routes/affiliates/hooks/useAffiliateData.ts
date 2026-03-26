@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReferrerPayoutData } from '@fuul/sdk';
+import { FuulSdk, Network } from '@fuul/sdk-solana';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import { fetchAttributedReferralCount } from '../../../utils/refreg';
+import {
+    buildClaimInstructions,
+    getFuulConnection,
+} from '~/utils/claimRewards';
 
 interface UserReferralCode {
     code?: string | null;
@@ -793,6 +799,105 @@ export interface AffiliateClaim {
     deadline: number;
     proof: string;
     signatures: string[];
+}
+
+type AffiliateClaimSessionState = {
+    walletPublicKey?: PublicKey;
+    sessionPublicKey?: PublicKey;
+    solanaWallet?: {
+        signTransaction?: (transaction: Transaction) => Promise<Transaction>;
+    };
+};
+
+function isAffiliateClaimSessionState(
+    sessionState: unknown,
+): sessionState is AffiliateClaimSessionState {
+    if (!sessionState || typeof sessionState !== 'object') {
+        return false;
+    }
+
+    const state = sessionState as Record<string, unknown>;
+    return 'walletPublicKey' in state || 'sessionPublicKey' in state;
+}
+
+function hexToBytes(hex: string): Uint8Array {
+    const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex;
+
+    if (cleanHex.length % 2 !== 0 || !/^[0-9A-Fa-f]*$/.test(cleanHex)) {
+        throw new Error('Invalid claim hex payload');
+    }
+
+    const bytes = new Uint8Array(cleanHex.length / 2);
+    for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(cleanHex.substr(i * 2, 2), 16);
+    }
+    return bytes;
+}
+
+export async function executeAffiliateClaim(params: {
+    claim: AffiliateClaim;
+    sessionState: unknown;
+}): Promise<string> {
+    const { claim, sessionState } = params;
+
+    if (!isAffiliateClaimSessionState(sessionState)) {
+        throw new Error('Session not established');
+    }
+
+    const walletPublicKey =
+        sessionState.walletPublicKey || sessionState.sessionPublicKey;
+    if (!walletPublicKey) {
+        throw new Error('No wallet public key found');
+    }
+
+    const signTransaction = sessionState.solanaWallet?.signTransaction;
+    if (!signTransaction) {
+        throw new Error('signTransaction not available on wallet');
+    }
+
+    const fuulConnection = getFuulConnection();
+    const sdk = new FuulSdk(fuulConnection, Network.FOGO_MAINNET);
+
+    const instructions = await buildClaimInstructions(sdk, walletPublicKey, {
+        projectAddress: new PublicKey(claim.project_address),
+        recipient: new PublicKey(claim.to),
+        tokenMint: new PublicKey(claim.currency),
+        amount: BigInt(claim.amount),
+        deadline: claim.deadline,
+        reasonCode: claim.reason,
+        proof: hexToBytes(claim.proof),
+        signature: hexToBytes(claim.signatures[0]),
+    });
+
+    const transaction = new Transaction();
+    transaction.add(...instructions);
+
+    const { blockhash, lastValidBlockHeight } =
+        await fuulConnection.getLatestBlockhash('confirmed');
+
+    transaction.recentBlockhash = blockhash;
+    transaction.lastValidBlockHeight = lastValidBlockHeight;
+    transaction.feePayer = walletPublicKey;
+
+    const signedTx = await signTransaction(transaction);
+    const txSignature = await fuulConnection.sendRawTransaction(
+        signedTx.serialize(),
+        {
+            skipPreflight: false,
+            preflightCommitment: 'confirmed',
+        },
+    );
+
+    await fuulConnection.confirmTransaction(
+        {
+            signature: txSignature,
+            blockhash,
+            lastValidBlockHeight,
+        },
+        'confirmed',
+    );
+
+    return txSignature;
 }
 
 export function useAffiliateClaims(
