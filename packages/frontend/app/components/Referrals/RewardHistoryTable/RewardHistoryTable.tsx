@@ -7,6 +7,11 @@ interface PropsIF {
     claimChecks: ClaimCheckIF[] | null;
 }
 
+const CURRENCY_LABELS_BY_MINT: Record<string, string> = {
+    fusdngghkzfwckbr5rllvrbvqvrctldh9hchjiq4jry: 'fUSD',
+    usd2cze61evaf76rnbq4kppxnkil3irdzglfume3nog: 'USDC.s',
+};
+
 const formatClaimAmount = (amount: string): string => {
     try {
         const rawAmount = BigInt(amount);
@@ -36,6 +41,14 @@ const formatDeadline = (deadline: number): string => {
         day: 'numeric',
         year: 'numeric',
     });
+};
+
+const getCurrencyLabel = (currencyMint: string): string => {
+    const mappedLabel = CURRENCY_LABELS_BY_MINT[currencyMint.toLowerCase()];
+    if (mappedLabel) {
+        return mappedLabel;
+    }
+    return truncString(currencyMint, 5, 5);
 };
 
 function RewardHistoryTable(props: PropsIF) {
@@ -78,7 +91,7 @@ function RewardHistoryTable(props: PropsIF) {
                                 {formatClaimAmount(claim.amount)}
                             </div>
                             <div className={styles.cell}>
-                                {truncString(claim.currency, 5, 5)}
+                                {getCurrencyLabel(claim.currency)}
                             </div>
                             <div
                                 className={`${styles.cell} ${styles.deadlineCell}`}
