@@ -561,7 +561,20 @@
         "claimRewardsWithAmount": "{{amount}} tutarında ödül talep et",
         "selectATabToViewData": "Verileri görüntülemek için bir sekme seçin",
         "trackingLinkExplanation": "Yönlendirilen kullanıcı ücretlerinin <0>{{referrerPercent}}</0> kadarını alacaksınız ve onlar <1>{{inviteePercent}}</1> indirim alacaklar.",
-        "claim": "Talep et"
+        "claim": "Talep et",
+        "payoutStatus": {
+            "pending_recipient_acceptance": "Kullanıcı onayı gerekiyor",
+            "pending_approval": "Yönetici onayı gerekiyor",
+            "pending_transaction": "İşlem bekleniyor",
+            "sending_transaction": "İşlem gönderiliyor",
+            "pending_confirmation": "Onay bekleniyor",
+            "confirmed": "Onaylandı",
+            "failed": "Başarısız",
+            "rejected": "Reddedildi",
+            "deferred": "Ertelendi",
+            "pending_process_approval": "Süreç onayı bekleniyor",
+            "processing_approval": "Onay işleniyor"
+        }
     },
     "deposit": {
         "prompt": "Fogo'dan {{token}} yatır",

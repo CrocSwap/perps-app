@@ -561,7 +561,20 @@
         "claimRewardsWithAmount": "Claim {{amount}} in rewards",
         "selectATabToViewData": "Select a tab to view data",
         "trackingLinkExplanation": "You will receive <0>{{referrerPercent}}</0> of referred users fees and they will receive a <1>{{inviteePercent}}</1> discount.",
-        "claim": "Claim"
+        "claim": "Claim",
+        "payoutStatus": {
+            "pending_recipient_acceptance": "Needs User Acceptance",
+            "pending_approval": "Needs Admin Approval",
+            "pending_transaction": "Awaiting Transaction",
+            "sending_transaction": "Sending Transaction",
+            "pending_confirmation": "Awaiting Confirmation",
+            "confirmed": "Confirmed",
+            "failed": "Failed",
+            "rejected": "Rejected",
+            "deferred": "Deferred",
+            "pending_process_approval": "Awaiting Process Approval",
+            "processing_approval": "Processing Approval"
+        }
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",

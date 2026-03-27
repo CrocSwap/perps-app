@@ -561,7 +561,20 @@
         "claimRewardsWithAmount": "Réclamer {{amount}} de récompenses",
         "selectATabToViewData": "Sélectionner un onglet pour afficher les données",
         "trackingLinkExplanation": "Vous recevrez <0>{{referrerPercent}}</0> des frais des utilisateurs parrainés et ils recevront une réduction de <1>{{inviteePercent}}</1>.",
-        "claim": "Réclamer"
+        "claim": "Réclamer",
+        "payoutStatus": {
+            "pending_recipient_acceptance": "En attente d'acceptation utilisateur",
+            "pending_approval": "En attente d'approbation admin",
+            "pending_transaction": "En attente de transaction",
+            "sending_transaction": "Envoi de transaction",
+            "pending_confirmation": "En attente de confirmation",
+            "confirmed": "Confirmé",
+            "failed": "Échec",
+            "rejected": "Rejeté",
+            "deferred": "Différé",
+            "pending_process_approval": "En attente d'approbation du processus",
+            "processing_approval": "Approbation en cours"
+        }
     },
     "deposit": {
         "prompt": "Déposer {{token}} depuis Fogo",
