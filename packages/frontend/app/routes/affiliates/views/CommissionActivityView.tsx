@@ -9,6 +9,7 @@ import { EmptyState } from '../components/EmptyState';
 import { useUserPayoutMovements } from '../hooks/useAffiliateData';
 import { formatTokenAmount } from '../utils/format-numbers';
 import { useUserDataStore } from '~/stores/UserDataStore';
+import { getPayoutStatusLabel } from '~/utils/payoutStatus';
 import styles from '../affiliates.module.css';
 
 interface CommissionActivityEntry {
@@ -66,26 +67,6 @@ export function CommissionActivityView() {
             default:
                 return styles['badge-error'];
         }
-    };
-
-    const getStatusLabel = (status: string) => {
-        const normalizedStatus = status.toLowerCase();
-
-        const statusLabels: Record<string, string> = {
-            pending_recipient_acceptance: 'Needs User Acceptance',
-            pending_approval: 'Needs Admin Approval',
-            pending_transaction: 'Awaiting Transaction',
-            sending_transaction: 'Sending Transaction',
-            pending_confirmation: 'Awaiting Confirmation',
-            confirmed: 'Confirmed',
-            failed: 'Failed',
-            rejected: 'Rejected',
-            deferred: 'Deferred',
-            pending_process_approval: 'Awaiting Process Approval',
-            processing_approval: 'Processing Approval',
-        };
-
-        return statusLabels[normalizedStatus] ?? status;
     };
 
     if (!isConnected) {
@@ -175,7 +156,9 @@ export function CommissionActivityView() {
                                             <span
                                                 className={`${styles.badge} ${getStatusBadgeClass(entry.status)}`}
                                             >
-                                                {getStatusLabel(entry.status)}
+                                                {getPayoutStatusLabel(
+                                                    entry.status,
+                                                )}
                                             </span>
                                         </td>
                                         <td
