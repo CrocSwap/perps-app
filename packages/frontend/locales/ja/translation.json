@@ -561,7 +561,20 @@
         "claimRewardsWithAmount": "{{amount}} の報酬を請求",
         "selectATabToViewData": "データ表示するタブを選択してください",
         "trackingLinkExplanation": "紹介されたユーザーの手数料の <0>{{referrerPercent}}</0> を受け取り、そのユーザーは <1>{{inviteePercent}}</1> の割引を受けられます。",
-        "claim": "請求する"
+        "claim": "請求する",
+        "payoutStatus": {
+            "pending_recipient_acceptance": "ユーザー承認待ち",
+            "pending_approval": "管理者承認待ち",
+            "pending_transaction": "トランザクション待ち",
+            "sending_transaction": "トランザクション送信中",
+            "pending_confirmation": "確認待ち",
+            "confirmed": "確認済み",
+            "failed": "失敗",
+            "rejected": "拒否",
+            "deferred": "保留",
+            "pending_process_approval": "プロセス承認待ち",
+            "processing_approval": "承認処理中"
+        }
     },
     "deposit": {
         "prompt": "Fogoから{{token}}を入金",

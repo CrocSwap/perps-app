@@ -555,7 +555,20 @@
         "claimRewardsWithAmount": "Reclamar {{amount}} en recompensas",
         "selectATabToViewData": "Selecciona una pestaña para ver datos",
         "trackingLinkExplanation": "Recibirás <0>{{referrerPercent}}</0> de las comisiones de usuarios referidos y ellos recibirán un descuento de <1>{{inviteePercent}}</1>.",
-        "claim": "Reclamar"
+        "claim": "Reclamar",
+        "payoutStatus": {
+            "pending_recipient_acceptance": "Necesita aceptación del usuario",
+            "pending_approval": "Necesita aprobación administrativa",
+            "pending_transaction": "En espera de transacción",
+            "sending_transaction": "Enviando transacción",
+            "pending_confirmation": "En espera de confirmación",
+            "confirmed": "Confirmado",
+            "failed": "Fallido",
+            "rejected": "Rechazado",
+            "deferred": "Diferido",
+            "pending_process_approval": "En espera de aprobación del proceso",
+            "processing_approval": "Procesando aprobación"
+        }
     },
     "deposit": {
         "prompt": "Deposita {{token}} desde Fogo",

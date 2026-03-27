@@ -561,7 +561,20 @@
         "claimRewardsWithAmount": "{{amount}} an Belohnungen beanspruchen",
         "selectATabToViewData": "Wählen Sie einen Tab aus, um Daten anzuzeigen",
         "trackingLinkExplanation": "Sie erhalten <0>{{referrerPercent}}</0> der Gebühren der geworbenen Benutzer und diese erhalten einen Rabatt von <1>{{inviteePercent}}</1>.",
-        "claim": "Einlösen"
+        "claim": "Einlösen",
+        "payoutStatus": {
+            "pending_recipient_acceptance": "Benutzerbestätigung erforderlich",
+            "pending_approval": "Admin-Genehmigung erforderlich",
+            "pending_transaction": "Warten auf Transaktion",
+            "sending_transaction": "Transaktion wird gesendet",
+            "pending_confirmation": "Warten auf Bestätigung",
+            "confirmed": "Bestätigt",
+            "failed": "Fehlgeschlagen",
+            "rejected": "Abgelehnt",
+            "deferred": "Zurückgestellt",
+            "pending_process_approval": "Warten auf Prozessgenehmigung",
+            "processing_approval": "Genehmigung wird verarbeitet"
+        }
     },
     "deposit": {
         "prompt": "{{token}} von Fogo einzahlen",

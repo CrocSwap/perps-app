@@ -561,7 +561,20 @@
         "toCustomizeAffiliateCode": "推广码默认使用钱包地址前六位字符。交易量超过 $1M 的用户可自定义推广码。",
         "claimRewardsWithAmount": "领取 {{amount}} 奖励",
         "selectATabToViewData": "选择一个标签以查看数据",
-        "trackingLinkExplanation": "您将获得被推荐用户手续费的 <0>{{referrerPercent}}</0>，他们将获得 <1>{{inviteePercent}}</1> 的折扣。"
+        "trackingLinkExplanation": "您将获得被推荐用户手续费的 <0>{{referrerPercent}}</0>，他们将获得 <1>{{inviteePercent}}</1> 的折扣。",
+        "payoutStatus": {
+            "pending_recipient_acceptance": "需要用户确认",
+            "pending_approval": "需要管理员批准",
+            "pending_transaction": "等待交易",
+            "sending_transaction": "正在发送交易",
+            "pending_confirmation": "等待确认",
+            "confirmed": "已确认",
+            "failed": "失败",
+            "rejected": "已拒绝",
+            "deferred": "已延期",
+            "pending_process_approval": "等待流程批准",
+            "processing_approval": "正在处理批准"
+        }
     },
     "deposit": {
         "prompt": "从Fogo充值{{token}}",

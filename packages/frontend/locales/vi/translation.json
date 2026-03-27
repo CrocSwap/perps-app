@@ -561,7 +561,20 @@
         "toCustomizeAffiliateCode": "Mã giới thiệu mặc định là 6 ký tự đầu của địa chỉ ví. Người dùng có khối lượng giao dịch > $1M có thể tuỳ chỉnh mã giới thiệu.",
         "claimRewardsWithAmount": "Nhận {{amount}} phần thưởng",
         "selectATabToViewData": "Chọn một tab để xem dữ liệu",
-        "trackingLinkExplanation": "Bạn sẽ nhận <0>{{referrerPercent}}</0> phí từ người dùng được giới thiệu và họ sẽ nhận giảm giá <1>{{inviteePercent}}</1>."
+        "trackingLinkExplanation": "Bạn sẽ nhận <0>{{referrerPercent}}</0> phí từ người dùng được giới thiệu và họ sẽ nhận giảm giá <1>{{inviteePercent}}</1>.",
+        "payoutStatus": {
+            "pending_recipient_acceptance": "Cần người dùng chấp nhận",
+            "pending_approval": "Cần quản trị viên phê duyệt",
+            "pending_transaction": "Đang chờ giao dịch",
+            "sending_transaction": "Đang gửi giao dịch",
+            "pending_confirmation": "Đang chờ xác nhận",
+            "confirmed": "Đã xác nhận",
+            "failed": "Thất bại",
+            "rejected": "Đã từ chối",
+            "deferred": "Đã hoãn",
+            "pending_process_approval": "Đang chờ phê duyệt quy trình",
+            "processing_approval": "Đang xử lý phê duyệt"
+        }
     },
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",
