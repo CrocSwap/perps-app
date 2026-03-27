@@ -7,9 +7,6 @@ import { useAffiliateAudience } from './hooks/useAffiliateData';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from './affiliates.module.css';
 
-const TEST_AFFILIATES_USER_ADDRESS: string | null =
-    '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
-
 function PageLoader() {
     return (
         <div className={styles['page-loader']}>
@@ -22,13 +19,9 @@ export default function AffiliatesPage() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const { userAddress } = useUserDataStore();
-    const effectiveUserAddress = TEST_AFFILIATES_USER_ADDRESS ?? userAddress;
 
     const { data: audience, isLoading: isLoadingAudience } =
-        useAffiliateAudience(
-            effectiveUserAddress || '',
-            isConnected && !!effectiveUserAddress,
-        );
+        useAffiliateAudience(userAddress || '', isConnected && !!userAddress);
 
     // Show connect wallet if not connected
     if (!isConnected) {
@@ -56,7 +49,7 @@ export default function AffiliatesPage() {
     }
 
     // Show loading while checking audience (also show loader when data is null but we have a valid address)
-    if (isLoadingAudience || (audience === null && effectiveUserAddress)) {
+    if (isLoadingAudience || (audience === null && userAddress)) {
         return (
             <div
                 className={`${styles['affiliates-root']} ${styles['affiliates-container']}`}

@@ -26,36 +26,29 @@ const STATS_LABELS = {
     INVITEES: 'Invitees',
 };
 
-const TEST_AFFILIATES_USER_ADDRESS: string | null =
-    '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
-
 export function YourStatsSection() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const notificationStore = useNotificationStore();
     const { userAddress } = useUserDataStore();
     const [isClaiming, setIsClaiming] = useState(false);
-    const effectiveUserAddress = TEST_AFFILIATES_USER_ADDRESS ?? userAddress;
 
     const {
         data: stats,
         isLoading,
         error,
         refetch,
-    } = useAffiliateStats(
-        effectiveUserAddress || '',
-        isConnected && !!effectiveUserAddress,
-    );
+    } = useAffiliateStats(userAddress || '', isConnected && !!userAddress);
 
     const { data: inviteeCount, isLoading: isLoadingInviteeCount } =
         useAffiliateInviteeCount(
-            effectiveUserAddress || '',
-            isConnected && !!effectiveUserAddress,
+            userAddress || '',
+            isConnected && !!userAddress,
         );
 
     const { data: referrerData } = useUserReferrer(
-        effectiveUserAddress || '',
-        isConnected && !!effectiveUserAddress,
+        userAddress || '',
+        isConnected && !!userAddress,
     );
 
     const userRebateRate = useMemo(() => {
@@ -66,8 +59,8 @@ export function YourStatsSection() {
     }, [referrerData]);
 
     const { data: payoutMovements } = useUserPayoutMovements(
-        effectiveUserAddress || '',
-        isConnected && !!effectiveUserAddress,
+        userAddress || '',
+        isConnected && !!userAddress,
     );
 
     // Use the same API key as the referrals page to show claimable fees
@@ -76,9 +69,9 @@ export function YourStatsSection() {
         isLoading: isClaimsLoading,
         refetch: refetchClaims,
     } = useAffiliateClaims(
-        effectiveUserAddress || '',
+        userAddress || '',
         '459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661', // Referrals API key
-        isConnected && !!effectiveUserAddress,
+        isConnected && !!userAddress,
     );
 
     const claimableAmount = useMemo(() => {
