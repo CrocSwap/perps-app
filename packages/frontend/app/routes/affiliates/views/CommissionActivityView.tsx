@@ -68,6 +68,26 @@ export function CommissionActivityView() {
         }
     };
 
+    const getStatusLabel = (status: string) => {
+        const normalizedStatus = status.toLowerCase();
+
+        const statusLabels: Record<string, string> = {
+            pending_recipient_acceptance: 'Needs User Acceptance',
+            pending_approval: 'Needs Admin Approval',
+            pending_transaction: 'Awaiting Transaction',
+            sending_transaction: 'Sending Transaction',
+            pending_confirmation: 'Awaiting Confirmation',
+            confirmed: 'Confirmed',
+            failed: 'Failed',
+            rejected: 'Rejected',
+            deferred: 'Deferred',
+            pending_process_approval: 'Awaiting Process Approval',
+            processing_approval: 'Processing Approval',
+        };
+
+        return statusLabels[normalizedStatus] ?? status;
+    };
+
     if (!isConnected) {
         return (
             <ViewLayout title='Commission Activity'>
@@ -155,7 +175,7 @@ export function CommissionActivityView() {
                                             <span
                                                 className={`${styles.badge} ${getStatusBadgeClass(entry.status)}`}
                                             >
-                                                {entry.status}
+                                                {getStatusLabel(entry.status)}
                                             </span>
                                         </td>
                                         <td
