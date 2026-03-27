@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReferrerPayoutData } from '@fuul/sdk';
+import { FuulSdk, Network } from '@fuul/sdk-solana';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import { fetchAttributedReferralCount } from '../../../utils/refreg';
+import {
+    buildClaimInstructions,
+    getFuulConnection,
+} from '~/utils/claimRewards';
 
 interface UserReferralCode {
     code?: string | null;
@@ -232,6 +238,10 @@ export function useAffiliateInviteeCount(
     const inFlightRef = useRef(false);
     const hasLoadedOnceRef = useRef(false);
 
+    // Import and use useAffiliateCode hook to fetch the affiliate's actual referral code
+    const { data: affiliateCodeData, isLoading: isAffiliateCodeLoading } =
+        useAffiliateCode(walletAddress, enabled);
+
     const fetchData = useCallback(async () => {
         if (!enabled || !walletAddress) return;
         if (inFlightRef.current) return;
@@ -243,17 +253,17 @@ export function useAffiliateInviteeCount(
         setError(null);
 
         try {
-            const referralCodes =
-                await fetchAffiliateReferralCodes(walletAddress);
+            // Use the affiliate code (affiliateCodeData?.code) instead of fetching from separate referral codes endpoint
+            const affiliateCode = affiliateCodeData?.code;
 
-            if (referralCodes.length === 0) {
+            if (!affiliateCode) {
                 setData(0);
                 return;
             }
 
             const count = await fetchAttributedReferralCount({
                 referralKind: 1,
-                referralIdTexts: referralCodes,
+                referralIdTexts: [affiliateCode],
             });
 
             setData(count ?? 0);
@@ -268,10 +278,10 @@ export function useAffiliateInviteeCount(
             hasLoadedOnceRef.current = true;
             setIsLoading(false);
         }
-    }, [enabled, walletAddress]);
+    }, [enabled, walletAddress, affiliateCodeData?.code]);
 
     useEffect(() => {
-        if (!enabled || !walletAddress) return;
+        if (!enabled || !walletAddress || isAffiliateCodeLoading) return;
 
         void fetchData();
         const intervalId = window.setInterval(() => {
@@ -281,7 +291,7 @@ export function useAffiliateInviteeCount(
         return () => {
             window.clearInterval(intervalId);
         };
-    }, [enabled, fetchData, walletAddress]);
+    }, [enabled, fetchData, walletAddress, isAffiliateCodeLoading]);
 
     useEffect(() => {
         window.addEventListener('affiliateDataUpdate', fetchData);
@@ -772,6 +782,246 @@ export function useAffiliateCode(userIdentifier: string, enabled = true) {
         window.addEventListener('affiliateCodeUpdated', fetchData);
         return () =>
             window.removeEventListener('affiliateCodeUpdated', fetchData);
+    }, [fetchData]);
+
+    return { data, isLoading, error, refetch: fetchData };
+}
+
+// Hook for affiliate claim checks
+export interface AffiliateClaim {
+    project_address: string;
+    to: string;
+    currency: string;
+    currency_type: number;
+    amount: string;
+    reason: number;
+    token_id: string;
+    deadline: number;
+    proof: string;
+    signatures: string[];
+}
+
+type AffiliateClaimSessionState = {
+    walletPublicKey?: PublicKey;
+    sessionPublicKey?: PublicKey;
+    solanaWallet?: {
+        signTransaction?: (transaction: Transaction) => Promise<Transaction>;
+    };
+};
+
+function isAffiliateClaimSessionState(
+    sessionState: unknown,
+): sessionState is AffiliateClaimSessionState {
+    if (!sessionState || typeof sessionState !== 'object') {
+        return false;
+    }
+
+    const state = sessionState as Record<string, unknown>;
+    return 'walletPublicKey' in state || 'sessionPublicKey' in state;
+}
+
+function hexToBytes(hex: string): Uint8Array {
+    const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex;
+
+    if (cleanHex.length % 2 !== 0 || !/^[0-9A-Fa-f]*$/.test(cleanHex)) {
+        throw new Error('Invalid claim hex payload');
+    }
+
+    const bytes = new Uint8Array(cleanHex.length / 2);
+    for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(cleanHex.substr(i * 2, 2), 16);
+    }
+    return bytes;
+}
+
+function collectErrorText(error: unknown): string {
+    if (typeof error === 'string') {
+        return error;
+    }
+
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    if (typeof error === 'object' && error !== null) {
+        const errRecord = error as Record<string, unknown>;
+        const message = errRecord.message;
+        if (typeof message === 'string') {
+            return message;
+        }
+
+        const logs = errRecord.logs;
+        if (Array.isArray(logs)) {
+            return logs
+                .filter((line): line is string => typeof line === 'string')
+                .join(' ');
+        }
+
+        try {
+            return JSON.stringify(error);
+        } catch {
+            return 'Unknown claim failure';
+        }
+    }
+
+    return 'Unknown claim failure';
+}
+
+export function getAffiliateClaimErrorMessage(error: unknown): string {
+    const text = collectErrorText(error);
+    const normalized = text.toLowerCase();
+
+    const isInsufficientNativeToken =
+        /insufficient\s+(funds?|balance|lamports?|native)/.test(normalized) ||
+        /fee\s*payer/.test(normalized) ||
+        /rent\s*exempt/.test(normalized) ||
+        /custom\s+program\s+error:\s*0x1/.test(normalized);
+
+    if (isInsufficientNativeToken) {
+        return 'Insufficient native token to pay network fees. Please top up and try again.';
+    }
+
+    return text;
+}
+
+export async function executeAffiliateClaim(params: {
+    claim: AffiliateClaim;
+    sessionState: unknown;
+}): Promise<string> {
+    const { claim, sessionState } = params;
+
+    if (!isAffiliateClaimSessionState(sessionState)) {
+        throw new Error('Session not established');
+    }
+
+    const walletPublicKey =
+        sessionState.walletPublicKey || sessionState.sessionPublicKey;
+    if (!walletPublicKey) {
+        throw new Error('No wallet public key found');
+    }
+
+    const solanaWallet = sessionState.solanaWallet;
+    if (!solanaWallet?.signTransaction) {
+        throw new Error('signTransaction not available on wallet');
+    }
+
+    const fuulConnection = getFuulConnection();
+    const sdk = new FuulSdk(fuulConnection, Network.FOGO_MAINNET);
+
+    const instructions = await buildClaimInstructions(sdk, walletPublicKey, {
+        projectAddress: new PublicKey(claim.project_address),
+        recipient: new PublicKey(claim.to),
+        tokenMint: new PublicKey(claim.currency),
+        amount: BigInt(claim.amount),
+        deadline: claim.deadline,
+        reasonCode: claim.reason,
+        proof: hexToBytes(claim.proof),
+        signature: hexToBytes(claim.signatures[0]),
+    });
+
+    const transaction = new Transaction();
+    transaction.add(...instructions);
+
+    const { blockhash, lastValidBlockHeight } =
+        await fuulConnection.getLatestBlockhash('confirmed');
+
+    transaction.recentBlockhash = blockhash;
+    transaction.lastValidBlockHeight = lastValidBlockHeight;
+    transaction.feePayer = walletPublicKey;
+
+    const signedTx = await solanaWallet.signTransaction(transaction);
+    const txSignature = await fuulConnection.sendRawTransaction(
+        signedTx.serialize(),
+        {
+            skipPreflight: false,
+            preflightCommitment: 'confirmed',
+        },
+    );
+
+    await fuulConnection.confirmTransaction(
+        {
+            signature: txSignature,
+            blockhash,
+            lastValidBlockHeight,
+        },
+        'confirmed',
+    );
+
+    return txSignature;
+}
+
+export function useAffiliateClaims(
+    userIdentifier: string,
+    apiKey: string,
+    enabled = true,
+) {
+    const [data, setData] = useState<AffiliateClaim[] | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const fetchData = useCallback(async () => {
+        if (!enabled || !userIdentifier) return;
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const res = await fetch(
+                'https://api.fuul.xyz/api/v1/claim-checks/claim',
+                {
+                    method: 'POST',
+                    headers: {
+                        accept: 'application/json',
+                        'content-type': 'application/json',
+                        authorization: `Bearer ${apiKey}`,
+                    },
+                    body: JSON.stringify({
+                        userIdentifierType: 'solana_address',
+                        userIdentifier,
+                    }),
+                },
+            );
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setData([]);
+                    return;
+                }
+                const text = await res.text();
+                console.error('FUUL getAffiliateClaims error:', text);
+                throw new Error(text);
+            }
+
+            const response = await res.json();
+            console.log('FUUL getAffiliateClaims response:', response);
+            setData(
+                Array.isArray(response)
+                    ? response
+                    : (response?.claims ?? response?.data ?? []),
+            );
+        } catch (err) {
+            if (isNotFoundError(err)) {
+                setData([]);
+            } else {
+                setError(
+                    err instanceof Error
+                        ? err
+                        : new Error('Failed to fetch affiliate claims'),
+                );
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, [userIdentifier, apiKey, enabled]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    useEffect(() => {
+        window.addEventListener('affiliateDataUpdate', fetchData);
+        return () =>
+            window.removeEventListener('affiliateDataUpdate', fetchData);
     }, [fetchData]);
 
     return { data, isLoading, error, refetch: fetchData };
