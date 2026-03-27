@@ -42,7 +42,7 @@
         "d3fc": "^15.2.13",
         "express": "^5.2.1",
         "framer-motion": "^12.38.0",
-        "i18next": "^25.10.5",
+        "i18next": "^25.10.10",
         "i18next-browser-languagedetector": "^8.2.1",
         "isbot": "^5.1.36",
         "isomorphic-fetch": "^3.0.0",
@@ -51,7 +51,7 @@
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
         "react-helmet-async": "^2.0.5",
-        "react-i18next": "^16.6.2",
+        "react-i18next": "^16.6.6",
         "react-icons": "^5.6.0",
         "react-router": "^7.13.2",
         "zustand": "^5.0.12"
@@ -63,8 +63,8 @@
         "@types/node": "24.10.1",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
-        "@typescript-eslint/eslint-plugin": "^8.57.1",
-        "@typescript-eslint/parser": "^8.57.1",
+        "@typescript-eslint/eslint-plugin": "^8.57.2",
+        "@typescript-eslint/parser": "^8.57.2",
         "@vite-pwa/assets-generator": "^1.0.2",
         "cross-env": "^10.1.0",
         "eslint": "^9.39.4",
@@ -72,11 +72,11 @@
         "fs-extra": "^11.3.4",
         "terser": "^5.46.1",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.57.1",
+        "typescript-eslint": "^8.57.2",
         "vite": "^7.3.1",
         "vite-plugin-node-polyfills": "^0.24.0",
         "vite-plugin-pwa": "^1.2.0",
         "vite-tsconfig-paths": "^5.1.4",
-        "vitest": "^4.1.0"
+        "vitest": "^4.1.2"
     }
 }
