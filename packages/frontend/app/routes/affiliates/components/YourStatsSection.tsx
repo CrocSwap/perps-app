@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { StatCard, StatCardSkeleton } from './StatCard';
 import { RebateRateCard, RebateRateCardSkeleton } from './RebateRateCard';
@@ -26,28 +26,36 @@ const STATS_LABELS = {
     INVITEES: 'Invitees',
 };
 
+const TEST_AFFILIATES_USER_ADDRESS: string | null =
+    '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
+
 export function YourStatsSection() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const notificationStore = useNotificationStore();
     const { userAddress } = useUserDataStore();
+    const [isClaiming, setIsClaiming] = useState(false);
+    const effectiveUserAddress = TEST_AFFILIATES_USER_ADDRESS ?? userAddress;
 
     const {
         data: stats,
         isLoading,
         error,
         refetch,
-    } = useAffiliateStats(userAddress || '', isConnected && !!userAddress);
+    } = useAffiliateStats(
+        effectiveUserAddress || '',
+        isConnected && !!effectiveUserAddress,
+    );
 
     const { data: inviteeCount, isLoading: isLoadingInviteeCount } =
         useAffiliateInviteeCount(
-            userAddress || '',
-            isConnected && !!userAddress,
+            effectiveUserAddress || '',
+            isConnected && !!effectiveUserAddress,
         );
 
     const { data: referrerData } = useUserReferrer(
-        userAddress || '',
-        isConnected && !!userAddress,
+        effectiveUserAddress || '',
+        isConnected && !!effectiveUserAddress,
     );
 
     const userRebateRate = useMemo(() => {
@@ -58,8 +66,8 @@ export function YourStatsSection() {
     }, [referrerData]);
 
     const { data: payoutMovements } = useUserPayoutMovements(
-        userAddress || '',
-        isConnected && !!userAddress,
+        effectiveUserAddress || '',
+        isConnected && !!effectiveUserAddress,
     );
 
     // Use the same API key as the referrals page to show claimable fees
@@ -68,9 +76,9 @@ export function YourStatsSection() {
         isLoading: isClaimsLoading,
         refetch: refetchClaims,
     } = useAffiliateClaims(
-        userAddress || '',
+        effectiveUserAddress || '',
         '459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661', // Referrals API key
-        isConnected && !!userAddress,
+        isConnected && !!effectiveUserAddress,
     );
 
     const claimableAmount = useMemo(() => {
@@ -146,7 +154,14 @@ export function YourStatsSection() {
     const isInviteesLoading =
         isLoading || (isLoadingInviteeCount && inviteeCount === null);
 
+    const hasClaimChecks = Boolean(claimsData && claimsData.length > 0);
+    const isClaimDisabled = isClaimsLoading || isClaiming || !hasClaimChecks;
+
     const handleClaimClick = useCallback(async () => {
+        if (isClaiming) {
+            return;
+        }
+
         console.log('🎁 [Affiliates Claim] Claim button clicked');
 
         if (!claimsData || claimsData.length === 0) {
@@ -156,24 +171,67 @@ export function YourStatsSection() {
             return;
         }
 
+        setIsClaiming(true);
+
         try {
-            const txSignature = await executeAffiliateClaim({
-                claim: claimsData[0],
-                sessionState,
-            });
+            const successfulSignatures: string[] = [];
+            let failedClaims = 0;
+            let firstFailureMessage: string | null = null;
 
-            console.log(
-                '🎁 [Affiliates Claim] Claim transaction confirmed:',
-                txSignature,
-            );
+            for (const claim of claimsData) {
+                try {
+                    const txSignature = await executeAffiliateClaim({
+                        claim,
+                        sessionState,
+                    });
 
-            notificationStore.add({
-                title: 'Claim successful',
-                message: 'Your affiliate rewards claim has been processed.',
-                icon: 'check',
-                removeAfter: 5000,
-                txLink: getTxLink(txSignature),
-            });
+                    successfulSignatures.push(txSignature);
+                    console.log(
+                        '🎁 [Affiliates Claim] Claim transaction confirmed:',
+                        txSignature,
+                    );
+                } catch (claimError) {
+                    failedClaims += 1;
+                    const message = getAffiliateClaimErrorMessage(claimError);
+                    if (!firstFailureMessage) {
+                        firstFailureMessage = message;
+                    }
+                    console.error(
+                        '🎁 [Affiliates Claim] Individual claim failed:',
+                        claimError,
+                    );
+                }
+            }
+
+            const successCount = successfulSignatures.length;
+            const totalClaims = claimsData.length;
+
+            if (successCount === 0) {
+                throw new Error(firstFailureMessage || 'Claim failed');
+            }
+
+            if (failedClaims === 0) {
+                notificationStore.add({
+                    title: 'Claim successful',
+                    message:
+                        successCount === 1
+                            ? 'Your affiliate rewards claim has been processed.'
+                            : `Processed ${successCount} affiliate reward claims.`,
+                    icon: 'check',
+                    removeAfter: 5000,
+                    txLink:
+                        successCount === 1
+                            ? getTxLink(successfulSignatures[0])
+                            : undefined,
+                });
+            } else {
+                notificationStore.add({
+                    title: 'Claim partially successful',
+                    message: `Processed ${successCount} of ${totalClaims} claims.${firstFailureMessage ? ` Last error: ${firstFailureMessage}` : ''}`,
+                    icon: 'check',
+                    removeAfter: 10000,
+                });
+            }
 
             window.dispatchEvent(new CustomEvent('affiliateDataUpdate'));
             await refetchClaims();
@@ -186,8 +244,16 @@ export function YourStatsSection() {
                 icon: 'error',
                 removeAfter: 10000,
             });
+        } finally {
+            setIsClaiming(false);
         }
-    }, [claimsData, notificationStore, refetchClaims, sessionState]);
+    }, [
+        claimsData,
+        isClaiming,
+        notificationStore,
+        refetchClaims,
+        sessionState,
+    ]);
 
     return (
         <section
@@ -230,7 +296,8 @@ export function YourStatsSection() {
                                 unclaimed: claimableAmount,
                             }}
                             actionButton={{
-                                text: 'Claim',
+                                text: isClaiming ? 'Claiming...' : 'Claim',
+                                disabled: isClaimDisabled,
                                 onClick: () => {
                                     void handleClaimClick();
                                 },

@@ -14,6 +14,7 @@ interface PropsIF {
     actionButton?: {
         text: string;
         onClick: () => void;
+        disabled?: boolean;
     };
 }
 
@@ -65,6 +66,7 @@ export function StatCard(props: PropsIF) {
                         bg='accent1'
                         hoverBg='accent2'
                         className={styles['stat-button']}
+                        disabled={actionButton.disabled}
                         onClick={actionButton.onClick}
                     >
                         {actionButton.text}

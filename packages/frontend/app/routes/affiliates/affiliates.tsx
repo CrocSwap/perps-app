@@ -1,5 +1,4 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import { IoReload } from 'react-icons/io5';
 import { ConnectWalletCard } from './components/ConnectWalletCard';
 import { YourStatsSection } from './components/YourStatsSection';
 import { DashboardTabsSection } from './components/DashboardTabsSection';
@@ -7,6 +6,9 @@ import { AffiliateApplicationForm } from './components/AffiliateApplicationForm'
 import { useAffiliateAudience } from './hooks/useAffiliateData';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from './affiliates.module.css';
+
+const TEST_AFFILIATES_USER_ADDRESS: string | null =
+    '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
 
 function PageLoader() {
     return (
@@ -20,9 +22,13 @@ export default function AffiliatesPage() {
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const { userAddress } = useUserDataStore();
+    const effectiveUserAddress = TEST_AFFILIATES_USER_ADDRESS ?? userAddress;
 
     const { data: audience, isLoading: isLoadingAudience } =
-        useAffiliateAudience(userAddress || '', isConnected && !!userAddress);
+        useAffiliateAudience(
+            effectiveUserAddress || '',
+            isConnected && !!effectiveUserAddress,
+        );
 
     // Show connect wallet if not connected
     if (!isConnected) {
@@ -50,7 +56,7 @@ export default function AffiliatesPage() {
     }
 
     // Show loading while checking audience (also show loader when data is null but we have a valid address)
-    if (isLoadingAudience || (audience === null && userAddress)) {
+    if (isLoadingAudience || (audience === null && effectiveUserAddress)) {
         return (
             <div
                 className={`${styles['affiliates-root']} ${styles['affiliates-container']}`}

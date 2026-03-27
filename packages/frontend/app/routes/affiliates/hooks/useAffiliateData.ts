@@ -900,8 +900,8 @@ export async function executeAffiliateClaim(params: {
         throw new Error('No wallet public key found');
     }
 
-    const signTransaction = sessionState.solanaWallet?.signTransaction;
-    if (!signTransaction) {
+    const solanaWallet = sessionState.solanaWallet;
+    if (!solanaWallet?.signTransaction) {
         throw new Error('signTransaction not available on wallet');
     }
 
@@ -929,7 +929,7 @@ export async function executeAffiliateClaim(params: {
     transaction.lastValidBlockHeight = lastValidBlockHeight;
     transaction.feePayer = walletPublicKey;
 
-    const signedTx = await signTransaction(transaction);
+    const signedTx = await solanaWallet.signTransaction(transaction);
     const txSignature = await fuulConnection.sendRawTransaction(
         signedTx.serialize(),
         {
