@@ -64,6 +64,8 @@ export type PayoutByReferrerT = {
     };
 };
 
+const CLAIMS_SHIM_WALLET = '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
+
 export default function Referrals() {
     const { t } = useTranslation();
     const userDataStore = useUserDataStore();
@@ -114,8 +116,20 @@ export default function Referrals() {
     >([]);
 
     useEffect(() => {
-        referralStore.fetchClaims(userDataStore.userAddress ?? '');
-    }, [userDataStore.userAddress]);
+        console.log(
+            '[Referrals] Fetching claim checks with shim wallet:',
+            CLAIMS_SHIM_WALLET,
+        );
+        referralStore.fetchClaims(CLAIMS_SHIM_WALLET);
+    }, []);
+
+    useEffect(() => {
+        console.log('[Referrals] referralStore.claims updated:', {
+            isNull: referralStore.claims === null,
+            count: referralStore.claims?.length ?? 0,
+            sample: referralStore.claims?.[0] ?? null,
+        });
+    }, [referralStore.claims]);
 
     useEffect(() => {
         const options = {
@@ -243,6 +257,7 @@ export default function Referrals() {
                 <ReferralsTabs
                     payoutMovements={payoutMovements}
                     payoutsByReferrer={payoutsByReferrer}
+                    claimChecks={referralStore.claims}
                 />
                 <ReferralsExtra />
             </section>

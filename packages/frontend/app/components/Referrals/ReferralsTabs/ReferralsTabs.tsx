@@ -5,15 +5,18 @@ import styles from './ReferralsTabs.module.css';
 import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import ReferralsTable from '../ReferralsTable/ReferralsTable';
+import RewardHistoryTable from '../RewardHistoryTable/RewardHistoryTable';
 import type {
     PayoutMovementIF,
     PayoutByReferrerT,
 } from '~/routes/referrals/referrals';
+import type { ClaimCheckIF } from '~/stores/ReferralStore';
 
 interface PropsIF {
     initialTab?: string;
     payoutMovements: PayoutMovementIF[];
     payoutsByReferrer: PayoutByReferrerT[];
+    claimChecks: ClaimCheckIF[] | null;
 }
 
 const availableTabs = ['referrals.title', 'referrals.rewardHistory'];
@@ -23,11 +26,13 @@ export default function ReferralsTabs(props: PropsIF) {
         initialTab = 'referrals.title',
         payoutMovements,
         payoutsByReferrer,
+        claimChecks,
     } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
     const hasData =
         (payoutMovements?.length ?? 0) > 0 ||
-        (payoutsByReferrer?.length ?? 0) > 0;
+        (payoutsByReferrer?.length ?? 0) > 0 ||
+        (claimChecks?.length ?? 0) > 0;
     const [isCollapsed, setIsCollapsed] = useState(!hasData);
 
     const handleTabChange = (tab: string) => {
@@ -44,7 +49,7 @@ export default function ReferralsTabs(props: PropsIF) {
                     />
                 );
             case 'referrals.rewardHistory':
-                return <div className={styles.emptyState}>enter code</div>;
+                return <RewardHistoryTable claimChecks={claimChecks} />;
             default:
                 return (
                     <div className={styles.emptyState}>
