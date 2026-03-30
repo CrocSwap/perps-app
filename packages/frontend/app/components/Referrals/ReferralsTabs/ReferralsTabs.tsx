@@ -44,7 +44,12 @@ export default function ReferralsTabs(props: PropsIF) {
                     />
                 );
             case 'referrals.rewardHistory':
-                return <div className={styles.emptyState}>enter code</div>;
+                return (
+                    <div className={styles.emptyState}>
+                        A record of claimed and unclaimed rewards for will be
+                        shown here once generated.
+                    </div>
+                );
             default:
                 return (
                     <div className={styles.emptyState}>
