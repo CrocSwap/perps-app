@@ -8,7 +8,12 @@
         "prod": "pnpm i && pnpm prepare && pnpm update-submodules && pnpm --filter frontend prod",
         "prepare": "husky",
         "prettier": "prettier --write .",
-        "update-submodules": "git submodule update --remote --recursive --merge"
+        "update-submodules": "git submodule update --remote --recursive --merge",
+        "lint": "pnpm --filter frontend lint",
+        "lint:fix": "pnpm --filter frontend lint:fix",
+        "typecheck": "pnpm --filter frontend typecheck",
+        "test": "pnpm --filter frontend test",
+        "test:ci": "pnpm --filter frontend test:ci"
     },
     "lint-staged": {
         "**/*": "prettier --write --ignore-unknown"
