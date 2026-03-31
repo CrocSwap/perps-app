@@ -53,13 +53,17 @@ export interface ReferralStoreIF {
     convertedWallets: string[];
     claims: ClaimCheckIF[] | null;
     rewardHistory: any[] | null;
+    rewardHistoryPage: number;
+    rewardHistoryTotalCount: number;
+    rewardHistoryPageSize: number;
+    rewardHistoryTotalPages: number;
     fetchUserReferrer: (address: string) => Promise<UserReferrerResponse[]>;
     getRefCodeByPubKey: (
         userIdentifier: string,
     ) => Promise<AffiliateCodeResponse | null>;
     checkForConversion: (address: string) => Promise<boolean>;
     fetchClaims: (address: string) => Promise<void>;
-    fetchRewardHistory: (address: string) => Promise<void>;
+    fetchRewardHistory: (address: string, page?: number) => Promise<void>;
     cache(refCode: string, isApproved?: boolean): void;
     markCodeApproved(refCode: string): void;
     setTotVolume(volume: number | undefined): void;
@@ -92,6 +96,10 @@ export const useReferralStore = create<ReferralStoreIF>()(
             totVolume: undefined,
             claims: null,
             rewardHistory: null,
+            rewardHistoryPage: 1,
+            rewardHistoryTotalCount: 0,
+            rewardHistoryPageSize: 25,
+            rewardHistoryTotalPages: 0,
             cache(refCode: string, isApproved: boolean = false): void {
                 const current = get().cached;
                 // Don't overwrite if current code is approved and new code is unapproved
@@ -185,7 +193,10 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     set({ claims: [] });
                 }
             },
-            async fetchRewardHistory(address: string): Promise<void> {
+            async fetchRewardHistory(
+                address: string,
+                page: number = 1,
+            ): Promise<void> {
                 set({ rewardHistory: null });
 
                 if (!address) {
@@ -205,9 +216,11 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     console.log(
                         '🔍 [ReferralStore] fetchRewardHistory calling API for address:',
                         address,
+                        'page:',
+                        page,
                     );
                     const res = await fetch(
-                        `https://api.fuul.xyz/api/v1/claim-checks/rewards-payouts?user_identifier=${address}&user_identifier_type=solana_address`,
+                        `https://api.fuul.xyz/api/v1/claim-checks/rewards-payouts?user_identifier=${address}&user_identifier_type=solana_address&page=${page}&page_size=25`,
                         options,
                     );
                     console.log(
@@ -220,18 +233,29 @@ export const useReferralStore = create<ReferralStoreIF>()(
                         data,
                     );
 
-                    // Store claimchecks directly (API already filters by user)
+                    // Store claimchecks and pagination metadata
                     console.log(
                         '🔍 [ReferralStore] fetchRewardHistory claimchecks:',
                         data.claimchecks,
                     );
-                    set({ rewardHistory: data.claimchecks });
+                    const totalPages = Math.ceil(data.total_count / 25);
+                    set({
+                        rewardHistory: data.claimchecks,
+                        rewardHistoryPage: page,
+                        rewardHistoryTotalCount: data.total_count,
+                        rewardHistoryTotalPages: totalPages,
+                    });
                 } catch (err) {
                     console.error(
                         '❌ [ReferralStore] fetchRewardHistory error:',
                         err,
                     );
-                    set({ rewardHistory: [] });
+                    set({
+                        rewardHistory: [],
+                        rewardHistoryPage: 1,
+                        rewardHistoryTotalCount: 0,
+                        rewardHistoryTotalPages: 0,
+                    });
                 }
             },
             async fetchUserReferrer(

@@ -6,6 +6,7 @@ import { useReferralsTable } from './useReferralsTable';
 import { referralData } from './data';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useRewardHistoryPagination } from './useRewardHistoryPagination';
 import type {
     PayoutByReferrerT,
     PayoutMovementIF,
@@ -50,7 +51,21 @@ function ReferralsTable(props: PropsIF) {
     const isNextButtonDisabled = currentPage === totalPages;
 
     if (mode === 'rewardHistory') {
-        const history = rewardHistory || [];
+        const {
+            currentItems,
+            currentPage,
+            totalPages,
+            totalItems,
+            startIndex,
+            endIndex,
+            goToNextPage,
+            goToPreviousPage,
+            isLoading,
+        } = useRewardHistoryPagination();
+
+        const isPrevButtonDisabled = currentPage === 1;
+        const isNextButtonDisabled =
+            currentPage === totalPages || totalPages === 0;
 
         return (
             <div className={styles.tableWrapper}>
@@ -72,51 +87,89 @@ function ReferralsTable(props: PropsIF) {
                     </div>
                 </div>
                 <div className={styles.tableBody}>
-                    {history.map((item: any, index) => (
-                        <div
-                            key={`reward-${index}`}
-                            className={styles.rowContainer}
-                        >
-                            <div className={styles.cell}>
-                                {new Date(item.date).toLocaleDateString()}
-                            </div>
-                            <div className={styles.cell}>
-                                {item.currency_name}
-                            </div>
-                            <div className={styles.cell}>
-                                {currency(parseFloat(item.amount) * 0.000001)}
-                            </div>
-                            <div className={styles.cell}>
-                                {new Date(
-                                    item.deadline * 1000,
-                                ).toLocaleDateString('en-GB', {
-                                    day: '2-digit',
-                                    month: 'short',
-                                    year: 'numeric',
-                                })}
-                            </div>
-                            <div className={styles.cell}>
-                                <span
-                                    className={
-                                        item.status === 'claimed'
-                                            ? styles.claimedBadge
-                                            : styles.unclaimedBadge
-                                    }
+                    {isLoading ? (
+                        <div className={styles.emptyState}>Loading...</div>
+                    ) : (
+                        <>
+                            {currentItems.map((item: any, index) => (
+                                <div
+                                    key={`reward-${index}`}
+                                    className={styles.rowContainer}
                                 >
-                                    {item.status === 'claimed'
-                                        ? 'Claimed'
-                                        : 'Unclaimed'}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
+                                    <div className={styles.cell}>
+                                        {new Date(
+                                            item.date,
+                                        ).toLocaleDateString()}
+                                    </div>
+                                    <div className={styles.cell}>
+                                        {item.currency_name}
+                                    </div>
+                                    <div className={styles.cell}>
+                                        {currency(
+                                            parseFloat(item.amount) * 0.000001,
+                                        )}
+                                    </div>
+                                    <div className={styles.cell}>
+                                        {new Date(
+                                            item.deadline * 1000,
+                                        ).toLocaleDateString('en-GB', {
+                                            day: '2-digit',
+                                            month: 'short',
+                                            year: 'numeric',
+                                        })}
+                                    </div>
+                                    <div className={styles.cell}>
+                                        <span
+                                            className={
+                                                item.status === 'claimed'
+                                                    ? styles.claimedBadge
+                                                    : styles.unclaimedBadge
+                                            }
+                                        >
+                                            {item.status === 'claimed'
+                                                ? 'Claimed'
+                                                : 'Unclaimed'}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
 
-                    {history.length === 0 && (
-                        <div className={styles.emptyState}>
-                            No reward history to display
-                        </div>
+                            {currentItems.length === 0 && (
+                                <div className={styles.emptyState}>
+                                    No reward history to display
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
+
+                {totalPages > 1 && (
+                    <div className={styles.paginationContainer}>
+                        <div className={styles.pageInfo}>
+                            {totalItems > 0
+                                ? `${startIndex + 1}-${Math.min(endIndex + 1, totalItems)} of ${totalItems}`
+                                : '0-0 of 0'}
+                        </div>
+
+                        <div className={styles.pageButtons}>
+                            <button
+                                className={styles.pageButton}
+                                onClick={goToPreviousPage}
+                                disabled={isPrevButtonDisabled || isLoading}
+                            >
+                                <BiChevronLeft size={16} />
+                            </button>
+
+                            <button
+                                className={styles.pageButton}
+                                onClick={goToNextPage}
+                                disabled={isNextButtonDisabled || isLoading}
+                            >
+                                <BiChevronRight size={16} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
