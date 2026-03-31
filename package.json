@@ -23,7 +23,7 @@
             "lodash": "4.17.23",
             "bn.js": "5.2.3",
             "serialize-javascript": "7.0.3",
-            "axios": "!1.14.1 !0.30.4"
+            "axios": "1.14.0"
         }
     }
 }
