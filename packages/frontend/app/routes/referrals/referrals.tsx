@@ -118,6 +118,10 @@ export default function Referrals() {
     }, [userDataStore.userAddress]);
 
     useEffect(() => {
+        referralStore.fetchRewardHistory(userDataStore.userAddress ?? '');
+    }, [userDataStore.userAddress]);
+
+    useEffect(() => {
         const options = {
             method: 'GET',
             headers: {
@@ -243,6 +247,7 @@ export default function Referrals() {
                 <ReferralsTabs
                     payoutMovements={payoutMovements}
                     payoutsByReferrer={payoutsByReferrer}
+                    rewardHistory={referralStore.rewardHistory}
                 />
                 <ReferralsExtra />
             </section>

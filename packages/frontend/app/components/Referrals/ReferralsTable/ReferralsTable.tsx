@@ -5,6 +5,7 @@ import ReferralsTableRow from './ReferralsTableRow';
 import { useReferralsTable } from './useReferralsTable';
 import { referralData } from './data';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import type {
     PayoutByReferrerT,
     PayoutMovementIF,
@@ -13,10 +14,18 @@ import type {
 interface PropsIF {
     payoutMovements: PayoutMovementIF[];
     payoutsByReferrer: PayoutByReferrerT[];
+    rewardHistory?: any[] | null;
+    mode?: 'referrals' | 'rewardHistory';
 }
 
 function ReferralsTable(props: PropsIF) {
-    const { payoutMovements, payoutsByReferrer } = props;
+    const {
+        payoutMovements,
+        payoutsByReferrer,
+        rewardHistory,
+        mode = 'referrals',
+    } = props;
+    const { currency } = useNumFormatter();
 
     console.log(payoutMovements);
 
@@ -39,6 +48,78 @@ function ReferralsTable(props: PropsIF) {
 
     const isPrevButtonDisabled = currentPage === 1;
     const isNextButtonDisabled = currentPage === totalPages;
+
+    if (mode === 'rewardHistory') {
+        const history = rewardHistory || [];
+
+        return (
+            <div className={styles.tableWrapper}>
+                <div className={styles.headerContainer}>
+                    <div className={`${styles.cell} ${styles.headerCell}`}>
+                        Date
+                    </div>
+                    <div className={`${styles.cell} ${styles.headerCell}`}>
+                        Currency
+                    </div>
+                    <div className={`${styles.cell} ${styles.headerCell}`}>
+                        Amount
+                    </div>
+                    <div className={`${styles.cell} ${styles.headerCell}`}>
+                        Claim By
+                    </div>
+                    <div className={`${styles.cell} ${styles.headerCell}`}>
+                        Status
+                    </div>
+                </div>
+                <div className={styles.tableBody}>
+                    {history.map((item: any, index) => (
+                        <div
+                            key={`reward-${index}`}
+                            className={styles.rowContainer}
+                        >
+                            <div className={styles.cell}>
+                                {new Date(item.date).toLocaleDateString()}
+                            </div>
+                            <div className={styles.cell}>
+                                {item.currency_name}
+                            </div>
+                            <div className={styles.cell}>
+                                {currency(parseFloat(item.amount) * 0.000001)}
+                            </div>
+                            <div className={styles.cell}>
+                                {new Date(
+                                    item.deadline * 1000,
+                                ).toLocaleDateString('en-GB', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric',
+                                })}
+                            </div>
+                            <div className={styles.cell}>
+                                <span
+                                    className={
+                                        item.status === 'claimed'
+                                            ? styles.claimedBadge
+                                            : styles.unclaimedBadge
+                                    }
+                                >
+                                    {item.status === 'claimed'
+                                        ? 'Claimed'
+                                        : 'Unclaimed'}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+
+                    {history.length === 0 && (
+                        <div className={styles.emptyState}>
+                            No reward history to display
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.tableWrapper}>

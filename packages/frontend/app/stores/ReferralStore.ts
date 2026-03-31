@@ -52,12 +52,14 @@ export interface ReferralStoreIF {
     totVolume: number | undefined;
     convertedWallets: string[];
     claims: ClaimCheckIF[] | null;
+    rewardHistory: any[] | null;
     fetchUserReferrer: (address: string) => Promise<UserReferrerResponse[]>;
     getRefCodeByPubKey: (
         userIdentifier: string,
     ) => Promise<AffiliateCodeResponse | null>;
     checkForConversion: (address: string) => Promise<boolean>;
     fetchClaims: (address: string) => Promise<void>;
+    fetchRewardHistory: (address: string) => Promise<void>;
     cache(refCode: string, isApproved?: boolean): void;
     markCodeApproved(refCode: string): void;
     setTotVolume(volume: number | undefined): void;
@@ -89,6 +91,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
             convertedWallets: [],
             totVolume: undefined,
             claims: null,
+            rewardHistory: null,
             cache(refCode: string, isApproved: boolean = false): void {
                 const current = get().cached;
                 // Don't overwrite if current code is approved and new code is unapproved
@@ -180,6 +183,55 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 } catch (err) {
                     console.error('❌ [ReferralStore] fetchClaims error:', err);
                     set({ claims: [] });
+                }
+            },
+            async fetchRewardHistory(address: string): Promise<void> {
+                set({ rewardHistory: null });
+
+                if (!address) {
+                    return;
+                }
+
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        accept: 'application/json',
+                        authorization:
+                            'Bearer 459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661',
+                    },
+                };
+
+                try {
+                    console.log(
+                        '🔍 [ReferralStore] fetchRewardHistory calling API for address:',
+                        address,
+                    );
+                    const res = await fetch(
+                        `https://api.fuul.xyz/api/v1/claim-checks/rewards-payouts?user_identifier=${address}&user_identifier_type=solana_address`,
+                        options,
+                    );
+                    console.log(
+                        '🔍 [ReferralStore] fetchRewardHistory response status:',
+                        res.status,
+                    );
+                    const data = await res.json();
+                    console.log(
+                        '🔍 [ReferralStore] fetchRewardHistory result:',
+                        data,
+                    );
+
+                    // Store claimchecks directly (API already filters by user)
+                    console.log(
+                        '🔍 [ReferralStore] fetchRewardHistory claimchecks:',
+                        data.claimchecks,
+                    );
+                    set({ rewardHistory: data.claimchecks });
+                } catch (err) {
+                    console.error(
+                        '❌ [ReferralStore] fetchRewardHistory error:',
+                        err,
+                    );
+                    set({ rewardHistory: [] });
                 }
             },
             async fetchUserReferrer(

@@ -1,11 +1,17 @@
 .rowContainer {
     width: 100%;
-    height: 15px;
+    height: var(--table-row-height);
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     align-items: center;
+}
+
+.rowContainer:hover {
+    background: var(--bg-dark3);
+    cursor: pointer;
+    border-radius: var(--radius-xs);
 }
 
 .headerContainer {
@@ -38,6 +44,7 @@
     height: 255px;
     overflow-y: auto;
     flex: 0 1 auto;
+    padding-bottom: var(--padding-m);
 }
 
 .emptyState {
@@ -51,6 +58,28 @@
 
     letter-spacing: 0.01em;
     opacity: 0.7;
+}
+
+.claimedBadge {
+    background: var(--green, #22d3ee);
+    color: var(--bg-dark1, #1e1e24);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.unclaimedBadge {
+    background: var(--orange, #f97316);
+    color: var(--bg-dark1, #1e1e24);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .cell {

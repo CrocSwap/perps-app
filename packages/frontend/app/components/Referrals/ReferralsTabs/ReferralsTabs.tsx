@@ -14,6 +14,7 @@ interface PropsIF {
     initialTab?: string;
     payoutMovements: PayoutMovementIF[];
     payoutsByReferrer: PayoutByReferrerT[];
+    rewardHistory?: any[] | null;
 }
 
 const availableTabs = ['referrals.title', 'referrals.rewardHistory'];
@@ -23,6 +24,7 @@ export default function ReferralsTabs(props: PropsIF) {
         initialTab = 'referrals.title',
         payoutMovements,
         payoutsByReferrer,
+        rewardHistory,
     } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
     const hasData =
@@ -45,10 +47,12 @@ export default function ReferralsTabs(props: PropsIF) {
                 );
             case 'referrals.rewardHistory':
                 return (
-                    <div className={styles.emptyState}>
-                        A record of claimed and unclaimed rewards for will be
-                        shown here once generated.
-                    </div>
+                    <ReferralsTable
+                        payoutMovements={payoutMovements}
+                        payoutsByReferrer={payoutsByReferrer}
+                        rewardHistory={rewardHistory}
+                        mode='rewardHistory'
+                    />
                 );
             default:
                 return (
