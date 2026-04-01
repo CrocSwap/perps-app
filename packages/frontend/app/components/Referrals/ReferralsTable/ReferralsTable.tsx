@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState, useCallback } from 'react';
 import styles from './ReferralsTable.module.css';
 import ReferralsTableHeader from './ReferralsTableHeader';
 import ReferralsTableRow from './ReferralsTableRow';
@@ -6,7 +6,9 @@ import { useReferralsTable } from './useReferralsTable';
 import { referralData } from './data';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useRewardHistoryPagination } from './useRewardHistoryPagination';
+import { useReferralStore } from '~/stores/ReferralStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
+import { FUUL_KEYS } from '~/components/Referrals/referralKeys';
 import type {
     PayoutByReferrerT,
     PayoutMovementIF,
@@ -51,17 +53,59 @@ function ReferralsTable(props: PropsIF) {
     const isNextButtonDisabled = currentPage === totalPages;
 
     if (mode === 'rewardHistory') {
+        const userAddress = useUserDataStore((state) => state.userAddress);
         const {
-            currentItems,
-            currentPage,
-            totalPages,
-            totalItems,
-            startIndex,
-            endIndex,
-            goToNextPage,
-            goToPreviousPage,
-            isLoading,
-        } = useRewardHistoryPagination();
+            rewardHistory,
+            rewardHistoryPage,
+            rewardHistoryTotalCount,
+            rewardHistoryPageSize,
+            rewardHistoryTotalPages,
+            fetchRewardHistory,
+        } = useReferralStore();
+
+        const [isLoading, setIsLoading] = useState(false);
+
+        // Pagination actions
+        const goToNextPage = useCallback(async () => {
+            if (rewardHistoryPage < rewardHistoryTotalPages) {
+                setIsLoading(true);
+                await fetchRewardHistory(
+                    userAddress ?? '',
+                    FUUL_KEYS.NON_PERMISSIONED.READ_ONLY,
+                    rewardHistoryPage + 1,
+                );
+                setIsLoading(false);
+            }
+        }, [
+            rewardHistoryPage,
+            rewardHistoryTotalPages,
+            fetchRewardHistory,
+            userAddress,
+        ]);
+
+        const goToPreviousPage = useCallback(async () => {
+            if (rewardHistoryPage > 1) {
+                setIsLoading(true);
+                await fetchRewardHistory(
+                    userAddress ?? '',
+                    FUUL_KEYS.NON_PERMISSIONED.READ_ONLY,
+                    rewardHistoryPage - 1,
+                );
+                setIsLoading(false);
+            }
+        }, [rewardHistoryPage, fetchRewardHistory, userAddress]);
+
+        // Calculate indices
+        const startIndex = (rewardHistoryPage - 1) * rewardHistoryPageSize;
+        const endIndex = Math.min(
+            startIndex + rewardHistoryPageSize - 1,
+            rewardHistoryTotalCount - 1,
+        );
+
+        const currentItems = rewardHistory || [];
+        const currentPage = rewardHistoryPage;
+        const totalPages = rewardHistoryTotalPages;
+        const totalItems = rewardHistoryTotalCount;
 
         const isPrevButtonDisabled = currentPage === 1;
         const isNextButtonDisabled =
