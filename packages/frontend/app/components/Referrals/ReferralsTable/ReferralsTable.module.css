@@ -60,8 +60,16 @@
     opacity: 0.7;
 }
 
+.cell {
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1, #f0f0f8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .claimedBadge {
-    background: var(--green, #22d3ee);
+    background: var(--green);
     color: var(--bg-dark1, #1e1e24);
     padding: 2px 8px;
     border-radius: 12px;
@@ -72,7 +80,7 @@
 }
 
 .unclaimedBadge {
-    background: var(--orange, #f97316);
+    background: var(--red);
     color: var(--bg-dark1, #1e1e24);
     padding: 2px 8px;
     border-radius: 12px;
@@ -80,14 +88,6 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-}
-
-.cell {
-    font-size: var(--font-size-s, 12px);
-    color: var(--text1, #f0f0f8);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .headerCell {
