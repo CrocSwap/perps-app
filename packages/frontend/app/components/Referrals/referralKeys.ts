@@ -14,7 +14,7 @@ export interface FUUL_API_KEY_SET {
     REFERRAL_CODES_READ: string;
 }
 
-export const NON_PERMISSIONED: FUUL_API_KEY_SET = {
+const NON_PERMISSIONED: FUUL_API_KEY_SET = {
     READ_ONLY:
         '459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661',
     SEND_TRACKING_EVENT: '',
@@ -23,9 +23,9 @@ export const NON_PERMISSIONED: FUUL_API_KEY_SET = {
     SERVICE_ROLE: '',
     REFERRAL_CODES_READ:
         '5208e0f9fd95f4dd7897fc383186cd2870cb45446f4c5d7fc75f670df02132fa',
-};
+} as const;
 
-export const PERMISSIONED: FUUL_API_KEY_SET = {
+const PERMISSIONED: FUUL_API_KEY_SET = {
     READ_ONLY:
         'fa6829880bf45b720329c5ab1b6beafad705b6cc3967981120e31d398568f4e0',
     SEND_TRACKING_EVENT: '',
@@ -34,6 +34,11 @@ export const PERMISSIONED: FUUL_API_KEY_SET = {
     SERVICE_ROLE: '',
     REFERRAL_CODES_READ:
         'f0273090097e61ce706cc8c6423b7da119bc5e13896ac30c7187cdbb339abf0a',
+} as const;
+
+export const FUUL_KEYS = {
+    NON_PERMISSIONED,
+    PERMISSIONED,
 };
 
 export type READ_ONLY_KEY = (
