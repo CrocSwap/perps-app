@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { Fuul, UserIdentifierType } from '@fuul/sdk';
 
 export interface CachedRefCodeIF {
     // ref code created for referral use
@@ -63,7 +62,11 @@ export interface ReferralStoreIF {
     ) => Promise<AffiliateCodeResponse | null>;
     checkForConversion: (address: string) => Promise<boolean>;
     fetchClaims: (address: string) => Promise<void>;
-    fetchRewardHistory: (address: string, page?: number) => Promise<void>;
+    fetchRewardHistory: (
+        address: string,
+        programKey: string,
+        page?: number,
+    ) => Promise<void>;
     cache(refCode: string, isApproved?: boolean): void;
     markCodeApproved(refCode: string): void;
     setTotVolume(volume: number | undefined): void;
@@ -195,6 +198,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
             },
             async fetchRewardHistory(
                 address: string,
+                programKey: string,
                 page: number = 1,
             ): Promise<void> {
                 set({ rewardHistory: null });
@@ -207,8 +211,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     method: 'GET',
                     headers: {
                         accept: 'application/json',
-                        authorization:
-                            'Bearer 459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661',
+                        authorization: `Bearer ${programKey}`,
                     },
                 };
 
@@ -246,10 +249,6 @@ export const useReferralStore = create<ReferralStoreIF>()(
                         rewardHistoryTotalPages: totalPages,
                     });
                 } catch (err) {
-                    console.error(
-                        '❌ [ReferralStore] fetchRewardHistory error:',
-                        err,
-                    );
                     set({
                         rewardHistory: [],
                         rewardHistoryPage: 1,
@@ -261,10 +260,6 @@ export const useReferralStore = create<ReferralStoreIF>()(
             async fetchUserReferrer(
                 address: string,
             ): Promise<UserReferrerResponse[]> {
-                console.log(
-                    '🚀 [ReferralStore] fetchUserReferrer called with address:',
-                    address,
-                );
                 // API keys for the two programs (program-specific keys route requests)
                 const REFERRALS_API_KEY =
                     '459f44f19dd5e3d7a8e2953fb0742ed98736abc42873b6c35c4847585c781661';

@@ -12,6 +12,7 @@ import ReferralsExtra from '~/components/Referrals/ReferralsExtra/ReferralsExtra
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { useReferralStore } from '~/stores/ReferralStore';
+import { FUUL_KEYS } from '~/components/Referrals/referralKeys';
 
 export function meta() {
     return [
@@ -118,7 +119,10 @@ export default function Referrals() {
     }, [userDataStore.userAddress]);
 
     useEffect(() => {
-        referralStore.fetchRewardHistory(userDataStore.userAddress ?? '');
+        referralStore.fetchRewardHistory(
+            userDataStore.userAddress ?? '',
+            FUUL_KEYS.NON_PERMISSIONED.READ_ONLY,
+        );
     }, [userDataStore.userAddress]);
 
     useEffect(() => {
