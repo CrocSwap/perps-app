@@ -160,6 +160,16 @@ export default function Referrals() {
             .then((res) => res.json())
             .then((res) => {
                 console.log('payouts: ', res);
+                if (!Array.isArray(res)) {
+                    console.error(
+                        'payouts/by-referrer returned non-array:',
+                        res,
+                    );
+                    setPayoutsByReferrer([]);
+                    setInviteeCount('0');
+                    setRewardsEarned('$0.00');
+                    return;
+                }
                 console.log('calculating payouts...');
                 setPayoutsByReferrer(res);
                 setInviteeCount(res.length.toString());
