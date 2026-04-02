@@ -899,6 +899,11 @@ export default function CodeTabs(props: PropsIF) {
         console.log('🎁 [Claim] Claims data:', claimsData);
         console.log('🎁 [Claim] Claimable amount:', claimableAmount);
 
+        if (!referrerAddress) {
+            console.warn('🎁 [Claim] No wallet address available');
+            return;
+        }
+
         if (!claimsData || claimsData.length === 0) {
             console.warn('🎁 [Claim] No claims data available');
             return;
