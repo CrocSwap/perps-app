@@ -90,6 +90,11 @@ export default function Referrals() {
         [],
     );
     useEffect(() => {
+        if (!userDataStore.userAddress) {
+            setPayoutMovements([]);
+            return;
+        }
+
         const OPTIONS = {
             method: 'GET',
             headers: {
@@ -105,10 +110,10 @@ export default function Referrals() {
             .then((res) => res.json())
             .then((res: PayoutMovementsResponseIF) => {
                 console.log(res);
-                setPayoutMovements(res.results);
+                setPayoutMovements(res.results ?? []);
             })
             .catch((err) => console.error(err));
-    }, []);
+    }, [userDataStore.userAddress]);
 
     const [payoutsByReferrer, setPayoutsByReferrer] = useState<
         PayoutByReferrerT[]
@@ -251,7 +256,6 @@ export default function Referrals() {
                 <ReferralsTabs
                     payoutMovements={payoutMovements}
                     payoutsByReferrer={payoutsByReferrer}
-                    rewardHistory={referralStore.rewardHistory}
                 />
                 <ReferralsExtra />
             </section>

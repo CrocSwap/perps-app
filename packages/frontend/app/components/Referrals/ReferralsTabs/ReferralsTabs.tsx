@@ -5,6 +5,7 @@ import styles from './ReferralsTabs.module.css';
 import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import ReferralsTable from '../ReferralsTable/ReferralsTable';
+import RewardHistoryTable from '../ReferralsTable/RewardHistoryTable';
 import type {
     PayoutMovementIF,
     PayoutByReferrerT,
@@ -14,7 +15,6 @@ interface PropsIF {
     initialTab?: string;
     payoutMovements: PayoutMovementIF[];
     payoutsByReferrer: PayoutByReferrerT[];
-    rewardHistory?: any[] | null;
 }
 
 const availableTabs = ['referrals.title', 'referrals.rewardHistory'];
@@ -24,7 +24,6 @@ export default function ReferralsTabs(props: PropsIF) {
         initialTab = 'referrals.title',
         payoutMovements,
         payoutsByReferrer,
-        rewardHistory,
     } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
     const hasData =
@@ -46,14 +45,7 @@ export default function ReferralsTabs(props: PropsIF) {
                     />
                 );
             case 'referrals.rewardHistory':
-                return (
-                    <ReferralsTable
-                        payoutMovements={payoutMovements}
-                        payoutsByReferrer={payoutsByReferrer}
-                        rewardHistory={rewardHistory}
-                        mode='rewardHistory'
-                    />
-                );
+                return <RewardHistoryTable />;
             default:
                 return (
                     <div className={styles.emptyState}>
