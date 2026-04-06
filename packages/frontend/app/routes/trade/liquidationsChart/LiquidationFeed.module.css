@@ -1,0 +1,110 @@
+.feedContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.feedHeader {
+    display: flex;
+    align-items: center;
+    padding: 2px var(--padding-xs);
+    color: var(--text3);
+    font-size: var(--font-size-mini);
+    border-bottom: var(--border-width) solid var(--dark3);
+    flex-shrink: 0;
+    gap: 4px;
+}
+
+.feedHeader > span {
+    flex: 1;
+    text-align: right;
+}
+
+.feedHeader > span:first-child {
+    text-align: left;
+    flex: 0.8;
+}
+
+.feedList {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.feedRow {
+    display: flex;
+    align-items: center;
+    padding: 2px var(--padding-xs);
+    font-size: var(--font-size-mini);
+    gap: 4px;
+    transition: background-color 0.15s ease;
+}
+
+.feedRow:hover {
+    background-color: var(--dark2);
+}
+
+.feedRow > span {
+    flex: 1;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.feedRow > span:first-child {
+    text-align: left;
+    flex: 0.8;
+}
+
+.long {
+    color: var(--positive);
+}
+
+.short {
+    color: var(--negative);
+}
+
+.time {
+    color: var(--text3);
+}
+
+.price {
+    color: var(--text1);
+}
+
+.size {
+    color: var(--text2);
+}
+
+.user {
+    color: var(--text3);
+    font-family: var(--font-mono, monospace);
+    font-size: 0.7rem;
+}
+
+.emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text3);
+    font-size: var(--font-size-body);
+}
+
+.newRow {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        background-color: var(--dark3);
+    }
+    to {
+        opacity: 1;
+        background-color: transparent;
+    }
+}

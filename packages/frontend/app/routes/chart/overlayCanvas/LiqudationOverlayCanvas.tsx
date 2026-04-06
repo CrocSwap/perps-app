@@ -1,23 +1,21 @@
-import OrderLines from '../orders/OrderLines';
+import LiqComponent from '../liqudation/LiqComponent';
 import OverlayCanvasLayer from './overlayCanvasLayer';
 
-const OrderLinesOverlayCanvas: React.FC = () => {
+const LiquidationOverlayCanvas: React.FC = () => {
     return (
-        <OverlayCanvasLayer id='order-overlay' zIndex={5}>
+        <OverlayCanvasLayer id='liquidation-overlay' zIndex={5}>
             {({
                 canvasRef,
+                canvasWrapperRef,
                 canvasSize,
                 scaleData,
-                mousePositionRef,
                 zoomChanged,
-                canvasWrapperRef,
             }) => (
-                <OrderLines
+                <LiqComponent
                     overlayCanvasRef={canvasRef}
                     canvasWrapperRef={canvasWrapperRef}
                     canvasSize={canvasSize}
                     scaleData={scaleData}
-                    overlayCanvasMousePositionRef={mousePositionRef}
                     zoomChanged={zoomChanged}
                 />
             )}
@@ -25,4 +23,4 @@ const OrderLinesOverlayCanvas: React.FC = () => {
     );
 };
 
-export default OrderLinesOverlayCanvas;
+export default LiquidationOverlayCanvas;
