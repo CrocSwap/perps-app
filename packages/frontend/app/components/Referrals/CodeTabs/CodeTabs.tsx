@@ -624,8 +624,9 @@ export default function CodeTabs(props: PropsIF) {
                     setReferrerCode(referrerData.code);
                 }
 
-                // Only fetch and apply on-chain referrer if no URL parameter is present
-                // URL parameter always takes precedence
+                // Fetch on-chain referrer to sync localStorage.
+                // If the API says the user is already attributed, silently
+                // persist the code as approved — never re-prompt with a modal.
                 if (!handleReferralURLParam.value) {
                     const referrer = await getReferrerAsync(
                         userWalletKey.toString(),
@@ -636,7 +637,12 @@ export default function CodeTabs(props: PropsIF) {
                             UserIdentifierType.SolanaAddress,
                         );
                         if (referrerData?.code) {
-                            handleUpdateReferralCode(referrerData.code);
+                            // Silently update localStorage so the referrals
+                            // page shows the attribution, but do NOT set the
+                            // URL param or open the confirmation modal.
+                            referralStore.cache(referrerData.code, true);
+                            setIsCachedValueValid(true);
+                            setLastValidatedCode(referrerData.code);
                         }
                     }
                 }
