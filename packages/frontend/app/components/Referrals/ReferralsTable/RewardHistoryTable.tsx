@@ -71,16 +71,22 @@ function RewardHistoryTable() {
                 <div className={`${styles.cell} ${styles.headerCell}`}>
                     Date
                 </div>
-                <div className={`${styles.cell} ${styles.headerCell}`}>
+                <div
+                    className={`${styles.cell} ${styles.headerCell} ${styles.currencyCell}`}
+                >
                     Currency
                 </div>
                 <div className={`${styles.cell} ${styles.headerCell}`}>
                     Amount
                 </div>
-                <div className={`${styles.cell} ${styles.headerCell}`}>
+                <div
+                    className={`${styles.cell} ${styles.headerCell} ${styles.claimByCell}`}
+                >
                     Claim By
                 </div>
-                <div className={`${styles.cell} ${styles.headerCell}`}>
+                <div
+                    className={`${styles.cell} ${styles.headerCell} ${styles.statusCell}`}
+                >
                     Status
                 </div>
             </div>
@@ -97,7 +103,9 @@ function RewardHistoryTable() {
                                 <div className={styles.cell}>
                                     {new Date(item.date).toLocaleDateString()}
                                 </div>
-                                <div className={styles.cell}>
+                                <div
+                                    className={`${styles.cell} ${styles.currencyCell}`}
+                                >
                                     {item.currency_name}
                                 </div>
                                 <div className={styles.cell}>
@@ -105,7 +113,9 @@ function RewardHistoryTable() {
                                         parseFloat(item.amount) * 0.000001,
                                     )}
                                 </div>
-                                <div className={styles.cell}>
+                                <div
+                                    className={`${styles.cell} ${styles.claimByCell}`}
+                                >
                                     {new Date(
                                         item.deadline * 1000,
                                     ).toLocaleDateString('en-GB', {
@@ -114,7 +124,9 @@ function RewardHistoryTable() {
                                         year: 'numeric',
                                     })}
                                 </div>
-                                <div className={styles.cell}>
+                                <div
+                                    className={`${styles.cell} ${styles.statusCell}`}
+                                >
                                     <span
                                         className={
                                             item.status === 'claimed'

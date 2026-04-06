@@ -175,7 +175,8 @@
         grid-template-columns: 1.5fr 1fr 1fr 1fr;
     }
 
-    .rewardsCell {
+    .rewardsCell,
+    .claimByCell {
         display: none;
     }
 }
@@ -186,7 +187,8 @@
         grid-template-columns: 1.5fr 1fr 1fr;
     }
 
-    .feesCell {
+    .feesCell,
+    .currencyCell {
         display: none;
     }
 
@@ -201,7 +203,8 @@
         grid-template-columns: 1.5fr 1fr;
     }
 
-    .volumeCell {
+    .volumeCell,
+    .statusCell {
         display: none;
     }
 }

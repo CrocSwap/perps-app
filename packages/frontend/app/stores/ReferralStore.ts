@@ -101,7 +101,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
             rewardHistory: null,
             rewardHistoryPage: 1,
             rewardHistoryTotalCount: 0,
-            rewardHistoryPageSize: 25,
+            rewardHistoryPageSize: 14,
             rewardHistoryTotalPages: 0,
             cache(refCode: string, isApproved: boolean = false): void {
                 const current = get().cached;
@@ -222,8 +222,9 @@ export const useReferralStore = create<ReferralStoreIF>()(
                         'page:',
                         page,
                     );
+                    const apiPageSize = get().rewardHistoryPageSize;
                     const res = await fetch(
-                        `https://api.fuul.xyz/api/v1/claim-checks/rewards-payouts?user_identifier=${address}&user_identifier_type=solana_address&page=${page}&page_size=25`,
+                        `https://api.fuul.xyz/api/v1/claim-checks/rewards-payouts?user_identifier=${address}&user_identifier_type=solana_address&page=${page}&page_size=${apiPageSize}`,
                         options,
                     );
                     console.log(
@@ -241,7 +242,10 @@ export const useReferralStore = create<ReferralStoreIF>()(
                         '🔍 [ReferralStore] fetchRewardHistory claimchecks:',
                         data.claimchecks,
                     );
-                    const totalPages = Math.ceil(data.total_count / 25);
+                    const paginationPageSize = get().rewardHistoryPageSize;
+                    const totalPages = Math.ceil(
+                        data.total_count / paginationPageSize,
+                    );
                     set({
                         rewardHistory: data.claimchecks,
                         rewardHistoryPage: page,
