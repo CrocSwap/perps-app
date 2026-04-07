@@ -12,7 +12,6 @@
 
 .rowContainer:hover {
     background: var(--bg-dark3);
-    cursor: pointer;
     border-radius: var(--radius-xs);
 }
 
