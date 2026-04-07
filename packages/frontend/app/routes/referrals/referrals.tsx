@@ -90,7 +90,15 @@ export default function Referrals() {
         [],
     );
     useEffect(() => {
+        console.log(
+            '🔍 [Referrals] Starting payout movements query for address:',
+            userDataStore.userAddress,
+        );
+
         if (!userDataStore.userAddress) {
+            console.log(
+                '🔍 [Referrals] No user address, clearing payout movements',
+            );
             setPayoutMovements([]);
             return;
         }
@@ -103,16 +111,34 @@ export default function Referrals() {
             },
         };
 
-        fetch(
-            `https://api.fuul.xyz/api/v1/payouts/movements?user_identifier=${userDataStore.userAddress}&identifier_type=solana_address&type=point`,
-            OPTIONS,
-        )
-            .then((res) => res.json())
+        const queryUrl = `https://api.fuul.xyz/api/v1/payouts/movements?user_identifier=${userDataStore.userAddress}&identifier_type=solana_address&type=point`;
+        console.log(
+            '🔍 [Referrals] Executing payout movements query:',
+            queryUrl,
+        );
+
+        fetch(queryUrl, OPTIONS)
+            .then((res) => {
+                console.log(
+                    '🔍 [Referrals] Payout movements query response status:',
+                    res.status,
+                );
+                return res.json();
+            })
             .then((res: PayoutMovementsResponseIF) => {
-                console.log(res);
+                console.log(
+                    '🔍 [Referrals] Payout movements query results count:',
+                    res.results?.length ?? 0,
+                );
                 setPayoutMovements(res.results ?? []);
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                console.error(
+                    '❌ [Referrals] Payout movements query error:',
+                    err,
+                );
+                setPayoutMovements([]);
+            });
     }, [userDataStore.userAddress]);
 
     const [payoutsByReferrer, setPayoutsByReferrer] = useState<
@@ -131,15 +157,24 @@ export default function Referrals() {
     }, [userDataStore.userAddress]);
 
     useEffect(() => {
+        console.log(
+            '🔍 [Referrals] Starting payouts by referrer query for address:',
+            userDataStore.userAddress,
+        );
+
         const options = {
             method: 'GET',
             headers: {
                 accept: 'application/json',
-                authorization: `Bearer ${FUUL_API_KEY}`,
+                authorization:
+                    'Bearer 7010050cc4b7274037a80fd9119bce3567ce7443d163c097c787a39dac341870',
             },
         };
 
         if (!userDataStore.userAddress) {
+            console.log(
+                '🔍 [Referrals] No user address, clearing payouts data',
+            );
             setReferralData(null);
             return;
         }
@@ -153,46 +188,69 @@ export default function Referrals() {
             },
         };
 
-        fetch(
-            `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`,
-            optionsPayouts,
-        )
-            .then((res) => res.json())
+        const queryUrl = `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`;
+        console.log(
+            '🔍 [Referrals] Executing payouts by referrer query:',
+            queryUrl,
+        );
+
+        fetch(queryUrl, optionsPayouts)
             .then((res) => {
-                console.log('payouts: ', res);
+                console.log(
+                    '🔍 [Referrals] Payouts by referrer query response status:',
+                    res.status,
+                );
+                return res.json();
+            })
+            .then((res) => {
                 if (!Array.isArray(res)) {
                     console.error(
-                        'payouts/by-referrer returned non-array:',
-                        res,
+                        '❌ [Referrals] payouts/by-referrer query returned non-array:',
+                        typeof res,
                     );
                     setPayoutsByReferrer([]);
                     setInviteeCount('0');
                     setRewardsEarned('$0.00');
                     return;
                 }
-                console.log('calculating payouts...');
+
+                console.log(
+                    '✅ [Referrals] Payouts by referrer query results count:',
+                    res.length,
+                );
                 setPayoutsByReferrer(res);
                 setInviteeCount(res.length.toString());
+
                 const totalPayouts: number = res.reduce(
                     (acc: number, payout: any) => {
-                        // Each payout object has one unknown key with an object value containing volume
                         const payoutValue = Object.values(payout)[0] as any;
                         const volume = payoutValue?.volume || 0;
-                        console.log('volume: ', volume);
                         return acc + volume;
                     },
                     0,
                 );
+
                 const totalPayoutsFormatted = formatNum(
                     totalPayouts,
                     2,
                     true,
                     true,
                 );
-                console.log('totalPayoutsFormatted: ', totalPayoutsFormatted);
+                console.log(
+                    '✅ [Referrals] Total payouts calculated:',
+                    totalPayoutsFormatted,
+                );
                 setRewardsEarned(totalPayoutsFormatted);
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                console.error(
+                    '❌ [Referrals] Payouts by referrer query error:',
+                    err,
+                );
+                setPayoutsByReferrer([]);
+                setInviteeCount('0');
+                setRewardsEarned('$0.00');
+            });
 
         fetch(
             `https://api.fuul.xyz/api/v1/payouts/leaderboard/points?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`,

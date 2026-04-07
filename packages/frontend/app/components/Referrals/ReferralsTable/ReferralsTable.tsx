@@ -42,6 +42,11 @@ function getReferralSortValue(item: PayoutByReferrerT, key: ReferralSortKey) {
 function ReferralsTable(props: PropsIF) {
     const { payoutsByReferrer } = props;
 
+    console.log(
+        '🔍 [ReferralsTable] Component render with data length:',
+        payoutsByReferrer?.length ?? 0,
+    );
+
     const [page, setPage] = useState(0);
     const [sortConfig, setSortConfig] = useState<{
         key: ReferralSortKey;
@@ -65,15 +70,18 @@ function ReferralsTable(props: PropsIF) {
     }, []);
 
     const sortedData = useMemo(() => {
-        if (!sortConfig || !sortConfig.direction) return payoutsByReferrer;
+        if (!sortConfig || !sortConfig.direction) {
+            return payoutsByReferrer;
+        }
         const { key, direction } = sortConfig;
-        return [...payoutsByReferrer].sort((a, b) => {
+        const sorted = [...payoutsByReferrer].sort((a, b) => {
             const aVal = getReferralSortValue(a, key);
             const bVal = getReferralSortValue(b, key);
             if (aVal < bVal) return direction === 'asc' ? -1 : 1;
             if (aVal > bVal) return direction === 'asc' ? 1 : -1;
             return 0;
         });
+        return sorted;
     }, [payoutsByReferrer, sortConfig]);
 
     const totalItems = sortedData.length;
@@ -81,6 +89,10 @@ function ReferralsTable(props: PropsIF) {
     const startIndex = page * ITEMS_PER_PAGE;
     const pageData = sortedData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
     const endIndex = startIndex + pageData.length;
+
+    if (totalItems === 0) {
+        console.log('🔍 [ReferralsTable] No data to display');
+    }
 
     return (
         <div className={styles.tableWrapper}>
