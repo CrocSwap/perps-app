@@ -293,6 +293,10 @@
     font-size: var(--font-size-s, 12px);
 }
 
+.rpcButton:hover {
+    color: var(--text2) !important;
+}
+
 .networkButton {
     min-width: 120px;
     text-align: center;

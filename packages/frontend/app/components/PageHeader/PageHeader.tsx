@@ -39,6 +39,7 @@ import {
     matchesShortcutEvent,
 } from '~/utils/keyboardShortcuts';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useCircuitBreaker } from '~/hooks/useCircuitBreaker';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -114,7 +115,7 @@ export default function PageHeader() {
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
     // const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
-    const showRPCButton = false;
+    const { status: rpcStatus } = useCircuitBreaker('fuul');
     const location = useLocation();
 
     // symbol for active market
@@ -530,41 +531,38 @@ export default function PageHeader() {
                         </span>
                     )}
 
-                    {isUserConnected && showRPCButton && (
-                        <section
-                            style={{ position: 'relative' }}
-                            ref={rpcMenuRef}
+                    <section style={{ position: 'relative' }} ref={rpcMenuRef}>
+                        <button
+                            className={styles.rpcButton}
+                            onClick={() =>
+                                setIsRpcDropdownOpen(!isRpcDropdownOpen)
+                            }
                         >
-                            {isUserConnected && (
-                                <button
-                                    className={styles.rpcButton}
-                                    onClick={() =>
-                                        setIsRpcDropdownOpen(!isRpcDropdownOpen)
+                            <span>RPC</span>
+                            <svg
+                                xmlns='http://www.w3.org/2000/svg'
+                                width='10'
+                                height='10'
+                                viewBox='0 0 10 10'
+                                fill='none'
+                            >
+                                <circle
+                                    cx='5'
+                                    cy='5'
+                                    r='5'
+                                    fill={
+                                        rpcStatus === 'up'
+                                            ? 'var(--green)'
+                                            : rpcStatus === 'issues'
+                                              ? 'var(--yellow)'
+                                              : 'var(--red)'
                                     }
-                                >
-                                    <span>RPC</span>
-                                    <svg
-                                        xmlns='http://www.w3.org/2000/svg'
-                                        width='16'
-                                        height='16'
-                                        viewBox='0 0 16 16'
-                                        fill='none'
-                                    >
-                                        <circle
-                                            cx='8'
-                                            cy='8'
-                                            r='8'
-                                            fill='#26A69A'
-                                        />
-                                    </svg>
-                                </button>
-                            )}
+                                />
+                            </svg>
+                        </button>
 
-                            {isRpcDropdownOpen && isUserConnected && (
-                                <RpcDropdown />
-                            )}
-                        </section>
-                    )}
+                        {isRpcDropdownOpen && <RpcDropdown />}
+                    </section>
                     <span
                         ref={sessionButtonRef}
                         className={`${styles.sessionWrap} ${isUserConnected ? styles.activeSessionWrap : ''}`}
