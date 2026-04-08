@@ -533,7 +533,7 @@ export default function PageHeader() {
 
                     <section style={{ position: 'relative' }} ref={rpcMenuRef}>
                         <button
-                            className={styles.rpcButton}
+                            className={`${styles.rpcButton} ${styles.headerIconButton}`}
                             onClick={() =>
                                 setIsRpcDropdownOpen(!isRpcDropdownOpen)
                             }
@@ -628,7 +628,7 @@ export default function PageHeader() {
                     </section> */}
 
                     <button
-                        className={styles.internationalButton}
+                        className={`${styles.internationalButton} ${styles.headerIconButton}`}
                         onClick={() => appSettingsModal.open()}
                         aria-label={t('aria.openSettings')}
                     >
@@ -640,7 +640,7 @@ export default function PageHeader() {
                         className={styles.menuButtonContainer}
                     >
                         <button
-                            className={styles.menuButton}
+                            className={`${styles.menuButton} ${styles.headerIconButton}`}
                             onClick={() =>
                                 setIsDropdownMenuOpen(!isDropdownMenuOpen)
                             }
