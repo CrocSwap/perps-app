@@ -1,3 +1,5 @@
+import { fuulFetch } from '~/utils/circuitBreaker/fuulFetch';
+
 export default async function getReferrerAsync(userAddress: string) {
     const OPTIONS = {
         method: 'GET',
@@ -10,7 +12,7 @@ export default async function getReferrerAsync(userAddress: string) {
 
     const FUUL_ENDPOINT = `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${userAddress}&user_identifier_type=solana_address`;
 
-    const response = fetch(FUUL_ENDPOINT, OPTIONS)
+    const response = fuulFetch(FUUL_ENDPOINT, OPTIONS)
         .then((res) => res.json())
         .then((res) => {
             console.log(res);

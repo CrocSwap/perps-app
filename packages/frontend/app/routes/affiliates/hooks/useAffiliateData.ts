@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReferrerPayoutData } from '@fuul/sdk';
 import { fetchAttributedReferralCount } from '../../../utils/refreg';
+import { fuulFetch } from '~/utils/circuitBreaker/fuulFetch';
 
 interface UserReferralCode {
     code?: string | null;
@@ -16,7 +17,7 @@ const FUUL_LEGACY_REFERRAL_CODES_API_KEY =
 const FUUL_REFERRAL_CODES_PAGE_SIZE = 100;
 
 async function fetchReferralCodesPage(url: string): Promise<Response> {
-    const response = await fetch(url, {
+    const response = await fuulFetch(url, {
         method: 'GET',
         headers: {
             accept: 'application/json',
@@ -177,7 +178,7 @@ export function useAffiliateAudience(userIdentifier: string, enabled = true) {
 
             console.log('FUUL getUserAudiences request:', { url, headers });
 
-            const response = await fetch(url, { method: 'GET', headers });
+            const response = await fuulFetch(url, { method: 'GET', headers });
             console.log(
                 'FUUL getUserAudiences response status:',
                 response.status,
@@ -323,7 +324,10 @@ export function useAffiliateStats(userIdentifier: string, enabled = true) {
             // Fetch affiliate stats
             const statsUrl = `https://api.fuul.xyz/api/v1/affiliate-portal/stats?user_identifier=${userIdentifier}&user_identifier_type=solana_address`;
             console.log('FUUL getAffiliateStats request:', { url: statsUrl });
-            const statsRes = await fetch(statsUrl, { method: 'GET', headers });
+            const statsRes = await fuulFetch(statsUrl, {
+                method: 'GET',
+                headers,
+            });
             console.log(
                 'FUUL getAffiliateStats response status:',
                 statsRes.status,
@@ -341,7 +345,7 @@ export function useAffiliateStats(userIdentifier: string, enabled = true) {
             console.log('FUUL getAffiliateNewTraders request:', {
                 url: newTradersUrl,
             });
-            const newTradersRes = await fetch(newTradersUrl, {
+            const newTradersRes = await fuulFetch(newTradersUrl, {
                 method: 'GET',
                 headers,
             });
@@ -363,7 +367,7 @@ export function useAffiliateStats(userIdentifier: string, enabled = true) {
             console.log('FUUL getAffiliateNewTraders (30d) request:', {
                 url: activeTradersUrl,
             });
-            const activeTradersRes = await fetch(activeTradersUrl, {
+            const activeTradersRes = await fuulFetch(activeTradersUrl, {
                 method: 'GET',
                 headers,
             });
@@ -462,7 +466,7 @@ export function usePayoutsByReferrer(userIdentifier: string, enabled = true) {
 
             console.log('FUUL getPayoutsByReferrer request:', { url, headers });
 
-            const res = await fetch(url, { method: 'GET', headers });
+            const res = await fuulFetch(url, { method: 'GET', headers });
             console.log(
                 'FUUL getPayoutsByReferrer response status:',
                 res.status,
@@ -563,7 +567,7 @@ export function useUserReferrer(userIdentifier: string, enabled = true) {
 
             console.log('FUUL getUserReferrer request:', { url, headers });
 
-            const res = await fetch(url, { method: 'GET', headers });
+            const res = await fuulFetch(url, { method: 'GET', headers });
             console.log('FUUL getUserReferrer response status:', res.status);
 
             if (!res.ok) {
@@ -645,7 +649,7 @@ export function useUserPayoutMovements(userIdentifier: string, enabled = true) {
                 headers,
             });
 
-            const res = await fetch(url, { method: 'GET', headers });
+            const res = await fuulFetch(url, { method: 'GET', headers });
             console.log(
                 'FUUL getUserPayoutMovements response status:',
                 res.status,
@@ -733,7 +737,7 @@ export function useAffiliateCode(userIdentifier: string, enabled = true) {
 
             console.log('FUUL getAffiliateCode request:', { url, headers });
 
-            const res = await fetch(url, { method: 'GET', headers });
+            const res = await fuulFetch(url, { method: 'GET', headers });
             console.log('FUUL getAffiliateCode response status:', res.status);
 
             if (!res.ok) {

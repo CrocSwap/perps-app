@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { FUUL_API_KEY, FUUL_GET_API_KEY } from '~/utils/Constants';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
+import { fuulFetch } from '~/utils/circuitBreaker/fuulFetch';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import ReferralsExtra from '~/components/Referrals/ReferralsExtra/ReferralsExtra';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
@@ -142,7 +143,7 @@ export default function Referrals() {
             queryUrl,
         );
 
-        fetch(queryUrl, OPTIONS)
+        fuulFetch(queryUrl, OPTIONS)
             .then((res) => {
                 console.log(
                     '🔍 [Referrals] Payout movements query response status:',
@@ -219,7 +220,7 @@ export default function Referrals() {
             queryUrl,
         );
 
-        fetch(queryUrl, optionsPayouts)
+        fuulFetch(queryUrl, optionsPayouts)
             .then((res) => {
                 console.log(
                     '🔍 [Referrals] Payouts by referrer query response status:',
@@ -277,7 +278,7 @@ export default function Referrals() {
                 setRewardsEarned('$0.00');
             });
 
-        fetch(
+        fuulFetch(
             `https://api.fuul.xyz/api/v1/payouts/leaderboard/points?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`,
             options,
         )

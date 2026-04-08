@@ -40,6 +40,7 @@ import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { debugLog } from '~/utils/debugLog';
 import { useDebounce } from '~/hooks/useDebounce';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
+import { fuulFetch } from '~/utils/circuitBreaker/fuulFetch';
 
 // --- Fuul claim helpers ---
 // Fuul contracts are deployed on Fogo mainnet, separate from app's testnet
@@ -705,7 +706,7 @@ export default function CodeTabs(props: PropsIF) {
                     },
                 };
 
-                fetch(
+                fuulFetch(
                     'https://api.fuul.xyz/api/v1/referral_codes/' +
                         temporaryReferrerCode,
                     options,

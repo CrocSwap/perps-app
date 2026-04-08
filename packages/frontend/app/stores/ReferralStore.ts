@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { fuulFetch } from '~/utils/circuitBreaker/fuulFetch';
 
 export interface CachedRefCodeIF {
     // ref code created for referral use
@@ -172,7 +173,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                         '🔍 [ReferralStore] fetchClaims calling API for address:',
                         address,
                     );
-                    const res = await fetch(
+                    const res = await fuulFetch(
                         'https://api.fuul.xyz/api/v1/claim-checks/claim',
                         options,
                     );
@@ -223,7 +224,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                         page,
                     );
                     const apiPageSize = get().rewardHistoryPageSize;
-                    const res = await fetch(
+                    const res = await fuulFetch(
                         `https://api.fuul.xyz/api/v1/claim-checks/rewards-payouts?user_identifier=${address}&user_identifier_type=solana_address&page=${page}&page_size=${apiPageSize}`,
                         options,
                     );
@@ -281,7 +282,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                             authorization: `Bearer ${key}`,
                         },
                     };
-                    const res = await fetch(
+                    const res = await fuulFetch(
                         `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`,
                         options,
                     ).then((r) => r.json());
@@ -308,7 +309,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     userIdentifier,
                 );
                 try {
-                    const res = await fetch(
+                    const res = await fuulFetch(
                         `https://api.fuul.xyz/api/v1/affiliates/${userIdentifier}?identifier_type=solana_address`,
                         {
                             method: 'GET',
