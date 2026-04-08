@@ -215,6 +215,11 @@ export class CircuitBreaker implements CircuitBreakerIF {
         const start = Date.now();
         try {
             const res = await globalThis.fetch(url, init);
+            if (res.status >= 300 && res.status < 400) {
+                console.warn(
+                    `[CircuitBreaker:${this.label}] Unexpected redirect: HTTP ${res.status}`,
+                );
+            }
             if (res.status >= 500) {
                 this.markFailure(Date.now() - start, `HTTP ${res.status}`);
             } else {
@@ -250,6 +255,13 @@ export class CircuitBreaker implements CircuitBreakerIF {
                             this.baseRetryDelayMs * Math.pow(2, attempt);
                         await sleep(delay);
                         continue;
+                    }
+
+                    // 3xx redirect → warn but don't degrade health
+                    if (response.status >= 300 && response.status < 400) {
+                        console.warn(
+                            `[CircuitBreaker:${this.label}] Unexpected redirect: HTTP ${response.status}`,
+                        );
                     }
 
                     // 5xx after exhausting retries → mark as health failure
