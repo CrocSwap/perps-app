@@ -156,6 +156,16 @@
     border: none;
 }
 
+.headerIconButton {
+    color: var(--text1);
+    background: var(--bg-dark2, #0e0e14);
+    transition: background 0.2s ease-in-out;
+}
+
+.headerIconButton:hover {
+    background: var(--bg-dark3, #16161c);
+}
+
 .menuButton {
     display: flex;
     width: var(--menu-button-height-width);
@@ -176,7 +186,6 @@
 }
 
 .menuButtonMobile:hover > svg,
-.menuButton:hover svg,
 .walletButton:hover svg {
     color: var(--text2) !important;
 }
@@ -195,11 +204,7 @@
 }
 
 .internationalButton svg {
-    stroke: var(--text2);
-}
-
-.internationalButton:hover svg {
-    stroke: var(--text1) !important;
+    stroke: var(--text1);
 }
 
 .mobileNavCloseButton {
@@ -291,10 +296,6 @@
     background: var(--bg-dark2, #0e0e14);
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
-}
-
-.rpcButton:hover {
-    color: var(--text2) !important;
 }
 
 .networkButton {
