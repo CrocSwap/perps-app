@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
 import ReferralsTabs from '~/components/Referrals/ReferralsTabs/ReferralsTabs';
 import styles from './referrals.module.css';
@@ -13,6 +14,8 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { FUUL_KEYS } from '~/components/Referrals/referralKeys';
+import { useAffiliateStatus } from '~/hooks/useAffiliateStatus';
+import Spinner from '~/components/Spinners/Spinner';
 
 export function meta() {
     return [
@@ -64,6 +67,28 @@ export type PayoutByReferrerT = {
         earnings: PayoutByReferrerEarningsT[];
     };
 };
+
+function PartnerLink() {
+    const { isAffiliateAccepted, isLoading } = useAffiliateStatus();
+
+    if (isLoading) {
+        return null; // Hide link during loading
+    }
+
+    return (
+        <a href='/v2/affiliates' className={styles.partner_link}>
+            {isAffiliateAccepted ? 'View Dashboard' : 'Become a Partner'}
+        </a>
+    );
+}
+
+function PartnerLinkWrapper() {
+    return (
+        <Suspense fallback={null}>
+            <PartnerLink />
+        </Suspense>
+    );
+}
 
 export default function Referrals() {
     const { t } = useTranslation();
@@ -297,12 +322,7 @@ export default function Referrals() {
                                 {t('common.learnMore')}
                             </a>
                         </p>
-                        <a
-                            href='/v2/affiliates'
-                            className={styles.partner_link}
-                        >
-                            Become a Partner
-                        </a>
+                        <PartnerLinkWrapper />
                     </div>
                 </div>
                 <SimpleButton bg={'dark2'} onClick={handleOpenRefCodeModal}>
