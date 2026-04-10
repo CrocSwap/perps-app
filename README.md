@@ -38,6 +38,18 @@ pnpm dev
 pnpm dev
 ```
 
+## Lint, typecheck, and tests from the repo root
+
+After `pnpm install` at the repo root, you can run the frontend checks without `cd packages/frontend`:
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+```
+
+Use `pnpm test:ci` for a single non-watch test run (same as CI).
+
 ## Troubleshooting (if app/tv submodule directory not getting populated)
 
 ```bash
