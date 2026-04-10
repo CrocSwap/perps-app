@@ -25,7 +25,7 @@
     },
     "pnpm": {
         "overrides": {
-            "lodash": "4.17.21",
+            "lodash": "4.17.23",
             "bn.js": "5.2.3",
             "serialize-javascript": "7.0.5"
         }
