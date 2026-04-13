@@ -61,13 +61,22 @@ export function CommissionActivityView() {
 
     const getStatusBadgeClass = (status: string) => {
         switch (status.toLowerCase()) {
-            case 'completed':
-            case 'paid':
+            case 'confirmed':
                 return styles['badge-success'];
-            case 'pending':
+            case 'pending_recipient_acceptance':
+            case 'pending_approval':
+            case 'pending_transaction':
+            case 'sending_transaction':
+            case 'pending_confirmation':
+            case 'pending_process_approval':
+            case 'processing_approval':
+            case 'deferred':
                 return styles['badge-pending'];
-            default:
+            case 'failed':
+            case 'rejected':
                 return styles['badge-error'];
+            default:
+                return styles['badge-neutral'];
         }
     };
 
