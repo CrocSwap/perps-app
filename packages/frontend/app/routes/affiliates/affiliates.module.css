@@ -734,6 +734,10 @@
     color: var(--aff-negative);
 }
 
+.badge-neutral {
+    background-color: var(--bg-dark2);
+}
+
 /* Animations */
 .animate-fade-in {
     animation: fade-in 0.5s ease-out;
