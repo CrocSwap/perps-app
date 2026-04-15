@@ -50,20 +50,12 @@ function RewardHistoryTable() {
         }
     }, [rewardHistoryPage, fetchRewardHistory, userAddress]);
 
-    // Calculate indices
-    const startIndex = (rewardHistoryPage - 1) * rewardHistoryPageSize;
-    const endIndex = Math.min(
-        startIndex + rewardHistoryPageSize - 1,
-        rewardHistoryTotalCount - 1,
-    );
-
     const currentItems = rewardHistory || [];
-    const currentPage = rewardHistoryPage;
-    const totalPages = rewardHistoryTotalPages;
-    const totalItems = rewardHistoryTotalCount;
 
-    const isPrevButtonDisabled = currentPage === 1;
-    const isNextButtonDisabled = currentPage === totalPages || totalPages === 0;
+    const isPrevButtonDisabled = rewardHistoryPage === 1;
+    const isNextButtonDisabled =
+        rewardHistoryPage === rewardHistoryTotalPages ||
+        rewardHistoryTotalPages === 0;
 
     return (
         <div className={styles.tableWrapper}>
@@ -151,12 +143,10 @@ function RewardHistoryTable() {
                 )}
             </div>
 
-            {totalPages > 1 && (
+            {currentItems.length > 0 && (
                 <div className={styles.paginationContainer}>
                     <div className={styles.pageInfo}>
-                        {totalItems > 0
-                            ? `${startIndex + 1}-${Math.min(endIndex + 1, totalItems)} of ${totalItems}`
-                            : '0-0 of 0'}
+                        {`${(rewardHistoryPage - 1) * rewardHistoryPageSize + 1}-${Math.min(rewardHistoryPage * rewardHistoryPageSize, rewardHistoryTotalCount)} of ${rewardHistoryTotalCount}`}
                     </div>
 
                     <div className={styles.pageButtons}>

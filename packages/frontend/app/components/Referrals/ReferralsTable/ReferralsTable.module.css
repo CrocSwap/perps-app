@@ -36,15 +36,10 @@
     flex-direction: column;
     border-radius: var(--radius-s);
     overflow: hidden;
-    /* Set a specific height that fits your design */
-    height: 303px;
 }
 
 .tableBody {
-    /* Explicitly set height to fit only 7 rows plus a bit of buffer */
-    height: 255px;
-    overflow-y: auto;
-    flex: 0 1 auto;
+    flex: 1;
     padding-bottom: var(--padding-m);
 }
 
