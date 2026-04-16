@@ -25,6 +25,7 @@ import { CreateReferralCodeModal } from '../components/CreateReferralCode/Create
 import styles from '../affiliates.module.css';
 
 export function LinksView() {
+    console.log('running');
     const allowMultipleAffiliateCodes = false;
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
@@ -140,6 +141,7 @@ export function LinksView() {
     const canCreateCode = allowMultipleAffiliateCodes || !hasCreatedCode;
     const createCodeDisabledMessage =
         'Creating multiple referral codes is currently disabled. You can only have one code per wallet.';
+    console.log(data);
 
     return (
         <ViewLayout title='Links'>
@@ -251,7 +253,7 @@ export function LinksView() {
                                             %
                                         </td>
                                         <td className={styles['table-cell']}>
-                                            {entry.clicks.toLocaleString()}
+                                            {entry.clicks ?? '--'}
                                         </td>
                                         <td className={styles['table-cell']}>
                                             {entry.total_users.toLocaleString()}
