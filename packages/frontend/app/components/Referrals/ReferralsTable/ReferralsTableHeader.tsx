@@ -1,7 +1,12 @@
 import { memo, useMemo, useCallback } from 'react';
 import SortIcon from '~/components/SortIcon/SortIcon';
 import styles from './ReferralsTable.module.css';
-import type { ReferralData } from './data';
+
+export type ReferralSortKey =
+    | 'address'
+    | 'totalVolume'
+    | 'feesPaid'
+    | 'yourRewards';
 
 export interface HeaderCell {
     name: string;
@@ -15,7 +20,7 @@ interface ReferralsTableHeaderProps {
         key: string;
         direction: 'asc' | 'desc' | null;
     } | null;
-    onSort: (key: keyof ReferralData) => void;
+    onSort: (key: ReferralSortKey) => void;
 }
 
 function ReferralsTableHeader({
@@ -55,7 +60,7 @@ function ReferralsTableHeader({
 
     const handleHeaderClick = useCallback(
         (key: string) => {
-            return () => onSort(key as keyof ReferralData);
+            return () => onSort(key as ReferralSortKey);
         },
         [onSort],
     );

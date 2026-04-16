@@ -561,7 +561,20 @@
         "claimRewardsWithAmount": "{{amount}} 보상 청구",
         "selectATabToViewData": "데이터를 보려면 탭을 선택하세요",
         "trackingLinkExplanation": "추천된 사용자의 수수료 <0>{{referrerPercent}}</0>를 받게 되며, 해당 사용자는 <1>{{inviteePercent}}</1> 할인을 받게 됩니다.",
-        "claim": "요청하기"
+        "claim": "요청하기",
+        "payoutStatus": {
+            "pending_recipient_acceptance": "사용자 승인 필요",
+            "pending_approval": "관리자 승인 필요",
+            "pending_transaction": "트랜잭션 대기 중",
+            "sending_transaction": "트랜잭션 전송 중",
+            "pending_confirmation": "확인 대기 중",
+            "confirmed": "확인됨",
+            "failed": "실패",
+            "rejected": "거부됨",
+            "deferred": "보류됨",
+            "pending_process_approval": "프로세스 승인 대기 중",
+            "processing_approval": "승인 처리 중"
+        }
     },
     "deposit": {
         "prompt": "Fogo에서 {{token}} 입금하기",

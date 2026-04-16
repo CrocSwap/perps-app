@@ -1,15 +1,14 @@
 .tableWrapper {
     --container-height: 317px;
-
     width: 100%;
     height: 100%;
     border-radius: var(--radius-m, 16px);
     background: var(--bg-dark2, #0e0e14);
     min-height: var(--container-height);
-
     display: flex;
     flex-direction: column;
 }
+
 .tableContent {
     padding: var(--padding-s) var(--padding-s) 0px var(--padding-s);
     flex: 1;
@@ -21,13 +20,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     height: 100%;
     width: 100%;
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-m, 14px);
-
     opacity: 0.7;
 }
+
+.emptyState > span {
+    color: var(--accent2);
+}
+
 .tableControls {
     display: flex;
     align-items: center;

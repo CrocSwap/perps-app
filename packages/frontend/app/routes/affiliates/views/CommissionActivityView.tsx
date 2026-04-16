@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { IoReceipt, IoChevronBack, IoChevronForward } from 'react-icons/io5';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ConnectWalletCard } from '../components/ConnectWalletCard';
 import { TableErrorState } from '../components/TableErrorState';
 import { ViewLayout } from '../components/ViewLayout';
@@ -9,6 +10,7 @@ import { EmptyState } from '../components/EmptyState';
 import { useUserPayoutMovements } from '../hooks/useAffiliateData';
 import { formatTokenAmount } from '../utils/format-numbers';
 import { useUserDataStore } from '~/stores/UserDataStore';
+import mapPayoutStatusText from '~/utils/mapPayoutStatusText';
 import styles from '../affiliates.module.css';
 
 interface CommissionActivityEntry {
@@ -23,6 +25,7 @@ interface CommissionActivityEntry {
 }
 
 export function CommissionActivityView() {
+    const { t } = useTranslation();
     const sessionState = useSession();
     const isConnected = isEstablished(sessionState);
     const { userAddress } = useUserDataStore();
@@ -58,13 +61,22 @@ export function CommissionActivityView() {
 
     const getStatusBadgeClass = (status: string) => {
         switch (status.toLowerCase()) {
-            case 'completed':
-            case 'paid':
+            case 'confirmed':
                 return styles['badge-success'];
-            case 'pending':
+            case 'pending_recipient_acceptance':
+            case 'pending_approval':
+            case 'pending_transaction':
+            case 'sending_transaction':
+            case 'pending_confirmation':
+            case 'pending_process_approval':
+            case 'processing_approval':
+            case 'deferred':
                 return styles['badge-pending'];
-            default:
+            case 'failed':
+            case 'rejected':
                 return styles['badge-error'];
+            default:
+                return styles['badge-neutral'];
         }
     };
 
@@ -155,7 +167,10 @@ export function CommissionActivityView() {
                                             <span
                                                 className={`${styles.badge} ${getStatusBadgeClass(entry.status)}`}
                                             >
-                                                {entry.status}
+                                                {mapPayoutStatusText(
+                                                    t,
+                                                    entry.status,
+                                                )}
                                             </span>
                                         </td>
                                         <td

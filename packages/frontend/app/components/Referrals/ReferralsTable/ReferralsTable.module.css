@@ -1,11 +1,18 @@
 .rowContainer {
     width: 100%;
-    height: 15px;
+    height: var(--table-row-height);
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     align-items: center;
+    overflow: hidden; /* Prevent content from overflowing row */
+    margin-bottom: 8px; /* Add negative space between rows */
+}
+
+.rowContainer:hover {
+    background: var(--bg-dark3);
+    border-radius: var(--radius-xs);
 }
 
 .headerContainer {
@@ -29,15 +36,11 @@
     flex-direction: column;
     border-radius: var(--radius-s);
     overflow: hidden;
-    /* Set a specific height that fits your design */
-    height: 303px;
 }
 
 .tableBody {
-    /* Explicitly set height to fit only 7 rows plus a bit of buffer */
-    height: 255px;
-    overflow-y: auto;
-    flex: 0 1 auto;
+    flex: 1;
+    padding-bottom: var(--padding-m);
 }
 
 .emptyState {
@@ -48,7 +51,6 @@
     width: 100%;
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-m, 14px);
-
     letter-spacing: 0.01em;
     opacity: 0.7;
 }
@@ -59,6 +61,32 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0; /* Allow flex items to shrink */
+    display: flex;
+    align-items: center;
+}
+
+/* common styles for both badges (claimed and unclaimed) */
+.cell > .claimedBadge,
+.cell > .unclaimedBadge {
+    padding: 2px 6px;
+    border-radius: var(--radius-m);
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    flex-shrink: 0; /* Prevent badge from shrinking */
+}
+
+.claimedBadge {
+    background: var(--green);
+    color: var(--bg-dark1, #1e1e24);
+}
+
+.unclaimedBadge {
+    background: var(--red);
+    color: var(--bg-dark1, #1e1e24);
 }
 
 .headerCell {
@@ -146,7 +174,8 @@
         grid-template-columns: 1.5fr 1fr 1fr 1fr;
     }
 
-    .rewardsCell {
+    .rewardsCell,
+    .claimByCell {
         display: none;
     }
 }
@@ -157,7 +186,8 @@
         grid-template-columns: 1.5fr 1fr 1fr;
     }
 
-    .feesCell {
+    .feesCell,
+    .currencyCell {
         display: none;
     }
 
@@ -172,7 +202,8 @@
         grid-template-columns: 1.5fr 1fr;
     }
 
-    .volumeCell {
+    .volumeCell,
+    .statusCell {
         display: none;
     }
 }

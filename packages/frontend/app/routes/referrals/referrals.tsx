@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
 import ReferralsTabs from '~/components/Referrals/ReferralsTabs/ReferralsTabs';
 import styles from './referrals.module.css';
@@ -12,6 +13,9 @@ import ReferralsExtra from '~/components/Referrals/ReferralsExtra/ReferralsExtra
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { useReferralStore } from '~/stores/ReferralStore';
+import { FUUL_KEYS } from '~/components/Referrals/referralKeys';
+import { useAffiliateStatus } from '~/hooks/useAffiliateStatus';
+import Spinner from '~/components/Spinners/Spinner';
 
 export function meta() {
     return [
@@ -64,6 +68,28 @@ export type PayoutByReferrerT = {
     };
 };
 
+function PartnerLink() {
+    const { isAffiliateAccepted, isLoading } = useAffiliateStatus();
+
+    if (isLoading) {
+        return null; // Hide link during loading
+    }
+
+    return (
+        <a href='/v2/affiliates' className={styles.partner_link}>
+            {isAffiliateAccepted ? 'View Dashboard' : 'Become a Partner'}
+        </a>
+    );
+}
+
+function PartnerLinkWrapper() {
+    return (
+        <Suspense fallback={null}>
+            <PartnerLink />
+        </Suspense>
+    );
+}
+
 export default function Referrals() {
     const { t } = useTranslation();
     const userDataStore = useUserDataStore();
@@ -89,6 +115,19 @@ export default function Referrals() {
         [],
     );
     useEffect(() => {
+        console.log(
+            '🔍 [Referrals] Starting payout movements query for address:',
+            userDataStore.userAddress,
+        );
+
+        if (!userDataStore.userAddress) {
+            console.log(
+                '🔍 [Referrals] No user address, clearing payout movements',
+            );
+            setPayoutMovements([]);
+            return;
+        }
+
         const OPTIONS = {
             method: 'GET',
             headers: {
@@ -97,17 +136,35 @@ export default function Referrals() {
             },
         };
 
-        fetch(
-            `https://api.fuul.xyz/api/v1/payouts/movements?user_identifier=${userDataStore.userAddress}&identifier_type=solana_address&type=point`,
-            OPTIONS,
-        )
-            .then((res) => res.json())
-            .then((res: PayoutMovementsResponseIF) => {
-                console.log(res);
-                setPayoutMovements(res.results);
+        const queryUrl = `https://api.fuul.xyz/api/v1/payouts/movements?user_identifier=${userDataStore.userAddress}&identifier_type=solana_address&type=point`;
+        console.log(
+            '🔍 [Referrals] Executing payout movements query:',
+            queryUrl,
+        );
+
+        fetch(queryUrl, OPTIONS)
+            .then((res) => {
+                console.log(
+                    '🔍 [Referrals] Payout movements query response status:',
+                    res.status,
+                );
+                return res.json();
             })
-            .catch((err) => console.error(err));
-    }, []);
+            .then((res: PayoutMovementsResponseIF) => {
+                console.log(
+                    '🔍 [Referrals] Payout movements query results count:',
+                    res.results?.length ?? 0,
+                );
+                setPayoutMovements(res.results ?? []);
+            })
+            .catch((err) => {
+                console.error(
+                    '❌ [Referrals] Payout movements query error:',
+                    err,
+                );
+                setPayoutMovements([]);
+            });
+    }, [userDataStore.userAddress]);
 
     const [payoutsByReferrer, setPayoutsByReferrer] = useState<
         PayoutByReferrerT[]
@@ -118,15 +175,31 @@ export default function Referrals() {
     }, [userDataStore.userAddress]);
 
     useEffect(() => {
+        referralStore.fetchRewardHistory(
+            userDataStore.userAddress ?? '',
+            FUUL_KEYS.NON_PERMISSIONED.READ_ONLY,
+        );
+    }, [userDataStore.userAddress]);
+
+    useEffect(() => {
+        console.log(
+            '🔍 [Referrals] Starting payouts by referrer query for address:',
+            userDataStore.userAddress,
+        );
+
         const options = {
             method: 'GET',
             headers: {
                 accept: 'application/json',
-                authorization: `Bearer ${FUUL_API_KEY}`,
+                authorization:
+                    'Bearer 7010050cc4b7274037a80fd9119bce3567ce7443d163c097c787a39dac341870',
             },
         };
 
         if (!userDataStore.userAddress) {
+            console.log(
+                '🔍 [Referrals] No user address, clearing payouts data',
+            );
             setReferralData(null);
             return;
         }
@@ -140,36 +213,69 @@ export default function Referrals() {
             },
         };
 
-        fetch(
-            `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`,
-            optionsPayouts,
-        )
-            .then((res) => res.json())
+        const queryUrl = `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`;
+        console.log(
+            '🔍 [Referrals] Executing payouts by referrer query:',
+            queryUrl,
+        );
+
+        fetch(queryUrl, optionsPayouts)
             .then((res) => {
-                console.log('payouts: ', res);
-                console.log('calculating payouts...');
+                console.log(
+                    '🔍 [Referrals] Payouts by referrer query response status:',
+                    res.status,
+                );
+                return res.json();
+            })
+            .then((res) => {
+                if (!Array.isArray(res)) {
+                    console.error(
+                        '❌ [Referrals] payouts/by-referrer query returned non-array:',
+                        typeof res,
+                    );
+                    setPayoutsByReferrer([]);
+                    setInviteeCount('0');
+                    setRewardsEarned('$0.00');
+                    return;
+                }
+
+                console.log(
+                    '✅ [Referrals] Payouts by referrer query results count:',
+                    res.length,
+                );
                 setPayoutsByReferrer(res);
                 setInviteeCount(res.length.toString());
+
                 const totalPayouts: number = res.reduce(
                     (acc: number, payout: any) => {
-                        // Each payout object has one unknown key with an object value containing volume
                         const payoutValue = Object.values(payout)[0] as any;
                         const volume = payoutValue?.volume || 0;
-                        console.log('volume: ', volume);
                         return acc + volume;
                     },
                     0,
                 );
+
                 const totalPayoutsFormatted = formatNum(
                     totalPayouts,
                     2,
                     true,
                     true,
                 );
-                console.log('totalPayoutsFormatted: ', totalPayoutsFormatted);
+                console.log(
+                    '✅ [Referrals] Total payouts calculated:',
+                    totalPayoutsFormatted,
+                );
                 setRewardsEarned(totalPayoutsFormatted);
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                console.error(
+                    '❌ [Referrals] Payouts by referrer query error:',
+                    err,
+                );
+                setPayoutsByReferrer([]);
+                setInviteeCount('0');
+                setRewardsEarned('$0.00');
+            });
 
         fetch(
             `https://api.fuul.xyz/api/v1/payouts/leaderboard/points?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`,
@@ -216,12 +322,7 @@ export default function Referrals() {
                                 {t('common.learnMore')}
                             </a>
                         </p>
-                        <a
-                            href='/v2/affiliates'
-                            className={styles.partner_link}
-                        >
-                            Become a Partner
-                        </a>
+                        <PartnerLinkWrapper />
                     </div>
                 </div>
                 <SimpleButton bg={'dark2'} onClick={handleOpenRefCodeModal}>

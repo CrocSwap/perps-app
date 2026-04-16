@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useReferralStore } from '~/stores/ReferralStore';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import styles from './ReferralsTabs.module.css';
 
 import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import ReferralsTable from '../ReferralsTable/ReferralsTable';
+import RewardHistoryTable from '../ReferralsTable/RewardHistoryTable';
 import type {
     PayoutMovementIF,
     PayoutByReferrerT,
@@ -25,9 +27,11 @@ export default function ReferralsTabs(props: PropsIF) {
         payoutsByReferrer,
     } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
+    const { rewardHistory } = useReferralStore();
     const hasData =
         (payoutMovements?.length ?? 0) > 0 ||
-        (payoutsByReferrer?.length ?? 0) > 0;
+        (payoutsByReferrer?.length ?? 0) > 0 ||
+        (rewardHistory?.length ?? 0) > 0;
     const [isCollapsed, setIsCollapsed] = useState(!hasData);
 
     const handleTabChange = (tab: string) => {
@@ -44,7 +48,7 @@ export default function ReferralsTabs(props: PropsIF) {
                     />
                 );
             case 'referrals.rewardHistory':
-                return <div className={styles.emptyState}>enter code</div>;
+                return <RewardHistoryTable />;
             default:
                 return (
                     <div className={styles.emptyState}>
