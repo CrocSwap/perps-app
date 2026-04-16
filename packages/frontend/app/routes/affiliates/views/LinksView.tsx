@@ -256,7 +256,7 @@ export function LinksView() {
                                             {entry.clicks ?? '--'}
                                         </td>
                                         <td className={styles['table-cell']}>
-                                            {entry.total_users.toLocaleString()}
+                                            {entry.total_users ?? '--'}
                                         </td>
                                         <td
                                             className={styles['table-cell']}
@@ -266,7 +266,12 @@ export function LinksView() {
                                                 fontWeight: 600,
                                             }}
                                         >
-                                            ${formatUSD(entry.total_earnings)}
+                                            $
+                                            {entry.total_earnings
+                                                ? formatUSD(
+                                                      entry.total_earnings,
+                                                  )
+                                                : '--'}
                                         </td>
                                         <td
                                             className={styles['table-cell']}
