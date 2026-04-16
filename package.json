@@ -8,7 +8,12 @@
         "prod": "pnpm i && pnpm prepare && pnpm update-submodules && pnpm --filter frontend prod",
         "prepare": "husky",
         "prettier": "prettier --write .",
-        "update-submodules": "git submodule update --remote --recursive --merge"
+        "update-submodules": "git submodule update --remote --recursive --merge",
+        "lint": "pnpm --filter frontend lint",
+        "lint:fix": "pnpm --filter frontend lint:fix",
+        "typecheck": "pnpm --filter frontend typecheck",
+        "test": "pnpm --filter frontend test",
+        "test:ci": "pnpm --filter frontend test:ci"
     },
     "lint-staged": {
         "**/*": "prettier --write --ignore-unknown"
@@ -16,14 +21,13 @@
     "devDependencies": {
         "husky": "^9.1.7",
         "lint-staged": "^16.4.0",
-        "prettier": "^3.8.1"
+        "prettier": "^3.8.2"
     },
     "pnpm": {
         "overrides": {
             "lodash": "4.17.23",
             "bn.js": "5.2.3",
-            "serialize-javascript": "7.0.3",
-            "axios": "1.14.0"
+            "serialize-javascript": "7.0.5"
         }
     }
 }
