@@ -546,7 +546,7 @@
         "overwriteCurrentReferralCode": "현재 추천 코드 덮어쓰기",
         "enterReferralCode": "추천 코드 입력",
         "referralCodeNotValidPleaseConfirm": "코드 <0>{{invalidCode}}</0>는 추천 프로그램에 등록되지 않았습니다. 코드가 정확한지 확인해 주세요.",
-        "yourCodeIs": "귀하의 코드는 지갑 주소의 첫 6글자를 기반으로 한 <0>{{referrerCode}}</0>입니다. 추천 시스템에 이 코드를 등록하려면 '활성화'를 클릭하세요.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "제휴 코드 생성",
         "createAUniqueCodeToEarn": "추천된 사용자의 수수료 10%를 적립하려면 고유 코드를 생성하세요.",
         "codeAlreadyInUse": "이미 사용 중인 코드",
@@ -555,6 +555,7 @@
             "claim": "보상을 청구하려면 지갑을 연결하세요",
             "enterCode": "추천 코드를 입력하려면 지갑을 연결하세요"
         },
+        "pleaseActivate": "'활성화'를 클릭하여 추천인으로 등록하세요.",
         "usersWithTradingVolume": "이 코드는 거래량이 100만 달러에 도달한 후 사용자가 맞춤 설정하거나 업데이트할 수 있습니다.",
         "doNotSelfRefer": "코드 <0>{{refCode}}</0>는 생성된 주소와 동일한 주소로 등록할 수 없습니다. 다른 코드를 선택해 주세요.",
         "toCustomizeAffiliateCode": "제휴 코드는 기본적으로 지갑 주소의 첫 6글자로 설정됩니다. 거래량이 100만 달러 이상인 사용자는 제휴 코드를 맞춤 설정할 수 있습니다.",
