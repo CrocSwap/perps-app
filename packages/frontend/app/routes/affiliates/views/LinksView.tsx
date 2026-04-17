@@ -80,11 +80,11 @@ export function LinksView() {
     const data = affiliateCode
         ? [
               {
-                  code: affiliateCode.code,
-                  created_at: affiliateCode.created_at,
-                  clicks: affiliateCode.clicks,
-                  total_users: affiliateCode.total_users,
-                  total_earnings: affiliateCode.total_earnings,
+                  code: affiliateCode.code ?? '--',
+                  created_at: affiliateCode.created_at ?? '--',
+                  clicks: affiliateCode.clicks ?? '--',
+                  total_users: affiliateCode.total_users ?? '--',
+                  total_earnings: affiliateCode.total_earnings ?? '--',
                   you_percentage: youPercent,
                   invitee_percentage: inviteePercent,
               },
