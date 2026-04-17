@@ -547,7 +547,7 @@
         "overwriteCurrentReferralCode": "覆盖当前推荐码",
         "enterReferralCode": "输入推荐码",
         "referralCodeNotValidPleaseConfirm": "该代码 <0>{{invalidCode}}</0> 尚未在推荐计划中注册。请确认代码是否正确。",
-        "yourCodeIs": "您的代码是 <0>{{referrerCode}}</0>（基于钱包地址前六位字符）。请点击“激活”以在推荐系统中注册该代码。",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "创建推广码",
         "createAUniqueCodeToEarn": "创建一个唯一代码，可赚取被推荐用户手续费的 10%。",
         "codeAlreadyInUse": "代码已被占用",

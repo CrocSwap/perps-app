@@ -546,7 +546,7 @@
         "overwriteCurrentReferralCode": "현재 추천 코드 덮어쓰기",
         "enterReferralCode": "추천 코드 입력",
         "referralCodeNotValidPleaseConfirm": "코드 <0>{{invalidCode}}</0>는 추천 프로그램에 등록되지 않았습니다. 코드가 정확한지 확인해 주세요.",
-        "yourCodeIs": "귀하의 코드는 지갑 주소의 첫 6글자를 기반으로 한 <0>{{referrerCode}}</0>입니다. 추천 시스템에 이 코드를 등록하려면 '활성화'를 클릭하세요.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "제휴 코드 생성",
         "createAUniqueCodeToEarn": "추천된 사용자의 수수료 10%를 적립하려면 고유 코드를 생성하세요.",
         "codeAlreadyInUse": "이미 사용 중인 코드",

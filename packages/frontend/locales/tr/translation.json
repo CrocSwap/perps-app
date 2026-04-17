@@ -546,7 +546,7 @@
         "overwriteCurrentReferralCode": "Mevcut referans kodunun üzerine yaz",
         "enterReferralCode": "Bir referans kodu girin",
         "referralCodeNotValidPleaseConfirm": "Kod <0>{{invalidCode}}</0> referans programında talep edilmemiş. Lütfen kodun doğru olduğunu onaylayın.",
-        "yourCodeIs": "Kodunuz, cüzdan adresinizin ilk altı karakterine dayalı olarak <0>{{referrerCode}}</0>. Lütfen bu kodu referans sistemine kaydetmek için 'Etkinleştir'e tıklayın.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "Bir ortaklık kodu oluşturun",
         "createAUniqueCodeToEarn": "Yönlendirilen kullanıcıların ücretlerinin %10'unu kazanmak için benzersiz bir kod oluşturun.",
         "codeAlreadyInUse": "Kod Zaten Kullanımda",

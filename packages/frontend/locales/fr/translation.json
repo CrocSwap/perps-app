@@ -546,7 +546,7 @@
         "overwriteCurrentReferralCode": "Remplacer le code de parrainage actuel",
         "enterReferralCode": "Entrer un code de parrainage",
         "referralCodeNotValidPleaseConfirm": "Le code <0>{{invalidCode}}</0> n'est pas enregistré dans le programme de parrainage. Veuillez confirmer que le code est correct.",
-        "yourCodeIs": "Votre code est <0>{{referrerCode}}</0> basé sur les six premiers caractères de votre adresse de wallet. Cliquez sur 'Activer' pour enregistrer ce code dans le système de parrainage.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "Créer un code d'affiliation",
         "createAUniqueCodeToEarn": "Créez un code unique pour gagner 10% des frais des utilisateurs parrainés.",
         "codeAlreadyInUse": "Code déjà utilisé",

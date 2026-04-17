@@ -547,7 +547,7 @@
         "overwriteCurrentReferralCode": "Ghi đè mã giới thiệu hiện tại",
         "enterReferralCode": "Nhập mã giới thiệu",
         "referralCodeNotValidPleaseConfirm": "Mã <0>{{invalidCode}}</0> chưa được đăng ký trong chương trình giới thiệu. Vui lòng kiểm tra lại mã.",
-        "yourCodeIs": "Mã của bạn là <0>{{referrerCode}}</0> (dựa trên 6 ký tự đầu của địa chỉ ví). Vui lòng nhấn 'Kích hoạt' để đăng ký mã này trong hệ thống giới thiệu.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "Tạo mã giới thiệu",
         "createAUniqueCodeToEarn": "Tạo mã riêng để nhận 10% phí từ người dùng được giới thiệu.",
         "codeAlreadyInUse": "Mã đã được sử dụng",

@@ -546,7 +546,7 @@
         "overwriteCurrentReferralCode": "Aktuellen Empfehlungscode überschreiben",
         "enterReferralCode": "Empfehlungscode eingeben",
         "referralCodeNotValidPleaseConfirm": "Der Code <0>{{invalidCode}}</0> wurde im Empfehlungsprogramm nicht beansprucht. Bitte bestätigen Sie, dass der Code korrekt ist.",
-        "yourCodeIs": "Ihr Code lautet <0>{{referrerCode}}</0>, basierend auf den ersten sechs Zeichen Ihrer Wallet-Adresse. Bitte klicken Sie auf 'Aktivieren', um diesen Code im Empfehlungssystem zu registrieren.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "Einen Affiliate-Code erstellen",
         "createAUniqueCodeToEarn": "Erstellen Sie einen einzigartigen Code, um 10% der Gebühren der geworbenen Benutzer zu verdienen.",
         "codeAlreadyInUse": "Code bereits in Verwendung",
