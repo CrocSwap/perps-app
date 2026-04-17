@@ -555,6 +555,7 @@
             "claim": "Connectez votre wallet pour réclamer des récompenses",
             "enterCode": "Connectez votre wallet pour entrer un code de parrainage"
         },
+        "pleaseActivate": "Cliquez sur « Activer » pour vous enregistrer en tant que parrain.",
         "usersWithTradingVolume": "Ce code peut être personnalisé ou mis à jour par les utilisateurs après avoir atteint 1M$ de volume de trading.",
         "doNotSelfRefer": "Le code <0>{{refCode}}</0> ne peut pas être enregistré par la même adresse qui l'a créé. Veuillez choisir un autre code.",
         "toCustomizeAffiliateCode": "Les codes d'affiliation correspondent par défaut aux six premiers caractères de votre adresse de wallet. Les utilisateurs avec > 1M$ de volume de trading peuvent personnaliser leur code.",

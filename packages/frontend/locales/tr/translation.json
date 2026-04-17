@@ -555,6 +555,7 @@
             "claim": "Ödülleri talep etmek için cüzdanınızı bağlayın",
             "enterCode": "Bir referans kodu girmek için cüzdanınızı bağlayın"
         },
+        "pleaseActivate": "Yönlendirici olarak kaydolmak için 'Etkinleştir'e tıklayın.",
         "usersWithTradingVolume": "Bu kod, 1 milyon ABD doları işlem hacmine ulaştıktan sonra kullanıcılar tarafından özelleştirilebilir veya güncellenebilir.",
         "doNotSelfRefer": "<0>{{refCode}}</0> kodu, oluşturulduğu adresle aynı adres tarafından kaydedilemez. Lütfen farklı bir kod seçin.",
         "toCustomizeAffiliateCode": "Ortaklık kodları varsayılan olarak cüzdan adresinizin ilk altı karakteridir. 1 milyon dolardan fazla işlem hacmine sahip kullanıcılar ortaklık kodlarını özelleştirebilir.",

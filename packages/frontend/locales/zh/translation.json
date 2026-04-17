@@ -556,6 +556,7 @@
             "claim": "连接钱包以领取奖励",
             "enterCode": "连接钱包以输入推荐码"
         },
+        "pleaseActivate": "点击'激活'以注册为推荐人。",
         "usersWithTradingVolume": "当交易量达到 $1M 后，用户可自定义或更新该代码。",
         "doNotSelfRefer": "代码 <0>{{refCode}}</0> 不能由创建该代码的同一地址注册。请选择其他代码。",
         "toCustomizeAffiliateCode": "推广码默认使用钱包地址前六位字符。交易量超过 $1M 的用户可自定义推广码。",

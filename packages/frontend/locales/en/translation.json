@@ -555,6 +555,7 @@
             "claim": "Connect your wallet to claim rewards",
             "enterCode": "Connect your wallet to enter a referral code"
         },
+        "pleaseActivate": "Click 'Activate' to register as a referrer.",
         "usersWithTradingVolume": "This code may be customized or updated by users after reaching $1M in trading volume.",
         "doNotSelfRefer": "The code <0>{{refCode}}</0> cannot be registered by the same address by which it was created. Please choose a different code.",
         "toCustomizeAffiliateCode": "Affiliate codes default to the first six characters of your wallet address. Users with > $1M in trading volume can customize their affiliate code.",

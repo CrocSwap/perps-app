@@ -549,6 +549,7 @@
             "claim": "Conecta tu wallet para reclamar recompensas",
             "enterCode": "Conecta tu wallet para ingresar un código de referido"
         },
+        "pleaseActivate": "Haz clic en 'Activar' para registrarte como referidor.",
         "usersWithTradingVolume": "Este código puede ser personalizado o actualizado por usuarios después de alcanzar $1M en volumen de trading.",
         "doNotSelfRefer": "El código <0>{{refCode}}</0> no puede ser registrado por la misma dirección que lo creó. Por favor, elige un código diferente.",
         "toCustomizeAffiliateCode": "Los códigos de afiliado por defecto son los primeros seis caracteres de tu dirección de wallet. Usuarios con > $1M en volumen de trading pueden personalizar su código.",

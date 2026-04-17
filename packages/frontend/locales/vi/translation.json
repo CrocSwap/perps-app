@@ -556,6 +556,7 @@
             "claim": "Kết nối ví để nhận thưởng",
             "enterCode": "Kết nối ví để nhập mã giới thiệu"
         },
+        "pleaseActivate": "Nhấn 'Kích hoạt' để đăng ký làm người giới thiệu.",
         "usersWithTradingVolume": "Mã này có thể được tuỳ chỉnh/cập nhật sau khi người dùng đạt $1M khối lượng giao dịch.",
         "doNotSelfRefer": "Mã <0>{{refCode}}</0> không thể được đăng ký bởi cùng địa chỉ đã tạo ra nó. Vui lòng chọn mã khác.",
         "toCustomizeAffiliateCode": "Mã giới thiệu mặc định là 6 ký tự đầu của địa chỉ ví. Người dùng có khối lượng giao dịch > $1M có thể tuỳ chỉnh mã giới thiệu.",
