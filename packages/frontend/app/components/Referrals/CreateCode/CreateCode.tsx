@@ -222,7 +222,9 @@ export default function CreateCode(props: PropsIF) {
                                     />,
                                 ]}
                             />
-                            {isRefCodeClaimed && t('referrals.pleaseActivate')}
+                        </p>
+                        <p>
+                            {isRefCodeClaimed || t('referrals.pleaseActivate')}
                         </p>
                         <p>{t('referrals.toCustomizeAffiliateCode')}</p>
                     </>
