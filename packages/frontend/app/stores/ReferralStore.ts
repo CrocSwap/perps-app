@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { Fuul, UserIdentifierType } from '@fuul/sdk';
+import type { FetchUserReferrerResponseIF } from '~/utils/fuul/interfaces';
 
 export interface CachedRefCodeIF {
     // ref code created for referral use
@@ -9,14 +10,6 @@ export interface CachedRefCodeIF {
     isApproved: boolean;
     // increments on explicit approvals to allow one-shot downstream triggers
     approvalNonce: number;
-}
-
-export interface UserReferrerResponse {
-    user_identifier: string;
-    referrer_identifier: string | null;
-    referrer_name: string | null;
-    referrer_code: string | null;
-    referrer_user_rebate_rate: number | null;
 }
 
 export interface AffiliateCodeResponse {
@@ -52,7 +45,9 @@ export interface ReferralStoreIF {
     totVolume: number | undefined;
     convertedWallets: string[];
     claims: ClaimCheckIF[] | null;
-    fetchUserReferrer: (address: string) => Promise<UserReferrerResponse[]>;
+    fetchUserReferrer: (
+        address: string,
+    ) => Promise<FetchUserReferrerResponseIF[]>;
     getRefCodeByPubKey: (
         userIdentifier: string,
     ) => Promise<AffiliateCodeResponse | null>;
@@ -184,7 +179,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
             },
             async fetchUserReferrer(
                 address: string,
-            ): Promise<UserReferrerResponse[]> {
+            ): Promise<FetchUserReferrerResponseIF[]> {
                 console.log(
                     '🚀 [ReferralStore] fetchUserReferrer called with address:',
                     address,
@@ -198,7 +193,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 // reusable fn to send a query to FUUL for user's referrer data
                 const queryFuul = async (
                     key: string,
-                ): Promise<UserReferrerResponse> => {
+                ): Promise<FetchUserReferrerResponseIF> => {
                     const options = {
                         method: 'GET',
                         headers: {
