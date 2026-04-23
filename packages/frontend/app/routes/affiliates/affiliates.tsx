@@ -1,5 +1,4 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import { IoReload } from 'react-icons/io5';
 import { ConnectWalletCard } from './components/ConnectWalletCard';
 import { YourStatsSection } from './components/YourStatsSection';
 import { DashboardTabsSection } from './components/DashboardTabsSection';
