@@ -145,8 +145,8 @@ export interface AffiliateStats {
 
 const INVITEE_COUNT_POLL_MS = 30_000;
 
-// Hook for affiliate audience check
-export function useAffiliateAudience(userIdentifier: string) {
+// Hook for audience check
+export function useAudience(userIdentifier: string) {
     console.log('did not crash');
     const [data, setData] = useState<{
         audiences: GetUserAudiencesResponseIF;

@@ -13,10 +13,7 @@ import { ConnectWalletCard } from '../components/ConnectWalletCard';
 import { TableErrorState } from '../components/TableErrorState';
 import { ViewLayout } from '../components/ViewLayout';
 import { EmptyState } from '../components/EmptyState';
-import {
-    useAffiliateCode,
-    useAffiliateAudience,
-} from '../hooks/useAffiliateData';
+import { useAffiliateCode, useAudience } from '../hooks/useAffiliateData';
 import { formatUSD } from '../utils/format-numbers';
 import { getCommissionByAudienceId } from '../utils/affiliate-levels';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -55,7 +52,7 @@ export function LinksView() {
         return () => document.removeEventListener('mousedown', handleClick);
     }, [dropdownOpen]);
 
-    const { data: audienceData } = useAffiliateAudience(userAddress);
+    const { data: audienceData } = useAudience(userAddress);
 
     const {
         data: affiliateCode,

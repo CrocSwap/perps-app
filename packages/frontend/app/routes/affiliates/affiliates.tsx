@@ -4,7 +4,7 @@ import { ConnectWalletCard } from './components/ConnectWalletCard';
 import { YourStatsSection } from './components/YourStatsSection';
 import { DashboardTabsSection } from './components/DashboardTabsSection';
 import { AffiliateApplicationForm } from './components/AffiliateApplicationForm';
-import { useAffiliateAudience } from './hooks/useAffiliateData';
+import { useAudience } from './hooks/useAffiliateData';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from './affiliates.module.css';
 
@@ -22,7 +22,7 @@ export default function AffiliatesPage() {
     const { userAddress } = useUserDataStore();
 
     const { data: audience, isLoading: isLoadingAudience } =
-        useAffiliateAudience(userAddress);
+        useAudience(userAddress);
 
     // Show connect wallet if not connected
     if (!isConnected) {

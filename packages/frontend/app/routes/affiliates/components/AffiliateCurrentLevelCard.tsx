@@ -5,10 +5,7 @@ import { useSearchParams } from 'react-router';
 import { FaTelegramPlane } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import {
-    useAffiliateAudience,
-    useAffiliateCode,
-} from '../hooks/useAffiliateData';
+import { useAudience, useAffiliateCode } from '../hooks/useAffiliateData';
 import {
     getAffiliateLevelByAudienceId,
     getCommissionByAudienceId,
@@ -22,7 +19,7 @@ export function AffiliateCurrentLevelCard() {
     const { userAddress } = useUserDataStore();
     const [, setSearchParams] = useSearchParams();
 
-    const { data: audienceData } = useAffiliateAudience(userAddress);
+    const { data: audienceData } = useAudience(userAddress);
 
     const {
         data: affiliateCode,
