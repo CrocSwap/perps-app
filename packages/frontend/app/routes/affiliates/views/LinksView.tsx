@@ -55,10 +55,7 @@ export function LinksView() {
         return () => document.removeEventListener('mousedown', handleClick);
     }, [dropdownOpen]);
 
-    const { data: audienceData } = useAffiliateAudience(
-        userAddress || '',
-        isConnected && !!userAddress,
-    );
+    const { data: audienceData } = useAffiliateAudience(userAddress);
 
     const {
         data: affiliateCode,

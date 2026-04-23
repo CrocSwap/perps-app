@@ -14,3 +14,13 @@ export interface GetAffiliateCodeResponseIF {
     user_identifier: string;
     user_identifier_type: 'solana_address';
 }
+
+export interface GetUserAudiencesResponseIF {
+    results: {
+        id: string;
+        name: string;
+        badge_name: string;
+        badge_description: string;
+        badge_image: string;
+    }[];
+}

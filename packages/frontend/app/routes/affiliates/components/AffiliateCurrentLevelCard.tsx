@@ -22,10 +22,7 @@ export function AffiliateCurrentLevelCard() {
     const { userAddress } = useUserDataStore();
     const [, setSearchParams] = useSearchParams();
 
-    const { data: audienceData } = useAffiliateAudience(
-        userAddress || '',
-        isConnected && !!userAddress,
-    );
+    const { data: audienceData } = useAffiliateAudience(userAddress);
 
     const {
         data: affiliateCode,

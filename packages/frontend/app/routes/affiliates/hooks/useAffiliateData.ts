@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReferrerPayoutData } from '@fuul/sdk';
 import { fetchAttributedReferralCount } from '../../../utils/refreg';
+import type { GetUserAudiencesResponseIF } from '~/utils/fuul/interfaces';
 
 interface UserReferralCode {
     code?: string | null;
@@ -146,8 +147,9 @@ const INVITEE_COUNT_POLL_MS = 30_000;
 
 // Hook for affiliate audience check
 export function useAffiliateAudience(userIdentifier: string) {
+    console.log('did not crash');
     const [data, setData] = useState<{
-        audiences: { results?: Array<{ id: string }> };
+        audiences: GetUserAudiencesResponseIF;
         isAffiliateAccepted: boolean;
     } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -189,7 +191,7 @@ export function useAffiliateAudience(userIdentifier: string) {
                 throw new Error(text);
             }
 
-            const audiences = await response.json();
+            const audiences: GetUserAudiencesResponseIF = await response.json();
             console.log('FUUL getUserAudiences success:', audiences);
 
             const isAffiliateAccepted = (audiences.results?.length ?? 0) > 0;
