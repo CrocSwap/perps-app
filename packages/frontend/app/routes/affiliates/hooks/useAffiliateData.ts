@@ -145,7 +145,7 @@ export interface AffiliateStats {
 const INVITEE_COUNT_POLL_MS = 30_000;
 
 // Hook for affiliate audience check
-export function useAffiliateAudience(userIdentifier: string, enabled = true) {
+export function useAffiliateAudience(userIdentifier: string) {
     const [data, setData] = useState<{
         audiences: { results?: Array<{ id: string }> };
         isAffiliateAccepted: boolean;
@@ -154,7 +154,7 @@ export function useAffiliateAudience(userIdentifier: string, enabled = true) {
     const [error, setError] = useState<Error | null>(null);
 
     const fetchData = useCallback(async () => {
-        if (!enabled || !userIdentifier) return;
+        if (!userIdentifier) return;
 
         setIsLoading(true);
         setError(null);
@@ -207,7 +207,7 @@ export function useAffiliateAudience(userIdentifier: string, enabled = true) {
         } finally {
             setIsLoading(false);
         }
-    }, [userIdentifier, enabled]);
+    }, [userIdentifier]);
 
     useEffect(() => {
         fetchData();

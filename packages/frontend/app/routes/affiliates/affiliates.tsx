@@ -22,7 +22,7 @@ export default function AffiliatesPage() {
     const { userAddress } = useUserDataStore();
 
     const { data: audience, isLoading: isLoadingAudience } =
-        useAffiliateAudience(userAddress || '', isConnected && !!userAddress);
+        useAffiliateAudience(userAddress);
 
     // Show connect wallet if not connected
     if (!isConnected) {
