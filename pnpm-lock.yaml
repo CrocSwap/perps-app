@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  lodash: 4.18.0
+  lodash: 4.17.23
   bn.js: 5.2.3
   serialize-javascript: 7.0.5
   protobufjs: 7.5.5
@@ -6491,9 +6491,8 @@ packages:
   lodash.throttle@4.1.1:
     resolution: {integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==}
 
-  lodash@4.18.0:
-    resolution: {integrity: sha512-l1mfj2atMqndAHI3ls7XqPxEjV2J9ZkcNyHpoZA3r2T1LLwDB69jgkMWh71YKwhBbK0G2f4WSn05ahmQXVxupA==}
-    deprecated: Bad release. Please use lodash@4.17.21 instead.
+  lodash@4.17.23:
+    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
 
   log-update@6.1.0:
     resolution: {integrity: sha512-9ie8ItPR6tjY5uYJh8K/Zrv/RMZ5VOlOWvtZdEHYSTFKZfIBPQa9tOAEeAWhd+AnIneLJ22w5fjOYtoutpWq5w==}
@@ -11080,7 +11079,7 @@ snapshots:
       exit-hook: 2.2.1
       isbot: 5.1.39
       jsesc: 3.0.2
-      lodash: 4.18.0
+      lodash: 4.17.23
       p-map: 7.0.4
       pathe: 1.1.2
       picocolors: 1.1.1
@@ -14549,7 +14548,7 @@ snapshots:
       '@walletconnect/types': 2.19.0(@netlify/blobs@10.0.10)(@react-native-async-storage/async-storage@1.24.0(react-native@0.81.1(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.5)(utf-8-validate@6.0.6)))
       '@walletconnect/utils': 2.19.0(@netlify/blobs@10.0.10)(@react-native-async-storage/async-storage@1.24.0(react-native@0.81.1(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.5)(utf-8-validate@6.0.6)))(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
       events: 3.3.0
-      lodash: 4.18.0
+      lodash: 4.17.23
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -17734,7 +17733,7 @@ snapshots:
 
   lodash.throttle@4.1.1: {}
 
-  lodash@4.18.0: {}
+  lodash@4.17.23: {}
 
   log-update@6.1.0:
     dependencies:
@@ -20041,7 +20040,7 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       fs-extra: 9.1.0
       glob: 7.2.3
-      lodash: 4.18.0
+      lodash: 4.17.23
       pretty-bytes: 5.6.0
       rollup: 2.80.0
       source-map: 0.8.0-beta.0
