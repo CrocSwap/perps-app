@@ -40,6 +40,10 @@ import { useRefCodeModalStore } from '~/stores/RefCodeModalStore';
 import { debugLog } from '~/utils/debugLog';
 import { useDebounce } from '~/hooks/useDebounce';
 import { checkAddressFormat } from '~/utils/functions/checkAddressFormat';
+import {
+    useAudience,
+    useAffiliateCode,
+} from '~/routes/affiliates/hooks/useAffiliateData';
 
 // --- Fuul claim helpers ---
 // Fuul contracts are deployed on Fogo mainnet, separate from app's testnet
@@ -220,6 +224,20 @@ export default function CodeTabs(props: PropsIF) {
             .toString()
             .slice(0, DEFAULT_REFERRER_CODE_LENGTH);
     }, [referrerAddress]);
+
+    // audience check: if the user is in a Fuul audience, they are a
+    // registered affiliate whose referral code is immutable. This dataset is
+    // distinct from the /referral_codes dataset used by getRefCode, so a user
+    // may be present in one but not the other.
+    const { data: audienceData, isLoading: isAudienceLoading } = useAudience(
+        referrerAddress?.toString() ?? '',
+    );
+    const isAffiliate = !!audienceData?.isAffiliateAccepted;
+
+    // fetch the affiliate-specific code only when we know the user is an
+    // affiliate (different endpoint than getRefCode)
+    const { data: affiliateCodeData, isLoading: isAffiliateCodeLoading } =
+        useAffiliateCode(referrerAddress?.toString() ?? '', isAffiliate);
 
     // boolean representing whether referrer code has enough volume to be changed
     const canEditReferrerCode = useMemo<boolean>(() => {
@@ -658,6 +676,15 @@ export default function CodeTabs(props: PropsIF) {
             setTemporaryReferrerCode(defaultReferrerCode);
         }
     }, [canEditReferrerCode, defaultReferrerCode, editModeReferrer]);
+
+    // When the user is a registered affiliate (audience membership), populate
+    // referrerCode from the affiliate-specific dataset. getRefCode may not
+    // return anything for these users since they live in a different dataset.
+    useEffect(() => {
+        if (isAffiliate && affiliateCodeData?.code) {
+            setReferrerCode(affiliateCodeData.code);
+        }
+    }, [isAffiliate, affiliateCodeData?.code]);
 
     useEffect(() => {
         // Only exit edit mode if user loses edit capability while not actively editing
@@ -1154,9 +1181,22 @@ export default function CodeTabs(props: PropsIF) {
                 ) {
                     return spinner;
                 }
+                // Show spinner while resolving affiliate status / code so we
+                // don't flash the Activate UI for a user whose code is
+                // actually immutable.
+                if (
+                    isSessionEstablished &&
+                    (isAudienceLoading ||
+                        (isAffiliate &&
+                            !affiliateCodeData?.code &&
+                            isAffiliateCodeLoading))
+                ) {
+                    return spinner;
+                }
                 return (
                     <CreateCode
                         isSessionEstablished={isSessionEstablished}
+                        isAffiliate={isAffiliate}
                         referrerCode={referrerCode}
                         editModeReferrer={editModeReferrer}
                         setEditModeReferrer={setEditModeReferrer}
