@@ -9,6 +9,7 @@ import styles from './CreateCode.module.css';
 
 interface PropsIF {
     isSessionEstablished: boolean;
+    isAffiliate?: boolean;
     referrerCode: string;
     editModeReferrer: boolean;
     setEditModeReferrer: (value: boolean) => void;
@@ -35,6 +36,7 @@ interface PropsIF {
 export default function CreateCode(props: PropsIF) {
     const {
         isSessionEstablished,
+        isAffiliate,
         referrerCode,
         editModeReferrer,
         setEditModeReferrer,
@@ -71,7 +73,7 @@ export default function CreateCode(props: PropsIF) {
         );
     }
 
-    if (referrerCode && !editModeReferrer) {
+    if ((referrerCode && !editModeReferrer) || isAffiliate) {
         return (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
@@ -130,17 +132,19 @@ export default function CreateCode(props: PropsIF) {
                         {t('common.seeDocsForMore')}
                     </p>
                 </div>
-                {canEditReferrerCode === true && isVolumeDataLoaded && (
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => {
-                            setTemporaryReferrerCode(referrerCode);
-                            setEditModeReferrer(true);
-                        }}
-                    >
-                        {t('common.edit')}
-                    </SimpleButton>
-                )}
+                {!isAffiliate &&
+                    canEditReferrerCode === true &&
+                    isVolumeDataLoaded && (
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => {
+                                setTemporaryReferrerCode(referrerCode);
+                                setEditModeReferrer(true);
+                            }}
+                        >
+                            {t('common.edit')}
+                        </SimpleButton>
+                    )}
             </section>
         );
     }
