@@ -10,7 +10,7 @@
         "pino": "^9.14.0"
     },
     "devDependencies": {
-        "prettier": "^3.8.1",
+        "prettier": "^3.8.3",
         "typescript": "^5.9.3"
     }
 }
