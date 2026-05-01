@@ -1,9 +1,16 @@
 packages:
     - packages/*
+allowBuilds:
+    '@stellar/stellar-sdk': true
+    bigint-buffer: true
+    blake-hash: true
+    bufferutil: true
+    esbuild: true
+    protobufjs: true
+    sharp: true
+    tiny-secp256k1: true
+    usb: true
+    utf-8-validate: true
+blockExoticSubdeps: true
 
-onlyBuiltDependencies:
-    - blake-hash
-    - esbuild
-    - protobufjs
-    - tiny-secp256k1
-    - usb
+minimumReleaseAge: 10080

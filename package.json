@@ -3,6 +3,7 @@
     "version": "0.0.12",
     "private": true,
     "type": "module",
+    "packageManager": "pnpm@11.0.0",
     "scripts": {
         "dev": "pnpm i && pnpm prepare && pnpm update-submodules && pnpm --filter frontend dev",
         "prod": "pnpm i && pnpm prepare && pnpm update-submodules && pnpm --filter frontend prod",
@@ -26,10 +27,7 @@
     "pnpm": {
         "overrides": {
             "lodash": "4.17.23",
-            "bn.js": "5.2.3",
-            "serialize-javascript": "7.0.5",
-            "protobufjs": "7.5.5",
-            "uuid": "14.0.0"
+            "bn.js": "5.2.3"
         }
     }
 }
