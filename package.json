@@ -26,7 +26,7 @@
     },
     "pnpm": {
         "overrides": {
-            "lodash": "4.17.23",
+            "axios": "1.15.2",
             "bn.js": "5.2.3"
         }
     }
