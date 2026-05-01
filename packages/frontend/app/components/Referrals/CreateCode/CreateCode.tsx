@@ -30,6 +30,7 @@ interface PropsIF {
     createRefCode: () => Promise<void>;
     updateRefCode: () => Promise<void>;
     isVolumeDataLoaded: boolean;
+    isRefCodeClaimed: boolean | undefined;
 }
 
 export default function CreateCode(props: PropsIF) {
@@ -56,6 +57,7 @@ export default function CreateCode(props: PropsIF) {
         createRefCode,
         updateRefCode,
         isVolumeDataLoaded,
+        isRefCodeClaimed,
     } = props;
 
     const { t } = useTranslation();
@@ -220,6 +222,9 @@ export default function CreateCode(props: PropsIF) {
                                     />,
                                 ]}
                             />
+                        </p>
+                        <p>
+                            {isRefCodeClaimed || t('referrals.pleaseActivate')}
                         </p>
                         <p>{t('referrals.toCustomizeAffiliateCode')}</p>
                     </>
