@@ -58,14 +58,9 @@ export class CancelOrderService {
                     ? params.orderId
                     : BigInt(params.orderId);
 
-            // Get the cached market order log page to avoid RPC call
-            const cachedLogPage = marketOrderLogManager.getCachedLogPage();
-            if (cachedLogPage !== undefined) {
-                console.log(
-                    '  - Using cached marketOrderLogPage:',
-                    cachedLogPage,
-                );
-            }
+            const marketOrderLogPage =
+                await marketOrderLogManager.getLogPageForTransaction();
+            console.log('  - marketOrderLogPage:', marketOrderLogPage);
 
             const transaction = await buildCancelOrderTransaction(
                 this.connection,
@@ -75,7 +70,7 @@ export class CancelOrderService {
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
-                    marketOrderLogPage: cachedLogPage,
+                    marketOrderLogPage,
                 },
             );
 

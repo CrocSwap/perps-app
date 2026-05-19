@@ -573,8 +573,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     console.warn(
                         'No orderbook updates for 5s, reconnecting...',
                     );
+                    setOrderBookState(TableState.LOADING);
+                    setWsError(
+                        'Order book data is stale. Waiting for live updates...',
+                    );
                     forceReconnect();
-                    lastMessageTimeRef.current = Date.now();
                 }
             }, 6000);
 

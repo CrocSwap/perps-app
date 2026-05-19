@@ -23,6 +23,7 @@ interface OrderBookStore {
         resolutionPair: OrderRowResolutionIF,
     ) => void;
     midPrice: number | null;
+    lastBookUpdateAt: number | null;
     setMidPrice: (midPrice: number) => void;
     usualResolution: OrderRowResolutionIF | null;
     setUsualResolution: (resolution: OrderRowResolutionIF) => void;
@@ -40,16 +41,19 @@ export const useOrderBookStore = create<OrderBookStore>()(
                 sells: OrderBookRowIF[],
                 setMid?: boolean,
             ) => {
+                const lastBookUpdateAt = Date.now();
                 if (setMid) {
                     set({
                         buys: buys,
                         sells: sells,
                         midPrice: (buys[0].px + sells[0].px) / 2,
+                        lastBookUpdateAt,
                     });
                 } else {
                     set({
                         buys,
                         sells,
+                        lastBookUpdateAt,
                     });
                 }
             },
@@ -66,6 +70,7 @@ export const useOrderBookStore = create<OrderBookStore>()(
                 })),
             resolutionPairs: {},
             midPrice: null,
+            lastBookUpdateAt: null,
             setMidPrice: (midPrice: number) => set({ midPrice }),
             usualResolution: null,
             setUsualResolution: (resolution: OrderRowResolutionIF) =>

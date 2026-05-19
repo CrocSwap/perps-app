@@ -196,6 +196,9 @@ export const getTxLink = (signature?: string | null) => {
  */
 export const MARKET_ORDER_PRICE_OFFSET_USD = 50;
 
+/** Reject market orders if the order book has not updated within this window. */
+export const ORDER_BOOK_MAX_AGE_MS = 10_000;
+
 export const wsUrls = [
     MARKET_WS_ENDPOINT,
     'wss://pulse-api-mock.liquidity.tools/ws',

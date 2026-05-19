@@ -79,6 +79,20 @@ class MarketOrderLogManager {
         return this.fetchData();
     }
 
+    /**
+     * Fetch the current on-chain log page immediately before building a transaction.
+     * Avoids submitting orders with a stale cached page from the 30s poll interval.
+     */
+    async getLogPageForTransaction(): Promise<number> {
+        await this.forceRefresh();
+        if (this.cachedLogPage === undefined) {
+            throw new Error(
+                'Cannot fetch market order log page. Try again in a moment.',
+            );
+        }
+        return this.cachedLogPage;
+    }
+
     private start(): void {
         if (this.isPolling || !this.connection) {
             return;
