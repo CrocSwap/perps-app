@@ -11,8 +11,8 @@ on:
             - main
 
 jobs:
-    validate:
-        name: Install, lint, typecheck, test, and build
+    fast-validation:
+        name: Fast Node validation and build
         runs-on: ubuntu-latest
 
         defaults:
@@ -46,11 +46,40 @@ jobs:
             - name: Run unit tests
               run: pnpm test:ci
 
+            - name: Run coverage diagnostics
+              run: pnpm test:coverage
+
+            - name: Build frontend
+              run: pnpm build:prod
+
+    browser-smoke:
+        name: Browser smoke validation
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: packages/frontend
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  submodules: recursive
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: 'pnpm'
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
             - name: Install Playwright browser
               run: pnpm exec playwright install --with-deps chromium
 
             - name: Run browser smoke tests
               run: pnpm test:smoke
-
-            - name: Build frontend
-              run: pnpm build:prod

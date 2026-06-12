@@ -100,6 +100,11 @@ It still does not declare Testing Library, jsdom/happy-dom, or MSW.
    Added narrow role/focus/mobile/modal/protected-state browser checks without
    adding axe or another browser/component framework.
 
+6. `review-ci-coverage-thresholds`
+   Split CI into fast Node/build and browser-smoke jobs, added coverage
+   diagnostics to CI, and deferred hard thresholds until the baseline is more
+   meaningful.
+
 ## CI Recommendation
 
 Keep the current CI gates as the default required checks:
@@ -108,17 +113,19 @@ Keep the current CI gates as the default required checks:
 - `pnpm lint`
 - `pnpm typecheck`
 - `pnpm test:ci`
+- `pnpm test:coverage`
 - `pnpm test:smoke`
 - `pnpm build:prod`
 
-Keep `pnpm test:coverage` diagnostic-only for now. The baseline is low because
-coverage includes many hooks, stores, and utilities that are intentionally out
-of this node-only branch; adding hard thresholds now would incentivize noisy
-coverage work instead of targeted risk coverage.
+Keep `pnpm test:coverage` diagnostic-only for thresholds for now. The baseline
+is low because coverage includes many hooks, stores, and utilities that are
+intentionally under-covered relative to the new test harness; adding hard
+thresholds now would incentivize noisy coverage work instead of targeted risk
+coverage.
 
-Keep browser/provider suites as separate workflow steps or jobs so fast unit
-tests remain quick and deterministic while slower integration checks can have
-their own timeouts and fixtures.
+Keep browser/provider suites as separate workflow jobs so fast unit tests remain
+quick and deterministic while slower integration checks have their own timeouts
+and fixtures.
 
 ## What This Does Not Prove
 
