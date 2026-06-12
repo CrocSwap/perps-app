@@ -1,4 +1,14 @@
-import type { TradeHistoryData } from './TradeHistoryTableRow';
+interface TradeHistoryData {
+    time: string;
+    coin: string;
+    direction: string;
+    price: string;
+    size: string;
+    tradeValue: string;
+    fee: string;
+    closedPnl: string;
+    hasOrderDetails: boolean;
+}
 
 export const tradeHistoryData: TradeHistoryData[] = [
     {

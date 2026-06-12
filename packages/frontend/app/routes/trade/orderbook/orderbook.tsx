@@ -387,7 +387,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
             targetSlots = sells.slice(0, orderCount).map((sell) => sell.px);
         }
 
-        let closestSlot = findClosestByFlooring(
+        const closestSlot = findClosestByFlooring(
             focusedPriceRef.current,
             targetSlots,
         );

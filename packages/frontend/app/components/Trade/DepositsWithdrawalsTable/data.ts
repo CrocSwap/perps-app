@@ -1,4 +1,11 @@
-import type { TransactionData } from './DepositsWithdrawalsTableRow';
+interface TransactionData {
+    time: string;
+    status: string;
+    network: string;
+    action: string;
+    valueChange: string;
+    fee: string;
+}
 
 export const transactionsData: TransactionData[] = [
     {

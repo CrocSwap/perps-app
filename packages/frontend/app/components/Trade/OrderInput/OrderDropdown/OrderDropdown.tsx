@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import styles from './OrderDropdown.module.css';
 import { FiChevronDown } from 'react-icons/fi';
 
@@ -56,14 +56,16 @@ export default function OrderDropdown({
             document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const dropdownVariants = {
+    const easeOut = [0.4, 0.0, 0.2, 1] as const;
+
+    const dropdownVariants: Variants = {
         closed: {
             opacity: 0,
             y: -10,
             scale: 0.95,
             transition: {
                 duration: 0.2,
-                ease: [0.4, 0.0, 0.2, 1],
+                ease: easeOut,
             },
         },
         open: {
@@ -72,20 +74,20 @@ export default function OrderDropdown({
             scale: 1,
             transition: {
                 duration: 0.3,
-                ease: [0.4, 0.0, 0.2, 1],
+                ease: easeOut,
                 staggerChildren: 0.05,
                 delayChildren: 0.1,
             },
         },
     };
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         closed: {
             opacity: 0,
             x: -10,
             transition: {
                 duration: 0.15,
-                ease: [0.4, 0.0, 0.2, 1],
+                ease: easeOut,
             },
         },
         open: {
@@ -93,24 +95,24 @@ export default function OrderDropdown({
             x: 0,
             transition: {
                 duration: 0.2,
-                ease: [0.4, 0.0, 0.2, 1],
+                ease: easeOut,
             },
         },
     };
 
-    const chevronVariants = {
+    const chevronVariants: Variants = {
         closed: {
             rotate: 0,
             transition: {
                 duration: 0.3,
-                ease: [0.4, 0.0, 0.2, 1],
+                ease: easeOut,
             },
         },
         open: {
             rotate: 180,
             transition: {
                 duration: 0.3,
-                ease: [0.4, 0.0, 0.2, 1],
+                ease: easeOut,
             },
         },
     };

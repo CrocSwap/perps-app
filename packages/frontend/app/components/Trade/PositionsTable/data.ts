@@ -1,3 +1,21 @@
+interface PositionData {
+    coin: string;
+    leverageBadge: string;
+    size: string;
+    positionValue: string;
+    entryPrice: string;
+    markPrice: string;
+    pnl: {
+        value: string;
+        percentage: string;
+        isPositive: boolean;
+    };
+    liqPrice: string;
+    margin: string;
+    funding: string;
+    tpsl: string;
+}
+
 export const positionsData: PositionData[] = [
     {
         coin: 'ETH',

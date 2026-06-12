@@ -316,7 +316,8 @@ export function useInfoApi() {
         if (tokenName === 'BTC') {
             tokenName = 'UBTC';
         }
-        const token = spotMeta.tokens.find((t) => t.name === tokenName);
+        const tokens = Array.isArray(spotMeta.tokens) ? spotMeta.tokens : [];
+        const token = tokens.find((t) => t.name === tokenName);
         return token?.tokenId || '';
     };
 

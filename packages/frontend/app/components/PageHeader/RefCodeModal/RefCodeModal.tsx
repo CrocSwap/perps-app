@@ -55,12 +55,10 @@ export default function RefCodeModal() {
     useEffect(() => {
         if (userPublicKey) {
             referralStore.getRefCodeByPubKey(userPublicKey).then((res) => {
-                setUserRefCode(res?.code ?? null);
+                const userCode = res?.codes?.[0]?.code ?? null;
+                setUserRefCode(userCode);
                 setUserRefCodeFetchedFor(userPublicKey);
-                console.log(
-                    '🔑 [RefCodeModal] userRefCode set to:',
-                    res?.code ?? null,
-                );
+                console.log('🔑 [RefCodeModal] userRefCode set to:', userCode);
             });
         } else {
             setUserRefCode(null);

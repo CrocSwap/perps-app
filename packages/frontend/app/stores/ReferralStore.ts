@@ -48,6 +48,75 @@ export interface ReferralStoreIF {
 }
 
 const LS_KEY = 'AFFILIATE_DATA';
+const FUUL_PROVIDER_TIMEOUT_MS = 10_000;
+
+const emptyReferrerResponse = (
+    userIdentifier = '',
+): FetchUserReferrerResponseIF => ({
+    user_identifier: userIdentifier,
+    referrer_identifier: null,
+    referrer_name: null,
+    referrer_code: null,
+    referrer_user_rebate_rate: null,
+});
+
+function normalizeReferrerResponse(
+    value: unknown,
+    userIdentifier: string,
+): FetchUserReferrerResponseIF {
+    if (!value || typeof value !== 'object') {
+        return emptyReferrerResponse(userIdentifier);
+    }
+
+    const record = value as Partial<FetchUserReferrerResponseIF>;
+
+    return {
+        user_identifier:
+            typeof record.user_identifier === 'string'
+                ? record.user_identifier
+                : userIdentifier,
+        referrer_identifier:
+            typeof record.referrer_identifier === 'string'
+                ? record.referrer_identifier
+                : null,
+        referrer_name:
+            typeof record.referrer_name === 'string'
+                ? record.referrer_name
+                : null,
+        referrer_code:
+            typeof record.referrer_code === 'string'
+                ? record.referrer_code
+                : null,
+        referrer_user_rebate_rate:
+            typeof record.referrer_user_rebate_rate === 'number'
+                ? record.referrer_user_rebate_rate
+                : null,
+    };
+}
+
+async function fetchJsonWithTimeout<T>(
+    url: string,
+    options: RequestInit,
+    timeoutMs = FUUL_PROVIDER_TIMEOUT_MS,
+): Promise<T> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        return (await response.json()) as T;
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
 
 const ssrSafeStorage = () =>
     (typeof window !== 'undefined'
@@ -141,24 +210,28 @@ export const useReferralStore = create<ReferralStoreIF>()(
                         '🔍 [ReferralStore] fetchClaims calling API for address:',
                         address,
                     );
-                    const res = await fetch(
+                    const data = await fetchJsonWithTimeout<unknown>(
                         'https://api.fuul.xyz/api/v1/claim-checks/claim',
                         options,
                     );
-                    console.log(
-                        '🔍 [ReferralStore] fetchClaims response status:',
-                        res.status,
-                    );
-                    const data = await res.json();
                     console.log('🔍 [ReferralStore] fetchClaims result:', data);
                     console.log(
                         '🔍 [ReferralStore] fetchClaims is array:',
                         Array.isArray(data),
                     );
+                    const fallbackClaims =
+                        data && typeof data === 'object'
+                            ? ((data as { claims?: unknown; data?: unknown })
+                                  .claims ??
+                              (data as { data?: unknown }).data ??
+                              [])
+                            : [];
                     set({
                         claims: Array.isArray(data)
                             ? data
-                            : (data?.claims ?? data?.data ?? []),
+                            : Array.isArray(fallbackClaims)
+                              ? (fallbackClaims as ClaimCheckIF[])
+                              : [],
                     });
                 } catch (err) {
                     console.error('❌ [ReferralStore] fetchClaims error:', err);
@@ -190,11 +263,19 @@ export const useReferralStore = create<ReferralStoreIF>()(
                             authorization: `Bearer ${key}`,
                         },
                     };
-                    const res = await fetch(
-                        `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`,
-                        options,
-                    ).then((r) => r.json());
-                    return res;
+                    try {
+                        const data = await fetchJsonWithTimeout<unknown>(
+                            `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`,
+                            options,
+                        );
+                        return normalizeReferrerResponse(data, address);
+                    } catch (error) {
+                        console.warn(
+                            '⚠️ [ReferralStore] fetchUserReferrer fallback:',
+                            error,
+                        );
+                        return emptyReferrerResponse(address);
+                    }
                 };
 
                 // create and resolve fetch requests to both programs
@@ -216,17 +297,14 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     '🚀 [ReferralStore] getRefCodeByPubKey called with:',
                     userIdentifier,
                 );
-                const res = await fetch(
-                    `https://api.fuul.xyz/api/v1/affiliates/${userIdentifier}?identifier_type=solana_address`,
-                    {
-                        method: 'GET',
-                        headers: { accept: 'application/json' },
-                    },
-                );
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}`);
-                }
-                const data: GetAffiliateCodeResponseIF = await res.json();
+                const data =
+                    await fetchJsonWithTimeout<GetAffiliateCodeResponseIF>(
+                        `https://api.fuul.xyz/api/v1/affiliates/${userIdentifier}?identifier_type=solana_address`,
+                        {
+                            method: 'GET',
+                            headers: { accept: 'application/json' },
+                        },
+                    );
                 return data;
             },
             async checkForConversion(address: string): Promise<boolean> {

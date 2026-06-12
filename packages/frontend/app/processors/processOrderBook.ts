@@ -1,4 +1,8 @@
-import type { L2BookData, OrderData } from '@perps-app/sdk/src/utils/types';
+import type {
+    L2BookData,
+    OpenOrderRawData,
+    OrderData,
+} from '@perps-app/sdk/src/utils/types';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
     OrderBookRowIF,
@@ -82,36 +86,41 @@ export function processTrades(data: any): OrderBookTradeIF[] {
 }
 
 export function processUserOrder(
-    data: OrderData,
+    data: OrderData | OpenOrderRawData,
     status: string,
 ): OrderDataIF | null {
     if (data) {
         const markPx = useTradeDataStore.getState().symbolInfo?.markPx;
+        const side =
+            data.side === 'A' || data.side === 'S' || data.side === 'sell'
+                ? 'sell'
+                : data.side === 'B' || data.side === 'buy'
+                  ? 'buy'
+                  : null;
+
+        if (!side) return null;
+
+        const size = parseNum(data.sz);
+        const originalSize = parseNum(data.origSz);
         return {
             coin: data.coin,
             cloid: data.cloid,
             oid: parseNum(data.oid),
-            // side: e.side,
-            side:
-                data.side === 'A' || data.side === 'S'
-                    ? 'sell'
-                    : data.side === 'B'
-                      ? 'buy'
-                      : data.side,
-            sz: parseNum(data.sz),
+            side,
+            sz: size,
             tif: data.tif,
             timestamp: data.timestamp,
             status: status,
             limitPx: parseNum(data.limitPx),
-            origSz: parseNum(data.origSz),
-            filledSz: parseNum(data.origSz - data.sz),
+            origSz: originalSize,
+            filledSz: parseNum(originalSize - size),
             reduceOnly: data.reduceOnly,
             isPositionTpsl: data.isPositionTpsl,
             isTrigger: data.isTrigger,
             triggerPx: data.triggerPx ? parseNum(data.triggerPx) : undefined,
             triggerCondition: data.triggerCondition,
             orderType: data.orderType || '',
-            orderValue: Math.round(data.sz * (markPx || 1) * 100) / 100,
+            orderValue: Math.round(size * (markPx || 1) * 100) / 100,
         };
     }
 

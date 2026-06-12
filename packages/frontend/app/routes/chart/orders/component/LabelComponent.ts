@@ -648,57 +648,99 @@ const LabelComponent = ({
                 chart
                     .activeChart()
                     .crossHairMoved()
-                    .subscribe(null, ({ offsetX, offsetY }) => {
-                        if (chart) {
-                            const { iframeDoc, paneCanvas } =
-                                getPaneCanvasAndIFrameDoc(chart);
+                    .subscribe(
+                        null,
+                        ({
+                            offsetX,
+                            offsetY,
+                        }: {
+                            offsetX?: number;
+                            offsetY?: number;
+                        }) => {
+                            if (chart) {
+                                const { iframeDoc, paneCanvas } =
+                                    getPaneCanvasAndIFrameDoc(chart);
 
-                            if (!paneCanvas) return;
+                                if (!paneCanvas) return;
 
-                            const rect = paneCanvas?.getBoundingClientRect();
+                                const rect =
+                                    paneCanvas?.getBoundingClientRect();
 
-                            if (rect && paneCanvas && offsetX && offsetY) {
-                                const cssOffsetX = offsetX - rect.left;
-                                const cssOffsetY = offsetY - rect.top;
+                                if (rect && paneCanvas && offsetX && offsetY) {
+                                    const cssOffsetX = offsetX - rect.left;
+                                    const cssOffsetY = offsetY - rect.top;
 
-                                const scaleY =
-                                    paneCanvas?.height / rect?.height;
-                                const scaleX = paneCanvas.width / rect.width;
+                                    const scaleY =
+                                        paneCanvas?.height / rect?.height;
+                                    const scaleX =
+                                        paneCanvas.width / rect.width;
 
-                                const overlayOffsetX = cssOffsetX * scaleX;
-                                const overlayOffsetY = cssOffsetY * scaleY;
+                                    const overlayOffsetX = cssOffsetX * scaleX;
+                                    const overlayOffsetY = cssOffsetY * scaleY;
 
-                                const isLabel = findLimitLabelAtPosition(
-                                    overlayOffsetX,
-                                    overlayOffsetY,
-                                    drawnLabelsRef.current,
-                                );
-                                overlayCanvasMousePositionRef.current = {
-                                    x: overlayOffsetX,
-                                    y: overlayOffsetY,
-                                };
+                                    const isLabel = findLimitLabelAtPosition(
+                                        overlayOffsetX,
+                                        overlayOffsetY,
+                                        drawnLabelsRef.current,
+                                    );
+                                    overlayCanvasMousePositionRef.current = {
+                                        x: overlayOffsetX,
+                                        y: overlayOffsetY,
+                                    };
 
-                                const pane = iframeDoc?.querySelector(
-                                    '.chart-markup-table.pane',
-                                );
-                                if (isLabel) {
-                                    setShowPlusButton(false);
-                                    if (overlayCanvasRef.current) {
-                                        if (isLabel.matchType === 'onLabel') {
+                                    const pane = iframeDoc?.querySelector(
+                                        '.chart-markup-table.pane',
+                                    );
+                                    if (isLabel) {
+                                        setShowPlusButton(false);
+                                        if (overlayCanvasRef.current) {
                                             if (
-                                                isLabel.label?.type === 'Cancel'
+                                                isLabel.matchType === 'onLabel'
                                             ) {
-                                                if (pane) {
-                                                    (
-                                                        pane as HTMLElement
-                                                    ).style.cursor = 'pointer';
+                                                if (
+                                                    isLabel.label?.type ===
+                                                    'Cancel'
+                                                ) {
+                                                    if (pane) {
+                                                        (
+                                                            pane as HTMLElement
+                                                        ).style.cursor =
+                                                            'pointer';
+                                                    }
+                                                } else if (
+                                                    isLabel.parentLine.type ===
+                                                        'PNL' ||
+                                                    (isLabel.parentLine.type ===
+                                                        'LIQ' &&
+                                                        !isLiqPriceLineDraggable)
+                                                ) {
+                                                    if (pane) {
+                                                        (
+                                                            pane as HTMLElement
+                                                        ).style.cursor =
+                                                            'crosshair';
+                                                    }
+                                                } else {
+                                                    if (
+                                                        isLabel.parentLine
+                                                            .type ===
+                                                        'PREVIEW_ORDER'
+                                                    ) {
+                                                        (
+                                                            pane as HTMLElement
+                                                        ).style.cursor =
+                                                            'row-resize';
+                                                        overlayCanvasRef.current.style.cursor =
+                                                            'row-resize';
+                                                    }
+
+                                                    overlayCanvasRef.current.style.pointerEvents =
+                                                        'auto';
                                                 }
-                                            } else if (
-                                                isLabel.parentLine.type ===
-                                                    'PNL' ||
-                                                (isLabel.parentLine.type ===
-                                                    'LIQ' &&
-                                                    !isLiqPriceLineDraggable)
+                                            }
+
+                                            if (
+                                                isLabel.matchType === 'onLine'
                                             ) {
                                                 if (pane) {
                                                     (
@@ -706,42 +748,19 @@ const LabelComponent = ({
                                                     ).style.cursor =
                                                         'crosshair';
                                                 }
-                                            } else {
-                                                if (
-                                                    isLabel.parentLine.type ===
-                                                    'PREVIEW_ORDER'
-                                                ) {
-                                                    (
-                                                        pane as HTMLElement
-                                                    ).style.cursor =
-                                                        'row-resize';
-                                                    overlayCanvasRef.current.style.cursor =
-                                                        'row-resize';
-                                                }
-
-                                                overlayCanvasRef.current.style.pointerEvents =
-                                                    'auto';
                                             }
                                         }
-
-                                        if (isLabel.matchType === 'onLine') {
-                                            if (pane) {
-                                                (
-                                                    pane as HTMLElement
-                                                ).style.cursor = 'crosshair';
-                                            }
+                                    } else {
+                                        setShowPlusButton(true);
+                                        if (pane) {
+                                            (pane as HTMLElement).style.cursor =
+                                                'crosshair';
                                         }
-                                    }
-                                } else {
-                                    setShowPlusButton(true);
-                                    if (pane) {
-                                        (pane as HTMLElement).style.cursor =
-                                            'crosshair';
                                     }
                                 }
                             }
-                        }
-                    });
+                        },
+                    );
             });
         }
     }, [chart, drawnLabelsRef.current, isDrag, isMobile]);
@@ -893,7 +912,7 @@ const LabelComponent = ({
             const timeOfTxBuildStart = Date.now();
             // Execute the cancel order
             const result = await executeCancelOrder({
-                orderId: order.oid,
+                orderId: BigInt(order.oid),
             });
 
             if (result.success) {

@@ -6,6 +6,7 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { calcLeverageFloor } from '@crocswap-libs/ambient-ember';
 import { useSetUserMarginService } from '~/hooks/useSetUserMarginService';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
+import type { SetUserMarginResult } from '~/services/setUserMarginService';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { getTxLink } from '~/utils/Constants';
@@ -84,7 +85,7 @@ export default function LeverageSliderModal({
             );
 
             // Create a timeout promise
-            const timeoutPromise = new Promise((_, reject) => {
+            const timeoutPromise = new Promise<never>((_, reject) => {
                 setTimeout(
                     () =>
                         reject(
@@ -95,7 +96,7 @@ export default function LeverageSliderModal({
             });
 
             // Race between the transaction and the timeout
-            const result = await Promise.race([
+            const result: SetUserMarginResult = await Promise.race([
                 executeSetUserMargin({ userSetImBps: userImBps }),
                 timeoutPromise,
             ]);

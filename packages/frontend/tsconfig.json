@@ -5,6 +5,7 @@
         "**/.client/**/*",
         ".react-router/types/**/*"
     ],
+    "exclude": ["app/tv/**/*", "server/**/*"],
     "compilerOptions": {
         "lib": ["DOM", "DOM.Iterable", "ES2022"],
         "types": ["vite/client"],
@@ -15,6 +16,9 @@
         "rootDirs": [".", "./.react-router/types"],
         "baseUrl": ".",
         "paths": {
+            "~/tv/charting_library": [
+                "./app/routes/chart/lazyLoading/charting_library.mock.d.ts"
+            ],
             "~/*": ["./app/*"]
         },
         "esModuleInterop": true,

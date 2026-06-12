@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import styles from './buttonShowcase.module.css';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import SimpleButton, {
+    type SimpleButtonProps,
+} from '~/components/SimpleButton/SimpleButton';
 
 // SimpleButton Component (your original component with CSS modules)
 // Main Showcase Component
 export default function ButtonShowcase() {
     const [showCode, setShowCode] = useState<any>({});
 
-    const backgroundColors = [
+    const backgroundColors: NonNullable<SimpleButtonProps['bg']>[] = [
         'green',
         'red',
         'accent1',

@@ -189,7 +189,10 @@ export default function WebDataConsumer() {
             const webData2Config = {
                 handler: (data: any) => {
                     // WsContext passes msg.data directly to handler
-                    postWebData2MarketOnly({ data });
+                    postWebData2MarketOnly({
+                        channel: WsChannels.WEB_DATA2,
+                        data,
+                    });
                 },
                 payload: { user: DUMMY_ADDRESS },
             };
