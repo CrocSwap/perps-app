@@ -95,6 +95,21 @@ function hyperliquidInfoResponse(route: Route) {
     const postData = postDataJSON(route);
 
     switch (postData.type) {
+        case 'l2Book':
+            return jsonResponse({
+                coin: 'BTC',
+                time: Date.UTC(2026, 0, 1),
+                levels: [
+                    [
+                        { px: '99950', sz: '1.25', n: 2 },
+                        { px: '99900', sz: '0.75', n: 1 },
+                    ],
+                    [
+                        { px: '100050', sz: '1.1', n: 2 },
+                        { px: '100100', sz: '0.9', n: 1 },
+                    ],
+                ],
+            });
         case 'meta':
             return jsonResponse({ universe: marketUniverse });
         case 'metaAndAssetCtxs':
