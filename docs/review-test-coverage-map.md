@@ -18,7 +18,7 @@ the current coverage.
 - Include pattern: `app/**/*.test.{ts,tsx}`.
 - CI command: `pnpm test:ci`.
 - Coverage command: `pnpm test:coverage`.
-- Current result: 15 test files, 98 tests passing.
+- Current result: 16 test files, 102 tests passing.
 - Current coverage baseline: statements 29.12%, branches 18.6%, functions
   24.08%, lines 29.64%.
 
@@ -32,7 +32,7 @@ It still does not declare Testing Library, jsdom/happy-dom, or MSW.
 - Browser project: Chromium desktop.
 - Test directory: `packages/frontend/e2e`.
 - Command: `pnpm test:smoke`.
-- Current result: 13 Chromium smoke tests passing.
+- Current result: 15 Chromium smoke tests passing.
 - Current route set: `/`, `/v2/trade`, `/v2/portfolio`, `/v2/referrals`,
   `/v2/vaults`, `/v2/agents`, `/v2/more`, `/v2/privacy`, `/v2/terms`, and a
   not-found route.
@@ -54,6 +54,7 @@ It still does not declare Testing Library, jsdom/happy-dom, or MSW.
 | Provider/polling managers           | `app/services/providerManagers.test.ts`                                                                                      | Market-order-log caching, unified-margin empty-bucket updates/reset, notification auto-removal, Pyth subscription/cache cleanup, malformed Pyth payload containment, and monitor failure status changes with fake timers. |
 | Browser route smoke                 | `e2e/app-smoke.spec.ts`                                                                                                      | Real Chromium app boot, lazy route rendering, deterministic provider startup mocks, generated-file independence, and not-found route rendering.                                                                           |
 | Table/form regressions              | `app/components/Tables/GenericTable/*.test.ts`, `app/stores/useTableSortStore.test.ts`, `e2e/table-form-regressions.spec.ts` | Sort-cycle helpers, table empty/loading/filled decisions, CSV cell formatting, persisted sort entries, no-wallet trade form guards, reduce-only safe default state, and protected portfolio state.                        |
+| TradingView overlay smoke           | `app/routes/chart/orders/component/chartElementControlIntent.test.ts`, `e2e/tradingview-overlay-smoke.spec.ts`               | Local TradingView iframe boot, pane canvas readiness, app overlay canvas injection, Quick Trade chart-control open/cancel behavior, and pure chart-line cancel/confirm intent decisions.                                  |
 
 ## Major Untested Surfaces
 
@@ -80,8 +81,9 @@ It still does not declare Testing Library, jsdom/happy-dom, or MSW.
    no-wallet order form and protected table states.
 
 3. `review-tradingview-overlay-smoke`
-   Add narrow browser checks for chart script loading, overlay canvas presence,
-   and order-line interaction once stable chart fixtures are available.
+   Added narrow browser checks for local TradingView boot, overlay canvas
+   presence, and a safe chart-control interaction path, plus Node coverage for
+   chart-line cancel/confirm intent decisions.
 
 ## CI Recommendation
 
