@@ -6,9 +6,10 @@ The current test suite now covers the first fast validation layer for the perps
 app: referral/refreg utilities, deterministic data processors, worker message
 normalization, transaction-service envelopes, provider fetch boundaries, and
 polling/notification managers. The repo now also has a narrow Playwright
-Chromium smoke layer for route rendering through the real browser app shell.
-Visual trading workflows, wallet flows, and chart interactions remain outside
-the current coverage.
+Chromium smoke layer for route rendering, guarded no-wallet form states,
+TradingView overlay boot, and disconnected session behavior through the real
+browser app shell. Live wallet flows, real provider availability, and
+pixel-perfect chart correctness remain outside the current coverage.
 
 ## Current Test Harness
 
@@ -18,7 +19,7 @@ the current coverage.
 - Include pattern: `app/**/*.test.{ts,tsx}`.
 - CI command: `pnpm test:ci`.
 - Coverage command: `pnpm test:coverage`.
-- Current result: 16 test files, 102 tests passing.
+- Current result: 17 test files, 109 tests passing.
 - Current coverage baseline: statements 29.12%, branches 18.6%, functions
   24.08%, lines 29.64%.
 
@@ -32,7 +33,7 @@ It still does not declare Testing Library, jsdom/happy-dom, or MSW.
 - Browser project: Chromium desktop.
 - Test directory: `packages/frontend/e2e`.
 - Command: `pnpm test:smoke`.
-- Current result: 15 Chromium smoke tests passing.
+- Current result: 17 Chromium smoke tests passing.
 - Current route set: `/`, `/v2/trade`, `/v2/portfolio`, `/v2/referrals`,
   `/v2/vaults`, `/v2/agents`, `/v2/more`, `/v2/privacy`, `/v2/terms`, and a
   not-found route.
@@ -55,20 +56,21 @@ It still does not declare Testing Library, jsdom/happy-dom, or MSW.
 | Browser route smoke                 | `e2e/app-smoke.spec.ts`                                                                                                      | Real Chromium app boot, lazy route rendering, deterministic provider startup mocks, generated-file independence, and not-found route rendering.                                                                           |
 | Table/form regressions              | `app/components/Tables/GenericTable/*.test.ts`, `app/stores/useTableSortStore.test.ts`, `e2e/table-form-regressions.spec.ts` | Sort-cycle helpers, table empty/loading/filled decisions, CSV cell formatting, persisted sort entries, no-wallet trade form guards, reduce-only safe default state, and protected portfolio state.                        |
 | TradingView overlay smoke           | `app/routes/chart/orders/component/chartElementControlIntent.test.ts`, `e2e/tradingview-overlay-smoke.spec.ts`               | Local TradingView iframe boot, pane canvas readiness, app overlay canvas injection, Quick Trade chart-control open/cancel behavior, and pure chart-line cancel/confirm intent decisions.                                  |
+| Websocket/session lifecycle         | `app/contexts/wsLifecycle.test.ts`, `e2e/websocket-session-lifecycle.spec.ts`                                                | Fake-WebSocket connect/subscribe/dispatch/reconnect/unsubscribe behavior, offline/tab-active deferral, sleep-mode suppression, cleanup, and no-wallet session route boot.                                                 |
 
 ## Major Untested Surfaces
 
-| Risk Area                    | Why It Matters                                                                                          | Missing Proof                                                                                                                                                                 | Smallest Useful Check                                                                                                                                                                              |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Data processors and workers  | Websocket and HTTP data feed most tables and account state.                                             | Node tests now cover core normalization and worker envelopes, but not every sort branch or websocket lifecycle interaction.                                                   | Extend branch coverage around table-specific sorting and add websocket context lifecycle tests separately.                                                                                         |
-| Transaction services         | Market, limit, cancel, leverage, deposit, and withdraw services build/send wallet transactions.         | Node tests cover builder/send envelopes and key parameters with mocked builders; they do not prove on-chain instruction correctness.                                          | Add SDK/contract-level transaction fixture checks if the Ember SDK exposes stable instruction decoding fixtures.                                                                                   |
-| Session/refreg app effects   | `AppContext` sends connect-wallet referral instructions when sessions establish.                        | Pure gating and duplicate-key helpers are covered; the React effect itself is not mounted in a provider harness.                                                              | Add a future component/provider test once jsdom or a browser harness is deliberately introduced.                                                                                                   |
-| Websocket lifecycle          | `WsContext` owns reconnects, subscription routing, ready state, and sleeps/retries.                     | No tests prove reconnect backoff, unsubscribe behavior, message routing, or cleanup on unmount.                                                                               | Add a fake `WebSocket` harness in node or jsdom and test connect, message dispatch to subscribed handler, close-triggered reconnect, and unsubscribe cleanup.                                      |
-| TradingView/chart overlays   | Chart lines, y-axis overlay, drag/cancel/edit behavior are core trading UX.                             | Typecheck/build prove compilation only; no browser or canvas interaction checks.                                                                                              | Add a browser smoke harness after Playwright is introduced: open trade route with mocked chart/data, assert overlay canvas renders, drag intent updates state, cancel action calls mocked service. |
-| Order input workflow         | Sizing, leverage, reduce-only, TP/SL, market/limit toggles, and validation are core order safety.       | No component or integration tests prove disabled states, edge values, min order checks, or modal confirmation flow.                                                           | Start with pure hook/helper tests where possible; then add component tests for invalid size, unavailable session, max leverage, and confirm button service call.                                   |
-| Tables and sorting           | Open orders, positions, fills, funding, TWAP, balances, deposits/withdrawals drive portfolio decisions. | Generic table persistence and row formatting are untested, and mock data drift already caused type failures.                                                                  | Add tests for table sort persistence, empty state, CSV formatting edge cases, and one row-format test per high-value table.                                                                        |
-| Routes and navigation        | The app has many route entry points and feature views.                                                  | Browser smoke tests now cover core route rendering and not-found behavior, but not navigation interactions, mobile layout, or route-specific user workflows.                  | Add interaction checks for header navigation, protected/no-wallet states, and mobile route layout.                                                                                                 |
-| Provider/live API boundaries | FUUL, info API, Pyth, websocket, and chain RPC calls can spend time/money and fail.                     | FUUL, info API, Pyth, and fixture-level RPC envelopes now have deterministic Node coverage for several failure shapes; websocket/session provider lifecycle remains untested. | Add fake-websocket lifecycle tests and keep any further provider checks mocked or explicitly gated.                                                                                                |
+| Risk Area                    | Why It Matters                                                                                          | Missing Proof                                                                                                                                                                   | Smallest Useful Check                                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Data processors and workers  | Websocket and HTTP data feed most tables and account state.                                             | Node tests cover core normalization, worker envelopes, and websocket lifecycle routing, but not every consumer render path fed by those payloads.                               | Add consumer-level checks for the highest-value websocket-fed tables if a future browser/component harness is intentionally introduced. |
+| Transaction services         | Market, limit, cancel, leverage, deposit, and withdraw services build/send wallet transactions.         | Node tests cover builder/send envelopes and key parameters with mocked builders; they do not prove on-chain instruction correctness.                                            | Add SDK/contract-level transaction fixture checks if the Ember SDK exposes stable instruction decoding fixtures.                        |
+| Session/refreg app effects   | `AppContext` sends connect-wallet referral instructions when sessions establish.                        | Pure gating and duplicate-key helpers are covered; the React effect itself is not mounted in a provider harness.                                                                | Add a future component/provider test once jsdom or a browser harness is deliberately introduced.                                        |
+| Websocket lifecycle          | `WsContext` owns reconnects, subscription routing, ready state, and sleeps/retries.                     | Fake-WebSocket tests now cover lifecycle envelopes, routing, reconnect deferral, and cleanup, but not live websocket payload compatibility or every consumer render path.       | Add consumer-level checks for the highest-value websocket-fed tables if a future browser/component harness is intentionally introduced. |
+| TradingView/chart overlays   | Chart lines, y-axis overlay, drag/cancel/edit behavior are core trading UX.                             | Browser smoke proves local iframe/canvas/overlay boot and one safe chart-control path, but not pixel-perfect rendering, drag behavior, or live TradingView data correctness.    | Add deeper chart interaction checks only when a stable mocked chart API path exists for drag/edit behavior.                             |
+| Order input workflow         | Sizing, leverage, reduce-only, TP/SL, market/limit toggles, and validation are core order safety.       | Browser smoke now covers guarded no-wallet form state and reduce-only defaults, but not wallet-enabled confirmation, live best-bid/ask changes, or real signing.                | Add wallet/session-enabled order-flow checks only after a deterministic wallet/signing harness exists.                                  |
+| Tables and sorting           | Open orders, positions, fills, funding, TWAP, balances, deposits/withdrawals drive portfolio decisions. | Generic table sorting, persistence, empty-state decisions, and CSV formatting helpers are covered; individual high-value table row renderers are still not exhaustively tested. | Add one focused row-format test per high-value table when touching those table modules.                                                 |
+| Routes and navigation        | The app has many route entry points and feature views.                                                  | Browser smoke tests now cover core route rendering and not-found behavior, but not navigation interactions, mobile layout, or route-specific user workflows.                    | Add interaction checks for header navigation, protected/no-wallet states, and mobile route layout.                                      |
+| Provider/live API boundaries | FUUL, info API, Pyth, websocket, and chain RPC calls can spend time/money and fail.                     | FUUL, info API, Pyth, fixture-level RPC envelopes, and websocket lifecycle behavior have deterministic coverage; live provider availability remains intentionally unproven.     | Keep any future provider checks mocked or explicitly gated from default CI.                                                             |
 
 ## Recommended Test Branches
 
@@ -84,6 +86,10 @@ It still does not declare Testing Library, jsdom/happy-dom, or MSW.
    Added narrow browser checks for local TradingView boot, overlay canvas
    presence, and a safe chart-control interaction path, plus Node coverage for
    chart-line cancel/confirm intent decisions.
+
+4. `review-websocket-session-lifecycle`
+   Added fake-WebSocket lifecycle coverage plus disconnected trade/referrals
+   browser smoke checks.
 
 ## CI Recommendation
 
@@ -109,5 +115,6 @@ their own timeouts and fixtures.
 
 - It executes a browser smoke harness, but it does not execute a wallet,
   websocket server, or live chain RPC.
-- It does not prove TradingView runtime behavior.
+- It proves only narrow local TradingView smoke behavior, not live TradingView
+  data correctness or pixel-perfect rendering.
 - It does not prove transaction correctness against the real on-chain program.

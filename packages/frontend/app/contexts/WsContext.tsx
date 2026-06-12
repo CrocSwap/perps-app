@@ -9,21 +9,21 @@ import React, {
 } from 'react';
 import { useIsClient } from '~/hooks/useIsClient';
 import { useDebugStore } from '~/stores/DebugStore';
-import { useWorker, WORKERS } from '~/hooks/useWorker';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import {
+    WebSocketReadyState,
+    WsLifecycleController,
+    type WsLike,
+    type WsSubscriptionConfig,
+} from './wsLifecycle';
+
+export type { WsSubscriptionConfig } from './wsLifecycle';
 
 interface WsContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribeAllByChannel: (channel: string) => void;
     forceReconnect: () => void;
-}
-
-enum WebSocketReadyState {
-    CONNECTING = 0,
-    OPEN = 1,
-    CLOSING = 2,
-    CLOSED = 3,
 }
 
 export const WsContext = createContext<WsContextType>({
@@ -38,35 +38,17 @@ export interface WsProviderProps {
     url: string;
 }
 
-export interface WsSubscriptionConfig {
-    handler: (payload: any) => void;
-    payload?: any;
-    single?: boolean;
-}
-
 export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     //----------------------------------- ws context
 
     const isClient = useIsClient();
-    const [readyState, setReadyState] = useState<number>(
-        WebSocketReadyState.CLOSED,
-    );
-    const readyStateRef = useRef<number>(WebSocketReadyState.CLOSED);
-    readyStateRef.current = readyState;
-    const workers = useRef<Map<string, Worker>>(new Map());
-    const socketRef = useRef<WebSocket | null>(null);
-    const subscriptions = useRef<Map<string, WsSubscriptionConfig[]>>(
-        new Map(),
-    );
-    const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-        null,
-    );
-    const reconnectAttemptsRef = useRef(0);
-    const connectWebSocketRef = useRef<() => void>(() => {});
-    const scheduleReconnectRef = useRef<(reason?: string) => void>(() => {});
+    const [, setReadyState] = useState<number>(WebSocketReadyState.CLOSED);
+    const controllerRef = useRef<WsLifecycleController | null>(null);
 
     const { isWsSleepMode } = useDebugStore();
     const { isTabActive, setWsReconnecting } = useAppStateStore();
+    const isClientRef = useRef(isClient);
+    isClientRef.current = isClient;
     const sleepModeRef = useRef(isWsSleepMode);
     sleepModeRef.current = isWsSleepMode;
 
@@ -76,268 +58,63 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     const isTabActiveRef = useRef(isTabActive);
     isTabActiveRef.current = isTabActive;
 
-    const shouldReconnect = useRef(false);
-    const shouldReconnectForTabActive = useRef(false);
-
-    function extractChannelFromPayload(raw: string): string {
-        const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
-        return match ? match[1] : '';
-    }
-
-    const connectWebSocket = useCallback(() => {
-        if (!isClient) {
-            return;
-        } // ✅ Ensure WebSocket only runs on client side
-
-        if (reconnectTimeoutRef.current) {
-            clearTimeout(reconnectTimeoutRef.current);
-            reconnectTimeoutRef.current = null;
-        }
-
-        // Close the previous WebSocket if it exists
-        if (
-            socketRef.current &&
-            socketRef.current.readyState !== WebSocketReadyState.CLOSED
-        ) {
-            socketRef.current.close();
-        }
-
-        // Create a new WebSocket connection
-        const socket = new WebSocket(url);
-        socketRef.current = socket;
-
-        socket.onopen = () => {
-            setReadyState(WebSocketReadyState.OPEN);
-            setWsReconnecting(false);
-            reconnectAttemptsRef.current = 0;
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current);
-                reconnectTimeoutRef.current = null;
-            }
-        };
-
-        socket.onmessage = (event) => {
-            if (sleepModeRef.current) {
-                return;
-            }
-
-            if (event.data) {
-                const channel = extractChannelFromPayload(event.data);
-                // const worker = getWorker(channel);
-                // if (worker) {
-                //     worker.postMessage(event.data);
-                // }
-
-                // const sub = subscriptions.current.get(channel);
-                // if(sub){
-                //   subscriptions.current.get(channel)?.forEach(config => {
-                //     config.handler(event.data);
-                //   });
-                // }
-
-                const msg = JSON.parse(event.data);
-
-                if (subscriptions.current.has(msg.channel)) {
-                    subscriptions.current
-                        .get(msg.channel)
-                        ?.forEach((config) => {
-                            config.handler(msg.data);
-                        });
-                }
-            }
-        };
-
-        socket.onclose = () => {
-            if (socketRef.current !== socket) {
-                return;
-            }
-            setReadyState(WebSocketReadyState.CLOSED);
-            scheduleReconnectRef.current('close');
-        };
-
-        socket.onerror = (error) => {
-            if (socketRef.current !== socket) {
-                return;
-            }
-            socket.close();
-        };
-    }, [isClient, setWsReconnecting, url]);
-
-    const scheduleReconnect = useCallback(
-        (reason?: string) => {
-            if (!isClient) return;
-
-            if (!internetConnectedRef.current) {
-                shouldReconnect.current = true;
-                return;
-            }
-
-            if (!isTabActiveRef.current || sleepModeRef.current) {
-                shouldReconnectForTabActive.current = true;
-                return;
-            }
-
-            const state = socketRef.current?.readyState;
-            if (
-                state === WebSocketReadyState.OPEN ||
-                state === WebSocketReadyState.CONNECTING
-            ) {
-                return;
-            }
-
-            if (reconnectTimeoutRef.current) {
-                return;
-            }
-
-            setWsReconnecting(true);
-            const delay = Math.min(
-                1000 * Math.pow(2, reconnectAttemptsRef.current),
-                10000,
-            );
-            reconnectTimeoutRef.current = setTimeout(() => {
-                reconnectTimeoutRef.current = null;
-                reconnectAttemptsRef.current += 1;
-                connectWebSocketRef.current();
-            }, delay);
-        },
-        [isClient, setWsReconnecting],
-    );
-
-    useEffect(() => {
-        connectWebSocketRef.current = connectWebSocket;
-    }, [connectWebSocket]);
-
-    useEffect(() => {
-        scheduleReconnectRef.current = scheduleReconnect;
-    }, [scheduleReconnect]);
-
-    useEffect(() => {
-        if (isClient) {
-            connectWebSocket();
-        }
-
-        return () => {
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current);
-                reconnectTimeoutRef.current = null;
-            }
-            socketRef.current?.close();
-        };
-    }, [url, isClient]); // ✅ Only runs when client-side is ready
-
-    const sendMessage = (msg: string) => {
-        if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
-            socketRef.current.send(msg);
-        }
-    };
-
-    const registerWsSubscription = (
-        type: string,
-        payload: any,
-        unsubscribe: boolean = false,
-    ) => {
-        sendMessage(
-            JSON.stringify({
-                method: unsubscribe ? 'unsubscribe' : 'subscribe',
-                subscription: {
-                    type: type,
-                    ...payload,
-                },
-            }),
-        );
-    };
-
-    useEffect(() => {
-        if (readyStateRef.current === WebSocketReadyState.OPEN) {
-            subscriptions.current.forEach((configs, key) => {
-                configs.forEach((config) => {
-                    registerWsSubscription(key, config.payload || {});
-                });
+    const getController = useCallback(() => {
+        if (!controllerRef.current) {
+            controllerRef.current = new WsLifecycleController({
+                url,
+                createSocket: (socketUrl) =>
+                    new WebSocket(socketUrl) as unknown as WsLike,
+                getIsClient: () => isClientRef.current,
+                getSleepMode: () => sleepModeRef.current,
+                getInternetConnected: () => internetConnectedRef.current,
+                getIsTabActive: () => isTabActiveRef.current,
+                setWsReconnecting,
+                setReadyState,
             });
         }
-    }, [readyState]);
+
+        return controllerRef.current;
+    }, [setWsReconnecting, url]);
 
     useEffect(() => {
-        if (!internetConnected) {
-            if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
-                socketRef.current?.close();
-                shouldReconnect.current = true;
-            }
-        } else {
-            if (shouldReconnect.current) {
-                connectWebSocket();
-                shouldReconnect.current = false;
-            }
-        }
+        if (!isClient) return;
+
+        getController().connect();
+
+        return () => {
+            controllerRef.current?.cleanup();
+            controllerRef.current = null;
+        };
+    }, [url, isClient, getController]); // ✅ Only runs when client-side is ready
+
+    useEffect(() => {
+        controllerRef.current?.handleInternetConnectedChange(internetConnected);
     }, [internetConnected]);
 
     useEffect(() => {
-        if (isTabActive) {
-            if (
-                socketRef.current?.readyState !== WebSocketReadyState.OPEN &&
-                shouldReconnectForTabActive.current
-            ) {
-                setWsReconnecting(true);
-                connectWebSocket();
-            }
-            shouldReconnectForTabActive.current = false;
-        } else {
-            shouldReconnectForTabActive.current = true;
-        }
+        controllerRef.current?.handleTabActiveChange(isTabActive);
     }, [isTabActive]);
 
     const subscribe = useCallback(
         (key: string, config: WsSubscriptionConfig) => {
-            if (!subscriptions.current.has(key)) {
-                subscriptions.current.set(key, []);
-            }
-
-            if (config.single) {
-                const currentSubs = subscriptions.current.get(key) || [];
-                currentSubs.forEach((sub) => {
-                    registerWsSubscription(key, sub.payload || {}, true);
-                });
-                subscriptions.current.set(key, [config]);
-            } else {
-                subscriptions.current.get(key)!.push(config);
-            }
-
-            // add subscription through websocket context
-            registerWsSubscription(key, config.payload || {});
-
-            if (socketRef.current?.readyState !== WebSocketReadyState.OPEN) {
-                scheduleReconnectRef.current('subscribe');
-            }
+            getController().subscribe(key, config);
         },
-        [],
+        [getController],
     );
 
     // unsubscribe all subscriptions by channel
-    const unsubscribeAllByChannel = useCallback((channel: string) => {
-        if (subscriptions.current.has(channel)) {
-            subscriptions.current.get(channel)!.forEach((config) => {
-                registerWsSubscription(channel, config.payload || {}, true);
-            });
-        }
-        subscriptions.current.delete(channel);
-    }, []);
+    const unsubscribeAllByChannel = useCallback(
+        (channel: string) => {
+            getController().unsubscribeAllByChannel(channel);
+        },
+        [getController],
+    );
 
     const unsubscribe = useCallback(
         (key: string, config: WsSubscriptionConfig) => {
-            if (subscriptions.current.has(key)) {
-                const configs = subscriptions.current
-                    .get(key)!
-                    .filter((c) => c !== config);
-                if (configs.length === 0) {
-                    subscriptions.current.delete(key);
-                } else {
-                    subscriptions.current.set(key, configs);
-                }
-                // Send unsubscribe message to server
-                registerWsSubscription(key, config.payload || {}, true);
-            }
+            getController().unsubscribe(key, config);
         },
-        [],
+        [getController],
     );
 
     // const initWorker = (type: string) => {
@@ -395,16 +172,9 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     //     }
     // };
 
-    const getWorker = (type: string) => {
-        return workers.current.get(type);
-    };
-
     const forceReconnect = useCallback(() => {
-        if (sleepModeRef.current) {
-            return;
-        }
-        connectWebSocket();
-    }, []);
+        getController().forceReconnect();
+    }, [getController]);
 
     const contextValue = useMemo(
         () => ({
