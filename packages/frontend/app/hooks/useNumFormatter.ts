@@ -146,7 +146,7 @@ export function useNumFormatter() {
                     formattedNum = formattedNum
                         .replace(
                             new RegExp(
-                                `(${activeDecimalSeparator}\d*?[1-9])0+$`,
+                                `(${activeDecimalSeparator}\\d*?[1-9])0+$`,
                                 'g',
                             ),
                             '$1',

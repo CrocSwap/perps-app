@@ -274,8 +274,9 @@ export default function CodeTabs(props: PropsIF) {
             (async () => {
                 const userCodeData =
                     await referralStore.getRefCodeByPubKey(referrerAddress);
+                const userCode = userCodeData?.codes?.[0]?.code;
                 const isOwnedByUser =
-                    userCodeData?.code === referralStore.cached.code ||
+                    userCode === referralStore.cached.code ||
                     referralStore.cached.code === referrerAddress;
                 !isOwnedByUser &&
                     setRefCodeToConsume(referralStore.cached.code);
@@ -497,8 +498,8 @@ export default function CodeTabs(props: PropsIF) {
         referralStore
             .getRefCodeByPubKey(referrerAddress.toString())
             .then((userCodeData) => {
-                const isSelfOwned =
-                    userCodeData?.code === debouncedUserInputRefCode;
+                const userCode = userCodeData?.codes?.[0]?.code;
+                const isSelfOwned = userCode === debouncedUserInputRefCode;
                 setIsUserInputRefCodeSelfOwned(isSelfOwned);
             })
             .catch((err) => {
@@ -727,7 +728,6 @@ export default function CodeTabs(props: PropsIF) {
     const createRefCode = async () => {
         try {
             // Get the user's wallet address from the session
-            // @ts-ignore - The session type might not be fully typed
             if (isEstablished(sessionState)) {
                 const userWalletKey =
                     sessionState.walletPublicKey ||
@@ -752,38 +752,32 @@ export default function CodeTabs(props: PropsIF) {
                 // Convert message to Uint8Array
                 const messageBytes = new TextEncoder().encode(message);
 
-                try {
-                    console.log(sessionState);
-                    // Get the signature from the session
-                    const signatureBytes =
-                        await sessionState.solanaWallet.signMessage(
-                            messageBytes,
-                        );
+                console.log(sessionState);
+                // Get the signature from the session
+                const signatureBytes =
+                    await sessionState.solanaWallet.signMessage(messageBytes);
 
-                    // Convert the signature to base64
-                    const signatureArray = Array.from(
-                        new Uint8Array(signatureBytes),
-                    );
-                    const binaryString = String.fromCharCode.apply(
-                        null,
-                        signatureArray,
-                    );
-                    const signature = btoa(binaryString);
+                // Convert the signature to base64
+                const signatureArray = Array.from(
+                    new Uint8Array(signatureBytes),
+                );
+                const binaryString = String.fromCharCode.apply(
+                    null,
+                    signatureArray,
+                );
+                const signature = btoa(binaryString);
 
-                    // Call the Fuul SDK to create the referral code
-                    await Fuul.createAffiliateCode({
-                        userIdentifier: userWalletKey.toString(),
-                        identifierType: UserIdentifierType.SolanaAddress,
-                        signature,
-                        signaturePublicKey: userWalletKey.toString(),
-                        code: codeToCreate,
-                    });
+                // Call the Fuul SDK to create the referral code
+                await Fuul.createAffiliateCode({
+                    userIdentifier: userWalletKey.toString(),
+                    identifierType: UserIdentifierType.SolanaAddress,
+                    signature,
+                    signaturePublicKey: userWalletKey.toString(),
+                    code: codeToCreate,
+                });
 
-                    setTemporaryReferrerCode('');
-                    setReferrerCode(codeToCreate);
-                } catch (error) {
-                    throw error;
-                }
+                setTemporaryReferrerCode('');
+                setReferrerCode(codeToCreate);
             }
         } catch (error) {
             console.error('Error creating referral code:', error);

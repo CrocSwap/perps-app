@@ -14,7 +14,9 @@
         "lint:fix": "pnpm --filter frontend lint:fix",
         "typecheck": "pnpm --filter frontend typecheck",
         "test": "pnpm --filter frontend test",
-        "test:ci": "pnpm --filter frontend test:ci"
+        "test:ci": "pnpm --filter frontend test:ci",
+        "test:coverage": "pnpm --filter frontend test:coverage",
+        "test:smoke": "pnpm --filter frontend test:smoke"
     },
     "lint-staged": {
         "**/*": "prettier --write --ignore-unknown"
@@ -23,11 +25,5 @@
         "husky": "^9.1.7",
         "lint-staged": "^16.4.0",
         "prettier": "^3.8.3"
-    },
-    "pnpm": {
-        "overrides": {
-            "axios": "1.15.2",
-            "bn.js": "5.2.3"
-        }
     }
 }

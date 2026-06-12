@@ -9,4 +9,5 @@ export {
     type WebSocketInstanceConfig,
     type SocketType,
 } from './websocket-instance';
-export * from './websocket-pool';
+export { WebSocketPool } from './websocket-pool';
+export type { WebSocketEndpoints, WebSocketPoolConfig } from './websocket-pool';

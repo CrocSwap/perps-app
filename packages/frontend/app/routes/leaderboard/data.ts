@@ -1,4 +1,4 @@
-import type { LeaderboardData } from './LeaderboardTableRow';
+import type { LeaderboardData } from '~/components/Leaderboard/LeaderboardTable/LeaderboardTableRow';
 
 // Utility function to generate random wallet addresses
 const generateWalletAddress = () => {

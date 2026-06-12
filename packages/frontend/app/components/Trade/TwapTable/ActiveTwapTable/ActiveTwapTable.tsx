@@ -36,8 +36,13 @@ export default function ActiveTwapTable(props: ActiveTwapTableProps) {
 
     return (
         <>
-            <GenericTable<ActiveTwapIF, ActiveTwapSortBy>
+            <GenericTable<
+                ActiveTwapIF,
+                ActiveTwapSortBy,
+                () => Promise<ActiveTwapIF[]>
+            >
                 data={filteredData}
+                storageKey='active-twaps'
                 renderHeader={() => <ActiveTwapTableHeader />}
                 renderRow={(twap) => (
                     <ActiveTwapTableRow

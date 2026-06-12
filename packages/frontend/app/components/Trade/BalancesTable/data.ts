@@ -1,4 +1,12 @@
-import type { BalanceData } from './BalancesTableRow';
+interface BalanceData {
+    coin: string;
+    totalBalance: string;
+    availableBalance: string;
+    usdcValue: string;
+    buyingPower: string;
+    pnl: string;
+    contract: string;
+}
 
 export const balanceData: BalanceData[] = [
     {

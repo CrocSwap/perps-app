@@ -6,6 +6,7 @@ import {
     useRef,
     useState,
     type ChangeEvent,
+    type KeyboardEvent,
 } from 'react';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';

@@ -347,7 +347,7 @@ export default function GenericTable<
         if (typeof val === 'string') {
             const trimmed = val.trim();
 
-            if (/^[\$£€¥]/.test(trimmed)) {
+            if (/^[$£€¥]/.test(trimmed)) {
                 return `="${trimmed}"`;
             }
 

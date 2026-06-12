@@ -22,6 +22,10 @@ import {
     buildConnectWalletIx,
     pollConnectWalletConsistency,
 } from '~/utils/refreg';
+import {
+    getConnectWalletRefregGate,
+    getConnectWalletSubmissionKey,
+} from './connectWalletRefregGate';
 
 interface AppContextType {
     isUserConnected: boolean;
@@ -145,24 +149,45 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }, []);
 
     useEffect(() => {
+        const sessionEstablished = isEstablished(sessionState);
+
         console.info('[refreg] connect_wallet effect triggered', {
             path: location.pathname,
             userAddress,
             hasCachedReferralCode: Boolean(cachedReferralCode.code),
             isCachedReferralCodeApproved,
             cachedReferralApprovalNonce,
-            isSessionEstablished: isEstablished(sessionState),
+            isSessionEstablished: sessionEstablished,
         });
 
-        if (!isEstablished(sessionState)) {
+        const gate = getConnectWalletRefregGate({
+            isSessionEstablished: sessionEstablished,
+            hasSendTransaction:
+                sessionEstablished &&
+                typeof sessionState.sendTransaction === 'function',
+            hasWalletPublicKey:
+                sessionEstablished && Boolean(sessionState.walletPublicKey),
+            hasSessionPublicKey:
+                sessionEstablished && Boolean(sessionState.sessionPublicKey),
+            hasPayerPublicKey:
+                sessionEstablished && Boolean(sessionState.payer),
+            hasCachedReferralCode: Boolean(cachedReferralCode.code),
+            isCachedReferralCodeApproved,
+        });
+
+        if (!gate.shouldRun && gate.reason === 'session_not_established') {
             console.info(
                 '[refreg] connect_wallet effect skipped: session not established',
             );
             lastConnectWalletKeyRef.current = null;
             return;
         }
+        if (!sessionEstablished) {
+            lastConnectWalletKeyRef.current = null;
+            return;
+        }
 
-        if (typeof sessionState.sendTransaction !== 'function') {
+        if (!gate.shouldRun && gate.reason === 'send_transaction_unavailable') {
             console.info(
                 '[refreg] connect_wallet effect skipped: sendTransaction unavailable',
             );
@@ -172,19 +197,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         const walletPublicKey = sessionState.walletPublicKey;
         const sessionPublicKey = sessionState.sessionPublicKey;
         const payerPublicKey = sessionState.payer;
-        if (!walletPublicKey || !sessionPublicKey) {
+        const sendTransaction = sessionState.sendTransaction;
+        if (
+            !gate.shouldRun &&
+            gate.reason === 'missing_wallet_or_session_pubkey'
+        ) {
             console.info(
                 '[refreg] connect_wallet effect skipped: missing wallet/session pubkey',
             );
             return;
         }
-        if (!payerPublicKey) {
+        if (!gate.shouldRun && gate.reason === 'missing_payer_pubkey') {
             console.info(
                 '[refreg] connect_wallet effect skipped: missing payer/sponsor pubkey',
             );
             return;
         }
-        if (!cachedReferralCode.code || !isCachedReferralCodeApproved) {
+        if (!gate.shouldRun && gate.reason === 'referral_not_approved') {
             console.info(
                 '[refreg] connect_wallet effect skipped: referral not approved by invitee',
                 {
@@ -230,7 +259,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                     connectWallet.referralAttribution.sourceValue,
             });
 
-            const connectWalletSubmissionKey = `${connectWallet.fingerprint}:${cachedReferralApprovalNonce}`;
+            const connectWalletSubmissionKey = getConnectWalletSubmissionKey(
+                connectWallet.fingerprint,
+                cachedReferralApprovalNonce,
+            );
 
             if (
                 lastConnectWalletKeyRef.current === connectWalletSubmissionKey
@@ -272,7 +304,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                         isWritable: key.isWritable,
                     })),
                 });
-                const transactionResult = await sessionState.sendTransaction([
+                const transactionResult = await sendTransaction([
                     connectWallet.instruction,
                 ]);
                 const submitDurationMs = Date.now() - submitStartedAt;

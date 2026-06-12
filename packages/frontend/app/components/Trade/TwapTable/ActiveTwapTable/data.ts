@@ -1,4 +1,12 @@
-import type { ActiveTwapData } from './ActiveTwapTableRow';
+interface ActiveTwapData {
+    coin: string;
+    size: string;
+    executedSize: string;
+    averagePrice: string;
+    runningTime: string;
+    reduceOnly: string;
+    creationTime: string;
+}
 
 export const activeTwapsData: ActiveTwapData[] = [
     {

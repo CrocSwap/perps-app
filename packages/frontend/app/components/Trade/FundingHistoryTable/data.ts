@@ -1,4 +1,11 @@
-import type { FundingHistoryData } from './FundingHistoryTableRow';
+interface FundingHistoryData {
+    time: string;
+    coin: string;
+    size: string;
+    positionSide: string;
+    payment: string;
+    rate: string;
+}
 
 export const fundingHistoryData: FundingHistoryData[] = [
     {

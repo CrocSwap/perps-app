@@ -55,7 +55,6 @@ export default function Modal(props: ModalProps) {
             // external unmount, don't call the caller again
             dismiss('external');
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // run once on mount
 
     // Keep host in sync if props/children change while mounted

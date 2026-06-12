@@ -1,5 +1,8 @@
 packages:
     - packages/*
+overrides:
+    axios: 1.15.2
+    bn.js: 5.2.3
 allowBuilds:
     '@stellar/stellar-sdk': true
     bigint-buffer: true

@@ -172,18 +172,16 @@ export const createDataFeed = (
         },
 
         onReady: (cb: any) => {
-            (cb({
+            cb({
                 supported_resolutions: supportedResolutions,
                 supports_marks: true,
-            }),
-                //   exchanges: [
-                //     { value: "BINANCE", name: "Binance", desc: "Binance Exchange" },
-                //     { value: "NASDAQ", name: "NASDAQ", desc: "NASDAQ Exchange" },
-                // ],
-                // supports_marks: false,
-                // supports_time: true,
-
-                0);
+            });
+            //   exchanges: [
+            //     { value: "BINANCE", name: "Binance", desc: "Binance Exchange" },
+            //     { value: "NASDAQ", name: "NASDAQ", desc: "NASDAQ Exchange" },
+            // ],
+            // supports_marks: false,
+            // supports_time: true,
         },
 
         resolveSymbol: (

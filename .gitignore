@@ -35,3 +35,11 @@ packages/frontend/public/announcements.json
 
 # Vitest cache and results
 .vitest/
+coverage/
+packages/frontend/coverage/
+
+# Playwright reports and artifacts
+playwright-report/
+test-results/
+packages/frontend/playwright-report/
+packages/frontend/test-results/
