@@ -25,6 +25,11 @@ import {
     type TableSortDirection,
 } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
+import {
+    formatCsvCell,
+    getNextTableSort,
+    getTableStateForRows,
+} from './tableRegressionUtils';
 
 interface GenericTableProps<
     T,
@@ -288,31 +293,15 @@ export default function GenericTable<
     }, [sortedData, pageMode, page, rowsPerPage, rowLimit]);
 
     useEffect(() => {
-        if (!isFetched) {
-            setTableState(TableState.LOADING);
-        } else if (dataToShow.length === 0) {
-            setTableState(TableState.EMPTY);
-        } else {
-            setTableState(TableState.FILLED);
-        }
+        setTableState(getTableStateForRows(isFetched, dataToShow.length));
     }, [isFetched, dataToShow, storageKey]);
 
     const handleSort = (key: S) => {
-        let nextBy: S | undefined;
-        let nextDir: TableSortDirection | undefined;
-
-        if (sortBy === key) {
-            nextDir =
-                sortDirection === 'desc'
-                    ? 'asc'
-                    : sortDirection === 'asc'
-                      ? undefined
-                      : 'desc';
-            nextBy = nextDir ? key : undefined;
-        } else {
-            nextBy = key;
-            nextDir = 'desc';
-        }
+        const { sortBy: nextBy, sortDirection: nextDir } = getNextTableSort(
+            sortBy,
+            sortDirection,
+            key,
+        );
 
         setSortBy(nextBy as S);
         setSortDirection(nextDir!);
@@ -334,40 +323,6 @@ export default function GenericTable<
             navigate(viewAllLink, { viewTransition: true });
         }
     };
-
-    function formatCsvCell(val: any): string {
-        if (val == null) {
-            return '--';
-        }
-
-        if (typeof val === 'number' && isFinite(val)) {
-            return val.toFixed(2);
-        }
-
-        if (typeof val === 'string') {
-            const trimmed = val.trim();
-
-            if (/^[$£€¥]/.test(trimmed)) {
-                return `="${trimmed}"`;
-            }
-
-            if (
-                trimmed !== '' &&
-                !isNaN(Number(trimmed)) &&
-                isFinite(Number(trimmed))
-            ) {
-                return Number(trimmed).toFixed(2);
-            }
-
-            if (/^\d{1,2}\.\d{1,2}\.\d{2,4}$/.test(trimmed)) {
-                return `="${trimmed}"`;
-            }
-
-            return trimmed;
-        }
-
-        return String(val);
-    }
 
     const handleExportCsv = async (e: React.MouseEvent) => {
         e.preventDefault();

@@ -18,9 +18,9 @@ the current coverage.
 - Include pattern: `app/**/*.test.{ts,tsx}`.
 - CI command: `pnpm test:ci`.
 - Coverage command: `pnpm test:coverage`.
-- Current result: 13 test files, 93 tests passing.
-- Current coverage baseline: statements 28.86%, branches 18.52%, functions
-  23.5%, lines 29.42%.
+- Current result: 15 test files, 98 tests passing.
+- Current coverage baseline: statements 29.12%, branches 18.6%, functions
+  24.08%, lines 29.64%.
 
 The repo now declares `@vitest/coverage-v8` as a direct frontend dev dependency.
 It still does not declare Testing Library, jsdom/happy-dom, or MSW.
@@ -32,27 +32,28 @@ It still does not declare Testing Library, jsdom/happy-dom, or MSW.
 - Browser project: Chromium desktop.
 - Test directory: `packages/frontend/e2e`.
 - Command: `pnpm test:smoke`.
-- Current result: 10 route smoke tests passing.
+- Current result: 13 Chromium smoke tests passing.
 - Current route set: `/`, `/v2/trade`, `/v2/portfolio`, `/v2/referrals`,
   `/v2/vaults`, `/v2/agents`, `/v2/more`, `/v2/privacy`, `/v2/terms`, and a
   not-found route.
 
 ## What Is Covered
 
-| Area                                | Files                                       | What It Proves                                                                                                                                                                                                            |
-| ----------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Referral store cache and migrations | `app/stores/ReferralStore.test.ts`          | Cache approval rules, migration normalization, and protection against passive URL overwrites.                                                                                                                             |
-| Referral provider boundaries        | `app/stores/ReferralStore.provider.test.ts` | Affiliate-code fetch success/failure, conversion checks across Fuul programs, persisted conversion short-circuiting, malformed payloads, non-OK responses, timeouts, and claims fallback behavior.                        |
-| Info/provider fixtures              | `app/hooks/useInfoApi.provider.test.ts`     | Hyperliquid spot/token payload parsing, malformed spot metadata fallback, token detail numeric conversion, and Fogo JSON-RPC fixture envelope shape.                                                                      |
-| Referral/refreg instruction helpers | `app/utils/refreg.test.ts`                  | Instruction tags, byte layouts, PDA derivation, referral kind detection, localStorage reads, send sequencing, failure continuation, and attributed-count fetch query construction.                                        |
-| App refreg gating                   | `app/contexts/AppContext.test.ts`           | The connect-wallet referral flow only runs when the session, sender, wallet/session keys, payer, cached code, and invitee approval are present.                                                                           |
-| Explorer tx links                   | `app/utils/Constants.test.ts`               | `getTxLink` handles empty signatures, testnet/mainnet URL shape, and custom explorer envs.                                                                                                                                |
-| Market ID lookup                    | `app/utils/marketIdToName.test.ts`          | BTC market ID lookup across bigint/number/string inputs and fallback behavior for invalid or unknown inputs.                                                                                                              |
-| Data processors                     | `app/processors/*.test.ts`                  | Order book totals/ratios, trade side mapping, user order normalization, positions, symbol info, balances, fills, TWAP, funding, deposit/withdrawal, and vault normalization.                                              |
-| Worker message handlers             | `app/hooks/workers/*.test.ts`               | `orderbook.worker` and `webdata2.worker` output shapes for fixture messages and error envelopes for malformed messages.                                                                                                   |
-| Transaction services                | `app/services/transactionServices.test.ts`  | Limit/market/cancel/margin/deposit/withdraw success and failure envelopes, mocked builder parameters, instruction forwarding, scaling, and refreg follow-up triggers.                                                     |
-| Provider/polling managers           | `app/services/providerManagers.test.ts`     | Market-order-log caching, unified-margin empty-bucket updates/reset, notification auto-removal, Pyth subscription/cache cleanup, malformed Pyth payload containment, and monitor failure status changes with fake timers. |
-| Browser route smoke                 | `e2e/app-smoke.spec.ts`                     | Real Chromium app boot, lazy route rendering, deterministic provider startup mocks, generated-file independence, and not-found route rendering.                                                                           |
+| Area                                | Files                                                                                                                        | What It Proves                                                                                                                                                                                                            |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Referral store cache and migrations | `app/stores/ReferralStore.test.ts`                                                                                           | Cache approval rules, migration normalization, and protection against passive URL overwrites.                                                                                                                             |
+| Referral provider boundaries        | `app/stores/ReferralStore.provider.test.ts`                                                                                  | Affiliate-code fetch success/failure, conversion checks across Fuul programs, persisted conversion short-circuiting, malformed payloads, non-OK responses, timeouts, and claims fallback behavior.                        |
+| Info/provider fixtures              | `app/hooks/useInfoApi.provider.test.ts`                                                                                      | Hyperliquid spot/token payload parsing, malformed spot metadata fallback, token detail numeric conversion, and Fogo JSON-RPC fixture envelope shape.                                                                      |
+| Referral/refreg instruction helpers | `app/utils/refreg.test.ts`                                                                                                   | Instruction tags, byte layouts, PDA derivation, referral kind detection, localStorage reads, send sequencing, failure continuation, and attributed-count fetch query construction.                                        |
+| App refreg gating                   | `app/contexts/AppContext.test.ts`                                                                                            | The connect-wallet referral flow only runs when the session, sender, wallet/session keys, payer, cached code, and invitee approval are present.                                                                           |
+| Explorer tx links                   | `app/utils/Constants.test.ts`                                                                                                | `getTxLink` handles empty signatures, testnet/mainnet URL shape, and custom explorer envs.                                                                                                                                |
+| Market ID lookup                    | `app/utils/marketIdToName.test.ts`                                                                                           | BTC market ID lookup across bigint/number/string inputs and fallback behavior for invalid or unknown inputs.                                                                                                              |
+| Data processors                     | `app/processors/*.test.ts`                                                                                                   | Order book totals/ratios, trade side mapping, user order normalization, positions, symbol info, balances, fills, TWAP, funding, deposit/withdrawal, and vault normalization.                                              |
+| Worker message handlers             | `app/hooks/workers/*.test.ts`                                                                                                | `orderbook.worker` and `webdata2.worker` output shapes for fixture messages and error envelopes for malformed messages.                                                                                                   |
+| Transaction services                | `app/services/transactionServices.test.ts`                                                                                   | Limit/market/cancel/margin/deposit/withdraw success and failure envelopes, mocked builder parameters, instruction forwarding, scaling, and refreg follow-up triggers.                                                     |
+| Provider/polling managers           | `app/services/providerManagers.test.ts`                                                                                      | Market-order-log caching, unified-margin empty-bucket updates/reset, notification auto-removal, Pyth subscription/cache cleanup, malformed Pyth payload containment, and monitor failure status changes with fake timers. |
+| Browser route smoke                 | `e2e/app-smoke.spec.ts`                                                                                                      | Real Chromium app boot, lazy route rendering, deterministic provider startup mocks, generated-file independence, and not-found route rendering.                                                                           |
+| Table/form regressions              | `app/components/Tables/GenericTable/*.test.ts`, `app/stores/useTableSortStore.test.ts`, `e2e/table-form-regressions.spec.ts` | Sort-cycle helpers, table empty/loading/filled decisions, CSV cell formatting, persisted sort entries, no-wallet trade form guards, reduce-only safe default state, and protected portfolio state.                        |
 
 ## Major Untested Surfaces
 
@@ -75,8 +76,8 @@ It still does not declare Testing Library, jsdom/happy-dom, or MSW.
    fake timers where polling or timeout behavior matters.
 
 2. `review-table-and-form-regressions`
-   Cover table sorting/persistence and order input validation edge cases that are
-   likely to regress during UI work.
+   Added focused table helper/store tests and browser smoke checks for
+   no-wallet order form and protected table states.
 
 3. `review-tradingview-overlay-smoke`
    Add narrow browser checks for chart script loading, overlay canvas presence,
