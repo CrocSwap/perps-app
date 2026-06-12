@@ -8,6 +8,10 @@ import { getPaneCanvasAndIFrameDoc } from '../../overlayCanvas/overlayCanvasUtil
 import { useTradingView } from '~/contexts/TradingviewContext';
 import type { TabType } from '~/routes/trade';
 import { usePreviewOrderLines } from '../usePreviewOrderLines';
+import {
+    getChartElementCancelIntent,
+    getChartElementConfirmIntent,
+} from './chartElementControlIntent';
 
 interface ChartElementControlPanelProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,26 +104,25 @@ export const ChartElementControlPanel: React.FC<
     };
 
     const cancelChanges = () => {
-        if (originalPrice !== null) {
+        const intent = getChartElementCancelIntent(
+            selectedOrderLine,
+            originalPrice,
+        );
+
+        if (intent.type === 'restorePreviewPrice') {
             setPreviewPrice(originalPrice);
-            if (
-                selectedOrderLine &&
-                selectedOrderLine.type === 'PREVIEW_ORDER'
-            ) {
-                updateYPosition(originalPrice);
-            }
+            updateYPosition(intent.price);
         }
         setSelectedOrderLine(undefined);
     };
 
     const confirmChanges = () => {
-        if (!selectedOrderLine) return;
+        const intent = getChartElementConfirmIntent(selectedOrderLine);
 
-        if (selectedOrderLine.type === 'PREVIEW_ORDER') {
-            const newPrice = selectedOrderLine.yPrice;
+        if (intent.type === 'noop') return;
 
-            setObChosenPrice(newPrice);
-
+        if (intent.type === 'previewToOrderForm') {
+            setObChosenPrice(intent.price);
             // Navigate to trade page (order tab) and focus on size input
             if (switchTab) {
                 switchTab('order' as TabType);

@@ -43,6 +43,35 @@ const marketAssetCtxs = [
     },
 ];
 
+function candleSnapshotResponse(route: Route) {
+    const postData = postDataJSON(route) as {
+        req?: { coin?: string; startTime?: number; endTime?: number };
+    };
+    const endTime = postData.req?.endTime ?? Date.UTC(2026, 0, 1);
+    const intervalMs = 60 * 60 * 1000;
+    const firstTime = endTime - intervalMs * 4;
+    const coin = postData.req?.coin ?? 'BTC';
+
+    return jsonResponse(
+        Array.from({ length: 5 }, (_, index) => {
+            const price = 100000 + index * 100;
+
+            return {
+                T: firstTime + index * intervalMs + intervalMs - 1,
+                c: String(price + 50),
+                h: String(price + 100),
+                i: '1h',
+                l: String(price - 100),
+                n: index + 1,
+                o: String(price),
+                s: coin,
+                t: firstTime + index * intervalMs,
+                v: String(10 + index),
+            };
+        }),
+    );
+}
+
 function jsonResponse(body: JsonValue, status = 200) {
     return {
         status,
@@ -73,6 +102,8 @@ function hyperliquidInfoResponse(route: Route) {
                 { universe: marketUniverse },
                 marketAssetCtxs,
             ]);
+        case 'candleSnapshot':
+            return candleSnapshotResponse(route);
         case 'allMids':
             return jsonResponse({ mids: { BTC: '100000' } });
         case 'spotMeta':
