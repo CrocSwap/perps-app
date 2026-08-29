@@ -546,7 +546,7 @@
         "overwriteCurrentReferralCode": "Overwrite current referral code",
         "enterReferralCode": "Enter a referral code",
         "referralCodeNotValidPleaseConfirm": "The code <0>{{invalidCode}}</0> is not claimed in the referral program. Please confirm the code is correct.",
-        "yourCodeIs": "Your code is <0>{{referrerCode}}</0> based on the first six characters of your wallet address. Please click 'Activate' to register this code in the referral system.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "Create an affiliate code",
         "createAUniqueCodeToEarn": "Create a unique code to earn 10% of referred users' fees.",
         "codeAlreadyInUse": "Code Already In Use",
@@ -555,6 +555,7 @@
             "claim": "Connect your wallet to claim rewards",
             "enterCode": "Connect your wallet to enter a referral code"
         },
+        "pleaseActivate": "Click 'Activate' to register as a referrer.",
         "usersWithTradingVolume": "This code may be customized or updated by users after reaching $1M in trading volume.",
         "doNotSelfRefer": "The code <0>{{refCode}}</0> cannot be registered by the same address by which it was created. Please choose a different code.",
         "toCustomizeAffiliateCode": "Affiliate codes default to the first six characters of your wallet address. Users with > $1M in trading volume can customize their affiliate code.",

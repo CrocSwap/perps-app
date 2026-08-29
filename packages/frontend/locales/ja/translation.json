@@ -546,7 +546,7 @@
         "overwriteCurrentReferralCode": "現在の紹介コードを上書き",
         "enterReferralCode": "紹介コードを入力してください",
         "referralCodeNotValidPleaseConfirm": "コード <0>{{invalidCode}}</0> は紹介プログラムで申請されていません。コードが正しいか確認してください。",
-        "yourCodeIs": "あなたのコードはウォレットアドレスの最初の6文字に基づく <0>{{referrerCode}}</0> です。このコードを紹介システムに登録するには「アクティベート」をクリックしてください。",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "アフィリエイトコードを作成",
         "createAUniqueCodeToEarn": "紹介されたユーザーの手数料の10%を獲得するために、ユニークなコードを作成してください。",
         "codeAlreadyInUse": "コードは既に使用されています",
@@ -555,6 +555,7 @@
             "claim": "報酬を請求するにはウォレットを接続してください",
             "enterCode": "紹介コードを入力するにはウォレットを接続してください"
         },
+        "pleaseActivate": "紹介者として登録するには「アクティベート」をクリックしてください。",
         "usersWithTradingVolume": "このコードは、取引高が100万ドルに達した後、ユーザーによってカスタマイズまたは更新される場合があります。",
         "doNotSelfRefer": "コード <0>{{refCode}}</0> は、作成されたのと同じアドレスで登録することはできません。別のコードを選択してください。",
         "toCustomizeAffiliateCode": "アフィリエイトコードはデフォルトでウォレットアドレスの最初の6文字になります。取引高が100万ドルを超えるユーザーはアフィリエイトコードをカスタマイズできます。",

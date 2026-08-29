@@ -546,7 +546,7 @@
         "overwriteCurrentReferralCode": "Aktuellen Empfehlungscode überschreiben",
         "enterReferralCode": "Empfehlungscode eingeben",
         "referralCodeNotValidPleaseConfirm": "Der Code <0>{{invalidCode}}</0> wurde im Empfehlungsprogramm nicht beansprucht. Bitte bestätigen Sie, dass der Code korrekt ist.",
-        "yourCodeIs": "Ihr Code lautet <0>{{referrerCode}}</0>, basierend auf den ersten sechs Zeichen Ihrer Wallet-Adresse. Bitte klicken Sie auf 'Aktivieren', um diesen Code im Empfehlungssystem zu registrieren.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "Einen Affiliate-Code erstellen",
         "createAUniqueCodeToEarn": "Erstellen Sie einen einzigartigen Code, um 10% der Gebühren der geworbenen Benutzer zu verdienen.",
         "codeAlreadyInUse": "Code bereits in Verwendung",
@@ -555,6 +555,7 @@
             "claim": "Verbinden Sie Ihre Wallet, um Belohnungen zu beanspruchen",
             "enterCode": "Verbinden Sie Ihre Wallet, um einen Empfehlungscode einzugeben"
         },
+        "pleaseActivate": "Klicken Sie auf 'Aktivieren', um sich als Empfehlungsgeber zu registrieren.",
         "usersWithTradingVolume": "Dieser Code kann von Benutzern angepasst oder aktualisiert werden, nachdem sie ein Handelsvolumen von 1 Mio. USD erreicht haben.",
         "doNotSelfRefer": "Der Code <0>{{refCode}}</0> kann nicht von derselben Adresse registriert werden, mit der er erstellt wurde. Bitte wählen Sie einen anderen Code.",
         "toCustomizeAffiliateCode": "Affiliate-Codes entsprechen standardmäßig den ersten sechs Zeichen Ihrer Wallet-Adresse. Benutzer mit > 1 Mio. USD Handelsvolumen können ihren Affiliate-Code anpassen.",

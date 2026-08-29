@@ -1187,6 +1187,7 @@ export default function CodeTabs(props: PropsIF) {
                         createRefCode={createRefCode}
                         updateRefCode={updateRefCode}
                         isVolumeDataLoaded={isVolumeDataLoaded}
+                        isRefCodeClaimed={isRefCodeClaimed}
                     />
                 );
             // handlers for claiming rewards

@@ -547,7 +547,7 @@
         "overwriteCurrentReferralCode": "覆盖当前推荐码",
         "enterReferralCode": "输入推荐码",
         "referralCodeNotValidPleaseConfirm": "该代码 <0>{{invalidCode}}</0> 尚未在推荐计划中注册。请确认代码是否正确。",
-        "yourCodeIs": "您的代码是 <0>{{referrerCode}}</0>（基于钱包地址前六位字符）。请点击“激活”以在推荐系统中注册该代码。",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "创建推广码",
         "createAUniqueCodeToEarn": "创建一个唯一代码，可赚取被推荐用户手续费的 10%。",
         "codeAlreadyInUse": "代码已被占用",
@@ -556,6 +556,7 @@
             "claim": "连接钱包以领取奖励",
             "enterCode": "连接钱包以输入推荐码"
         },
+        "pleaseActivate": "点击'激活'以注册为推荐人。",
         "usersWithTradingVolume": "当交易量达到 $1M 后，用户可自定义或更新该代码。",
         "doNotSelfRefer": "代码 <0>{{refCode}}</0> 不能由创建该代码的同一地址注册。请选择其他代码。",
         "toCustomizeAffiliateCode": "推广码默认使用钱包地址前六位字符。交易量超过 $1M 的用户可自定义推广码。",
