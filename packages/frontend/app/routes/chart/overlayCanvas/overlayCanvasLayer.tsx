@@ -5,6 +5,7 @@ import {
     getMainSeriesPaneIndex,
     getPaneCanvasAndIFrameDoc,
     mousePositionRef,
+    type CanvasSize,
 } from './overlayCanvasUtils';
 import type { IPaneApi } from '~/tv/charting_library';
 import { useChartScaleStore } from '~/stores/ChartScaleStore';
@@ -21,6 +22,7 @@ interface OverlayCanvasLayerProps {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scaleData: any;
         mousePositionRef: React.MutableRefObject<{ x: number; y: number }>;
+        zoomChanged: boolean;
     }) => React.ReactNode;
 }
 
@@ -42,6 +44,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isZoomingRef = useRef(false);
     const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
+    const zoomChanged = useChartScaleStore((state) => state.zoomChanged);
     const setZoomChanged = useChartScaleStore((state) => state.setZoomChanged);
     const setPriceDomain = useChartScaleStore((state) => state.setPriceDomain);
 
@@ -122,6 +125,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
     useEffect(() => {
         if (!chart || !isChartReady) return;
 
+        const dpr = window.devicePixelRatio || 1;
         const isFirstInit = !scaleDataRef.current;
 
         if (isFirstInit) {
@@ -141,6 +145,8 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         if (!canvasRef.current) {
             const wrapper = iframeDoc.createElement('div');
             wrapper.style.position = 'absolute';
+            wrapper.style.width = paneCanvas.width / dpr + 'px';
+            wrapper.style.height = paneCanvas.height / dpr + 'px';
             wrapper.style.pointerEvents = pointerEvents;
             wrapper.style.zIndex = zIndex.toString();
             wrapper.style.top = '0';
@@ -159,12 +165,14 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             newCanvas.style.zIndex = zIndex.toString();
             newCanvas.width = paneCanvas.width;
             newCanvas.height = paneCanvas.height;
-            paneCanvas.parentNode.appendChild(newCanvas);
+            newCanvas.style.height = `${paneCanvas.height / dpr}px`;
+            newCanvas.style.width = `${paneCanvas.width / dpr}px`;
+            wrapper.appendChild(newCanvas);
+
             canvasRef.current = newCanvas;
             canvasWrapperRef.current = wrapper;
         }
 
-        const dpr = window.devicePixelRatio || 1;
         const canvas = canvasRef.current;
 
         const handleMouseMove = (e: MouseEvent) => {
@@ -177,34 +185,23 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
 
         canvas.addEventListener('mousemove', handleMouseMove);
 
-        const updateCanvasSize = () => {
-            const width = paneCanvas.width;
-            const height = paneCanvas?.height;
-
-            canvas.width = width;
-            canvas.style.width = `${width}px`;
-
-            canvas.height = height;
-            canvas.style.height = `${height}px`;
-
-            yScale.range([canvas.height, 0]);
-            scaleSymlog.range([canvas.height, 0]);
-        };
-
-        updateCanvasSize();
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const observer = new ResizeObserver((result: any) => {
             if (result) {
                 setCanvasSize({
-                    styleWidth: result[0].contentRect.width,
-                    styleHeight: result[0].contentRect?.height,
                     width: paneCanvas.width,
-                    height: paneCanvas?.height,
+                    height: paneCanvas.height,
                 });
 
-                yScale.range([result[0].contentRect?.height, 0]);
-                scaleSymlog.range([result[0].contentRect?.height, 0]);
+                if (canvasWrapperRef.current) {
+                    canvasWrapperRef.current.style.width =
+                        result[0].contentRect.width + 'px';
+                    canvasWrapperRef.current.style.height =
+                        result[0].contentRect.height + 'px';
+                }
+
+                yScale.range([paneCanvas.height, 0]);
+                scaleSymlog.range([paneCanvas.height, 0]);
             }
         });
 
@@ -247,6 +244,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
                 canvasSize: canvasSize,
                 scaleData: scaleDataRef.current,
                 mousePositionRef,
+                zoomChanged: zoomChanged,
             })}
         </>
     );

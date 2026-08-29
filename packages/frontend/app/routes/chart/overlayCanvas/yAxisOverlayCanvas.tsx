@@ -121,6 +121,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             isClosePrice: boolean;
         };
 
+        const dpr = window.devicePixelRatio || 1;
         const labels: LabelInfo[] = [
             ...allPrices.map((price) => ({
                 price,
@@ -395,15 +396,21 @@ const YAxisOverlayCanvas: React.FC = () => {
         });
 
         const handleCanvasMouseMove = (e: MouseEvent) => {
+            // ensureCanvasSize();
+
+            const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
-            const y = e.clientY - rect.top;
+            const y = (e.clientY - rect.top) * dpr;
 
             setMouseY(y);
         };
 
         const handleYAxisMouseMove = (e: MouseEvent) => {
+            // ensureCanvasSize();
+
+            const dpr = window.devicePixelRatio || 1;
             const rect = yAxisCanvas.getBoundingClientRect();
-            const y = e.clientY - rect.top;
+            const y = (e.clientY - rect.top) * dpr;
 
             setMouseY(y);
         };
@@ -452,7 +459,11 @@ const YAxisOverlayCanvas: React.FC = () => {
         const adjustedPixel = orderLabel.adjustedPixel;
         const originalPixel = orderLabel.pixel;
         const originalPrice = orderLabel.price;
-        const tolerance = 10;
+
+        // BACKUP - LIQ BRANCH
+        // const tolerance = 30;
+        // const isNearOrderPrice = Math.abs(mouseY - adjustedPixel) <= tolerance;
+        const tolerance = 30;
         const pixelToCheck = isMobile ? originalPixel : adjustedPixel;
         const isNearOrderPrice = Math.abs(mouseY - pixelToCheck) <= tolerance;
 

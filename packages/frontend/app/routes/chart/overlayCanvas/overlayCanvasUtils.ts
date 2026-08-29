@@ -8,7 +8,10 @@ export type LabelLocationData = {
 };
 
 export const mousePositionRef = { current: { x: 0, y: 0 } };
-
+export type CanvasSize = {
+    width: number;
+    height: number;
+};
 export function findLimitLabelAtPosition(
     x: number,
     y: number,
@@ -57,8 +60,47 @@ export function findLimitLabelAtPosition(
 export function getXandYLocationForChartDrag(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event: any,
+    // dpr: number,
     rect: DOMRect,
 ) {
+    // let evtY;
+    // let evtX;
+
+    // let retY = 0;
+    // let retX = 0;
+
+    // // BACKUP : LIQUIDATION
+
+    // //if (
+    // //    typeof TouchEvent !== 'undefined' &&
+    // //    event.sourceEvent instanceof TouchEvent
+    // //) {
+    // //  offsetY = event.sourceEvent.touches[0].clientY * dpr;
+    // // offsetX = event.sourceEvent.touches[0].clientX * dpr;
+    // //}
+
+    // if (event.sourceEvent.touches && event.sourceEvent.touches.length > 0) {
+    //     evtY = event.sourceEvent.touches[0].clientY * dpr;
+    //     evtX = event.sourceEvent.touches[0].clientX * dpr;
+
+    //     console.log('>>>> evtY', evtY);
+    //     console.log('>>>> evtX', evtX);
+    // } else if (event.x && event.y) {
+    //     evtY = event.y * dpr;
+    //     evtX = event.x * dpr;
+    //     console.log('>>>> evtY 2', evtY);
+    //     console.log('>>>> evtX 2', evtX);
+    //     console.log('>>>> rect.top', rect.top);
+    //     console.log('>>>> rect.left', rect.left);
+    // }
+
+    // if (evtY && evtX) {
+    //     retY = evtY - rect.top;
+    //     retX = evtX - rect.left;
+    // }
+
+    // return { offsetX: retX, offsetY: retY };
+
     let offsetY = event.sourceEvent.clientY - rect?.top;
     let offsetX = event.sourceEvent.clientX - rect?.left;
 
@@ -67,7 +109,9 @@ export function getXandYLocationForChartDrag(
         offsetX = event.sourceEvent.touches[0].clientX - rect?.left;
     }
 
-    return { offsetX: offsetX, offsetY: offsetY };
+    // return { offsetX, offsetY };
+    const dpr = window.devicePixelRatio || 1;
+    return { offsetX: offsetX * dpr, offsetY: offsetY * dpr };
 }
 
 export const getPixelToPrice = (
@@ -268,3 +312,19 @@ export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
             priceAxisContainers.length > 0 ? priceAxisContainers : null,
     };
 }
+
+export const updateOverlayCanvasSize = (
+    canvas: HTMLCanvasElement,
+    canvasSize: CanvasSize,
+) => {
+    const dpr = window.devicePixelRatio || 1;
+
+    const width = canvasSize.width;
+    const height = canvasSize.height;
+
+    canvas.width = width;
+    canvas.style.width = `${width / dpr}px`;
+
+    canvas.height = height;
+    canvas.style.height = `${height / dpr}px`;
+};

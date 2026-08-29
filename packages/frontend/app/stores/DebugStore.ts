@@ -35,6 +35,8 @@ interface DebugStore {
     setUseMockLeverage: (useMockLeverage: boolean) => void;
     mockMinimumLeverage: number;
     setMockMinimumLeverage: (mockMinimumLeverage: number) => void;
+    pauseLiqAnimation: boolean;
+    setPauseLiqAnimation: (pauseLiqAnimation: boolean) => void;
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
@@ -82,4 +84,7 @@ export const useDebugStore = create<DebugStore>((set) => ({
     mockMinimumLeverage: 1,
     setMockMinimumLeverage: (mockMinimumLeverage: number) =>
         set({ mockMinimumLeverage }),
+    pauseLiqAnimation: false,
+    setPauseLiqAnimation: (pauseLiqAnimation: boolean) =>
+        set({ pauseLiqAnimation }),
 }));

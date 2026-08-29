@@ -80,6 +80,10 @@ body {
     gap: var(--gap-s);
 }
 
+.containerTopLeft > * {
+    min-width: 0;
+}
+
 .containerTopLeft.debugToolbarOpen {
     grid-template-rows: 30px 40px 40px 1fr;
 }
@@ -94,6 +98,8 @@ body {
 .watchlist,
 .chart,
 .symbolInfo,
+.orderBook,
+.liquidationsChart,
 .tradeModules {
     background: var(--bg-dark2);
     height: 100%;
@@ -106,6 +112,7 @@ body {
 
 .orderBook,
 .tradeModules,
+.liquidationsChart,
 .symbolSectionWrapper,
 .chart {
     max-height: none;
@@ -113,15 +120,44 @@ body {
 }
 
 .orderBook {
-    background: var(--bg-dark2);
-    height: 100%;
-    border-radius: var(--radius-m);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    min-height: 0;
     position: relative;
+    align-items: flex-start;
+    overflow: hidden;
+}
+
+.chartLayout {
+    transition: all 0.2s ease-in-out;
+    display: grid;
+    gap: var(--gap-s);
+    grid-template-columns: minmax(0, 1fr);
+    height: 100%;
+    overflow: hidden;
+}
+
+.chartLayout.liqActive {
+    grid-template-columns: minmax(0, 1fr) var(--order-book-width-desktop-small);
+}
+
+.liquidationsChart {
+    position: relative;
+    overflow: hidden;
+}
+
+.chartLayout {
+    transition: all 0.2s ease-in-out;
+    display: grid;
+    gap: var(--gap-s);
+    grid-template-columns: minmax(0, 1fr);
+    height: 100%;
+}
+
+.chartLayout.liqActive {
+    grid-template-columns: minmax(0, 1fr) var(--order-book-width-desktop-small);
+}
+
+.liquidationsChart {
+    position: relative;
+    align-items: flex-start;
     overflow: hidden;
 }
 
@@ -240,6 +276,10 @@ body {
 /* Desktop styles (1920px and above) */
 @media only screen and (min-width: 1920px) {
     .containerTop {
+        grid-template-columns: 1fr var(--order-book-width-desktop-large);
+    }
+
+    .chartLayout.liqActive {
         grid-template-columns: 1fr var(--order-book-width-desktop-large);
     }
 

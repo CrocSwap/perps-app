@@ -48,6 +48,8 @@ export default function ComboBoxContainer() {
         setUseMockLeverage,
         mockMinimumLeverage,
         setMockMinimumLeverage,
+        pauseLiqAnimation,
+        setPauseLiqAnimation,
     } = useDebugStore();
 
     const currencies = ['USD', 'BTC', 'ETH'];
@@ -143,7 +145,6 @@ export default function ComboBoxContainer() {
                 </div>
                 <div className={styles.divider} />
             </div>
-
             <HorizontalScrollable
                 excludes={['debug-wallet-static-area']}
                 wrapperId='trade-page-left-section'
@@ -278,7 +279,10 @@ export default function ComboBoxContainer() {
                                                     target: userWalletKey,
                                                 },
                                             );
-                                            console.log({ ix, sessionState });
+                                            console.log({
+                                                ix,
+                                                sessionState,
+                                            });
                                             const result =
                                                 await sessionState.sendTransaction(
                                                     [ix],
@@ -292,6 +296,42 @@ export default function ComboBoxContainer() {
                             </button>
                         </div>
                     )}
+                    <div className={styles.subInfo}>{userAddress}</div>
+                    <div className={styles.divider} />
+                    {isEstablished(sessionState) && (
+                        <button
+                            onClick={() => {
+                                (async () => {
+                                    if (isEstablished(sessionState)) {
+                                        console.log('established');
+                                        const userWalletKey =
+                                            sessionState.walletPublicKey ||
+                                            sessionState.sessionPublicKey;
+                                        const ix = instructions.pingIx(42n, {
+                                            actor: sessionState.sessionPublicKey,
+                                            target: userWalletKey,
+                                        });
+                                        console.log({ ix, sessionState });
+                                        const result =
+                                            await sessionState.sendTransaction([
+                                                ix,
+                                            ]);
+                                        console.log({ result });
+                                    }
+                                })();
+                            }}
+                        >
+                            Ping
+                        </button>
+                    )}
+                    <div
+                        className={`${styles.wsToggle} ${pauseLiqAnimation ? styles.wsToggleRunning : styles.wsTogglePaused}`}
+                        onClick={() => setPauseLiqAnimation(!pauseLiqAnimation)}
+                    >
+                        <div className={styles.wsToggleButton}>
+                            {pauseLiqAnimation ? 'Pause Liq' : 'Pause Liq'}
+                        </div>
+                    </div>
                 </div>
             </HorizontalScrollable>
         </section>
