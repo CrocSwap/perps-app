@@ -1,0 +1,122 @@
+.tableWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-s);
+    overflow: hidden;
+    height: 303px;
+}
+
+.headerContainer {
+    background: var(--bg-dark2);
+    width: 100%;
+    height: 24px;
+    padding-left: var(--padding-s);
+    gap: var(--gap-s);
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 0.8fr;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.rowContainer {
+    width: 100%;
+    min-height: 28px;
+    padding-left: var(--padding-s);
+    gap: var(--gap-s);
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 0.8fr;
+    align-items: center;
+}
+
+.tableBody {
+    height: 255px;
+    overflow-y: auto;
+    flex: 0 1 auto;
+}
+
+.cell {
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1, #f0f0f8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.headerCell {
+    color: var(--text2, #6a6a6d);
+    font-size: var(--font-size-xs, 10px);
+}
+
+.amountCell {
+    color: var(--text1, #f0f0f8);
+}
+
+.deadlineCell {
+    color: var(--text2, #6a6a6d);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.badgeClaimable {
+    background: rgba(82, 196, 122, 0.15);
+    color: #52c47a;
+}
+
+.badgeExpired {
+    background: rgba(224, 87, 87, 0.15);
+    color: #e05757;
+}
+
+.emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    color: var(--text2, #6a6a6d);
+    font-size: var(--font-size-m, 14px);
+    opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+    .tableWrapper {
+        height: 100%;
+        min-height: 0;
+    }
+
+    .tableBody {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .headerContainer,
+    .rowContainer {
+        grid-template-columns: 1.2fr 1fr 0.8fr;
+    }
+
+    .deadlineCell {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .headerContainer,
+    .rowContainer {
+        grid-template-columns: 1.2fr 1fr 0.8fr;
+    }
+}

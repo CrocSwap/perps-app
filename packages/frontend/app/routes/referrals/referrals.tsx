@@ -118,6 +118,14 @@ export default function Referrals() {
     }, [userDataStore.userAddress]);
 
     useEffect(() => {
+        console.log('[Referrals] referralStore.claims updated:', {
+            isNull: referralStore.claims === null,
+            count: referralStore.claims?.length ?? 0,
+            sample: referralStore.claims?.[0] ?? null,
+        });
+    }, [referralStore.claims]);
+
+    useEffect(() => {
         const options = {
             method: 'GET',
             headers: {
@@ -243,6 +251,7 @@ export default function Referrals() {
                 <ReferralsTabs
                     payoutMovements={payoutMovements}
                     payoutsByReferrer={payoutsByReferrer}
+                    claimChecks={referralStore.claims}
                 />
                 <ReferralsExtra />
             </section>
