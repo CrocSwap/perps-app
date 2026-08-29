@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 // slugs to indicate which React icon should be rendered
-type icons = 'spinner' | 'check' | 'error';
+type icons = 'spinner' | 'check' | 'error' | 'console';
 
 // shape of post-processed data used to construct a DOM element
 export interface notificationIF {

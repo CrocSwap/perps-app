@@ -1,0 +1,145 @@
+.container {
+    padding: var(--padding-l);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--margin-l);
+}
+
+.title {
+    font-size: var(--font-size-l);
+    color: var(--text1);
+    margin: 0;
+}
+
+.refresh {
+    background: var(--accent1);
+    color: var(--text1);
+    border: none;
+    padding: var(--padding-s) var(--padding-m);
+    border-radius: var(--radius-xs);
+    font-size: var(--font-size-s);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.refresh:hover {
+    background: var(--accent1-dark);
+}
+
+.report_section {
+    background: var(--bg-dark2);
+    border: 1px solid var(--bg-dark4);
+    border-radius: var(--radius-s);
+    padding: var(--padding-m);
+    margin-bottom: var(--margin-l);
+}
+
+.report_title {
+    font-size: var(--font-size-m);
+    color: var(--text1);
+    margin: 0 0 var(--margin-m) 0;
+}
+
+.reports_list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+}
+
+.report_item {
+    background: var(--bg-dark3);
+    border: 1px solid var(--bg-dark5);
+    border-radius: var(--radius-xs);
+    padding: var(--padding-m);
+}
+
+.report_message {
+    color: var(--text1);
+    font-size: var(--font-size-s);
+    margin-bottom: var(--margin-s);
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.report_timestamp {
+    color: var(--text3);
+    font-size: var(--font-size-xs);
+    font-family: var(--font-family-mono);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--gap-m);
+}
+
+.card {
+    background: var(--bg-dark2);
+    border: 1px solid var(--bg-dark4);
+    border-radius: var(--radius-s);
+    padding: var(--padding-m);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    background: var(--bg-dark3);
+}
+
+.card_title {
+    font-size: var(--font-size-m);
+    color: var(--text1);
+    margin-bottom: var(--margin-s);
+}
+
+.card_status {
+    font-size: var(--font-size-s);
+    font-weight: 600;
+    margin-bottom: var(--margin-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card_time {
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    margin-bottom: var(--margin-s);
+    font-family: var(--font-family-mono);
+}
+
+.card_url {
+    font-size: var(--font-size-xs);
+    color: var(--text3);
+    word-break: break-all;
+    font-family: var(--font-family-mono);
+}
+
+.status_operational {
+    border-color: var(--green);
+}
+
+.status_operational .card_status {
+    color: var(--green);
+}
+
+.status_down {
+    border-color: var(--red);
+}
+
+.status_down .card_status {
+    color: var(--red);
+}
+
+.status_checking {
+    border-color: var(--accent4);
+}
+
+.status_checking .card_status {
+    color: var(--accent4);
+}

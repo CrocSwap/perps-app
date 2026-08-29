@@ -9,6 +9,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import type { notificationIF } from '~/stores/NotificationStore';
 import styles from './Notification.module.css';
 import { t } from 'i18next';
+import { FaDev } from 'react-icons/fa6';
 
 interface propsIF {
     data: notificationIF;
@@ -197,6 +198,9 @@ export default function Notification(props: propsIF) {
                             size={ICON_SIZE}
                             color='var(--red)'
                         />
+                    )}
+                    {data.icon === 'console' && (
+                        <FaDev size={ICON_SIZE} color='var(--accent1)' />
                     )}
                     <h2
                         style={{ userSelect: 'text' }}
