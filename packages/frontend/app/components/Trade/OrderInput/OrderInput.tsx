@@ -36,6 +36,7 @@ import {
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { getMarketExecutionPrice } from '~/utils/orderbook/orderBookExecution';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
@@ -296,7 +297,8 @@ function OrderInput({
 
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
 
-    const { buys, sells, midPrice, usualResolution } = useOrderBookStore();
+    const { buys, sells, midPrice, usualResolution, lastBookUpdateAt } =
+        useOrderBookStore();
     const midPriceRef = useRef(midPrice);
     midPriceRef.current = midPrice;
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
@@ -1419,8 +1421,26 @@ function OrderInput({
 
         try {
             setIsProcessingOrder(true);
-            // Get best ask price for buy order
-            const bestAskPrice = sells.length > 0 ? sells[0].px : markPx;
+            const { price: bestAskPrice, error: bookError } =
+                getMarketExecutionPrice('buy', buys, sells, lastBookUpdateAt);
+            if (bookError || bestAskPrice === undefined) {
+                setIsProcessingOrder(false);
+                confirmOrderModal.close();
+                notifications.add({
+                    title: t(
+                        bookError === 'no_asks'
+                            ? 'transactions.orderBookNoAsksTitle'
+                            : 'transactions.orderBookStaleTitle',
+                    ),
+                    message: t(
+                        bookError === 'no_asks'
+                            ? 'transactions.orderBookNoAsksMessage'
+                            : 'transactions.orderBookStaleMessage',
+                    ),
+                    icon: 'error',
+                });
+                return;
+            }
             const usdValueOfOrderStr = formatNum(
                 roundDownToHundredth(notionalQtyNum * (bestAskPrice || 1)),
                 2,
@@ -1566,8 +1586,9 @@ function OrderInput({
         }
     }, [
         notionalQtyNum,
+        buys,
         sells,
-        markPx,
+        lastBookUpdateAt,
         activeOptions.skipOpenOrderConfirm,
         symbol,
         executeMarketOrder,
@@ -1599,15 +1620,33 @@ function OrderInput({
         const slug = makeSlug(10);
 
         try {
-            // Get best bid price for sell order
-            const bestBidPrice = buys.length > 0 ? buys[0].px : markPx;
+            setIsProcessingOrder(true);
+            const { price: bestBidPrice, error: bookError } =
+                getMarketExecutionPrice('sell', buys, sells, lastBookUpdateAt);
+            if (bookError || bestBidPrice === undefined) {
+                setIsProcessingOrder(false);
+                confirmOrderModal.close();
+                notifications.add({
+                    title: t(
+                        bookError === 'no_bids'
+                            ? 'transactions.orderBookNoBidsTitle'
+                            : 'transactions.orderBookStaleTitle',
+                    ),
+                    message: t(
+                        bookError === 'no_bids'
+                            ? 'transactions.orderBookNoBidsMessage'
+                            : 'transactions.orderBookStaleMessage',
+                    ),
+                    icon: 'error',
+                });
+                return;
+            }
             const usdValueOfOrderStr = formatNum(
-                Math.round(notionalQtyNum * (bestBidPrice || 1) * 100) / 100,
+                Math.round(notionalQtyNum * bestBidPrice * 100) / 100,
                 2,
                 true,
                 true,
             );
-            setIsProcessingOrder(true);
             if (activeOptions.skipOpenOrderConfirm) {
                 confirmOrderModal.close();
                 notifications.add({
@@ -1748,7 +1787,8 @@ function OrderInput({
     }, [
         notionalQtyNum,
         buys,
-        markPx,
+        sells,
+        lastBookUpdateAt,
         activeOptions.skipOpenOrderConfirm,
         symbol,
         executeMarketOrder,

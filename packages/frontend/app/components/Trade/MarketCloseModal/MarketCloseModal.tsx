@@ -17,6 +17,7 @@ import {
 } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
+import { getMarketExecutionPrice } from '~/utils/orderbook/orderBookExecution';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 import SizeInput from '../OrderInput/SizeInput/SizeInput';
@@ -34,7 +35,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     const { symbolInfo, symbol } = useTradeDataStore();
 
     const { executeMarketOrder } = useMarketOrderService();
-    const { buys, sells } = useOrderBookStore();
+    const { buys, sells, lastBookUpdateAt } = useOrderBookStore();
 
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
@@ -255,10 +256,39 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         setIsProcessingOrder(true);
 
         try {
-            // Get order book prices for the closing order
             const closingSide = isPositionLong ? 'sell' : 'buy';
-            const bestBidPrice = buys.length > 0 ? buys[0].px : markPx;
-            const bestAskPrice = sells.length > 0 ? sells[0].px : markPx;
+            const { price: executionPrice, error: bookError } =
+                getMarketExecutionPrice(
+                    closingSide,
+                    buys,
+                    sells,
+                    lastBookUpdateAt,
+                );
+            if (bookError || executionPrice === undefined) {
+                setIsProcessingOrder(false);
+                notifications.add({
+                    title: t(
+                        bookError === 'no_asks'
+                            ? 'transactions.orderBookNoAsksTitle'
+                            : bookError === 'no_bids'
+                              ? 'transactions.orderBookNoBidsTitle'
+                              : 'transactions.orderBookStaleTitle',
+                    ),
+                    message: t(
+                        bookError === 'no_asks'
+                            ? 'transactions.orderBookNoAsksMessage'
+                            : bookError === 'no_bids'
+                              ? 'transactions.orderBookNoBidsMessage'
+                              : 'transactions.orderBookStaleMessage',
+                    ),
+                    icon: 'error',
+                });
+                return;
+            }
+            const bestBidPrice =
+                closingSide === 'sell' ? executionPrice : undefined;
+            const bestAskPrice =
+                closingSide === 'buy' ? executionPrice : undefined;
 
             const timeOfTxBuildStart = Date.now();
             // Execute market order in opposite direction to close position

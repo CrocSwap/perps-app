@@ -96,14 +96,9 @@ export class LimitOrderService {
                 );
             }
 
-            // Get the cached market order log page to avoid RPC call
-            const cachedLogPage = marketOrderLogManager.getCachedLogPage();
-            if (cachedLogPage !== undefined) {
-                console.log(
-                    '  - Using cached marketOrderLogPage:',
-                    cachedLogPage,
-                );
-            }
+            const marketOrderLogPage =
+                await marketOrderLogManager.getLogPageForTransaction();
+            console.log('  - marketOrderLogPage:', marketOrderLogPage);
 
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
@@ -121,7 +116,7 @@ export class LimitOrderService {
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
-                    marketOrderLogPage: cachedLogPage,
+                    marketOrderLogPage,
                     reduceOnly: params.reduceOnly,
                 };
 
@@ -147,7 +142,7 @@ export class LimitOrderService {
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
-                    marketOrderLogPage: cachedLogPage,
+                    marketOrderLogPage,
                     reduceOnly: params.reduceOnly,
                 };
 

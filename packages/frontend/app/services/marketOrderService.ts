@@ -84,14 +84,9 @@ export class MarketOrderService {
                 console.log('  - Calculated userSetImBps:', userSetImBps);
             }
 
-            // Get the cached market order log page to avoid RPC call
-            const cachedLogPage = marketOrderLogManager.getCachedLogPage();
-            if (cachedLogPage !== undefined) {
-                console.log(
-                    '  - Using cached marketOrderLogPage:',
-                    cachedLogPage,
-                );
-            }
+            const marketOrderLogPage =
+                await marketOrderLogManager.getLogPageForTransaction();
+            console.log('  - marketOrderLogPage:', marketOrderLogPage);
 
             // Calculate fill prices based on order book
             let fillPrice: bigint;
@@ -136,7 +131,7 @@ export class MarketOrderService {
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
                 console.log('  - Building market BUY order...');
-                console.log('  - Log page:', cachedLogPage);
+                console.log('  - Log page:', marketOrderLogPage);
 
                 const orderParams: any = {
                     marketId: marketId,
@@ -152,7 +147,7 @@ export class MarketOrderService {
                     keeper: sessionPublicKey,
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
-                    marketOrderLogPage: cachedLogPage,
+                    marketOrderLogPage,
                     reduceOnly: params.reduceOnly,
                 };
 
@@ -180,7 +175,7 @@ export class MarketOrderService {
                     keeper: sessionPublicKey,
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true, // Ensure fill at market is included
-                    marketOrderLogPage: cachedLogPage,
+                    marketOrderLogPage,
                     reduceOnly: params.reduceOnly,
                 };
 
