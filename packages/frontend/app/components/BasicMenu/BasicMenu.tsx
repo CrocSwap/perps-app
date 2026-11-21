@@ -6,6 +6,7 @@ import styles from './BasicMenu.module.css';
 export interface BasicMenuItemIF {
     label: string;
     listener: () => void;
+    exclude?: boolean;
 }
 
 interface BasicMenuProps {
@@ -41,18 +42,21 @@ const BasicMenu: React.FC<BasicMenuProps> = ({
                     <div
                         className={`${styles.menuContainer} ${styles[positionVertical]} ${styles[positionHorizontal]}`}
                     >
-                        {items.map((item, index) => (
-                            <div
-                                key={index}
-                                className={styles.menuItem}
-                                onClick={() => {
-                                    item.listener();
-                                    setIsOpen(false);
-                                }}
-                            >
-                                {item.label}
-                            </div>
-                        ))}
+                        {items.map(
+                            (item, index) =>
+                                !item.exclude && (
+                                    <div
+                                        key={index}
+                                        className={styles.menuItem}
+                                        onClick={() => {
+                                            item.listener();
+                                            setIsOpen(false);
+                                        }}
+                                    >
+                                        {item.label}
+                                    </div>
+                                ),
+                        )}
                     </div>
                 )}
             </div>

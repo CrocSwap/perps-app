@@ -1,0 +1,153 @@
+.container {
+    padding: var(--padding-m);
+    /* background: rgba(0, 0, 0, 0.3); */
+    border-radius: var(--radius-s);
+    min-width: 300px;
+}
+
+.header {
+    position: relative;
+    margin-bottom: var(--margin-m);
+}
+
+.header h3 {
+    margin: 0;
+    font-size: var(--font-size-s);
+    font-weight: 600;
+    color: var(--text1);
+}
+
+.resetButton {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: var(--padding-xs) var(--padding-s);
+    font-size: var(--font-size-xs);
+    background: var(--bg-dark3);
+    color: var(--text2);
+    border: 1px solid var(--bg-dark5);
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    transition:
+        opacity 0.2s ease,
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.resetButton:hover {
+    background: var(--bg-dark4);
+    color: var(--text1);
+    border-color: var(--bg-dark6);
+}
+
+.resetButtonHidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.legend {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    margin-bottom: var(--margin-m);
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+.colorIndicator {
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-xs);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+}
+
+.levelLabel {
+    font-size: var(--font-size-s);
+    font-weight: 500;
+    color: var(--text1);
+    flex: 1;
+}
+
+.thresholdValue {
+    font-size: var(--font-size-s);
+    font-weight: 500;
+    color: var(--text2);
+    font-variant-numeric: tabular-nums;
+    min-width: 30px;
+    text-align: right;
+}
+
+.sliderWrapper {
+    padding: var(--padding-m) 0;
+}
+
+.track {
+    position: relative;
+    height: 12px;
+    border-radius: var(--radius-s);
+    /* cursor: pointer; */
+    user-select: none;
+}
+
+.thumb {
+    position: absolute;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: grab;
+    transition: transform 0.1s ease;
+    z-index: 2;
+    background: linear-gradient(
+        90deg,
+        var(--gradient-left) 0%,
+        var(--gradient-right) 100%
+    );
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+.thumb::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    background: rgba(0, 0, 0, 0.5);
+    background: var(--bg-dark3);
+    border-radius: 50%;
+}
+
+.thumb:hover {
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+}
+
+.thumb:active {
+    cursor: grabbing;
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+.thumbLabel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: var(--font-size-xs);
+    color: var(--text2);
+    white-space: nowrap;
+    pointer-events: none;
+    font-variant-numeric: tabular-nums;
+}
+
+.thumb:hover .thumbLabel,
+.thumb:active .thumbLabel {
+    color: var(--text1);
+}

@@ -9,6 +9,8 @@ import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
 import type { TabType } from '~/routes/trade';
 import { useTranslation } from 'react-i18next';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useAppStateStore } from '~/stores/AppStateStore';
 
 interface propsIF {
     mobileView?: boolean;
@@ -22,19 +24,31 @@ const ORDER_ROW_GAP = 4;
 
 export default function OrderBookSection(props: propsIF) {
     const { mobileView, mobileContent, switchTab, chartTopHeight } = props;
-    const [orderCount, setOrderCount] = useState(9);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
     const sectionContainerRef = useRef<HTMLDivElement>(null);
 
     const { t, i18n } = useTranslation();
 
     const { orderBookMode, setOrderBookMode } = useAppSettings();
+    const { orderCount, setOrderCount, setActiveOrderTab } =
+        useOrderBookStore();
+    const orderCountRef = useRef(orderCount);
+    orderCountRef.current = orderCount;
     const orderBookModeRef = useRef(orderBookMode);
+
+    const { liquidationsActive } = useAppStateStore();
 
     // Sync ref with state
     useEffect(() => {
         orderBookModeRef.current = orderBookMode;
     }, [orderBookMode]);
+
+    useEffect(() => {
+        if (orderBookModeRef.current === 'stacked' && liquidationsActive) {
+            setOrderBookMode('tab');
+            orderBookModeRef.current = 'tab';
+        }
+    }, [liquidationsActive]);
 
     const menuItems = useMemo(
         () => [
@@ -44,14 +58,17 @@ export default function OrderBookSection(props: propsIF) {
             },
             {
                 label: t('orderBook.stacked'),
+
                 listener: () => setOrderBookMode('stacked'),
+
+                exclude: liquidationsActive,
             },
             {
                 label: t('orderBook.large'),
                 listener: () => setOrderBookMode('large'),
             },
         ],
-        [setOrderBookMode, i18n.language],
+        [setOrderBookMode, i18n.language, liquidationsActive],
     );
 
     const orderBookComponent = useMemo(
@@ -73,7 +90,9 @@ export default function OrderBookSection(props: propsIF) {
     );
     const [activeTab, setActiveTab] = useState(orderBookTabs[0]);
 
-    const handleTabChange = useCallback((tab: string) => setActiveTab(tab), []);
+    const handleTabChange = useCallback((tab: string) => {
+        (setActiveTab(tab), setActiveOrderTab(tab));
+    }, []);
 
     const renderTabContent = useCallback(() => {
         if (activeTab === 'orderBook.trades')
@@ -169,10 +188,9 @@ export default function OrderBookSection(props: propsIF) {
 
         // Only update if we have a valid positive count
         if (calculatedOrderCount > 0) {
-            setOrderCount((prev) => {
-                if (prev !== calculatedOrderCount) return calculatedOrderCount;
-                return prev;
-            });
+            if (orderCountRef.current !== calculatedOrderCount) {
+                setOrderCount(calculatedOrderCount);
+            }
         }
     }, [orderBookMode, activeTab]);
 
@@ -231,7 +249,7 @@ export default function OrderBookSection(props: propsIF) {
                 <BasicMenu items={menuItems} icon={<BsThreeDots size={14} />} />
             </div>
         ),
-        [menuItems],
+        [menuItems, liquidationsActive],
     );
 
     const stackedOrderBook = useMemo(
@@ -267,7 +285,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount, tradesMaxHeight, i18n.language],
+        [orderCount, tradesMaxHeight, i18n.language, liquidationsActive],
     );
 
     const largeOrderBook = useMemo(
@@ -306,7 +324,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount, tradesMaxHeight, i18n.language],
+        [orderCount, tradesMaxHeight, i18n.language, liquidationsActive],
     );
 
     const orderBookTabsComponent = (

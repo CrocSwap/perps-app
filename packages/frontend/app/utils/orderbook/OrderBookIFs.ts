@@ -58,6 +58,13 @@ export interface OrderDataIF {
     orderValue?: number;
 }
 
+export interface OrderBookLiqIF {
+    sz: number;
+    type: 'buy' | 'sell';
+    px: number;
+    ratio?: number;
+}
+
 export type OrderBookMode = 'symbol' | 'usd';
 
 export type OrderDataSortBy =

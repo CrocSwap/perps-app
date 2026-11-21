@@ -92,31 +92,35 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, []);
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
-    const [selectedResolution, setSelectedResolution] =
-        useState<OrderRowResolutionIF | null>(null);
 
-    const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
     const [wsError, setWsError] = useState<string | null>(null);
 
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
     const { formatNum } = useNumFormatter();
     const lockOrderBook = useRef<boolean>(false);
     const { getBsColor } = useAppSettings();
     const {
         buys,
         sells,
+        selectedResolution,
+        selectedMode,
+        orderBookState,
         setOrderBook,
+        setSelectedResolution,
+        setSelectedMode,
+        setOrderBookState,
         addToResolutionPair,
         resolutionPairs,
         midPrice,
         setMidPrice,
         setUsualResolution,
+        setObMaxSell,
+        setObMinBuy,
+        setObMaxBuy,
+        setObMinSell,
     } = useOrderBookStore();
-
     const midPriceRef = useRef<number | null>(null);
     midPriceRef.current = midPrice;
-
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
 
@@ -134,6 +138,15 @@ const OrderBook: React.FC<OrderBookProps> = ({
     // No useMemo for simple arithmetic
     const buyPlaceHolderCount = Math.max(orderCount - buys?.length || 0, 0);
     const sellPlaceHolderCount = Math.max(orderCount - sells?.length || 0, 0);
+
+    const selectedResolutionRef = useRef(selectedResolution);
+    selectedResolutionRef.current = selectedResolution;
+
+    // useEffect(() => {
+    //     console.log('buys', buys);
+    //     console.log('sells', sells);
+    //     console.log('orderBook');
+    // }, [buys, sells]);
 
     const {
         userOrders,
@@ -322,6 +335,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [userSymbolOrders, sellSlots, findClosestSlot]);
 
     const focusedPriceRef = useRef<number | null>(null);
+    // code blocks were being used in sdk approach
 
     useEffect(() => {
         if (obPreviewLine?.yPrice) {
@@ -346,6 +360,31 @@ const OrderBook: React.FC<OrderBookProps> = ({
             setFocusedSlotOutOfBounds(null);
         }
     }, [orderInputPriceValue.value]);
+
+    useEffect(() => {
+        if (buys.length > 0) {
+            if (buys.length > orderCount) {
+                setObMinBuy(buys[orderCount - 1].px);
+            } else {
+                setObMinBuy(buys[buys.length - 1].px);
+            }
+            setObMaxBuy(buys[0].px);
+        }
+        if (sells.length > 0) {
+            if (sells.length > orderCount) {
+                setObMaxSell(
+                    sells[orderCount - 1].px +
+                        (selectedResolutionRef.current?.val || 0),
+                );
+            } else {
+                setObMaxSell(
+                    sells[sells.length - 1].px +
+                        (selectedResolutionRef.current?.val || 0),
+                );
+            }
+            setObMinSell(sells[0].px);
+        }
+    }, [buys, sells, orderCount]);
 
     useEffect(() => {
         if (
@@ -853,6 +892,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                             exit={{ opacity: 0, x: 10 }}
                             transition={{ duration: 0.2 }}
                             className={styles.orderSlotsWrapper}
+                            id={'orderBookSlotsWrapper'}
                         >
                             {focusedSlotOutOfBounds && (
                                 <>
@@ -913,7 +953,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     background: `linear-gradient(to top,  ${getBsColor().buy} 0%, var(--bg-dark2) 100%)`,
                                 }}
                             ></div>
-                            <div className={styles.orderBookBlock}>
+                            <div
+                                id={'orderbook-sell-block'}
+                                className={styles.orderBookBlock}
+                            >
                                 {sellPlaceHolderCount === 1 ? (
                                     <div className={styles.orderRowWrapper}>
                                         <div
@@ -963,6 +1006,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     .reverse()
                                     .map((order, index) => (
                                         <div
+                                            id={`order-sell-srow-${index}`}
                                             key={order.px}
                                             className={styles.orderRowWrapper}
                                         >
@@ -1004,7 +1048,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
                             {midHeader('orderBookMidHeader')}
 
-                            <div className={styles.orderBookBlock}>
+                            <div
+                                id={'orderbook-buy-block'}
+                                className={styles.orderBookBlock}
+                            >
                                 {buys
                                     .slice(0, orderCount)
                                     .map((order, index) => (

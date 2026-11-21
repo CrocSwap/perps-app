@@ -4,16 +4,21 @@ import { usePositionOrderLines } from './usePositionOrderLines';
 import LineComponent, { type LineData } from './component/LineComponent';
 import LabelComponent from './component/LabelComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
-import { type LabelLocationData } from '../overlayCanvas/overlayCanvasUtils';
+import {
+    getMainSeriesPaneIndex,
+    type LabelLocationData,
+} from '../overlayCanvas/overlayCanvasUtils';
 import { getPricetoPixel } from './customOrderLineUtils';
 import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
 import { usePreviewOrderLines } from './usePreviewOrderLines';
 import { ChartElementControlPanel } from './component/ChartElementControlPanel';
 import { useChartLinesStore } from '~/stores/ChartLinesStore';
 import { useChartScaleStore } from '~/stores/ChartScaleStore';
+import type { IPaneApi } from '~/tv/charting_library';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
+    canvasWrapperRef: React.MutableRefObject<HTMLDivElement | null>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     canvasSize: any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,13 +27,16 @@ export type OrderLinesProps = {
         x: number;
         y: number;
     }>;
+    zoomChanged: boolean;
 };
 
 export default function OrderLines({
     overlayCanvasRef,
+    canvasWrapperRef,
     canvasSize,
     scaleData,
     overlayCanvasMousePositionRef,
+    // zoomChanged,
 }: OrderLinesProps) {
     const { chart } = useTradingView();
 
@@ -187,6 +195,7 @@ export default function OrderLines({
                     key='labels'
                     lines={visibleLines}
                     overlayCanvasRef={overlayCanvasRef}
+                    canvasWrapperRef={canvasWrapperRef}
                     zoomChanged={zoomChanged}
                     canvasSize={canvasSize}
                     drawnLabelsRef={drawnLabelsRef}
