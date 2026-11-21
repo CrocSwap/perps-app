@@ -540,7 +540,7 @@
         "overwriteCurrentReferralCode": "Sobrescribir código de referido actual",
         "enterReferralCode": "Ingresar un código de referido",
         "referralCodeNotValidPleaseConfirm": "El código <0>{{invalidCode}}</0> no está registrado en el programa de referidos. Por favor, confirme que el código es correcto.",
-        "yourCodeIs": "Tu código es <0>{{referrerCode}}</0> basado en los primeros seis caracteres de tu dirección de wallet. Haz clic en 'Activar' para registrar este código en el sistema de referidos.",
+        "yourCodeIs": "Your code is <0>{{referrerCode}}</0>.",
         "createAnAffiliateCode": "Crear un código de afiliado",
         "createAUniqueCodeToEarn": "Crea un código único para ganar el 10% de las comisiones de usuarios referidos.",
         "codeAlreadyInUse": "Código ya en uso",
@@ -549,6 +549,7 @@
             "claim": "Conecta tu wallet para reclamar recompensas",
             "enterCode": "Conecta tu wallet para ingresar un código de referido"
         },
+        "pleaseActivate": "Haz clic en 'Activar' para registrarte como referidor.",
         "usersWithTradingVolume": "Este código puede ser personalizado o actualizado por usuarios después de alcanzar $1M en volumen de trading.",
         "doNotSelfRefer": "El código <0>{{refCode}}</0> no puede ser registrado por la misma dirección que lo creó. Por favor, elige un código diferente.",
         "toCustomizeAffiliateCode": "Los códigos de afiliado por defecto son los primeros seis caracteres de tu dirección de wallet. Usuarios con > $1M en volumen de trading pueden personalizar su código.",
