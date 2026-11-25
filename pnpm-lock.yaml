@@ -30,8 +30,8 @@ importers:
         specifier: ^0.1.4
         version: 0.1.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@fogo/sessions-sdk':
-        specifier: ^0.1.10
-        version: 0.1.10(@wormhole-foundation/sdk-definitions@4.18.0)(@wormhole-foundation/sdk-evm-core@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-evm@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-solana@4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(axios@1.15.2)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(google-protobuf@3.21.4)(got@11.8.6)(typescript@5.9.3)(utf-8-validate@6.0.6)
+        specifier: ^0.1.11
+        version: 0.1.11(@wormhole-foundation/sdk-definitions@4.18.0)(@wormhole-foundation/sdk-evm-core@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-evm@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-solana@4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(axios@1.15.2)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(google-protobuf@3.21.4)(got@11.8.6)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@fogo/sessions-sdk-react':
         specifier: ^0.1.17
         version: 0.1.17(@babel/runtime@7.29.2)(@react-native-async-storage/async-storage@1.24.0(react-native@0.81.1(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.5)(utf-8-validate@6.0.6)))(@solana/sysvars@6.8.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3))(@types/emscripten@1.41.1)(@types/react@19.2.14)(@wormhole-foundation/sdk-definitions@4.18.0)(@wormhole-foundation/sdk-evm-core@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-evm@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-solana@4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(axios@1.15.2)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(google-protobuf@3.21.4)(got@11.8.6)(react-dom@19.2.5(react@19.2.5))(react-native@0.81.1(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.5)(utf-8-validate@6.0.6))(react@19.2.5)(tslib@2.8.1)(typescript@5.9.3)(utf-8-validate@6.0.6)(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))
@@ -1295,6 +1295,10 @@ packages:
     resolution: {integrity: sha512-Do2C7vLoKg6FHaOOhyn4B9lIKheq8goSZsAESqcs2C7IHrVmuujCY4RVIYUgX9EfgPtPXx+G1awgafwZffH5qw==}
     engines: {node: '>=22'}
 
+  '@fogo/sessions-sdk@0.1.11':
+    resolution: {integrity: sha512-muHNu6WOyFOg3lwHjLYYZd/kwtq4es86wIePb2Ijx+NvXhROSuds9bfkNwn+fZANlaceGIJACg+ghWw9BA40/g==}
+    engines: {node: '>=22'}
+
   '@fogolend/fns-client@0.1.0':
     resolution: {integrity: sha512-KZhEEkA+sKzu9PI/Usgoozu2cUqbgu8XgvUOseF1Yo6uEqXxqnukamOfxGZg9eST37J6fmxfIlmdDImQHAPAzw==}
 
@@ -1614,9 +1618,11 @@ packages:
 
   '@ledgerhq/errors@6.34.0':
     resolution: {integrity: sha512-l16K56FzPoXBMT5J4EpnIBmRLTYkpSyYj3z4er+rmbwq0t9dDG/UaRvFeBpwB2gqGcYWcue14qF9Wkuos/43eA==}
+    deprecated: This package is no longer maintained and will not receive updates. Published versions remain available.
 
   '@ledgerhq/hw-transport-webhid@6.35.1':
     resolution: {integrity: sha512-94/2AfTnYLW9nvddSfy6PXLdx5tQHpCL5necdgKSg5BMzq8+d9Hv3uH1qo6jSeC98M20GJpll8rRrn1n5336hg==}
+    deprecated: This package is no longer maintained. Use @ledgerhq/device-transport-kit-web-hid instead.
 
   '@ledgerhq/hw-transport@6.35.1':
     resolution: {integrity: sha512-YCkk9koo0FzCzHvLVpdrQ3+EQOPMpp/fSednHhk7AiaJC/c+pX6wKevUDp1MLcq7gUHbVOXyYYpqoW6A97w8OA==}
@@ -3647,6 +3653,7 @@ packages:
   '@stellar/stellar-base@14.1.0':
     resolution: {integrity: sha512-A8kFli6QGy22SRF45IjgPAJfUNGjnI+R7g4DF5NZYVsD1kGf7B4ITyc4OPclLV9tqNI4/lXxafGEw0JEUbHixw==}
     engines: {node: '>=20.0.0'}
+    deprecated: This package is now rolled into @stellar/stellar-sdk. Please use @stellar/stellar-sdk to continue receiving updates and support.
 
   '@stellar/stellar-sdk@14.2.0':
     resolution: {integrity: sha512-7nh2ogzLRMhfkIC0fGjn1LHUzk3jqVw8tjAuTt5ADWfL9CSGBL18ILucE9igz2L/RU2AZgeAvhujAnW91Ut/oQ==}
@@ -3749,11 +3756,13 @@ packages:
 
   '@trezor/connect-web@9.7.3':
     resolution: {integrity: sha512-oTI/v9sUJMvLZgLa0seSGyPaumXydRYeAT4OVTQxIaEiL1hOA0yH+UvEfT4WKwxbxOtOqWosD8chP3uuWSArcg==}
+    deprecated: 'Trezor Connect 9 is no longer supported and gets no fixes. Upgrade to Trezor Connect 10: https://connect.trezor.io/10/guides/migrating-to-connect-10/'
     peerDependencies:
       tslib: ^2.6.2
 
   '@trezor/connect@9.7.3':
     resolution: {integrity: sha512-oAOfvJHT8tPqOXTmCOhn8uTZcoqSDuWAiWXQegx7C46tq+NLg+enkYXxUYEHq/9PmfZAOrUT9VMxZDsXM2thkA==}
+    deprecated: 'Trezor Connect 9 is no longer supported and gets no fixes. Upgrade to Trezor Connect 10: https://connect.trezor.io/10/guides/migrating-to-connect-10/'
     peerDependencies:
       tslib: ^2.6.2
 
@@ -5054,6 +5063,7 @@ packages:
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+    deprecated: Active development of CryptoJS has been discontinued. This library is no longer maintained.
 
   crypto-random-string@2.0.0:
     resolution: {integrity: sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==}
@@ -5491,6 +5501,7 @@ packages:
   eslint@9.39.4:
     resolution: {integrity: sha512-XoMjdBOwe/esVgEvLmNsD3IRHkm7fbKIUGvrleloJXUZgDHig2IPWNniv+GwjyJXzuNqVjlr5+4yVUZjycJwfQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -10126,6 +10137,44 @@ snapshots:
       - utf-8-validate
 
   '@fogo/sessions-sdk@0.1.10(@wormhole-foundation/sdk-definitions@4.18.0)(@wormhole-foundation/sdk-evm-core@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-evm@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-solana@4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(axios@1.15.2)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(google-protobuf@3.21.4)(got@11.8.6)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+    dependencies:
+      '@coral-xyz/anchor': 0.32.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@fogo/sessions-idls': 0.1.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@metaplex-foundation/mpl-token-metadata': 3.4.0(@metaplex-foundation/umi@1.5.1)
+      '@metaplex-foundation/umi': 1.5.1
+      '@metaplex-foundation/umi-bundle-defaults': 1.5.1(@metaplex-foundation/umi@1.5.1)(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))
+      '@noble/hashes': 2.2.0
+      '@solana/compat': 6.8.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)
+      '@solana/kit': 6.8.0(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@solana/spl-token': 0.4.14(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@solana/web3.js': 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk': 4.18.0(bufferutil@4.1.0)(google-protobuf@3.21.4)(got@11.8.6)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6)
+      '@wormhole-foundation/sdk-base': 4.18.0
+      '@wormhole-foundation/sdk-connect': 4.18.0
+      '@wormhole-foundation/sdk-route-ntt': 4.0.17(@wormhole-foundation/sdk-base@4.18.0)(@wormhole-foundation/sdk-connect@4.18.0)(@wormhole-foundation/sdk-definitions@4.18.0)(@wormhole-foundation/sdk-evm-core@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-evm@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-solana-core@4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-solana@4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(axios@1.15.2)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-solana-core': 4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@wormhole-foundation/sdk-solana-ntt': 4.0.17(@wormhole-foundation/sdk-base@4.18.0)(@wormhole-foundation/sdk-definitions@4.18.0)(@wormhole-foundation/sdk-solana-core@4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-solana@4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      bn.js: 5.2.3
+      bs58: 6.0.0
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
+      - '@wormhole-foundation/sdk-definitions'
+      - '@wormhole-foundation/sdk-evm'
+      - '@wormhole-foundation/sdk-evm-core'
+      - '@wormhole-foundation/sdk-solana'
+      - axios
+      - bufferutil
+      - debug
+      - encoding
+      - fastestsmallesttextencoderdecoder
+      - google-protobuf
+      - got
+      - typescript
+      - utf-8-validate
+
+  '@fogo/sessions-sdk@0.1.11(@wormhole-foundation/sdk-definitions@4.18.0)(@wormhole-foundation/sdk-evm-core@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-evm@4.18.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(@wormhole-foundation/sdk-solana@4.18.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(axios@1.15.2)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(google-protobuf@3.21.4)(got@11.8.6)(typescript@5.9.3)(utf-8-validate@6.0.6)':
     dependencies:
       '@coral-xyz/anchor': 0.32.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@fogo/sessions-idls': 0.1.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
@@ -15632,7 +15681,7 @@ snapshots:
 
   c32check@2.0.0:
     dependencies:
-      '@noble/hashes': 1.1.5
+      '@noble/hashes': 1.8.0
       base-x: 4.0.1
 
   cac@6.7.14: {}
@@ -18115,11 +18164,11 @@ snapshots:
   ox@0.6.7(typescript@5.9.3)(zod@4.3.6):
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
-      '@noble/curves': 1.8.1
-      '@noble/hashes': 1.7.1
-      '@scure/bip32': 1.6.2
-      '@scure/bip39': 1.5.4
-      abitype: 1.0.8(typescript@5.9.3)(zod@4.3.6)
+      '@noble/curves': 1.9.7
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.3.6)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.9.3
