@@ -80,11 +80,11 @@ export function LinksView() {
     const data = affiliateCode
         ? [
               {
-                  code: affiliateCode.code,
-                  created_at: affiliateCode.created_at,
-                  clicks: affiliateCode.clicks,
-                  total_users: affiliateCode.total_users,
-                  total_earnings: affiliateCode.total_earnings,
+                  code: affiliateCode.code ?? '--',
+                  created_at: affiliateCode.created_at ?? '--',
+                  clicks: affiliateCode.clicks ?? '--',
+                  total_users: affiliateCode.total_users ?? '--',
+                  total_earnings: affiliateCode.total_earnings ?? '--',
                   you_percentage: youPercent,
                   invitee_percentage: inviteePercent,
               },
@@ -251,10 +251,10 @@ export function LinksView() {
                                             %
                                         </td>
                                         <td className={styles['table-cell']}>
-                                            {entry.clicks.toLocaleString()}
+                                            {entry.clicks ?? '--'}
                                         </td>
                                         <td className={styles['table-cell']}>
-                                            {entry.total_users.toLocaleString()}
+                                            {entry.total_users ?? '--'}
                                         </td>
                                         <td
                                             className={styles['table-cell']}
@@ -264,7 +264,12 @@ export function LinksView() {
                                                 fontWeight: 600,
                                             }}
                                         >
-                                            ${formatUSD(entry.total_earnings)}
+                                            $
+                                            {entry.total_earnings
+                                                ? formatUSD(
+                                                      entry.total_earnings,
+                                                  )
+                                                : '--'}
                                         </td>
                                         <td
                                             className={styles['table-cell']}

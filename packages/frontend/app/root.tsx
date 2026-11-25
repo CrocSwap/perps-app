@@ -251,7 +251,7 @@ class ErrorBoundary extends React.Component<
 if (SHOULD_LOG_ANALYTICS) {
     initPlausible({
         domain: 'perps.ambient.finance',
-        endpoint: 'https://pls.embindexer.net/ev',
+        endpoint: 'https://pls.ambindexer.net/ev',
         outboundLinks: true,
         customProperties: {
             version: packageJson.version,
